@@ -1,0 +1,23 @@
+{
+  "name": "moi-abi",
+  "version": "0.1.0",
+  "description": "Web3 module encode and decode PISA in/output.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi.js",
+    "abi"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-polo": "file:/Users/gokul/Documents/Github/js-polo",
+    "moi-utils": "0.1.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}

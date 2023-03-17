@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "types": [
+        "node",
+        "jest"
+      ],
+      "lib": [
+        "es6",
+        "esnext",
+        "dom"
+      ],
+      "module": "ESNext",
+      "target": "esnext",
+      "moduleResolution": "node",
+      "outDir": "./lib",
+      "declaration": true,
+      "preserveSymlinks": true,
+      "preserveWatchOutput": true,
+      "pretty": true,
+      "forceConsistentCasingInFileNames": true,
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitAny": false,
+      "noImplicitReturns": true,
+      "experimentalDecorators": true,
+      "noUnusedLocals": true,
+    },
+    "ts-node": {
+      "esm": true
+    },
+    // "files": ["src/index.ts"]
+}
+  

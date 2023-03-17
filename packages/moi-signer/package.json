@@ -1,0 +1,20 @@
+{
+  "name": "moi-signer",
+  "version": "0.1.0",
+  "description": "This package enables users to sign and verify messages in their applications.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "mudra",
+    "zkp"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "moi-wallet": "0.1.0"
+  }
+}

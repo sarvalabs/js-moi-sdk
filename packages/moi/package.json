@@ -1,0 +1,15 @@
+{
+  "name": "moi",
+  "version": "0.1.0",
+  "description": "MOI JavaScript API",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi"
+  ],
+  "author": "",
+  "license": "ISC"
+}

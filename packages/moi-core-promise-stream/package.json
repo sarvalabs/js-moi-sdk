@@ -1,0 +1,17 @@
+{
+  "name": "moi-core-promise-stream",
+  "version": "0.1.0",
+  "description": "This package extends the functionality of promises by providing an event emitter that can be used to emit events during the lifecycle of a Promise.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "promises",
+    "event emitter"
+  ],
+  "author": "",
+  "license": "ISC"
+}

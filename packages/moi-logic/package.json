@@ -1,0 +1,24 @@
+{
+  "name": "moi-logic",
+  "version": "0.1.0",
+  "description": "Web3 module to interact with MOI smart contracts.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi.js",
+    "smart contracts"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "moi-abi": "0.1.0",
+    "moi-core-method": "0.1.0",
+    "moi-core-request-manager": "0.1.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}

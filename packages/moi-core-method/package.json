@@ -1,0 +1,21 @@
+{
+  "name": "moi-core-method",
+  "version": "0.1.0",
+  "description": "Creates the methods on the moi modules. This is an internal package.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "methods"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "moi-core": "0.1.0",
+    "moi-core-request-manager": "0.1.0",
+    "moi-core-promise-stream": "0.1.0"
+  }
+}

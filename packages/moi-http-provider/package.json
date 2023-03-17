@@ -1,0 +1,16 @@
+{
+  "name": "moi-http-provider",
+  "version": "0.1.0",
+  "description": "Module to handle moi RPC connections over HTTP.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "rpc"
+  ],
+  "author": "",
+  "license": "ISC"
+}

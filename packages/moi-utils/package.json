@@ -1,0 +1,16 @@
+{
+  "name": "moi-utils",
+  "version": "0.1.0",
+  "description": "Collection of utility functions used in moi.js.",
+  "main": "src/index.ts",
+  "scripts": {
+    "compile": "tsc -b tsconfig.json"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "utility"
+  ],
+  "author": "",
+  "license": "ISC"
+}
