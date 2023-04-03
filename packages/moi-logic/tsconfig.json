@@ -27,6 +27,6 @@
     "ts-node": {
       "esm": true
     },
-    "files": ["src/index.ts"]
+    "files": ["src/logic.ts"]
 }
   

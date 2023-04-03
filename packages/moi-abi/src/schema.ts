@@ -1,213 +1,6 @@
 import Manifest from "../types/manifest";
 import PoloSchema from "js-polo/src/schema"
 
-const PISA_SYNTAX_SCHEMA = {
-    kind: "string"
-}
-
-const PISA_ENGINE_SCHEMA = {
-    kind: "struct",
-    fields: {
-        kind: {
-            kind: "string"
-        },
-        flags: {
-            kind: "array",
-            fields: {
-                values: {
-                    kind: "string"
-                }
-            }
-        }
-    }
-}
-
-const PISA_DEPS_SCHEMA = {
-    kind: "array",
-    fields: {
-        values: {
-            kind: "integer"
-        }
-    }
-}
-
-const PISA_TYPE_FIELD_SCHEMA = {
-    kind: "map",
-    fields: {
-        keys: {
-            kind: "string"
-        },
-        values: {
-            kind: "struct",
-            fields: {
-                label: {
-                    kind: "string"
-                },
-                type: {
-                    kind: "string"
-                }
-            }
-        }
-    }
-}
-
-const PISA_INSTRUCTIONS_SCHEMA = {
-    kind: "struct",
-    fields: {
-        bin: {
-            kind: "array",
-            fields: {
-                values: {
-                    kind: "integer"
-                }
-            }
-        },
-        hex: {
-            kind: "string"
-        },
-        asm: {
-            kind: "array",
-            fields: {
-                values: {
-                    kind: "string"
-                }
-            }
-        }
-    }
-}
-
-const PISA_BUILDER_SCHEMA = {
-    kind: "struct",
-    fields: {
-        name: {
-            kind: "string"
-        },
-        scope: {
-            kind: "string"
-        },
-        accepts: {
-            ...PISA_TYPE_FIELD_SCHEMA
-        },
-        returns: {
-            ...PISA_TYPE_FIELD_SCHEMA
-        },
-        catches: {
-            kind: "array",
-            fields: {
-                values: {
-                    kind: "string"
-                }
-            }
-        },
-        executes: {
-            ...PISA_INSTRUCTIONS_SCHEMA
-        }
-    }
-}
-
-const PISA_STORAGE_SCHEMA = {
-    kind: "struct",
-    fields: {
-        scope: {
-            kind: "string"
-        },
-        fields: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "struct",
-                    fields: {
-                        label: {
-                            kind: "string"
-                        },
-                        type: {
-                            kind: "string"
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-const PISA_CONSTANT_SCHEMA = {
-    kind: "struct",
-    fields: {
-        type: {
-            kind: "string"
-        },
-        value: {
-            kind: "string"
-        }
-    }
-}
-
-const PISA_TYPEDEF_SCHEMA = {
-    kind: "string"
-}
-
-const PISA_ROUTINE_SCHEMA = {
-    kind: "struct",
-    fields: {
-        name: {
-            kind: "string"
-        },
-        accepts: {
-            ...PISA_TYPE_FIELD_SCHEMA
-        },
-        returns: {
-            ...PISA_TYPE_FIELD_SCHEMA
-        },
-        catches: {
-            kind: "array",
-            fields: {
-                values: {
-                    kind: "string"
-                }
-            }
-        },
-        executes: {
-            ...PISA_INSTRUCTIONS_SCHEMA
-        }
-    }
-}
-
-const PISA_ELEMENT_SCHEMA = {
-    kind: "struct",
-    fields: {
-        kind: {
-            kind: "string"
-        },
-        deps: {
-            ...PISA_DEPS_SCHEMA
-        },
-        data: {}
-    }
-}
-
-const PISA_ELEMENTS_SCHEMA = {
-    kind: "struct",
-    fields: {}
-}
-
-const MANIFEST_SCHEMA = {
-    kind: "struct",
-    fields: {
-        syntax: {
-            ...PISA_SYNTAX_SCHEMA
-        },
-        engine: {
-            ...PISA_ENGINE_SCHEMA
-        },
-        elements: {
-            ...PISA_ELEMENTS_SCHEMA
-        }
-    }
-}
-
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "uint64", "int64", "bigint"
 ]
@@ -225,80 +18,128 @@ const isMap = (type: string): boolean => {
 }
 
 export default class Schema {
-    public static parseABI = (manifest: Manifest.Manifest): PoloSchema => {
-        const schema = {...MANIFEST_SCHEMA}
-        Object.entries(manifest.elements).forEach(([key, value]) => {
-            let dataSchema
-            switch(value.kind) {
-                case "storage":
-                    value.data = value.data as Storage
-    
-                    if(value.data.fields) {
-                        value.data.fields = new Map(
-                            Object.entries(value.data.fields)
-                        )
-                    }
-    
-                    dataSchema = PISA_STORAGE_SCHEMA
-    
-                    break;
-                case "builder":
-                    dataSchema = PISA_BUILDER_SCHEMA
-    
-                    value.data = value.data as Manifest.Builder
-    
-                    if(value.data.accepts) {
-                        value.data.accepts = new Map(
-                            Object.entries(value.data.accepts)
-                        )
-                    } 
-        
-                    if(value.data.returns) {
-                        value.data.returns = new Map(
-                            Object.entries(value.data.returns)
-                        )
-                    }
-    
-                    break;
-                case "constant":
-                    dataSchema = PISA_CONSTANT_SCHEMA
-    
-                    break;
-                case "typedef":
-                    dataSchema = PISA_TYPEDEF_SCHEMA
-    
-                    break;
-                case "routine":
-                    dataSchema = PISA_ROUTINE_SCHEMA
-                    value.data = value.data as Manifest.Routine
-    
-                    if(value.data.accepts) {
-                        value.data.accepts = new Map(
-                            Object.entries(value.data.accepts)
-                        )
-                    } 
-        
-                    if(value.data.returns) {
-                        value.data.returns = new Map(
-                            Object.entries(value.data.returns)
-                        )
-                    }
-                    
-                    break;
-                default:
-                    throw new Error("Invalid type")
-            }
-    
-            schema.fields.elements.fields[key] = {
-                ...PISA_ELEMENT_SCHEMA,
+    public static PISA_ENGINE_SCHEMA = {
+        kind: "struct",
+        fields: {
+            kind: {
+                kind: "string"
+            },
+            flags: {
+                kind: "array",
                 fields: {
-                    ...PISA_ELEMENT_SCHEMA.fields,
-                    data: dataSchema
+                    values: {
+                        kind: "string"
+                    }
                 }
             }
-        })
+        }
+    }
+
+    public static PISA_DEPS_SCHEMA = {
+        kind: "array",
+        fields: {
+            values: {
+                kind: "integer"
+            }
+        }
+    }
+
+    public static PISA_TYPE_FIELD_SCHEMA = {
+        kind: "array",
+        fields: {
+            values: {
+                kind: "struct",
+                fields: {
+                    slot: {
+                        kind: "integer"
+                    },
+                    label: {
+                        kind: "string"
+                    },
+                    type: {
+                        kind: "string"
+                    }
+                }
+            }
+        }
+    }
+
+    public static PISA_INSTRUCTIONS_SCHEMA = {
+        kind: "struct",
+        fields: {
+            bin: {
+                kind: "bytes"
+            },
+            hex: {
+                kind: "string"
+            },
+            asm: {
+                kind: "array",
+                fields: {
+                    values: {
+                        kind: "string"
+                    }
+                }
+            }
+        }
+    }
+
+    public static PISA_STATE_SCHEMA = {
+        kind: "struct",
+        fields: {
+            kind: {
+                kind: "string"
+            },
+            fields: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            }
+        }
+    }
+
+    public static PISA_CONSTANT_SCHEMA = {
+        kind: "struct",
+        fields: {
+            type: {
+                kind: "string"
+            },
+            value: {
+                kind: "string"
+            }
+        }
+    }
     
-        return schema
+    public static PISA_TYPEDEF_SCHEMA = {
+        kind: "string",
+        fields: {}
+    }
+    
+    public static PISA_ROUTINE_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string"
+            },
+            kind: {
+                kind: "string"
+            },
+            accepts: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            },
+            returns: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            },
+            catches: {
+                kind: "array",
+                fields: {
+                    values: {
+                        kind: "string"
+                    }
+                }
+            },
+            executes: {
+                ...Schema.PISA_INSTRUCTIONS_SCHEMA
+            }
+        }
     }
 
     private static extractArrayDataType = (dataType: string): string => {

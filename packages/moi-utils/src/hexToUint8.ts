@@ -1,4 +1,4 @@
-import throwError from "./errors"
+import {Errors, ErrorCode} from "./errors"
 
 function isHexable(value: any) {
     return !!(value.toHexString);
@@ -29,7 +29,7 @@ function isArrayish(value: any) {
 
 function hexToUint8(value: any) {
     if (value == null) {
-        throwError('cannot convert null value to array', "INVALID_ARGUMENT", { arg: 'value', value: value });
+        Errors.throwError('cannot convert null value to array', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
     }
     if (isHexable(value)) {
         value = value.toHexString();
@@ -37,7 +37,7 @@ function hexToUint8(value: any) {
     if (typeof (value) === 'string') {
         var match = value.match(/^(0x)?[0-9a-fA-F]*$/);
         if (!match) {
-            throwError('invalid hexidecimal string', "INVALID_ARGUMENT", { arg: 'value', value: value });
+            Errors.throwError('invalid hexidecimal string', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
         }
         value = value.substring(2);
         if (value.length % 2) {
@@ -52,7 +52,7 @@ function hexToUint8(value: any) {
     if (isArrayish(value)) {
         return addSlice(new Uint8Array(value));
     }
-    throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
+    Errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
     return null;
 }
 

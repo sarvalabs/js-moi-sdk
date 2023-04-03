@@ -5,13 +5,14 @@ declare module LogicManifest {
     }
     
     export interface TypeField {
+        slot: number;
         label: string;
         type: string;
     }
     
-    export interface Storage {
-        scope: string;
-        fields: Record<string, TypeField> | Map<string, TypeField>;
+    export interface State {
+        kind: string;
+        fields: TypeField[];
     }
     
     export interface Constant {
@@ -27,33 +28,26 @@ declare module LogicManifest {
     
     export interface Routine {
         name: string;
-        accepts?: Record<string, TypeField> | Map<string, TypeField>;
-        returns: Record<string, TypeField> | Map<string, TypeField>;
+        kind: string;
+        accepts?: TypeField[];
+        returns?: TypeField[];
         catches?: string[];
         executes: Instructions
-    }
-    
-    export interface Builder {
-        name: string;
-        scope: string;
-        accepts: Record<string, TypeField> | Map<string, TypeField>;
-        returns?: Record<string, TypeField> | Map<string, TypeField>;
-        catches?: string[];
-        executes: Instructions;
     }
     
     export type TypeDef = string;
     
     export interface Element {
+        ptr: number;
         kind: string;
         deps?: number[];
-        data: Storage | Constant | TypeDef | Routine | Builder;
+        data: State | Constant | TypeDef | Routine;
     }
     
     export interface Manifest {
         syntax: string;
         engine: EngineConfig;
-        elements: Record<string, Element> | Map<string, Element>;
+        elements: Element[];
     }
 }
 

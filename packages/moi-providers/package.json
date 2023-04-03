@@ -1,7 +1,7 @@
 {
-  "name": "moi-core-request-manager",
+  "name": "moi-providers",
   "version": "0.1.0",
-  "description": "Module to handle requests to external providers.",
+  "description": "Module to connect and interact with MOI network",
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,10 +9,10 @@
   "keywords": [
     "moichain",
     "moi",
-    "request manager"
+    "providers"
   ],
   "dependencies": {
-    "moi-http-provider": "0.1.0"
+    "moi-utils": "0.1.0"
   },
   "author": "",
   "license": "ISC"

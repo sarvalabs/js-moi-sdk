@@ -11,6 +11,9 @@
     "moi",
     "utility"
   ],
+  "dependencies": {
+    "moi-constants": "0.1.0"
+  },
   "author": "",
   "license": "ISC"
 }
