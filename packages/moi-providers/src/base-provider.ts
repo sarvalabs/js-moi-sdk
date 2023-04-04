@@ -1,4 +1,5 @@
 import { Address, bytesToHex, hexDataLength } from "moi-utils";
+import { ErrorCode, Errors } from "moi-utils/src/errors";
 import { decodeBase64 } from "../../moi-utils/src";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams } from "../types/jsonrpc";
@@ -26,6 +27,24 @@ export class BaseProvider extends AbstractProvider {
         this._pollingInterval = 4000;
     }
 
+    private processResponse(response: RpcResponse): any {
+        if(response.result) {
+            if(response.result.data) {
+                return response.result.data;
+            }
+
+            Errors.throwError(
+                response.result.error.message, 
+                ErrorCode.SERVER_ERROR,
+            );
+        }
+
+        Errors.throwError(
+            response.error.message, 
+            ErrorCode.SERVER_ERROR,
+        );
+    }
+
     // Account Methods
     public async getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint> {
         const params: BalanceParams = {
@@ -37,13 +56,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.Balance", params);
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -56,13 +71,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.ContextInfo", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -75,13 +86,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.TDU", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -94,13 +101,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.InteractionCount", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -112,13 +115,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -131,13 +130,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.AccountState", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -150,13 +145,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.AccountMetaInfo", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -168,13 +159,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("ixpool.ContentFrom", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -186,13 +173,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -206,13 +189,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.Tesseract", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -222,14 +201,24 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.SendInteractions", ixObject)
 
         try {
-            if(response.result.data) {
-                return {
-                    hash: response.result.data,
-                    wait: this.waitForInteraction.bind(this)
+            if(response.result) {
+                if(response.result.data) {
+                    return {
+                        hash: response.result.data,
+                        wait: this.waitForInteraction.bind(this)
+                    }
                 }
+    
+                Errors.throwError(
+                    response.result.error.message, 
+                    ErrorCode.SERVER_ERROR,
+                );
             }
-
-            throw new Error(response.result.error.message)
+    
+            Errors.throwError(
+                response.error.message, 
+                ErrorCode.SERVER_ERROR,
+            );
         } catch (error) {
             throw new Error("bad result form backend")
         }
@@ -245,13 +234,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.AssetInfoByAssetID", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -263,13 +248,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.InteractionReceipt", params)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -282,9 +263,11 @@ export class BaseProvider extends AbstractProvider {
 
         const response = await this.execute("moi.StorageAt", params)
 
-        console.log(response)
-
-        return null;
+        try {
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
     }
 
     public async getLogicManifest(logicId: string): Promise<string> {
@@ -296,14 +279,12 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("moi.LogicManifest", params)
 
         try {
-            if(response.result.data) {
-                const decodedManifest = decodeBase64(response.result.data)
-                return bytesToHex(decodedManifest);
-            }
-
-            throw new Error(response.result.error.message)
+            const data = this.processResponse(response);
+            const decodedManifest = decodeBase64(data);
+            
+            return bytesToHex(decodedManifest);
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -311,13 +292,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("ixpool.Content", null)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -325,13 +302,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("ixpool.Status", null)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -339,13 +312,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("ixpool.Inspect", null)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -353,13 +322,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("net.Peers", null)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -371,17 +336,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("debug.DBGet", params)
 
         try {
-            if(response.result) {
-                if(response.result.data) {
-                    return response.result.data;
-                }
-
-                throw new Error(response.result.error.message)
-            }
-
-            throw new Error(response.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 
@@ -389,13 +346,9 @@ export class BaseProvider extends AbstractProvider {
         const response: RpcResponse = await this.execute("debug.GetAccounts", null)
 
         try {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            throw new Error(response.result.error.message)
+            return this.processResponse(response)
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error;
         }
     }
 

@@ -8,6 +8,6 @@ export type Subscription = {
    processFunc: (payload: any) => void;
 };
 
-export type AllTesseracts = {
+export type TesseractParams = {
     address: string
 }

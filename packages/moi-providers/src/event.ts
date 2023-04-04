@@ -1,6 +1,6 @@
 import { EventType, Filter, Listener } from "../types/event";
 
-const PollableEvents = [ "block", "network", "pending", "poll" ];
+const PollableEvents = [ "all_tesseracts", "tesseract" ];
 
 function defineReadOnly<T, K extends keyof T>(object: T, name: K, value: T[K]): void {
     Object.defineProperty(object, name, {

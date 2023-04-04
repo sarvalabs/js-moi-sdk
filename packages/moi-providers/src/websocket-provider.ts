@@ -2,7 +2,7 @@ import { WebsocketProviderOptions } from "../types/provider";
 import { w3cwebsocket as WsConn } from "websocket";
 import {JsonRpcProvider} from "./jsonrpc-provider";
 import Event from "./event";
-import { AllTesseracts, Subscription } from "../types/websocket";
+import { TesseractParams, Subscription } from "../types/websocket";
 import { InflightRequest } from "../types/websocket";
 
 export class WebSocketProvider extends JsonRpcProvider {
@@ -205,8 +205,6 @@ export class WebSocketProvider extends JsonRpcProvider {
                 jsonrpc: "2.0"
             });
 
-            console.log(method, params)
-
             const request: InflightRequest = {
                 payload: payload, 
                 callback: callback
@@ -240,7 +238,7 @@ export class WebSocketProvider extends JsonRpcProvider {
     public _startEvent(event: Event): void {
         switch (event.type) {
             case "tesseract":
-                const params: AllTesseracts = {
+                const params: TesseractParams = {
                     address: event.address
                 }
                 this._subscribe("tesseract", [ "newTesseracts", params ], (result: any) => {
@@ -248,9 +246,9 @@ export class WebSocketProvider extends JsonRpcProvider {
                 });
                 break;
 
-            case "allTesseracts":
-                this._subscribe("allTesseracts", [ "newTesseracts" ], (result: any) => {
-                    this.emit("allTesseracts", result);
+            case "all_tesseracts":
+                this._subscribe("all_tesseracts", [ "newTesseracts" ], (result: any) => {
+                    this.emit("all_tesseracts", result);
                 });
                 break;
 
@@ -281,7 +279,26 @@ export class WebSocketProvider extends JsonRpcProvider {
        subId.then((subId) => {
             if (!this.subscriptions[subId]) { return; }
             delete this.subscriptions[subId];
-            this.send("eth_unsubscribe", [ subId ]);
+            this.send("moi.unsubscribe", [ subId ]);
         });
+    }
+
+    public async disconnect(): Promise<void> {
+        // Wait until we have connected before trying to disconnect
+        if (this.connection.readyState === WsConn.CONNECTING) {
+            await (new Promise((resolve) => {
+                this.connection.onopen = function() {
+                    resolve(true);
+                };
+
+                this.connection.onerror = function() {
+                    resolve(false);
+                };
+            }));
+        }
+
+        // Hangup
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes
+        this.connection.close(1000);
     }
 }

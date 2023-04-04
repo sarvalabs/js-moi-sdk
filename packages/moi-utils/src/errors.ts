@@ -47,7 +47,10 @@ export class Errors {
         const error: any = new Error(message);
         error.code = code;
         error.reason = message;
-        error.stack = errorMessageStack;
+
+        if(errorMessageStack) {
+            error.stack = errorMessageStack;
+        }
 
         return error;
     }
