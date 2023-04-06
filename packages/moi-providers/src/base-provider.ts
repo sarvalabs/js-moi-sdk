@@ -1,6 +1,6 @@
 import { Address, bytesToHex, hexDataLength } from "moi-utils";
-import { ErrorCode, Errors } from "moi-utils/src/errors";
-import { decodeBase64 } from "../../moi-utils/src";
+import { ErrorCode, Errors } from "moi-utils";
+import { decodeBase64 } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";

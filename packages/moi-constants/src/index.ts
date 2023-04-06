@@ -1,2 +1,2 @@
-export { VERSION } from "./version";
-export { MOI_DERIVATION_PATH } from "./path";
+export * from "./version";
+export * from "./path";

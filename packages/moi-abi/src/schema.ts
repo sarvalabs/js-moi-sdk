@@ -1,5 +1,5 @@
 import Manifest from "../types/manifest";
-import PoloSchema from "js-polo/src/schema"
+import { Schema as PoloSchema } from "js-polo"
 
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "uint64", "int64", "bigint"

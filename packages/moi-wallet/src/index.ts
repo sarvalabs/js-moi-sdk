@@ -12,8 +12,8 @@ import * as schnorrkel from "@parity/schnorrkel-js";
 
 /* Internal imports */
 import { 
-    MOI_DEFAULT_PATH, 
-} from 'moi-utils/src/constants';
+    MOI_DERIVATION_PATH, 
+} from 'moi-constants';
 import { 
     bytesToUint8, 
     uint8ToHex, 
@@ -107,7 +107,7 @@ class Wallet {
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterHdNode = bip32.fromSeed(seed, undefined);
-            const derviedExtendedKey = masterHdNode.derivePath(MOI_DEFAULT_PATH)
+            const derviedExtendedKey = masterHdNode.derivePath(MOI_DERIVATION_PATH)
             this.load(derviedExtendedKey.privateKey, mnemonic, Types.SR25519)
         }catch(e: any) {
             throw new Error(e.message);

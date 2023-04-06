@@ -27,5 +27,5 @@
   "ts-node": {
     "esm": true
   },
-  "files": ["src/index.ts"]
+  "files": ["src/abi.ts"]
 }

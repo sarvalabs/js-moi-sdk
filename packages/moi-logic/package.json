@@ -14,7 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "moi-abi": "0.1.0"
+    "moi-abi": "0.1.0",
+    "moi-utils": "0.1.0",
+    "moi-providers": "0.1.0"
   },
   "devDependencies": {
     "ts-node": "^10.9.1"

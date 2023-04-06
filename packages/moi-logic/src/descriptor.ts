@@ -1,5 +1,4 @@
-import ABICoder from "moi-abi";
-import LogicManifest from "moi-abi/types/manifest";
+import { ABICoder, LogicManifest } from "moi-abi";
 import LogicId from "./logic_id"
 
 export default class LogicDescriptor {

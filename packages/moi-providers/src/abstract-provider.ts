@@ -1,4 +1,4 @@
-import { Address, AssetId, Hash, LogicId } from "../../moi-utils/src/types";
+import { Address, AssetId, Hash, LogicId } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, 
 InteractionObject, InteractionResponse, InteractionReceipt } from "../types/jsonrpc";
