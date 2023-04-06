@@ -1,4 +1,7 @@
-export class AbstractProvider {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AbstractProvider = void 0;
+class AbstractProvider {
     // Alias for "on"
     addListener(eventName, listener) {
         return this.on(eventName, listener);
@@ -8,3 +11,4 @@ export class AbstractProvider {
         return this.off(eventName, listener);
     }
 }
+exports.AbstractProvider = AbstractProvider;

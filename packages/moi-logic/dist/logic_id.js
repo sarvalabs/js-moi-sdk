@@ -1,5 +1,7 @@
-import { bytesToHex } from "moi-utils";
-export default class LogicId {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const moi_utils_1 = require("moi-utils");
+class LogicId {
     logic;
     constructor(logicId) {
         this.logic = new Uint8Array(Buffer.from(logicId, "hex"));
@@ -80,6 +82,7 @@ export default class LogicId {
         // we know it will be 32 bytes, because of the validity check
         const addressData = this.logic.slice(3);
         // convert address data into an Address and return
-        return bytesToHex(addressData);
+        return (0, moi_utils_1.bytesToHex)(addressData);
     }
 }
+exports.default = LogicId;

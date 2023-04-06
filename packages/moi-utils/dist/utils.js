@@ -1,8 +1,15 @@
-import _hexToUint8 from "./hexToUint8";
-export const bytesToHex = (data) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.hexToUint8 = exports.bytesToUint8 = exports.uint8ToHex = exports.hexToBytes = exports.bytesToHex = void 0;
+const hexToUint8_1 = __importDefault(require("./hexToUint8"));
+const bytesToHex = (data) => {
     return Buffer.from(data).toString('hex');
 };
-export const hexToBytes = (str) => {
+exports.bytesToHex = bytesToHex;
+const hexToBytes = (str) => {
     const hex = str.trim();
     if (hex.length % 2 !== 0) {
         throw new Error('Invalid hex string');
@@ -13,7 +20,8 @@ export const hexToBytes = (str) => {
     }
     return bytes;
 };
-export function uint8ToHex(arr) {
+exports.hexToBytes = hexToBytes;
+function uint8ToHex(arr) {
     let hexString = "";
     for (let byte of arr) {
         let _byte = byte.toString(16).padStart(2, "0");
@@ -21,9 +29,12 @@ export function uint8ToHex(arr) {
     }
     return hexString;
 }
-export function bytesToUint8(target) {
+exports.uint8ToHex = uint8ToHex;
+function bytesToUint8(target) {
     return new Uint8Array(target);
 }
-export function hexToUint8(hexString) {
-    return _hexToUint8(hexString);
+exports.bytesToUint8 = bytesToUint8;
+function hexToUint8(hexString) {
+    return (0, hexToUint8_1.default)(hexString);
 }
+exports.hexToUint8 = hexToUint8;

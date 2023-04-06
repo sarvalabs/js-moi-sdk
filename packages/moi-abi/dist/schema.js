@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "uint64", "int64", "bigint"
 ];
@@ -227,4 +229,4 @@ class Schema {
         return schema;
     };
 }
-export default Schema;
+exports.default = Schema;

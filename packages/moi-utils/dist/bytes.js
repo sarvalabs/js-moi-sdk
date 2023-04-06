@@ -1,7 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.decodeBase64 = exports.hexlify = exports.isHexString = exports.hexDataLength = exports.isBytes = void 0;
 function isInteger(value) {
     return (typeof (value) === "number" && value == value && (value % 1) === 0);
 }
-export function isBytes(value) {
+function isBytes(value) {
     if (value == null) {
         return false;
     }
@@ -22,7 +25,8 @@ export function isBytes(value) {
     }
     return true;
 }
-export function hexDataLength(data) {
+exports.isBytes = isBytes;
+function hexDataLength(data) {
     if (typeof (data) !== "string") {
         data = hexlify(data);
     }
@@ -31,10 +35,11 @@ export function hexDataLength(data) {
     }
     return (data.length - 2) / 2;
 }
+exports.hexDataLength = hexDataLength;
 function isHexable(value) {
     return !!(value.toHexString);
 }
-export function isHexString(value, length) {
+function isHexString(value, length) {
     if (typeof (value) !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
         return false;
     }
@@ -43,8 +48,9 @@ export function isHexString(value, length) {
     }
     return true;
 }
+exports.isHexString = isHexString;
 const HexCharacters = "0123456789abcdef";
-export function hexlify(value, options) {
+function hexlify(value, options) {
     if (!options) {
         options = {};
     }
@@ -102,7 +108,8 @@ export function hexlify(value, options) {
     // return logger.throwArgumentError("invalid hexlify value", "value", value);
     throw new Error("invalid hexlify value");
 }
-export function decodeBase64(base64String) {
+exports.hexlify = hexlify;
+function decodeBase64(base64String) {
     const binaryString = Buffer.from(base64String, 'base64').toString('binary');
     const uint8Array = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
@@ -110,3 +117,4 @@ export function decodeBase64(base64String) {
     }
     return uint8Array;
 }
+exports.decodeBase64 = decodeBase64;

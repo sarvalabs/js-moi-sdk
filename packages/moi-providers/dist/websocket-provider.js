@@ -1,6 +1,9 @@
-import { w3cwebsocket as WsConn } from "websocket";
-import { JsonRpcProvider } from "./jsonrpc-provider";
-export class WebSocketProvider extends JsonRpcProvider {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.WebSocketProvider = void 0;
+const websocket_1 = require("websocket");
+const jsonrpc_provider_1 = require("./jsonrpc-provider");
+class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     requestQueue;
     responseQueue;
     connection;
@@ -41,7 +44,7 @@ export class WebSocketProvider extends JsonRpcProvider {
         throw new Error("Invalid websocket request url!");
     }
     connect = () => {
-        this.connection = new WsConn(this.host, this.wsConnOptions.protocol, undefined, this.wsConnOptions.headers, this.wsConnOptions.requestOptions, this.wsConnOptions.clientConfig);
+        this.connection = new websocket_1.w3cwebsocket(this.host, this.wsConnOptions.protocol, undefined, this.wsConnOptions.headers, this.wsConnOptions.requestOptions, this.wsConnOptions.clientConfig);
         this.addEventListener();
     };
     addEventListener = () => {
@@ -237,7 +240,7 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
     async disconnect() {
         // Wait until we have connected before trying to disconnect
-        if (this.connection.readyState === WsConn.CONNECTING) {
+        if (this.connection.readyState === websocket_1.w3cwebsocket.CONNECTING) {
             await (new Promise((resolve) => {
                 this.connection.onopen = function () {
                     resolve(true);
@@ -252,3 +255,4 @@ export class WebSocketProvider extends JsonRpcProvider {
         this.connection.close(1000);
     }
 }
+exports.WebSocketProvider = WebSocketProvider;

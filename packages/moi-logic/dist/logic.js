@@ -1,7 +1,13 @@
-import { ABICoder } from "moi-abi";
-import LogicDescriptor from "./descriptor";
-import Errors from "./errors";
-export class Logic extends LogicDescriptor {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Logic = void 0;
+const moi_abi_1 = require("moi-abi");
+const descriptor_1 = __importDefault(require("./descriptor"));
+const errors_1 = __importDefault(require("./errors"));
+class Logic extends descriptor_1.default {
     provider;
     routines;
     constructor(logicId, provider, manifest) {
@@ -27,13 +33,13 @@ export class Logic extends LogicDescriptor {
             callsite: ixObject.routine.data.name,
         };
         if (ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = ABICoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+            payload.calldata = moi_abi_1.ABICoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
         }
         return payload;
     }
     processArguments(ixObject, args) {
         if (args.length < 2 || !args[1].sender) {
-            throw Errors.missingArguments();
+            throw errors_1.default.missingArguments();
         }
         const processedArgs = {
             type: args[0],
@@ -43,7 +49,7 @@ export class Logic extends LogicDescriptor {
         };
         if (args[0] === "send") {
             if (!args[1].fuelPrice || !args[1].fuelLimit) {
-                throw Errors.missingFuelInfo();
+                throw errors_1.default.missingFuelInfo();
             }
             processedArgs.params.type = 8;
             processedArgs.params.fuel_price = args[1].fuelPrice;
@@ -55,10 +61,10 @@ export class Logic extends LogicDescriptor {
     executeRoutine(ixObject, ...args) {
         const processedArgs = this.processArguments(ixObject, args);
         if (!this.provider) {
-            throw Errors.providerNotFound();
+            throw errors_1.default.providerNotFound();
         }
         if (!this.logicId) {
-            throw Errors.addressNotDefined();
+            throw errors_1.default.addressNotDefined();
         }
         switch (processedArgs.type) {
             case "estimate":
@@ -100,3 +106,4 @@ export class Logic extends LogicDescriptor {
         return this.createIxRequest(ixObject);
     }
 }
+exports.Logic = Logic;

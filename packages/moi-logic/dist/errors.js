@@ -1,4 +1,6 @@
-export default class Errors {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Errors {
     static builderNotFound() {
         return new Error("Invalid builder name, builder not found!");
     }
@@ -15,3 +17,4 @@ export default class Errors {
         return new Error("This contract object doesn\'t have address set yet, please set an address first.");
     }
 }
+exports.default = Errors;

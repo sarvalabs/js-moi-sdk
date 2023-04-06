@@ -1,4 +1,6 @@
-import { Errors, ErrorCode } from "./errors";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const errors_1 = require("./errors");
 function isHexable(value) {
     return !!(value.toHexString);
 }
@@ -25,7 +27,7 @@ function isArrayish(value) {
 }
 function hexToUint8(value) {
     if (value == null) {
-        Errors.throwError('cannot convert null value to array', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
+        errors_1.Errors.throwError('cannot convert null value to array', errors_1.ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
     }
     if (isHexable(value)) {
         value = value.toHexString();
@@ -33,7 +35,7 @@ function hexToUint8(value) {
     if (typeof (value) === 'string') {
         var match = value.match(/^(0x)?[0-9a-fA-F]*$/);
         if (!match) {
-            Errors.throwError('invalid hexidecimal string', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
+            errors_1.Errors.throwError('invalid hexidecimal string', errors_1.ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
         }
         value = value.substring(2);
         if (value.length % 2) {
@@ -48,7 +50,7 @@ function hexToUint8(value) {
     if (isArrayish(value)) {
         return addSlice(new Uint8Array(value));
     }
-    Errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
+    errors_1.Errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
     return null;
 }
-export default hexToUint8;
+exports.default = hexToUint8;

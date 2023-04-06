@@ -1,6 +1,11 @@
-import { ABICoder } from "moi-abi";
-import LogicId from "./logic_id";
-export default class LogicDescriptor {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const moi_abi_1 = require("moi-abi");
+const logic_id_1 = __importDefault(require("./logic_id"));
+class LogicDescriptor {
     logicId;
     manifest;
     manifestHash;
@@ -9,9 +14,9 @@ export default class LogicDescriptor {
     persistentStatePtr;
     ephemeralStatePtr;
     constructor(logicId, manifest) {
-        this.logicId = new LogicId(logicId);
+        this.logicId = new logic_id_1.default(logicId);
         this.manifest = manifest;
-        this.manifestHash = ABICoder.encodeABI(this.manifest);
+        this.manifestHash = moi_abi_1.ABICoder.encodeABI(this.manifest);
         const engine = this.manifest.engine;
         this.engine = engine.kind;
         const stateElement = this.manifest.elements.find(element => element.kind === "state");
@@ -62,3 +67,4 @@ export default class LogicDescriptor {
         return this.logicId.isStateful();
     };
 }
+exports.default = LogicDescriptor;

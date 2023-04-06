@@ -6,7 +6,7 @@
   "main": "packages/moi/dist/index.js",
   "types": "packages/moi/dist/index.d.ts",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && rm -rf dist",
     "test": "jest --env=node --colors --verbose"
   },
   "repository": {

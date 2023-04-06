@@ -1,10 +1,16 @@
-import { bytesToHex, hexDataLength } from "moi-utils";
-import { ErrorCode, Errors } from "moi-utils";
-import { decodeBase64 } from "moi-utils";
-import { AbstractProvider } from "./abstract-provider";
-import Event from "./event";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BaseProvider = void 0;
+const moi_utils_1 = require("moi-utils");
+const moi_utils_2 = require("moi-utils");
+const moi_utils_3 = require("moi-utils");
+const abstract_provider_1 = require("./abstract-provider");
+const event_1 = __importDefault(require("./event"));
 const defaultTimeout = 120;
-export class BaseProvider extends AbstractProvider {
+class BaseProvider extends abstract_provider_1.AbstractProvider {
     _events;
     _pollingInterval;
     _poller;
@@ -23,9 +29,9 @@ export class BaseProvider extends AbstractProvider {
             if (response.result.data) {
                 return response.result.data;
             }
-            Errors.throwError(response.result.error.message, ErrorCode.SERVER_ERROR);
+            moi_utils_2.Errors.throwError(response.result.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
         }
-        Errors.throwError(response.error.message, ErrorCode.SERVER_ERROR);
+        moi_utils_2.Errors.throwError(response.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
     }
     // Account Methods
     async getBalance(address, assetId, options) {
@@ -168,9 +174,9 @@ export class BaseProvider extends AbstractProvider {
                         wait: this.waitForInteraction.bind(this)
                     };
                 }
-                Errors.throwError(response.result.error.message, ErrorCode.SERVER_ERROR);
+                moi_utils_2.Errors.throwError(response.result.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
             }
-            Errors.throwError(response.error.message, ErrorCode.SERVER_ERROR);
+            moi_utils_2.Errors.throwError(response.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
         }
         catch (error) {
             throw new Error("bad result form backend");
@@ -223,8 +229,8 @@ export class BaseProvider extends AbstractProvider {
         const response = await this.execute("moi.LogicManifest", params);
         try {
             const data = this.processResponse(response);
-            const decodedManifest = decodeBase64(data);
-            return bytesToHex(decodedManifest);
+            const decodedManifest = (0, moi_utils_3.decodeBase64)(data);
+            return (0, moi_utils_1.bytesToHex)(decodedManifest);
         }
         catch (error) {
             throw error;
@@ -324,7 +330,7 @@ export class BaseProvider extends AbstractProvider {
         this.polling = (this._events.filter((e) => e.pollable()).length > 0);
     }
     _addEventListener(eventName, listener, once) {
-        const event = new Event(getEventTag(eventName), listener, once);
+        const event = new event_1.default(getEventTag(eventName), listener, once);
         this._events.push(event);
         this._startEvent(event);
         return this;
@@ -458,10 +464,11 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 }
+exports.BaseProvider = BaseProvider;
 function getEventTag(eventName) {
     if (typeof (eventName) === "string") {
         eventName = eventName.toLowerCase();
-        if (hexDataLength(eventName) === 32) {
+        if ((0, moi_utils_1.hexDataLength)(eventName) === 32) {
             return "tx:" + eventName;
         }
         if (eventName.indexOf(":") === -1) {

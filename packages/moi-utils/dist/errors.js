@@ -1,4 +1,7 @@
-export var ErrorCode;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Errors = exports.ErrorCode = void 0;
+var ErrorCode;
 (function (ErrorCode) {
     ErrorCode["UNKNOWN_ERROR"] = "UNKNOWN_ERROR";
     ErrorCode["NOT_IMPLEMENTED"] = "NOT_IMPLEMENTED";
@@ -19,9 +22,9 @@ export var ErrorCode;
     ErrorCode["UNPREDICTABLE_GAS_LIMIT"] = "UNPREDICTABLE_GAS_LIMIT";
     ErrorCode["TRANSACTION_REPLACED"] = "TRANSACTION_REPLACED";
     ErrorCode["ACTION_REJECTED"] = "ACTION_REJECTED";
-})(ErrorCode || (ErrorCode = {}));
+})(ErrorCode = exports.ErrorCode || (exports.ErrorCode = {}));
 ;
-export class Errors {
+class Errors {
     static createError(message, code, params) {
         if (!code) {
             code = ErrorCode.UNKNOWN_ERROR;
@@ -61,3 +64,4 @@ export class Errors {
         });
     }
 }
+exports.Errors = Errors;

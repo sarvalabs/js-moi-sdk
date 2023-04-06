@@ -1,8 +1,14 @@
-import _BN from "bn.js";
-var BN = _BN.BN;
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BigNumber = void 0;
+const bn_js_1 = __importDefault(require("bn.js"));
+var BN = bn_js_1.default.BN;
 const _constructorGuard = {};
 const MAX_SAFE = 0x1fffffffffffff;
-export class BigNumber {
+class BigNumber {
     _hex;
     _isBigNumber;
     constructor(constructorGuard, hex) {
@@ -216,6 +222,7 @@ export class BigNumber {
         return !!(value && value._isBigNumber);
     }
 }
+exports.BigNumber = BigNumber;
 // Normalize the hex string
 function toHex(value) {
     // For BN, call on the hex string

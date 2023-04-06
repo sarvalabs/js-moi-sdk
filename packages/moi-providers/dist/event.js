@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const PollableEvents = ["all_tesseracts", "tesseract"];
 function defineReadOnly(object, name, value) {
     Object.defineProperty(object, name, {
@@ -20,7 +22,7 @@ function deserializeTopics(data) {
         return ((comps.length === 1) ? comps[0] : comps);
     });
 }
-export default class Event {
+class Event {
     listener;
     once;
     tag;
@@ -81,3 +83,4 @@ export default class Event {
         return (this.tag.indexOf(":") >= 0 || PollableEvents.indexOf(this.tag) >= 0);
     }
 }
+exports.default = Event;
