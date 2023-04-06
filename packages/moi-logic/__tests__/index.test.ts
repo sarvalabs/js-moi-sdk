@@ -2,7 +2,7 @@
 // import {LogicFactory} from "../src/factory";
 // import { Logic } from "../src/logic";
 
-import { LogicId } from "../src/logic_id"
+import LogicId from "../src/logic_id"
 
 // describe("Testing Contract", () => {
 //     test("Constructor", async () => {
