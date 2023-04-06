@@ -1,31 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "types": [
-      "node",
-    ],
-    "lib": [
-      "es6",
-      "esnext",
-      "dom"
-    ],
-    "module": "ESNext",
-    "target": "esnext",
-    "moduleResolution": "node",
-    "outDir": "./lib",
-    "declaration": true,
-    "preserveSymlinks": true,
-    "preserveWatchOutput": true,
-    "pretty": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
-    "noImplicitReturns": true,
-    "experimentalDecorators": true,
-    "noUnusedLocals": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
   },
-  "ts-node": {
-    "esm": true
-  },
-  "files": ["src/abi.ts"]
+  "include": [
+    "./src"
+  ]
 }

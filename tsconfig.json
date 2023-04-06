@@ -1,33 +1,42 @@
 {
-    "compilerOptions": {
-      "esModuleInterop": true,
-      "types": [
-        "node",
-        "jest"
-      ],
-      "lib": [
-        "es6",
-        "esnext",
-        "dom"
-      ],
-      "module": "ESNext",
-      "target": "esnext",
-      "moduleResolution": "node",
-      "outDir": "./lib",
-      "declaration": true,
-      "preserveSymlinks": true,
-      "preserveWatchOutput": true,
-      "pretty": true,
-      "forceConsistentCasingInFileNames": true,
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitAny": false,
-      "noImplicitReturns": true,
-      "experimentalDecorators": true,
-      "noUnusedLocals": true,
-    },
-    "ts-node": {
-      "esm": true
-    },
-    // "files": ["src/index.ts"]
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "lib": [
+      "es6",
+      "esnext",
+      "dom"
+    ],
+    "module": "ESNext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "composite": true,
+    "declaration": true,
+    "preserveSymlinks": true,
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
+  },
+  "ts-node": {
+    "esm": true
+  },
+  "references": [
+    { "path": "./packages/moi" },
+    { "path": "./packages/moi-abi" },
+    { "path": "./packages/moi-constants" },
+    { "path": "./packages/moi-logic" },
+    { "path": "./packages/moi-providers" },
+    { "path": "./packages/moi-signer" },
+    { "path": "./packages/moi-utils"},
+    { "path": "./packages/moi-wallet"},
+  ]
 }
-  
