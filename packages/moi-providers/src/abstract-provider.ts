@@ -37,6 +37,7 @@ export abstract class AbstractProvider {
     abstract getAccounts(): Promise<any>
 
     abstract waitForInteraction(interactionHash: Hash, timeout?: number): Promise<InteractionReceipt>
+    abstract waitForResult(interactionHash: Hash, timeout?: number): Promise<any>
 
     // Event Emitter (ish)
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;

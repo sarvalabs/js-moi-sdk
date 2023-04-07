@@ -17,7 +17,7 @@ const isMap = (type: string): boolean => {
     return type.startsWith("map[")
 }
 
-export default class Schema {
+export class Schema {
     public static PISA_ENGINE_SCHEMA = {
         kind: "struct",
         fields: {

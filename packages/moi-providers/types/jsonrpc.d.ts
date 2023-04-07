@@ -1,4 +1,4 @@
-import { Address, AssetId, Hash } from "moi-utils";
+import { Address, AssetCreationReceipt, AssetId, Hash, LogicDeployReceipt, LogicExecuteReceipt } from "moi-utils";
 
 interface Options {
     tesseract_number?: number;
@@ -59,7 +59,8 @@ interface InteractionObject {
 
 interface InteractionResponse {
     hash: string;
-    wait: (interactionHash: string, timeout?: number) => Promise<InteractionReceipt>
+    wait: (interactionHash: string, timeout?: number) => Promise<InteractionReceipt>,
+    result: (interactionHash: string, timeout?: number) => Promise<any>
 }
 
 interface InteractionReceipt {
@@ -68,7 +69,7 @@ interface InteractionReceipt {
     FuelUsed: number;
     StateHashes: Record<Address, Hash>;
     ContextHashes: Record<Address, Hash>;
-    ExtraData: string; 
+    ExtraData: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
 }
 
 interface AssetInfo {

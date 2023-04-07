@@ -1,6 +1,4 @@
-import { Address, bytesToHex, hexDataLength } from "moi-utils";
-import { ErrorCode, Errors } from "moi-utils";
-import { decodeBase64 } from "moi-utils";
+import { Address, ErrorCode, Errors, IxType, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64 } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
@@ -205,7 +203,8 @@ export class BaseProvider extends AbstractProvider {
                 if(response.result.data) {
                     return {
                         hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this)
+                        wait: this.waitForInteraction.bind(this),
+                        result: this.waitForResult.bind(this)
                     }
                 }
     
@@ -383,6 +382,55 @@ export class BaseProvider extends AbstractProvider {
                 clearInterval(intervalId);
                 reject({message: "failed to fetch receipt"})
             }, timeout * 1000)
+        })
+    }
+
+    public async waitForResult(interactionHash: string, timeout?: number): Promise<any> {
+        return new Promise(async(resolve, reject) => {
+            try {
+                const receipt = await this.waitForInteraction(interactionHash, timeout);
+    
+                switch(receipt.IxType) {
+                    case IxType.VALUE_TRANSFER:
+                        resolve(null);
+                        
+                        break;
+                    case IxType.ASSET_CREATE:
+                        if(receipt.ExtraData) {
+                            receipt.ExtraData = receipt.ExtraData as AssetCreationReceipt;
+                            resolve(receipt.ExtraData.asset_id);
+                        }
+
+                        reject({message: "asset id not found"});
+
+                        break;
+                    case IxType.LOGIC_DEPLOY:
+                        if(receipt.ExtraData) {
+                            receipt.ExtraData = receipt.ExtraData as LogicDeployReceipt;
+                            resolve(receipt.ExtraData.logic_id);
+                        }
+
+                        reject({message: "logic id not found"})
+
+                        break;
+                    case IxType.LOGIC_INVOKE:
+                        if(receipt.ExtraData) {
+                            receipt.ExtraData = receipt.ExtraData as LogicExecuteReceipt;
+                            resolve(receipt.ExtraData.return_data)
+                        }
+
+                        reject({message: "invalid logic invoke response"});
+
+                        break;
+                    default:
+                        Errors.throwError(
+                            "Unsupported interaction type", 
+                            ErrorCode.UNSUPPORTED_OPERATION
+                        );
+                }
+            } catch(err) {
+                throw err;
+            }
         })
     }
 

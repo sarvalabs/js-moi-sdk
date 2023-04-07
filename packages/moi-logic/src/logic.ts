@@ -1,8 +1,10 @@
-import { ABICoder, LogicManifest } from "moi-abi";
+import { ABICoder, Schema, LogicManifest } from "moi-abi";
 import LogicDescriptor from "./descriptor";
-import { JsonRpcProvider } from "moi-providers";
+import { InteractionResponse, JsonRpcProvider } from "moi-providers";
 import { LogicExecuteRequest, Routines } from "../types/logic";
 import Errors from "./errors";
+import { decodeBase64 } from "moi-utils";
+import { Depolorizer } from "js-polo";
 
 export class Logic extends LogicDescriptor {
     private provider: JsonRpcProvider;
@@ -68,7 +70,29 @@ export class Logic extends LogicDescriptor {
         return processedArgs
     }
 
-    private executeRoutine(ixObject: any, ...args: any[]): any {
+    private async processResult(response: any, ixObject: any, interactionHash: string, timeout?: number): Promise<any> {
+        try {
+            const result = await response.result(interactionHash, timeout);
+
+            if(result) {
+                const data = decodeBase64(result);
+                const depolorizer = new Depolorizer(data);
+    
+                if(ixObject.routine.data && ixObject.routine.data.returns) {
+                    const schema = Schema.parseFields(ixObject.routine.data.returns)
+                    const result = depolorizer.depolorize(schema)
+    
+                    return result;
+                }
+            }
+    
+            return null;
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    private async executeRoutine(ixObject: any, ...args: any[]): Promise<InteractionResponse> {
         const processedArgs = this.processArguments(ixObject, args)
 
         if(!this.provider) {
@@ -80,14 +104,19 @@ export class Logic extends LogicDescriptor {
         }
 
         switch(processedArgs.type) {
-            case "estimate":
-                console.log("yet to be implemented");
-                break;
             case "call":
-                console.log("yet to be implemented")
-                break;
+            case "estimate":
+                throw new Error('Method "' + processedArgs.type + '" not implemented.');
             case "send":
                 return this.provider.sendInteraction(processedArgs.params)
+                .then((response) => {
+                    return {
+                        ...response,
+                        result: this.processResult.bind(this, response, ixObject)
+                    }
+                }).catch((err) => {
+                    throw err;
+                });
             default:
                 throw new Error('Method "' + processedArgs.type + '" not implemented.');
         }
@@ -101,7 +130,7 @@ export class Logic extends LogicDescriptor {
         }
     }
 
-    private createIxObject(routine: any, ...args: any[]) {
+    private createIxObject(routine: any, ...args: any[]): LogicExecuteRequest {
         const ixObject:any = {
             routine: routine,
             arguments: args
