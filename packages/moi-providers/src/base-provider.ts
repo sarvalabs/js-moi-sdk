@@ -45,15 +45,15 @@ export class BaseProvider extends AbstractProvider {
 
     // Account Methods
     public async getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint> {
-        const params: BalanceParams = {
-            from: address,
-            assetid: assetId,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.Balance", params);
-
         try {
+            const params: BalanceParams = {
+                from: address,
+                assetid: assetId,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.Balance", params);
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -61,14 +61,14 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getContextInfo(address: string, options?: Options): Promise<ContextInfo> {
-        const params: AccountParamsBase = {
-            from: address,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.ContextInfo", params)
-
         try {
+            const params: AccountParamsBase = {
+                from: address,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.ContextInfo", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -76,14 +76,14 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getTDU(address: string, options?: Options): Promise<TDU> {
-        const params: AccountParamsBase = {
-            from: address,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.TDU", params)
-
         try {
+            const params: AccountParamsBase = {
+                from: address,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.TDU", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -91,14 +91,14 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getInteractionCount(address: string, options?: Options): Promise<number | bigint> {
-        const params: AccountParamsBase = {
-            from: address,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.InteractionCount", params)
-
         try {
+            const params: AccountParamsBase = {
+                from: address,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.InteractionCount", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -106,13 +106,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getPendingInteractionCount(address: string): Promise<number | bigint> {
-        const params: AccountParamsBase = {
-            from: address
-        }
-
-        const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params)
-
         try {
+            const params: AccountParamsBase = {
+                from: address
+            }
+    
+            const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -120,14 +120,14 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getAccountState(address: string, options?: Options): Promise<AccountState> {
-        const params: AccountStateParams = {
-            address: address,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.AccountState", params)
-
         try {
+            const params: AccountStateParams = {
+                address: address,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.AccountState", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -135,14 +135,14 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo> {
-        const params: AccountStateParams = {
-            address: address,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.AccountMetaInfo", params)
-
         try {
+            const params: AccountStateParams = {
+                address: address,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.AccountMetaInfo", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -150,13 +150,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getContentFrom(address: string): Promise<any> {
-        const params: AccountParamsBase = {
-            from: address
-        }
-
-        const response: RpcResponse = await this.execute("ixpool.ContentFrom", params)
-
         try {
+            const params: AccountParamsBase = {
+                from: address
+            }
+    
+            const response: RpcResponse = await this.execute("ixpool.ContentFrom", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -164,13 +164,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getWaitTime(address: string): Promise<number | bigint> {
-        const params: AccountParamsBase = {
-            from: address
-        }
-
-        const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
-
         try {
+            const params: AccountParamsBase = {
+                from: address
+            }
+    
+            const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -178,15 +178,15 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<any> {
-        const params: TesseractParams = {
-            from: address,
-            with_interactions: with_interactions,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.Tesseract", params)
-
         try {
+            const params: TesseractParams = {
+                from: address,
+                with_interactions: with_interactions,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.Tesseract", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -226,13 +226,13 @@ export class BaseProvider extends AbstractProvider {
     // Query Methods
 
     public async getAssetInfoByAssetID(assetId: string): Promise<AssetInfo> {
-        const params: AssetInfoParams = {
-            asset_id: assetId
-        }
-
-        const response: RpcResponse = await this.execute("moi.AssetInfoByAssetID", params)
-
         try {
+            const params: AssetInfoParams = {
+                asset_id: assetId
+            }
+    
+            const response: RpcResponse = await this.execute("moi.AssetInfoByAssetID", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -240,13 +240,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getInteractionReceipt(ixHash: string): Promise<InteractionReceipt> {
-        const params: InteractionReceiptParams = {
-            hash: ixHash
-        }
-
-        const response: RpcResponse = await this.execute("moi.InteractionReceipt", params)
-
         try {
+            const params: InteractionReceiptParams = {
+                hash: ixHash
+            }
+    
+            const response: RpcResponse = await this.execute("moi.InteractionReceipt", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -254,15 +254,15 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any> {
-        const params: StorageParams = {
-            logic_id: logicId,
-            "storage-key": storageKey,
-            options: options ? options : this.defaultOptions
-        }
-
-        const response = await this.execute("moi.StorageAt", params)
-
         try {
+            const params: StorageParams = {
+                logic_id: logicId,
+                "storage-key": storageKey,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response = await this.execute("moi.StorageAt", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -270,14 +270,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getLogicManifest(logicId: string): Promise<string> {
-        const params: LogicManifestParams = {
-            logic_id: logicId,
-            options: this.defaultOptions
-        }
-
-        const response: RpcResponse = await this.execute("moi.LogicManifest", params)
-
         try {
+            const params: LogicManifestParams = {
+                logic_id: logicId,
+                options: this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.LogicManifest", params)
             const data = this.processResponse(response);
             const decodedManifest = decodeBase64(data);
             
@@ -288,9 +287,8 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getContent(): Promise<Content> {
-        const response: RpcResponse = await this.execute("ixpool.Content", null)
-
         try {
+            const response: RpcResponse = await this.execute("ixpool.Content", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -298,9 +296,8 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getStatus(): Promise<any> {
-        const response: RpcResponse = await this.execute("ixpool.Status", null)
-
         try {
+            const response: RpcResponse = await this.execute("ixpool.Status", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -308,9 +305,8 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getInspect(): Promise<any> {
-        const response: RpcResponse = await this.execute("ixpool.Inspect", null)
-
         try {
+            const response: RpcResponse = await this.execute("ixpool.Inspect", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -318,9 +314,8 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getPeers(): Promise<string[]> {
-        const response: RpcResponse = await this.execute("net.Peers", null)
-
         try {
+            const response: RpcResponse = await this.execute("net.Peers", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -328,13 +323,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getDBEntry(key: string): Promise<any> {
-        const params: DBEntryParams = {
-            key: key
-        }
-
-        const response: RpcResponse = await this.execute("debug.DBGet", params)
-
         try {
+            const params: DBEntryParams = {
+                key: key
+            }
+    
+            const response: RpcResponse = await this.execute("debug.DBGet", params)
+
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -342,9 +337,8 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public async getAccounts(): Promise<Address[]> {
-        const response: RpcResponse = await this.execute("debug.GetAccounts", null)
-
         try {
+            const response: RpcResponse = await this.execute("debug.GetAccounts", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
