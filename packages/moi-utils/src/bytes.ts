@@ -107,13 +107,3 @@ export function hexlify(value: BytesLike | Hexable | number | bigint, options?: 
 
     throw new Error("invalid hexlify value")
 }
-
-export function decodeBase64(base64String: string) {
-    const binaryString = Buffer.from(base64String, 'base64').toString('binary');
-    const uint8Array = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      uint8Array[i] = binaryString.charCodeAt(i);
-    }
-    
-    return uint8Array;
-}

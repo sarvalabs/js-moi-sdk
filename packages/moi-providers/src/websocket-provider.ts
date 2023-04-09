@@ -4,12 +4,14 @@ import {JsonRpcProvider} from "./jsonrpc-provider";
 import Event from "./event";
 import { TesseractParams, Subscription } from "../types/websocket";
 import { InflightRequest } from "../types/websocket";
+import * as errors from "./errors";
+
+let nextReqId = 1;
 
 export class WebSocketProvider extends JsonRpcProvider {
-    public requestQueue: Map<string, InflightRequest>;
-    public responseQueue: Map<string, InflightRequest>;
+    public requestQueue: Map<number, InflightRequest>;
+    public responseQueue: Map<number, InflightRequest>;
     public connection: any;
-    public isConnected: boolean;
     public wsConnOptions: WebsocketProviderOptions;
     public reconnecting: boolean;
     public reconnAttempts: number;
@@ -20,7 +22,6 @@ export class WebSocketProvider extends JsonRpcProvider {
         if(/^ws(s)?:\/\//i.test(host)) {
             super(host)
             this.subsIds = {}
-            this.isConnected = false
             this.wsConnOptions = {}
             this.wsConnOptions.host = host
             this.wsConnOptions.timeout = options?.timeout || 1000 * 5;
@@ -83,57 +84,58 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     private onError = () => {
-        console.log("Connection Error");
-        // this.reject(new Error("Failed to establish connection"))
+        this.emit("error", "Failed to establish connection.");
     }
 
     private onConnect = () => {
-        // this.eventStream.emit("connect");
+        this.emit("connect", "Websocket connection established successfully!");
         this.reconnAttempts = 0;
         this.reconnecting = false;
-        this.isConnected = true;
 
         if(this.requestQueue.size > 0) {
             this.requestQueue.forEach((request: any, key) => {
                 try {
-                    this.connection.send(request.payload);
+                    this.sendRequest(key, request);
                 } catch (error) {
                     request.callback(error, null);
                     this.requestQueue.delete(key);
                 }
             })
         }
+    }
 
-        console.log("Connection established successfully")
-
-        // this.resolve("Connection established successfully")
+    private isConnectionFailed = (event) => {
+        return event.code === 1006 && event.reason === "connection failed";
     }
 
     private onClose = (event) => {
-        if(this.wsConnOptions.reconnectOptions.auto && (![1000, 1001].includes(event.code) || event.wasClean === false)) {
-            this.reconnect();
-
-            return;
-        }
-
-        // this.eventStream.emit("close", event)
-
-        if (this.requestQueue.size > 0) {
-            this.requestQueue.forEach(function (request, key) {
-                // request.callBack(Errors.ConnectionNotOpenError(event));
-                this.requestQueue.delete(key);
-            });
-        }
+        if(!this.isConnectionFailed(event)) {
+            if(this.wsConnOptions.reconnectOptions.auto && 
+            (![1000, 1001].includes(event.code) || event.wasClean === false)) {
+                this.reconnect();
     
-        if (this.responseQueue.size > 0) {
-            this.responseQueue.forEach(function (request, key) {
-                // request.callBack(Errors.InvalidConnection('on WS', event));
-                this.responseQueue.delete(key);
-            });
+                return;
+            }
+    
+            this.emit("close", event)
+    
+            if (this.requestQueue.size > 0) {
+                this.requestQueue.forEach(function (request, key) {
+                    request.callback(errors.ConnectionNotOpenError(event), null);
+                    this.requestQueue.delete(key);
+                });
+            }
+        
+            if (this.responseQueue.size > 0) {
+                this.responseQueue.forEach(function (request, key) {
+                    request.callback(errors.InvalidConnection('on WS', event), null);
+                    this.responseQueue.delete(key);
+                });
+            }
+    
+            this.removeEventListener();
+            this.removeAllListeners();
         }
-
-        this.removeEventListener();
-        // this.eventStream.removeAllListeners();
     }
 
     private onMessage = (event: { data: string }) => {
@@ -141,85 +143,78 @@ export class WebSocketProvider extends JsonRpcProvider {
         const response = JSON.parse(data);
 
         if(response.id != null) {
-            const id = String(response.id)
-            const request = this.requestQueue.get(id)
-            this.requestQueue.delete(id);
+            const id = response.id
+            const request = this.responseQueue.get(id)
+            this.responseQueue.delete(id);
 
             if(response.result != undefined) {
-                request.callback(null, response.result)
+                request.callback(null, response.result);
+
+                this.emit("debug", {
+                    action: "response",
+                    request: JSON.parse(request.payload),
+                    response: response.result,
+                    provider: this
+                });
             } else {
                 // TODO: handle error
             }
         } else if(response.method === "moi.subscription") {
             const sub = this.subscriptions[response.params.subscription];
             if (sub) {
-                //this.emit.apply(this,                  );
                 sub.processFunc(response.params.result)
             }
         }
     }
 
-    public send(method: string, params: any[]): Promise<any> {
-        // var id = payload.id;
-        // var request = {payload: payload, callBack: callback};
+    private sendRequest(requestId: number, request: InflightRequest): void {
+        if (this.connection.readyState !== this.connection.OPEN) {
+            this.requestQueue.delete(requestId);
     
-        // if (Array.isArray(payload)) {
-        //     id = payload[0].id;
-        // }
+            request.callback(errors.ConnectionNotOpenError(), null);
     
-        // if (this.connection.readyState === this.connection.CONNECTING) {
-        //     this.requestQueue.set(id, request);
-    
-        //     return;
-        // }
-    
-        // if (this.connection.readyState !== this.connection.OPEN) {
-        //     this.requestQueue.delete(id);
-    
-        //     // this.eventStream.emit("error", Errors.ConnectionNotOpenError());
-        //     // request.callBack(Errors.ConnectionNotOpenError());
-    
-        //     return;
-        // }
-    
-        // this.responseQueue.set(id, request);
-        // this.requestQueue.delete(id);
-    
-        // try {
-        //     this.connection.send(JSON.stringify(request.payload));
-        // } catch (error) {
-        //     request.callBack(error);
-        //     this.responseQueue.delete(id);
-        // }
+            return;
+        }
 
+        this.responseQueue.set(requestId, request);
+        this.requestQueue.delete(requestId);
+
+        try {
+            this.connection.send(request.payload);
+        } catch (error) {
+            request.callback(error, null);
+            this.responseQueue.delete(requestId);
+        }
+    }
+
+    public send(method: string, params: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
             function callback(error: Error, result: any) {
                 if (error) { return reject(error); }
                 return resolve(result);
             }
 
-            const payload = JSON.stringify({
+            const requestId = nextReqId + 1
+
+            const payload = {
                 method: method,
                 params: params,
-                id: 1,
+                id: requestId,
                 jsonrpc: "2.0"
-            });
+            };
 
             const request: InflightRequest = {
-                payload: payload, 
+                payload: JSON.stringify(payload), 
                 callback: callback
             };
 
-            this.requestQueue.set("1", request)
-
-            if(this.isConnected) {
-                try {
-                    this.connection.send(request.payload);
-                    request.callback(null, {})
-                } catch (error) {
-                    request.callback(error, null);
-                }
+            if (this.connection.readyState === this.connection.CONNECTING || this.reconnecting) {
+                this.requestQueue.set(requestId, request);
+        
+                return;
             }
+
+            this.sendRequest(requestId, request)
         })
     }
 
@@ -241,8 +236,8 @@ export class WebSocketProvider extends JsonRpcProvider {
                 const params: TesseractParams = {
                     address: event.address
                 }
-                this._subscribe("tesseract", [ "newTesseracts", params ], (result: any) => {
-                    this.emit("tesseract", result);
+                this._subscribe(event.tag, [ "newAccountTesseracts", params ], (result: any) => {
+                    this.emit(event.address, result);
                 });
                 break;
 
@@ -250,6 +245,15 @@ export class WebSocketProvider extends JsonRpcProvider {
                 this._subscribe("all_tesseracts", [ "newTesseracts" ], (result: any) => {
                     this.emit("all_tesseracts", result);
                 });
+                break;
+            
+            case "connect":
+            
+            case "close":
+
+            case "debug":
+
+            case "error":
                 break;
 
             default:
@@ -261,13 +265,7 @@ export class WebSocketProvider extends JsonRpcProvider {
     public _stopEvent(event: Event): void {
         let tag = event.tag;
 
-        if (event.type === "tx") {
-            // There are remaining transaction event listeners
-            if (this._events.filter((e) => (e.type === "tx")).length) {
-                return;
-            }
-            tag = "tx";
-        } else if (this.listenerCount(event.event)) {
+        if (this.listenerCount(event.event)) {
             // There are remaining event listeners
             return;
         }
@@ -285,7 +283,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     public async disconnect(): Promise<void> {
         // Wait until we have connected before trying to disconnect
-        if (this.connection.readyState === WsConn.CONNECTING) {
+        if (this.connection.readyState === this.connection.CONNECTING) {
             await (new Promise((resolve) => {
                 this.connection.onopen = function() {
                     resolve(true);

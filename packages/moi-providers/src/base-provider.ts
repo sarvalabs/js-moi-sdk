@@ -1,6 +1,6 @@
-import { Address, ErrorCode, Errors, IxType, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64 } from "moi-utils";
+import { Address, ErrorCode, Errors, IxType, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64, Tesseract } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
@@ -149,7 +149,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getContentFrom(address: string): Promise<any> {
+    public async getContentFrom(address: string): Promise<ContentFrom> {
         try {
             const params: AccountParamsBase = {
                 from: address
@@ -177,7 +177,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<any> {
+    public async getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract> {
         try {
             const params: TesseractParams = {
                 from: address,
@@ -269,11 +269,12 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getLogicManifest(logicId: string): Promise<string> {
+    public async getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string> {
         try {
             const params: LogicManifestParams = {
                 logic_id: logicId,
-                options: this.defaultOptions
+                encoding: encoding,
+                options: options ? options : this.defaultOptions
             }
     
             const response: RpcResponse = await this.execute("moi.LogicManifest", params)
@@ -295,7 +296,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getStatus(): Promise<any> {
+    public async getStatus(): Promise<Status> {
         try {
             const response: RpcResponse = await this.execute("ixpool.Status", null)
             return this.processResponse(response)
@@ -304,7 +305,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getInspect(): Promise<any> {
+    public async getInspect(): Promise<Inspect> {
         try {
             const response: RpcResponse = await this.execute("ixpool.Inspect", null)
             return this.processResponse(response)
@@ -322,7 +323,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getDBEntry(key: string): Promise<any> {
+    public async getDBEntry(key: string): Promise<string> {
         try {
             const params: DBEntryParams = {
                 key: key
@@ -379,7 +380,7 @@ export class BaseProvider extends AbstractProvider {
         })
     }
 
-    public async waitForResult(interactionHash: string, timeout?: number): Promise<any> {
+    public async waitForResult(interactionHash: string, timeout?: number): Promise<string> {
         return new Promise(async(resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
@@ -605,7 +606,7 @@ function getEventTag(eventName: EventType): string {
         eventName = eventName.toLowerCase();
 
         if (hexDataLength(eventName) === 32) {
-            return "tx:" + eventName;
+            return "tesseract:" + eventName;
         }
 
         if (eventName.indexOf(":") === -1) {

@@ -14,7 +14,7 @@ const isArray = (type: string): boolean => {
 }
 
 const isMap = (type: string): boolean => {
-    return type.startsWith("map[")
+    return type.startsWith("map")
 }
 
 export class Schema {

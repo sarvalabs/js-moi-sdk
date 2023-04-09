@@ -47,23 +47,44 @@ export class ABICoder {
         return bytesToHex(bytes);
     }
 
-    public static encodeArguments(fields: Record<string, LogicManifest.TypeField>, args: any[]) {
-        const callsite = {}
-        const schema = Schema.parseFields(fields)
-        Object.entries(fields).forEach(([key, value]:[string, LogicManifest.TypeField]) => {
-            if(value.type === "address") {
-                callsite[value.label] = hexToBytes(args[key])
-            } else {
-                callsite[value.label] = args[key];
+    private static parseCalldata(schema: any, arg: any): any {
+        if(schema.kind === "bytes" && typeof arg === "string") {
+            return hexToBytes(arg)
+        } else if(schema.kind === "array" && ["bytes", "array", "map"].includes(schema.fields.values.kind)) {
+            return arg.map(value => 
+                this.parseCalldata(schema.fields.values, value)
+            )
+        } else if (schema.kind === "map" && (["bytes", "array", "map"].includes(schema.fields.keys.kind) || 
+        ["bytes", "array", "map"].includes(schema.fields.values.kind))) {
+            const map = new Map()
+            // Loop through the entries of the Map
+            for(const [key, value] of arg.entries()) {
+                map.set(
+                    this.parseCalldata(schema.fields.keys, key), 
+                    this.parseCalldata(schema.fields.values, value)
+                );
             }
-            
-            return null;
-        })
 
-        const document = documentEncode(callsite, schema)
-        const bytes = document.bytes()
-        const data = bytesToHex(new Uint8Array(bytes))
+            return map;
+        }
 
-        return data
+        return arg
+    }
+
+    public static encodeArguments(fields: Record<string, LogicManifest.TypeField>, args: any[]) {
+        const schema = Schema.parseFields(fields);
+        let calldata = {};
+        Object.values(fields).forEach((field:LogicManifest.TypeField) => {
+            calldata[field.label] = this.parseCalldata(
+                schema.fields[field.label], 
+                args[field.slot]
+            );
+        });
+
+        const document = documentEncode(calldata, schema);
+        const bytes = document.bytes();
+        const data = bytesToHex(new Uint8Array(bytes));
+
+        return data;
     }
 }

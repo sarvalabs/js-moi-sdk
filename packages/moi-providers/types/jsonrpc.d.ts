@@ -1,4 +1,13 @@
-import { Address, AssetCreationReceipt, AssetId, Hash, LogicDeployReceipt, LogicExecuteReceipt } from "moi-utils";
+import { 
+    Address, 
+    AssetCreationReceipt, 
+    AssetKind, 
+    AssetId, 
+    Hash, 
+    IxType, 
+    LogicDeployReceipt, 
+    LogicExecuteReceipt 
+} from "moi-utils";
 
 interface Options {
     tesseract_number?: number;
@@ -37,24 +46,41 @@ interface AccountMetaInfo {
     StateExists: boolean;
 }
 
-interface InteractionPayload {
-    type: number;
-    symbol: string
-    supply: string
+interface AssetCreationPayload {
+    type: AssetKind;
+    symbol: string;
+    supply: string;
+    dimension?: number;
+    decimals?: number;
+    is_fungible?: boolean;
+    is_mintable?: boolean;
+    is_transferable?: boolean;
+    logic_id?: string;
 }
 
-interface LogicIxPayload {
+interface LogicDeployPayload {
     manifest: string;
     callsite: string;
     calldata: string
 }
 
+interface LogicInvokePayload {
+    logic_id: string;
+    callsite: string;
+    calldata: string;
+}
+
 interface InteractionObject {
+    type: IxType;
+    nonce?: number | bigint;
     sender: Address;
-    type: number;
+    receiver?: Address;
+    payer?: Address;
+    transfer_values?: Map<AssetId, string>;
+    perceived_values?: Map<AssetId, string>;
     fuel_price: string;
     fuel_limit: string;
-    payload: InteractionPayload | LogicIxPayload
+    payload: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
 }
 
 interface InteractionResponse {
@@ -121,30 +147,46 @@ interface DBEntryParams {
     key: string;
 }
 
+// Type alias for encoding type
+type Encoding = "JSON" | "POLO" | "YAML";
+
 interface LogicManifestParams {
     logic_id: string;
+    encoding: Encoding;
     options: Options;
 }
 
-interface ContentObject {
-    [address: Address]: {
-        [nonce: string]: {
-            Nonce: number;
-            Type: number;
-            Sender: string;
-            Receiver: string;
-            Cost: bigint;
-            FuelPrice: bigint;
-            FuelLimit: bigint;
-            Input: string;
-            Hash: string;
-        }
-    };
+interface InteractionInfo {
+    Nonce: number;
+    Type: number;
+    Sender: string;
+    Receiver: string;
+    Cost: bigint;
+    FuelPrice: bigint;
+    FuelLimit: bigint;
+    Input: string;
+    Hash: string;
 }
 
 interface Content {
-    pending: ContentObject;
-    queued: ContentObject;
+    pending: Map<string, Map<bigint, InteractionInfo>>;
+    queued: Map<string, Map<bigint, InteractionInfo>>;
+}
+
+interface ContentFrom {
+    pending: Map<bigint, InteractionInfo>;
+    queued: Map<bigint, InteractionInfo>;
+}
+
+interface Status {
+    pending: number | bigint;
+    queued: number | bigint;
+}
+
+interface Inspect {
+    pending: Map<string, Map<string, string>>;
+    queued: Map<string, Map<string, string>>;
+    wait_time: Map<string, number | bigint>;
 }
 
 interface RpcErrorResponse {

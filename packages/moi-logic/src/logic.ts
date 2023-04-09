@@ -10,11 +10,14 @@ export class Logic extends LogicDescriptor {
     private provider: JsonRpcProvider;
     public routines: Routines;
 
-    constructor(logicId: string, provider: JsonRpcProvider, manifest?: LogicManifest.Manifest) {
+    constructor(logicId: string, provider: JsonRpcProvider, manifest: LogicManifest.Manifest) {
         super(logicId, manifest)
         this.provider = provider;
-        this.routines = {};
+        this.createRoutines();
+    }
 
+    private createRoutines() {
+        this.routines = {};
         this.manifest.elements.forEach(element => {
             element.data = element.data as LogicManifest.Routine
             if(element.kind === "routine" && element.data.kind !== "deployer") {
@@ -27,7 +30,11 @@ export class Logic extends LogicDescriptor {
     }
 
     private normalizeRoutineName(routineName: string) {
-        return routineName.replace("!", "")
+        if (routineName.endsWith("!")) {
+            return routineName.slice(0, -1); // Remove the last character (exclamation mark)
+          }
+
+          return routineName; // If no exclamation mark, return the original string
     }
 
     private createPayload(ixObject: any): any {
