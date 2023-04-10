@@ -1,5 +1,6 @@
-import { Address, ErrorCode, Errors, IxType, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64, Tesseract } from "moi-utils";
+import { Address, ErrorCode, Errors, IxType, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64, unmarshal, Tesseract } from "moi-utils";
 import { EventType, Listener } from "../types/event";
+import { LogicManifest } from "moi-abi";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -269,7 +270,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string> {
+    public async getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest> {
         try {
             const params: LogicManifestParams = {
                 logic_id: logicId,
@@ -280,8 +281,15 @@ export class BaseProvider extends AbstractProvider {
             const response: RpcResponse = await this.execute("moi.LogicManifest", params)
             const data = this.processResponse(response);
             const decodedManifest = decodeBase64(data);
-            
-            return bytesToHex(decodedManifest);
+
+            switch(encoding) {
+                case "JSON":
+                    return unmarshal(decodedManifest);
+                case "POLO":
+                    return bytesToHex(decodedManifest);
+                default:
+                    throw new Error("Unsupported encoding format!");
+            }
         } catch (error) {
             throw error;
         }

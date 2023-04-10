@@ -1,4 +1,5 @@
-import { ABICoder, LogicManifest } from "moi-abi";
+import { ABICoder } from "moi-abi";
+import { LogicManifest } from "moi-utils";
 import { LogicDeployRequest } from "../types/logic";
 import { JsonRpcProvider } from "moi-providers"
 import Errors from "./errors";

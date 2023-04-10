@@ -148,7 +148,7 @@ interface DBEntryParams {
 }
 
 // Type alias for encoding type
-type Encoding = "JSON" | "POLO" | "YAML";
+type Encoding = "JSON" | "POLO";
 
 interface LogicManifestParams {
     logic_id: string;

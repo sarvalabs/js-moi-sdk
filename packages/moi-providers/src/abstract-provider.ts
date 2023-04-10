@@ -1,4 +1,4 @@
-import { Address, AssetId, Hash, LogicId, Tesseract } from "moi-utils";
+import { Address, AssetId, Hash, LogicId, Tesseract, LogicManifest } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, 
 InteractionObject, InteractionResponse, InteractionReceipt, Content, Status, Inspect, ContentFrom, Encoding } from "../types/jsonrpc";
@@ -27,7 +27,7 @@ export abstract class AbstractProvider {
     abstract getInteractionReceipt(ixHash: Hash): Promise<InteractionReceipt>
     // TODO: replace any type
     abstract getStorageAt(logicId: LogicId, storageKey: string, options?: Options): Promise<any>
-    abstract getLogicManifest(logicId: LogicId, encoding: Encoding, options?: Options): Promise<string>
+    abstract getLogicManifest(logicId: LogicId, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>
     // TODO: replace any type
     abstract getContent(): Promise<Content>
     abstract getStatus(): Promise<Status>

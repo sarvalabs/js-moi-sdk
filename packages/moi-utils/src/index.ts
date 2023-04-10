@@ -12,3 +12,4 @@ export {
 } from "../types/receipt";
 
 export { Tesseract } from "../types/tesseract";
+export { LogicManifest } from "../types/manifest";

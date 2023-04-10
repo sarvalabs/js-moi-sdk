@@ -1,7 +1,6 @@
 import { documentEncode, Polorizer } from "js-polo";
-import LogicManifest from "../types/manifest";
 import { Schema } from "./schema";
-import { bytesToHex, hexToBytes } from "moi-utils";
+import { bytesToHex, hexToBytes, LogicManifest } from "moi-utils";
 
 export class ABICoder {
     public static encodeABI(manifest: LogicManifest.Manifest): string {

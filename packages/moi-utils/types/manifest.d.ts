@@ -1,4 +1,4 @@
-declare module LogicManifest {
+export declare module LogicManifest {
     export interface EngineConfig {
         kind: string;
         flags: string[];
@@ -50,5 +50,3 @@ declare module LogicManifest {
         elements: Element[];
     }
 }
-
-export default LogicManifest;

@@ -34,3 +34,17 @@ export function bytesToUint8(target: Buffer) {
 export function hexToUint8(hexString: string | Buffer): Uint8Array {
     return _hexToUint8(hexString)
 }
+
+export function marshal(data: object): Uint8Array {
+    const jsonString = JSON.stringify(data);
+    return new TextEncoder().encode(jsonString);
+}
+
+export function unmarshal(bytes: Uint8Array): any {
+    try {
+        const jsonString = new TextDecoder().decode(bytes);
+        return JSON.parse(jsonString);
+    } catch (error) {
+        throw new Error('Error deserializing data:', error);
+    }
+}

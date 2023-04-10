@@ -1,4 +1,5 @@
-import { ABICoder, LogicManifest } from "moi-abi";
+import { ABICoder } from "moi-abi";
+import { LogicManifest } from "moi-utils";
 import LogicId from "./logic_id"
 
 export default class LogicDescriptor {
@@ -7,6 +8,8 @@ export default class LogicDescriptor {
     protected manifestHash: string;
     protected engine: string;
     protected state: string;
+    protected sealed: boolean;
+    protected assetLogic: boolean;
     protected persistentStatePtr: number;
     protected ephemeralStatePtr: number;
 
@@ -14,6 +17,8 @@ export default class LogicDescriptor {
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
         this.manifestHash = ABICoder.encodeABI(this.manifest);
+        this.sealed = false;
+        this.assetLogic = false;
 
         const engine: LogicManifest.EngineConfig = this.manifest.engine;
         this.engine = engine.kind;
@@ -50,6 +55,14 @@ export default class LogicDescriptor {
 
     public getManifestHash = (): string => {
         return this.manifestHash;
+    }
+
+    public isSealed = () => {
+        return this.sealed;
+    }
+
+    public isAssetLogic = () => {
+        return this.assetLogic;
     }
 
     public getState = (): string => {

@@ -1,12 +1,12 @@
-import { ABICoder, Schema, LogicManifest } from "moi-abi";
+import { ABICoder, Schema } from "moi-abi";
 import LogicDescriptor from "./descriptor";
-import { InteractionResponse, JsonRpcProvider } from "moi-providers";
+import { InteractionResponse, JsonRpcProvider, Options } from "moi-providers";
 import { LogicExecuteRequest, Routines } from "../types/logic";
 import Errors from "./errors";
-import { decodeBase64 } from "moi-utils";
+import { decodeBase64, LogicManifest } from "moi-utils";
 import { Depolorizer } from "js-polo";
 
-export class Logic extends LogicDescriptor {
+class Logic extends LogicDescriptor {
     private provider: JsonRpcProvider;
     public routines: Routines;
 
@@ -160,5 +160,19 @@ export class Logic extends LogicDescriptor {
         }
 
         return this.createIxRequest(ixObject)
+    }
+}
+
+export const getLogicObject = async (logicId: string, provider: JsonRpcProvider, options?: Options) => {
+    try {
+        const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+
+        if (typeof manifest === 'object') {
+            return new Logic(logicId, provider, manifest);
+        }
+
+        throw new Error("Invalid manifest");
+    } catch(err) {
+        throw err;
     }
 }
