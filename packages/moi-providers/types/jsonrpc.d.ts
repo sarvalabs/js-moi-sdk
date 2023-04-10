@@ -3,6 +3,7 @@ import {
     AssetCreationReceipt, 
     AssetKind, 
     AssetId, 
+    Hex,
     Hash, 
     IxType, 
     LogicDeployReceipt, 
@@ -49,7 +50,7 @@ interface AccountMetaInfo {
 interface AssetCreationPayload {
     type: AssetKind;
     symbol: string;
-    supply: string;
+    supply: Hex;
     dimension?: number;
     decimals?: number;
     is_fungible?: boolean;
@@ -76,10 +77,10 @@ interface InteractionObject {
     sender: Address;
     receiver?: Address;
     payer?: Address;
-    transfer_values?: Map<AssetId, string>;
-    perceived_values?: Map<AssetId, string>;
-    fuel_price: string;
-    fuel_limit: string;
+    transfer_values?: Map<AssetId, Hex>;
+    perceived_values?: Map<AssetId, Hex>;
+    fuel_price: Hex;
+    fuel_limit: Hex;
     payload: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
 }
 
