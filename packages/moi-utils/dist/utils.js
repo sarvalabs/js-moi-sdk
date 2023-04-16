@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hexToUint8 = exports.bytesToUint8 = exports.uint8ToHex = exports.hexToBytes = exports.bytesToHex = void 0;
+exports.unmarshal = exports.marshal = exports.hexToUint8 = exports.bytesToUint8 = exports.uint8ToHex = exports.hexToBytes = exports.bytesToHex = void 0;
 const hexToUint8_1 = __importDefault(require("./hexToUint8"));
 const bytesToHex = (data) => {
     return Buffer.from(data).toString('hex');
@@ -38,3 +38,18 @@ function hexToUint8(hexString) {
     return (0, hexToUint8_1.default)(hexString);
 }
 exports.hexToUint8 = hexToUint8;
+function marshal(data) {
+    const jsonString = JSON.stringify(data);
+    return new TextEncoder().encode(jsonString);
+}
+exports.marshal = marshal;
+function unmarshal(bytes) {
+    try {
+        const jsonString = new TextDecoder().decode(bytes);
+        return JSON.parse(jsonString);
+    }
+    catch (error) {
+        throw new Error('Error deserializing data:', error);
+    }
+}
+exports.unmarshal = unmarshal;

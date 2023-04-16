@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Schema = void 0;
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "uint64", "int64", "bigint"
 ];
@@ -10,7 +11,7 @@ const isArray = (type) => {
     return (/^\[(\d*)\]/).test(type);
 };
 const isMap = (type) => {
-    return type.startsWith("map[");
+    return type.startsWith("map");
 };
 class Schema {
     static PISA_ENGINE_SCHEMA = {
@@ -229,4 +230,4 @@ class Schema {
         return schema;
     };
 }
-exports.default = Schema;
+exports.Schema = Schema;

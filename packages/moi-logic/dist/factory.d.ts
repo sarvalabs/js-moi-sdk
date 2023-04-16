@@ -1,4 +1,4 @@
-import { LogicManifest } from "moi-abi";
+import { LogicManifest } from "moi-utils";
 import { LogicDeployRequest } from "../types/logic";
 import { JsonRpcProvider } from "moi-providers";
 export declare class LogicFactory {

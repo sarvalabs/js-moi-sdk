@@ -18,3 +18,7 @@ __exportStar(require("./utils"), exports);
 __exportStar(require("./types"), exports);
 __exportStar(require("./bytes"), exports);
 __exportStar(require("./errors"), exports);
+__exportStar(require("./base64"), exports);
+__exportStar(require("./hex"), exports);
+__exportStar(require("./asset"), exports);
+__exportStar(require("./interaction"), exports);

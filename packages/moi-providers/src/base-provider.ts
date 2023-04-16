@@ -1,6 +1,5 @@
-import { Address, ErrorCode, Errors, IxType, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64, unmarshal, Tesseract } from "moi-utils";
+import { Address, ErrorCode, Errors, IxType, LogicManifest, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64, unmarshal, Tesseract } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { LogicManifest } from "moi-abi";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";

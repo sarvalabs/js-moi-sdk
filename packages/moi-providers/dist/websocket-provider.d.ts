@@ -4,10 +4,9 @@ import Event from "./event";
 import { Subscription } from "../types/websocket";
 import { InflightRequest } from "../types/websocket";
 export declare class WebSocketProvider extends JsonRpcProvider {
-    requestQueue: Map<string, InflightRequest>;
-    responseQueue: Map<string, InflightRequest>;
+    requestQueue: Map<number, InflightRequest>;
+    responseQueue: Map<number, InflightRequest>;
     connection: any;
-    isConnected: boolean;
     wsConnOptions: WebsocketProviderOptions;
     reconnecting: boolean;
     reconnAttempts: number;
@@ -22,8 +21,10 @@ export declare class WebSocketProvider extends JsonRpcProvider {
     private reconnect;
     private onError;
     private onConnect;
+    private isConnectionFailed;
     private onClose;
     private onMessage;
+    private sendRequest;
     send(method: string, params: any[]): Promise<any>;
     _subscribe(tag: string, param: Array<any>, processFunc: (result: any) => void): Promise<void>;
     _startEvent(event: Event): void;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeBase64 = exports.hexlify = exports.isHexString = exports.hexDataLength = exports.isBytes = void 0;
+exports.hexlify = exports.isHexString = exports.hexDataLength = exports.isBytes = void 0;
 function isInteger(value) {
     return (typeof (value) === "number" && value == value && (value % 1) === 0);
 }
@@ -109,12 +109,3 @@ function hexlify(value, options) {
     throw new Error("invalid hexlify value");
 }
 exports.hexlify = hexlify;
-function decodeBase64(base64String) {
-    const binaryString = Buffer.from(base64String, 'base64').toString('binary');
-    const uint8Array = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-        uint8Array[i] = binaryString.charCodeAt(i);
-    }
-    return uint8Array;
-}
-exports.decodeBase64 = decodeBase64;

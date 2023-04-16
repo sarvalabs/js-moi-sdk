@@ -1,6 +1,6 @@
-import Manifest from "../types/manifest";
+import { LogicManifest } from "moi-utils";
 import { Schema as PoloSchema } from "js-polo";
-export default class Schema {
+export declare class Schema {
     static PISA_ENGINE_SCHEMA: {
         kind: string;
         fields: {
@@ -185,5 +185,5 @@ export default class Schema {
     private static extractMapDataType;
     private static convertPrimitiveDataType;
     private static parseDataType;
-    static parseFields: (fields: Record<string, Manifest.TypeField>) => PoloSchema;
+    static parseFields: (fields: Record<string, LogicManifest.TypeField>) => PoloSchema;
 }

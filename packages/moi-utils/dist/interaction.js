@@ -1,0 +1,26 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IxType = void 0;
+var IxType;
+(function (IxType) {
+    IxType[IxType["VALUE_TRANSFER"] = 0] = "VALUE_TRANSFER";
+    IxType[IxType["FUEL_SUPPLY"] = 1] = "FUEL_SUPPLY";
+    IxType[IxType["ASSET_CREATE"] = 2] = "ASSET_CREATE";
+    IxType[IxType["ASSET_APPROVE"] = 3] = "ASSET_APPROVE";
+    IxType[IxType["ASSET_REVOKE"] = 4] = "ASSET_REVOKE";
+    IxType[IxType["ASSET_MINT"] = 5] = "ASSET_MINT";
+    IxType[IxType["ASSET_BURN"] = 6] = "ASSET_BURN";
+    IxType[IxType["LOGIC_DEPLOY"] = 7] = "LOGIC_DEPLOY";
+    IxType[IxType["LOGIC_INVOKE"] = 8] = "LOGIC_INVOKE";
+    IxType[IxType["LOGIC_ENLIST"] = 9] = "LOGIC_ENLIST";
+    IxType[IxType["LOGIC_INTERACT"] = 10] = "LOGIC_INTERACT";
+    IxType[IxType["LOGIC_UPGRADE"] = 11] = "LOGIC_UPGRADE";
+    IxType[IxType["FILE_CREATE"] = 12] = "FILE_CREATE";
+    IxType[IxType["FILE_UPDATE"] = 13] = "FILE_UPDATE";
+    IxType[IxType["PARTICIPANT_REGISTER"] = 14] = "PARTICIPANT_REGISTER";
+    IxType[IxType["VALIDATOR_REGISTER"] = 15] = "VALIDATOR_REGISTER";
+    IxType[IxType["VALIDATOR_UNREGISTER"] = 16] = "VALIDATOR_UNREGISTER";
+    IxType[IxType["STAKE_BOND"] = 17] = "STAKE_BOND";
+    IxType[IxType["STAKE_UNBOND"] = 18] = "STAKE_UNBOND";
+    IxType[IxType["STAKE_TRANSFER"] = 19] = "STAKE_TRANSFER";
+})(IxType = exports.IxType || (exports.IxType = {}));

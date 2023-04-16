@@ -1,4 +1,4 @@
-import Manifest from "../types/manifest";
+import { LogicManifest } from "moi-utils";
 import { Schema as PoloSchema } from "js-polo"
 
 const primitiveTypes = [
@@ -238,7 +238,7 @@ export class Schema {
         }
     }
     
-    public static parseFields = (fields: Record<string, Manifest.TypeField>): PoloSchema => {
+    public static parseFields = (fields: Record<string, LogicManifest.TypeField>): PoloSchema => {
         const schema = {
             kind: 'struct',
             fields: {}

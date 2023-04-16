@@ -5,8 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseProvider = void 0;
 const moi_utils_1 = require("moi-utils");
-const moi_utils_2 = require("moi-utils");
-const moi_utils_3 = require("moi-utils");
 const abstract_provider_1 = require("./abstract-provider");
 const event_1 = __importDefault(require("./event"));
 const defaultTimeout = 120;
@@ -29,19 +27,19 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             if (response.result.data) {
                 return response.result.data;
             }
-            moi_utils_2.Errors.throwError(response.result.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
+            moi_utils_1.Errors.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
         }
-        moi_utils_2.Errors.throwError(response.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
+        moi_utils_1.Errors.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
     }
     // Account Methods
     async getBalance(address, assetId, options) {
-        const params = {
-            from: address,
-            assetid: assetId,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.Balance", params);
         try {
+            const params = {
+                from: address,
+                assetid: assetId,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.Balance", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -49,12 +47,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getContextInfo(address, options) {
-        const params = {
-            from: address,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.ContextInfo", params);
         try {
+            const params = {
+                from: address,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.ContextInfo", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -62,12 +60,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getTDU(address, options) {
-        const params = {
-            from: address,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.TDU", params);
         try {
+            const params = {
+                from: address,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.TDU", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -75,12 +73,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getInteractionCount(address, options) {
-        const params = {
-            from: address,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.InteractionCount", params);
         try {
+            const params = {
+                from: address,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.InteractionCount", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -88,11 +86,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getPendingInteractionCount(address) {
-        const params = {
-            from: address
-        };
-        const response = await this.execute("moi.PendingInteractionCount", params);
         try {
+            const params = {
+                from: address
+            };
+            const response = await this.execute("moi.PendingInteractionCount", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -100,12 +98,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getAccountState(address, options) {
-        const params = {
-            address: address,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.AccountState", params);
         try {
+            const params = {
+                address: address,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.AccountState", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -113,12 +111,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getAccountMetaInfo(address, options) {
-        const params = {
-            address: address,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.AccountMetaInfo", params);
         try {
+            const params = {
+                address: address,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.AccountMetaInfo", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -126,11 +124,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getContentFrom(address) {
-        const params = {
-            from: address
-        };
-        const response = await this.execute("ixpool.ContentFrom", params);
         try {
+            const params = {
+                from: address
+            };
+            const response = await this.execute("ixpool.ContentFrom", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -138,11 +136,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getWaitTime(address) {
-        const params = {
-            from: address
-        };
-        const response = await this.execute("ixpool.WaitTime", params);
         try {
+            const params = {
+                from: address
+            };
+            const response = await this.execute("ixpool.WaitTime", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -150,13 +148,13 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getTesseract(address, with_interactions, options) {
-        const params = {
-            from: address,
-            with_interactions: with_interactions,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.Tesseract", params);
         try {
+            const params = {
+                from: address,
+                with_interactions: with_interactions,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.Tesseract", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -171,12 +169,13 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 if (response.result.data) {
                     return {
                         hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this)
+                        wait: this.waitForInteraction.bind(this),
+                        result: this.waitForResult.bind(this)
                     };
                 }
-                moi_utils_2.Errors.throwError(response.result.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
+                moi_utils_1.Errors.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
             }
-            moi_utils_2.Errors.throwError(response.error.message, moi_utils_2.ErrorCode.SERVER_ERROR);
+            moi_utils_1.Errors.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
         }
         catch (error) {
             throw new Error("bad result form backend");
@@ -184,11 +183,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     }
     // Query Methods
     async getAssetInfoByAssetID(assetId) {
-        const params = {
-            asset_id: assetId
-        };
-        const response = await this.execute("moi.AssetInfoByAssetID", params);
         try {
+            const params = {
+                asset_id: assetId
+            };
+            const response = await this.execute("moi.AssetInfoByAssetID", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -196,11 +195,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getInteractionReceipt(ixHash) {
-        const params = {
-            hash: ixHash
-        };
-        const response = await this.execute("moi.InteractionReceipt", params);
         try {
+            const params = {
+                hash: ixHash
+            };
+            const response = await this.execute("moi.InteractionReceipt", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -208,37 +207,45 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getStorageAt(logicId, storageKey, options) {
-        const params = {
-            logic_id: logicId,
-            "storage-key": storageKey,
-            options: options ? options : this.defaultOptions
-        };
-        const response = await this.execute("moi.StorageAt", params);
         try {
+            const params = {
+                logic_id: logicId,
+                "storage-key": storageKey,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.StorageAt", params);
             return this.processResponse(response);
         }
         catch (error) {
             throw error;
         }
     }
-    async getLogicManifest(logicId) {
-        const params = {
-            logic_id: logicId,
-            options: this.defaultOptions
-        };
-        const response = await this.execute("moi.LogicManifest", params);
+    async getLogicManifest(logicId, encoding, options) {
         try {
+            const params = {
+                logic_id: logicId,
+                encoding: encoding,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.LogicManifest", params);
             const data = this.processResponse(response);
-            const decodedManifest = (0, moi_utils_3.decodeBase64)(data);
-            return (0, moi_utils_1.bytesToHex)(decodedManifest);
+            const decodedManifest = (0, moi_utils_1.decodeBase64)(data);
+            switch (encoding) {
+                case "JSON":
+                    return (0, moi_utils_1.unmarshal)(decodedManifest);
+                case "POLO":
+                    return (0, moi_utils_1.bytesToHex)(decodedManifest);
+                default:
+                    throw new Error("Unsupported encoding format!");
+            }
         }
         catch (error) {
             throw error;
         }
     }
     async getContent() {
-        const response = await this.execute("ixpool.Content", null);
         try {
+            const response = await this.execute("ixpool.Content", null);
             return this.processResponse(response);
         }
         catch (error) {
@@ -246,8 +253,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getStatus() {
-        const response = await this.execute("ixpool.Status", null);
         try {
+            const response = await this.execute("ixpool.Status", null);
             return this.processResponse(response);
         }
         catch (error) {
@@ -255,8 +262,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getInspect() {
-        const response = await this.execute("ixpool.Inspect", null);
         try {
+            const response = await this.execute("ixpool.Inspect", null);
             return this.processResponse(response);
         }
         catch (error) {
@@ -264,8 +271,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getPeers() {
-        const response = await this.execute("net.Peers", null);
         try {
+            const response = await this.execute("net.Peers", null);
             return this.processResponse(response);
         }
         catch (error) {
@@ -273,11 +280,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getDBEntry(key) {
-        const params = {
-            key: key
-        };
-        const response = await this.execute("debug.DBGet", params);
         try {
+            const params = {
+                key: key
+            };
+            const response = await this.execute("debug.DBGet", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -285,8 +292,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     async getAccounts() {
-        const response = await this.execute("debug.GetAccounts", null);
         try {
+            const response = await this.execute("debug.GetAccounts", null);
             return this.processResponse(response);
         }
         catch (error) {
@@ -318,6 +325,44 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 clearInterval(intervalId);
                 reject({ message: "failed to fetch receipt" });
             }, timeout * 1000);
+        });
+    }
+    async waitForResult(interactionHash, timeout) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const receipt = await this.waitForInteraction(interactionHash, timeout);
+                switch (receipt.IxType) {
+                    case moi_utils_1.IxType.VALUE_TRANSFER:
+                        resolve(null);
+                        break;
+                    case moi_utils_1.IxType.ASSET_CREATE:
+                        if (receipt.ExtraData) {
+                            receipt.ExtraData = receipt.ExtraData;
+                            resolve(receipt.ExtraData.asset_id);
+                        }
+                        reject({ message: "asset id not found" });
+                        break;
+                    case moi_utils_1.IxType.LOGIC_DEPLOY:
+                        if (receipt.ExtraData) {
+                            receipt.ExtraData = receipt.ExtraData;
+                            resolve(receipt.ExtraData.logic_id);
+                        }
+                        reject({ message: "logic id not found" });
+                        break;
+                    case moi_utils_1.IxType.LOGIC_INVOKE:
+                        if (receipt.ExtraData) {
+                            receipt.ExtraData = receipt.ExtraData;
+                            resolve(receipt.ExtraData.return_data);
+                        }
+                        reject({ message: "invalid logic invoke response" });
+                        break;
+                    default:
+                        moi_utils_1.Errors.throwError("Unsupported interaction type", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+                }
+            }
+            catch (err) {
+                throw err;
+            }
         });
     }
     execute(method, params) {
@@ -469,7 +514,7 @@ function getEventTag(eventName) {
     if (typeof (eventName) === "string") {
         eventName = eventName.toLowerCase();
         if ((0, moi_utils_1.hexDataLength)(eventName) === 32) {
-            return "tx:" + eventName;
+            return "tesseract:" + eventName;
         }
         if (eventName.indexOf(":") === -1) {
             return eventName;

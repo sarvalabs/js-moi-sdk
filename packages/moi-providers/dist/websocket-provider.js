@@ -1,13 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebSocketProvider = void 0;
 const websocket_1 = require("websocket");
 const jsonrpc_provider_1 = require("./jsonrpc-provider");
+const errors = __importStar(require("./errors"));
+let nextReqId = 1;
 class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     requestQueue;
     responseQueue;
     connection;
-    isConnected;
     wsConnOptions;
     reconnecting;
     reconnAttempts;
@@ -17,7 +41,6 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         if (/^ws(s)?:\/\//i.test(host)) {
             super(host);
             this.subsIds = {};
-            this.isConnected = false;
             this.wsConnOptions = {};
             this.wsConnOptions.host = host;
             this.wsConnOptions.timeout = options?.timeout || 1000 * 5;
@@ -63,18 +86,16 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         console.log("Trying to reconnect...!");
     };
     onError = () => {
-        console.log("Connection Error");
-        // this.reject(new Error("Failed to establish connection"))
+        this.emit("error", "Failed to establish connection.");
     };
     onConnect = () => {
-        // this.eventStream.emit("connect");
+        this.emit("connect", "Websocket connection established successfully!");
         this.reconnAttempts = 0;
         this.reconnecting = false;
-        this.isConnected = true;
         if (this.requestQueue.size > 0) {
             this.requestQueue.forEach((request, key) => {
                 try {
-                    this.connection.send(request.payload);
+                    this.sendRequest(key, request);
                 }
                 catch (error) {
                     request.callback(error, null);
@@ -82,39 +103,49 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 }
             });
         }
-        console.log("Connection established successfully");
-        // this.resolve("Connection established successfully")
+    };
+    isConnectionFailed = (event) => {
+        return event.code === 1006 && event.reason === "connection failed";
     };
     onClose = (event) => {
-        if (this.wsConnOptions.reconnectOptions.auto && (![1000, 1001].includes(event.code) || event.wasClean === false)) {
-            this.reconnect();
-            return;
+        if (!this.isConnectionFailed(event)) {
+            if (this.wsConnOptions.reconnectOptions.auto &&
+                (![1000, 1001].includes(event.code) || event.wasClean === false)) {
+                this.reconnect();
+                return;
+            }
+            this.emit("close", event);
+            if (this.requestQueue.size > 0) {
+                this.requestQueue.forEach(function (request, key) {
+                    request.callback(errors.ConnectionNotOpenError(event), null);
+                    this.requestQueue.delete(key);
+                });
+            }
+            if (this.responseQueue.size > 0) {
+                this.responseQueue.forEach(function (request, key) {
+                    request.callback(errors.InvalidConnection('on WS', event), null);
+                    this.responseQueue.delete(key);
+                });
+            }
+            this.removeEventListener();
+            this.removeAllListeners();
         }
-        // this.eventStream.emit("close", event)
-        if (this.requestQueue.size > 0) {
-            this.requestQueue.forEach(function (request, key) {
-                // request.callBack(Errors.ConnectionNotOpenError(event));
-                this.requestQueue.delete(key);
-            });
-        }
-        if (this.responseQueue.size > 0) {
-            this.responseQueue.forEach(function (request, key) {
-                // request.callBack(Errors.InvalidConnection('on WS', event));
-                this.responseQueue.delete(key);
-            });
-        }
-        this.removeEventListener();
-        // this.eventStream.removeAllListeners();
     };
     onMessage = (event) => {
         const data = event.data;
         const response = JSON.parse(data);
         if (response.id != null) {
-            const id = String(response.id);
-            const request = this.requestQueue.get(id);
-            this.requestQueue.delete(id);
+            const id = response.id;
+            const request = this.responseQueue.get(id);
+            this.responseQueue.delete(id);
             if (response.result != undefined) {
                 request.callback(null, response.result);
+                this.emit("debug", {
+                    action: "response",
+                    request: JSON.parse(request.payload),
+                    response: response.result,
+                    provider: this
+                });
             }
             else {
                 // TODO: handle error
@@ -123,35 +154,27 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         else if (response.method === "moi.subscription") {
             const sub = this.subscriptions[response.params.subscription];
             if (sub) {
-                //this.emit.apply(this,                  );
                 sub.processFunc(response.params.result);
             }
         }
     };
+    sendRequest(requestId, request) {
+        if (this.connection.readyState !== this.connection.OPEN) {
+            this.requestQueue.delete(requestId);
+            request.callback(errors.ConnectionNotOpenError(), null);
+            return;
+        }
+        this.responseQueue.set(requestId, request);
+        this.requestQueue.delete(requestId);
+        try {
+            this.connection.send(request.payload);
+        }
+        catch (error) {
+            request.callback(error, null);
+            this.responseQueue.delete(requestId);
+        }
+    }
     send(method, params) {
-        // var id = payload.id;
-        // var request = {payload: payload, callBack: callback};
-        // if (Array.isArray(payload)) {
-        //     id = payload[0].id;
-        // }
-        // if (this.connection.readyState === this.connection.CONNECTING) {
-        //     this.requestQueue.set(id, request);
-        //     return;
-        // }
-        // if (this.connection.readyState !== this.connection.OPEN) {
-        //     this.requestQueue.delete(id);
-        //     // this.eventStream.emit("error", Errors.ConnectionNotOpenError());
-        //     // request.callBack(Errors.ConnectionNotOpenError());
-        //     return;
-        // }
-        // this.responseQueue.set(id, request);
-        // this.requestQueue.delete(id);
-        // try {
-        //     this.connection.send(JSON.stringify(request.payload));
-        // } catch (error) {
-        //     request.callBack(error);
-        //     this.responseQueue.delete(id);
-        // }
         return new Promise((resolve, reject) => {
             function callback(error, result) {
                 if (error) {
@@ -159,26 +182,22 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 }
                 return resolve(result);
             }
-            const payload = JSON.stringify({
+            const requestId = nextReqId + 1;
+            const payload = {
                 method: method,
                 params: params,
-                id: 1,
+                id: requestId,
                 jsonrpc: "2.0"
-            });
+            };
             const request = {
-                payload: payload,
+                payload: JSON.stringify(payload),
                 callback: callback
             };
-            this.requestQueue.set("1", request);
-            if (this.isConnected) {
-                try {
-                    this.connection.send(request.payload);
-                    request.callback(null, {});
-                }
-                catch (error) {
-                    request.callback(error, null);
-                }
+            if (this.connection.readyState === this.connection.CONNECTING || this.reconnecting) {
+                this.requestQueue.set(requestId, request);
+                return;
             }
+            this.sendRequest(requestId, request);
         });
     }
     async _subscribe(tag, param, processFunc) {
@@ -198,14 +217,19 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 const params = {
                     address: event.address
                 };
-                this._subscribe("tesseract", ["newTesseracts", params], (result) => {
-                    this.emit("tesseract", result);
+                this._subscribe(event.tag, ["newAccountTesseracts", params], (result) => {
+                    this.emit(event.address, result);
                 });
                 break;
             case "all_tesseracts":
                 this._subscribe("all_tesseracts", ["newTesseracts"], (result) => {
                     this.emit("all_tesseracts", result);
                 });
+                break;
+            case "connect":
+            case "close":
+            case "debug":
+            case "error":
                 break;
             default:
                 console.log("unhandled:", event);
@@ -214,14 +238,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     }
     _stopEvent(event) {
         let tag = event.tag;
-        if (event.type === "tx") {
-            // There are remaining transaction event listeners
-            if (this._events.filter((e) => (e.type === "tx")).length) {
-                return;
-            }
-            tag = "tx";
-        }
-        else if (this.listenerCount(event.event)) {
+        if (this.listenerCount(event.event)) {
             // There are remaining event listeners
             return;
         }
@@ -240,7 +257,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     }
     async disconnect() {
         // Wait until we have connected before trying to disconnect
-        if (this.connection.readyState === websocket_1.w3cwebsocket.CONNECTING) {
+        if (this.connection.readyState === this.connection.CONNECTING) {
             await (new Promise((resolve) => {
                 this.connection.onopen = function () {
                     resolve(true);

@@ -11,12 +11,16 @@ class LogicDescriptor {
     manifestHash;
     engine;
     state;
+    sealed;
+    assetLogic;
     persistentStatePtr;
     ephemeralStatePtr;
     constructor(logicId, manifest) {
         this.logicId = new logic_id_1.default(logicId);
         this.manifest = manifest;
         this.manifestHash = moi_abi_1.ABICoder.encodeABI(this.manifest);
+        this.sealed = false;
+        this.assetLogic = false;
         const engine = this.manifest.engine;
         this.engine = engine.kind;
         const stateElement = this.manifest.elements.find(element => element.kind === "state");
@@ -44,6 +48,12 @@ class LogicDescriptor {
     };
     getManifestHash = () => {
         return this.manifestHash;
+    };
+    isSealed = () => {
+        return this.sealed;
+    };
+    isAssetLogic = () => {
+        return this.assetLogic;
     };
     getState = () => {
         return this.state;

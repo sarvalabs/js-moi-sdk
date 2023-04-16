@@ -3,16 +3,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Logic = void 0;
+exports.getLogicObject = void 0;
 const moi_abi_1 = require("moi-abi");
 const descriptor_1 = __importDefault(require("./descriptor"));
 const errors_1 = __importDefault(require("./errors"));
+const moi_utils_1 = require("moi-utils");
+const js_polo_1 = require("js-polo");
 class Logic extends descriptor_1.default {
     provider;
     routines;
     constructor(logicId, provider, manifest) {
         super(logicId, manifest);
         this.provider = provider;
+        this.createRoutines();
+    }
+    createRoutines() {
         this.routines = {};
         this.manifest.elements.forEach(element => {
             element.data = element.data;
@@ -25,7 +30,10 @@ class Logic extends descriptor_1.default {
         });
     }
     normalizeRoutineName(routineName) {
-        return routineName.replace("!", "");
+        if (routineName.endsWith("!")) {
+            return routineName.slice(0, -1); // Remove the last character (exclamation mark)
+        }
+        return routineName; // If no exclamation mark, return the original string
     }
     createPayload(ixObject) {
         const payload = {
@@ -58,7 +66,25 @@ class Logic extends descriptor_1.default {
         processedArgs.params.payload = ixObject.createPayload();
         return processedArgs;
     }
-    executeRoutine(ixObject, ...args) {
+    async processResult(response, ixObject, interactionHash, timeout) {
+        try {
+            const result = await response.result(interactionHash, timeout);
+            if (result) {
+                const data = (0, moi_utils_1.decodeBase64)(result);
+                const depolorizer = new js_polo_1.Depolorizer(data);
+                if (ixObject.routine.data && ixObject.routine.data.returns) {
+                    const schema = moi_abi_1.Schema.parseFields(ixObject.routine.data.returns);
+                    const result = depolorizer.depolorize(schema);
+                    return result;
+                }
+            }
+            return null;
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+    async executeRoutine(ixObject, ...args) {
         const processedArgs = this.processArguments(ixObject, args);
         if (!this.provider) {
             throw errors_1.default.providerNotFound();
@@ -67,14 +93,19 @@ class Logic extends descriptor_1.default {
             throw errors_1.default.addressNotDefined();
         }
         switch (processedArgs.type) {
-            case "estimate":
-                console.log("yet to be implemented");
-                break;
             case "call":
-                console.log("yet to be implemented");
-                break;
+            case "estimate":
+                throw new Error('Method "' + processedArgs.type + '" not implemented.');
             case "send":
-                return this.provider.sendInteraction(processedArgs.params);
+                return this.provider.sendInteraction(processedArgs.params)
+                    .then((response) => {
+                    return {
+                        ...response,
+                        result: this.processResult.bind(this, response, ixObject)
+                    };
+                }).catch((err) => {
+                    throw err;
+                });
             default:
                 throw new Error('Method "' + processedArgs.type + '" not implemented.');
         }
@@ -106,4 +137,16 @@ class Logic extends descriptor_1.default {
         return this.createIxRequest(ixObject);
     }
 }
-exports.Logic = Logic;
+const getLogicObject = async (logicId, provider, options) => {
+    try {
+        const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+        if (typeof manifest === 'object') {
+            return new Logic(logicId, provider, manifest);
+        }
+        throw new Error("Invalid manifest");
+    }
+    catch (err) {
+        throw err;
+    }
+};
+exports.getLogicObject = getLogicObject;

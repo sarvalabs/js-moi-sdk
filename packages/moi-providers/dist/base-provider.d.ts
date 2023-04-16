@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { Address } from "moi-utils";
+import { Address, LogicManifest, Tesseract } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionObject, InteractionReceipt, InteractionResponse, Options, TDU, Content } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionObject, InteractionReceipt, InteractionResponse, Options, TDU, Content, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 export declare class BaseProvider extends AbstractProvider {
@@ -19,21 +19,22 @@ export declare class BaseProvider extends AbstractProvider {
     getPendingInteractionCount(address: string): Promise<number | bigint>;
     getAccountState(address: string, options?: Options): Promise<AccountState>;
     getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo>;
-    getContentFrom(address: string): Promise<any>;
+    getContentFrom(address: string): Promise<ContentFrom>;
     getWaitTime(address: string): Promise<number | bigint>;
-    getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<any>;
+    getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
     sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse>;
     getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
     getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
     getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any>;
-    getLogicManifest(logicId: string): Promise<string>;
+    getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>;
     getContent(): Promise<Content>;
-    getStatus(): Promise<any>;
-    getInspect(): Promise<any>;
+    getStatus(): Promise<Status>;
+    getInspect(): Promise<Inspect>;
     getPeers(): Promise<string[]>;
-    getDBEntry(key: string): Promise<any>;
+    getDBEntry(key: string): Promise<string>;
     getAccounts(): Promise<Address[]>;
     waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>;
+    waitForResult(interactionHash: string, timeout?: number): Promise<string>;
     execute(method: string, params: any): Promise<any>;
     _startEvent(event: Event): void;
     _stopEvent(event: Event): void;
