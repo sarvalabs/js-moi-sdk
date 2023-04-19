@@ -47,8 +47,8 @@ export class BaseProvider extends AbstractProvider {
     public async getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint> {
         try {
             const params: BalanceParams = {
-                from: address,
-                assetid: assetId,
+                address: address,
+                asset_id: assetId,
                 options: options ? options : this.defaultOptions
             }
     
@@ -63,7 +63,7 @@ export class BaseProvider extends AbstractProvider {
     public async getContextInfo(address: string, options?: Options): Promise<ContextInfo> {
         try {
             const params: AccountParamsBase = {
-                from: address,
+                address: address,
                 options: options ? options : this.defaultOptions
             }
     
@@ -78,7 +78,7 @@ export class BaseProvider extends AbstractProvider {
     public async getTDU(address: string, options?: Options): Promise<TDU> {
         try {
             const params: AccountParamsBase = {
-                from: address,
+                address: address,
                 options: options ? options : this.defaultOptions
             }
     
@@ -93,7 +93,7 @@ export class BaseProvider extends AbstractProvider {
     public async getInteractionCount(address: string, options?: Options): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                from: address,
+                address: address,
                 options: options ? options : this.defaultOptions
             }
     
@@ -108,7 +108,7 @@ export class BaseProvider extends AbstractProvider {
     public async getPendingInteractionCount(address: string): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                from: address
+                address: address
             }
     
             const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params)
@@ -152,7 +152,7 @@ export class BaseProvider extends AbstractProvider {
     public async getContentFrom(address: string): Promise<ContentFrom> {
         try {
             const params: AccountParamsBase = {
-                from: address
+                address: address
             }
     
             const response: RpcResponse = await this.execute("ixpool.ContentFrom", params)
@@ -166,7 +166,7 @@ export class BaseProvider extends AbstractProvider {
     public async getWaitTime(address: string): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                from: address
+                address: address
             }
     
             const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
@@ -180,7 +180,7 @@ export class BaseProvider extends AbstractProvider {
     public async getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract> {
         try {
             const params: TesseractParams = {
-                from: address,
+                address: address,
                 with_interactions: with_interactions,
                 options: options ? options : this.defaultOptions
             }
@@ -257,7 +257,7 @@ export class BaseProvider extends AbstractProvider {
         try {
             const params: StorageParams = {
                 logic_id: logicId,
-                "storage-key": storageKey,
+                storage_key: storageKey,
                 options: options ? options : this.defaultOptions
             }
     
@@ -392,33 +392,33 @@ export class BaseProvider extends AbstractProvider {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
     
-                switch(receipt.IxType) {
+                switch(receipt.ix_type) {
                     case IxType.VALUE_TRANSFER:
                         resolve(null);
                         
                         break;
                     case IxType.ASSET_CREATE:
-                        if(receipt.ExtraData) {
-                            receipt.ExtraData = receipt.ExtraData as AssetCreationReceipt;
-                            resolve(receipt.ExtraData.asset_id);
+                        if(receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data as AssetCreationReceipt;
+                            resolve(receipt.extra_data.asset_id);
                         }
 
                         reject({message: "asset id not found"});
 
                         break;
                     case IxType.LOGIC_DEPLOY:
-                        if(receipt.ExtraData) {
-                            receipt.ExtraData = receipt.ExtraData as LogicDeployReceipt;
-                            resolve(receipt.ExtraData.logic_id);
+                        if(receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data as LogicDeployReceipt;
+                            resolve(receipt.extra_data.logic_id);
                         }
 
                         reject({message: "logic id not found"})
 
                         break;
                     case IxType.LOGIC_INVOKE:
-                        if(receipt.ExtraData) {
-                            receipt.ExtraData = receipt.ExtraData as LogicExecuteReceipt;
-                            resolve(receipt.ExtraData.return_data)
+                        if(receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data as LogicExecuteReceipt;
+                            resolve(receipt.extra_data.return_data)
                         }
 
                         reject({message: "invalid logic invoke response"});

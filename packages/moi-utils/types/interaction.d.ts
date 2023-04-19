@@ -1,34 +1,34 @@
 export interface IxInput {
-    IxType: number;
-    Nonce: bigint;
-    Sender: string;
-    Receiver: string;
-    Payer: string;
-    TransferValues: Map<string, bigint>;
-    PerceivedValues: Map<string, bigint>;
-    PerceivedProofs: string;
-    FuelLimit: bigint;
-    FuelPrice: bigint;
-    Payload: unknown;
+    type: number;
+    nonce: bigint;
+    sender: string;
+    receiver: string;
+    payer: string;
+    transfer_values: Map<string, bigint>;
+    perceived_values: Map<string, bigint>;
+    perceived_proofs: string;
+    fuel_limit: bigint;
+    fuel_price: bigint;
+    payload: unknown;
 }
 
 export interface IxCompute {
-    Mode: number | bigint;
-    Hash: string;
-    Nodes: string[];
+    mode: number | bigint;
+    hash: string;
+    compute_nodes: string[];
 }
 
 export interface IxTrust {
-    MTQ: number | bigint;
-    Nodes: string[];
+    mtq: number | bigint;
+    trust_nodes: string[];
 }
 
 export interface Interaction {
-    Input: IxInput;
-    Compute: IxCompute;
-    Trust: IxTrust;
-    Hash: string;
-    Signature: string;
+    input: IxInput;
+    compute: IxCompute;
+    trust: IxTrust;
+    hash: string;
+    signature: string;
 }
 
 export type Interactions = Interaction[];

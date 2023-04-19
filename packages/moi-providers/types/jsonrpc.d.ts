@@ -17,9 +17,9 @@ interface Options {
 }
 
 interface ContextInfo {
-    BehaviourNodes: string[];
-    RandomNodes: string[];
-    StorageNodes: string[];
+    behaviour_nodes: string[];
+    random_nodes: string[];
+    storage_nodes: string[];
 }
 
 interface TDU {
@@ -27,24 +27,24 @@ interface TDU {
 }
 
 interface AccountState {
-    Nonce: number | bigint;
-    AccType: number;
-    Balance: string;
-    AssetApprovals: string;
-    ContextHash: string;
-    StorageRoot: string;
-    LogicRoot: string;
-    FileRoot: string
+    nonce: number | bigint;
+    acc_type: number;
+    balance: string;
+    asset_approvals: string;
+    context_hash: string;
+    storage_root: string;
+    logic_root: string;
+    file_root: string
 }
 
 interface AccountMetaInfo {
-    Type: number;
-    Mode: string;
-    Address: Address;
-    Height: number | bigint;
-    TesseractHash: string;
-    LatticeExists: boolean;
-    StateExists: boolean;
+    type: number;
+    mode: string;
+    address: Address;
+    height: number | bigint;
+    tesseract_hash: string;
+    lattice_exists: boolean;
+    state_exists: boolean;
 }
 
 interface AssetCreationPayload {
@@ -91,12 +91,12 @@ interface InteractionResponse {
 }
 
 interface InteractionReceipt {
-    IxType: number;
-    IxHash: Hash;
-    FuelUsed: number;
-    StateHashes: Record<Address, Hash>;
-    ContextHashes: Record<Address, Hash>;
-    ExtraData: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    ix_type: number;
+    ix_hash: Hash;
+    fuel_used: number;
+    state_hashes: Record<Address, Hash>;
+    context_hashes: Record<Address, Hash>;
+    extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
 }
 
 interface AssetInfo {
@@ -113,7 +113,7 @@ interface AssetInfo {
 }
 
 interface AccountParamsBase {
-    from: Address,
+    address: Address,
     options?: Options 
 }
 
@@ -123,7 +123,7 @@ interface AccountStateParams {
 }
 
 interface BalanceParams extends AccountParamsBase {
-    assetid: AssetId,
+    asset_id: AssetId,
 }
 
 interface TesseractParams extends AccountParamsBase {
@@ -140,7 +140,7 @@ interface InteractionReceiptParams {
 
 interface StorageParams {
     logic_id: string;
-    "storage-key": string;
+    storage_key: string;
     options: Options;
 }
 
@@ -158,15 +158,15 @@ interface LogicManifestParams {
 }
 
 interface InteractionInfo {
-    Nonce: number;
-    Type: number;
-    Sender: string;
-    Receiver: string;
-    Cost: bigint;
-    FuelPrice: bigint;
-    FuelLimit: bigint;
-    Input: string;
-    Hash: string;
+    nonce: number;
+    type: number;
+    sender: string;
+    receiver: string;
+    cost: bigint;
+    fuel_price: bigint;
+    fuel_limit: bigint;
+    input: string;
+    hash: string;
 }
 
 interface Content {

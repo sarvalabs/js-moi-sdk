@@ -12,12 +12,12 @@ export interface LogicExecuteReceipt {
 }
 
 export interface Receipt {
-    IxType: number;
-    IxHash: string;
-    FuelUsed: bigint;
-    StateHashes: Map<string, string>;
-    ContextHashes: Map<string, string>;
-    extraData: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    ix_type: number;
+    ix_hash: string;
+    fuel_used: bigint;
+    state_hashes: Map<string, string>;
+    context_hashes: Map<string, string>;
+    extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
 }
 
 export type Receipts = Map<string, Receipt>;
