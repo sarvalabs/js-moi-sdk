@@ -35,8 +35,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getBalance(address, assetId, options) {
         try {
             const params = {
-                from: address,
-                assetid: assetId,
+                address: address,
+                asset_id: assetId,
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.Balance", params);
@@ -49,7 +49,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getContextInfo(address, options) {
         try {
             const params = {
-                from: address,
+                address: address,
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.ContextInfo", params);
@@ -62,7 +62,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getTDU(address, options) {
         try {
             const params = {
-                from: address,
+                address: address,
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.TDU", params);
@@ -75,7 +75,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getInteractionCount(address, options) {
         try {
             const params = {
-                from: address,
+                address: address,
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.InteractionCount", params);
@@ -88,7 +88,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getPendingInteractionCount(address) {
         try {
             const params = {
-                from: address
+                address: address
             };
             const response = await this.execute("moi.PendingInteractionCount", params);
             return this.processResponse(response);
@@ -126,7 +126,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getContentFrom(address) {
         try {
             const params = {
-                from: address
+                address: address
             };
             const response = await this.execute("ixpool.ContentFrom", params);
             return this.processResponse(response);
@@ -138,7 +138,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getWaitTime(address) {
         try {
             const params = {
-                from: address
+                address: address
             };
             const response = await this.execute("ixpool.WaitTime", params);
             return this.processResponse(response);
@@ -150,7 +150,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getTesseract(address, with_interactions, options) {
         try {
             const params = {
-                from: address,
+                address: address,
                 with_interactions: with_interactions,
                 options: options ? options : this.defaultOptions
             };
@@ -210,7 +210,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         try {
             const params = {
                 logic_id: logicId,
-                "storage-key": storageKey,
+                storage_key: storageKey,
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.StorageAt", params);
@@ -331,28 +331,28 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return new Promise(async (resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-                switch (receipt.IxType) {
+                switch (receipt.ix_type) {
                     case moi_utils_1.IxType.VALUE_TRANSFER:
                         resolve(null);
                         break;
                     case moi_utils_1.IxType.ASSET_CREATE:
-                        if (receipt.ExtraData) {
-                            receipt.ExtraData = receipt.ExtraData;
-                            resolve(receipt.ExtraData.asset_id);
+                        if (receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data;
+                            resolve(receipt.extra_data.asset_id);
                         }
                         reject({ message: "asset id not found" });
                         break;
                     case moi_utils_1.IxType.LOGIC_DEPLOY:
-                        if (receipt.ExtraData) {
-                            receipt.ExtraData = receipt.ExtraData;
-                            resolve(receipt.ExtraData.logic_id);
+                        if (receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data;
+                            resolve(receipt.extra_data.logic_id);
                         }
                         reject({ message: "logic id not found" });
                         break;
                     case moi_utils_1.IxType.LOGIC_INVOKE:
-                        if (receipt.ExtraData) {
-                            receipt.ExtraData = receipt.ExtraData;
-                            resolve(receipt.ExtraData.return_data);
+                        if (receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data;
+                            resolve(receipt.extra_data.return_data);
                         }
                         reject({ message: "invalid logic invoke response" });
                         break;
