@@ -2,7 +2,7 @@ import * as schnorrkel from "@parity/schnorrkel-js";
 import { bytesToUint8, uint8ToHex } from "moi-utils";
 import Wallet from "moi-wallet";
 
-export function Sign(message: Buffer, vault: Wallet): string {
+export const sign = (message: Buffer, vault: Wallet): string => {
     let _priv = vault.privateKey();
     let _pub = vault.privateKey();
 
@@ -11,7 +11,7 @@ export function Sign(message: Buffer, vault: Wallet): string {
     return uint8ToHex(sigDigest)
 }
 
-export function Verify(message: Buffer, signature: string, pubKey: Buffer): boolean {
+export const verify = (message: Buffer, signature: string, pubKey: Buffer): boolean => {
     const sigInUint8Array = Uint8Array.from(Buffer.from(signature, 'hex'));
     return schnorrkel.verify(sigInUint8Array, message, pubKey);
 }

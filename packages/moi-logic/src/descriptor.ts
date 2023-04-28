@@ -1,17 +1,25 @@
 import { ABICoder } from "moi-abi";
 import { LogicManifest } from "moi-utils";
-import LogicId from "./logic_id"
+import { CallSite } from "../types/logic";
+import LogicId from "./logic_id";
+import { ContextStateKind, ContextStateMatrix } from "./state";
+
+export enum EngineKind {
+    PISA = "PISA",
+    MERU = "MERU"
+}
 
 export default class LogicDescriptor {
     protected logicId: LogicId;
     protected manifest: LogicManifest.Manifest;
     protected manifestHash: string;
-    protected engine: string;
-    protected state: string;
+    protected engine: EngineKind;
+    protected stateMatrix: ContextStateMatrix;
     protected sealed: boolean;
     protected assetLogic: boolean;
-    protected persistentStatePtr: number;
-    protected ephemeralStatePtr: number;
+    protected elements: Map<number, LogicManifest.Element>
+    protected callSites: Map<string, CallSite>;
+    protected classDefs: Map<string, number>;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest) {
         this.logicId = new LogicId(logicId);
@@ -21,31 +29,38 @@ export default class LogicDescriptor {
         this.assetLogic = false;
 
         const engine: LogicManifest.EngineConfig = this.manifest.engine;
-        this.engine = engine.kind;
+        this.engine = engine.kind as EngineKind;
 
-        const stateElement: any = this.manifest.elements.find(element => 
+        const stateElements: any = this.manifest.elements.filter(element => 
             element.kind === "state"
         )
 
-        switch(stateElement.data.kind) {
-            case "persistent":
-                this.state = "Persistent";
-                this.persistentStatePtr = stateElement.ptr;
-                break;
-            case "ephemeral":
-                this.state = "Ephemeral";
-                this.ephemeralStatePtr = stateElement.ptr;
-                break;
-            default:
-                break;
-        } 
+        this.stateMatrix = new ContextStateMatrix(stateElements)
+
+        manifest.elements.forEach(element => {
+            this.elements.set(element.ptr, element);
+            
+            switch(element.kind){
+                case "class":
+                    element.data = element.data as LogicManifest.Class;
+                    this.classDefs.set(element.data.name, element.ptr);
+                    break;
+                case "routine":
+                    element.data = element.data as LogicManifest.Routine;
+                    const callsite = { ptr: element.ptr, kind: element.data.kind };
+                    this.callSites.set(element.data.name, callsite);
+                    break;
+                default:
+                    break;
+            }
+        })
     }
 
     public getLogicId = (): string => {
         return this.logicId.hex()
     }
 
-    public getEngine = (): string => {
+    public getEngine = (): EngineKind => {
         return this.engine;
     }
 
@@ -57,39 +72,55 @@ export default class LogicDescriptor {
         return this.manifestHash;
     }
 
-    public isSealed = () => {
+    public isSealed = (): boolean => {
         return this.sealed;
     }
 
-    public isAssetLogic = () => {
+    public isAssetLogic = (): boolean => {
         return this.assetLogic;
     }
 
-    public getState = (): string => {
-        return this.state;
+    public getStateMatrix = (): ContextStateMatrix => {
+        return this.stateMatrix;
     }
 
     public getPersistentState = (): [number, boolean] => {
-        if(this.persistentStatePtr !== undefined) {
-            return [this.persistentStatePtr, true];
+        const ptr = this.stateMatrix.get(ContextStateKind.PersistentState);
+
+        if(ptr !== undefined) {
+            return [ptr, true];
         }
 
         return [0, false];
     }
 
     public getEphemeralState = (): [number, boolean] => {
-        if(this.ephemeralStatePtr !== undefined) {
-            return [this.ephemeralStatePtr, true];
+        const ptr = this.stateMatrix.get(ContextStateKind.EphemeralState);
+        
+        if(ptr !== undefined) {
+            return [ptr, true];
         }
 
         return [0, false];
     }
 
-    public allowsInteractions = () => {
+    public allowsInteractions = (): boolean => {
         return this.logicId.isInteractive();
     }
 
-    public isStateful = () => {
+    public isStateful = (): boolean => {
         return this.logicId.isStateful();
+    }
+
+    public getElements = (): Map<number, LogicManifest.Element> => {
+        return this.elements
+    }
+
+    public getCallsites = (): Map<string, CallSite> => {
+        return this.callSites
+    } 
+
+    public getClassDefs = (): Map<string, number> => {
+        return this.classDefs
     }
 }

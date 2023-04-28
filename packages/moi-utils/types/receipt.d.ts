@@ -5,11 +5,15 @@ export interface AssetCreationReceipt {
 
 export interface LogicDeployReceipt {
     logic_id: string;
+    error: string
 }
 
 export interface LogicExecuteReceipt {
-    return_data: string;
+    outputs: string;
+    error: string
 }
+
+export type IxReceiptData = string | LogicDeployReceipt | LogicExecuteReceipt
 
 export interface Receipt {
     ix_type: number;

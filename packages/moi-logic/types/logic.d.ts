@@ -12,3 +12,8 @@ export interface LogicExecuteRequest {
 export interface Routines {
     [name: string]: (args: any[]) => any
 }
+
+export interface CallSite {
+    ptr: number,
+    kind: string
+}

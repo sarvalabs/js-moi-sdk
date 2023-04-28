@@ -9,6 +9,11 @@ export declare module LogicManifest {
         label: string;
         type: string;
     }
+
+    export interface Class {
+        name: string,
+        fields: TypeField[]
+    }
     
     export interface State {
         kind: string;
@@ -41,7 +46,7 @@ export declare module LogicManifest {
         ptr: number;
         kind: string;
         deps?: number[];
-        data: State | Constant | TypeDef | Routine;
+        data: State | Constant | TypeDef | Routine | Class;
     }
     
     export interface Manifest {

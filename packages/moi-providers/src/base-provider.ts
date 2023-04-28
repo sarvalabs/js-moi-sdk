@@ -1,17 +1,20 @@
-import { Address, ErrorCode, Errors, IxType, LogicManifest, AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt, bytesToHex, hexDataLength, decodeBase64, unmarshal, Tesseract } from "moi-utils";
+import { ErrorCode, Errors, IxType, LogicManifest, AssetCreationReceipt, 
+LogicDeployReceipt, LogicExecuteReceipt, Tesseract, bytesToHex, hexDataLength, 
+hexToBytes, unmarshal } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, InteractionReceipt, InteractionReceiptParams, InteractionResponse, LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, Content, AccountStateParams, DBEntryParams, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
+AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, 
+InteractionReceipt, InteractionReceiptParams, InteractionResponse, 
+LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
+Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
+Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
 const defaultTimeout: number = 120;
 
 export class BaseProvider extends AbstractProvider {
-    public _events: Array<Event>;
-
-    _pollingInterval: number;
-    _poller: NodeJS.Timer;
-    _bootstrapPoll: NodeJS.Timer;
+    public _events: Event[];
 
     public defaultOptions: Options = {
         tesseract_number: -1
@@ -21,11 +24,9 @@ export class BaseProvider extends AbstractProvider {
         super();
         // Events being listened to
         this._events = [];
-
-        this._pollingInterval = 4000;
     }
 
-    private processResponse(response: RpcResponse): any {
+    public processResponse(response: RpcResponse): any {
         if(response.result) {
             if(response.result.data) {
                 return response.result.data;
@@ -219,7 +220,7 @@ export class BaseProvider extends AbstractProvider {
                 ErrorCode.SERVER_ERROR,
             );
         } catch (error) {
-            throw new Error("bad result form backend")
+            throw error
         }
     }
 
@@ -279,7 +280,7 @@ export class BaseProvider extends AbstractProvider {
     
             const response: RpcResponse = await this.execute("moi.LogicManifest", params)
             const data = this.processResponse(response);
-            const decodedManifest = decodeBase64(data);
+            const decodedManifest = hexToBytes(data.substr(2,))
 
             switch(encoding) {
                 case "JSON":
@@ -344,7 +345,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getAccounts(): Promise<Address[]> {
+    public async getAccounts(): Promise<string[]> {
         try {
             const response: RpcResponse = await this.execute("debug.GetAccounts", null)
             return this.processResponse(response)
@@ -387,7 +388,7 @@ export class BaseProvider extends AbstractProvider {
         })
     }
 
-    public async waitForResult(interactionHash: string, timeout?: number): Promise<string> {
+    public async waitForResult(interactionHash: string, timeout?: number): Promise<any> {
         return new Promise(async(resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
@@ -409,26 +410,32 @@ export class BaseProvider extends AbstractProvider {
                     case IxType.LOGIC_DEPLOY:
                         if(receipt.extra_data) {
                             receipt.extra_data = receipt.extra_data as LogicDeployReceipt;
-                            resolve(receipt.extra_data.logic_id);
+                            resolve(receipt.extra_data);
                         }
 
-                        reject({message: "logic id not found"})
+                        reject({
+                            message: "invalid logic deploy response", 
+                            error: null
+                        })
 
                         break;
                     case IxType.LOGIC_INVOKE:
                         if(receipt.extra_data) {
                             receipt.extra_data = receipt.extra_data as LogicExecuteReceipt;
-                            resolve(receipt.extra_data.return_data)
+                            resolve(receipt.extra_data);
                         }
 
-                        reject({message: "invalid logic invoke response"});
+                        reject({
+                            message: "invalid logic invoke response", 
+                            error: null
+                        });
 
                         break;
                     default:
-                        Errors.throwError(
-                            "Unsupported interaction type", 
-                            ErrorCode.UNSUPPORTED_OPERATION
-                        );
+                        reject({
+                            message: "unsupported interaction type", 
+                            error: null
+                        });
                 }
             } catch(err) {
                 throw err;
@@ -441,11 +448,9 @@ export class BaseProvider extends AbstractProvider {
     }
 
     public _startEvent(event: Event): void {
-        this.polling = (this._events.filter((e) => e.pollable()).length > 0);
     }
 
     public _stopEvent(event: Event): void {
-        this.polling = (this._events.filter((e) => e.pollable()).length > 0);
     }
 
     _addEventListener(eventName: EventType, listener: Listener, once: boolean): this {
@@ -554,61 +559,9 @@ export class BaseProvider extends AbstractProvider {
 
         return this;
     }
-
-    get polling(): boolean {
-        return (this._poller != null);
-    }
-
-    set polling(value: boolean) {
-        if (value && !this._poller) {
-            this._poller = setInterval(() => { this.poll(); }, this.pollingInterval);
-
-            if (!this._bootstrapPoll) {
-                this._bootstrapPoll = setTimeout(() => {
-                    this.poll();
-
-                    // We block additional polls until the polling interval
-                    // is done, to prevent overwhelming the poll function
-                    this._bootstrapPoll = setTimeout(() => {
-                        // If polling was disabled, something may require a poke
-                        // since starting the bootstrap poll and it was disabled
-                        if (!this._poller) { this.poll(); }
-
-                        // Clear out the bootstrap so we can do another
-                        this._bootstrapPoll = null;
-                    }, this.pollingInterval);
-                }, 0);
-            }
-
-        } else if (!value && this._poller) {
-            clearInterval(this._poller);
-            this._poller = null;
-        }
-    }
-
-    async poll() {
-        
-    }
-
-    get pollingInterval(): number {
-        return this._pollingInterval;
-    }
-
-    set pollingInterval(value: number) {
-        if (typeof(value) !== "number" || value <= 0 || parseInt(String(value)) != value) {
-            throw new Error("invalid polling interval");
-        }
-
-        this._pollingInterval = value;
-
-        if (this._poller) {
-            clearInterval(this._poller);
-            this._poller = setInterval(() => { this.poll(); }, this._pollingInterval);
-        }
-    }
 }
 
-function getEventTag(eventName: EventType): string {
+const getEventTag = (eventName: EventType): string => {
     if (typeof(eventName) === "string") {
         eventName = eventName.toLowerCase();
 

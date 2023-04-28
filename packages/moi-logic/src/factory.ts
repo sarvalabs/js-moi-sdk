@@ -9,11 +9,13 @@ export class LogicFactory {
     private manifest: LogicManifest.Manifest;
     private encodedManifest: string;
     private provider: JsonRpcProvider;
+    private abiCoder: ABICoder;
 
     constructor(manifest: LogicManifest.Manifest, provider: JsonRpcProvider) {
         this.manifest = manifest;
         this.encodedManifest = ABICoder.encodeABI(manifest);
         this.provider = provider;
+        this.abiCoder = new ABICoder()
     }
 
     private createPayload(ixObject: any): any {
@@ -23,7 +25,7 @@ export class LogicFactory {
         }
 
         if(ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = ABICoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
         }
 
         return payload;
@@ -56,6 +58,28 @@ export class LogicFactory {
         return processedArgs
     }
 
+    private async processResult(response: any, interactionHash: string, timeout?: number): Promise<any> {
+        try {
+            const result = await response.result(interactionHash, timeout);
+            const data = {
+                logic_id: "",
+                error: null
+            };
+
+            if(result.logic_id) {
+                data.logic_id = result.logic_id;
+
+                return result
+            }
+
+            data.error = ABICoder.decodeException(result.error.substr(2,))
+
+            return data
+        } catch(err) {
+            throw err;
+        }
+    }
+
     private executeRoutine(ixObject: any, ...args: any[]): any {
         const processedArgs = this.processArguments(ixObject, args)
 
@@ -72,6 +96,14 @@ export class LogicFactory {
                 break;
             case "send":
                 return this.provider.sendInteraction(processedArgs.params)
+                .then((response) => {
+                    return {
+                        ...response,
+                        result: this.processResult.bind(this, response)
+                    }
+                }).catch((err) => {
+                    throw err;
+                });
             default:
                 throw new Error('Method "' + processedArgs.type + '" not implemented.');
         }

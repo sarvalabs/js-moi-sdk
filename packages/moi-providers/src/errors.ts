@@ -1,12 +1,17 @@
+import { defineReadOnly } from "moi-utils";
 
 const connectionError = (msg, event) => {
-    const error: any = new Error(msg);
-    if (event) {
-        error.code = event.code;
-        error.reason = event.reason;
+    try {
+        const error: Error = new Error(msg);
+        if (event) {
+            defineReadOnly(<any>error, "code", event.code || null);
+            defineReadOnly(<any>error, "response", event.reason);
+        }
+    
+        return error;
+    } catch(err) {
+        throw err
     }
-
-    return error;
 }
 
 export const ConnectionNotOpenError = (event?: any): Error => {
@@ -15,4 +20,12 @@ export const ConnectionNotOpenError = (event?: any): Error => {
 
 export const InvalidConnection = (host, event): Error => {
     return connectionError('CONNECTION ERROR: Couldn\'t connect to node '+ host +'.', event);
+}
+
+export const MaxAttemptsReachedOnReconnectingError = (): Error => {
+    return new Error('Maximum number of reconnect attempts reached!');
+}
+
+export const PendingRequestsOnReconnectingError = (): Error => {
+    return new Error('CONNECTION ERROR: Provider started to reconnect before the response got received!');
 }

@@ -1,10 +1,7 @@
 import { 
-    Address, 
     AssetCreationReceipt, 
     AssetKind, 
-    AssetId, 
     Hex,
-    Hash, 
     IxType, 
     LogicDeployReceipt, 
     LogicExecuteReceipt 
@@ -13,7 +10,7 @@ import {
 interface Options {
     tesseract_number?: number;
     tesseract_hash?: string;
-    address?: Address;
+    address?: string;
 }
 
 interface ContextInfo {
@@ -23,7 +20,7 @@ interface ContextInfo {
 }
 
 interface TDU {
-    [assetId: AssetId]: number | bigint;
+    [assetId: string]: number | bigint;
 }
 
 interface AccountState {
@@ -40,7 +37,7 @@ interface AccountState {
 interface AccountMetaInfo {
     type: number;
     mode: string;
-    address: Address;
+    address: string;
     height: number | bigint;
     tesseract_hash: string;
     lattice_exists: boolean;
@@ -74,11 +71,11 @@ interface LogicInvokePayload {
 interface InteractionObject {
     type: IxType;
     nonce?: number | bigint;
-    sender: Address;
-    receiver?: Address;
-    payer?: Address;
-    transfer_values?: Map<AssetId, Hex>;
-    perceived_values?: Map<AssetId, Hex>;
+    sender: string;
+    receiver?: string;
+    payer?: string;
+    transfer_values?: Map<string, Hex>;
+    perceived_values?: Map<string, Hex>;
     fuel_price: Hex;
     fuel_limit: Hex;
     payload: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
@@ -92,10 +89,10 @@ interface InteractionResponse {
 
 interface InteractionReceipt {
     ix_type: number;
-    ix_hash: Hash;
+    ix_hash: string;
     fuel_used: number;
-    state_hashes: Record<Address, Hash>;
-    context_hashes: Record<Address, Hash>;
+    state_hashes: Record<string, string>;
+    context_hashes: Record<string, string>;
     extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
 }
 
@@ -113,17 +110,17 @@ interface AssetInfo {
 }
 
 interface AccountParamsBase {
-    address: Address,
+    address: string,
     options?: Options 
 }
 
 interface AccountStateParams {
-    address: Address,
+    address: string,
     options?: Options 
 }
 
 interface BalanceParams extends AccountParamsBase {
-    asset_id: AssetId,
+    asset_id: string,
 }
 
 interface TesseractParams extends AccountParamsBase {
@@ -131,11 +128,11 @@ interface TesseractParams extends AccountParamsBase {
 }
 
 interface AssetInfoParams {
-    asset_id: AssetId 
+    asset_id: string 
 }
 
 interface InteractionReceiptParams {
-    hash: Hash
+    hash: string
 }
 
 interface StorageParams {

@@ -11,37 +11,30 @@ import * as ecc from 'tiny-secp256k1';
 import * as schnorrkel from "@parity/schnorrkel-js";
 
 /* Internal imports */
-import { 
-    MOI_DERIVATION_PATH, 
-} from 'moi-constants';
-import { 
-    bytesToUint8, 
-    uint8ToHex, 
-    hexToUint8  
-} from "moi-utils";
-
+import { MOI_DERIVATION_PATH } from 'moi-constants';
+import { bytesToUint8, uint8ToHex, hexToUint8 } from "moi-utils";
 import * as Types from "../types/index";
 import * as SigningKeyErrors from "./errors";
 
 
 const bip32 = BIP32Factory(ecc);
 
-function _privateMapGet(receiver: any, privateMap: any) {
+const privateMapGet = (receiver: any, privateMap: any) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateGet()
     }
-    var descriptor = privateMap.get(receiver);
+    const descriptor = privateMap.get(receiver);
     if (descriptor.get) {
         return descriptor.get.call(receiver);
     }
     return descriptor.value;
 }
 
-function _privateMapSet(receiver: any, privateMap: any, value: any) {
+const privateMapSet = (receiver: any, privateMap: any, value: any) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateSet()
     }
-    var descriptor = privateMap.get(receiver);
+    const descriptor = privateMap.get(receiver);
     if (descriptor.set) {
         descriptor.set.call(receiver, value);
     } else {
@@ -50,7 +43,7 @@ function _privateMapSet(receiver: any, privateMap: any, value: any) {
     return value;
 }
 
-let __vault = new WeakMap();
+const __vault = new WeakMap();
 class Wallet {
     constructor() {
         __vault.set(this, {
@@ -58,8 +51,8 @@ class Wallet {
         })
     }
 
-    load(key: Buffer | undefined, mnemonic: string | undefined, curve: string) {
-        let privKey, pubKey;
+    public load(key: Buffer | undefined, mnemonic: string | undefined, curve: string) {
+        let privKey: string, pubKey: string;
         if(!key) {
             throw new Error("key cannot be undefined")
         }
@@ -84,7 +77,7 @@ class Wallet {
             }
         }
         
-        _privateMapSet(this, __vault, {
+        privateMapSet(this, __vault, {
             _key: privKey,
             _mnemonic: mnemonic,
             _public: pubKey,
@@ -92,7 +85,7 @@ class Wallet {
         });
     }
 
-    async createRandom() {
+    public async createRandom() {
         try {
             const _random16Bytes = randomBytes(16)
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
@@ -102,7 +95,7 @@ class Wallet {
         }
     }
     
-    async fromMnemonic(mnemonic: string, wordlist: undefined) {
+    public async fromMnemonic(mnemonic: string, wordlist: undefined) {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
@@ -114,10 +107,10 @@ class Wallet {
         }
     }
 
-    privateKey() { return _privateMapGet(this, __vault)._key }
-    mnemonic() { return _privateMapGet(this, __vault)._mnemonic }
-    publicKey() { return _privateMapGet(this, __vault)._public }
-    curve() { return _privateMapGet(this, __vault)._curve }
+    public privateKey() { return privateMapGet(this, __vault)._key }
+    public mnemonic() { return privateMapGet(this, __vault)._mnemonic }
+    public publicKey() { return privateMapGet(this, __vault)._public }
+    public curve() { return privateMapGet(this, __vault)._curve }
 }
 
 export default Wallet;

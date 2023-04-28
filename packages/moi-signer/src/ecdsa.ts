@@ -3,13 +3,13 @@ import elliptic from "elliptic";
 
 const secp256k1Curve = new elliptic.ec('secp256k1');
 
-export function Sign(message: Buffer, vault: Wallet): string {
+export const sign = (message: Buffer, vault: Wallet): string => {
     let prvKey = secp256k1Curve.keyFromPrivate(vault.privateKey())
     return prvKey.sign(message).toDER("hex");
 }
 
 
-export function Verify(message: Buffer, signature: string, pub: Buffer): boolean {
+export const verify = (message: Buffer, signature: string, pub: Buffer): boolean => {
     let pubKey = secp256k1Curve.keyFromPublic(pub);
     return pubKey.verify(message, signature)
 }

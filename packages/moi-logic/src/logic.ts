@@ -1,18 +1,19 @@
-import { ABICoder, Schema } from "moi-abi";
+import { ABICoder } from "moi-abi";
 import LogicDescriptor from "./descriptor";
 import { InteractionResponse, JsonRpcProvider, Options } from "moi-providers";
 import { LogicExecuteRequest, Routines } from "../types/logic";
 import Errors from "./errors";
-import { decodeBase64, LogicManifest } from "moi-utils";
-import { Depolorizer } from "js-polo";
+import { LogicManifest } from "moi-utils";
 
 class Logic extends LogicDescriptor {
     private provider: JsonRpcProvider;
+    private abiCoder: ABICoder;
     public routines: Routines;
 
     constructor(logicId: string, provider: JsonRpcProvider, manifest: LogicManifest.Manifest) {
         super(logicId, manifest)
         this.provider = provider;
+        this.abiCoder = new ABICoder(this.elements, this.classDefs);
         this.createRoutines();
     }
 
@@ -39,12 +40,12 @@ class Logic extends LogicDescriptor {
 
     private createPayload(ixObject: any): any {
         const payload: any = {
-            logic_id: this.logicId,
+            logic_id: this.getLogicId(),
             callsite: ixObject.routine.data.name,
         }
 
         if(ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = ABICoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
         }
 
         return payload;
@@ -80,20 +81,28 @@ class Logic extends LogicDescriptor {
     private async processResult(response: any, ixObject: any, interactionHash: string, timeout?: number): Promise<any> {
         try {
             const result = await response.result(interactionHash, timeout);
+            const data = {
+                output: null,
+                error: null
+            };
 
-            if(result) {
-                const data = decodeBase64(result);
-                const depolorizer = new Depolorizer(data);
-    
-                if(ixObject.routine.data && ixObject.routine.data.returns) {
-                    const schema = Schema.parseFields(ixObject.routine.data.returns)
-                    const result = depolorizer.depolorize(schema)
-    
-                    return result;
-                }
+            if(result.error && result.error !== "0x") {
+                data.error = ABICoder.decodeException(result.error.substr(2,))
+            }
+
+            if((result.outputs && result.outputs !== "0x") && 
+            ixObject.routine.data && ixObject.routine.data.returns) {
+                data.output = this.abiCoder.decodeOutput(
+                    result.outputs.substr(2,),
+                    ixObject.routine.data.returns
+                )
             }
     
-            return null;
+            if(data.output || data.error) {
+                return data
+            }
+
+            return null
         } catch(err) {
             throw err;
         }
@@ -106,7 +115,7 @@ class Logic extends LogicDescriptor {
             throw Errors.providerNotFound()
         }
 
-        if(!this.logicId) {
+        if(!this.getLogicId()) {
             throw Errors.addressNotDefined()
         }
 

@@ -17,7 +17,19 @@ const isMap = (type: string): boolean => {
     return type.startsWith("map")
 }
 
+const isClass = (type: string, classDefs: Map<string, number>): boolean => {
+    return classDefs.has(type)
+}
+
 export class Schema {
+    private elements: Map<number, LogicManifest.Element>
+    private classDefs: Map<string, number>
+
+    constructor(elements?: Map<number, LogicManifest.Element>, classDefs?: Map<string, number>) {
+        this.elements = elements
+        this.classDefs = classDefs
+    }
+
     public static PISA_ENGINE_SCHEMA = {
         kind: "struct",
         fields: {
@@ -112,6 +124,18 @@ export class Schema {
         kind: "string",
         fields: {}
     }
+
+    public static PISA_CLASS_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string"
+            },
+            fields: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            }
+        }
+    }
     
     public static PISA_ROUTINE_SCHEMA = {
         kind: "struct",
@@ -142,7 +166,39 @@ export class Schema {
         }
     }
 
-    private static extractArrayDataType = (dataType: string): string => {
+    public static PISA_EXCEPTION_SCHEMA = {
+        kind: "struct",
+        fields: {
+            class: {
+                kind: "string"
+            },
+            data: {
+                kind: "string"
+            },
+            trace: {
+                kind: "array",
+                fields: {
+                    values: {
+                        kind: "string"
+                    }
+                }
+            }
+        }
+    }
+
+    public static PISA_RESULT_SCHEMA = {
+        kind: "struct",
+        fields: {
+            outputs: {
+                kind: "bytes"
+            },
+            error: {
+                kind: "bytes"
+            }
+        }
+    }
+
+    private extractArrayDataType = (dataType: string): string => {
         let endIndex: number = 0
     
         for(let i = 0; i < dataType.length; i++) {
@@ -161,7 +217,7 @@ export class Schema {
         throw new Error("invalid array type!")
     }
     
-    private static extractMapDataType = (dataType: string): [string, string] => {
+    private extractMapDataType = (dataType: string): [string, string] => {
         let brackets: string[] = []
         let startIndex: number = 0
         let endIndex: number = 0
@@ -190,7 +246,7 @@ export class Schema {
         return [key, value]
     }
     
-    private static convertPrimitiveDataType = (type: string) => {
+    private convertPrimitiveDataType = (type: string) => {
         switch(type) {
             case "null":
                 return "null";
@@ -209,8 +265,24 @@ export class Schema {
                 throw new Error('unsupported data type!');
         }
     }
+
+    private parseClassFields = (type: string) => {
+        const ptr = this.classDefs.get(type)
+        const element = this.elements.get(ptr)
+        const schema = {
+            kind: "struct",
+            fields: {}
+        }
+
+        element.data = element.data as LogicManifest.Class
+        Object.values(element.data.fields).forEach(field => {
+            schema.fields[field.label] = this.parseDataType(field.type)
+        })
+
+        return schema
+    }
     
-    private static parseDataType = (type: string) => {
+    private parseDataType = (type: string) => {
         switch(true) {
             case isPrimitiveType(type):
                 return {
@@ -233,12 +305,14 @@ export class Schema {
                         values: this.parseDataType(value)
                     }
                 };
+            case isClass(type, this.classDefs):
+                return this.parseClassFields(type)
             default:
                 throw new Error("unsupported data type!")
         }
     }
     
-    public static parseFields = (fields: Record<string, LogicManifest.TypeField>): PoloSchema => {
+    public parseFields = (fields: LogicManifest.TypeField[]): PoloSchema => {
         const schema = {
             kind: 'struct',
             fields: {}
@@ -248,7 +322,7 @@ export class Schema {
             throw new Error("invalid fields") 
         }
     
-        Object.values(fields).forEach(field => {
+        fields.forEach(field => {
             if(!field || !(field.label && field.type)) {
                 throw new Error("invalid field")
             }

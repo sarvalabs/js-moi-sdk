@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BaseProvider } from "./base-provider"
+import { BaseProvider } from "./base-provider";
 import Event from "./event";
 
 const config = {
@@ -27,7 +27,7 @@ export class JsonRpcProvider extends BaseProvider {
         try {
             return await this.send(method, [params])
         } catch (error) {
-            return error
+            throw error
         }
     }
 

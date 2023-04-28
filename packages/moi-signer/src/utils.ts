@@ -1,6 +1,6 @@
 const SUPPORTED_SIG_ALGOS = ["ecdsa","schnorr"]
 
-export function generateRandomSeed(count: number) {
+export const generateRandomSeed = (count: number) => {
     let seed = new Uint8Array(count);
     for (let i = 0; i < count; i++) {
         seed[i] = Math.floor(Math.random() * 256)
@@ -8,7 +8,7 @@ export function generateRandomSeed(count: number) {
     return seed
 }
 
-export function getBytesFromString(str: string) {
+export const getBytesFromString = (str: string) => {
     var bytes = [];
     for (var i = 0; i < str.length; ++i) {
         bytes.push(str.charCodeAt(i));
@@ -16,7 +16,7 @@ export function getBytesFromString(str: string) {
     return bytes;
 };
 
-export function getSigTypeAttributes(sigType: string | undefined): string[] {
+export const getSigTypeAttributes = (sigType: string | undefined): string[] => {
     const sigTypeArray = sigType?.split("_");
     if(sigTypeArray?.length !== 2) {
         throw new Error("invalid signature type")

@@ -5,18 +5,29 @@ import Event from "./event";
 import { TesseractParams, Subscription } from "../types/websocket";
 import { InflightRequest } from "../types/websocket";
 import * as errors from "./errors";
+import { defineReadOnly } from "moi-utils";
 
 let nextReqId = 1;
 
+export enum WebSocketEvents {
+    TESSERACT = 'tesseract',
+    ALL_TESSERACTS = 'all_tesseracts',
+    CONNECT = "connect",
+    RECONNECT = 'reconnect',
+    CLOSE = 'close',
+    DEBUG = 'debug',
+    ERROR = 'error',
+}
+
 export class WebSocketProvider extends JsonRpcProvider {
-    public requestQueue: Map<number, InflightRequest>;
-    public responseQueue: Map<number, InflightRequest>;
-    public connection: any;
-    public wsConnOptions: WebsocketProviderOptions;
-    public reconnecting: boolean;
-    public reconnAttempts: number;
-    public subscriptions: Map<string, Subscription>;
-    public subsIds: { [ tag: string ]: Promise<string> };
+    private requestQueue: Map<number, InflightRequest>;
+    private responseQueue: Map<number, InflightRequest>;
+    private connection: any;
+    private wsConnOptions: WebsocketProviderOptions;
+    private reconnecting: boolean;
+    private reconnAttempts: number;
+    private subscriptions: Map<string, Subscription>;
+    private subsIds: { [ tag: string ]: Promise<string> };
 
     constructor(host: string, options?: WebsocketProviderOptions) {
         if(/^ws(s)?:\/\//i.test(host)) {
@@ -29,9 +40,9 @@ export class WebSocketProvider extends JsonRpcProvider {
             this.wsConnOptions.reconnectOptions = Object.assign({
                 auto: false,
                 delay: 5000,
-                maxAttempts: false,
+                maxAttempts: 5,
                 onTimeout: false
-            }, options?.reconnect);
+            }, options?.reconnectOptions);
             this.wsConnOptions.headers = options?.headers || {};
             this.wsConnOptions.protocol = options?.protocol || undefined;
             this.wsConnOptions.clientConfig = options?.clientConfig || undefined;
@@ -40,6 +51,7 @@ export class WebSocketProvider extends JsonRpcProvider {
             this.wsConnOptions.clientConfig = options?.clientConfig || undefined;
 
             this.connection = null;
+            this.reconnAttempts = 0;
             this.requestQueue = new Map()
             this.responseQueue = new Map()
             this.subscriptions = new Map()
@@ -52,7 +64,7 @@ export class WebSocketProvider extends JsonRpcProvider {
         throw new Error("Invalid websocket request url!")
     }
 
-    public connect = () => {
+    private connect = () => {
         this.connection = new WsConn(
             this.host, 
             this.wsConnOptions.protocol, 
@@ -66,29 +78,64 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     private addEventListener = () => {
-        this.connection.onerror = this.onError.bind(this)
         this.connection.onopen = this.onConnect.bind(this)
         this.connection.onclose = this.onClose.bind(this)
         this.connection.onmessage = this.onMessage.bind(this)
+
+        if(this.connection._client) {
+            this.connection._client.removeAllListeners("connectFailed")
+
+            this.connection._client.on("connectFailed", this.onConnectFailed.bind(this))
+        }
     }
 
     private removeEventListener = () => {
-        this.connection.onerror = null;
         this.connection.onopen = null;
         this.connection.onclose = null;
         this.connection.onmessage = null;
     }
 
-    private reconnect = () => {
-        console.log("Trying to reconnect...!");
-    }
-
-    private onError = () => {
-        this.emit("error", "Failed to establish connection.");
+    private reconnect(): void {
+        this.reconnecting = true;
+    
+        if (this.responseQueue.size > 0) {
+            this.responseQueue.forEach(function (request, key) {
+                try{
+                    this.responseQueue.delete(key);
+                    request.callback(errors.PendingRequestsOnReconnectingError(), null)
+                } catch (e) {
+                    console.error("Error encountered in reconnect: ", e)
+                }
+            });
+        }
+    
+        if (
+            !this.wsConnOptions.reconnectOptions.maxAttempts ||
+            this.reconnAttempts < this.wsConnOptions.reconnectOptions.maxAttempts
+        ) {
+            setTimeout(() => {
+                this.reconnAttempts++;
+                this.removeEventListener();
+                this.emit(WebSocketEvents.RECONNECT, this.reconnAttempts);
+                this.connect();
+            }, this.wsConnOptions.reconnectOptions.delay);
+    
+            return;
+        }
+    
+        this.emit(WebSocketEvents.ERROR, errors.MaxAttemptsReachedOnReconnectingError());
+        this.reconnecting = false;
+    
+        if (this.requestQueue.size > 0) {
+            this.requestQueue.forEach(function (request, key) {
+                request.callback(errors.MaxAttemptsReachedOnReconnectingError(), null);
+                this.requestQueue.delete(key);
+            });
+        }
     }
 
     private onConnect = () => {
-        this.emit("connect", "Websocket connection established successfully!");
+        this.emit(WebSocketEvents.CONNECT, "Websocket connection established successfully!");
         this.reconnAttempts = 0;
         this.reconnecting = false;
 
@@ -117,7 +164,7 @@ export class WebSocketProvider extends JsonRpcProvider {
                 return;
             }
     
-            this.emit("close", event)
+            this.emit(WebSocketEvents.CLOSE, event)
     
             if (this.requestQueue.size > 0) {
                 this.requestQueue.forEach(function (request, key) {
@@ -150,7 +197,7 @@ export class WebSocketProvider extends JsonRpcProvider {
             if(response.result != undefined) {
                 request.callback(null, response.result);
 
-                this.emit("debug", {
+                this.emit(WebSocketEvents.DEBUG, {
                     action: "response",
                     request: JSON.parse(request.payload),
                     response: response.result,
@@ -158,6 +205,23 @@ export class WebSocketProvider extends JsonRpcProvider {
                 });
             } else {
                 // TODO: handle error
+                let error: Error = null;
+                if (response.error) {
+                    error = new Error(response.error.message || "unknown error");
+                    defineReadOnly(<any>error, "code", response.error.code || null);
+                    defineReadOnly(<any>error, "response", data);
+                } else {
+                    error = new Error("unknown error");
+                }
+
+                request.callback(error, null);
+
+                this.emit(WebSocketEvents.ERROR, {
+                    action: "response",
+                    error: error,
+                    request: JSON.parse(request.payload),
+                    provider: this
+                });
             }
         } else if(response.method === "moi.subscription") {
             const sub = this.subscriptions[response.params.subscription];
@@ -165,6 +229,46 @@ export class WebSocketProvider extends JsonRpcProvider {
                 sub.processFunc(response.params.result)
             }
         }
+    }
+
+    private onConnectFailed = (event): void => {
+        let connectFailedDescription = event.toString().split('\n')[0];
+        if (connectFailedDescription) {
+            event.description = connectFailedDescription;
+        }
+    
+        event.code = 1006;
+        event.reason = 'connection failed';
+        
+        if (this.wsConnOptions.reconnectOptions.auto && (![1000, 1001].includes(event.code) || event.wasClean === false)) {
+            this.reconnect();
+
+            return;
+        }
+    
+        this.emit(WebSocketEvents.ERROR, event);
+        if (this.requestQueue.size > 0) {
+            this.requestQueue.forEach(function (request, key) {
+                request.callback(errors.ConnectionNotOpenError(event), null);
+                this.requestQueue.delete(key);
+            });
+        }
+    
+        if (this.responseQueue.size > 0) {
+            this.responseQueue.forEach(function (request, key) {
+                request.callback(errors.InvalidConnection('on WS', event), null);
+                this.responseQueue.delete(key);
+            });
+        }
+    
+        //clean connection on our own
+        if(this.connection._connection){
+            this.connection._connection.removeAllListeners();
+        }
+        this.connection._client.removeAllListeners();
+        this.connection._readyState = 3; // set readyState to CLOSED
+    
+        this.emit(WebSocketEvents.CLOSE, event);
     }
 
     private sendRequest(requestId: number, request: InflightRequest): void {
@@ -194,7 +298,7 @@ export class WebSocketProvider extends JsonRpcProvider {
                 return resolve(result);
             }
 
-            const requestId = nextReqId + 1
+            const requestId = nextReqId++
 
             const payload = {
                 method: method,
@@ -243,11 +347,13 @@ export class WebSocketProvider extends JsonRpcProvider {
 
             case "all_tesseracts":
                 this._subscribe("all_tesseracts", [ "newTesseracts" ], (result: any) => {
-                    this.emit("all_tesseracts", result);
+                    this.emit(WebSocketEvents.ALL_TESSERACTS, result);
                 });
                 break;
             
             case "connect":
+
+            case "reconnect":
             
             case "close":
 

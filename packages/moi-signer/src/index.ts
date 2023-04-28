@@ -8,9 +8,9 @@ import * as ecdsa from "./ecdsa"
 import * as Types from "../types/index"
 import Wallet from "moi-wallet"
 
-export default class Signer implements Types.Mudra {
-    signingVault: Wallet
-    sigAlgorithm: string
+export default class Signer {
+    private signingVault: Wallet
+    private sigAlgorithm: string
 
     constructor(vault: Wallet, sigAlgo?: string) {
         const sigTypeAtts = Utils.getSigTypeAttributes(sigAlgo)
@@ -21,13 +21,13 @@ export default class Signer implements Types.Mudra {
         this.signingVault = vault
     }
 
-    Sign(message: Buffer): String {
+    public sign(message: Buffer): String {
        switch(this.sigAlgorithm) {
         case Types.SCHNORR: {
-            return sr25519.Sign(message, this.signingVault)
+            return sr25519.sign(message, this.signingVault)
         }
         case Types.ECDSA: {
-            return ecdsa.Sign(message, this.signingVault)
+            return ecdsa.sign(message, this.signingVault)
         }
         default: {
             throw new Error("unsupported signature algorithm")
@@ -35,13 +35,13 @@ export default class Signer implements Types.Mudra {
        }
     }
 
-    Verify(message: Buffer, signature: string): boolean {
+    public verify(message: Buffer, signature: string): boolean {
         switch(this.sigAlgorithm) {
             case Types.SCHNORR: {
-                return sr25519.Verify(message, signature, this.signingVault.publicKey())
+                return sr25519.verify(message, signature, this.signingVault.publicKey())
             }
             case Types.ECDSA: {
-                return ecdsa.Verify(message, signature, this.signingVault.publicKey())
+                return ecdsa.verify(message, signature, this.signingVault.publicKey())
             }
             default: {
                 throw new Error("unsupported signature algorithm")
