@@ -1,13 +1,13 @@
 import { ErrorCode, Errors, IxType, LogicManifest, AssetCreationReceipt, 
-LogicDeployReceipt, LogicExecuteReceipt, Tesseract, bytesToHex, hexDataLength, 
-hexToBytes, unmarshal, hexToBN } from "moi-utils";
+LogicDeployReceipt, LogicExecuteReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
+hexToBytes, unmarshal, hexToBN, toQuantity } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
 AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, 
-InteractionReceipt, InteractionReceiptParams, InteractionResponse, 
+InteractionReceipt, InteractionParams, InteractionResponse, 
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
-Inspect, Encoding, AccountMetaInfoParams } from "../types/jsonrpc";
+Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
@@ -96,6 +96,36 @@ export class BaseProvider extends AbstractProvider {
             return tdu;
         } catch (error) {
             throw error;
+        }
+    }
+
+    public async getInteractionByHash(ixHash: string): Promise<Interaction> {
+        try {
+            const params: InteractionParams = {
+                hash: ixHash
+            }
+    
+            const response: RpcResponse = await this.execute("moi.InteractionByHash", params)
+
+            return this.processResponse(response)
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    public async getInteractionByTesseract(address: string, options?: Options, ix_index: string = toQuantity(1)): Promise<Interaction> {
+        try {
+            const params: InteractionByTesseractParams = {
+                address: address,
+                options: options ? options : this.defaultOptions,
+                ix_index: ix_index
+            }
+    
+            const response: RpcResponse = await this.execute("moi.InteractionByTesseract", params)
+
+            return this.processResponse(response)
+        } catch(err) {
+            throw err;
         }
     }
 
@@ -274,7 +304,7 @@ export class BaseProvider extends AbstractProvider {
 
     public async getInteractionReceipt(ixHash: string): Promise<InteractionReceipt> {
         try {
-            const params: InteractionReceiptParams = {
+            const params: InteractionParams = {
                 hash: ixHash
             }
     
@@ -477,7 +507,7 @@ export class BaseProvider extends AbstractProvider {
         return new Promise(async(resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-                receipt.ix_type = "0x7";
+
                 switch(hexToBN(receipt.ix_type)) {
                     case IxType.VALUE_TRANSFER:
                         resolve(null);

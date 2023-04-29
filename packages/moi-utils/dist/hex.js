@@ -43,9 +43,11 @@ const hexToBytes = (str) => {
 exports.hexToBytes = hexToBytes;
 const hexToBN = (hex) => {
     let value;
-    hex = hex.replace(/^0x/, '').trim();
-    if (hex.length % 2 !== 0) {
-        throw new Error('Invalid hex string');
+    hex = hex.trim();
+    // Check if the hex string starts with "0x"
+    if (hex.startsWith("0x")) {
+        // If it does, create a BN instance from the hex string without the "0x" prefix
+        hex = hex.slice(2);
     }
     value = new bn_js_1.default(hex, 16);
     // Check if the number is too large to fit in a number

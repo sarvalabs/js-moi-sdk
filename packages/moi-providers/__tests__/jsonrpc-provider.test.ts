@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from "../src/jsonrpc-provider";
 import { InteractionReceipt } from "moi-providers/types/jsonrpc";
-import { AssetCreationReceipt, hexToBN } from "moi-utils";
+import { AssetCreationReceipt, hexToBN, IxType } from "moi-utils";
 
 describe("Test JsonRpcProvider Query Calls", () => {
     const address = "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084";
@@ -11,7 +11,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
     beforeAll(async() => {
       provider = new JsonRpcProvider('http://localhost:1600');
       const ixResponse = await provider.sendInteraction({
-        type: 2,
+        type: IxType.ASSET_CREATE,
         sender: address,
         fuel_price: "0x130D41",
         fuel_limit: "0x130D41",
@@ -76,6 +76,14 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(tdu[ixReceipt.extra_data.asset_id]).toBe(1248577);
       })
     });
+
+    describe("getInteractionByHash", () => {
+      it("should return the interaction by hash", async () => {
+        const ix = await provider.getInteractionByHash(ixHash)
+        expect(ix).toBeDefined();
+        expect(hexToBN(ix.nonce)).toBeGreaterThanOrEqual(1)
+      })
+    })
 
     describe("getInteractionCount", () => {
       it('should return the latest interaction count', async () => {

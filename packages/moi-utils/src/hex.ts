@@ -41,23 +41,25 @@ export const hexToBytes = (str: string): Uint8Array => {
 }
 
 export const hexToBN = (hex: string): bigint | number => {
-    let value: BN;
+  let value: BN;
 
-    hex = hex.replace(/^0x/, '').trim();
-    if (hex.length % 2 !== 0) {
-      throw new Error('Invalid hex string');
-    }
+  hex = hex.trim()
+  // Check if the hex string starts with "0x"
+  if (hex.startsWith("0x")) {
+    // If it does, create a BN instance from the hex string without the "0x" prefix
+    hex = hex.slice(2);
+  }
 
-    value = new BN(hex, 16);
-  
-    // Check if the number is too large to fit in a number
-    if (value.bitLength() > 53) {
-      // If so, return it as a BigInt
-      return BigInt(`0x${value.toString(16)}`);
-    }
+  value = new BN(hex, 16);
 
-    // Otherwise, return it as a number
-    return value.toNumber();
+  // Check if the number is too large to fit in a number
+  if (value.bitLength() > 53) {
+    // If so, return it as a BigInt
+    return BigInt(`0x${value.toString(16)}`);
+  }
+
+  // Otherwise, return it as a number
+  return value.toNumber();
 }
 
 export const bytesToHex = (data: Uint8Array): string => {

@@ -1,4 +1,4 @@
-import { LogicManifest, Tesseract } from "moi-utils";
+import { LogicManifest, Tesseract, Interaction } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionObject, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
@@ -11,6 +11,8 @@ export declare class BaseProvider extends AbstractProvider {
     getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
     getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
     getTDU(address: string, options?: Options): Promise<TDU>;
+    getInteractionByHash(ixHash: string): Promise<Interaction>;
+    getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>;
     getInteractionCount(address: string, options?: Options): Promise<number | bigint>;
     getPendingInteractionCount(address: string): Promise<number | bigint>;
     getAccountState(address: string, options?: Options): Promise<AccountState>;

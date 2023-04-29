@@ -46,8 +46,8 @@ interface AssetCreationPayload {
     type: AssetKind;
     symbol: string;
     supply: string;
-    dimension?: number;
-    decimals?: number;
+    dimension?: string;
+    decimals?: string;
     is_fungible?: boolean;
     is_mintable?: boolean;
     is_transferable?: boolean;
@@ -68,15 +68,19 @@ interface LogicInvokePayload {
 
 interface InteractionObject {
     type: IxType;
-    nonce?: number | bigint;
+    nonce?: string;
+
     sender: string;
     receiver?: string;
     payer?: string;
-    transfer_values?: Map<string, string>;
-    perceived_values?: Map<string, string>;
+
+    transfer_values?: Record<string, string>;
+    perceived_values?: Record<string, string>;
+
     fuel_price: string;
     fuel_limit: string;
-    payload: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
+    
+    payload?: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
 }
 
 interface InteractionResponse {
@@ -85,22 +89,37 @@ interface InteractionResponse {
     result: (interactionHash: string, timeout?: number) => Promise<any>
 }
 
+interface StateHash {
+    address: string;
+    hash: string;
+}
+
+interface ContextHash {
+    address: string;
+    hash: string;
+}
+
 interface InteractionReceipt {
     ix_type: string;
     ix_hash: string;
-    fuel_used: number;
-    state_hashes: Record<string, string>;
-    context_hashes: Record<string, string>;
+    status: number;
+    fuel_used: string;
+    state_hashes: StateHash[];
+    context_hashes: ContextHash[];
     extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    from: string;
+    to: string;
+    ix_index: string;
+    parts: string;
 }
 
 interface AssetInfo {
     type: number;
     symbol: string;
     owner: string;
-    total_supply: number | bigint
-    dimension: number
-    decimals: number
+    supply: string;
+    dimension: string
+    decimals: string
     is_fungible: boolean
     is_mintable: boolean
     is_transferable: boolean
@@ -133,8 +152,12 @@ interface AssetInfoParams {
     asset_id: string 
 }
 
-interface InteractionReceiptParams {
+interface InteractionParams {
     hash: string
+}
+
+interface InteractionByTesseractParams extends AccountParamsBase {
+    ix_index: string
 }
 
 interface StorageParams {

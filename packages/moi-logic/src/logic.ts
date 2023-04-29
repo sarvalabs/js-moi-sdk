@@ -1,5 +1,5 @@
 import { ABICoder } from "moi-abi";
-import { LogicManifest } from "moi-utils";
+import { IxType, LogicManifest } from "moi-utils";
 import { InteractionResponse, JsonRpcProvider, Options } from "moi-providers";
 import { LogicExecuteRequest, Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
@@ -93,7 +93,7 @@ class LogicDriver extends LogicDescriptor {
                 throw Errors.missingFuelInfo()
             }
 
-            processedArgs.params.type = 8;
+            processedArgs.params.type = IxType.LOGIC_INVOKE;
             processedArgs.params.fuel_price = args[1].fuelPrice;
             processedArgs.params.fuel_limit = args[1].fuelLimit;
         }

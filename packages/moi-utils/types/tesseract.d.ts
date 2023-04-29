@@ -1,13 +1,16 @@
+import { TesseractPart } from "./common";
 import { Interactions } from "./interaction"
 import { Receipts } from "./receipt";
 
 export interface ContextLockInfo {
+    address: string;
     context_hash: string;
-    height: bigint;
+    height: string;
     tesseract_hash: string;
 }
 
 export interface DeltaGroup {
+    address: string;
     role: number;
     behavioural_nodes: string[];
     random_nodes: string[];
@@ -19,50 +22,33 @@ export interface PoXCData {
     identity_hash: string;
     ics_hash: string;
 }
-
-export type ContextDelta = Map<string, DeltaGroup>
-
-type Uint64Array = Array<bigint>;
-
-interface ArrayOfBits {
-    size: number;
-    elements: Uint64Array;
-}
-
-interface TesseractPart {
-    address: string;
-    hash: string;
-    height: bigint;
-}
-  
-type TesseractParts = Array<TesseractPart>;
   
 interface TesseractGridID {
     hash: string;
-    total: number;
-    parts: TesseractParts;
+    total: string;
+    parts: TesseractPart[];
 }
 
 interface CommitData {
-    round: number;
-    commit_signature: Uint8Array;
-    vote_set: ArrayOfBits | null;
+    round: string;
+    commit_signature: string;
+    vote_set: string;
     evidence_hash: string;
-    grid_id: TesseractGridID | null;
+    grid_id: TesseractGridID;
 }  
 
 export interface TesseractHeader {
     address: string;
     prev_hash: string;
-    height: bigint;
-    fuel_used: bigint;
-    fuel_limit: bigint;
+    height: string;
+    fuel_used: string;
+    fuel_limit: string;
     body_hash: string;
     grid_hash: string;
     operator: string;
     cluster_id: string;
-    timestamp: bigint;
-    context_lock: Map<string, ContextLockInfo>
+    timestamp: string;
+    context_lock: ContextLockInfo[]
     extra: CommitData
 }
 
@@ -71,7 +57,7 @@ export interface TesseractBody {
     context_hash: string;
     interaction_hash: string;
     receipt_hash: string;
-    context_delta: ContextDelta;
+    context_delta: DeltaGroup[];
     consensus_proof: PoXCData;
 }
 
@@ -79,7 +65,7 @@ export interface Tesseract {
     header: TesseractHeader;
     body: TesseractBody;
     ixns: Interactions;
-    receipts: Receipts;
-    seal: Uint8Array;
+    receipts?: Receipts;
+    seal: string;
     hash: string;
 }

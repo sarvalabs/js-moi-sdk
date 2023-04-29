@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicFactory = void 0;
 const moi_abi_1 = require("moi-abi");
+const moi_utils_1 = require("moi-utils");
 const errors_1 = __importDefault(require("./errors"));
 const errors_2 = __importDefault(require("./errors"));
 class LogicFactory {
@@ -42,7 +43,7 @@ class LogicFactory {
             if (!args[1].fuelPrice || !args[1].fuelLimit) {
                 throw errors_1.default.missingFuelInfo();
             }
-            processedArgs.params.type = 7;
+            processedArgs.params.type = moi_utils_1.IxType.LOGIC_DEPLOY;
             processedArgs.params.fuel_price = args[1].fuelPrice;
             processedArgs.params.fuel_limit = args[1].fuelLimit;
         }

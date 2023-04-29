@@ -1,4 +1,5 @@
 export enum IxType {
+    INVALID_IX,
     VALUE_TRANSFER,
     FUEL_SUPPLY,
 

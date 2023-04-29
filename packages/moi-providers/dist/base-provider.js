@@ -73,6 +73,32 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
+    async getInteractionByHash(ixHash) {
+        try {
+            const params = {
+                hash: ixHash
+            };
+            const response = await this.execute("moi.InteractionByHash", params);
+            return this.processResponse(response);
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+    async getInteractionByTesseract(address, options, ix_index = (0, moi_utils_1.toQuantity)(1)) {
+        try {
+            const params = {
+                address: address,
+                options: options ? options : this.defaultOptions,
+                ix_index: ix_index
+            };
+            const response = await this.execute("moi.InteractionByTesseract", params);
+            return this.processResponse(response);
+        }
+        catch (err) {
+            throw err;
+        }
+    }
     async getInteractionCount(address, options) {
         try {
             const params = {
@@ -375,7 +401,6 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return new Promise(async (resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-                receipt.ix_type = "0x7";
                 switch ((0, moi_utils_1.hexToBN)(receipt.ix_type)) {
                     case moi_utils_1.IxType.VALUE_TRANSFER:
                         resolve(null);

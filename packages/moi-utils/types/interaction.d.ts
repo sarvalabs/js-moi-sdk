@@ -1,34 +1,34 @@
-export interface IxInput {
+import { TesseractPart } from "./common";
+
+export interface Interaction {
     type: number;
-    nonce: bigint;
+    nonce: string;
+    
     sender: string;
     receiver: string;
     payer: string;
-    transfer_values: Map<string, bigint>;
-    perceived_values: Map<string, bigint>;
+
+    transfer_values: Map<string, string>;
+    perceived_values: Map<string, string>;
     perceived_proofs: string;
-    fuel_limit: bigint;
-    fuel_price: bigint;
+
+    fuel_price: string;
+    fuel_limit: string;
+
     payload: unknown;
-}
 
-export interface IxCompute {
-    mode: number | bigint;
-    hash: string;
+    mode: string;
+    compute_hash: string;
     compute_nodes: string[];
-}
 
-export interface IxTrust {
-    mtq: number | bigint;
+    mtq: string;
     trust_nodes: string[];
-}
-
-export interface Interaction {
-    input: IxInput;
-    compute: IxCompute;
-    trust: IxTrust;
+    
     hash: string;
     signature: string;
+
+    parts: TesseractPart[];
+    ix_index: string;
 }
 
 export type Interactions = Interaction[];

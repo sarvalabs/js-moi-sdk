@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = void 0;
 const moi_abi_1 = require("moi-abi");
+const moi_utils_1 = require("moi-utils");
 const state_1 = require("./state");
 const descriptor_1 = __importDefault(require("./descriptor"));
 const errors_1 = __importDefault(require("./errors"));
@@ -73,7 +74,7 @@ class LogicDriver extends descriptor_1.default {
             if (!args[1].fuelPrice || !args[1].fuelLimit) {
                 throw errors_1.default.missingFuelInfo();
             }
-            processedArgs.params.type = 8;
+            processedArgs.params.type = moi_utils_1.IxType.LOGIC_INVOKE;
             processedArgs.params.fuel_price = args[1].fuelPrice;
             processedArgs.params.fuel_limit = args[1].fuelLimit;
         }

@@ -1,5 +1,5 @@
 import { ABICoder } from "moi-abi";
-import { LogicManifest } from "moi-utils";
+import { IxType, LogicManifest } from "moi-utils";
 import { JsonRpcProvider } from "moi-providers"
 import { LogicDeployRequest } from "../types/logic";
 import Errors from "./errors";
@@ -51,7 +51,7 @@ export class LogicFactory {
                 throw Errors.missingFuelInfo()
             }
 
-            processedArgs.params.type = 7;
+            processedArgs.params.type = IxType.LOGIC_DEPLOY;
             processedArgs.params.fuel_price = args[1].fuelPrice;
             processedArgs.params.fuel_limit = args[1].fuelLimit;
         }
