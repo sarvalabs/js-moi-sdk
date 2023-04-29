@@ -27,17 +27,17 @@ export const encodeToString = (data: Uint8Array): string => {
 }
 
 export const hexToBytes = (str: string): Uint8Array => {
-    const hex = str.replace(/^0x/, '').trim();
-    if (hex.length % 2 !== 0) {
-      throw new Error('Invalid hex string');
-    }
-    
-    const bytes = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < hex.length; i += 2) {
-      bytes[i / 2] = parseInt(hex.substring(i, 2), 16);
-    }
+  const hex = str.replace(/^0x/, '').trim();
+  if (hex.length % 2 !== 0) {
+    throw new Error('Invalid hex string');
+  }
+  
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
 
-    return bytes;
+  return bytes;
 }
 
 export const hexToBN = (hex: string): bigint | number => {
