@@ -1,8 +1,8 @@
 import { ABICoder } from "moi-abi";
 import { LogicManifest } from "moi-utils";
+import { ContextStateKind, ContextStateMatrix } from "./state";
 import { CallSite } from "../types/logic";
 import LogicId from "./logic_id";
-import { ContextStateKind, ContextStateMatrix } from "./state";
 
 export enum EngineKind {
     PISA = "PISA",
@@ -12,7 +12,7 @@ export enum EngineKind {
 export default class LogicDescriptor {
     protected logicId: LogicId;
     protected manifest: LogicManifest.Manifest;
-    protected manifestHash: string;
+    protected encodedManifest: string;
     protected engine: EngineKind;
     protected stateMatrix: ContextStateMatrix;
     protected sealed: boolean;
@@ -24,20 +24,20 @@ export default class LogicDescriptor {
     constructor(logicId: string, manifest: LogicManifest.Manifest) {
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
-        this.manifestHash = ABICoder.encodeABI(this.manifest);
+        this.encodedManifest = ABICoder.encodeABI(this.manifest);
+        this.engine = this.manifest.engine.kind as EngineKind;
         this.sealed = false;
         this.assetLogic = false;
+        this.stateMatrix = new ContextStateMatrix(manifest.elements)
+        this.initManifestMaps();
+    }
 
-        const engine: LogicManifest.EngineConfig = this.manifest.engine;
-        this.engine = engine.kind as EngineKind;
+    private initManifestMaps(): void {
+        this.elements = new Map();
+        this.callSites = new Map();
+        this.classDefs = new Map();
 
-        const stateElements: any = this.manifest.elements.filter(element => 
-            element.kind === "state"
-        )
-
-        this.stateMatrix = new ContextStateMatrix(stateElements)
-
-        manifest.elements.forEach(element => {
+        this.manifest.elements.forEach(element => {
             this.elements.set(element.ptr, element);
             
             switch(element.kind){
@@ -56,35 +56,35 @@ export default class LogicDescriptor {
         })
     }
 
-    public getLogicId = (): string => {
-        return this.logicId.hex()
+    public getLogicId(): string {
+        return this.logicId.hex();
     }
 
-    public getEngine = (): EngineKind => {
+    public getEngine(): EngineKind {
         return this.engine;
     }
 
-    public getManifest = (): LogicManifest.Manifest => {
+    public getManifest(): LogicManifest.Manifest {
         return this.manifest;
     }
 
-    public getManifestHash = (): string => {
-        return this.manifestHash;
+    public getEncodedManifest(): string {
+        return this.encodedManifest;
     }
 
-    public isSealed = (): boolean => {
+    public isSealed(): boolean {
         return this.sealed;
     }
 
-    public isAssetLogic = (): boolean => {
+    public isAssetLogic(): boolean {
         return this.assetLogic;
     }
 
-    public getStateMatrix = (): ContextStateMatrix => {
+    public getStateMatrix(): ContextStateMatrix {
         return this.stateMatrix;
     }
 
-    public getPersistentState = (): [number, boolean] => {
+    public hasPersistentState(): [number, boolean] {
         const ptr = this.stateMatrix.get(ContextStateKind.PersistentState);
 
         if(ptr !== undefined) {
@@ -94,7 +94,7 @@ export default class LogicDescriptor {
         return [0, false];
     }
 
-    public getEphemeralState = (): [number, boolean] => {
+    public hasEphemeralState(): [number, boolean] {
         const ptr = this.stateMatrix.get(ContextStateKind.EphemeralState);
         
         if(ptr !== undefined) {
@@ -104,23 +104,23 @@ export default class LogicDescriptor {
         return [0, false];
     }
 
-    public allowsInteractions = (): boolean => {
+    public allowsInteractions(): boolean {
         return this.logicId.isInteractive();
     }
 
-    public isStateful = (): boolean => {
+    public isStateful(): boolean {
         return this.logicId.isStateful();
     }
 
-    public getElements = (): Map<number, LogicManifest.Element> => {
-        return this.elements
+    public getElements(): Map<number, LogicManifest.Element> {
+        return this.elements;
     }
 
-    public getCallsites = (): Map<string, CallSite> => {
-        return this.callSites
+    public getCallsites(): Map<string, CallSite> {
+        return this.callSites;
     } 
 
-    public getClassDefs = (): Map<string, number> => {
-        return this.classDefs
+    public getClassDefs(): Map<string, number> {
+        return this.classDefs;
     }
 }

@@ -336,7 +336,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     public _startEvent(event: Event): void {
         switch (event.type) {
-            case "tesseract":
+            case WebSocketEvents.TESSERACT:
                 const params: TesseractParams = {
                     address: event.address
                 }
@@ -345,21 +345,21 @@ export class WebSocketProvider extends JsonRpcProvider {
                 });
                 break;
 
-            case "all_tesseracts":
+            case WebSocketEvents.ALL_TESSERACTS:
                 this._subscribe("all_tesseracts", [ "newTesseracts" ], (result: any) => {
                     this.emit(WebSocketEvents.ALL_TESSERACTS, result);
                 });
                 break;
             
-            case "connect":
+            case WebSocketEvents.CONNECT:
 
-            case "reconnect":
+            case WebSocketEvents.RECONNECT:
             
-            case "close":
+            case WebSocketEvents.CLOSE:
 
-            case "debug":
+            case WebSocketEvents.DEBUG:
 
-            case "error":
+            case WebSocketEvents.CLOSE:
                 break;
 
             default:

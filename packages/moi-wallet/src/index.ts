@@ -52,37 +52,41 @@ class Wallet {
     }
 
     public load(key: Buffer | undefined, mnemonic: string | undefined, curve: string) {
-        let privKey: string, pubKey: string;
-        if(!key) {
-            throw new Error("key cannot be undefined")
+        try {
+            let privKey: string, pubKey: string;
+            if(!key) {
+                throw new Error("key cannot be undefined")
+            }
+            switch(curve) {
+                case Types.SR25519: {
+                    const uint8Key = bytesToUint8(key)
+                    let kp = schnorrkel.keypair_from_seed(uint8Key)
+                    privKey = uint8ToHex(kp.slice(0, 64))
+                    pubKey = uint8ToHex(kp.slice(64, 96))
+                    break;
+                }
+                case Types.SECP256K1: {
+                    const ecPrivKey = new elliptic.ec(Types.SECP256K1);
+                    let keyInBytes = hexToUint8(key)
+                    const keyPair = ecPrivKey.keyFromPrivate(keyInBytes)
+                    privKey = keyPair.getPrivate("hex")
+                    pubKey = keyPair.getPublic(true, "hex")
+                    break;
+                }
+                default: {
+                    throw new Error("un-supported curve")
+                }
+            }
+            
+            privateMapSet(this, __vault, {
+                _key: privKey,
+                _mnemonic: mnemonic,
+                _public: pubKey,
+                _curve: curve
+            });
+        } catch(err) {
+            throw err
         }
-        switch(curve) {
-            case Types.SR25519: {
-                const uint8Key = bytesToUint8(key)
-                let kp = schnorrkel.keypair_from_seed(uint8Key)
-                privKey = uint8ToHex(kp.slice(0, 64))
-                pubKey = uint8ToHex(kp.slice(64, 96))
-                break;
-            }
-            case Types.SECP256K1: {
-                const ecPrivKey = new elliptic.ec(Types.SECP256K1);
-                let keyInBytes = hexToUint8(key)
-                const keyPair = ecPrivKey.keyFromPrivate(keyInBytes)
-                privKey = keyPair.getPrivate("hex")
-                pubKey = keyPair.getPublic(true, "hex")
-                break;
-            }
-            default: {
-                throw new Error("un-supported curve")
-            }
-        }
-        
-        privateMapSet(this, __vault, {
-            _key: privKey,
-            _mnemonic: mnemonic,
-            _public: pubKey,
-            _curve: curve
-        });
     }
 
     public async createRandom() {

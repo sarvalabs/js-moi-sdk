@@ -119,4 +119,11 @@ export class ABICoder {
 
         return null
     }
+
+    public decodeState(data: string, field: string, fields: LogicManifest.TypeField[]): unknown {
+        const decodedData = hexToBytes(data)
+        const depolorizer = new Depolorizer(decodedData)
+        const schema = this.schema.parseFields(fields);
+        return depolorizer.depolorize(schema.fields[field])
+    }
 }

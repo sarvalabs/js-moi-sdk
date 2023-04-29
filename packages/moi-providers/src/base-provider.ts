@@ -1,13 +1,13 @@
 import { ErrorCode, Errors, IxType, LogicManifest, AssetCreationReceipt, 
 LogicDeployReceipt, LogicExecuteReceipt, Tesseract, bytesToHex, hexDataLength, 
-hexToBytes, unmarshal } from "moi-utils";
+hexToBytes, unmarshal, hexToBN } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
 AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, 
 InteractionReceipt, InteractionReceiptParams, InteractionResponse, 
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
-Inspect, Encoding } from "../types/jsonrpc";
+Inspect, Encoding, AccountMetaInfoParams } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
@@ -55,7 +55,9 @@ export class BaseProvider extends AbstractProvider {
     
             const response: RpcResponse = await this.execute("moi.Balance", params);
 
-            return this.processResponse(response)
+            const balance = this.processResponse(response);
+
+            return hexToBN(balance);
         } catch (error) {
             throw error;
         }
@@ -68,9 +70,9 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : this.defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.ContextInfo", params)
+            const response: RpcResponse = await this.execute("moi.ContextInfo", params);
 
-            return this.processResponse(response)
+            return this.processResponse(response);
         } catch (error) {
             throw error;
         }
@@ -83,9 +85,15 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : this.defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.TDU", params)
+            const response: RpcResponse = await this.execute("moi.TDU", params);
 
-            return this.processResponse(response)
+            const tdu = this.processResponse(response);
+
+            Object.keys(tdu).forEach((assetId) => {
+                tdu[assetId] = hexToBN(tdu[assetId])
+            });
+
+            return tdu;
         } catch (error) {
             throw error;
         }
@@ -98,9 +106,11 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : this.defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.InteractionCount", params)
+            const response: RpcResponse = await this.execute("moi.InteractionCount", params);
 
-            return this.processResponse(response)
+            const ixCount = this.processResponse(response);
+
+            return hexToBN(ixCount);
         } catch (error) {
             throw error;
         }
@@ -112,9 +122,11 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             }
     
-            const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params)
+            const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params);
 
-            return this.processResponse(response)
+            const ixCount = this.processResponse(response);
+
+            return hexToBN(ixCount);
         } catch (error) {
             throw error;
         }
@@ -135,11 +147,10 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo> {
+    public async getAccountMetaInfo(address: string): Promise<AccountMetaInfo> {
         try {
-            const params: AccountStateParams = {
-                address: address,
-                options: options ? options : this.defaultOptions
+            const params: AccountMetaInfoParams = {
+                address: address
             }
     
             const response: RpcResponse = await this.execute("moi.AccountMetaInfo", params)
@@ -158,7 +169,28 @@ export class BaseProvider extends AbstractProvider {
     
             const response: RpcResponse = await this.execute("ixpool.ContentFrom", params)
 
-            return this.processResponse(response)
+            const content = this.processResponse(response)
+
+            const contentResponse = {
+                pending: new Map(),
+                queued: new Map(),
+            }
+
+            Object.keys(content.pending).forEach(nonce => 
+                contentResponse.pending.set(
+                    hexToBN(nonce),
+                    content.pending[nonce]
+                )
+            )
+
+            Object.keys(content.queued).forEach(nonce => 
+                contentResponse.queued.set(
+                    hexToBN(nonce),
+                    content.queued[nonce]
+                )
+            )
+
+            return contentResponse
         } catch (error) {
             throw error;
         }
@@ -254,7 +286,7 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
-    public async getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any> {
+    public async getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string> {
         try {
             const params: StorageParams = {
                 logic_id: logicId,
@@ -262,7 +294,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : this.defaultOptions
             }
     
-            const response = await this.execute("moi.StorageAt", params)
+            const response = await this.execute("moi.Storage", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -280,7 +312,7 @@ export class BaseProvider extends AbstractProvider {
     
             const response: RpcResponse = await this.execute("moi.LogicManifest", params)
             const data = this.processResponse(response);
-            const decodedManifest = hexToBytes(data.substr(2,))
+            const decodedManifest = hexToBytes(data)
 
             switch(encoding) {
                 case "JSON":
@@ -298,7 +330,33 @@ export class BaseProvider extends AbstractProvider {
     public async getContent(): Promise<Content> {
         try {
             const response: RpcResponse = await this.execute("ixpool.Content", null)
-            return this.processResponse(response)
+            const content = this.processResponse(response)
+            const contentResponse = {
+                pending: new Map(),
+                queued: new Map(),
+            }
+
+            Object.keys(content.pending).forEach(key => {
+                contentResponse.pending.set(key, new Map())
+                Object.keys(content.pending[key]).forEach(nonce => 
+                    contentResponse.pending.get(key).set(
+                        hexToBN(nonce), 
+                        content.pending[key][nonce]
+                    )
+                )
+            })
+
+            Object.keys(content.queued).forEach(key => {
+                contentResponse.queued.set(key, new Map())
+                Object.keys(content.queued[key]).forEach(nonce => 
+                    contentResponse.queued.get(key).set(
+                        hexToBN(nonce), 
+                        content.queued[key][nonce]
+                    )
+                )
+            })
+
+            return contentResponse;
         } catch (error) {
             throw error;
         }
@@ -307,7 +365,12 @@ export class BaseProvider extends AbstractProvider {
     public async getStatus(): Promise<Status> {
         try {
             const response: RpcResponse = await this.execute("ixpool.Status", null)
-            return this.processResponse(response)
+            const status = this.processResponse(response)
+
+            return {
+                pending: hexToBN(status.pending),
+                queued: hexToBN(status.queued)
+            }
         } catch (error) {
             throw error;
         }
@@ -316,7 +379,29 @@ export class BaseProvider extends AbstractProvider {
     public async getInspect(): Promise<Inspect> {
         try {
             const response: RpcResponse = await this.execute("ixpool.Inspect", null)
-            return this.processResponse(response)
+            const inspect = this.processResponse(response)
+            const inspectResponse = {
+                pending: new Map(),
+                queued: new Map(),
+                wait_time: new Map()
+            }
+
+            Object.keys(inspect.pending).forEach(key => {
+                inspectResponse.pending.set(key, new Map(Object.entries(inspect.pending[key])))
+            })
+
+            Object.keys(inspect.queued).forEach(key => {
+                inspectResponse.queued.set(key, new Map(Object.entries(inspect.queued[key])))
+            })
+
+            Object.keys(inspectResponse.wait_time).forEach(key => {
+                inspectResponse.wait_time.set(key, {
+                    ...inspectResponse.wait_time[key],
+                    time: hexToBN(inspectResponse.wait_time[key]["time"])
+                })
+            })
+
+            return inspectResponse
         } catch (error) {
             throw error;
         }
@@ -347,7 +432,7 @@ export class BaseProvider extends AbstractProvider {
 
     public async getAccounts(): Promise<string[]> {
         try {
-            const response: RpcResponse = await this.execute("debug.GetAccounts", null)
+            const response: RpcResponse = await this.execute("debug.Accounts", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -392,8 +477,8 @@ export class BaseProvider extends AbstractProvider {
         return new Promise(async(resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-    
-                switch(receipt.ix_type) {
+                receipt.ix_type = "0x7";
+                switch(hexToBN(receipt.ix_type)) {
                     case IxType.VALUE_TRANSFER:
                         resolve(null);
                         

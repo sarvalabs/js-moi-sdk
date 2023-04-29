@@ -1,41 +1,62 @@
 import { ABICoder } from "moi-abi";
-import LogicDescriptor from "./descriptor";
+import { LogicManifest } from "moi-utils";
 import { InteractionResponse, JsonRpcProvider, Options } from "moi-providers";
 import { LogicExecuteRequest, Routines } from "../types/logic";
+import { EphemeralState, PersistentState } from "./state";
+import LogicDescriptor from "./descriptor";
 import Errors from "./errors";
-import { LogicManifest } from "moi-utils";
 
-class Logic extends LogicDescriptor {
+class LogicDriver extends LogicDescriptor {
     private provider: JsonRpcProvider;
     private abiCoder: ABICoder;
     public routines: Routines;
+    public persistentState: PersistentState;
+    public ephemeralState: EphemeralState;
 
-    constructor(logicId: string, provider: JsonRpcProvider, manifest: LogicManifest.Manifest) {
+    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: JsonRpcProvider) {
         super(logicId, manifest)
         this.provider = provider;
         this.abiCoder = new ABICoder(this.elements, this.classDefs);
+        this.createState();
         this.createRoutines();
+    }
+
+    private createState() {
+        const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
+
+        if(persistentStateExists) {
+            this.persistentState = new PersistentState(
+                this.logicId.hex(),
+                this.elements.get(persistentStatePtr),
+                this.abiCoder,
+                this.provider
+            )
+        }
     }
 
     private createRoutines() {
         this.routines = {};
         this.manifest.elements.forEach(element => {
             element.data = element.data as LogicManifest.Routine
-            if(element.kind === "routine" && element.data.kind !== "deployer") {
+            if(element.kind === "routine" && element.data.kind === "invokable") {
                 const routineName = this.normalizeRoutineName(element.data.name)
-                this.routines[routineName] = (args: any[]) => {
+                this.routines[routineName] = (args: any[] = []) => {
                     return this.createIxObject(element, ...args)
                 }
             }
         })
     }
 
-    private normalizeRoutineName(routineName: string) {
-        if (routineName.endsWith("!")) {
-            return routineName.slice(0, -1); // Remove the last character (exclamation mark)
-          }
+    private isMutableRoutine(routineName: string) {
+        return routineName.endsWith("!");
+    }
 
-          return routineName; // If no exclamation mark, return the original string
+    private normalizeRoutineName(routineName: string) {
+        if (this.isMutableRoutine(routineName)) {
+            return routineName.slice(0, -1); // Remove the last character (exclamation mark)
+        }
+
+        return routineName; // If no exclamation mark, return the original string
     }
 
     private createPayload(ixObject: any): any {
@@ -44,8 +65,12 @@ class Logic extends LogicDescriptor {
             callsite: ixObject.routine.data.name,
         }
 
-        if(ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+        if(ixObject.routine.data.accepts && 
+        Object.keys(ixObject.routine.data.accepts).length > 0) {
+            payload.calldata = this.abiCoder.encodeArguments(
+                ixObject.routine.data.accepts, 
+                ixObject.arguments
+            );
         }
 
         return payload;
@@ -81,19 +106,17 @@ class Logic extends LogicDescriptor {
     private async processResult(response: any, ixObject: any, interactionHash: string, timeout?: number): Promise<any> {
         try {
             const result = await response.result(interactionHash, timeout);
-            const data = {
-                output: null,
-                error: null
-            };
+            const data = { output: null, error: null };
 
             if(result.error && result.error !== "0x") {
-                data.error = ABICoder.decodeException(result.error.substr(2,))
+                data.error = ABICoder.decodeException(result.error)
             }
 
-            if((result.outputs && result.outputs !== "0x") && 
+            if(!this.isMutableRoutine(ixObject.routine.data.name) && 
+            (result.outputs && result.outputs !== "0x") && 
             ixObject.routine.data && ixObject.routine.data.returns) {
                 data.output = this.abiCoder.decodeOutput(
-                    result.outputs.substr(2,),
+                    result.outputs,
                     ixObject.routine.data.returns
                 )
             }
@@ -134,7 +157,7 @@ class Logic extends LogicDescriptor {
                     throw err;
                 });
             default:
-                throw new Error('Method "' + processedArgs.type + '" not implemented.');
+                throw new Error('Method "' + processedArgs.type + '" not supported.');
         }
     }
 
@@ -172,12 +195,12 @@ class Logic extends LogicDescriptor {
     }
 }
 
-export const getLogicObject = async (logicId: string, provider: JsonRpcProvider, options?: Options) => {
+export const getLogicDriver = async (logicId: string, provider: JsonRpcProvider, options?: Options): Promise<LogicDriver> => {
     try {
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
         if (typeof manifest === 'object') {
-            return new Logic(logicId, provider, manifest);
+            return new LogicDriver(logicId, manifest, provider);
         }
 
         throw new Error("Invalid manifest");

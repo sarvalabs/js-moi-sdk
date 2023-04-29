@@ -43,7 +43,6 @@ export class Errors {
             errorMessageStack += ' (' + messageDetails.join(', ') + ')';
         }
 
-        // @TODO: Any??
         const error: any = new Error(message);
         error.code = code;
         error.reason = message;

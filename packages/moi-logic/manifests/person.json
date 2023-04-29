@@ -1,0 +1,235 @@
+{
+    "syntax": "0.1.0",
+    "engine": {
+      "kind": "PISA",
+      "flags": []
+    },
+    "elements": [
+      {
+        "ptr": 0,
+        "kind": "state",
+        "deps": [
+          1
+        ],
+        "data": {
+          "kind": "persisatent",
+          "fields": [
+            {
+              "slot": 0,
+              "label": "registry",
+              "type": "map[string]Person"
+            }
+          ]
+        }
+      },
+      {
+        "ptr": 1,
+        "kind": "class",
+        "data": {
+          "name": "Person",
+          "fields": [
+            {
+              "slot": 0,
+              "label": "name",
+              "type": "string"
+            },
+            {
+              "slot": 1,
+              "label": "age",
+              "type": "uint64"
+            },
+            {
+              "slot": 2,
+              "label": "gender",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      {
+        "ptr": 2,
+        "kind": "routine",
+        "deps": [
+          0,
+          1
+        ],
+        "data": {
+          "name": "StorePerson!",
+          "kind": "invokable",
+          "accepts": [
+            {
+              "slot": 0,
+              "label": "person",
+              "type": "Person"
+            }
+          ],
+          "executes": {
+            "bin": [
+              4,
+              0,
+              0,
+              81,
+              1,
+              0,
+              0,
+              128,
+              2,
+              0,
+              84,
+              2,
+              1,
+              0,
+              129,
+              2,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "ptr": 3,
+        "kind": "routine",
+        "deps": [
+          0,
+          1
+        ],
+        "data": {
+          "name": "GetPerson",
+          "kind": "invokable",
+          "accepts": [
+            {
+              "slot": 0,
+              "label": "name",
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "slot": 0,
+              "label": "person",
+              "type": "Person"
+            }
+          ],
+          "executes": {
+            "bin": [
+              128,
+              0,
+              0,
+              4,
+              1,
+              0,
+              83,
+              2,
+              0,
+              1,
+              5,
+              2,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "ptr": 4,
+        "kind": "routine",
+        "deps": [
+          1
+        ],
+        "data": {
+          "name": "GetNameOf",
+          "kind": "invokable",
+          "accepts": [
+            {
+              "slot": 0,
+              "label": "person",
+              "type": "Person"
+            }
+          ],
+          "returns": [
+            {
+              "slot": 0,
+              "label": "name",
+              "type": "string"
+            }
+          ],
+          "executes": {
+            "bin": [
+              4,
+              0,
+              0,
+              81,
+              1,
+              0,
+              0,
+              5,
+              1,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "ptr": 5,
+        "kind": "routine",
+        "deps": [
+          1
+        ],
+        "data": {
+          "name": "DoubleAge",
+          "kind": "invokable",
+          "accepts": [
+            {
+              "slot": 0,
+              "label": "person",
+              "type": "Person"
+            }
+          ],
+          "returns": [
+            {
+              "slot": 0,
+              "label": "person",
+              "type": "Person"
+            }
+          ],
+          "executes": {
+            "bin": [
+              4,
+              0,
+              0,
+              81,
+              1,
+              0,
+              1,
+              36,
+              2,
+              1,
+              101,
+              2,
+              2,
+              1,
+              82,
+              0,
+              1,
+              2,
+              5,
+              0,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "ptr": 6,
+        "kind": "routine",
+        "deps": [
+          0
+        ],
+        "data": {
+          "name": "Setup!",
+          "kind": "deployer",
+          "executes": null,
+          "bin": []
+        }
+      }
+    ]
+  }

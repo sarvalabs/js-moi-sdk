@@ -1,7 +1,7 @@
 import { ABICoder } from "moi-abi";
 import { LogicManifest } from "moi-utils";
-import { LogicDeployRequest } from "../types/logic";
 import { JsonRpcProvider } from "moi-providers"
+import { LogicDeployRequest } from "../types/logic";
 import Errors from "./errors";
 import LogicErrors from "./errors";
 
@@ -25,7 +25,10 @@ export class LogicFactory {
         }
 
         if(ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+            payload.calldata = this.abiCoder.encodeArguments(
+                ixObject.routine.data.accepts, 
+                ixObject.arguments
+            );
         }
 
         return payload;
@@ -61,18 +64,15 @@ export class LogicFactory {
     private async processResult(response: any, interactionHash: string, timeout?: number): Promise<any> {
         try {
             const result = await response.result(interactionHash, timeout);
-            const data = {
-                logic_id: "",
-                error: null
-            };
+            const data = { logic_id: "", error: null };
 
             if(result.logic_id) {
                 data.logic_id = result.logic_id;
 
-                return result
+                return data
             }
 
-            data.error = ABICoder.decodeException(result.error.substr(2,))
+            data.error = ABICoder.decodeException(result.error)
 
             return data
         } catch(err) {
@@ -89,11 +89,7 @@ export class LogicFactory {
 
         switch(processedArgs.type) {
             case "estimate":
-                console.log("yet to be implemented");
-                break;
-            case "call":
-                console.log("yet to be implemented")
-                break;
+                throw new Error('Method "' + processedArgs.type + '" not implemented.');
             case "send":
                 return this.provider.sendInteraction(processedArgs.params)
                 .then((response) => {
@@ -105,7 +101,7 @@ export class LogicFactory {
                     throw err;
                 });
             default:
-                throw new Error('Method "' + processedArgs.type + '" not implemented.');
+                throw new Error('Method "' + processedArgs.type + '" not supported.');
         }
     }
 

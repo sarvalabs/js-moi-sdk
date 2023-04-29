@@ -1,7 +1,6 @@
 import { 
     AssetCreationReceipt, 
     AssetKind, 
-    Hex,
     IxType, 
     LogicDeployReceipt, 
     LogicExecuteReceipt 
@@ -24,7 +23,7 @@ interface TDU {
 }
 
 interface AccountState {
-    nonce: number | bigint;
+    nonce: string;
     acc_type: number;
     balance: string;
     asset_approvals: string;
@@ -36,9 +35,8 @@ interface AccountState {
 
 interface AccountMetaInfo {
     type: number;
-    mode: string;
     address: string;
-    height: number | bigint;
+    height: string;
     tesseract_hash: string;
     lattice_exists: boolean;
     state_exists: boolean;
@@ -47,7 +45,7 @@ interface AccountMetaInfo {
 interface AssetCreationPayload {
     type: AssetKind;
     symbol: string;
-    supply: Hex;
+    supply: string;
     dimension?: number;
     decimals?: number;
     is_fungible?: boolean;
@@ -74,10 +72,10 @@ interface InteractionObject {
     sender: string;
     receiver?: string;
     payer?: string;
-    transfer_values?: Map<string, Hex>;
-    perceived_values?: Map<string, Hex>;
-    fuel_price: Hex;
-    fuel_limit: Hex;
+    transfer_values?: Map<string, string>;
+    perceived_values?: Map<string, string>;
+    fuel_price: string;
+    fuel_limit: string;
     payload: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
 }
 
@@ -88,7 +86,7 @@ interface InteractionResponse {
 }
 
 interface InteractionReceipt {
-    ix_type: number;
+    ix_type: string;
     ix_hash: string;
     fuel_used: number;
     state_hashes: Record<string, string>;
@@ -117,6 +115,10 @@ interface AccountParamsBase {
 interface AccountStateParams {
     address: string,
     options?: Options 
+}
+
+interface AccountMetaInfoParams {
+    address: string
 }
 
 interface BalanceParams extends AccountParamsBase {
@@ -155,25 +157,25 @@ interface LogicManifestParams {
 }
 
 interface InteractionInfo {
-    nonce: number;
-    type: number;
+    nonce: string;
+    type: string;
     sender: string;
     receiver: string;
-    cost: bigint;
-    fuel_price: bigint;
-    fuel_limit: bigint;
+    cost: string;
+    fuel_price: string;
+    fuel_limit: string;
     input: string;
     hash: string;
 }
 
 interface Content {
-    pending: Map<string, Map<bigint, InteractionInfo>>;
-    queued: Map<string, Map<bigint, InteractionInfo>>;
+    pending: Map<string, Map<number | bigint, InteractionInfo>>;
+    queued: Map<string, Map<number | bigint, InteractionInfo>>;
 }
 
 interface ContentFrom {
-    pending: Map<bigint, InteractionInfo>;
-    queued: Map<bigint, InteractionInfo>;
+    pending: Map<number | bigint, InteractionInfo>;
+    queued: Map<number | bigint, InteractionInfo>;
 }
 
 interface Status {
@@ -181,10 +183,15 @@ interface Status {
     queued: number | bigint;
 }
 
+interface WaitTime {
+    expired: boolean,
+    time: number | bigint
+}
+
 interface Inspect {
     pending: Map<string, Map<string, string>>;
     queued: Map<string, Map<string, string>>;
-    wait_time: Map<string, number | bigint>;
+    wait_time: Map<string, WaitTime>;
 }
 
 interface RpcErrorResponse {
