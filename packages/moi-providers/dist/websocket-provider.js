@@ -99,7 +99,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     reconnect() {
         this.reconnecting = true;
         if (this.responseQueue.size > 0) {
-            this.responseQueue.forEach(function (request, key) {
+            this.responseQueue.forEach((request, key) => {
                 try {
                     this.responseQueue.delete(key);
                     request.callback(errors.PendingRequestsOnReconnectingError(), null);
@@ -122,7 +122,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.emit(WebSocketEvents.ERROR, errors.MaxAttemptsReachedOnReconnectingError());
         this.reconnecting = false;
         if (this.requestQueue.size > 0) {
-            this.requestQueue.forEach(function (request, key) {
+            this.requestQueue.forEach((request, key) => {
                 request.callback(errors.MaxAttemptsReachedOnReconnectingError(), null);
                 this.requestQueue.delete(key);
             });
@@ -156,13 +156,13 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             }
             this.emit(WebSocketEvents.CLOSE, event);
             if (this.requestQueue.size > 0) {
-                this.requestQueue.forEach(function (request, key) {
+                this.requestQueue.forEach((request, key) => {
                     request.callback(errors.ConnectionNotOpenError(event), null);
                     this.requestQueue.delete(key);
                 });
             }
             if (this.responseQueue.size > 0) {
-                this.responseQueue.forEach(function (request, key) {
+                this.responseQueue.forEach((request, key) => {
                     request.callback(errors.InvalidConnection('on WS', event), null);
                     this.responseQueue.delete(key);
                 });
@@ -227,13 +227,13 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         }
         this.emit(WebSocketEvents.ERROR, event);
         if (this.requestQueue.size > 0) {
-            this.requestQueue.forEach(function (request, key) {
+            this.requestQueue.forEach((request, key) => {
                 request.callback(errors.ConnectionNotOpenError(event), null);
                 this.requestQueue.delete(key);
             });
         }
         if (this.responseQueue.size > 0) {
-            this.responseQueue.forEach(function (request, key) {
+            this.responseQueue.forEach((request, key) => {
                 request.callback(errors.InvalidConnection('on WS', event), null);
                 this.responseQueue.delete(key);
             });
@@ -264,12 +264,12 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     }
     send(method, params) {
         return new Promise((resolve, reject) => {
-            function callback(error, result) {
+            const callback = (error, result) => {
                 if (error) {
                     return reject(error);
                 }
                 return resolve(result);
-            }
+            };
             const requestId = nextReqId++;
             const payload = {
                 method: method,
@@ -318,7 +318,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             case WebSocketEvents.RECONNECT:
             case WebSocketEvents.CLOSE:
             case WebSocketEvents.DEBUG:
-            case WebSocketEvents.CLOSE:
+            case WebSocketEvents.ERROR:
                 break;
             default:
                 console.log("unhandled:", event);
@@ -348,10 +348,10 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         // Wait until we have connected before trying to disconnect
         if (this.connection.readyState === this.connection.CONNECTING) {
             await (new Promise((resolve) => {
-                this.connection.onopen = function () {
+                this.connection.onopen = () => {
                     resolve(true);
                 };
-                this.connection.onerror = function () {
+                this.connection.onerror = () => {
                     resolve(false);
                 };
             }));

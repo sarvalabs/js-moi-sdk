@@ -99,7 +99,7 @@ export class WebSocketProvider extends JsonRpcProvider {
         this.reconnecting = true;
     
         if (this.responseQueue.size > 0) {
-            this.responseQueue.forEach(function (request, key) {
+            this.responseQueue.forEach((request, key) => {
                 try{
                     this.responseQueue.delete(key);
                     request.callback(errors.PendingRequestsOnReconnectingError(), null)
@@ -127,7 +127,7 @@ export class WebSocketProvider extends JsonRpcProvider {
         this.reconnecting = false;
     
         if (this.requestQueue.size > 0) {
-            this.requestQueue.forEach(function (request, key) {
+            this.requestQueue.forEach((request, key) => {
                 request.callback(errors.MaxAttemptsReachedOnReconnectingError(), null);
                 this.requestQueue.delete(key);
             });
@@ -167,14 +167,14 @@ export class WebSocketProvider extends JsonRpcProvider {
             this.emit(WebSocketEvents.CLOSE, event)
     
             if (this.requestQueue.size > 0) {
-                this.requestQueue.forEach(function (request, key) {
+                this.requestQueue.forEach((request, key) => {
                     request.callback(errors.ConnectionNotOpenError(event), null);
                     this.requestQueue.delete(key);
                 });
             }
         
             if (this.responseQueue.size > 0) {
-                this.responseQueue.forEach(function (request, key) {
+                this.responseQueue.forEach((request, key) => {
                     request.callback(errors.InvalidConnection('on WS', event), null);
                     this.responseQueue.delete(key);
                 });
@@ -248,14 +248,14 @@ export class WebSocketProvider extends JsonRpcProvider {
     
         this.emit(WebSocketEvents.ERROR, event);
         if (this.requestQueue.size > 0) {
-            this.requestQueue.forEach(function (request, key) {
+            this.requestQueue.forEach((request, key) => {
                 request.callback(errors.ConnectionNotOpenError(event), null);
                 this.requestQueue.delete(key);
             });
         }
     
         if (this.responseQueue.size > 0) {
-            this.responseQueue.forEach(function (request, key) {
+            this.responseQueue.forEach((request, key) => {
                 request.callback(errors.InvalidConnection('on WS', event), null);
                 this.responseQueue.delete(key);
             });
@@ -293,7 +293,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     public send(method: string, params: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
-            function callback(error: Error, result: any) {
+            const callback = (error: Error, result: any) => {
                 if (error) { return reject(error); }
                 return resolve(result);
             }
@@ -359,7 +359,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
             case WebSocketEvents.DEBUG:
 
-            case WebSocketEvents.CLOSE:
+            case WebSocketEvents.ERROR:
                 break;
 
             default:
@@ -391,11 +391,11 @@ export class WebSocketProvider extends JsonRpcProvider {
         // Wait until we have connected before trying to disconnect
         if (this.connection.readyState === this.connection.CONNECTING) {
             await (new Promise((resolve) => {
-                this.connection.onopen = function() {
+                this.connection.onopen = () => {
                     resolve(true);
                 };
 
-                this.connection.onerror = function() {
+                this.connection.onerror = () => {
                     resolve(false);
                 };
             }));
