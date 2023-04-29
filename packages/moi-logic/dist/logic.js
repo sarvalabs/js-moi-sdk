@@ -3,45 +3,59 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLogicObject = void 0;
+exports.getLogicDriver = void 0;
 const moi_abi_1 = require("moi-abi");
+const state_1 = require("./state");
 const descriptor_1 = __importDefault(require("./descriptor"));
 const errors_1 = __importDefault(require("./errors"));
-const moi_utils_1 = require("moi-utils");
-const js_polo_1 = require("js-polo");
-class Logic extends descriptor_1.default {
+class LogicDriver extends descriptor_1.default {
     provider;
+    abiCoder;
     routines;
-    constructor(logicId, provider, manifest) {
+    persistentState;
+    ephemeralState;
+    constructor(logicId, manifest, provider) {
         super(logicId, manifest);
         this.provider = provider;
+        this.abiCoder = new moi_abi_1.ABICoder(this.elements, this.classDefs);
+        this.createState();
         this.createRoutines();
+    }
+    createState() {
+        const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
+        if (persistentStateExists) {
+            this.persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.abiCoder, this.provider);
+        }
     }
     createRoutines() {
         this.routines = {};
         this.manifest.elements.forEach(element => {
             element.data = element.data;
-            if (element.kind === "routine" && element.data.kind !== "deployer") {
+            if (element.kind === "routine" && element.data.kind === "invokable") {
                 const routineName = this.normalizeRoutineName(element.data.name);
-                this.routines[routineName] = (args) => {
+                this.routines[routineName] = (args = []) => {
                     return this.createIxObject(element, ...args);
                 };
             }
         });
     }
+    isMutableRoutine(routineName) {
+        return routineName.endsWith("!");
+    }
     normalizeRoutineName(routineName) {
-        if (routineName.endsWith("!")) {
+        if (this.isMutableRoutine(routineName)) {
             return routineName.slice(0, -1); // Remove the last character (exclamation mark)
         }
         return routineName; // If no exclamation mark, return the original string
     }
     createPayload(ixObject) {
         const payload = {
-            logic_id: this.logicId,
+            logic_id: this.getLogicId(),
             callsite: ixObject.routine.data.name,
         };
-        if (ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = moi_abi_1.ABICoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+        if (ixObject.routine.data.accepts &&
+            Object.keys(ixObject.routine.data.accepts).length > 0) {
+            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
         }
         return payload;
     }
@@ -69,14 +83,17 @@ class Logic extends descriptor_1.default {
     async processResult(response, ixObject, interactionHash, timeout) {
         try {
             const result = await response.result(interactionHash, timeout);
-            if (result) {
-                const data = (0, moi_utils_1.decodeBase64)(result);
-                const depolorizer = new js_polo_1.Depolorizer(data);
-                if (ixObject.routine.data && ixObject.routine.data.returns) {
-                    const schema = moi_abi_1.Schema.parseFields(ixObject.routine.data.returns);
-                    const result = depolorizer.depolorize(schema);
-                    return result;
-                }
+            const data = { output: null, error: null };
+            if (result.error && result.error !== "0x") {
+                data.error = moi_abi_1.ABICoder.decodeException(result.error);
+            }
+            if (!this.isMutableRoutine(ixObject.routine.data.name) &&
+                (result.outputs && result.outputs !== "0x") &&
+                ixObject.routine.data && ixObject.routine.data.returns) {
+                data.output = this.abiCoder.decodeOutput(result.outputs, ixObject.routine.data.returns);
+            }
+            if (data.output || data.error) {
+                return data;
             }
             return null;
         }
@@ -89,7 +106,7 @@ class Logic extends descriptor_1.default {
         if (!this.provider) {
             throw errors_1.default.providerNotFound();
         }
-        if (!this.logicId) {
+        if (!this.getLogicId()) {
             throw errors_1.default.addressNotDefined();
         }
         switch (processedArgs.type) {
@@ -107,7 +124,7 @@ class Logic extends descriptor_1.default {
                     throw err;
                 });
             default:
-                throw new Error('Method "' + processedArgs.type + '" not implemented.');
+                throw new Error('Method "' + processedArgs.type + '" not supported.');
         }
     }
     createIxRequest(ixObject) {
@@ -137,11 +154,11 @@ class Logic extends descriptor_1.default {
         return this.createIxRequest(ixObject);
     }
 }
-const getLogicObject = async (logicId, provider, options) => {
+const getLogicDriver = async (logicId, provider, options) => {
     try {
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
         if (typeof manifest === 'object') {
-            return new Logic(logicId, provider, manifest);
+            return new LogicDriver(logicId, manifest, provider);
         }
         throw new Error("Invalid manifest");
     }
@@ -149,4 +166,4 @@ const getLogicObject = async (logicId, provider, options) => {
         throw err;
     }
 };
-exports.getLogicObject = getLogicObject;
+exports.getLogicDriver = getLogicDriver;

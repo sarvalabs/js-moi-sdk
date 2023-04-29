@@ -26,7 +26,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
             return await this.send(method, [params]);
         }
         catch (error) {
-            return error;
+            throw error;
         }
     }
     async send(method, params) {

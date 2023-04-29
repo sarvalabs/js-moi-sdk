@@ -42,21 +42,21 @@ const moi_utils_1 = require("moi-utils");
 const Types = __importStar(require("../types/index"));
 const SigningKeyErrors = __importStar(require("./errors"));
 const bip32 = (0, bip32_1.BIP32Factory)(ecc);
-function _privateMapGet(receiver, privateMap) {
+const privateMapGet = (receiver, privateMap) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateGet();
     }
-    var descriptor = privateMap.get(receiver);
+    const descriptor = privateMap.get(receiver);
     if (descriptor.get) {
         return descriptor.get.call(receiver);
     }
     return descriptor.value;
-}
-function _privateMapSet(receiver, privateMap, value) {
+};
+const privateMapSet = (receiver, privateMap, value) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateSet();
     }
-    var descriptor = privateMap.get(receiver);
+    const descriptor = privateMap.get(receiver);
     if (descriptor.set) {
         descriptor.set.call(receiver, value);
     }
@@ -64,8 +64,8 @@ function _privateMapSet(receiver, privateMap, value) {
         descriptor.value = value;
     }
     return value;
-}
-let __vault = new WeakMap();
+};
+const __vault = new WeakMap();
 class Wallet {
     constructor() {
         __vault.set(this, {
@@ -73,36 +73,41 @@ class Wallet {
         });
     }
     load(key, mnemonic, curve) {
-        let privKey, pubKey;
-        if (!key) {
-            throw new Error("key cannot be undefined");
+        try {
+            let privKey, pubKey;
+            if (!key) {
+                throw new Error("key cannot be undefined");
+            }
+            switch (curve) {
+                case Types.SR25519: {
+                    const uint8Key = (0, moi_utils_1.bytesToUint8)(key);
+                    let kp = schnorrkel.keypair_from_seed(uint8Key);
+                    privKey = (0, moi_utils_1.uint8ToHex)(kp.slice(0, 64));
+                    pubKey = (0, moi_utils_1.uint8ToHex)(kp.slice(64, 96));
+                    break;
+                }
+                case Types.SECP256K1: {
+                    const ecPrivKey = new elliptic_1.default.ec(Types.SECP256K1);
+                    let keyInBytes = (0, moi_utils_1.hexToUint8)(key);
+                    const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
+                    privKey = keyPair.getPrivate("hex");
+                    pubKey = keyPair.getPublic(true, "hex");
+                    break;
+                }
+                default: {
+                    throw new Error("un-supported curve");
+                }
+            }
+            privateMapSet(this, __vault, {
+                _key: privKey,
+                _mnemonic: mnemonic,
+                _public: pubKey,
+                _curve: curve
+            });
         }
-        switch (curve) {
-            case Types.SR25519: {
-                const uint8Key = (0, moi_utils_1.bytesToUint8)(key);
-                let kp = schnorrkel.keypair_from_seed(uint8Key);
-                privKey = (0, moi_utils_1.uint8ToHex)(kp.slice(0, 64));
-                pubKey = (0, moi_utils_1.uint8ToHex)(kp.slice(64, 96));
-                break;
-            }
-            case Types.SECP256K1: {
-                const ecPrivKey = new elliptic_1.default.ec(Types.SECP256K1);
-                let keyInBytes = (0, moi_utils_1.hexToUint8)(key);
-                const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
-                privKey = keyPair.getPrivate("hex");
-                pubKey = keyPair.getPublic(true, "hex");
-                break;
-            }
-            default: {
-                throw new Error("un-supported curve");
-            }
+        catch (err) {
+            throw err;
         }
-        _privateMapSet(this, __vault, {
-            _key: privKey,
-            _mnemonic: mnemonic,
-            _public: pubKey,
-            _curve: curve
-        });
     }
     async createRandom() {
         try {
@@ -126,9 +131,9 @@ class Wallet {
             throw new Error(e.message);
         }
     }
-    privateKey() { return _privateMapGet(this, __vault)._key; }
-    mnemonic() { return _privateMapGet(this, __vault)._mnemonic; }
-    publicKey() { return _privateMapGet(this, __vault)._public; }
-    curve() { return _privateMapGet(this, __vault)._curve; }
+    privateKey() { return privateMapGet(this, __vault)._key; }
+    mnemonic() { return privateMapGet(this, __vault)._mnemonic; }
+    publicKey() { return privateMapGet(this, __vault)._public; }
+    curve() { return privateMapGet(this, __vault)._curve; }
 }
 exports.default = Wallet;

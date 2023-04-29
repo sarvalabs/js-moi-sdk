@@ -45,7 +45,6 @@ class Errors {
         if (messageDetails.length) {
             errorMessageStack += ' (' + messageDetails.join(', ') + ')';
         }
-        // @TODO: Any??
         const error = new Error(message);
         error.code = code;
         error.reason = message;

@@ -1,12 +1,18 @@
-import LogicDescriptor from "./descriptor";
+import { LogicManifest } from "moi-utils";
 import { JsonRpcProvider, Options } from "moi-providers";
 import { Routines } from "../types/logic";
-import { LogicManifest } from "moi-utils";
-declare class Logic extends LogicDescriptor {
+import { EphemeralState, PersistentState } from "./state";
+import LogicDescriptor from "./descriptor";
+declare class LogicDriver extends LogicDescriptor {
     private provider;
+    private abiCoder;
     routines: Routines;
-    constructor(logicId: string, provider: JsonRpcProvider, manifest: LogicManifest.Manifest);
+    persistentState: PersistentState;
+    ephemeralState: EphemeralState;
+    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: JsonRpcProvider);
+    private createState;
     private createRoutines;
+    private isMutableRoutine;
     private normalizeRoutineName;
     private createPayload;
     private processArguments;
@@ -15,5 +21,5 @@ declare class Logic extends LogicDescriptor {
     private createIxRequest;
     private createIxObject;
 }
-export declare const getLogicObject: (logicId: string, provider: JsonRpcProvider, options?: Options) => Promise<Logic>;
+export declare const getLogicDriver: (logicId: string, provider: JsonRpcProvider, options?: Options) => Promise<LogicDriver>;
 export {};

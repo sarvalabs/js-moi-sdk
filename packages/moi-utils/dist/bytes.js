@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hexlify = exports.isHexString = exports.hexDataLength = exports.isBytes = void 0;
-function isInteger(value) {
+exports.bytesToUint8 = exports.isHexString = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
+const isInteger = (value) => {
     return (typeof (value) === "number" && value == value && (value % 1) === 0);
-}
-function isBytes(value) {
+};
+exports.isInteger = isInteger;
+const isBytes = (value) => {
     if (value == null) {
         return false;
     }
@@ -14,32 +15,26 @@ function isBytes(value) {
     if (typeof (value) === "string") {
         return false;
     }
-    if (!isInteger(value.length) || value.length < 0) {
+    if (!(0, exports.isInteger)(value.length) || value.length < 0) {
         return false;
     }
     for (let i = 0; i < value.length; i++) {
         const v = value[i];
-        if (!isInteger(v) || v < 0 || v >= 256) {
+        if (!(0, exports.isInteger)(v) || v < 0 || v >= 256) {
             return false;
         }
     }
     return true;
-}
+};
 exports.isBytes = isBytes;
-function hexDataLength(data) {
-    if (typeof (data) !== "string") {
-        data = hexlify(data);
-    }
-    else if (!isHexString(data) || (data.length % 2)) {
+const hexDataLength = (data) => {
+    if (!(0, exports.isHexString)(data) || (data.length % 2)) {
         return null;
     }
     return (data.length - 2) / 2;
-}
+};
 exports.hexDataLength = hexDataLength;
-function isHexable(value) {
-    return !!(value.toHexString);
-}
-function isHexString(value, length) {
+const isHexString = (value, length) => {
     if (typeof (value) !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
         return false;
     }
@@ -47,65 +42,9 @@ function isHexString(value, length) {
         return false;
     }
     return true;
-}
+};
 exports.isHexString = isHexString;
-const HexCharacters = "0123456789abcdef";
-function hexlify(value, options) {
-    if (!options) {
-        options = {};
-    }
-    if (typeof (value) === "number") {
-        // logger.checkSafeUint53(value, "invalid hexlify value");
-        let hex = "";
-        while (value) {
-            hex = HexCharacters[value & 0xf] + hex;
-            value = Math.floor(value / 16);
-        }
-        if (hex.length) {
-            if (hex.length % 2) {
-                hex = "0" + hex;
-            }
-            return "0x" + hex;
-        }
-        return "0x00";
-    }
-    if (typeof (value) === "bigint") {
-        value = value.toString(16);
-        if (value.length % 2) {
-            return ("0x0" + value);
-        }
-        return "0x" + value;
-    }
-    if (options.allowMissingPrefix && typeof (value) === "string" && value.substring(0, 2) !== "0x") {
-        value = "0x" + value;
-    }
-    if (isHexable(value)) {
-        return value.toHexString();
-    }
-    if (isHexString(value)) {
-        if (value.length % 2) {
-            if (options.hexPad === "left") {
-                value = "0x0" + value.substring(2);
-            }
-            else if (options.hexPad === "right") {
-                value += "0";
-            }
-            else {
-                // logger.throwArgumentError("hex data is odd-length", "value", value);
-                throw new Error("hex data is odd-length");
-            }
-        }
-        return value.toLowerCase();
-    }
-    if (isBytes(value)) {
-        let result = "0x";
-        for (let i = 0; i < value.length; i++) {
-            let v = value[i];
-            result += HexCharacters[(v & 0xf0) >> 4] + HexCharacters[v & 0x0f];
-        }
-        return result;
-    }
-    // return logger.throwArgumentError("invalid hexlify value", "value", value);
-    throw new Error("invalid hexlify value");
-}
-exports.hexlify = hexlify;
+const bytesToUint8 = (target) => {
+    return new Uint8Array(target);
+};
+exports.bytesToUint8 = bytesToUint8;

@@ -3,78 +3,106 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.EngineKind = void 0;
 const moi_abi_1 = require("moi-abi");
+const state_1 = require("./state");
 const logic_id_1 = __importDefault(require("./logic_id"));
+var EngineKind;
+(function (EngineKind) {
+    EngineKind["PISA"] = "PISA";
+    EngineKind["MERU"] = "MERU";
+})(EngineKind = exports.EngineKind || (exports.EngineKind = {}));
 class LogicDescriptor {
     logicId;
     manifest;
-    manifestHash;
+    encodedManifest;
     engine;
-    state;
+    stateMatrix;
     sealed;
     assetLogic;
-    persistentStatePtr;
-    ephemeralStatePtr;
+    elements;
+    callSites;
+    classDefs;
     constructor(logicId, manifest) {
         this.logicId = new logic_id_1.default(logicId);
         this.manifest = manifest;
-        this.manifestHash = moi_abi_1.ABICoder.encodeABI(this.manifest);
+        this.encodedManifest = moi_abi_1.ABICoder.encodeABI(this.manifest);
+        this.engine = this.manifest.engine.kind;
         this.sealed = false;
         this.assetLogic = false;
-        const engine = this.manifest.engine;
-        this.engine = engine.kind;
-        const stateElement = this.manifest.elements.find(element => element.kind === "state");
-        switch (stateElement.data.kind) {
-            case "persistent":
-                this.state = "Persistent";
-                this.persistentStatePtr = stateElement.ptr;
-                break;
-            case "ephemeral":
-                this.state = "Ephemeral";
-                this.ephemeralStatePtr = stateElement.ptr;
-                break;
-            default:
-                break;
-        }
+        this.stateMatrix = new state_1.ContextStateMatrix(manifest.elements);
+        this.initManifestMaps();
     }
-    getLogicId = () => {
+    initManifestMaps() {
+        this.elements = new Map();
+        this.callSites = new Map();
+        this.classDefs = new Map();
+        this.manifest.elements.forEach(element => {
+            this.elements.set(element.ptr, element);
+            switch (element.kind) {
+                case "class":
+                    element.data = element.data;
+                    this.classDefs.set(element.data.name, element.ptr);
+                    break;
+                case "routine":
+                    element.data = element.data;
+                    const callsite = { ptr: element.ptr, kind: element.data.kind };
+                    this.callSites.set(element.data.name, callsite);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+    getLogicId() {
         return this.logicId.hex();
-    };
-    getEngine = () => {
+    }
+    getEngine() {
         return this.engine;
-    };
-    getManifest = () => {
+    }
+    getManifest() {
         return this.manifest;
-    };
-    getManifestHash = () => {
-        return this.manifestHash;
-    };
-    isSealed = () => {
+    }
+    getEncodedManifest() {
+        return this.encodedManifest;
+    }
+    isSealed() {
         return this.sealed;
-    };
-    isAssetLogic = () => {
+    }
+    isAssetLogic() {
         return this.assetLogic;
-    };
-    getState = () => {
-        return this.state;
-    };
-    getPersistentState = () => {
-        if (this.persistentStatePtr !== undefined) {
-            return [this.persistentStatePtr, true];
+    }
+    getStateMatrix() {
+        return this.stateMatrix;
+    }
+    hasPersistentState() {
+        const ptr = this.stateMatrix.get(state_1.ContextStateKind.PersistentState);
+        if (ptr !== undefined) {
+            return [ptr, true];
         }
         return [0, false];
-    };
-    getEphemeralState = () => {
-        if (this.ephemeralStatePtr !== undefined) {
-            return [this.ephemeralStatePtr, true];
+    }
+    hasEphemeralState() {
+        const ptr = this.stateMatrix.get(state_1.ContextStateKind.EphemeralState);
+        if (ptr !== undefined) {
+            return [ptr, true];
         }
         return [0, false];
-    };
-    allowsInteractions = () => {
+    }
+    allowsInteractions() {
         return this.logicId.isInteractive();
-    };
-    isStateful = () => {
+    }
+    isStateful() {
         return this.logicId.isStateful();
-    };
+    }
+    getElements() {
+        return this.elements;
+    }
+    getCallsites() {
+        return this.callSites;
+    }
+    getClassDefs() {
+        return this.classDefs;
+    }
 }
 exports.default = LogicDescriptor;

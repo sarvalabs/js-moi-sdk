@@ -1,29 +1,34 @@
 import { WebsocketProviderOptions } from "../types/provider";
 import { JsonRpcProvider } from "./jsonrpc-provider";
 import Event from "./event";
-import { Subscription } from "../types/websocket";
-import { InflightRequest } from "../types/websocket";
+export declare enum WebSocketEvents {
+    TESSERACT = "tesseract",
+    ALL_TESSERACTS = "all_tesseracts",
+    CONNECT = "connect",
+    RECONNECT = "reconnect",
+    CLOSE = "close",
+    DEBUG = "debug",
+    ERROR = "error"
+}
 export declare class WebSocketProvider extends JsonRpcProvider {
-    requestQueue: Map<number, InflightRequest>;
-    responseQueue: Map<number, InflightRequest>;
-    connection: any;
-    wsConnOptions: WebsocketProviderOptions;
-    reconnecting: boolean;
-    reconnAttempts: number;
-    subscriptions: Map<string, Subscription>;
-    subsIds: {
-        [tag: string]: Promise<string>;
-    };
+    private requestQueue;
+    private responseQueue;
+    private connection;
+    private wsConnOptions;
+    private reconnecting;
+    private reconnAttempts;
+    private subscriptions;
+    private subsIds;
     constructor(host: string, options?: WebsocketProviderOptions);
-    connect: () => void;
+    private connect;
     private addEventListener;
     private removeEventListener;
     private reconnect;
-    private onError;
     private onConnect;
     private isConnectionFailed;
     private onClose;
     private onMessage;
+    private onConnectFailed;
     private sendRequest;
     send(method: string, params: any[]): Promise<any>;
     _subscribe(tag: string, param: Array<any>, processFunc: (result: any) => void): Promise<void>;

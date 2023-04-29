@@ -5,6 +5,10 @@ const js_polo_1 = require("js-polo");
 const schema_1 = require("./schema");
 const moi_utils_1 = require("moi-utils");
 class ABICoder {
+    schema;
+    constructor(elements, classDefs) {
+        this.schema = new schema_1.Schema(elements, classDefs);
+    }
     static encodeABI(manifest) {
         const polorizer = new js_polo_1.Polorizer();
         polorizer.polorizeString(manifest.syntax);
@@ -14,14 +18,17 @@ class ABICoder {
             manifest.elements.forEach((value) => {
                 const element = new js_polo_1.Polorizer();
                 element.polorizeInteger(value.ptr);
-                element.polorizeString(value.kind);
                 element.polorize(value.deps, schema_1.Schema.PISA_DEPS_SCHEMA);
+                element.polorizeString(value.kind);
                 switch (value.kind) {
                     case "constant":
                         element.polorize(value.data, schema_1.Schema.PISA_CONSTANT_SCHEMA);
                         break;
                     case "typedef":
                         element.polorize(value.data, schema_1.Schema.PISA_TYPEDEF_SCHEMA);
+                        break;
+                    case "class":
+                        element.polorize(value.data, schema_1.Schema.PISA_CLASS_SCHEMA);
                         break;
                     case "routine":
                         element.polorize(value.data, schema_1.Schema.PISA_ROUTINE_SCHEMA);
@@ -37,9 +44,9 @@ class ABICoder {
             polorizer.polorizePacked(elements);
         }
         const bytes = polorizer.bytes();
-        return (0, moi_utils_1.bytesToHex)(bytes);
+        return "0x" + (0, moi_utils_1.bytesToHex)(bytes);
     }
-    static parseCalldata(schema, arg) {
+    parseCalldata(schema, arg) {
         if (schema.kind === "bytes" && typeof arg === "string") {
             return (0, moi_utils_1.hexToBytes)(arg);
         }
@@ -57,16 +64,40 @@ class ABICoder {
         }
         return arg;
     }
-    static encodeArguments(fields, args) {
-        const schema = schema_1.Schema.parseFields(fields);
-        let calldata = {};
+    encodeArguments(fields, args) {
+        const schema = this.schema.parseFields(fields);
+        const calldata = {};
         Object.values(fields).forEach((field) => {
             calldata[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
         });
         const document = (0, js_polo_1.documentEncode)(calldata, schema);
         const bytes = document.bytes();
-        const data = (0, moi_utils_1.bytesToHex)(new Uint8Array(bytes));
+        const data = "0x" + (0, moi_utils_1.bytesToHex)(new Uint8Array(bytes));
         return data;
+    }
+    decodeOutput(output, fields) {
+        if (output) {
+            const decodedOutput = (0, moi_utils_1.hexToBytes)(output);
+            const depolorizer = new js_polo_1.Depolorizer(decodedOutput);
+            const schema = this.schema.parseFields(fields);
+            return depolorizer.depolorize(schema);
+        }
+        return null;
+    }
+    static decodeException(error) {
+        if (error) {
+            const decodedError = (0, moi_utils_1.hexToBytes)(error);
+            const depolorizer = new js_polo_1.Depolorizer(decodedError);
+            const exception = depolorizer.depolorize(schema_1.Schema.PISA_EXCEPTION_SCHEMA);
+            return exception;
+        }
+        return null;
+    }
+    decodeState(data, field, fields) {
+        const decodedData = (0, moi_utils_1.hexToBytes)(data);
+        const depolorizer = new js_polo_1.Depolorizer(decodedData);
+        const schema = this.schema.parseFields(fields);
+        return depolorizer.depolorize(schema.fields[field]);
     }
 }
 exports.ABICoder = ABICoder;

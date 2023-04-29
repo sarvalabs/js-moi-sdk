@@ -10,9 +10,6 @@ const event_1 = __importDefault(require("./event"));
 const defaultTimeout = 120;
 class BaseProvider extends abstract_provider_1.AbstractProvider {
     _events;
-    _pollingInterval;
-    _poller;
-    _bootstrapPoll;
     defaultOptions = {
         tesseract_number: -1
     };
@@ -20,7 +17,6 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         super();
         // Events being listened to
         this._events = [];
-        this._pollingInterval = 4000;
     }
     processResponse(response) {
         if (response.result) {
@@ -40,7 +36,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.Balance", params);
-            return this.processResponse(response);
+            const balance = this.processResponse(response);
+            return (0, moi_utils_1.hexToBN)(balance);
         }
         catch (error) {
             throw error;
@@ -66,7 +63,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.TDU", params);
-            return this.processResponse(response);
+            const tdu = this.processResponse(response);
+            Object.keys(tdu).forEach((assetId) => {
+                tdu[assetId] = (0, moi_utils_1.hexToBN)(tdu[assetId]);
+            });
+            return tdu;
         }
         catch (error) {
             throw error;
@@ -79,7 +80,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 options: options ? options : this.defaultOptions
             };
             const response = await this.execute("moi.InteractionCount", params);
-            return this.processResponse(response);
+            const ixCount = this.processResponse(response);
+            return (0, moi_utils_1.hexToBN)(ixCount);
         }
         catch (error) {
             throw error;
@@ -91,7 +93,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 address: address
             };
             const response = await this.execute("moi.PendingInteractionCount", params);
-            return this.processResponse(response);
+            const ixCount = this.processResponse(response);
+            return (0, moi_utils_1.hexToBN)(ixCount);
         }
         catch (error) {
             throw error;
@@ -110,11 +113,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
-    async getAccountMetaInfo(address, options) {
+    async getAccountMetaInfo(address) {
         try {
             const params = {
-                address: address,
-                options: options ? options : this.defaultOptions
+                address: address
             };
             const response = await this.execute("moi.AccountMetaInfo", params);
             return this.processResponse(response);
@@ -129,7 +131,14 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 address: address
             };
             const response = await this.execute("ixpool.ContentFrom", params);
-            return this.processResponse(response);
+            const content = this.processResponse(response);
+            const contentResponse = {
+                pending: new Map(),
+                queued: new Map(),
+            };
+            Object.keys(content.pending).forEach(nonce => contentResponse.pending.set((0, moi_utils_1.hexToBN)(nonce), content.pending[nonce]));
+            Object.keys(content.queued).forEach(nonce => contentResponse.queued.set((0, moi_utils_1.hexToBN)(nonce), content.queued[nonce]));
+            return contentResponse;
         }
         catch (error) {
             throw error;
@@ -178,7 +187,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             moi_utils_1.Errors.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
         }
         catch (error) {
-            throw new Error("bad result form backend");
+            throw error;
         }
     }
     // Query Methods
@@ -213,7 +222,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 storage_key: storageKey,
                 options: options ? options : this.defaultOptions
             };
-            const response = await this.execute("moi.StorageAt", params);
+            const response = await this.execute("moi.Storage", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -229,7 +238,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             };
             const response = await this.execute("moi.LogicManifest", params);
             const data = this.processResponse(response);
-            const decodedManifest = (0, moi_utils_1.decodeBase64)(data);
+            const decodedManifest = (0, moi_utils_1.hexToBytes)(data);
             switch (encoding) {
                 case "JSON":
                     return (0, moi_utils_1.unmarshal)(decodedManifest);
@@ -246,7 +255,20 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getContent() {
         try {
             const response = await this.execute("ixpool.Content", null);
-            return this.processResponse(response);
+            const content = this.processResponse(response);
+            const contentResponse = {
+                pending: new Map(),
+                queued: new Map(),
+            };
+            Object.keys(content.pending).forEach(key => {
+                contentResponse.pending.set(key, new Map());
+                Object.keys(content.pending[key]).forEach(nonce => contentResponse.pending.get(key).set((0, moi_utils_1.hexToBN)(nonce), content.pending[key][nonce]));
+            });
+            Object.keys(content.queued).forEach(key => {
+                contentResponse.queued.set(key, new Map());
+                Object.keys(content.queued[key]).forEach(nonce => contentResponse.queued.get(key).set((0, moi_utils_1.hexToBN)(nonce), content.queued[key][nonce]));
+            });
+            return contentResponse;
         }
         catch (error) {
             throw error;
@@ -255,7 +277,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getStatus() {
         try {
             const response = await this.execute("ixpool.Status", null);
-            return this.processResponse(response);
+            const status = this.processResponse(response);
+            return {
+                pending: (0, moi_utils_1.hexToBN)(status.pending),
+                queued: (0, moi_utils_1.hexToBN)(status.queued)
+            };
         }
         catch (error) {
             throw error;
@@ -264,7 +290,25 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getInspect() {
         try {
             const response = await this.execute("ixpool.Inspect", null);
-            return this.processResponse(response);
+            const inspect = this.processResponse(response);
+            const inspectResponse = {
+                pending: new Map(),
+                queued: new Map(),
+                wait_time: new Map()
+            };
+            Object.keys(inspect.pending).forEach(key => {
+                inspectResponse.pending.set(key, new Map(Object.entries(inspect.pending[key])));
+            });
+            Object.keys(inspect.queued).forEach(key => {
+                inspectResponse.queued.set(key, new Map(Object.entries(inspect.queued[key])));
+            });
+            Object.keys(inspectResponse.wait_time).forEach(key => {
+                inspectResponse.wait_time.set(key, {
+                    ...inspectResponse.wait_time[key],
+                    time: (0, moi_utils_1.hexToBN)(inspectResponse.wait_time[key]["time"])
+                });
+            });
+            return inspectResponse;
         }
         catch (error) {
             throw error;
@@ -293,7 +337,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     }
     async getAccounts() {
         try {
-            const response = await this.execute("debug.GetAccounts", null);
+            const response = await this.execute("debug.Accounts", null);
             return this.processResponse(response);
         }
         catch (error) {
@@ -331,7 +375,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return new Promise(async (resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-                switch (receipt.ix_type) {
+                receipt.ix_type = "0x7";
+                switch ((0, moi_utils_1.hexToBN)(receipt.ix_type)) {
                     case moi_utils_1.IxType.VALUE_TRANSFER:
                         resolve(null);
                         break;
@@ -345,19 +390,28 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     case moi_utils_1.IxType.LOGIC_DEPLOY:
                         if (receipt.extra_data) {
                             receipt.extra_data = receipt.extra_data;
-                            resolve(receipt.extra_data.logic_id);
+                            resolve(receipt.extra_data);
                         }
-                        reject({ message: "logic id not found" });
+                        reject({
+                            message: "invalid logic deploy response",
+                            error: null
+                        });
                         break;
                     case moi_utils_1.IxType.LOGIC_INVOKE:
                         if (receipt.extra_data) {
                             receipt.extra_data = receipt.extra_data;
-                            resolve(receipt.extra_data.return_data);
+                            resolve(receipt.extra_data);
                         }
-                        reject({ message: "invalid logic invoke response" });
+                        reject({
+                            message: "invalid logic invoke response",
+                            error: null
+                        });
                         break;
                     default:
-                        moi_utils_1.Errors.throwError("Unsupported interaction type", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+                        reject({
+                            message: "unsupported interaction type",
+                            error: null
+                        });
                 }
             }
             catch (err) {
@@ -369,10 +423,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         throw new Error(method + " not implemented");
     }
     _startEvent(event) {
-        this.polling = (this._events.filter((e) => e.pollable()).length > 0);
     }
     _stopEvent(event) {
-        this.polling = (this._events.filter((e) => e.pollable()).length > 0);
     }
     _addEventListener(eventName, listener, once) {
         const event = new event_1.default(getEventTag(eventName), listener, once);
@@ -465,52 +517,9 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         stopped.forEach((event) => { this._stopEvent(event); });
         return this;
     }
-    get polling() {
-        return (this._poller != null);
-    }
-    set polling(value) {
-        if (value && !this._poller) {
-            this._poller = setInterval(() => { this.poll(); }, this.pollingInterval);
-            if (!this._bootstrapPoll) {
-                this._bootstrapPoll = setTimeout(() => {
-                    this.poll();
-                    // We block additional polls until the polling interval
-                    // is done, to prevent overwhelming the poll function
-                    this._bootstrapPoll = setTimeout(() => {
-                        // If polling was disabled, something may require a poke
-                        // since starting the bootstrap poll and it was disabled
-                        if (!this._poller) {
-                            this.poll();
-                        }
-                        // Clear out the bootstrap so we can do another
-                        this._bootstrapPoll = null;
-                    }, this.pollingInterval);
-                }, 0);
-            }
-        }
-        else if (!value && this._poller) {
-            clearInterval(this._poller);
-            this._poller = null;
-        }
-    }
-    async poll() {
-    }
-    get pollingInterval() {
-        return this._pollingInterval;
-    }
-    set pollingInterval(value) {
-        if (typeof (value) !== "number" || value <= 0 || parseInt(String(value)) != value) {
-            throw new Error("invalid polling interval");
-        }
-        this._pollingInterval = value;
-        if (this._poller) {
-            clearInterval(this._poller);
-            this._poller = setInterval(() => { this.poll(); }, this._pollingInterval);
-        }
-    }
 }
 exports.BaseProvider = BaseProvider;
-function getEventTag(eventName) {
+const getEventTag = (eventName) => {
     if (typeof (eventName) === "string") {
         eventName = eventName.toLowerCase();
         if ((0, moi_utils_1.hexDataLength)(eventName) === 32) {
@@ -521,4 +530,4 @@ function getEventTag(eventName) {
         }
     }
     throw new Error("invalid event - " + eventName);
-}
+};

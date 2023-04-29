@@ -1,40 +1,36 @@
-/// <reference types="node" />
-import { Address, LogicManifest, Tesseract } from "moi-utils";
+import { LogicManifest, Tesseract } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionObject, InteractionReceipt, InteractionResponse, Options, TDU, Content, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionObject, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 export declare class BaseProvider extends AbstractProvider {
-    _events: Array<Event>;
-    _pollingInterval: number;
-    _poller: NodeJS.Timer;
-    _bootstrapPoll: NodeJS.Timer;
+    _events: Event[];
     defaultOptions: Options;
     constructor();
-    private processResponse;
+    processResponse(response: RpcResponse): any;
     getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
     getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
     getTDU(address: string, options?: Options): Promise<TDU>;
     getInteractionCount(address: string, options?: Options): Promise<number | bigint>;
     getPendingInteractionCount(address: string): Promise<number | bigint>;
     getAccountState(address: string, options?: Options): Promise<AccountState>;
-    getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo>;
+    getAccountMetaInfo(address: string): Promise<AccountMetaInfo>;
     getContentFrom(address: string): Promise<ContentFrom>;
     getWaitTime(address: string): Promise<number | bigint>;
     getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
     sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse>;
     getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
     getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
-    getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any>;
+    getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>;
     getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>;
     getContent(): Promise<Content>;
     getStatus(): Promise<Status>;
     getInspect(): Promise<Inspect>;
     getPeers(): Promise<string[]>;
     getDBEntry(key: string): Promise<string>;
-    getAccounts(): Promise<Address[]>;
+    getAccounts(): Promise<string[]>;
     waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>;
-    waitForResult(interactionHash: string, timeout?: number): Promise<string>;
+    waitForResult(interactionHash: string, timeout?: number): Promise<any>;
     execute(method: string, params: any): Promise<any>;
     _startEvent(event: Event): void;
     _stopEvent(event: Event): void;
@@ -46,9 +42,4 @@ export declare class BaseProvider extends AbstractProvider {
     listeners(eventName?: EventType): Array<Listener>;
     off(eventName: EventType, listener?: Listener): this;
     removeAllListeners(eventName?: EventType): this;
-    get polling(): boolean;
-    set polling(value: boolean);
-    poll(): Promise<void>;
-    get pollingInterval(): number;
-    set pollingInterval(value: number);
 }

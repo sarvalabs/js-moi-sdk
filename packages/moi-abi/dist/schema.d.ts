@@ -1,6 +1,9 @@
 import { LogicManifest } from "moi-utils";
 import { Schema as PoloSchema } from "js-polo";
 export declare class Schema {
+    private elements;
+    private classDefs;
+    constructor(elements?: Map<number, LogicManifest.Element>, classDefs?: Map<string, number>);
     static PISA_ENGINE_SCHEMA: {
         kind: string;
         fields: {
@@ -105,6 +108,33 @@ export declare class Schema {
         kind: string;
         fields: {};
     };
+    static PISA_CLASS_SCHEMA: {
+        kind: string;
+        fields: {
+            name: {
+                kind: string;
+            };
+            fields: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            slot: {
+                                kind: string;
+                            };
+                            label: {
+                                kind: string;
+                            };
+                            type: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
     static PISA_ROUTINE_SCHEMA: {
         kind: string;
         fields: {
@@ -181,9 +211,40 @@ export declare class Schema {
             };
         };
     };
-    private static extractArrayDataType;
-    private static extractMapDataType;
-    private static convertPrimitiveDataType;
-    private static parseDataType;
-    static parseFields: (fields: Record<string, LogicManifest.TypeField>) => PoloSchema;
+    static PISA_EXCEPTION_SCHEMA: {
+        kind: string;
+        fields: {
+            class: {
+                kind: string;
+            };
+            data: {
+                kind: string;
+            };
+            trace: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                    };
+                };
+            };
+        };
+    };
+    static PISA_RESULT_SCHEMA: {
+        kind: string;
+        fields: {
+            outputs: {
+                kind: string;
+            };
+            error: {
+                kind: string;
+            };
+        };
+    };
+    private extractArrayDataType;
+    private extractMapDataType;
+    private convertPrimitiveDataType;
+    private parseClassFields;
+    private parseDataType;
+    parseFields: (fields: LogicManifest.TypeField[]) => PoloSchema;
 }

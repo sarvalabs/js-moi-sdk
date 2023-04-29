@@ -11,10 +11,12 @@ class LogicFactory {
     manifest;
     encodedManifest;
     provider;
+    abiCoder;
     constructor(manifest, provider) {
         this.manifest = manifest;
         this.encodedManifest = moi_abi_1.ABICoder.encodeABI(manifest);
         this.provider = provider;
+        this.abiCoder = new moi_abi_1.ABICoder();
     }
     createPayload(ixObject) {
         const payload = {
@@ -22,7 +24,7 @@ class LogicFactory {
             callsite: ixObject.routine.data.name
         };
         if (ixObject.routine.data.accepts && Object.keys(ixObject.routine.data.accepts).length > 0) {
-            payload.calldata = moi_abi_1.ABICoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
+            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.data.accepts, ixObject.arguments);
         }
         return payload;
     }
@@ -47,6 +49,21 @@ class LogicFactory {
         processedArgs.params.payload = ixObject.createPayload();
         return processedArgs;
     }
+    async processResult(response, interactionHash, timeout) {
+        try {
+            const result = await response.result(interactionHash, timeout);
+            const data = { logic_id: "", error: null };
+            if (result.logic_id) {
+                data.logic_id = result.logic_id;
+                return data;
+            }
+            data.error = moi_abi_1.ABICoder.decodeException(result.error);
+            return data;
+        }
+        catch (err) {
+            throw err;
+        }
+    }
     executeRoutine(ixObject, ...args) {
         const processedArgs = this.processArguments(ixObject, args);
         if (!this.provider) {
@@ -54,15 +71,19 @@ class LogicFactory {
         }
         switch (processedArgs.type) {
             case "estimate":
-                console.log("yet to be implemented");
-                break;
-            case "call":
-                console.log("yet to be implemented");
-                break;
-            case "send":
-                return this.provider.sendInteraction(processedArgs.params);
-            default:
                 throw new Error('Method "' + processedArgs.type + '" not implemented.');
+            case "send":
+                return this.provider.sendInteraction(processedArgs.params)
+                    .then((response) => {
+                    return {
+                        ...response,
+                        result: this.processResult.bind(this, response)
+                    };
+                }).catch((err) => {
+                    throw err;
+                });
+            default:
+                throw new Error('Method "' + processedArgs.type + '" not supported.');
         }
     }
     createIxObject(routine, ...args) {

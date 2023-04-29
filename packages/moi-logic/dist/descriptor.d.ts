@@ -1,25 +1,36 @@
 import { LogicManifest } from "moi-utils";
+import { ContextStateMatrix } from "./state";
+import { CallSite } from "../types/logic";
 import LogicId from "./logic_id";
+export declare enum EngineKind {
+    PISA = "PISA",
+    MERU = "MERU"
+}
 export default class LogicDescriptor {
     protected logicId: LogicId;
     protected manifest: LogicManifest.Manifest;
-    protected manifestHash: string;
-    protected engine: string;
-    protected state: string;
+    protected encodedManifest: string;
+    protected engine: EngineKind;
+    protected stateMatrix: ContextStateMatrix;
     protected sealed: boolean;
     protected assetLogic: boolean;
-    protected persistentStatePtr: number;
-    protected ephemeralStatePtr: number;
+    protected elements: Map<number, LogicManifest.Element>;
+    protected callSites: Map<string, CallSite>;
+    protected classDefs: Map<string, number>;
     constructor(logicId: string, manifest: LogicManifest.Manifest);
-    getLogicId: () => string;
-    getEngine: () => string;
-    getManifest: () => LogicManifest.Manifest;
-    getManifestHash: () => string;
-    isSealed: () => boolean;
-    isAssetLogic: () => boolean;
-    getState: () => string;
-    getPersistentState: () => [number, boolean];
-    getEphemeralState: () => [number, boolean];
-    allowsInteractions: () => boolean;
-    isStateful: () => boolean;
+    private initManifestMaps;
+    getLogicId(): string;
+    getEngine(): EngineKind;
+    getManifest(): LogicManifest.Manifest;
+    getEncodedManifest(): string;
+    isSealed(): boolean;
+    isAssetLogic(): boolean;
+    getStateMatrix(): ContextStateMatrix;
+    hasPersistentState(): [number, boolean];
+    hasEphemeralState(): [number, boolean];
+    allowsInteractions(): boolean;
+    isStateful(): boolean;
+    getElements(): Map<number, LogicManifest.Element>;
+    getCallsites(): Map<string, CallSite>;
+    getClassDefs(): Map<string, number>;
 }

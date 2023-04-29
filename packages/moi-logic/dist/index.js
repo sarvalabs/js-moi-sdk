@@ -14,10 +14,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("moi-providers"), exports);
-__exportStar(require("moi-abi"), exports);
-__exportStar(require("moi-logic"), exports);
-__exportStar(require("moi-signer"), exports);
-__exportStar(require("moi-wallet"), exports);
-__exportStar(require("moi-constants"), exports);
-__exportStar(require("moi-utils"), exports);
+__exportStar(require("./logic"), exports);
+__exportStar(require("./factory"), exports);

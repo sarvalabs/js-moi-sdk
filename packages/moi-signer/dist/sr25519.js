@@ -23,19 +23,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Verify = exports.Sign = void 0;
+exports.verify = exports.sign = void 0;
 const schnorrkel = __importStar(require("@parity/schnorrkel-js"));
 const moi_utils_1 = require("moi-utils");
-function Sign(message, vault) {
+const sign = (message, vault) => {
     let _priv = vault.privateKey();
     let _pub = vault.privateKey();
     const kp = _priv.concat(_pub);
     let sigDigest = schnorrkel.sign(kp, (0, moi_utils_1.bytesToUint8)(message));
     return (0, moi_utils_1.uint8ToHex)(sigDigest);
-}
-exports.Sign = Sign;
-function Verify(message, signature, pubKey) {
+};
+exports.sign = sign;
+const verify = (message, signature, pubKey) => {
     const sigInUint8Array = Uint8Array.from(Buffer.from(signature, 'hex'));
     return schnorrkel.verify(sigInUint8Array, message, pubKey);
-}
-exports.Verify = Verify;
+};
+exports.verify = verify;

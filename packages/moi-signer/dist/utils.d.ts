@@ -1,3 +1,3 @@
-export declare function generateRandomSeed(count: number): Uint8Array;
-export declare function getBytesFromString(str: string): any[];
-export declare function getSigTypeAttributes(sigType: string | undefined): string[];
+export declare const generateRandomSeed: (count: number) => Uint8Array;
+export declare const getBytesFromString: (str: string) => any[];
+export declare const getSigTypeAttributes: (sigType: string | undefined) => string[];

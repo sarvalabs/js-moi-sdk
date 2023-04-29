@@ -23,11 +23,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebSocketProvider = void 0;
+exports.WebSocketProvider = exports.WebSocketEvents = void 0;
 const websocket_1 = require("websocket");
 const jsonrpc_provider_1 = require("./jsonrpc-provider");
 const errors = __importStar(require("./errors"));
+const moi_utils_1 = require("moi-utils");
 let nextReqId = 1;
+var WebSocketEvents;
+(function (WebSocketEvents) {
+    WebSocketEvents["TESSERACT"] = "tesseract";
+    WebSocketEvents["ALL_TESSERACTS"] = "all_tesseracts";
+    WebSocketEvents["CONNECT"] = "connect";
+    WebSocketEvents["RECONNECT"] = "reconnect";
+    WebSocketEvents["CLOSE"] = "close";
+    WebSocketEvents["DEBUG"] = "debug";
+    WebSocketEvents["ERROR"] = "error";
+})(WebSocketEvents = exports.WebSocketEvents || (exports.WebSocketEvents = {}));
 class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     requestQueue;
     responseQueue;
@@ -48,9 +59,9 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.wsConnOptions.reconnectOptions = Object.assign({
                 auto: false,
                 delay: 5000,
-                maxAttempts: false,
+                maxAttempts: 5,
                 onTimeout: false
-            }, options?.reconnect);
+            }, options?.reconnectOptions);
             this.wsConnOptions.headers = options?.headers || {};
             this.wsConnOptions.protocol = options?.protocol || undefined;
             this.wsConnOptions.clientConfig = options?.clientConfig || undefined;
@@ -58,6 +69,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.wsConnOptions.origin = options?.origin || undefined;
             this.wsConnOptions.clientConfig = options?.clientConfig || undefined;
             this.connection = null;
+            this.reconnAttempts = 0;
             this.requestQueue = new Map();
             this.responseQueue = new Map();
             this.subscriptions = new Map();
@@ -71,25 +83,53 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.addEventListener();
     };
     addEventListener = () => {
-        this.connection.onerror = this.onError.bind(this);
         this.connection.onopen = this.onConnect.bind(this);
         this.connection.onclose = this.onClose.bind(this);
         this.connection.onmessage = this.onMessage.bind(this);
+        if (this.connection._client) {
+            this.connection._client.removeAllListeners("connectFailed");
+            this.connection._client.on("connectFailed", this.onConnectFailed.bind(this));
+        }
     };
     removeEventListener = () => {
-        this.connection.onerror = null;
         this.connection.onopen = null;
         this.connection.onclose = null;
         this.connection.onmessage = null;
     };
-    reconnect = () => {
-        console.log("Trying to reconnect...!");
-    };
-    onError = () => {
-        this.emit("error", "Failed to establish connection.");
-    };
+    reconnect() {
+        this.reconnecting = true;
+        if (this.responseQueue.size > 0) {
+            this.responseQueue.forEach(function (request, key) {
+                try {
+                    this.responseQueue.delete(key);
+                    request.callback(errors.PendingRequestsOnReconnectingError(), null);
+                }
+                catch (e) {
+                    console.error("Error encountered in reconnect: ", e);
+                }
+            });
+        }
+        if (!this.wsConnOptions.reconnectOptions.maxAttempts ||
+            this.reconnAttempts < this.wsConnOptions.reconnectOptions.maxAttempts) {
+            setTimeout(() => {
+                this.reconnAttempts++;
+                this.removeEventListener();
+                this.emit(WebSocketEvents.RECONNECT, this.reconnAttempts);
+                this.connect();
+            }, this.wsConnOptions.reconnectOptions.delay);
+            return;
+        }
+        this.emit(WebSocketEvents.ERROR, errors.MaxAttemptsReachedOnReconnectingError());
+        this.reconnecting = false;
+        if (this.requestQueue.size > 0) {
+            this.requestQueue.forEach(function (request, key) {
+                request.callback(errors.MaxAttemptsReachedOnReconnectingError(), null);
+                this.requestQueue.delete(key);
+            });
+        }
+    }
     onConnect = () => {
-        this.emit("connect", "Websocket connection established successfully!");
+        this.emit(WebSocketEvents.CONNECT, "Websocket connection established successfully!");
         this.reconnAttempts = 0;
         this.reconnecting = false;
         if (this.requestQueue.size > 0) {
@@ -114,7 +154,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 this.reconnect();
                 return;
             }
-            this.emit("close", event);
+            this.emit(WebSocketEvents.CLOSE, event);
             if (this.requestQueue.size > 0) {
                 this.requestQueue.forEach(function (request, key) {
                     request.callback(errors.ConnectionNotOpenError(event), null);
@@ -140,7 +180,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.responseQueue.delete(id);
             if (response.result != undefined) {
                 request.callback(null, response.result);
-                this.emit("debug", {
+                this.emit(WebSocketEvents.DEBUG, {
                     action: "response",
                     request: JSON.parse(request.payload),
                     response: response.result,
@@ -149,6 +189,22 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             }
             else {
                 // TODO: handle error
+                let error = null;
+                if (response.error) {
+                    error = new Error(response.error.message || "unknown error");
+                    (0, moi_utils_1.defineReadOnly)(error, "code", response.error.code || null);
+                    (0, moi_utils_1.defineReadOnly)(error, "response", data);
+                }
+                else {
+                    error = new Error("unknown error");
+                }
+                request.callback(error, null);
+                this.emit(WebSocketEvents.ERROR, {
+                    action: "response",
+                    error: error,
+                    request: JSON.parse(request.payload),
+                    provider: this
+                });
             }
         }
         else if (response.method === "moi.subscription") {
@@ -157,6 +213,38 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 sub.processFunc(response.params.result);
             }
         }
+    };
+    onConnectFailed = (event) => {
+        let connectFailedDescription = event.toString().split('\n')[0];
+        if (connectFailedDescription) {
+            event.description = connectFailedDescription;
+        }
+        event.code = 1006;
+        event.reason = 'connection failed';
+        if (this.wsConnOptions.reconnectOptions.auto && (![1000, 1001].includes(event.code) || event.wasClean === false)) {
+            this.reconnect();
+            return;
+        }
+        this.emit(WebSocketEvents.ERROR, event);
+        if (this.requestQueue.size > 0) {
+            this.requestQueue.forEach(function (request, key) {
+                request.callback(errors.ConnectionNotOpenError(event), null);
+                this.requestQueue.delete(key);
+            });
+        }
+        if (this.responseQueue.size > 0) {
+            this.responseQueue.forEach(function (request, key) {
+                request.callback(errors.InvalidConnection('on WS', event), null);
+                this.responseQueue.delete(key);
+            });
+        }
+        //clean connection on our own
+        if (this.connection._connection) {
+            this.connection._connection.removeAllListeners();
+        }
+        this.connection._client.removeAllListeners();
+        this.connection._readyState = 3; // set readyState to CLOSED
+        this.emit(WebSocketEvents.CLOSE, event);
     };
     sendRequest(requestId, request) {
         if (this.connection.readyState !== this.connection.OPEN) {
@@ -182,7 +270,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 }
                 return resolve(result);
             }
-            const requestId = nextReqId + 1;
+            const requestId = nextReqId++;
             const payload = {
                 method: method,
                 params: params,
@@ -213,7 +301,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     }
     _startEvent(event) {
         switch (event.type) {
-            case "tesseract":
+            case WebSocketEvents.TESSERACT:
                 const params = {
                     address: event.address
                 };
@@ -221,15 +309,16 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                     this.emit(event.address, result);
                 });
                 break;
-            case "all_tesseracts":
+            case WebSocketEvents.ALL_TESSERACTS:
                 this._subscribe("all_tesseracts", ["newTesseracts"], (result) => {
-                    this.emit("all_tesseracts", result);
+                    this.emit(WebSocketEvents.ALL_TESSERACTS, result);
                 });
                 break;
-            case "connect":
-            case "close":
-            case "debug":
-            case "error":
+            case WebSocketEvents.CONNECT:
+            case WebSocketEvents.RECONNECT:
+            case WebSocketEvents.CLOSE:
+            case WebSocketEvents.DEBUG:
+            case WebSocketEvents.CLOSE:
                 break;
             default:
                 console.log("unhandled:", event);

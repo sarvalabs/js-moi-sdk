@@ -13,7 +13,16 @@ const isArray = (type) => {
 const isMap = (type) => {
     return type.startsWith("map");
 };
+const isClass = (type, classDefs) => {
+    return classDefs.has(type);
+};
 class Schema {
+    elements;
+    classDefs;
+    constructor(elements, classDefs) {
+        this.elements = elements;
+        this.classDefs = classDefs;
+    }
     static PISA_ENGINE_SCHEMA = {
         kind: "struct",
         fields: {
@@ -102,6 +111,17 @@ class Schema {
         kind: "string",
         fields: {}
     };
+    static PISA_CLASS_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string"
+            },
+            fields: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            }
+        }
+    };
     static PISA_ROUTINE_SCHEMA = {
         kind: "struct",
         fields: {
@@ -130,7 +150,37 @@ class Schema {
             }
         }
     };
-    static extractArrayDataType = (dataType) => {
+    static PISA_EXCEPTION_SCHEMA = {
+        kind: "struct",
+        fields: {
+            class: {
+                kind: "string"
+            },
+            data: {
+                kind: "string"
+            },
+            trace: {
+                kind: "array",
+                fields: {
+                    values: {
+                        kind: "string"
+                    }
+                }
+            }
+        }
+    };
+    static PISA_RESULT_SCHEMA = {
+        kind: "struct",
+        fields: {
+            outputs: {
+                kind: "bytes"
+            },
+            error: {
+                kind: "bytes"
+            }
+        }
+    };
+    extractArrayDataType = (dataType) => {
         let endIndex = 0;
         for (let i = 0; i < dataType.length; i++) {
             if (dataType.charAt(i) == "]") {
@@ -144,7 +194,7 @@ class Schema {
         }
         throw new Error("invalid array type!");
     };
-    static extractMapDataType = (dataType) => {
+    extractMapDataType = (dataType) => {
         let brackets = [];
         let startIndex = 0;
         let endIndex = 0;
@@ -167,7 +217,7 @@ class Schema {
         const value = dataType.replace("map[" + key + "]", "");
         return [key, value];
     };
-    static convertPrimitiveDataType = (type) => {
+    convertPrimitiveDataType = (type) => {
         switch (type) {
             case "null":
                 return "null";
@@ -186,7 +236,20 @@ class Schema {
                 throw new Error('unsupported data type!');
         }
     };
-    static parseDataType = (type) => {
+    parseClassFields = (type) => {
+        const ptr = this.classDefs.get(type);
+        const element = this.elements.get(ptr);
+        const schema = {
+            kind: "struct",
+            fields: {}
+        };
+        element.data = element.data;
+        Object.values(element.data.fields).forEach(field => {
+            schema.fields[field.label] = this.parseDataType(field.type);
+        });
+        return schema;
+    };
+    parseDataType = (type) => {
         switch (true) {
             case isPrimitiveType(type):
                 return {
@@ -209,11 +272,13 @@ class Schema {
                         values: this.parseDataType(value)
                     }
                 };
+            case isClass(type, this.classDefs):
+                return this.parseClassFields(type);
             default:
                 throw new Error("unsupported data type!");
         }
     };
-    static parseFields = (fields) => {
+    parseFields = (fields) => {
         const schema = {
             kind: 'struct',
             fields: {}
@@ -221,7 +286,7 @@ class Schema {
         if (typeof fields !== "object") {
             throw new Error("invalid fields");
         }
-        Object.values(fields).forEach(field => {
+        fields.forEach(field => {
             if (!field || !(field.label && field.type)) {
                 throw new Error("invalid field");
             }

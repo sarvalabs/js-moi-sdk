@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.hexToUint8 = void 0;
 const errors_1 = require("./errors");
-function isHexable(value) {
+const isHexable = (value) => {
     return !!(value.toHexString);
-}
-function addSlice(array) {
+};
+const addSlice = (array) => {
     if (array.slice) {
         return array;
     }
@@ -12,8 +13,8 @@ function addSlice(array) {
         return addSlice(new Uint8Array(Array.prototype.slice.apply(array)));
     };
     return array;
-}
-function isArrayish(value) {
+};
+const isArrayish = (value) => {
     if (!value || parseInt(String(value.length)) !== value.length || typeof (value) === 'string') {
         return false;
     }
@@ -24,33 +25,37 @@ function isArrayish(value) {
         }
     }
     return true;
-}
-function hexToUint8(value) {
-    if (value == null) {
-        errors_1.Errors.throwError('cannot convert null value to array', errors_1.ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
-    }
-    if (isHexable(value)) {
-        value = value.toHexString();
-    }
-    if (typeof (value) === 'string') {
-        var match = value.match(/^(0x)?[0-9a-fA-F]*$/);
-        if (!match) {
-            errors_1.Errors.throwError('invalid hexidecimal string', errors_1.ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
+};
+const hexToUint8 = (value) => {
+    try {
+        if (value == null) {
+            errors_1.Errors.throwError('cannot convert null value to array', errors_1.ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
         }
-        value = value.substring(2);
-        if (value.length % 2) {
-            value = '0' + value;
+        if (isHexable(value)) {
+            value = value.toHexString();
         }
-        var result = [];
-        for (var i = 0; i < value.length; i += 2) {
-            result.push(parseInt(value.substr(i, 2), 16));
+        if (typeof (value) === 'string') {
+            var match = value.match(/^(0x)?[0-9a-fA-F]*$/);
+            if (!match) {
+                errors_1.Errors.throwError('invalid hexidecimal string', errors_1.ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
+            }
+            value = value.substring(2);
+            if (value.length % 2) {
+                value = '0' + value;
+            }
+            var result = [];
+            for (var i = 0; i < value.length; i += 2) {
+                result.push(parseInt(value.substr(i, 2), 16));
+            }
+            return addSlice(new Uint8Array(result));
         }
-        return addSlice(new Uint8Array(result));
+        if (isArrayish(value)) {
+            return addSlice(new Uint8Array(value));
+        }
+        errors_1.Errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
     }
-    if (isArrayish(value)) {
-        return addSlice(new Uint8Array(value));
+    catch (err) {
+        throw err;
     }
-    errors_1.Errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
-    return null;
-}
-exports.default = hexToUint8;
+};
+exports.hexToUint8 = hexToUint8;

@@ -42,26 +42,26 @@ class Signer {
         this.sigAlgorithm = sigTypeAtts[0];
         this.signingVault = vault;
     }
-    Sign(message) {
+    sign(message) {
         switch (this.sigAlgorithm) {
             case Types.SCHNORR: {
-                return sr25519.Sign(message, this.signingVault);
+                return sr25519.sign(message, this.signingVault);
             }
             case Types.ECDSA: {
-                return ecdsa.Sign(message, this.signingVault);
+                return ecdsa.sign(message, this.signingVault);
             }
             default: {
                 throw new Error("unsupported signature algorithm");
             }
         }
     }
-    Verify(message, signature) {
+    verify(message, signature) {
         switch (this.sigAlgorithm) {
             case Types.SCHNORR: {
-                return sr25519.Verify(message, signature, this.signingVault.publicKey());
+                return sr25519.verify(message, signature, this.signingVault.publicKey());
             }
             case Types.ECDSA: {
-                return ecdsa.Verify(message, signature, this.signingVault.publicKey());
+                return ecdsa.verify(message, signature, this.signingVault.publicKey());
             }
             default: {
                 throw new Error("unsupported signature algorithm");
