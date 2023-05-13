@@ -17,5 +17,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("moi-providers"), exports);
 __exportStar(require("moi-abi"), exports);
 __exportStar(require("moi-logic"), exports);
+__exportStar(require("moi-hdnode"), exports);
+__exportStar(require("moi-wallet"), exports);
+__exportStar(require("moi-signer"), exports);
 __exportStar(require("moi-constants"), exports);
 __exportStar(require("moi-utils"), exports);

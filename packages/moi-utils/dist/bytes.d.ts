@@ -1,3 +1,4 @@
+/// <reference types="node" />
 export type Bytes = ArrayLike<number>;
 export declare const isInteger: (value: number) => boolean;
 export declare const isBytes: (value: any) => value is Bytes;

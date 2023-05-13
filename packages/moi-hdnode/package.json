@@ -1,0 +1,17 @@
+{
+  "name": "moi-hdnode",
+  "version": "0.1.0",
+  "description": "BIP32 HD Node for cryptocurrency key management.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "hdnode"
+  ],
+  "author": "",
+  "license": "ISC"
+}

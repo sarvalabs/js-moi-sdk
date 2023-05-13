@@ -38,6 +38,7 @@
     { "path": "./packages/moi-providers" },
     { "path": "./packages/moi-signer" },
     { "path": "./packages/moi-utils"},
+    { "path": "./packages/moi-hdnode"},
     { "path": "./packages/moi-wallet"},
   ],
   "include": [

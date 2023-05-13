@@ -1,4 +1,4 @@
-import Wallet from "moi-wallet";
+import {Wallet} from "moi-wallet";
 import elliptic from "elliptic";
 
 const secp256k1Curve = new elliptic.ec('secp256k1');
