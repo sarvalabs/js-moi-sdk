@@ -11,7 +11,7 @@ export class Signer {
     private signingVault: Wallet
     signingAlgorithms: any
 
-    constructor(vault: Wallet) {
+    constructor(vault?: Wallet) {
         this.signingVault = vault
         this.signingAlgorithms = {
             "ecdsa_secp256k1" : new ECDSA_S256()
@@ -33,8 +33,26 @@ export class Signer {
         throw new Error("signature type cannot be undefiend")
     }
 
-    public verify(message: Buffer, signature: string): boolean {
-        // yet to implement
-        return true
+    public verify(message: Buffer, signature: string, publicKey: string|Buffer): boolean {
+        let _verificationKey;
+        if(typeof publicKey === "string") {
+            _verificationKey = Buffer.from(publicKey, 'hex');
+        }else {
+            _verificationKey = publicKey;
+        }
+
+        const signatureInBytes = Buffer.from(signature, 'hex')
+        switch(signatureInBytes[0]) {
+            case 1: {
+                const sigLength = signatureInBytes[1];
+                const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
+                return _sig.verify(message, signatureInBytes.subarray(2,2+sigLength), _verificationKey);
+            }
+            default: {
+                throw new Error("invalid signature")
+            }
+        }
+
+        
     }
 }

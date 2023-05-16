@@ -3,5 +3,5 @@ export interface SigType {
     prefix: number;
     sigName: String;
     sign(message: Buffer, vault: Wallet): String
-    verify(): Boolean
+    verify(message: Buffer, signature: Buffer, publicKey: Buffer): Boolean
 }
