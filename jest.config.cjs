@@ -8,14 +8,14 @@ module.exports = {
         //         '^.+\\.tsx?$': 'ts-jest',
         //     },
         // },
-        {
-            displayName: 'moi-logic',
-            testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/moi-logic/__tests__/*.test.ts'],
-            transform: {
-                '^.+\\.tsx?$': 'ts-jest',
-            },
-        },
+        // {
+        //     displayName: 'moi-logic',
+        //     testEnvironment: 'ts-node',
+        //     testMatch: ['<rootDir>/packages/moi-logic/__tests__/*.test.ts'],
+        //     transform: {
+        //         '^.+\\.tsx?$': 'ts-jest',
+        //     },
+        // },
         // {
         //     displayName: 'moi-core',
         //     testEnvironment: 'ts-node',
@@ -32,6 +32,14 @@ module.exports = {
         //         '^.+\\.tsx?$': 'ts-jest',
         //     },
         // }
+        {
+            displayName: 'moi-signer',
+            testEnvironment: 'ts-node',
+            testMatch: ['<rootDir>/packages/moi-signer/__tests__/*.test.ts'],
+            transform: {
+                '^.+\\.tsx?$': 'ts-jest',
+            },
+        },
     ],
     testTimeout: 700000,
 }

@@ -5,7 +5,7 @@
 
 import * as bip39 from 'bip39';
 import elliptic from 'elliptic';
-import {HDNode} from "moi-hdnode";
+import { HDNode } from "moi-hdnode";
 import { randomBytes } from 'crypto';
 
 /* Internal imports */
