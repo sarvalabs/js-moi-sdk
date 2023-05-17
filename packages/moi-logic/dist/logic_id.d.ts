@@ -1,4 +1,4 @@
-export default class LogicId {
+export declare class LogicId {
     private logic;
     constructor(logicId: string);
     hex(): string;

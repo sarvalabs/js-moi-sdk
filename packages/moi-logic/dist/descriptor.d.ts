@@ -1,7 +1,7 @@
 import { LogicManifest } from "moi-utils";
 import { ContextStateMatrix } from "./state";
 import { CallSite } from "../types/logic";
-import LogicId from "./logic_id";
+import { LogicId } from "./logic_id";
 export declare enum EngineKind {
     PISA = "PISA",
     MERU = "MERU"

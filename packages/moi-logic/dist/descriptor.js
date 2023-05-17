@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EngineKind = void 0;
 const moi_abi_1 = require("moi-abi");
 const state_1 = require("./state");
-const logic_id_1 = __importDefault(require("./logic_id"));
+const logic_id_1 = require("./logic_id");
 var EngineKind;
 (function (EngineKind) {
     EngineKind["PISA"] = "PISA";
@@ -24,7 +21,7 @@ class LogicDescriptor {
     callSites;
     classDefs;
     constructor(logicId, manifest) {
-        this.logicId = new logic_id_1.default(logicId);
+        this.logicId = new logic_id_1.LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = moi_abi_1.ABICoder.encodeABI(this.manifest);
         this.engine = this.manifest.engine.kind;

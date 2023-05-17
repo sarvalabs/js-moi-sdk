@@ -3,7 +3,7 @@ import { JsonRpcProvider, Options } from "moi-providers";
 import { Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
 import LogicDescriptor from "./descriptor";
-declare class LogicDriver extends LogicDescriptor {
+export declare class LogicDriver extends LogicDescriptor {
     private provider;
     private abiCoder;
     routines: Routines;
@@ -22,4 +22,3 @@ declare class LogicDriver extends LogicDescriptor {
     private createIxObject;
 }
 export declare const getLogicDriver: (logicId: string, provider: JsonRpcProvider, options?: Options) => Promise<LogicDriver>;
-export {};

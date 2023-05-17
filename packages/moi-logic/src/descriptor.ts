@@ -2,7 +2,7 @@ import { ABICoder } from "moi-abi";
 import { LogicManifest } from "moi-utils";
 import { ContextStateKind, ContextStateMatrix } from "./state";
 import { CallSite } from "../types/logic";
-import LogicId from "./logic_id";
+import {LogicId} from "./logic_id";
 
 export enum EngineKind {
     PISA = "PISA",

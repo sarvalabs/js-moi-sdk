@@ -1,6 +1,6 @@
 import { bytesToHex } from "moi-utils";
 
-export default class LogicId {
+export class LogicId {
     private logic: Uint8Array;
 
     constructor(logicId: string) {

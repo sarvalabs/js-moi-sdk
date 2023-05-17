@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.LogicId = void 0;
 const moi_utils_1 = require("moi-utils");
 class LogicId {
     logic;
@@ -85,4 +86,4 @@ class LogicId {
         return (0, moi_utils_1.bytesToHex)(addressData);
     }
 }
-exports.default = LogicId;
+exports.LogicId = LogicId;

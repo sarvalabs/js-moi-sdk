@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLogicDriver = void 0;
+exports.getLogicDriver = exports.LogicDriver = void 0;
 const moi_abi_1 = require("moi-abi");
 const moi_utils_1 = require("moi-utils");
 const state_1 = require("./state");
@@ -155,6 +155,7 @@ class LogicDriver extends descriptor_1.default {
         return this.createIxRequest(ixObject);
     }
 }
+exports.LogicDriver = LogicDriver;
 const getLogicDriver = async (logicId, provider, options) => {
     try {
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);

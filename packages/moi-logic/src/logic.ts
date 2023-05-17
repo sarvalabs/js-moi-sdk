@@ -6,7 +6,7 @@ import { EphemeralState, PersistentState } from "./state";
 import LogicDescriptor from "./descriptor";
 import Errors from "./errors";
 
-class LogicDriver extends LogicDescriptor {
+export class LogicDriver extends LogicDescriptor {
     private provider: JsonRpcProvider;
     private abiCoder: ABICoder;
     public routines: Routines;
