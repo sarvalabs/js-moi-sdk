@@ -44,6 +44,9 @@ export class Signer {
         const signatureInBytes = Buffer.from(signature, 'hex')
         switch(signatureInBytes[0]) {
             case 1: {
+                if(_verificationKey.length === 32) {
+                    _verificationKey = Buffer.concat([Buffer.from([0x03]), _verificationKey])
+                }
                 const sigLength = signatureInBytes[1];
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
                 return _sig.verify(message, signatureInBytes.subarray(2,2+sigLength), _verificationKey);
@@ -52,7 +55,5 @@ export class Signer {
                 throw new Error("invalid signature")
             }
         }
-
-        
     }
 }
