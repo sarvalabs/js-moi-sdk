@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = void 0;
 const primitiveTypes = [
-    "null", "bool", "bytes", "address", "string", "uint64", "int64", "bigint"
+    "null", "bool", "bytes", "address", "string", "u64", "i64", "bigint"
 ];
 const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
@@ -228,8 +228,8 @@ class Schema {
                 return "bytes";
             case "string":
                 return "string";
-            case "uint64":
-            case "int64":
+            case "u64":
+            case "i64":
             case "bigint":
                 return "integer";
             default:
