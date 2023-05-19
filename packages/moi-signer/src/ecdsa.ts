@@ -29,7 +29,7 @@ export default class ECDSA_S256 implements SigType {
           Transaction.SIGHASH_ALL
         );
                      
-        // Removing last byte, since it's always 0x01 because of SIGHASH_ALL instruction
+        // Removing last byte, since it's always 0x01 because of SIGHASH_ALL hashType
         signature = signature.slice(0, signature.length - 1);
         
         const prefixArray = new Uint8Array(2);
@@ -39,8 +39,15 @@ export default class ECDSA_S256 implements SigType {
         const finalSigBytes = Buffer.concat([Buffer.from(prefixArray), signature]);
         return finalSigBytes.toString('hex');
     }
-    verify(): Boolean {
-        // yet to implement
-        return true
+    verify(message: Buffer, signature: Buffer, publicKey: Buffer): Boolean {        
+        let sigComps = script.signature.decode(
+            Buffer.concat([signature, Buffer.from([0x01])])
+        );
+
+        // Hashing raw message with blake2b to get 32 bytes digest 
+        const messageHash = Blake2b(256 / 8).update(message).digest();
+        const parsedPubkey = ECPair.fromPublicKey(publicKey, { network: networks.bitcoin });
+
+        return parsedPubkey.verify(messageHash, sigComps.signature)
     }
 }
