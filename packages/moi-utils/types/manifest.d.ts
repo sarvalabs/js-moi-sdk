@@ -36,8 +36,8 @@ export declare module LogicManifest {
         kind: string;
         accepts?: TypeField[];
         returns?: TypeField[];
+        executes: Instructions;
         catches?: string[];
-        executes: Instructions
     }
     
     export type TypeDef = string;

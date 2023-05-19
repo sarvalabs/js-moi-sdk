@@ -182,14 +182,6 @@ export declare class Schema {
                     };
                 };
             };
-            catches: {
-                kind: string;
-                fields: {
-                    values: {
-                        kind: string;
-                    };
-                };
-            };
             executes: {
                 kind: string;
                 fields: {
@@ -206,6 +198,14 @@ export declare class Schema {
                                 kind: string;
                             };
                         };
+                    };
+                };
+            };
+            catches: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
                     };
                 };
             };

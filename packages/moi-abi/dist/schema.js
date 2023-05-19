@@ -137,6 +137,9 @@ class Schema {
             returns: {
                 ...Schema.PISA_TYPE_FIELD_SCHEMA
             },
+            executes: {
+                ...Schema.PISA_INSTRUCTIONS_SCHEMA
+            },
             catches: {
                 kind: "array",
                 fields: {
@@ -144,9 +147,6 @@ class Schema {
                         kind: "string"
                     }
                 }
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA
             }
         }
     };
