@@ -59,11 +59,11 @@ export class ABICoder {
     private parseCalldata(schema: any, arg: any): any {
         if(schema.kind === "bytes" && typeof arg === "string") {
             return hexToBytes(arg)
-        } else if(schema.kind === "array" && ["bytes", "array", "map"].includes(schema.fields.values.kind)) {
+        } else if(schema.kind === "array" && ["bytes", "array", "map", "struct"].includes(schema.fields.values.kind)) {
             return arg.map(value => 
                 this.parseCalldata(schema.fields.values, value)
             )
-        } else if (schema.kind === "map" && (["bytes", "array", "map"].includes(schema.fields.keys.kind) || 
+        } else if (schema.kind === "map" && (["bytes", "array", "map", "struct"].includes(schema.fields.keys.kind) || 
         ["bytes", "array", "map"].includes(schema.fields.values.kind))) {
             const map = new Map()
             // Loop through the entries of the Map
@@ -75,6 +75,12 @@ export class ABICoder {
             }
 
             return map;
+        } else if (schema.kind === "struct") {
+            const doc = documentEncode(arg, schema);
+            schema.kind = "document"
+            delete schema.fields;
+
+            return doc.document
         }
 
         return arg
