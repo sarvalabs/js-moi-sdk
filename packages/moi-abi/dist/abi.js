@@ -46,26 +46,33 @@ class ABICoder {
         const bytes = polorizer.bytes();
         return "0x" + (0, moi_utils_1.bytesToHex)(bytes);
     }
-    parseCalldata(schema, arg) {
+    parseCalldata(schema, arg, updateType = true) {
         if (schema.kind === "bytes" && typeof arg === "string") {
             return (0, moi_utils_1.hexToBytes)(arg);
         }
         else if (schema.kind === "array" && ["bytes", "array", "map", "struct"].includes(schema.fields.values.kind)) {
-            return arg.map(value => this.parseCalldata(schema.fields.values, value));
+            return arg.map((value, index) => this.parseCalldata(schema.fields.values, value, arg.length - 1 === index));
         }
         else if (schema.kind === "map" && (["bytes", "array", "map", "struct"].includes(schema.fields.keys.kind) ||
-            ["bytes", "array", "map"].includes(schema.fields.values.kind))) {
+            ["bytes", "array", "map", "struct"].includes(schema.fields.values.kind))) {
             const map = new Map();
+            const entries = Array.from(arg.entries());
             // Loop through the entries of the Map
-            for (const [key, value] of arg.entries()) {
-                map.set(this.parseCalldata(schema.fields.keys, key), this.parseCalldata(schema.fields.values, value));
-            }
+            entries.forEach((entry, index) => {
+                const [key, value] = entry;
+                map.set(this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index), this.parseCalldata(schema.fields.values, value, entries.length - 1 === index));
+            });
             return map;
         }
         else if (schema.kind === "struct") {
+            Object.keys(arg).forEach(key => {
+                arg[key] = this.parseCalldata(schema.fields[key], arg[key]);
+            });
             const doc = (0, js_polo_1.documentEncode)(arg, schema);
-            schema.kind = "document";
-            delete schema.fields;
+            if (updateType) {
+                schema.kind = "document";
+                delete schema.fields;
+            }
             return doc.document;
         }
         return arg;

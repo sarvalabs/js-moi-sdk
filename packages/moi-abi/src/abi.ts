@@ -56,29 +56,40 @@ export class ABICoder {
         return "0x" + bytesToHex(bytes);
     }
 
-    private parseCalldata(schema: any, arg: any): any {
+    private parseCalldata(schema: any, arg: any, updateType: boolean = true): any {
         if(schema.kind === "bytes" && typeof arg === "string") {
             return hexToBytes(arg)
         } else if(schema.kind === "array" && ["bytes", "array", "map", "struct"].includes(schema.fields.values.kind)) {
-            return arg.map(value => 
-                this.parseCalldata(schema.fields.values, value)
+            return arg.map((value, index) => 
+                this.parseCalldata(schema.fields.values, value, arg.length - 1 === index)
             )
         } else if (schema.kind === "map" && (["bytes", "array", "map", "struct"].includes(schema.fields.keys.kind) || 
-        ["bytes", "array", "map"].includes(schema.fields.values.kind))) {
+        ["bytes", "array", "map", "struct"].includes(schema.fields.values.kind))) {
             const map = new Map()
+            const entries = Array.from(arg.entries());
+
             // Loop through the entries of the Map
-            for(const [key, value] of arg.entries()) {
+            entries.forEach((entry:[any, any], index: number) => {
+                const [key, value] = entry;
+
                 map.set(
-                    this.parseCalldata(schema.fields.keys, key), 
-                    this.parseCalldata(schema.fields.values, value)
+                    this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index), 
+                    this.parseCalldata(schema.fields.values, value, entries.length - 1 === index)
                 );
-            }
+            });
 
             return map;
         } else if (schema.kind === "struct") {
+            Object.keys(arg).forEach(key => {
+                arg[key] = this.parseCalldata(schema.fields[key], arg[key])
+            })
+
             const doc = documentEncode(arg, schema);
-            schema.kind = "document"
-            delete schema.fields;
+
+            if(updateType) {
+                schema.kind = "document"
+                delete schema.fields;
+            }
 
             return doc.document
         }
