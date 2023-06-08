@@ -6,6 +6,7 @@
 import ECDSA_S256 from "./ecdsa"
 import { SigType } from "../types"
 import { Wallet } from "moi-wallet"
+import Signature from "./signature"
 
 export class Signer {
     private signingVault: Wallet
@@ -23,7 +24,8 @@ export class Signer {
             switch(sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    return _sig.sign(message, this.signingVault);
+                    const sigBytes = _sig.sign(message, this.signingVault);
+                    return sigBytes.Serialize().toString('hex');
                 }
                 default: {
                     throw new Error("invalid signature type")
@@ -33,23 +35,23 @@ export class Signer {
         throw new Error("signature type cannot be undefiend")
     }
 
-    public verify(message: Buffer, signature: string, publicKey: string|Buffer): boolean {
-        let _verificationKey;
-        if(typeof publicKey === "string") {
-            _verificationKey = Buffer.from(publicKey, 'hex');
-        }else {
-            _verificationKey = publicKey;
-        }
+    public verify(message: Buffer, signature: string|Buffer, publicKey: string|Buffer): boolean {
+        let verificationKey: Buffer;
 
-        const signatureInBytes = Buffer.from(signature, 'hex')
-        switch(signatureInBytes[0]) {
+        if(typeof publicKey === "string") {
+            verificationKey = Buffer.from(publicKey, 'hex');
+        }else {
+            verificationKey = Buffer.from(publicKey)
+        }
+        
+        const sig = new Signature();
+        sig.UnMarshall(signature);
+
+        switch(sig.SigByte()) {
             case 1: {
-                if(_verificationKey.length === 32) {
-                    _verificationKey = Buffer.concat([Buffer.from([0x03]), _verificationKey])
-                }
-                const sigLength = signatureInBytes[1];
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                return _sig.verify(message, signatureInBytes.subarray(2,2+sigLength), _verificationKey);
+
+                return _sig.verify(message, sig, verificationKey);
             }
             default: {
                 throw new Error("invalid signature")
