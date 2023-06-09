@@ -1,4 +1,4 @@
-import { ErrorCode, Errors, IxType, LogicManifest, AssetCreationReceipt, 
+import { ErrorCode, ErrorUtils, IxType, LogicManifest, AssetCreationReceipt, AssetMintOrBurnReceipt,
 LogicDeployReceipt, LogicExecuteReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
 hexToBytes, unmarshal, hexToBN, toQuantity } from "moi-utils";
 import { EventType, Listener } from "../types/event";
@@ -10,7 +10,6 @@ Content, AccountStateParams, DBEntryParams, ContentFrom, Status,
 Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, Registry } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
-import { AssetMintOrBurnReceipt } from "moi-utils/types/receipt";
 
 const defaultTimeout: number = 120;
 
@@ -33,13 +32,13 @@ export class BaseProvider extends AbstractProvider {
                 return response.result.data;
             }
 
-            Errors.throwError(
+            ErrorUtils.throwError(
                 response.result.error.message, 
                 ErrorCode.SERVER_ERROR,
             );
         }
 
-        Errors.throwError(
+        ErrorUtils.throwError(
             response.error.message, 
             ErrorCode.SERVER_ERROR,
         );
@@ -287,13 +286,13 @@ export class BaseProvider extends AbstractProvider {
                     }
                 }
     
-                Errors.throwError(
+                ErrorUtils.throwError(
                     response.result.error.message, 
                     ErrorCode.SERVER_ERROR,
                 );
             }
     
-            Errors.throwError(
+            ErrorUtils.throwError(
                 response.error.message, 
                 ErrorCode.SERVER_ERROR,
             );

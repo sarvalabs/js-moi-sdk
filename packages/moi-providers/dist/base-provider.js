@@ -23,9 +23,9 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             if (response.result.data) {
                 return response.result.data;
             }
-            moi_utils_1.Errors.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
+            moi_utils_1.ErrorUtils.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
         }
-        moi_utils_1.Errors.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
+        moi_utils_1.ErrorUtils.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
     }
     // Account Methods
     async getBalance(address, assetId, options) {
@@ -221,9 +221,9 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                         result: this.waitForResult.bind(this)
                     };
                 }
-                moi_utils_1.Errors.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
+                moi_utils_1.ErrorUtils.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
             }
-            moi_utils_1.Errors.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
+            moi_utils_1.ErrorUtils.throwError(response.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);
         }
         catch (error) {
             throw error;

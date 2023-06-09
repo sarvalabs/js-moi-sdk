@@ -10,7 +10,7 @@ export * from "./hex";
 export * from "./hexToUint8";
 export * from "./json";
 export { Hex } from "../types/hex";
-export { AssetCreationReceipt, LogicDeployReceipt, LogicExecuteReceipt } from "../types/receipt";
+export { AssetCreationReceipt, AssetMintOrBurnReceipt, LogicDeployReceipt, LogicExecuteReceipt } from "../types/receipt";
 export { Tesseract } from "../types/tesseract";
 export { Interaction } from "../types/interaction";
 export { LogicManifest } from "../types/manifest";

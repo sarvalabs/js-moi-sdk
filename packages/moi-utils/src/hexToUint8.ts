@@ -1,4 +1,4 @@
-import {Errors, ErrorCode} from "./errors"
+import {ErrorUtils, ErrorCode} from "./errors"
 
 const isHexable = (value: any) => {
     return !!(value.toHexString);
@@ -30,7 +30,7 @@ const isArrayish = (value: any) => {
 export const hexToUint8 = (value: any) => {
     try {
         if (value == null) {
-            Errors.throwError('cannot convert null value to array', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
+            ErrorUtils.throwError('cannot convert null value to array', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
         }
         if (isHexable(value)) {
             value = value.toHexString();
@@ -38,7 +38,7 @@ export const hexToUint8 = (value: any) => {
         if (typeof (value) === 'string') {
             var match = value.match(/^(0x)?[0-9a-fA-F]*$/);
             if (!match) {
-                Errors.throwError('invalid hexidecimal string', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
+                ErrorUtils.throwError('invalid hexidecimal string', ErrorCode.INVALID_ARGUMENT, { arg: 'value', value: value });
             }
             value = value.substring(2);
             if (value.length % 2) {
@@ -53,7 +53,7 @@ export const hexToUint8 = (value: any) => {
         if (isArrayish(value)) {
             return addSlice(new Uint8Array(value));
         }
-        Errors.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
+        ErrorUtils.throwError('invalid arrayify value', undefined, { arg: 'value', value: value, type: typeof (value) });
     } catch(err) {
         throw err
     }
