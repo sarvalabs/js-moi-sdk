@@ -22,7 +22,7 @@ var ErrorCode;
     ErrorCode["UNPREDICTABLE_GAS_LIMIT"] = "UNPREDICTABLE_GAS_LIMIT";
     ErrorCode["TRANSACTION_REPLACED"] = "TRANSACTION_REPLACED";
     ErrorCode["ACTION_REJECTED"] = "ACTION_REJECTED";
-})(ErrorCode = exports.ErrorCode || (exports.ErrorCode = {}));
+})(ErrorCode || (exports.ErrorCode = ErrorCode = {}));
 ;
 class Errors {
     static createError(message, code, params) {

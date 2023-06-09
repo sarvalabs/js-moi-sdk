@@ -1,6 +1,6 @@
 import { Tesseract, LogicManifest, Interaction } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, InteractionObject, InteractionResponse, InteractionReceipt, Content, Status, Inspect, ContentFrom, Encoding } from "../types/jsonrpc";
+import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, Inspect, ContentFrom, Encoding, Registry } from "../types/jsonrpc";
 export declare abstract class AbstractProvider {
     abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
     abstract getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
@@ -12,9 +12,10 @@ export declare abstract class AbstractProvider {
     abstract getPendingInteractionCount(address: string): Promise<number | bigint>;
     abstract getAccountState(address: string, options?: Options): Promise<AccountState>;
     abstract getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo>;
+    abstract getRegistry(address: string, options?: Options): Promise<Registry>;
     abstract getContentFrom(address: string): Promise<ContentFrom>;
     abstract getWaitTime(address: string): Promise<number | bigint>;
-    abstract sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse>;
+    abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>;
     abstract getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
     abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any>;

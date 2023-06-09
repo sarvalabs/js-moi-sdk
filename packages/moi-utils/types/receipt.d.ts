@@ -3,6 +3,10 @@ export interface AssetCreationReceipt {
     asset_id: string;
 }
 
+export interface AssetMintOrBurnReceipt {
+    "total-supply": string;
+}
+
 export interface LogicDeployReceipt {
     logic_id: string;
     error: string
@@ -21,7 +25,7 @@ export interface Receipt {
     fuel_used: bigint;
     state_hashes: Map<string, string>;
     context_hashes: Map<string, string>;
-    extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
 }
 
 export type Receipts = Map<string, Receipt>;

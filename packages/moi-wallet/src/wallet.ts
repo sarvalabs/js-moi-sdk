@@ -6,11 +6,14 @@
 import * as bip39 from 'bip39';
 import elliptic from 'elliptic';
 import { HDNode } from "moi-hdnode";
+import { Signer, SigType, InteractionObject } from "moi-signer";
+import { BaseProvider, InteractionRequest } from "moi-providers";
 import { randomBytes } from 'crypto';
 
 /* Internal imports */
-import { hexToUint8 } from "moi-utils";
+import { bytesToHex, hexToUint8 } from "moi-utils";
 import * as SigningKeyErrors from "./errors";
+import { serializeIxObject } from './serializer';
 
 const SECP256K1 = "secp256k1"
 
@@ -40,8 +43,9 @@ const privateMapSet = (receiver: any, privateMap: any, value: any) => {
 
 const __vault = new WeakMap();
 
-export class Wallet {
-    constructor() {
+export class Wallet extends Signer {
+    constructor(provider?: BaseProvider) {
+        super(provider)
         __vault.set(this, {
             value: void 0
         })
@@ -97,4 +101,42 @@ export class Wallet {
     public mnemonic() { return privateMapGet(this, __vault)._mnemonic }
     public publicKey() { return privateMapGet(this, __vault)._public }
     public curve() { return privateMapGet(this, __vault)._curve }
+
+    // Signer methods
+    public getAddress(): string {
+        return this.publicKey();
+    }
+
+    public connect(provider: BaseProvider): Signer {
+        return new Wallet(provider)
+    }
+
+    public sign(message: Uint8Array, sigAlgo: SigType): string {
+        if(sigAlgo) {
+            switch(sigAlgo.sigName) {
+                case "ECDSA_S256": {
+                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sigBytes = _sig.sign(Buffer.from(message), this);
+                    return sigBytes.Serialize().toString('hex');
+                }
+                default: {
+                    throw new Error("invalid signature type")
+                }
+            }
+        }
+        throw new Error("signature type cannot be undefiend")
+    }
+
+    public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
+        try {
+            const ixData = serializeIxObject(ixObject);
+            const signature = this.sign(ixData, sigAlgo);
+            return {
+                ix_args: bytesToHex(ixData),
+                signature: signature
+            }
+        } catch(err) {
+            throw new Error("failed to sign interaction");
+        }
+    }
 }

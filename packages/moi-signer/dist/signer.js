@@ -4,52 +4,59 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Signer = void 0;
-/*
-    This module/directory is responsible for handling
-    cryptographic activity like signing and verification
-    using different Curves and Algorithms
-*/
 const ecdsa_1 = __importDefault(require("./ecdsa"));
+const signature_1 = __importDefault(require("./signature"));
 class Signer {
-    signingVault;
+    // private signingVault: Wallet
+    provider;
     signingAlgorithms;
-    constructor(vault) {
-        this.signingVault = vault;
+    constructor(provider) {
+        this.provider = provider;
+        // this.signingVault = vault
         this.signingAlgorithms = {
             "ecdsa_secp256k1": new ecdsa_1.default()
         };
     }
-    sign(message, sigAlgo) {
-        if (sigAlgo) {
-            switch (sigAlgo.sigName) {
-                case "ECDSA_S256": {
-                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    return _sig.sign(message, this.signingVault);
-                }
-                default: {
-                    throw new Error("invalid signature type");
-                }
-            }
+    getProvider() {
+        if (this.provider) {
+            return this.provider;
         }
-        throw new Error("signature type cannot be undefiend");
+        throw new Error("Provider is not initialized!");
+    }
+    async getNonce(options) {
+        try {
+            const provider = this.getProvider();
+            return provider.getInteractionCount(this.getAddress(), options);
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+    async sendInteraction(ixObject) {
+        try {
+            const provider = this.getProvider();
+            const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+            const ixRequest = this.signInteraction(ixObject, sigAlgo);
+            return await provider.sendInteraction(ixRequest);
+        }
+        catch (err) {
+            throw new Error("Failed to send interaction", err);
+        }
     }
     verify(message, signature, publicKey) {
-        let _verificationKey;
+        let verificationKey;
         if (typeof publicKey === "string") {
-            _verificationKey = Buffer.from(publicKey, 'hex');
+            verificationKey = Buffer.from(publicKey, 'hex');
         }
         else {
-            _verificationKey = publicKey;
+            verificationKey = Buffer.from(publicKey);
         }
-        const signatureInBytes = Buffer.from(signature, 'hex');
-        switch (signatureInBytes[0]) {
+        const sig = new signature_1.default();
+        sig.UnMarshall(signature);
+        switch (sig.SigByte()) {
             case 1: {
-                if (_verificationKey.length === 32) {
-                    _verificationKey = Buffer.concat([Buffer.from([0x03]), _verificationKey]);
-                }
-                const sigLength = signatureInBytes[1];
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                return _sig.verify(message, signatureInBytes.subarray(2, 2 + sigLength), _verificationKey);
+                return _sig.verify(message, sig, verificationKey);
             }
             default: {
                 throw new Error("invalid signature");

@@ -3,13 +3,14 @@ LogicDeployReceipt, LogicExecuteReceipt, Tesseract, Interaction, bytesToHex, hex
 hexToBytes, unmarshal, hexToBN, toQuantity } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
-AssetInfoParams, BalanceParams, ContextInfo, InteractionObject, 
+AssetInfoParams, BalanceParams, ContextInfo, InteractionRequest, 
 InteractionReceipt, InteractionParams, InteractionResponse, 
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
-Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams } from "../types/jsonrpc";
+Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, Registry } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
+import { AssetMintOrBurnReceipt } from "moi-utils/types/receipt";
 
 const defaultTimeout: number = 120;
 
@@ -256,9 +257,24 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
+    public async getRegistry(address: string, options?: Options): Promise<Registry> {
+        try {
+            const params: AccountParamsBase = {
+                address: address,
+                options: options ? options : this.defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.Registry", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // Execution Methods
 
-    public async sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse> {
+    public async sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse> {
         const response: RpcResponse = await this.execute("moi.SendInteractions", ixObject)
 
         try {
@@ -520,6 +536,16 @@ export class BaseProvider extends AbstractProvider {
                         }
 
                         reject({message: "asset id not found"});
+
+                        break;
+                    case IxType.ASSET_MINT:
+                    case IxType.ASSET_BURN:
+                        if(receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data as AssetMintOrBurnReceipt;
+                            resolve(receipt.extra_data["total-supply"]);
+                        }
+
+                        reject({message: "total supply not found"});
 
                         break;
                     case IxType.LOGIC_DEPLOY:

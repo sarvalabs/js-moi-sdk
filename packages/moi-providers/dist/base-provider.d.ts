@@ -1,6 +1,6 @@
 import { LogicManifest, Tesseract, Interaction } from "moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionObject, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 export declare class BaseProvider extends AbstractProvider {
@@ -20,7 +20,8 @@ export declare class BaseProvider extends AbstractProvider {
     getContentFrom(address: string): Promise<ContentFrom>;
     getWaitTime(address: string): Promise<number | bigint>;
     getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
-    sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse>;
+    getRegistry(address: string, options?: Options): Promise<Registry>;
+    sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>;
     getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
     getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
     getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>;

@@ -34,10 +34,12 @@ exports.Wallet = void 0;
 const bip39 = __importStar(require("bip39"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const moi_hdnode_1 = require("moi-hdnode");
+const moi_signer_1 = require("moi-signer");
 const crypto_1 = require("crypto");
 /* Internal imports */
 const moi_utils_1 = require("moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
+const serializer_1 = require("./serializer");
 const SECP256K1 = "secp256k1";
 const privateMapGet = (receiver, privateMap) => {
     if (!privateMap.has(receiver)) {
@@ -63,8 +65,9 @@ const privateMapSet = (receiver, privateMap, value) => {
     return value;
 };
 const __vault = new WeakMap();
-class Wallet {
-    constructor() {
+class Wallet extends moi_signer_1.Signer {
+    constructor(provider) {
+        super(provider);
         __vault.set(this, {
             value: void 0
         });
@@ -117,5 +120,40 @@ class Wallet {
     mnemonic() { return privateMapGet(this, __vault)._mnemonic; }
     publicKey() { return privateMapGet(this, __vault)._public; }
     curve() { return privateMapGet(this, __vault)._curve; }
+    // Signer methods
+    getAddress() {
+        return this.publicKey();
+    }
+    connect(provider) {
+        return new Wallet(provider);
+    }
+    sign(message, sigAlgo) {
+        if (sigAlgo) {
+            switch (sigAlgo.sigName) {
+                case "ECDSA_S256": {
+                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sigBytes = _sig.sign(message, this);
+                    return sigBytes.Serialize().toString('hex');
+                }
+                default: {
+                    throw new Error("invalid signature type");
+                }
+            }
+        }
+        throw new Error("signature type cannot be undefiend");
+    }
+    signInteraction(ixObject, sigAlgo) {
+        try {
+            const ixData = (0, serializer_1.serializeIxObject)(ixObject);
+            const signature = this.sign(ixData, sigAlgo);
+            return {
+                ix_args: (0, moi_utils_1.bytesToHex)(ixData),
+                signature: signature
+            };
+        }
+        catch (err) {
+            throw new Error("failed to sign interaction");
+        }
+    }
 }
 exports.Wallet = Wallet;

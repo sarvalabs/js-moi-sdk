@@ -38,7 +38,7 @@ var WebSocketEvents;
     WebSocketEvents["CLOSE"] = "close";
     WebSocketEvents["DEBUG"] = "debug";
     WebSocketEvents["ERROR"] = "error";
-})(WebSocketEvents = exports.WebSocketEvents || (exports.WebSocketEvents = {}));
+})(WebSocketEvents || (exports.WebSocketEvents = WebSocketEvents = {}));
 class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     requestQueue;
     responseQueue;

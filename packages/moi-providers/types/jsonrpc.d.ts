@@ -1,10 +1,9 @@
 import { 
     AssetCreationReceipt, 
-    AssetKind, 
-    IxType, 
     LogicDeployReceipt, 
     LogicExecuteReceipt 
 } from "moi-utils";
+import { AssetMintOrBurnReceipt } from "moi-utils/types/receipt";
 
 interface Options {
     tesseract_number?: number;
@@ -42,45 +41,9 @@ interface AccountMetaInfo {
     state_exists: boolean;
 }
 
-interface AssetCreationPayload {
-    type: AssetKind;
-    symbol: string;
-    supply: string;
-    dimension?: string;
-    decimals?: string;
-    is_fungible?: boolean;
-    is_mintable?: boolean;
-    is_transferable?: boolean;
-    logic_id?: string;
-}
-
-interface LogicDeployPayload {
-    manifest: string;
-    callsite: string;
-    calldata: string
-}
-
-interface LogicInvokePayload {
-    logic_id: string;
-    callsite: string;
-    calldata: string;
-}
-
-interface InteractionObject {
-    type: IxType;
-    nonce?: string;
-
-    sender: string;
-    receiver?: string;
-    payer?: string;
-
-    transfer_values?: Record<string, string>;
-    perceived_values?: Record<string, string>;
-
-    fuel_price: string;
-    fuel_limit: string;
-    
-    payload?: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
+interface InteractionRequest {
+    ix_args: string;
+    signature: string;
 }
 
 interface InteractionResponse {
@@ -106,7 +69,7 @@ interface InteractionReceipt {
     fuel_used: string;
     state_hashes: StateHash[];
     context_hashes: ContextHash[];
-    extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
     from: string;
     to: string;
     ix_index: string;
@@ -119,11 +82,15 @@ interface AssetInfo {
     owner: string;
     supply: string;
     dimension: string
-    decimals: string
-    is_fungible: boolean
-    is_mintable: boolean
-    is_transferable: boolean
+    standard: string
+    is_logical: boolean
+    is_stateful: boolean
     logic_id: string
+}
+
+interface Registry {
+    asset_id: string;
+    asset_info: AssetInfo;
 }
 
 interface AccountParamsBase {

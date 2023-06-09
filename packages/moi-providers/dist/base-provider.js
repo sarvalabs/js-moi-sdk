@@ -196,6 +196,19 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
+    async getRegistry(address, options) {
+        try {
+            const params = {
+                address: address,
+                options: options ? options : this.defaultOptions
+            };
+            const response = await this.execute("moi.Registry", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     // Execution Methods
     async sendInteraction(ixObject) {
         const response = await this.execute("moi.SendInteractions", ixObject);
@@ -411,6 +424,14 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                             resolve(receipt.extra_data.asset_id);
                         }
                         reject({ message: "asset id not found" });
+                        break;
+                    case moi_utils_1.IxType.ASSET_MINT:
+                    case moi_utils_1.IxType.ASSET_BURN:
+                        if (receipt.extra_data) {
+                            receipt.extra_data = receipt.extra_data;
+                            resolve(receipt.extra_data["total-supply"]);
+                        }
+                        reject({ message: "total supply not found" });
                         break;
                     case moi_utils_1.IxType.LOGIC_DEPLOY:
                         if (receipt.extra_data) {
