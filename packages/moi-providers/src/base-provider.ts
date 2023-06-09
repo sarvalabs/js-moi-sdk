@@ -541,7 +541,7 @@ export class BaseProvider extends AbstractProvider {
                     case IxType.ASSET_BURN:
                         if(receipt.extra_data) {
                             receipt.extra_data = receipt.extra_data as AssetMintOrBurnReceipt;
-                            resolve(receipt.extra_data["total-supply"]);
+                            resolve(receipt.extra_data["total_supply"]);
                         }
 
                         reject({message: "total supply not found"});

@@ -4,7 +4,7 @@ export interface AssetCreationReceipt {
 }
 
 export interface AssetMintOrBurnReceipt {
-    "total-supply": string;
+    total_supply: string;
 }
 
 export interface LogicDeployReceipt {

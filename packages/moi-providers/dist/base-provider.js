@@ -429,7 +429,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     case moi_utils_1.IxType.ASSET_BURN:
                         if (receipt.extra_data) {
                             receipt.extra_data = receipt.extra_data;
-                            resolve(receipt.extra_data["total-supply"]);
+                            resolve(receipt.extra_data["total_supply"]);
                         }
                         reject({ message: "total supply not found" });
                         break;
