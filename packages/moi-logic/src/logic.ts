@@ -3,7 +3,7 @@ import { IxType, LogicManifest } from "moi-utils";
 import { InteractionResponse, JsonRpcProvider, Options } from "moi-providers";
 import { LogicExecuteRequest, Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
-import LogicDescriptor from "./descriptor";
+import LogicDescriptor from "./logic-descriptor";
 import Errors from "./errors";
 
 export class LogicDriver extends LogicDescriptor {

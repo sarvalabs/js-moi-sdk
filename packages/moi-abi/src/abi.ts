@@ -6,7 +6,7 @@ import { bytesToHex, hexToBytes, LogicManifest } from "moi-utils";
 export class ABICoder {
     private schema: Schema
 
-    constructor(elements?: Map<number, LogicManifest.Element>, classDefs?: Map<string, number>) {
+    constructor(elements: Map<number, LogicManifest.Element>, classDefs: Map<string, number>) {
         this.schema = new Schema(elements, classDefs)
     }
 

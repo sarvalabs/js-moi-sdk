@@ -15,5 +15,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./logic"), exports);
-__exportStar(require("./logic_id"), exports);
+__exportStar(require("./logic-id"), exports);
 __exportStar(require("./factory"), exports);

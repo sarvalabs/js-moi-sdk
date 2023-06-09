@@ -2,7 +2,7 @@ import { LogicManifest } from "moi-utils";
 import { JsonRpcProvider, Options } from "moi-providers";
 import { Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
-import LogicDescriptor from "./descriptor";
+import LogicDescriptor from "./logic-descriptor";
 export declare class LogicDriver extends LogicDescriptor {
     private provider;
     private abiCoder;

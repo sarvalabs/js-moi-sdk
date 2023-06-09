@@ -1,3 +1,3 @@
 export * from "./logic";
-export * from "./logic_id";
+export * from "./logic-id";
 export * from "./factory";

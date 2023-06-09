@@ -4,18 +4,20 @@ import { JsonRpcProvider } from "moi-providers"
 import { LogicDeployRequest } from "../types/logic";
 import Errors from "./errors";
 import LogicErrors from "./errors";
+import ElementDescriptor from "./element-descriptor";
 
-export class LogicFactory {
+export class LogicFactory extends ElementDescriptor {
     private manifest: LogicManifest.Manifest;
     private encodedManifest: string;
     private provider: JsonRpcProvider;
     private abiCoder: ABICoder;
 
     constructor(manifest: LogicManifest.Manifest, provider: JsonRpcProvider) {
+        super(manifest.elements);
         this.manifest = manifest;
         this.encodedManifest = ABICoder.encodeABI(manifest);
         this.provider = provider;
-        this.abiCoder = new ABICoder()
+        this.abiCoder = new ABICoder(this.elements, this.classDefs)
     }
 
     private createPayload(ixObject: any): any {

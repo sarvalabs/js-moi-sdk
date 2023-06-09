@@ -1,59 +1,30 @@
 import { ABICoder } from "moi-abi";
 import { LogicManifest } from "moi-utils";
-import { ContextStateKind, ContextStateMatrix } from "./state";
-import { CallSite } from "../types/logic";
-import {LogicId} from "./logic_id";
+import { ContextStateKind } from "./state";
+import {LogicId} from "./logic-id";
+import ElementDescriptor from "./element-descriptor";
 
 export enum EngineKind {
     PISA = "PISA",
     MERU = "MERU"
 }
 
-export default class LogicDescriptor {
+export default class LogicDescriptor extends ElementDescriptor {
     protected logicId: LogicId;
     protected manifest: LogicManifest.Manifest;
     protected encodedManifest: string;
     protected engine: EngineKind;
-    protected stateMatrix: ContextStateMatrix;
     protected sealed: boolean;
     protected assetLogic: boolean;
-    protected elements: Map<number, LogicManifest.Element>
-    protected callSites: Map<string, CallSite>;
-    protected classDefs: Map<string, number>;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest) {
+        super(manifest.elements);
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = ABICoder.encodeABI(this.manifest);
         this.engine = this.manifest.engine.kind as EngineKind;
         this.sealed = false;
         this.assetLogic = false;
-        this.stateMatrix = new ContextStateMatrix(manifest.elements)
-        this.initManifestMaps();
-    }
-
-    private initManifestMaps(): void {
-        this.elements = new Map();
-        this.callSites = new Map();
-        this.classDefs = new Map();
-
-        this.manifest.elements.forEach(element => {
-            this.elements.set(element.ptr, element);
-            
-            switch(element.kind){
-                case "class":
-                    element.data = element.data as LogicManifest.Class;
-                    this.classDefs.set(element.data.name, element.ptr);
-                    break;
-                case "routine":
-                    element.data = element.data as LogicManifest.Routine;
-                    const callsite = { ptr: element.ptr, kind: element.data.kind };
-                    this.callSites.set(element.data.name, callsite);
-                    break;
-                default:
-                    break;
-            }
-        })
     }
 
     public getLogicId(): string {
@@ -78,10 +49,6 @@ export default class LogicDescriptor {
 
     public isAssetLogic(): boolean {
         return this.assetLogic;
-    }
-
-    public getStateMatrix(): ContextStateMatrix {
-        return this.stateMatrix;
     }
 
     public hasPersistentState(): [number, boolean] {
@@ -110,17 +77,5 @@ export default class LogicDescriptor {
 
     public isStateful(): boolean {
         return this.logicId.isStateful();
-    }
-
-    public getElements(): Map<number, LogicManifest.Element> {
-        return this.elements;
-    }
-
-    public getCallsites(): Map<string, CallSite> {
-        return this.callSites;
-    } 
-
-    public getClassDefs(): Map<string, number> {
-        return this.classDefs;
     }
 }
