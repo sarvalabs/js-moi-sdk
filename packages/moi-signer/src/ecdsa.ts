@@ -44,9 +44,9 @@ export default class ECDSA_S256 implements SigType {
 
     verify(message: Buffer, signature: Signature, publicKey: Buffer): Boolean {  
 
-        let verificationKey = Buffer.concat([signature.Extra(), publicKey])
+        let verificationKey = Buffer.concat([signature.getExtra(), publicKey])
 
-        let rawSignature = signature.Digest();
+        let rawSignature = signature.getDigest();
         // Appending the byte that was removed at the time of signing      
         let sigComps = script.signature.decode(
             Buffer.concat([rawSignature, Buffer.from([0x01])])

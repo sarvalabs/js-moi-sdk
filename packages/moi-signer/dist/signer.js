@@ -52,8 +52,8 @@ class Signer {
             verificationKey = Buffer.from(publicKey);
         }
         const sig = new signature_1.default();
-        sig.UnMarshall(signature);
-        switch (sig.SigByte()) {
+        sig.unmarshall(signature);
+        switch (sig.getSigByte()) {
             case 1: {
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
                 return _sig.verify(message, sig, verificationKey);

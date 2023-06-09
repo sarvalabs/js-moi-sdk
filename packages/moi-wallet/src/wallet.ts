@@ -117,7 +117,7 @@ export class Wallet extends Signer {
                 case "ECDSA_S256": {
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
                     const sigBytes = _sig.sign(Buffer.from(message), this);
-                    return sigBytes.Serialize().toString('hex');
+                    return sigBytes.serialize().toString('hex');
                 }
                 default: {
                     throw new Error("invalid signature type")

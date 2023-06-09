@@ -4,12 +4,12 @@ export default class Signature {
     private digest;
     private extraData;
     private name;
-    constructor(prefix?: Buffer, digest?: Buffer, extraData?: Buffer, signatureName?: String);
-    UnMarshall(signature: Buffer | String): void;
-    Digest(): Buffer;
-    SigByte(): number;
-    Name(): String;
-    Extra(): Buffer;
-    Serialize(): Buffer;
+    constructor(prefix?: Buffer, digest?: Buffer, extraData?: Buffer, signatureName?: string);
+    unmarshall(signature: Buffer | string): void;
+    getDigest(): Buffer;
+    getSigByte(): number;
+    getName(): string;
+    getExtra(): Buffer;
+    serialize(): Buffer;
     private getSignatureName;
 }

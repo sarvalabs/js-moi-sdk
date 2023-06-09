@@ -35,8 +35,8 @@ class ECDSA_S256 {
         return sig;
     }
     verify(message, signature, publicKey) {
-        let verificationKey = Buffer.concat([signature.Extra(), publicKey]);
-        let rawSignature = signature.Digest();
+        let verificationKey = Buffer.concat([signature.getExtra(), publicKey]);
+        let rawSignature = signature.getDigest();
         // Appending the byte that was removed at the time of signing      
         let sigComps = bitcoinjs_lib_1.script.signature.decode(Buffer.concat([rawSignature, Buffer.from([0x01])]));
         // Hashing raw message with blake2b to get 32 bytes digest 

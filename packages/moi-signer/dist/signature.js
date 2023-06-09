@@ -11,7 +11,7 @@ class Signature {
         this.extraData = extraData;
         this.name = signatureName;
     }
-    UnMarshall(signature) {
+    unmarshall(signature) {
         let sig;
         if (typeof signature === "string") {
             sig = Buffer.from(signature, 'hex');
@@ -25,19 +25,19 @@ class Signature {
         this.extraData = sig.subarray(2 + sigLen);
         this.name = this.getSignatureName(sig[0].valueOf());
     }
-    Digest() {
+    getDigest() {
         return this.digest;
     }
-    SigByte() {
+    getSigByte() {
         return this.prefix[0].valueOf();
     }
-    Name() {
+    getName() {
         return this.name;
     }
-    Extra() {
+    getExtra() {
         return this.extraData;
     }
-    Serialize() {
+    serialize() {
         if (this.name == "") {
             throw new Error("signature is not intialized");
         }

@@ -64,9 +64,9 @@ export abstract class Signer {
         }
         
         const sig = new Signature();
-        sig.UnMarshall(signature);
+        sig.unmarshall(signature);
 
-        switch(sig.SigByte()) {
+        switch(sig.getSigByte()) {
             case 1: {
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
 

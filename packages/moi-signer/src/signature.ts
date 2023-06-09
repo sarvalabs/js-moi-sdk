@@ -2,16 +2,16 @@ export default class Signature {
     private prefix: Buffer;
     private digest: Buffer;
     private extraData: Buffer;
-    private name: String
+    private name: string
 
-    constructor(prefix?: Buffer, digest?: Buffer, extraData?: Buffer, signatureName?: String) {
+    constructor(prefix?: Buffer, digest?: Buffer, extraData?: Buffer, signatureName?: string) {
         this.prefix = prefix;
         this.digest = digest;
         this.extraData = extraData;
         this.name = signatureName
     }
     
-    public UnMarshall(signature: Buffer | String) {
+    public unmarshall(signature: Buffer | string) {
         let sig: Buffer;
         if(typeof signature === "string") {
             sig = Buffer.from(signature, 'hex')
@@ -26,23 +26,23 @@ export default class Signature {
         this.name = this.getSignatureName(sig[0].valueOf())
     }
 
-    public Digest(): Buffer {
+    public getDigest(): Buffer {
         return this.digest;
     }
 
-    public SigByte(): number {
+    public getSigByte(): number {
         return this.prefix[0].valueOf();
     }
 
-    public Name(): String {
+    public getName(): string {
         return this.name;
     }
 
-    public Extra(): Buffer {
+    public getExtra(): Buffer {
         return this.extraData;
     }
 
-    public Serialize(): Buffer {
+    public serialize(): Buffer {
         if(this.name == "") {
             throw new Error("signature is not intialized");
         }
@@ -51,7 +51,7 @@ export default class Signature {
         return finalSigBytes;
     }
 
-    private getSignatureName(sigIndex: number): String {
+    private getSignatureName(sigIndex: number): string {
         switch(sigIndex) {
             case 1: return "ECDSA_S256"
             default: return ""
