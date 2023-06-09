@@ -5,31 +5,35 @@ class Signature {
     digest;
     extraData;
     name;
-    constructor(prefix, digest, extraData, signatureName) {
+    constructor(prefix = Buffer.alloc(0), digest = Buffer.alloc(0), extraData = Buffer.alloc(0), signatureName = "") {
         this.prefix = prefix;
         this.digest = digest;
         this.extraData = extraData;
         this.name = signatureName;
     }
     unmarshall(signature) {
-        let sig;
-        if (typeof signature === "string") {
-            sig = Buffer.from(signature, 'hex');
+        const sig = typeof signature === "string" ? Buffer.from(signature, 'hex') : Buffer.from(signature);
+        const sigLen = sig[1];
+        if (typeof sigLen === "undefined") {
+            throw new Error("Invalid signature length.");
         }
-        else {
-            sig = Buffer.from(signature);
+        const sigIndex = sig[0];
+        if (typeof sigIndex !== "number") {
+            throw new Error("Invalid signature index.");
         }
-        const sigLen = sig[1].valueOf();
         this.prefix = sig.subarray(0, 2);
         this.digest = sig.subarray(2, 2 + sigLen);
         this.extraData = sig.subarray(2 + sigLen);
-        this.name = this.getSignatureName(sig[0].valueOf());
+        this.name = this.getSignatureName(sigIndex);
     }
     getDigest() {
         return this.digest;
     }
     getSigByte() {
-        return this.prefix[0].valueOf();
+        if (typeof this.prefix[0] !== "number") {
+            throw new Error("Invalid signature byte.");
+        }
+        return this.prefix[0];
     }
     getName() {
         return this.name;
@@ -38,12 +42,11 @@ class Signature {
         return this.extraData;
     }
     serialize() {
-        if (this.name == "") {
-            throw new Error("signature is not intialized");
+        if (this.name === "") {
+            throw new Error("Signature is not initialized.");
         }
-        const finalSigBytesWithoutExtra = Buffer.concat([Buffer.from(this.prefix), this.digest]);
-        const finalSigBytes = Buffer.concat([finalSigBytesWithoutExtra, this.extraData]);
-        return finalSigBytes;
+        const finalSigBytesWithoutExtra = Buffer.concat([this.prefix, this.digest]);
+        return Buffer.concat([finalSigBytesWithoutExtra, this.extraData]);
     }
     getSignatureName(sigIndex) {
         switch (sigIndex) {
