@@ -5,7 +5,7 @@ export declare class Wallet extends Signer {
     constructor(provider?: BaseProvider);
     load(key: Buffer | undefined, mnemonic: string | undefined, curve: string): void;
     createRandom(): Promise<void>;
-    fromMnemonic(mnemonic: string, wordlist: undefined): Promise<void>;
+    fromMnemonic(mnemonic: string, path?: string, wordlist?: string[]): Promise<void>;
     privateKey(): any;
     mnemonic(): any;
     publicKey(): any;

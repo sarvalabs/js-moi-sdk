@@ -16,10 +16,10 @@ export class HDNode {
     }
   }
 
-  public fromSeed(seed: Buffer) {
+  public fromSeed(seed: Buffer, path?: string) {
     try {
       const masterHdNode = HDKey.fromMasterSeed(seed, undefined);
-      this.node = masterHdNode.derive(MOI_DERIVATION_PATH);
+      this.node = masterHdNode.derive(path ? path : MOI_DERIVATION_PATH);
     } catch (e) {
       throw new Error(e.message);
     }

@@ -85,12 +85,12 @@ export class Wallet extends Signer {
         }
     }
     
-    public async fromMnemonic(mnemonic: string, wordlist: undefined) {
+    public async fromMnemonic(mnemonic: string, path?: string, wordlist?: string[]) {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const hdNode = new HDNode()
-            hdNode.fromSeed(seed);
+            hdNode.fromSeed(seed, path);
             this.load(hdNode.privateKey(), mnemonic, SECP256K1)
         } catch(e: any) {
             throw new Error(e.message);

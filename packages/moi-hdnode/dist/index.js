@@ -42,10 +42,10 @@ class HDNode {
             throw err;
         }
     }
-    fromSeed(seed) {
+    fromSeed(seed, path) {
         try {
             const masterHdNode = hdkey_1.default.fromMasterSeed(seed, undefined);
-            this.node = masterHdNode.derive(moi_constants_1.MOI_DERIVATION_PATH);
+            this.node = masterHdNode.derive(path ? path : moi_constants_1.MOI_DERIVATION_PATH);
         }
         catch (e) {
             throw new Error(e.message);

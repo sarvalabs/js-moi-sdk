@@ -35,7 +35,7 @@ module.exports = {
         {
             displayName: 'moi-signer',
             testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/moi-signer/__tests__/*.test.ts'],
+            testMatch: ['<rootDir>/packages/moi-wallet/__tests__/*.test.ts'],
             transform: {
                 '^.+\\.tsx?$': 'ts-jest',
             },

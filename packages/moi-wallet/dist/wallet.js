@@ -104,12 +104,12 @@ class Wallet extends moi_signer_1.Signer {
             throw new Error(e.message);
         }
     }
-    async fromMnemonic(mnemonic, wordlist) {
+    async fromMnemonic(mnemonic, path, wordlist) {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const hdNode = new moi_hdnode_1.HDNode();
-            hdNode.fromSeed(seed);
+            hdNode.fromSeed(seed, path);
             this.load(hdNode.privateKey(), mnemonic, SECP256K1);
         }
         catch (e) {
