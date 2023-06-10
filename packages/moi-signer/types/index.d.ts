@@ -9,7 +9,7 @@ export interface SigType {
     verify(message: Buffer, signature: Signature, publicKey: Buffer): Boolean
 }
 
-interface AssetCreatePayload {
+export interface AssetCreatePayload {
     type: AssetKind;
     symbol: string;
     supply: number | bigint;
@@ -20,19 +20,19 @@ interface AssetCreatePayload {
     logic_payload?: LogicPayload;
 }
 
-interface AssetMintOrBurnPayload {
+export interface AssetMintOrBurnPayload {
     asset_id: string;
     amount: number | bigint;
 }
 
-interface LogicPayload {
+export interface LogicPayload {
     logic_id?: string;
     callsite: string;
     calldata: string;
     manifest?: string;
 }
 
-interface InteractionObject {
+export interface InteractionObject {
     type: IxType;
     // Todo check if this mandatory or optional
     nonce?: number | bigint;

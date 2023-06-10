@@ -1,2 +1,2 @@
 export * from "./signer";
-export { SigType, InteractionObject } from "../types/index";
+export * from "../types/index";
