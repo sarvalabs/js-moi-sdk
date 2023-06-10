@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = void 0;
+const moi_utils_1 = require("moi-utils");
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "i64", "bigint"
 ];
@@ -16,6 +17,14 @@ const isMap = (type) => {
 const isClass = (type, classDefs) => {
     return classDefs.has(type);
 };
+/**
+ * Schema is a class that provides schema parsing functionality for encoding and
+ decoding manifest, arguments, logic states and other data based on
+ a predefined schema. It supports parsing fields and generating a schema for
+ decoding purposes.
+ *
+ * @class
+ */
 class Schema {
     elements;
     classDefs;
@@ -180,7 +189,14 @@ class Schema {
             }
         }
     };
-    extractArrayDataType = (dataType) => {
+    /**
+     * Extracts the array data type from the provided data type string.
+     *
+     * @param {string} dataType - The array data type, eg:"[]u64".
+     * @returns {string} The extracted array data type.
+     * @throws {Error} If the array type is invalid or unsupported.
+     */
+    extractArrayDataType(dataType) {
         let endIndex = 0;
         for (let i = 0; i < dataType.length; i++) {
             if (dataType.charAt(i) == "]") {
@@ -192,9 +208,16 @@ class Schema {
         if (type) {
             return type;
         }
-        throw new Error("invalid array type!");
-    };
-    extractMapDataType = (dataType) => {
+        moi_utils_1.ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    }
+    /**
+     * Extracts the key and value data types from the provided map data type string.
+     *
+     * @param {string} dataType - The map data type. eg:"map[u64]string".
+     * @returns {[string, string]} The extracted key and value data types as a tuple.
+     * @throws {Error} If the map data type is invalid or unsupported.
+     */
+    extractMapDataType(dataType) {
         let brackets = [];
         let startIndex = 0;
         let endIndex = 0;
@@ -215,9 +238,19 @@ class Schema {
         }
         const key = dataType.slice(startIndex, endIndex);
         const value = dataType.replace("map[" + key + "]", "");
+        if (!key || !value) {
+            moi_utils_1.ErrorUtils.throwError("Failed to extract map type: The key or value type of the map could not be determined.", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
         return [key, value];
-    };
-    convertPrimitiveDataType = (type) => {
+    }
+    /**
+     * Converts the primitive data type to a standardized representation.
+     *
+     * @param {string} type - The primitive data type.
+     * @returns {string} The converted data type.
+     * @throws {Error} If the data type is unsupported.
+     */
+    convertPrimitiveDataType(type) {
         switch (type) {
             case "null":
                 return "null";
@@ -233,11 +266,20 @@ class Schema {
             case "bigint":
                 return "integer";
             default:
-                throw new Error('unsupported data type!');
+                moi_utils_1.ErrorUtils.throwError('Unsupported data type!', moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
         }
-    };
-    parseClassFields = (type) => {
-        const ptr = this.classDefs.get(type);
+    }
+    /**
+     * Parses the fields of a class data type and generates the schema for the class.
+     *
+     * @param {string} className - The name of the class.
+     * @returns {object} The schema for the class.
+     */
+    parseClassFields(className) {
+        const ptr = this.classDefs.get(className);
+        if (ptr === undefined) {
+            moi_utils_1.ErrorUtils.throwError(`Invalid class name: ${className}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
         const element = this.elements.get(ptr);
         const schema = {
             kind: "struct",
@@ -248,8 +290,16 @@ class Schema {
             schema.fields[field.label] = this.parseDataType(field.type);
         });
         return schema;
-    };
-    parseDataType = (type) => {
+    }
+    /**
+     * Parses a data type and generates the corresponding schema based on the
+     data type. The parsing is performed recursively to handle nested data types,
+     such as arrays, maps and class.
+     * @param {string} type - The data type string.
+     * @returns {object} The schema generated based on the data type.
+     * @throws {Error} If the data type is unsupported.
+     */
+    parseDataType(type) {
         switch (true) {
             case isPrimitiveType(type):
                 return {
@@ -275,24 +325,31 @@ class Schema {
             case isClass(type, this.classDefs):
                 return this.parseClassFields(type);
             default:
-                throw new Error("unsupported data type!");
+                moi_utils_1.ErrorUtils.throwError(`Unsupported data type: ${type}!`, moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
         }
-    };
-    parseFields = (fields) => {
+    }
+    /**
+     * Parses an array of fields and generates the schema based on the fields.
+     *
+     * @param {LogicManifest.TypeField[]} fields - The array of fields.
+     * @returns {PoloSchema} The generated schema based on the fields.
+     * @throws {Error} If the fields are invalid or contain unsupported data types.
+     */
+    parseFields(fields) {
         const schema = {
             kind: 'struct',
             fields: {}
         };
-        if (typeof fields !== "object") {
-            throw new Error("invalid fields");
+        if (!Array.isArray(fields)) {
+            moi_utils_1.ErrorUtils.throwError("Invalid fields: Fields must be an array.", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         fields.forEach(field => {
             if (!field || !(field.label && field.type)) {
-                throw new Error("invalid field");
+                moi_utils_1.ErrorUtils.throwError("Invalid field: Each field must have a label and a type.", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             schema.fields[field.label] = this.parseDataType(field.type);
         });
         return schema;
-    };
+    }
 }
 exports.Schema = Schema;
