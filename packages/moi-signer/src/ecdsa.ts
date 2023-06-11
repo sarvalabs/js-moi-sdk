@@ -1,9 +1,13 @@
-import { Wallet } from "moi-wallet";
 import { SigType } from "../types";
 import Signature from "./signature";
 import { ECPair, script, Transaction, networks } from "bitcoinjs-lib";
 import Blake2b from "blake2b";
 
+/**
+ * ECDSA_S256
+ *
+ * Represents the ECDSA_S256 signature type.
+ */
 export default class ECDSA_S256 implements SigType {
     prefix: number;
     sigName: string;
@@ -13,8 +17,17 @@ export default class ECDSA_S256 implements SigType {
         this.sigName = "ECDSA_S256";
     }
 
-    sign(message: Buffer, vault: Wallet): Signature {
-        let signingKey = vault.privateKey();
+    /**
+     * sign
+     *
+     * Signs a message using the ECDSA_S256 signature algorithm.
+     *
+     * @param message - The message to be signed, as a Buffer.
+     * @param signingKey - The private key used for signing, either as 
+     * a hexadecimal string or a Buffer.
+     * @returns A Signature object representing the signed message.
+     */
+    public sign(message: Buffer, signingKey: Buffer | string): Signature {
         let _signingKey: Buffer
         if(typeof signingKey === "string") {
             _signingKey = Buffer.from(signingKey, 'hex');
@@ -42,7 +55,17 @@ export default class ECDSA_S256 implements SigType {
         return sig;
     }
 
-    verify(message: Buffer, signature: Signature, publicKey: Buffer): Boolean {  
+    /**
+     * verify
+     *
+     * Verifies the signature of a message using the ECDSA_S256 signature algorithm.
+     *
+     * @param message - The message to be verified, as a Buffer.
+     * @param signature - The signature to be verified, as a Signature instance.
+     * @param publicKey - The public key used for verification, as a Buffer.
+     * @returns A boolean indicating whether the signature is valid.
+     */
+    public verify(message: Buffer, signature: Signature, publicKey: Buffer): boolean {  
 
         let verificationKey = Buffer.concat([signature.getExtra(), publicKey])
 

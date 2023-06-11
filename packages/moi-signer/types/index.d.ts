@@ -1,12 +1,16 @@
-import { Wallet } from "moi-wallet";
 import { AssetKind, IxType } from "moi-utils";
 import Signature from "../src/signature";
+import ECDSA_S256 from "../src/ecdsa";
 
 export interface SigType {
     prefix: number;
     sigName: String;
-    sign(message: Buffer, vault: Wallet): Signature
+    sign(message: Buffer, signingKey: string | Buffer): Signature
     verify(message: Buffer, signature: Signature, publicKey: Buffer): Boolean
+}
+
+export interface SigningAlgorithms {
+    ecdsa_secp256k1: ECDSA_S256
 }
 
 export interface AssetCreatePayload {

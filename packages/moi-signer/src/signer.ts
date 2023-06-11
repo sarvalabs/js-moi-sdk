@@ -4,21 +4,26 @@
     using different Curves and Algorithms
 */
 import { BaseProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
-import ECDSA_S256 from "./ecdsa"
-import { SigType, InteractionObject } from "../types";
+import ECDSA_S256 from "./ecdsa";
+import { SigType, InteractionObject, SigningAlgorithms } from "../types";
 import Signature from "./signature";
+import { ErrorCode, ErrorUtils } from "moi-utils";
 
+
+/**
+ * Signer
+ *
+ * An abstract class representing a signer responsible for cryptographic activities like signing and verification.
+ */
 export abstract class Signer {
-    // private signingVault: Wallet
     public provider?: BaseProvider;
-    public signingAlgorithms: any
+    public signingAlgorithms: SigningAlgorithms;
 
     constructor(provider?: BaseProvider) {
         this.provider = provider;
-        // this.signingVault = vault
         this.signingAlgorithms = {
-            "ecdsa_secp256k1" : new ECDSA_S256()
-        }
+            ecdsa_secp256k1: new ECDSA_S256()
+        };
     }
 
     abstract getAddress(): string;
@@ -26,14 +31,37 @@ export abstract class Signer {
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
 
+
+    /**
+     * getProvider
+     *
+     * Retrieves the connected provider instance.
+     *
+     * @returns The connected provider instance.
+     * @throws Error if the provider is not initialized.
+     */
     public getProvider() {
         if(this.provider) {
             return this.provider;
         }
 
-        throw new Error("Provider is not initialized!");
+        ErrorUtils.throwError(
+            "Provider is not initialized!",
+            ErrorCode.NOT_INITIALIZED
+        );
     }
 
+    /**
+     * getNonce
+     *
+     * Retrieves the nonce (interaction count) for the signer's address 
+     * from the provider.
+     *
+     * @param options - The options for retrieving the nonce. (optional)
+     * @returns A Promise that resolves to the nonce as a number or bigint.
+     * @throws Error if there is an error retrieving the nonce or the provider 
+     * is not initialized.
+     */
     public async getNonce(options?: Options): Promise<number | bigint> {
         try {
             const provider = this.getProvider();
@@ -43,6 +71,16 @@ export abstract class Signer {
         }
     }
 
+    /**
+     * sendInteraction
+     *
+     * Sends an interaction object by signing it with the appropriate signature algorithm
+     * and forwarding it to the connected provider.
+     *
+     * @param ixObject - The interaction object to send.
+     * @returns A Promise that resolves to the interaction response.
+     * @throws Error if there is an error sending the interaction or the provider is not initialized.
+     */
     public async sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse> {
         try {
             const provider = this.getProvider();
@@ -50,10 +88,22 @@ export abstract class Signer {
             const ixRequest = this.signInteraction(ixObject, sigAlgo)
             return await provider.sendInteraction(ixRequest);
         } catch(err) {
-            throw new Error("Failed to send interaction", err);
+            throw err;
         }
     }
 
+    /**
+     * verify
+     *
+     * Verifies the authenticity of a signature by performing signature verification 
+     * using the provided parameters.
+     *
+     * @param message - The message that was signed.
+     * @param signature - The signature to verify, as a string or Buffer.
+     * @param publicKey - The public key used for verification, as a string or Buffer.
+     * @returns A boolean indicating whether the signature is valid or not.
+     * @throws Error if the signature is invalid or the signature byte is not recognized.
+     */
     public verify(message: Buffer, signature: string|Buffer, publicKey: string|Buffer): boolean {
         let verificationKey: Buffer;
 
@@ -73,7 +123,10 @@ export abstract class Signer {
                 return _sig.verify(message, sig, verificationKey);
             }
             default: {
-                throw new Error("invalid signature")
+                ErrorUtils.throwError(
+                    "Invalid signature provided. Unable to verify the signature.", 
+                    ErrorCode.INVALID_SIGNATURE
+                )
             }
         }
     }
