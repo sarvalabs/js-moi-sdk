@@ -24,6 +24,7 @@ var ErrorCode;
     ErrorCode["UNPREDICTABLE_GAS_LIMIT"] = "ERROR_UNPREDICTABLE_GAS_LIMIT";
     ErrorCode["TRANSACTION_REPLACED"] = "ERROR_TRANSACTION_REPLACED";
     ErrorCode["ACTION_REJECTED"] = "ERROR_ACTION_REJECTED";
+    ErrorCode["INVALID_SIGNATURE"] = "ERROR_INVALID_SIGNATURE";
 })(ErrorCode || (exports.ErrorCode = ErrorCode = {}));
 class CustomError extends Error {
     code;
