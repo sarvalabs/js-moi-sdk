@@ -391,8 +391,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 if (response.result.data) {
                     return {
                         hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this),
-                        result: this.waitForResult.bind(this)
+                        wait: this.waitForInteraction.bind(this, response.result.data),
+                        result: this.waitForResult.bind(this, response.result.data)
                     };
                 }
                 moi_utils_1.ErrorUtils.throwError(response.result.error.message, moi_utils_1.ErrorCode.SERVER_ERROR);

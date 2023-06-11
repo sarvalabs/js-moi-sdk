@@ -57,8 +57,8 @@ export interface InteractionRequest {
 
 export interface InteractionResponse {
     hash: string;
-    wait: (interactionHash: string, timeout?: number) => Promise<InteractionReceipt>,
-    result: (interactionHash: string, timeout?: number) => Promise<any>
+    wait: (timeout?: number) => Promise<InteractionReceipt>,
+    result: (timeout?: number) => Promise<any>
 }
 
 export interface StateHash {

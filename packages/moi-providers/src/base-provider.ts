@@ -459,8 +459,8 @@ export class BaseProvider extends AbstractProvider {
                 if(response.result.data) {
                     return {
                         hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this),
-                        result: this.waitForResult.bind(this)
+                        wait: this.waitForInteraction.bind(this, response.result.data),
+                        result: this.waitForResult.bind(this, response.result.data)
                     }
                 }
     
