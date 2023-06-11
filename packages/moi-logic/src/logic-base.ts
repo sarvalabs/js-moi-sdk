@@ -1,7 +1,7 @@
 import { ABICoder } from "moi-abi";
 import { ErrorCode, ErrorUtils, IxType, LogicManifest } from "moi-utils";
-import { LogicPayload } from "moi-signer";
-import { InteractionResponse, JsonRpcProvider } from "moi-providers";
+import { LogicPayload, Signer } from "moi-signer";
+import { InteractionResponse } from "moi-providers";
 import ElementDescriptor from "./element-descriptor";
 import { LogicExecuteRequest } from "../types/logic";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -14,13 +14,13 @@ import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from 
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export abstract class LogicBase extends ElementDescriptor {
-    protected provider: JsonRpcProvider;
+    protected signer: Signer;
     protected abiCoder: ABICoder;
 
-    constructor(manifest: LogicManifest.Manifest, provider: JsonRpcProvider) {
+    constructor(manifest: LogicManifest.Manifest, signer: Signer) {
         super(manifest.elements)
         
-        this.provider = provider;
+        this.signer = signer;
         this.abiCoder = new ABICoder(this.elements, this.classDefs)
     }
 
@@ -48,18 +48,14 @@ export abstract class LogicBase extends ElementDescriptor {
      * 
      * @param {any} ixObject - The interaction object.
      * @param {any[]} args - The arguments for the routine.
-     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
-     * @throws {Error} Throws an error if the provider is not found or if the logic ID is not defined.
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the 
+     * interaction response.
+     * @throws Error if the provider is not initialized within 
+     * the signer, if the logic id is not defined, if the method type is unsupported,
+     * or if the sendInteraction operation fails.
      */
     protected async executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionResponse> {
         const processedArgs = this.processArguments(ixObject, args)
-
-        if(!this.provider) {
-            ErrorUtils.throwError(
-                "Provider not found!",
-                ErrorCode.NOT_INITIALIZED
-            )
-        }
 
         if(this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
@@ -73,7 +69,7 @@ export abstract class LogicBase extends ElementDescriptor {
             case "estimate":
                 break;
             case "send":
-                return this.provider.sendInteraction(processedArgs.params)
+                return this.signer.sendInteraction(processedArgs.params)
                 .then((response) => {
                     return {
                         ...response,

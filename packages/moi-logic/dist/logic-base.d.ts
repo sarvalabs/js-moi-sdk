@@ -1,7 +1,7 @@
 import { ABICoder } from "moi-abi";
 import { IxType, LogicManifest } from "moi-utils";
-import { LogicPayload } from "moi-signer";
-import { InteractionResponse, JsonRpcProvider } from "moi-providers";
+import { LogicPayload, Signer } from "moi-signer";
+import { InteractionResponse } from "moi-providers";
 import ElementDescriptor from "./element-descriptor";
 import { LogicExecuteRequest } from "../types/logic";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -13,9 +13,9 @@ import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from 
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export declare abstract class LogicBase extends ElementDescriptor {
-    protected provider: JsonRpcProvider;
+    protected signer: Signer;
     protected abiCoder: ABICoder;
-    constructor(manifest: LogicManifest.Manifest, provider: JsonRpcProvider);
+    constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract getIxType(): IxType;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null>;
@@ -34,8 +34,11 @@ export declare abstract class LogicBase extends ElementDescriptor {
      *
      * @param {any} ixObject - The interaction object.
      * @param {any[]} args - The arguments for the routine.
-     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
-     * @throws {Error} Throws an error if the provider is not found or if the logic ID is not defined.
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the
+     * interaction response.
+     * @throws Error if the provider is not initialized within
+     * the signer, if the logic id is not defined, if the method type is unsupported,
+     * or if the sendInteraction operation fails.
      */
     protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionResponse>;
     /**

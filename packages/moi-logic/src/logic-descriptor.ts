@@ -1,8 +1,8 @@
 import { ABICoder } from "moi-abi";
 import { LogicManifest } from "moi-utils";
+import { Signer } from "moi-signer";
 import {LogicId} from "./logic-id";
 import { LogicBase } from "./logic-base";
-import { JsonRpcProvider } from "moi-providers";
 import { ContextStateKind } from "./state";
 
 export enum EngineKind {
@@ -24,8 +24,8 @@ export abstract class LogicDescriptor extends LogicBase {
     protected sealed: boolean;
     protected assetLogic: boolean;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: JsonRpcProvider) {
-        super(manifest, provider)
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
+        super(manifest, signer)
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = ABICoder.encodeABI(this.manifest);

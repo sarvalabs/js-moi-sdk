@@ -14,8 +14,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     routines = {};
     persistentState;
     ephemeralState;
-    constructor(logicId, manifest, provider) {
-        super(logicId, manifest, provider);
+    constructor(logicId, manifest, signer) {
+        super(logicId, manifest, signer);
         this.createState();
         this.createRoutines();
     }
@@ -26,9 +26,10 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      if available in logic manifest.
      */
     createState() {
+        const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            this.persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.abiCoder, this.provider);
+            this.persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.abiCoder, provider);
         }
     }
     /**
@@ -150,15 +151,17 @@ exports.LogicDriver = LogicDriver;
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {JsonRpcProvider} provider - The JSON-RPC provider.
- * @param {Options} options - The custom options for the logic driver. (optional)
+ * @param {Signer} signer - The signer instance for signing the interactions.
+ * @param {Options} options - The custom tesseract options for retrieving
+ * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-const getLogicDriver = async (logicId, provider, options) => {
+const getLogicDriver = async (logicId, signer, options) => {
     try {
+        const provider = signer.getProvider();
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
         if (typeof manifest === 'object') {
-            return new LogicDriver(logicId, manifest, provider);
+            return new LogicDriver(logicId, manifest, signer);
         }
         moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }

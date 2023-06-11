@@ -12,8 +12,8 @@ const logic_base_1 = require("./logic-base");
 class LogicFactory extends logic_base_1.LogicBase {
     manifest;
     encodedManifest;
-    constructor(manifest, provider) {
-        super(manifest, provider);
+    constructor(manifest, signer) {
+        super(manifest, signer);
         this.manifest = manifest;
         this.encodedManifest = moi_abi_1.ABICoder.encodeABI(manifest);
     }

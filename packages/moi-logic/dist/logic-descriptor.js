@@ -23,8 +23,8 @@ class LogicDescriptor extends logic_base_1.LogicBase {
     engine;
     sealed;
     assetLogic;
-    constructor(logicId, manifest, provider) {
-        super(manifest, provider);
+    constructor(logicId, manifest, signer) {
+        super(manifest, signer);
         this.logicId = new logic_id_1.LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = moi_abi_1.ABICoder.encodeABI(this.manifest);

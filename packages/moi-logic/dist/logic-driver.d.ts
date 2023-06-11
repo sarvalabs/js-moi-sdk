@@ -1,6 +1,6 @@
-import { LogicPayload } from "moi-signer";
+import { LogicPayload, Signer } from "moi-signer";
 import { IxType, LogicManifest } from "moi-utils";
-import { JsonRpcProvider, Options } from "moi-providers";
+import { Options } from "moi-providers";
 import { Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -14,7 +14,7 @@ export declare class LogicDriver extends LogicDescriptor {
     routines: Routines;
     persistentState: PersistentState;
     ephemeralState: EphemeralState;
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: JsonRpcProvider);
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
     /**
      * createState
      *
@@ -82,8 +82,9 @@ export declare class LogicDriver extends LogicDescriptor {
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {JsonRpcProvider} provider - The JSON-RPC provider.
- * @param {Options} options - The custom options for the logic driver. (optional)
+ * @param {Signer} signer - The signer instance for signing the interactions.
+ * @param {Options} options - The custom tesseract options for retrieving
+ * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export declare const getLogicDriver: (logicId: string, provider: JsonRpcProvider, options?: Options) => Promise<LogicDriver>;
+export declare const getLogicDriver: (logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver>;

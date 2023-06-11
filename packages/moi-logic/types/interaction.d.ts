@@ -23,9 +23,7 @@ export interface LogicIxResult {
     error: Exception | null
 }
 
-// Todo: params type has to be updated.
 export interface LogicIxArguments {
     type: string;
-    // params: InteractionObject;
-    params: any
+    params: InteractionObject;
 }

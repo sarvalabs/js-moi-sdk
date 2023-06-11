@@ -114,10 +114,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             };
             const response = await this.execute("moi.TDU", params);
             const tdu = this.processResponse(response);
-            Object.keys(tdu).forEach((assetId) => {
-                tdu[assetId] = (0, moi_utils_1.hexToBN)(tdu[assetId]);
-            });
-            return tdu;
+            return tdu.map((asset) => ({
+                asset_id: asset.asset_id,
+                amount: (0, moi_utils_1.hexToBN)(asset.amount)
+            }));
         }
         catch (error) {
             throw error;
@@ -325,6 +325,28 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.Tesseract", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * getLogicIds
+     *
+     * Retrieves the logic id's associated with a specific address.
+     * @param address - The address for which to retrieve the logic id's.
+     * @param options - The tesseract options. (optional)
+     * @returns A Promise that resolves to an array of logic id's.
+     * @throws Error if there is an error executing the RPC call.
+     */
+    async getLogicIds(address, options) {
+        try {
+            const params = {
+                address: address,
+                options: options ? options : defaultOptions
+            };
+            const response = await this.execute("moi.LogicIDs", params);
             return this.processResponse(response);
         }
         catch (error) {

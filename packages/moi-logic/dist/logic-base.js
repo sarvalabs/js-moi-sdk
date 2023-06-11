@@ -15,11 +15,11 @@ const element_descriptor_1 = __importDefault(require("./element-descriptor"));
  * It defines common properties and abstract methods that subclasses should implement.
  */
 class LogicBase extends element_descriptor_1.default {
-    provider;
+    signer;
     abiCoder;
-    constructor(manifest, provider) {
+    constructor(manifest, signer) {
         super(manifest.elements);
-        this.provider = provider;
+        this.signer = signer;
         this.abiCoder = new moi_abi_1.ABICoder(this.elements, this.classDefs);
     }
     /**
@@ -39,14 +39,14 @@ class LogicBase extends element_descriptor_1.default {
      *
      * @param {any} ixObject - The interaction object.
      * @param {any[]} args - The arguments for the routine.
-     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
-     * @throws {Error} Throws an error if the provider is not found or if the logic ID is not defined.
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the
+     * interaction response.
+     * @throws Error if the provider is not initialized within
+     * the signer, if the logic id is not defined, if the method type is unsupported,
+     * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, ...args) {
         const processedArgs = this.processArguments(ixObject, args);
-        if (!this.provider) {
-            moi_utils_1.ErrorUtils.throwError("Provider not found!", moi_utils_1.ErrorCode.NOT_INITIALIZED);
-        }
         if (this.getIxType() !== moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             moi_utils_1.ErrorUtils.throwError("This logic object doesn\'t have address set yet, please set an address first.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
@@ -55,7 +55,7 @@ class LogicBase extends element_descriptor_1.default {
             case "estimate":
                 break;
             case "send":
-                return this.provider.sendInteraction(processedArgs.params)
+                return this.signer.sendInteraction(processedArgs.params)
                     .then((response) => {
                     return {
                         ...response,

@@ -1,7 +1,7 @@
 import { LogicManifest } from "moi-utils";
+import { Signer } from "moi-signer";
 import { LogicId } from "./logic-id";
 import { LogicBase } from "./logic-base";
-import { JsonRpcProvider } from "moi-providers";
 export declare enum EngineKind {
     PISA = "PISA",
     MERU = "MERU"
@@ -19,7 +19,7 @@ export declare abstract class LogicDescriptor extends LogicBase {
     protected engine: EngineKind;
     protected sealed: boolean;
     protected assetLogic: boolean;
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: JsonRpcProvider);
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
     /**
      * getLogicId
      *

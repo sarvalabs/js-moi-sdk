@@ -1,6 +1,5 @@
 import { IxType, LogicManifest } from "moi-utils";
-import { LogicPayload } from "moi-signer";
-import { JsonRpcProvider } from "moi-providers";
+import { LogicPayload, Signer } from "moi-signer";
 import { LogicDeployRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
@@ -12,7 +11,7 @@ import { LogicBase } from "./logic-base";
 export declare class LogicFactory extends LogicBase {
     private manifest;
     private encodedManifest;
-    constructor(manifest: LogicManifest.Manifest, provider: JsonRpcProvider);
+    constructor(manifest: LogicManifest.Manifest, signer: Signer);
     /**
      * getIxType
      *

@@ -59,7 +59,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the TDU object.
      * @throws Error if there is an error executing the RPC call.
      */
-    getTDU(address: string, options?: Options): Promise<TDU>;
+    getTDU(address: string, options?: Options): Promise<TDU[]>;
     /**
      * getInteractionByHash
      *
@@ -154,6 +154,16 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws Error if there is an error executing the RPC call.
      */
     getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
+    /**
+     * getLogicIds
+     *
+     * Retrieves the logic id's associated with a specific address.
+     * @param address - The address for which to retrieve the logic id's.
+     * @param options - The tesseract options. (optional)
+     * @returns A Promise that resolves to an array of logic id's.
+     * @throws Error if there is an error executing the RPC call.
+     */
+    getLogicIds(address: string, options?: Options): Promise<string[]>;
     /**
      * getRegistry
      *

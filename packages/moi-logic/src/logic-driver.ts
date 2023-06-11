@@ -1,7 +1,7 @@
 import { ABICoder } from "moi-abi";
-import { LogicPayload } from "moi-signer";
+import { LogicPayload, Signer } from "moi-signer";
 import { ErrorCode, ErrorUtils, IxType, LogicManifest } from "moi-utils";
-import { JsonRpcProvider, Options } from "moi-providers";
+import { Options } from "moi-providers";
 import { Routine, Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -17,8 +17,8 @@ export class LogicDriver extends LogicDescriptor {
     public persistentState: PersistentState;
     public ephemeralState: EphemeralState;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: JsonRpcProvider) {
-        super(logicId, manifest, provider)
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
+        super(logicId, manifest, signer)
         this.createState();
         this.createRoutines();
     }
@@ -30,6 +30,7 @@ export class LogicDriver extends LogicDescriptor {
      if available in logic manifest.
      */
     private createState() {
+        const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
 
         if(persistentStateExists) {
@@ -37,7 +38,7 @@ export class LogicDriver extends LogicDescriptor {
                 this.logicId.hex(),
                 this.elements.get(persistentStatePtr),
                 this.abiCoder,
-                this.provider
+                provider
             )
         }
     }
@@ -181,16 +182,18 @@ export class LogicDriver extends LogicDescriptor {
  * Returns a logic driver instance based on the given logic id.
  * 
  * @param {string} logicId - The logic id of the logic.
- * @param {JsonRpcProvider} provider - The JSON-RPC provider.
- * @param {Options} options - The custom options for the logic driver. (optional)
+ * @param {Signer} signer - The signer instance for signing the interactions.
+ * @param {Options} options - The custom tesseract options for retrieving 
+ * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async (logicId: string, provider: JsonRpcProvider, options?: Options): Promise<LogicDriver> => {
+export const getLogicDriver = async (logicId: string, signer: Signer, options?: Options): Promise<LogicDriver> => {
     try {
+        const provider = signer.getProvider()
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
         if (typeof manifest === 'object') {
-            return new LogicDriver(logicId, manifest, provider);
+            return new LogicDriver(logicId, manifest, signer);
         }
 
         ErrorUtils.throwError(
