@@ -16,8 +16,8 @@ describe("Test Wallet", () => {
             type: 3,
             nonce: 0,
             sender: "870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b",
-            fuel_price: 1248577,
-            fuel_limit: 1248577,
+            fuel_price: 1,
+            fuel_limit: 200,
             payload: {
                 type: 3,
                 symbol: "MOI",

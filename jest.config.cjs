@@ -39,6 +39,7 @@ module.exports = {
             transform: {
                 '^.+\\.tsx?$': 'ts-jest',
             },
+            moduleFileExtensions: ['js', 'ts', 'd.ts'],
         },
     ],
     testTimeout: 700000,

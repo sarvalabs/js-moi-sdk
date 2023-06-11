@@ -123,6 +123,19 @@ const serializeIxObject = (ixObject) => {
     try {
         let polorizer = new js_polo_1.Polorizer();
         switch (ixObject.type) {
+            case moi_utils_1.IxType.VALUE_TRANSFER: {
+                if (!ixObject.transfer_values) {
+                    moi_utils_1.ErrorUtils.throwError("Transfer values is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+                }
+                const ixData = {
+                    ...ixObject,
+                    sender: (0, moi_utils_1.hexToBytes)(ixObject.sender),
+                    receiver: (0, moi_utils_1.hexToBytes)(ixObject.receiver),
+                    payer: (0, moi_utils_1.hexToBytes)(ZERO_ADDRESS),
+                };
+                polorizer.polorize(ixData, ixObjectSchema);
+                return polorizer.bytes();
+            }
             case moi_utils_1.IxType.ASSET_CREATE: {
                 if (!ixObject.payload) {
                     moi_utils_1.ErrorUtils.throwError("Payload is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
@@ -158,14 +171,19 @@ const serializeIxObject = (ixObject) => {
                 polorizer.polorize(ixData, ixObjectSchema);
                 return polorizer.bytes();
             }
-            case moi_utils_1.IxType.VALUE_TRANSFER: {
-                if (!ixObject.transfer_values) {
-                    moi_utils_1.ErrorUtils.throwError("Transfer values is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+            case moi_utils_1.IxType.LOGIC_DEPLOY:
+            case moi_utils_1.IxType.LOGIC_INVOKE: {
+                if (!ixObject.payload) {
+                    moi_utils_1.ErrorUtils.throwError("Payload is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
                 }
+                polorizer.polorize(ixObject.payload, logicSchema);
+                const payload = polorizer.bytes();
+                polorizer = new js_polo_1.Polorizer();
                 const ixData = {
                     ...ixObject,
+                    payload,
                     sender: (0, moi_utils_1.hexToBytes)(ixObject.sender),
-                    receiver: (0, moi_utils_1.hexToBytes)(ixObject.receiver),
+                    receiver: (0, moi_utils_1.hexToBytes)(ZERO_ADDRESS),
                     payer: (0, moi_utils_1.hexToBytes)(ZERO_ADDRESS),
                 };
                 polorizer.polorize(ixData, ixObjectSchema);

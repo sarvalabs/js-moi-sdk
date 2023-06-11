@@ -127,6 +127,25 @@ export const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
     try {
         let polorizer = new Polorizer();
         switch(ixObject.type) {
+            case IxType.VALUE_TRANSFER: {
+                if(!ixObject.transfer_values) {
+                    ErrorUtils.throwError(
+                        "Transfer values is missing!",
+                        ErrorCode.MISSING_ARGUMENT
+                    )
+                }
+
+                const ixData = {
+                    ...ixObject,
+                    sender: hexToBytes(ixObject.sender),
+                    receiver: hexToBytes(ixObject.receiver),
+                    payer: hexToBytes(ZERO_ADDRESS),
+                }
+
+                polorizer.polorize(ixData, ixObjectSchema);
+
+                return polorizer.bytes();
+            }
             case IxType.ASSET_CREATE: {
                 if(!ixObject.payload) {
                     ErrorUtils.throwError(
@@ -180,23 +199,31 @@ export const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
     
                 return polorizer.bytes();
             }
-            case IxType.VALUE_TRANSFER: {
-                if(!ixObject.transfer_values) {
+            case IxType.LOGIC_DEPLOY:
+            case IxType.LOGIC_INVOKE: {
+                if(!ixObject.payload) {
                     ErrorUtils.throwError(
-                        "Transfer values is missing!",
+                        "Payload is missing!",
                         ErrorCode.MISSING_ARGUMENT
                     )
                 }
+    
+                polorizer.polorize(ixObject.payload, logicSchema);
+    
+                const payload = polorizer.bytes();
+    
+                polorizer = new Polorizer();
 
                 const ixData = {
-                    ...ixObject,
+                    ...ixObject, 
+                    payload,
                     sender: hexToBytes(ixObject.sender),
-                    receiver: hexToBytes(ixObject.receiver),
+                    receiver: hexToBytes(ZERO_ADDRESS),
                     payer: hexToBytes(ZERO_ADDRESS),
                 }
-
+    
                 polorizer.polorize(ixData, ixObjectSchema);
-
+    
                 return polorizer.bytes();
             }
             default:
