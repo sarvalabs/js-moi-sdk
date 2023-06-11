@@ -8,7 +8,8 @@ AssetInfoParams, BalanceParams, ContextInfo, InteractionRequest,
 InteractionReceipt, InteractionParams, InteractionResponse, 
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
-Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, Registry } from "../types/jsonrpc";
+Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, 
+Registry, TDUResponse } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
@@ -130,7 +131,7 @@ export class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the TDU object.
      * @throws Error if there is an error executing the RPC call.
      */
-    public async getTDU(address: string, options?: Options): Promise<TDU> {
+    public async getTDU(address: string, options?: Options): Promise<TDU[]> {
         try {
             const params: AccountParamsBase = {
                 address: address,
@@ -141,11 +142,10 @@ export class BaseProvider extends AbstractProvider {
 
             const tdu = this.processResponse(response);
 
-            Object.keys(tdu).forEach((assetId) => {
-                tdu[assetId] = hexToBN(tdu[assetId])
-            });
-
-            return tdu;
+            return tdu.map((asset: TDUResponse) => ({
+                asset_id: asset.asset_id,
+                amount: hexToBN(asset.amount)
+            }));
         } catch (error) {
             throw error;
         }
@@ -173,7 +173,6 @@ export class BaseProvider extends AbstractProvider {
             throw err;
         }
     }
-
 
     /**
      * getInteractionByTesseract
@@ -387,6 +386,30 @@ export class BaseProvider extends AbstractProvider {
             }
     
             const response: RpcResponse = await this.execute("moi.Tesseract", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * getLogicIds
+     * 
+     * Retrieves the logic id's associated with a specific address.
+     * @param address - The address for which to retrieve the logic id's.
+     * @param options - The tesseract options. (optional)
+     * @returns A Promise that resolves to an array of logic id's.
+     * @throws Error if there is an error executing the RPC call.
+     */
+    public async getLogicIds(address: string, options?: Options): Promise<string[]> {
+        try {
+            const params: AccountParamsBase = {
+                address: address,
+                options: options ? options : defaultOptions
+            }
+    
+            const response: RpcResponse = await this.execute("moi.LogicIDs", params)
 
             return this.processResponse(response)
         } catch (error) {

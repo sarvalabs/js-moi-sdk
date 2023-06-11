@@ -1,9 +1,10 @@
 import { 
-    AssetCreationReceipt, 
+    AssetKind,
+    AssetCreationReceipt,
+    AssetMintOrBurnReceipt, 
     LogicDeployReceipt, 
     LogicExecuteReceipt 
 } from "moi-utils";
-import { AssetMintOrBurnReceipt } from "moi-utils/types/receipt";
 
 export interface Options {
     tesseract_number?: number;
@@ -17,8 +18,16 @@ export interface ContextInfo {
     storage_nodes: string[];
 }
 
-export interface TDU {
-    [assetId: string]: number | bigint;
+interface TDUBase {
+    asset_id: string;
+}
+
+export interface TDU extends TDUBase {
+    amount: number | bigint; 
+}
+
+export interface TDUResponse extends TDUBase {
+    amount: string; 
 }
 
 export interface AccountState {
@@ -77,7 +86,7 @@ export interface InteractionReceipt {
 }
 
 export interface AssetInfo {
-    type: number;
+    type: AssetKind;
     symbol: string;
     owner: string;
     supply: string;
@@ -85,7 +94,7 @@ export interface AssetInfo {
     standard: string
     is_logical: boolean
     is_stateful: boolean
-    logic_id: string
+    logic_id?: string
 }
 
 export interface Registry {
