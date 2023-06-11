@@ -4,6 +4,12 @@ import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU,
 InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, 
 Inspect, ContentFrom, Encoding, Registry } from "../types/jsonrpc";
 
+/**
+ * AbstractProvider
+ * 
+ * Abstract class representing a provider for interacting with the MOI protocol.
+ * Provides methods for account operations, execution, and querying.
+ */
 export abstract class AbstractProvider {
     // Account Methods
     abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>
@@ -21,7 +27,6 @@ export abstract class AbstractProvider {
     abstract getWaitTime(address: string): Promise<number|bigint>
 
     // Execution Methods
-    // TODO: Update InteractionRequest and InteractionResponse
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>
 
     // Query Methods
@@ -36,24 +41,44 @@ export abstract class AbstractProvider {
     abstract getDBEntry(key: string): Promise<string>
     abstract getAccounts(): Promise<string[]>
 
-    abstract waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>
-    abstract waitForResult(interactionHash: string, timeout?: number): Promise<any>
+    protected abstract waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>
+    protected abstract waitForResult(interactionHash: string, timeout?: number): Promise<any>
 
     // Event Emitter (ish)
+    protected abstract emit(eventName: EventType, ...args: Array<any>): boolean;
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;
     abstract once(eventName: EventType, listener: Listener): AbstractProvider;
-    abstract emit(eventName: EventType, ...args: Array<any>): boolean
     abstract listenerCount(eventName?: EventType): number;
     abstract listeners(eventName?: EventType): Array<Listener>;
     abstract off(eventName: EventType, listener?: Listener): AbstractProvider;
     abstract removeAllListeners(eventName?: EventType): AbstractProvider;
 
     // Alias for "on"
+
+    /**
+     * addListener
+     * 
+     * Alias for "on" method.
+     * 
+     * @param eventName - The name of the event.
+     * @param listener - The listener function to be called when the event is emitted.
+     * @returns The provider instance for chaining.
+     */
     addListener(eventName: EventType, listener: Listener): AbstractProvider {
         return this.on(eventName, listener);
     }
 
     // Alias for "off"
+
+    /**
+     * removeListener
+     * 
+     * Alias for "off" method.
+     * 
+     * @param eventName - The name of the event.
+     * @param listener - The listener function to be unregistered.
+     * @returns The provider instance for chaining.
+     */
     removeListener(eventName: EventType, listener: Listener): AbstractProvider {
         return this.off(eventName, listener);
     }

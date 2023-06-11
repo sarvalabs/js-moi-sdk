@@ -24,11 +24,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebSocketProvider = exports.WebSocketEvents = void 0;
+const moi_utils_1 = require("moi-utils");
 const websocket_1 = require("websocket");
 const jsonrpc_provider_1 = require("./jsonrpc-provider");
 const errors = __importStar(require("./errors"));
-const moi_utils_1 = require("moi-utils");
 let nextReqId = 1;
+/**
+ * WebSocketEvents
+ *
+ * Enum defining the WebSocket events.
+ */
 var WebSocketEvents;
 (function (WebSocketEvents) {
     WebSocketEvents["TESSERACT"] = "tesseract";
@@ -39,6 +44,11 @@ var WebSocketEvents;
     WebSocketEvents["DEBUG"] = "debug";
     WebSocketEvents["ERROR"] = "error";
 })(WebSocketEvents || (exports.WebSocketEvents = WebSocketEvents = {}));
+/**
+ * WebSocketProvider
+ *
+ * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based communication with the JSON-RPC endpoint.
+ */
 class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     requestQueue;
     responseQueue;
@@ -76,12 +86,23 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.connect();
             return;
         }
-        throw new Error("Invalid websocket request url!");
+        moi_utils_1.ErrorUtils.throwError("Invalid websocket request url!", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
+    /**
+     * connect
+     *
+     * Establishes a WebSocket connection with the provided host.
+     * Creates a new WebSocket connection instance and sets up event handlers.
+     */
     connect = () => {
         this.connection = new websocket_1.w3cwebsocket(this.host, this.wsConnOptions.protocol, undefined, this.wsConnOptions.headers, this.wsConnOptions.requestOptions, this.wsConnOptions.clientConfig);
         this.addEventListener();
     };
+    /**
+     * addEventListener
+     *
+     * Sets up event listeners for the WebSocket connection.
+     */
     addEventListener = () => {
         this.connection.onopen = this.onConnect.bind(this);
         this.connection.onclose = this.onClose.bind(this);
@@ -91,11 +112,27 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.connection._client.on("connectFailed", this.onConnectFailed.bind(this));
         }
     };
+    /**
+     * removeEventListener
+     *
+     * Removes event listeners from the WebSocket connection.
+     */
     removeEventListener = () => {
         this.connection.onopen = null;
         this.connection.onclose = null;
         this.connection.onmessage = null;
     };
+    /**
+     * reconnect
+     *
+     * Initiates a reconnection to the WebSocket server.
+     * If there are pending requests in the response queue, their callbacks are
+     * invoked with a reconnection error.
+     * If the maximum reconnection attempts have not been reached, it schedules
+     * another reconnection attempt.
+     * If the maximum reconnection attempts have been reached, it invokes the
+     * error event and clears the request queue.
+     */
     reconnect() {
         this.reconnecting = true;
         if (this.responseQueue.size > 0) {
@@ -128,6 +165,12 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             });
         }
     }
+    /**
+     * onConnect
+     *
+     * Event handler triggered when the WebSocket connection is successfully established.
+     * Invokes pending requests in the request queue if any.
+     */
     onConnect = () => {
         this.emit(WebSocketEvents.CONNECT, "Websocket connection established successfully!");
         this.reconnAttempts = 0;
@@ -144,9 +187,20 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             });
         }
     };
+    /**
+     * isConnectionFailed
+     *
+     * Checks if the WebSocket connection has failed based on the close event.
+     * @param event The close event object.
+     * @returns A boolean indicating whether the connection has failed.
+     */
     isConnectionFailed = (event) => {
         return event.code === 1006 && event.reason === "connection failed";
     };
+    /**
+     * Method called when the WebSocket connection is closed.
+     * @param event - The close event.
+     */
     onClose = (event) => {
         if (!this.isConnectionFailed(event)) {
             if (this.wsConnOptions.reconnectOptions.auto &&
@@ -171,6 +225,10 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.removeAllListeners();
         }
     };
+    /**
+     * Method called when a message is received through the WebSocket connection.
+     * @param event - The message event.
+     */
     onMessage = (event) => {
         const data = event.data;
         const response = JSON.parse(data);
@@ -214,6 +272,10 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             }
         }
     };
+    /**
+     * Method called when the WebSocket connection fails to connect.
+     * @param event - The connect failed event.
+     */
     onConnectFailed = (event) => {
         let connectFailedDescription = event.toString().split('\n')[0];
         if (connectFailedDescription) {
@@ -246,6 +308,13 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.connection._readyState = 3; // set readyState to CLOSED
         this.emit(WebSocketEvents.CLOSE, event);
     };
+    /**
+     * sendRequest
+     *
+     * Sends a request over the WebSocket connection.
+     * @param requestId - The ID of the request.
+     * @param request - The request object.
+     */
     sendRequest(requestId, request) {
         if (this.connection.readyState !== this.connection.OPEN) {
             this.requestQueue.delete(requestId);
@@ -262,6 +331,15 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.responseQueue.delete(requestId);
         }
     }
+    /**
+     * send
+     *
+     * Sends a request over the WebSocket connection and returns a Promise that
+     * resolves with the response.
+     * @param method - The method of the request.
+     * @param params - The parameters of the request.
+     * @returns A Promise that resolves with the response or rejects with an error.
+     */
     send(method, params) {
         return new Promise((resolve, reject) => {
             const callback = (error, result) => {
@@ -288,6 +366,15 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.sendRequest(requestId, request);
         });
     }
+    /**
+     * _subscribe
+     *
+     * Subscribes to an event.
+     * @param tag - The tag associated with the subscription.
+     * @param param - The parameters of the subscription.
+     * @param processFunc - The function to process the subscription result.
+     * @returns A Promise that resolves when the subscription is complete.
+     */
     async _subscribe(tag, param, processFunc) {
         let subIdPromise = this.subsIds[tag];
         if (subIdPromise == null) {
@@ -299,6 +386,12 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         const subId = await subIdPromise;
         this.subscriptions[subId] = { tag, processFunc };
     }
+    /**
+     * _startEvent
+     *
+     * Starts listening to an event.
+     * @param event - The event to start listening to.
+     */
     _startEvent(event) {
         switch (event.type) {
             case WebSocketEvents.TESSERACT:
@@ -325,6 +418,10 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 break;
         }
     }
+    /**
+     * Stops listening to an event.
+     * @param event - The event to stop listening to.
+     */
     _stopEvent(event) {
         let tag = event.tag;
         if (this.listenerCount(event.event)) {
@@ -344,6 +441,10 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             this.send("moi.unsubscribe", [subId]);
         });
     }
+    /**
+     * Disconnects the WebSocket connection.
+     * @returns A Promise that resolves when the disconnect operation is complete.
+     */
     async disconnect() {
         // Wait until we have connected before trying to disconnect
         if (this.connection.readyState === this.connection.CONNECTING) {

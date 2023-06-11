@@ -1,6 +1,6 @@
 import { defineReadOnly } from "moi-utils";
 
-const connectionError = (msg, event) => {
+const connectionError = (msg: string, event: any) => {
     try {
         const error: Error = new Error(msg);
         if (event) {
@@ -18,7 +18,7 @@ export const ConnectionNotOpenError = (event?: any): Error => {
     return connectionError('connection not open on send()', event);
 }
 
-export const InvalidConnection = (host, event): Error => {
+export const InvalidConnection = (host: string, event: any): Error => {
     return connectionError('CONNECTION ERROR: Couldn\'t connect to node '+ host +'.', event);
 }
 

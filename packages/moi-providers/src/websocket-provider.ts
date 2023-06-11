@@ -1,14 +1,18 @@
-import { WebsocketProviderOptions } from "../types/provider";
+import { ErrorCode, ErrorUtils, defineReadOnly } from "moi-utils";
 import { w3cwebsocket as WsConn } from "websocket";
 import {JsonRpcProvider} from "./jsonrpc-provider";
 import Event from "./event";
-import { TesseractParams, Subscription } from "../types/websocket";
-import { InflightRequest } from "../types/websocket";
 import * as errors from "./errors";
-import { defineReadOnly } from "moi-utils";
+import { WebsocketProviderOptions } from "../types/provider";
+import { InflightRequest, TesseractParams, Subscription } from "../types/websocket";
 
 let nextReqId = 1;
 
+/**
+ * WebSocketEvents
+ * 
+ * Enum defining the WebSocket events.
+ */
 export enum WebSocketEvents {
     TESSERACT = 'tesseract',
     ALL_TESSERACTS = 'all_tesseracts',
@@ -19,6 +23,11 @@ export enum WebSocketEvents {
     ERROR = 'error',
 }
 
+/**
+ * WebSocketProvider
+ * 
+ * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based communication with the JSON-RPC endpoint.
+ */
 export class WebSocketProvider extends JsonRpcProvider {
     private requestQueue: Map<number, InflightRequest>;
     private responseQueue: Map<number, InflightRequest>;
@@ -61,9 +70,18 @@ export class WebSocketProvider extends JsonRpcProvider {
             return;
         }
 
-        throw new Error("Invalid websocket request url!")
+        ErrorUtils.throwError(
+            "Invalid websocket request url!",
+            ErrorCode.INVALID_ARGUMENT
+        );
     }
 
+    /**
+     * connect
+     *
+     * Establishes a WebSocket connection with the provided host.
+     * Creates a new WebSocket connection instance and sets up event handlers.
+     */
     private connect = () => {
         this.connection = new WsConn(
             this.host, 
@@ -77,6 +95,11 @@ export class WebSocketProvider extends JsonRpcProvider {
         this.addEventListener();
     }
 
+    /**
+     * addEventListener
+     *
+     * Sets up event listeners for the WebSocket connection.
+     */
     private addEventListener = () => {
         this.connection.onopen = this.onConnect.bind(this)
         this.connection.onclose = this.onClose.bind(this)
@@ -89,12 +112,28 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
+    /**
+     * removeEventListener
+     * 
+     * Removes event listeners from the WebSocket connection.
+     */
     private removeEventListener = () => {
         this.connection.onopen = null;
         this.connection.onclose = null;
         this.connection.onmessage = null;
     }
 
+    /**
+     * reconnect
+     * 
+     * Initiates a reconnection to the WebSocket server.
+     * If there are pending requests in the response queue, their callbacks are 
+     * invoked with a reconnection error.
+     * If the maximum reconnection attempts have not been reached, it schedules 
+     * another reconnection attempt.
+     * If the maximum reconnection attempts have been reached, it invokes the 
+     * error event and clears the request queue.
+     */
     private reconnect(): void {
         this.reconnecting = true;
     
@@ -134,6 +173,12 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
+    /**
+     * onConnect
+     * 
+     * Event handler triggered when the WebSocket connection is successfully established.
+     * Invokes pending requests in the request queue if any.
+     */
     private onConnect = () => {
         this.emit(WebSocketEvents.CONNECT, "Websocket connection established successfully!");
         this.reconnAttempts = 0;
@@ -151,10 +196,21 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
+    /**
+     * isConnectionFailed
+     * 
+     * Checks if the WebSocket connection has failed based on the close event.
+     * @param event The close event object.
+     * @returns A boolean indicating whether the connection has failed.
+     */
     private isConnectionFailed = (event) => {
         return event.code === 1006 && event.reason === "connection failed";
     }
 
+    /**
+     * Method called when the WebSocket connection is closed.
+     * @param event - The close event.
+     */
     private onClose = (event) => {
         if(!this.isConnectionFailed(event)) {
             if(this.wsConnOptions.reconnectOptions.auto && 
@@ -185,6 +241,10 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
+    /**
+     * Method called when a message is received through the WebSocket connection.
+     * @param event - The message event.
+     */
     private onMessage = (event: { data: string }) => {
         const data:any = event.data;
         const response = JSON.parse(data);
@@ -231,6 +291,11 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
+
+    /**
+     * Method called when the WebSocket connection fails to connect.
+     * @param event - The connect failed event.
+     */
     private onConnectFailed = (event): void => {
         let connectFailedDescription = event.toString().split('\n')[0];
         if (connectFailedDescription) {
@@ -271,6 +336,13 @@ export class WebSocketProvider extends JsonRpcProvider {
         this.emit(WebSocketEvents.CLOSE, event);
     }
 
+    /**
+     * sendRequest
+     * 
+     * Sends a request over the WebSocket connection.
+     * @param requestId - The ID of the request.
+     * @param request - The request object.
+     */
     private sendRequest(requestId: number, request: InflightRequest): void {
         if (this.connection.readyState !== this.connection.OPEN) {
             this.requestQueue.delete(requestId);
@@ -291,7 +363,16 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
-    public send(method: string, params: any[]): Promise<any> {
+    /**
+     * send
+     * 
+     * Sends a request over the WebSocket connection and returns a Promise that 
+     * resolves with the response.
+     * @param method - The method of the request.
+     * @param params - The parameters of the request.
+     * @returns A Promise that resolves with the response or rejects with an error.
+     */
+    protected send(method: string, params: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
             const callback = (error: Error, result: any) => {
                 if (error) { return reject(error); }
@@ -322,7 +403,16 @@ export class WebSocketProvider extends JsonRpcProvider {
         })
     }
 
-    public async _subscribe(tag: string, param: Array<any>, processFunc: (result: any) => void): Promise<void> {
+    /**
+     * _subscribe
+     * 
+     * Subscribes to an event.
+     * @param tag - The tag associated with the subscription.
+     * @param param - The parameters of the subscription.
+     * @param processFunc - The function to process the subscription result.
+     * @returns A Promise that resolves when the subscription is complete.
+     */
+    protected async _subscribe(tag: string, param: Array<any>, processFunc: (result: any) => void): Promise<void> {
         let subIdPromise = this.subsIds[tag];
         if (subIdPromise == null) {
             subIdPromise = Promise.all(param).then((param) => {
@@ -334,7 +424,13 @@ export class WebSocketProvider extends JsonRpcProvider {
         this.subscriptions[subId] = { tag, processFunc };
     }
 
-    public _startEvent(event: Event): void {
+    /**
+     * _startEvent
+     * 
+     * Starts listening to an event.
+     * @param event - The event to start listening to.
+     */
+    protected _startEvent(event: Event): void {
         switch (event.type) {
             case WebSocketEvents.TESSERACT:
                 const params: TesseractParams = {
@@ -368,7 +464,11 @@ export class WebSocketProvider extends JsonRpcProvider {
         }
     }
 
-    public _stopEvent(event: Event): void {
+    /**
+     * Stops listening to an event.
+     * @param event - The event to stop listening to.
+     */
+    protected _stopEvent(event: Event): void {
         let tag = event.tag;
 
         if (this.listenerCount(event.event)) {
@@ -387,6 +487,10 @@ export class WebSocketProvider extends JsonRpcProvider {
         });
     }
 
+    /**
+     * Disconnects the WebSocket connection.
+     * @returns A Promise that resolves when the disconnect operation is complete.
+     */
     public async disconnect(): Promise<void> {
         // Wait until we have connected before trying to disconnect
         if (this.connection.readyState === this.connection.CONNECTING) {

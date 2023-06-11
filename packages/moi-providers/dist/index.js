@@ -17,3 +17,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./base-provider"), exports);
 __exportStar(require("./jsonrpc-provider"), exports);
 __exportStar(require("./websocket-provider"), exports);
+__exportStar(require("../types/jsonrpc"), exports);
+__exportStar(require("../types/event"), exports);
+__exportStar(require("../types/provider"), exports);
