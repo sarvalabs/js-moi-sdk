@@ -1,3 +1,6 @@
+/**
+ * Enumerates the kinds of assets in the system.
+ */
 export declare enum AssetKind {
     ASSET_KIND_VALUE = 0,
     ASSET_KIND_FILE = 1,

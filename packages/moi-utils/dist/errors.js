@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorUtils = exports.CustomError = exports.ErrorCode = void 0;
+/**
+ * Enum representing error codes.
+ */
 var ErrorCode;
 (function (ErrorCode) {
     ErrorCode["UNKNOWN_ERROR"] = "ERROR_UNKNOWN";
@@ -26,6 +29,9 @@ var ErrorCode;
     ErrorCode["ACTION_REJECTED"] = "ERROR_ACTION_REJECTED";
     ErrorCode["INVALID_SIGNATURE"] = "ERROR_INVALID_SIGNATURE";
 })(ErrorCode || (exports.ErrorCode = ErrorCode = {}));
+/**
+ * CustomError class that extends the Error class.
+ */
 class CustomError extends Error {
     code;
     reason;
@@ -37,6 +43,12 @@ class CustomError extends Error {
         this.params = params;
         Object.setPrototypeOf(this, CustomError.prototype);
     }
+    /**
+     * toString
+     *
+     * Overrides the toString() method to provide a string representation of the error.
+     * @returns {string} - The string representation of the error.
+     */
     toString() {
         const messageDetails = Object.entries(this.params)
             .map(([key, value]) => `${key}=${serializeValue(value)}`)
@@ -46,10 +58,32 @@ class CustomError extends Error {
     }
 }
 exports.CustomError = CustomError;
+/**
+ * ErrorUtils class with static helper methods for handling errors.
+ */
 class ErrorUtils {
+    /**
+     * throwError
+     *
+     * Throws a CustomError with the specified message, error code, and parameters.
+     * @param {string} message - The error message.
+     * @param {ErrorCode} code - The error code.
+     * @param {ErrorParams} params - The parameters of the error.
+     * @throws {CustomError} - Throws a CustomError.
+     */
     static throwError(message, code = ErrorCode.UNKNOWN_ERROR, params = {}) {
         throw new CustomError(message, code, params);
     }
+    /**
+     * throwArgumentError
+     *
+     * Throws a CustomError with the specified argument-related error message,
+     * argument name, and value.
+     * @param {string} message - The error message.
+     * @param {string} name - The name of the argument.
+     * @param {any} value - The value of the argument.
+     * @throws {CustomError} - Throws a CustomError.
+     */
     static throwArgumentError(message, name, value) {
         ErrorUtils.throwError(message, ErrorCode.INVALID_ARGUMENT, {
             argument: name,
@@ -58,7 +92,17 @@ class ErrorUtils {
     }
 }
 exports.ErrorUtils = ErrorUtils;
-// helper function
+// helper functions
+/**
+ * serializeValue
+ *
+ * Serializes a value into a string representation.
+ * If the value can be successfully converted to a JSON string, it is returned.
+ * Otherwise, the value is converted to a string using the `String` function.
+ *
+ * @param {any} value - The value to serialize.
+ * @returns {string} - The serialized string representation of the value.
+ */
 const serializeValue = (value) => {
     try {
         return JSON.stringify(value);

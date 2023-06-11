@@ -1,9 +1,28 @@
+/**
+ * Array-like type representing bytes.
+ */
 export type Bytes = ArrayLike<number>;
 
+/**
+ * isInteger
+ * 
+ * Checks if the given value is an integer.
+ *
+ * @param {number} value - The value to check.
+ * @returns {boolean} - Returns true if the value is an integer, otherwise false.
+ */
 export const isInteger = (value: number) => {
-    return (typeof(value) === "number" && value == value && (value % 1) === 0);
+    return (typeof(value) === "number" && value === value && (value % 1) === 0);
 }
 
+/**
+ * isBytes
+ * 
+ * Checks if the given value is a valid byte array.
+ *
+ * @param {any} value - The value to check.
+ * @returns {boolean} - Returns true if the value is a valid byte array, otherwise false.
+ */
 export const isBytes = (value: any): value is Bytes => {
     if (value == null) { return false; }
 
@@ -18,15 +37,34 @@ export const isBytes = (value: any): value is Bytes => {
     return true;
 }
 
+/**
+ * hexDataLength
+ * 
+ * Calculates the length of the data represented by a hexadecimal string.
+ *
+ * @param {string} data - The hexadecimal string.
+ * @returns {number | null} - The length of the data, or null if the input is 
+ * not a valid hexadecimal string.
+ */
 export const hexDataLength = (data: string) => {
+    // Check if the input is a valid hexadecimal string and has an even length
     if (!isHexString(data) || (data.length % 2)) {
         return null;
     }
 
+    // Calculate the length of the data excluding the "0x" prefix
     return (data.length - 2) / 2;
 }
 
-
+/**
+ * isHexString
+ * 
+ * Checks if the given value is a valid hexadecimal string.
+ *
+ * @param {any} value - The value to check.
+ * @param {number} length - Optional. The expected length of the hexadecimal string.
+ * @returns {boolean} - Returns true if the value is a valid hexadecimal string, otherwise false.
+ */
 export const isHexString = (value: any, length?: number): boolean => {
     if (typeof(value) !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
         return false
@@ -35,6 +73,14 @@ export const isHexString = (value: any, length?: number): boolean => {
     return true;
 }
 
-export const bytesToUint8 = (target: Buffer): Uint8Array => {
+/**
+ * bufferToUint8
+ * 
+ * Converts a Buffer to a Uint8Array.
+ *
+ * @param {Buffer} target - The Buffer to convert.
+ * @returns {Uint8Array} - The Uint8Array representation of the Buffer.
+ */
+export const bufferToUint8 = (target: Buffer): Uint8Array => {
     return new Uint8Array(target)
 }

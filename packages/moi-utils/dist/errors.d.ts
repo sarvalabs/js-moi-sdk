@@ -1,3 +1,6 @@
+/**
+ * Enum representing error codes.
+ */
 export declare enum ErrorCode {
     UNKNOWN_ERROR = "ERROR_UNKNOWN",
     NOT_IMPLEMENTED = "ERROR_NOT_IMPLEMENTED",
@@ -22,18 +25,52 @@ export declare enum ErrorCode {
     ACTION_REJECTED = "ERROR_ACTION_REJECTED",
     INVALID_SIGNATURE = "ERROR_INVALID_SIGNATURE"
 }
+/**
+ * Interface representing error parameters.
+ */
 interface ErrorParams {
     [name: string]: any;
 }
+/**
+ * CustomError class that extends the Error class.
+ */
 export declare class CustomError extends Error {
     code: ErrorCode;
     reason: string;
     params: ErrorParams;
     constructor(message: string, code?: ErrorCode, params?: ErrorParams);
+    /**
+     * toString
+     *
+     * Overrides the toString() method to provide a string representation of the error.
+     * @returns {string} - The string representation of the error.
+     */
     toString(): string;
 }
+/**
+ * ErrorUtils class with static helper methods for handling errors.
+ */
 export declare class ErrorUtils {
+    /**
+     * throwError
+     *
+     * Throws a CustomError with the specified message, error code, and parameters.
+     * @param {string} message - The error message.
+     * @param {ErrorCode} code - The error code.
+     * @param {ErrorParams} params - The parameters of the error.
+     * @throws {CustomError} - Throws a CustomError.
+     */
     static throwError(message: string, code?: ErrorCode, params?: ErrorParams): never;
+    /**
+     * throwArgumentError
+     *
+     * Throws a CustomError with the specified argument-related error message,
+     * argument name, and value.
+     * @param {string} message - The error message.
+     * @param {string} name - The name of the argument.
+     * @param {any} value - The value of the argument.
+     * @throws {CustomError} - Throws a CustomError.
+     */
     static throwArgumentError(message: string, name: string, value: any): never;
 }
 export {};

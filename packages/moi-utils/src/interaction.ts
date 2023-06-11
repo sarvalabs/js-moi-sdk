@@ -1,3 +1,6 @@
+/**
+ * Enumerates the types of Interactions in the system.
+ */
 export enum IxType {
     INVALID_IX,
     VALUE_TRANSFER,
@@ -26,4 +29,3 @@ export enum IxType {
     STAKE_UNBOND,
     STAKE_TRANSFER
 }
-

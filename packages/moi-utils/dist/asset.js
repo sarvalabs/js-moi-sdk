@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssetKind = void 0;
+/**
+ * Enumerates the kinds of assets in the system.
+ */
 var AssetKind;
 (function (AssetKind) {
     AssetKind[AssetKind["ASSET_KIND_VALUE"] = 0] = "ASSET_KIND_VALUE";
