@@ -1,5 +1,10 @@
 import { bytesToHex } from "moi-utils";
 
+/**
+ * LogicId
+ * 
+ * Represents a LogicID, which is an identifier for a logic.
+ */
 export class LogicId {
     private logic: Uint8Array;
 
@@ -7,19 +12,30 @@ export class LogicId {
         this.logic = new Uint8Array(Buffer.from(logicId, "hex"))
     }
 
-    // hex returns the LogicID as a hex encoded string
+    /**
+     * hex
+     * 
+     * Returns the LogicID as a hex encoded string.
+     * 
+     * @returns {string} The LogicID as a hex encoded string.
+     */
     public hex(): string {
         return Buffer.from(this.logic).toString('hex');
     }
 
-    // isValid returns true if the LogicID is valid, false otherwise.
+    /**
+     * isValid
+     * 
+     * Checks if the LogicID is valid.
+     * 
+     * @returns {boolean} True if the LogicID is valid, false otherwise.
+     */
     public isValid(): boolean {
         if (this.logic.length === 0) {
             return false;
         }
     
-        // Calculate version of the LogicID
-        // and check if there are enough bytes
+        // Calculate version of the LogicID and check if there are enough bytes
         switch (this.logic[0] & 0xf0) {
         case 0:
             return this.logic.length === 35;
@@ -28,8 +44,14 @@ export class LogicId {
         }
     }
   
-    // getVersion returns the version of the LogicID.
-    // Returns -1, if the LogicID is not valid
+    /**
+     * getVersion
+     * 
+     * Returns the version of the LogicID.
+     * Returns -1 if the LogicID is not valid.
+     * 
+     * @returns {number} The version of the LogicID.
+     */
     public getVersion(): number {
         // Check validity
         if (!this.isValid()) {
@@ -40,8 +62,14 @@ export class LogicId {
         return this.logic[0] & 0xf0;
     }
 
-    // isStateful returns whether the stateful flag is set for the LogicID.
-    // returns false if the LogicID is invalid.
+    /**
+     * isStateful
+     * 
+     * Checks if the stateful flag is set for the LogicID.
+     * Returns false if the LogicID is invalid.
+     * 
+     * @returns {boolean} True if the stateful flag is set, false otherwise.
+     */
     public isStateful(): boolean {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {
@@ -54,8 +82,14 @@ export class LogicId {
         return bit !== 0;
     }
 
-    // isInteractive returns whether the interactive flag is set for the LogicID.
-    // returns false if the LogicID is invalid.
+    /**
+     * isInteractive
+     * 
+     * Checks if the interactive flag is set for the LogicID.
+     * Returns false if the LogicID is invalid.
+     * 
+     * @returns {boolean} True if the interactive flag is set, false otherwise.
+     */
     public isInteractive(): boolean {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {
@@ -68,8 +102,14 @@ export class LogicId {
         return bit !== 0;
     }
 
-    // getEdition returns the edition number of the LogicID.
-    // returns 0 if the LogicID is invalid.
+    /**
+     * getEdition
+     * 
+     * Returns the edition number of the LogicID.
+     * Returns 0 if the LogicID is invalid.
+     * 
+     * @returns {number} The edition number of the LogicID.
+     */
     public getEdition(): number {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {
@@ -84,8 +124,15 @@ export class LogicId {
         return edition;
     }
   
-    // getAddress returns the address associated with the LogicID.
-    // returns NilAddress if the LogicID is invalid or the version is not 0.
+    /**
+     * getAddress
+     * 
+     * Returns the address associated with the LogicID.
+     * Returns null if the LogicID is invalid or the version is not 0.
+     * 
+     * @returns {string | null} The address associated with the LogicID, or 
+     null if not applicable.
+     */
     public getAddress(): string | null {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {

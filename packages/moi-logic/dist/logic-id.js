@@ -2,22 +2,38 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicId = void 0;
 const moi_utils_1 = require("moi-utils");
+/**
+ * LogicId
+ *
+ * Represents a LogicID, which is an identifier for a logic.
+ */
 class LogicId {
     logic;
     constructor(logicId) {
         this.logic = new Uint8Array(Buffer.from(logicId, "hex"));
     }
-    // hex returns the LogicID as a hex encoded string
+    /**
+     * hex
+     *
+     * Returns the LogicID as a hex encoded string.
+     *
+     * @returns {string} The LogicID as a hex encoded string.
+     */
     hex() {
         return Buffer.from(this.logic).toString('hex');
     }
-    // isValid returns true if the LogicID is valid, false otherwise.
+    /**
+     * isValid
+     *
+     * Checks if the LogicID is valid.
+     *
+     * @returns {boolean} True if the LogicID is valid, false otherwise.
+     */
     isValid() {
         if (this.logic.length === 0) {
             return false;
         }
-        // Calculate version of the LogicID
-        // and check if there are enough bytes
+        // Calculate version of the LogicID and check if there are enough bytes
         switch (this.logic[0] & 0xf0) {
             case 0:
                 return this.logic.length === 35;
@@ -25,8 +41,14 @@ class LogicId {
                 return false;
         }
     }
-    // getVersion returns the version of the LogicID.
-    // Returns -1, if the LogicID is not valid
+    /**
+     * getVersion
+     *
+     * Returns the version of the LogicID.
+     * Returns -1 if the LogicID is not valid.
+     *
+     * @returns {number} The version of the LogicID.
+     */
     getVersion() {
         // Check validity
         if (!this.isValid()) {
@@ -35,8 +57,14 @@ class LogicId {
         // Determine the highest 4 bits of the first byte (v0)
         return this.logic[0] & 0xf0;
     }
-    // isStateful returns whether the stateful flag is set for the LogicID.
-    // returns false if the LogicID is invalid.
+    /**
+     * isStateful
+     *
+     * Checks if the stateful flag is set for the LogicID.
+     * Returns false if the LogicID is invalid.
+     *
+     * @returns {boolean} True if the stateful flag is set, false otherwise.
+     */
     isStateful() {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {
@@ -47,8 +75,14 @@ class LogicId {
         // Return true if bit is set
         return bit !== 0;
     }
-    // isInteractive returns whether the interactive flag is set for the LogicID.
-    // returns false if the LogicID is invalid.
+    /**
+     * isInteractive
+     *
+     * Checks if the interactive flag is set for the LogicID.
+     * Returns false if the LogicID is invalid.
+     *
+     * @returns {boolean} True if the interactive flag is set, false otherwise.
+     */
     isInteractive() {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {
@@ -59,8 +93,14 @@ class LogicId {
         // Return true if bit is set
         return bit !== 0;
     }
-    // getEdition returns the edition number of the LogicID.
-    // returns 0 if the LogicID is invalid.
+    /**
+     * getEdition
+     *
+     * Returns the edition number of the LogicID.
+     * Returns 0 if the LogicID is invalid.
+     *
+     * @returns {number} The edition number of the LogicID.
+     */
     getEdition() {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {
@@ -72,8 +112,15 @@ class LogicId {
         const edition = new DataView(editionBuf.buffer).getUint16(0, false);
         return edition;
     }
-    // getAddress returns the address associated with the LogicID.
-    // returns NilAddress if the LogicID is invalid or the version is not 0.
+    /**
+     * getAddress
+     *
+     * Returns the address associated with the LogicID.
+     * Returns null if the LogicID is invalid or the version is not 0.
+     *
+     * @returns {string | null} The address associated with the LogicID, or
+     null if not applicable.
+     */
     getAddress() {
         // Check logic version, internally checks validity
         if (this.getVersion() !== 0) {

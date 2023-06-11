@@ -1,3 +1,4 @@
-export * from "./logic";
+export * from "./logic-driver";
 export * from "./logic-id";
-export * from "./factory";
+export * from "./logic-factory";
+export * from "../types/logic";
