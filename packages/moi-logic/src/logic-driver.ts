@@ -156,7 +156,7 @@ export class LogicDriver extends LogicDescriptor {
     protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null> {
         try {
             const routine = this.getRoutineElement(response.routine_name)
-            const result = await response.result(response.hash, timeout);
+            const result = await response.result(timeout);
             const data = { 
                 output: this.abiCoder.decodeOutput(
                     result.outputs,

@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { BaseProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
+import { AbstractProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
 import { SigType, InteractionObject, SigningAlgorithms } from "../types";
 /**
  * Signer
@@ -7,11 +7,11 @@ import { SigType, InteractionObject, SigningAlgorithms } from "../types";
  * An abstract class representing a signer responsible for cryptographic activities like signing and verification.
  */
 export declare abstract class Signer {
-    provider?: BaseProvider;
+    provider?: AbstractProvider;
     signingAlgorithms: SigningAlgorithms;
-    constructor(provider?: BaseProvider);
+    constructor(provider?: AbstractProvider);
     abstract getAddress(): string;
-    abstract connect(provider: BaseProvider): Signer;
+    abstract connect(provider: AbstractProvider): Signer;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
     /**
@@ -22,7 +22,7 @@ export declare abstract class Signer {
      * @returns The connected provider instance.
      * @throws Error if the provider is not initialized.
      */
-    getProvider(): BaseProvider;
+    getProvider(): AbstractProvider;
     /**
      * getNonce
      *

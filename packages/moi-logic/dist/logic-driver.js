@@ -129,7 +129,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     async processResult(response, timeout) {
         try {
             const routine = this.getRoutineElement(response.routine_name);
-            const result = await response.result(response.hash, timeout);
+            const result = await response.result(timeout);
             const data = {
                 output: this.abiCoder.decodeOutput(result.outputs, routine.data["returns"]),
                 error: moi_abi_1.ABICoder.decodeException(result.error)

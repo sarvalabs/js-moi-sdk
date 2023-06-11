@@ -56,7 +56,7 @@ class LogicFactory extends logic_base_1.LogicBase {
      */
     async processResult(response, timeout) {
         try {
-            const result = await response.result(response.hash, timeout);
+            const result = await response.result(timeout);
             return {
                 logic_id: result.logic_id ? result.logic_id : "",
                 error: moi_abi_1.ABICoder.decodeException(result.error)

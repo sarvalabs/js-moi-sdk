@@ -3,7 +3,7 @@
     cryptographic activity like signing and verification 
     using different Curves and Algorithms
 */
-import { BaseProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
+import { AbstractProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
 import ECDSA_S256 from "./ecdsa";
 import { SigType, InteractionObject, SigningAlgorithms } from "../types";
 import Signature from "./signature";
@@ -16,10 +16,10 @@ import { ErrorCode, ErrorUtils } from "moi-utils";
  * An abstract class representing a signer responsible for cryptographic activities like signing and verification.
  */
 export abstract class Signer {
-    public provider?: BaseProvider;
+    public provider?: AbstractProvider;
     public signingAlgorithms: SigningAlgorithms;
 
-    constructor(provider?: BaseProvider) {
+    constructor(provider?: AbstractProvider) {
         this.provider = provider;
         this.signingAlgorithms = {
             ecdsa_secp256k1: new ECDSA_S256()
@@ -27,7 +27,7 @@ export abstract class Signer {
     }
 
     abstract getAddress(): string;
-    abstract connect(provider: BaseProvider): Signer;
+    abstract connect(provider: AbstractProvider): Signer;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
 

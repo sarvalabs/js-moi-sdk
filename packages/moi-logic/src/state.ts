@@ -1,6 +1,6 @@
 import { ErrorCode, ErrorUtils, LogicManifest, encodeToString } from "moi-utils";
 import { blake2b } from 'blakejs';
-import { BaseProvider } from "moi-providers";
+import { AbstractProvider } from "moi-providers";
 import { ABICoder } from "moi-abi";
 
 export enum ContextStateKind {
@@ -90,7 +90,7 @@ export class PersistentState {
     private slots:Map<string, string>;
     private types:Map<string, string>;
     private logicId: string;
-    private provider: BaseProvider;
+    private provider: AbstractProvider;
     private abiCoder: ABICoder;
     private element: LogicManifest.Element;
 
@@ -98,7 +98,7 @@ export class PersistentState {
         logicId: string, 
         element: LogicManifest.Element, 
         abiCoder: ABICoder, 
-        provider: BaseProvider
+        provider: AbstractProvider
     ) {
         this.logicId = logicId;
         this.provider = provider;

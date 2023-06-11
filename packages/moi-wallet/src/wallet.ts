@@ -3,7 +3,7 @@ import elliptic from "elliptic";
 import { HDNode } from "moi-hdnode";
 import { randomBytes } from "crypto";
 import { Signer, SigType, InteractionObject } from "moi-signer";
-import { BaseProvider, InteractionRequest } from "moi-providers";
+import { AbstractProvider, InteractionRequest } from "moi-providers";
 import { ErrorCode, ErrorUtils, bytesToHex, hexToUint8 } from "moi-utils";
 import * as SigningKeyErrors from "./errors";
 import { serializeIxObject } from "./serializer";
@@ -37,7 +37,7 @@ const privateMapSet = (receiver: any, privateMap: any, value: any) => {
 const __vault = new WeakMap();
 
 export class Wallet extends Signer {
-    constructor(provider?: BaseProvider) {
+    constructor(provider?: AbstractProvider) {
         super(provider)
         __vault.set(this, {
             value: void 0
@@ -115,7 +115,7 @@ export class Wallet extends Signer {
         return this.publicKey();
     }
 
-    public connect(provider: BaseProvider): Signer {
+    public connect(provider: AbstractProvider): Signer {
         return new Wallet(provider)
     }
 

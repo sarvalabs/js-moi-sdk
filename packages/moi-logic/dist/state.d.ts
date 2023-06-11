@@ -1,5 +1,5 @@
 import { LogicManifest } from "moi-utils";
-import { BaseProvider } from "moi-providers";
+import { AbstractProvider } from "moi-providers";
 import { ABICoder } from "moi-abi";
 export declare enum ContextStateKind {
     PersistentState = 0,
@@ -54,7 +54,7 @@ export declare class PersistentState {
     private provider;
     private abiCoder;
     private element;
-    constructor(logicId: string, element: LogicManifest.Element, abiCoder: ABICoder, provider: BaseProvider);
+    constructor(logicId: string, element: LogicManifest.Element, abiCoder: ABICoder, provider: AbstractProvider);
     /**
      * slotHash
      *

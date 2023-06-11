@@ -66,7 +66,7 @@ export class LogicFactory extends LogicBase {
      */
     protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
         try {
-            const result = await response.result(response.hash, timeout);
+            const result = await response.result(timeout);
 
             return { 
                 logic_id: result.logic_id ? result.logic_id : "", 
