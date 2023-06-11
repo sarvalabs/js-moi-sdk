@@ -1,4 +1,4 @@
-import { IxType, hexToBytes } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes } from "moi-utils";
 import { InteractionObject } from "moi-signer";
 import { Polorizer } from "js-polo";
 
@@ -114,23 +114,33 @@ const assetMintOrBurnSchema = {
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
-const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
+/**
+ * serializeIxObject
+ *
+ * POLO encodes an interaction object into a Uint8Array representation.
+ *
+ * @param ixObject - The interaction object to be encoded.
+ * @returns The encoded interaction object as a Uint8Array.
+ * @throws Error if there is an error during encoding or if the payload is missing.
+ */
+export const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
     try {
         let polorizer = new Polorizer();
         switch(ixObject.type) {
             case IxType.ASSET_CREATE: {
                 if(!ixObject.payload) {
-                    throw new Error("payload is missing!");
+                    ErrorUtils.throwError(
+                        "Payload is missing!",
+                        ErrorCode.MISSING_ARGUMENT
+                    )
                 }
     
                 polorizer.polorize(ixObject.payload, assetCreateSchema);
     
                 const payload = polorizer.bytes();
-                console.log(payload)
     
                 polorizer = new Polorizer();
 
-                // Todo check why address is of type bytes instead of string
                 const ixData = {
                     ...ixObject, 
                     payload,
@@ -146,7 +156,10 @@ const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
             case IxType.ASSET_BURN:
             case IxType.ASSET_MINT: {
                 if(!ixObject.payload) {
-                    throw new Error("payload is missing!");
+                    ErrorUtils.throwError(
+                        "Payload is missing!",
+                        ErrorCode.MISSING_ARGUMENT
+                    )
                 }
     
                 polorizer.polorize(ixObject.payload, assetMintOrBurnSchema);
@@ -154,28 +167,49 @@ const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
                 const payload = polorizer.bytes();
     
                 polorizer = new Polorizer();
+
+                const ixData = {
+                    ...ixObject, 
+                    payload,
+                    sender: hexToBytes(ixObject.sender),
+                    receiver: hexToBytes(ZERO_ADDRESS),
+                    payer: hexToBytes(ZERO_ADDRESS),
+                }
     
-                polorizer.polorize({ ...ixObject, payload }, ixObjectSchema);
+                polorizer.polorize(ixData, ixObjectSchema);
     
                 return polorizer.bytes();
             }
             case IxType.VALUE_TRANSFER: {
                 if(!ixObject.transfer_values) {
-                    throw new Error("transfer values is missing!");
+                    ErrorUtils.throwError(
+                        "Transfer values is missing!",
+                        ErrorCode.MISSING_ARGUMENT
+                    )
                 }
 
-                polorizer.polorize(ixObject, ixObjectSchema);
+                const ixData = {
+                    ...ixObject,
+                    sender: hexToBytes(ixObject.sender),
+                    receiver: hexToBytes(ixObject.receiver),
+                    payer: hexToBytes(ZERO_ADDRESS),
+                }
+
+                polorizer.polorize(ixData, ixObjectSchema);
 
                 return polorizer.bytes();
             }
             default:
-                throw new Error("unsupported interaction type!");
+                ErrorUtils.throwError(
+                    "Unsupported interaction type!",
+                    ErrorCode.UNSUPPORTED_OPERATION
+                );
         }
     } catch(err) {
-        throw new Error("failed to serialize interaction object", err);
+        ErrorUtils.throwError(
+            "Failed to serialize interaction object",
+            ErrorCode.UNKNOWN_ERROR,
+            { originalError: err }
+        )
     }
-}
-
-export {
-    serializeIxObject
 }

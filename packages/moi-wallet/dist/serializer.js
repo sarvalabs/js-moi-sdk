@@ -110,19 +110,26 @@ const assetMintOrBurnSchema = {
     }
 };
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000000000000000000000000000";
+/**
+ * serializeIxObject
+ *
+ * POLO encodes an interaction object into a Uint8Array representation.
+ *
+ * @param ixObject - The interaction object to be encoded.
+ * @returns The encoded interaction object as a Uint8Array.
+ * @throws Error if there is an error during encoding or if the payload is missing.
+ */
 const serializeIxObject = (ixObject) => {
     try {
         let polorizer = new js_polo_1.Polorizer();
         switch (ixObject.type) {
             case moi_utils_1.IxType.ASSET_CREATE: {
                 if (!ixObject.payload) {
-                    throw new Error("payload is missing!");
+                    moi_utils_1.ErrorUtils.throwError("Payload is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
                 }
                 polorizer.polorize(ixObject.payload, assetCreateSchema);
                 const payload = polorizer.bytes();
-                console.log(payload);
                 polorizer = new js_polo_1.Polorizer();
-                // Todo check why address is of type bytes instead of string
                 const ixData = {
                     ...ixObject,
                     payload,
@@ -136,27 +143,40 @@ const serializeIxObject = (ixObject) => {
             case moi_utils_1.IxType.ASSET_BURN:
             case moi_utils_1.IxType.ASSET_MINT: {
                 if (!ixObject.payload) {
-                    throw new Error("payload is missing!");
+                    moi_utils_1.ErrorUtils.throwError("Payload is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
                 }
                 polorizer.polorize(ixObject.payload, assetMintOrBurnSchema);
                 const payload = polorizer.bytes();
                 polorizer = new js_polo_1.Polorizer();
-                polorizer.polorize({ ...ixObject, payload }, ixObjectSchema);
+                const ixData = {
+                    ...ixObject,
+                    payload,
+                    sender: (0, moi_utils_1.hexToBytes)(ixObject.sender),
+                    receiver: (0, moi_utils_1.hexToBytes)(ZERO_ADDRESS),
+                    payer: (0, moi_utils_1.hexToBytes)(ZERO_ADDRESS),
+                };
+                polorizer.polorize(ixData, ixObjectSchema);
                 return polorizer.bytes();
             }
             case moi_utils_1.IxType.VALUE_TRANSFER: {
                 if (!ixObject.transfer_values) {
-                    throw new Error("transfer values is missing!");
+                    moi_utils_1.ErrorUtils.throwError("Transfer values is missing!", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
                 }
-                polorizer.polorize(ixObject, ixObjectSchema);
+                const ixData = {
+                    ...ixObject,
+                    sender: (0, moi_utils_1.hexToBytes)(ixObject.sender),
+                    receiver: (0, moi_utils_1.hexToBytes)(ixObject.receiver),
+                    payer: (0, moi_utils_1.hexToBytes)(ZERO_ADDRESS),
+                };
+                polorizer.polorize(ixData, ixObjectSchema);
                 return polorizer.bytes();
             }
             default:
-                throw new Error("unsupported interaction type!");
+                moi_utils_1.ErrorUtils.throwError("Unsupported interaction type!", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
         }
     }
     catch (err) {
-        throw new Error("failed to serialize interaction object", err);
+        moi_utils_1.ErrorUtils.throwError("Failed to serialize interaction object", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
     }
 };
 exports.serializeIxObject = serializeIxObject;

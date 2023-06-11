@@ -1,19 +1,12 @@
-/*
-    This module/directory is responsible for 
-    handling wallet
-*/
-
-import * as bip39 from 'bip39';
-import elliptic from 'elliptic';
+import * as bip39 from "bip39";
+import elliptic from "elliptic";
 import { HDNode } from "moi-hdnode";
+import { randomBytes } from "crypto";
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { BaseProvider, InteractionRequest } from "moi-providers";
-import { randomBytes } from 'crypto';
-
-/* Internal imports */
-import { bytesToHex, hexToUint8 } from "moi-utils";
+import { ErrorCode, ErrorUtils, bytesToHex, hexToUint8 } from "moi-utils";
 import * as SigningKeyErrors from "./errors";
-import { serializeIxObject } from './serializer';
+import { serializeIxObject } from "./serializer";
 
 const SECP256K1 = "secp256k1"
 
@@ -51,11 +44,14 @@ export class Wallet extends Signer {
         })
     }
 
-    public load(key: Buffer | undefined, mnemonic: string | undefined, curve: string) {
+    public load(key: Buffer, mnemonic: string, curve: string) {
         try {
             let privKey: string, pubKey: string;
             if(!key) {
-                throw new Error("key cannot be undefined")
+                ErrorUtils.throwError(
+                    "Key is required, cannot be undefined", 
+                    ErrorCode.INVALID_ARGUMENT
+                );
             }
 
             const ecPrivKey = new elliptic.ec(SECP256K1);
@@ -71,7 +67,11 @@ export class Wallet extends Signer {
                 _curve: curve
             });
         } catch(err) {
-            throw err
+            ErrorUtils.throwError(
+                "Failed to load wallet",
+                ErrorCode.UNKNOWN_ERROR,
+                { originalError: err }
+            );
         }
     }
 
@@ -80,8 +80,12 @@ export class Wallet extends Signer {
             const _random16Bytes = randomBytes(16)
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             await this.fromMnemonic(mnemonic, undefined);
-        }catch(e: any) {
-            throw new Error(e.message);
+        } catch(err) {
+            ErrorUtils.throwError(
+                "Failed to create random mnemonic",
+                ErrorCode.UNKNOWN_ERROR,
+                { originalError: err }
+            )
         }
     }
     
@@ -92,8 +96,12 @@ export class Wallet extends Signer {
             const hdNode = new HDNode()
             hdNode.fromSeed(seed, path);
             this.load(hdNode.privateKey(), mnemonic, SECP256K1)
-        } catch(e: any) {
-            throw new Error(e.message);
+        } catch(err) {
+            ErrorUtils.throwError(
+                "Failed to load wallet from mnemonic",
+                ErrorCode.UNKNOWN_ERROR,
+                { originalError: err }
+            )
         }
     }
 
@@ -113,18 +121,33 @@ export class Wallet extends Signer {
 
     public sign(message: Uint8Array, sigAlgo: SigType): string {
         if(sigAlgo) {
+            const privateKey = this.privateKey();
+            if (!privateKey) {
+                ErrorUtils.throwError(
+                    "Private key not found. The wallet has not been loaded or initialized.",
+                    ErrorCode.NOT_INITIALIZED
+                )
+            }
+
             switch(sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(Buffer.from(message), this);
+                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
                     return sigBytes.serialize().toString('hex');
                 }
                 default: {
-                    throw new Error("invalid signature type")
+                    ErrorUtils.throwError(
+                        "Unsupported signature type",
+                        ErrorCode.UNSUPPORTED_OPERATION
+                    )
                 }
             }
         }
-        throw new Error("signature type cannot be undefiend")
+
+        ErrorUtils.throwError(
+            "Signature type cannot be undefiend",
+            ErrorCode.INVALID_ARGUMENT
+        )
     }
 
     public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
@@ -136,7 +159,11 @@ export class Wallet extends Signer {
                 signature: signature
             }
         } catch(err) {
-            throw new Error("failed to sign interaction");
+            ErrorUtils.throwError(
+                "Failed to sign interaction",
+                ErrorCode.UNKNOWN_ERROR,
+                { originalError: err }
+            )
         }
     }
 }

@@ -1,8 +1,4 @@
 "use strict";
-/*
-    This module/directory is responsible for
-    handling wallet
-*/
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -34,9 +30,8 @@ exports.Wallet = void 0;
 const bip39 = __importStar(require("bip39"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const moi_hdnode_1 = require("moi-hdnode");
-const moi_signer_1 = require("moi-signer");
 const crypto_1 = require("crypto");
-/* Internal imports */
+const moi_signer_1 = require("moi-signer");
 const moi_utils_1 = require("moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
 const serializer_1 = require("./serializer");
@@ -76,7 +71,7 @@ class Wallet extends moi_signer_1.Signer {
         try {
             let privKey, pubKey;
             if (!key) {
-                throw new Error("key cannot be undefined");
+                moi_utils_1.ErrorUtils.throwError("Key is required, cannot be undefined", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             const ecPrivKey = new elliptic_1.default.ec(SECP256K1);
             const keyInBytes = (0, moi_utils_1.hexToUint8)(key);
@@ -91,7 +86,7 @@ class Wallet extends moi_signer_1.Signer {
             });
         }
         catch (err) {
-            throw err;
+            moi_utils_1.ErrorUtils.throwError("Failed to load wallet", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     async createRandom() {
@@ -100,8 +95,8 @@ class Wallet extends moi_signer_1.Signer {
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             await this.fromMnemonic(mnemonic, undefined);
         }
-        catch (e) {
-            throw new Error(e.message);
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     async fromMnemonic(mnemonic, path, wordlist) {
@@ -112,8 +107,8 @@ class Wallet extends moi_signer_1.Signer {
             hdNode.fromSeed(seed, path);
             this.load(hdNode.privateKey(), mnemonic, SECP256K1);
         }
-        catch (e) {
-            throw new Error(e.message);
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     privateKey() { return privateMapGet(this, __vault)._key; }
@@ -129,18 +124,22 @@ class Wallet extends moi_signer_1.Signer {
     }
     sign(message, sigAlgo) {
         if (sigAlgo) {
+            const privateKey = this.privateKey();
+            if (!privateKey) {
+                moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+            }
             switch (sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(Buffer.from(message), this);
+                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
                     return sigBytes.serialize().toString('hex');
                 }
                 default: {
-                    throw new Error("invalid signature type");
+                    moi_utils_1.ErrorUtils.throwError("Unsupported signature type", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
                 }
             }
         }
-        throw new Error("signature type cannot be undefiend");
+        moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefiend", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     signInteraction(ixObject, sigAlgo) {
         try {
@@ -152,7 +151,7 @@ class Wallet extends moi_signer_1.Signer {
             };
         }
         catch (err) {
-            throw new Error("failed to sign interaction");
+            moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
 }
