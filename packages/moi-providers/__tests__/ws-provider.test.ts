@@ -1,14 +1,18 @@
-import { hexToBN, IxType } from "moi-utils";
-import { JsonRpcProvider } from "../src/jsonrpc-provider"
-import { WebSocketProvider } from "../src/websocket-provider"
+import { AssetKind, hexToBN, IxType } from "moi-utils";
+import { Signer } from "moi-signer";
+import { JsonRpcProvider } from "../dist/jsonrpc-provider"
+import { WebSocketProvider } from "../dist/websocket-provider"
+import { initializeWallet } from "./utils/utils";
 
 describe("Test Websocket Provider", () => {
-    const address = "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084";
-    let rpcProvider: JsonRpcProvider;
+    const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+    let signer: Signer;
+    let nonce: number | bigint;
     let wsProvider: WebSocketProvider;
 
-    beforeAll(() => {
-        rpcProvider = new JsonRpcProvider("http://localhost:1600")
+    beforeAll(async () => {
+        const rpcProvider = new JsonRpcProvider("http://localhost:1600")
+        signer = await initializeWallet(rpcProvider)
         wsProvider = new WebSocketProvider("ws://localhost:1600/ws", {
             reconnectOptions: {
                 auto: true,
@@ -26,15 +30,16 @@ describe("Test Websocket Provider", () => {
         });
 
         // create a new tesseract
-        rpcProvider.sendInteraction({
+        signer.sendInteraction({
             type: IxType.ASSET_CREATE,
+            nonce: nonce,
             sender: address,
-            fuel_price: "0x130D41",
-            fuel_limit: "0x130D41",
+            fuel_price: 1,
+            fuel_limit: 200,
             payload: {
-              type: 2,
-              symbol: "FOO",
-              supply: "0x130D41"
+                type: AssetKind.ASSET_KIND_CONTEXT,
+                symbol: "FOO",
+                supply: 1248577
             }
         });
     });
@@ -49,15 +54,16 @@ describe("Test Websocket Provider", () => {
         });
 
         // create a new tesseract
-        rpcProvider.sendInteraction({
+        signer.sendInteraction({
             type: IxType.ASSET_CREATE,
+            nonce: Number(nonce) + 1,
             sender: address,
-            fuel_price: "0x130D41",
-            fuel_limit: "0x130D41",
+            fuel_price: 1,
+            fuel_limit: 200,
             payload: {
-              type: 2,
-              symbol: "BOO",
-              supply: "0x130D41"
+                type: AssetKind.ASSET_KIND_CONTEXT,
+                symbol: "BOO",
+                supply: 1248577
             }
         });
     });
