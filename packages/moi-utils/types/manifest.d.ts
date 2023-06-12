@@ -17,8 +17,8 @@ export declare module LogicManifest {
 
     export interface Class {
         name: string,
-        fields?: TypeField[],
-        methods?: MethodField[]
+        fields?: TypeField[] | null,
+        methods?: MethodField[] | null
     }
     
     export interface State {
@@ -32,27 +32,27 @@ export declare module LogicManifest {
     }
     
     export interface Instructions {
-        bin?: number[];
+        bin?: number[] | null;
         hex?: string;
-        asm?: string[];
+        asm?: string[] | null;
     }
     
     export interface Routine {
         name: string;
         kind: string;
-        accepts?: TypeField[];
-        returns?: TypeField[];
+        accepts?: TypeField[] | null;
+        returns?: TypeField[] | null;
         executes: Instructions;
-        catches?: string[];
+        catches?: string[] | null;
     }
 
     export interface Method {
         name: string;
         class: string;
-        accepts?: TypeField[];
-        returns?: TypeField[];
+        accepts?: TypeField[] | null;
+        returns?: TypeField[] | null;
         executes: Instructions;
-        catches?: string[];
+        catches?: string[] | null;
     }
     
     export type TypeDef = string;
@@ -60,7 +60,7 @@ export declare module LogicManifest {
     export interface Element {
         ptr: number;
         kind: string;
-        deps?: number[];
+        deps?: number[] | null;
         data: State | Constant | TypeDef | Routine | Class | Method;
     }
     

@@ -40,6 +40,14 @@ export declare class LogicFactory extends LogicBase {
      */
     protected processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
     /**
+     * getEncodedManifest
+     *
+     * Returns the POLO encoded manifest in hexadecimal format.
+     *
+     * @returns {string} The encoded manifest.
+     */
+    getEncodedManifest(): string;
+    /**
      * deploy
      *
      * Deploys a logic.

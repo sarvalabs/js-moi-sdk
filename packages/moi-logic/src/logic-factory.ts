@@ -78,6 +78,17 @@ export class LogicFactory extends LogicBase {
     }
 
     /**
+     * getEncodedManifest
+     * 
+     * Returns the POLO encoded manifest in hexadecimal format.
+     * 
+     * @returns {string} The encoded manifest.
+     */
+    public getEncodedManifest(): string {
+        return this.encodedManifest;
+    }
+
+    /**
      * deploy
      * 
      * Deploys a logic.
