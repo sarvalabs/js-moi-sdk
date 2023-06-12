@@ -42,11 +42,7 @@ export abstract class AbstractProvider {
     abstract getDBEntry(key: string): Promise<string>
     abstract getAccounts(): Promise<string[]>
 
-    protected abstract waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>
-    protected abstract waitForResult(interactionHash: string, timeout?: number): Promise<any>
-
     // Event Emitter (ish)
-    protected abstract emit(eventName: EventType, ...args: Array<any>): boolean;
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;
     abstract once(eventName: EventType, listener: Listener): AbstractProvider;
     abstract listenerCount(eventName?: EventType): number;
