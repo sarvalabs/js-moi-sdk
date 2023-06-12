@@ -36,6 +36,16 @@ export declare abstract class Signer {
      */
     getNonce(options?: Options): Promise<number | bigint>;
     /**
+     * checkInteraction
+     *
+     * Checks the validity of an interaction object by performing various checks.
+     *
+     * @param ixObject - The interaction object to be checked.
+     * @param nonce - The nonce (interaction count) for comparison.
+     * @throws Error if any of the checks fail, indicating an invalid interaction.
+     */
+    private checkInteraction;
+    /**
      * sendInteraction
      *
      * Sends an interaction object by signing it with the appropriate signature algorithm
@@ -43,7 +53,8 @@ export declare abstract class Signer {
      *
      * @param ixObject - The interaction object to send.
      * @returns A Promise that resolves to the interaction response.
-     * @throws Error if there is an error sending the interaction or the provider is not initialized.
+     * @throws Error if there is an error sending the interaction, if the provider
+     * is not initialized, or if the interaction object fails the validity checks.
      */
     sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse>;
     /**

@@ -7,7 +7,7 @@ import { AbstractProvider, Options, InteractionResponse, InteractionRequest } fr
 import ECDSA_S256 from "./ecdsa";
 import { SigType, InteractionObject, SigningAlgorithms } from "../types";
 import Signature from "./signature";
-import { ErrorCode, ErrorUtils } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, isValidAddress } from "moi-utils";
 
 
 /**
@@ -65,9 +65,70 @@ export abstract class Signer {
     public async getNonce(options?: Options): Promise<number | bigint> {
         try {
             const provider = this.getProvider();
-            return provider.getInteractionCount(this.getAddress(), options)
+            const address = this.getAddress();
+
+            if(!options) {
+                return provider.getPendingInteractionCount(address)
+            }
+
+            return provider.getInteractionCount(address, options)
         } catch(err) {
             throw err;
+        }
+    }
+
+    /**
+     * checkInteraction
+     *
+     * Checks the validity of an interaction object by performing various checks.
+     *
+     * @param ixObject - The interaction object to be checked.
+     * @param nonce - The nonce (interaction count) for comparison.
+     * @throws Error if any of the checks fail, indicating an invalid interaction.
+     */
+    private checkInteraction(ixObject: InteractionObject, nonce: number | bigint): void {
+        if(ixObject.type === undefined || ixObject.type === null) {
+            ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
+        }
+
+        if(!ixObject.sender) {
+            ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
+        }
+
+        if(!isValidAddress(ixObject.sender)) {
+            ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
+        }
+
+        if(ixObject.sender !== this.getAddress()) {
+            ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
+        }
+
+        if(ixObject.type === IxType.VALUE_TRANSFER) {
+            if(!ixObject.receiver) {
+                ErrorUtils.throwError("Receiver address is missing", ErrorCode.MISSING_ARGUMENT);
+            }
+    
+            if(!isValidAddress(ixObject.receiver)) {
+                ErrorUtils.throwError("Invalid receiver address", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+
+        if(ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
+            ErrorUtils.throwError("Fuel price is missing", ErrorCode.MISSING_ARGUMENT);
+        }
+
+        if(ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
+            ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
+        }
+
+        if(ixObject.fuel_limit === 0) {
+            ErrorUtils.throwError("Invalid fuel limit", ErrorCode.INTERACTION_UNDERPRICED)
+        }
+
+        if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
+            if(ixObject.nonce < nonce) {
+                ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
+            }
         }
     }
 
@@ -79,13 +140,25 @@ export abstract class Signer {
      *
      * @param ixObject - The interaction object to send.
      * @returns A Promise that resolves to the interaction response.
-     * @throws Error if there is an error sending the interaction or the provider is not initialized.
+     * @throws Error if there is an error sending the interaction, if the provider 
+     * is not initialized, or if the interaction object fails the validity checks.
      */
     public async sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse> {
         try {
+            // Get the provider and nonce
             const provider = this.getProvider();
-            const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"]
+            const nonce = await this.getNonce();
+
+            // Get the signature algorithm
+            const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+
+            // Check the validity of the interaction object
+            this.checkInteraction(ixObject, nonce)
+
+            // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo)
+
+            // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         } catch(err) {
             throw err;

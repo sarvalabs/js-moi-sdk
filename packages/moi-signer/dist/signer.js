@@ -49,10 +49,59 @@ class Signer {
     async getNonce(options) {
         try {
             const provider = this.getProvider();
-            return provider.getInteractionCount(this.getAddress(), options);
+            const address = this.getAddress();
+            if (!options) {
+                return provider.getPendingInteractionCount(address);
+            }
+            return provider.getInteractionCount(address, options);
         }
         catch (err) {
             throw err;
+        }
+    }
+    /**
+     * checkInteraction
+     *
+     * Checks the validity of an interaction object by performing various checks.
+     *
+     * @param ixObject - The interaction object to be checked.
+     * @param nonce - The nonce (interaction count) for comparison.
+     * @throws Error if any of the checks fail, indicating an invalid interaction.
+     */
+    checkInteraction(ixObject, nonce) {
+        if (ixObject.type === undefined || ixObject.type === null) {
+            moi_utils_1.ErrorUtils.throwError("Interaction type is missing", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        if (!ixObject.sender) {
+            moi_utils_1.ErrorUtils.throwError("Sender address is missing", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        if (!(0, moi_utils_1.isValidAddress)(ixObject.sender)) {
+            moi_utils_1.ErrorUtils.throwError("Invalid sender address", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        if (ixObject.sender !== this.getAddress()) {
+            moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
+        }
+        if (ixObject.type === moi_utils_1.IxType.VALUE_TRANSFER) {
+            if (!ixObject.receiver) {
+                moi_utils_1.ErrorUtils.throwError("Receiver address is missing", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+            }
+            if (!(0, moi_utils_1.isValidAddress)(ixObject.receiver)) {
+                moi_utils_1.ErrorUtils.throwError("Invalid receiver address", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+        if (ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
+            moi_utils_1.ErrorUtils.throwError("Fuel price is missing", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        if (ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
+            moi_utils_1.ErrorUtils.throwError("Fuel limit is missing", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        if (ixObject.fuel_limit === 0) {
+            moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
+        }
+        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
+            if (ixObject.nonce < nonce) {
+                moi_utils_1.ErrorUtils.throwError("Invalid nonce", moi_utils_1.ErrorCode.NONCE_EXPIRED);
+            }
         }
     }
     /**
@@ -63,13 +112,21 @@ class Signer {
      *
      * @param ixObject - The interaction object to send.
      * @returns A Promise that resolves to the interaction response.
-     * @throws Error if there is an error sending the interaction or the provider is not initialized.
+     * @throws Error if there is an error sending the interaction, if the provider
+     * is not initialized, or if the interaction object fails the validity checks.
      */
     async sendInteraction(ixObject) {
         try {
+            // Get the provider and nonce
             const provider = this.getProvider();
+            const nonce = await this.getNonce();
+            // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+            // Check the validity of the interaction object
+            this.checkInteraction(ixObject, nonce);
+            // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo);
+            // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }
         catch (err) {

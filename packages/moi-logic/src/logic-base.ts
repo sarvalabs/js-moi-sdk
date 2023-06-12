@@ -117,20 +117,6 @@ export abstract class LogicBase extends ElementDescriptor {
         }
 
         if(args[0] === "send") {
-            if(args[1].fuelPrice === null || args[1].fuelPrice === undefined) {
-                ErrorUtils.throwError(
-                    "fuel price is required",
-                    ErrorCode.MISSING_ARGUMENT
-                )
-            }
-
-            if(args[1].fuelLimit === null || args[1].fuelLimit === undefined) {
-                ErrorUtils.throwError(
-                    "fuel limit is requeired",
-                    ErrorCode.MISSING_ARGUMENT
-                )
-            }
-
             processedArgs.params.type = this.getIxType();
             processedArgs.params.fuel_price = args[1].fuelPrice;
             processedArgs.params.fuel_limit = args[1].fuelLimit;

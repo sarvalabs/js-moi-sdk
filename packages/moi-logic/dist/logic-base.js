@@ -93,12 +93,6 @@ class LogicBase extends element_descriptor_1.default {
             }
         };
         if (args[0] === "send") {
-            if (args[1].fuelPrice === null || args[1].fuelPrice === undefined) {
-                moi_utils_1.ErrorUtils.throwError("fuel price is required", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-            }
-            if (args[1].fuelLimit === null || args[1].fuelLimit === undefined) {
-                moi_utils_1.ErrorUtils.throwError("fuel limit is requeired", moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-            }
             processedArgs.params.type = this.getIxType();
             processedArgs.params.fuel_price = args[1].fuelPrice;
             processedArgs.params.fuel_limit = args[1].fuelLimit;
