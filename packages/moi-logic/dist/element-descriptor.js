@@ -12,23 +12,32 @@ class ElementDescriptor {
     elements = new Map();
     callSites = new Map();
     classDefs = new Map();
+    methodDefs = new Map();
     constructor(elements) {
         this.stateMatrix = new state_1.ContextStateMatrix(elements);
-        // Populate the maps for elements, call sites, and class definitions
+        // Populate the maps for elements, call sites, class and method definitions.
         elements.forEach(element => {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
                 case "class":
-                    element.data = element.data;
-                    this.classDefs.set(element.data.name, element.ptr);
+                    const classData = element.data;
+                    this.classDefs.set(classData.name, element.ptr);
+                    break;
+                case "method":
+                    const methodData = element.data;
+                    const methodDef = {
+                        ptr: element.ptr,
+                        class: methodData.class
+                    };
+                    this.methodDefs.set(methodData.name, methodDef);
                     break;
                 case "routine":
-                    element.data = element.data;
+                    const routineData = element.data;
                     const callsite = {
                         ptr: element.ptr,
-                        kind: element.data.kind
+                        kind: routineData.kind
                     };
-                    this.callSites.set(element.data.name, callsite);
+                    this.callSites.set(routineData.name, callsite);
                     break;
                 default:
                     break;
@@ -76,19 +85,52 @@ class ElementDescriptor {
         return this.classDefs;
     }
     /**
+     * getMethodDefs
+     *
+     * Retrieves the map of method definitions associated with the ElementDescriptor.
+     *
+     * @returns {Map<string, MethodDef>} The method definitions map.
+     */
+    getMethodDefs() {
+        return this.methodDefs;
+    }
+    /**
+     * getClassMethods
+     *
+     * Retrieves the methods of a class based on the given class name.
+     *
+     * @param {string} className - The name of the class.
+     * @returns {Map<string, LogicManifest.Method>} The methods of the class.
+     * @throws Error if the class name is invalid.
+     */
+    getClassMethods(className) {
+        const classPtr = this.classDefs.get(className);
+        if (classPtr === undefined) {
+            return moi_utils_1.ErrorUtils.throwError(`Invalid class name: ${className}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        const classMethods = new Map();
+        this.methodDefs.forEach((method, methodName) => {
+            if (method.class === className) {
+                const element = this.elements.get(method.ptr);
+                classMethods.set(methodName, element.data);
+            }
+        });
+        return classMethods;
+    }
+    /**
      * getRoutineElement
      *
      * Retrieves the element from the logic manifest based on the given
      routine name.
      *
-     * @param {string} name - The name of the routine.
-     * @returns {LogicManifest.Element} The routine element, or throws an error
-     if the routine name is invalid.
+     * @param {string} routineName - The name of the routine.
+     * @returns {LogicManifest.Element} The routine element.
+     * @throws Error if the routine name is invalid.
      */
-    getRoutineElement(name) {
-        const callsite = this.callSites.get(name);
+    getRoutineElement(routineName) {
+        const callsite = this.callSites.get(routineName);
         if (!callsite) {
-            return moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${name}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${routineName}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         return this.elements.get(callsite.ptr);
     }
@@ -98,16 +140,32 @@ class ElementDescriptor {
      * Retrieves the element from the logic manifest based on the given
      class name.
      *
-     * @param {string} name - The name of the class.
-     * @returns {LogicManifest.Element} The class element, or throws an error
-     if the class name is invalid.
+     * @returns {LogicManifest.Element} The class element.
+     * @throws Error if the class name is invalid.
      */
-    getClassElement(name) {
-        const ptr = this.classDefs.get(name);
-        if (!ptr) {
-            return moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${name}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    getClassElement(className) {
+        const ptr = this.classDefs.get(className);
+        if (ptr === undefined) {
+            return moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${className}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         return this.elements.get(ptr);
+    }
+    /**
+     * getMethodElement
+     *
+     * Retrieves the element from the logic manifest based on the given
+     method name.
+     *
+     * @param {string} methodName - The name of the method.
+     * @returns {LogicManifest.Element} The method element.
+     * @throws Error if the method name is invalid.
+     */
+    getMethodElement(methodName) {
+        const methodDef = this.methodDefs.get(methodName);
+        if (!methodDef) {
+            return moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${methodName}`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        return this.elements.get(methodDef.ptr);
     }
 }
 exports.default = ElementDescriptor;

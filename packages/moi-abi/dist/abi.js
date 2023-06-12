@@ -49,6 +49,9 @@ class ABICoder {
                     case "class":
                         element.polorize(value.data, schema_1.Schema.PISA_CLASS_SCHEMA);
                         break;
+                    case "method":
+                        element.polorize(value.data, schema_1.Schema.PISA_METHOD_SCHEMA);
+                        break;
                     case "routine":
                         element.polorize(value.data, schema_1.Schema.PISA_ROUTINE_SCHEMA);
                         break;

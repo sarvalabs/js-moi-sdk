@@ -55,6 +55,22 @@ export declare class Schema {
             };
         };
     };
+    static PISA_METHOD_FIELD_SCHEMA: {
+        kind: string;
+        fields: {
+            values: {
+                kind: string;
+                fields: {
+                    ptr: {
+                        kind: string;
+                    };
+                    code: {
+                        kind: string;
+                    };
+                };
+            };
+        };
+    };
     static PISA_INSTRUCTIONS_SCHEMA: {
         kind: string;
         fields: {
@@ -141,6 +157,22 @@ export declare class Schema {
                     };
                 };
             };
+            methods: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            ptr: {
+                                kind: string;
+                            };
+                            code: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
         };
     };
     static PISA_ROUTINE_SCHEMA: {
@@ -150,6 +182,82 @@ export declare class Schema {
                 kind: string;
             };
             kind: {
+                kind: string;
+            };
+            accepts: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            slot: {
+                                kind: string;
+                            };
+                            label: {
+                                kind: string;
+                            };
+                            type: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
+            returns: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            slot: {
+                                kind: string;
+                            };
+                            label: {
+                                kind: string;
+                            };
+                            type: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
+            executes: {
+                kind: string;
+                fields: {
+                    bin: {
+                        kind: string;
+                    };
+                    hex: {
+                        kind: string;
+                    };
+                    asm: {
+                        kind: string;
+                        fields: {
+                            values: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
+            catches: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                    };
+                };
+            };
+        };
+    };
+    static PISA_METHOD_SCHEMA: {
+        kind: string;
+        fields: {
+            name: {
+                kind: string;
+            };
+            class: {
                 kind: string;
             };
             accepts: {

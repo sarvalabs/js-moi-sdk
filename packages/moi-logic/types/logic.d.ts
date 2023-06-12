@@ -27,3 +27,8 @@ export interface CallSite {
     ptr: number,
     kind: string
 }
+
+export interface MethodDef {
+    ptr: number;
+    class: string;
+}

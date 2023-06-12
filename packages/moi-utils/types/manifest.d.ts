@@ -10,9 +10,15 @@ export declare module LogicManifest {
         type: string;
     }
 
+    export interface MethodField {
+        ptr: number | bigint;
+        code: number | bigint;
+    }
+
     export interface Class {
         name: string,
-        fields: TypeField[]
+        fields?: TypeField[],
+        methods?: MethodField[]
     }
     
     export interface State {
@@ -39,6 +45,15 @@ export declare module LogicManifest {
         executes: Instructions;
         catches?: string[];
     }
+
+    export interface Method {
+        name: string;
+        class: string;
+        accepts?: TypeField[];
+        returns?: TypeField[];
+        executes: Instructions;
+        catches?: string[];
+    }
     
     export type TypeDef = string;
     
@@ -46,7 +61,7 @@ export declare module LogicManifest {
         ptr: number;
         kind: string;
         deps?: number[];
-        data: State | Constant | TypeDef | Routine | Class;
+        data: State | Constant | TypeDef | Routine | Class | Method;
     }
     
     export interface Manifest {

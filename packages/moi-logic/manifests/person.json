@@ -1,235 +1,570 @@
 {
-    "syntax": "0.1.0",
-    "engine": {
-      "kind": "PISA",
-      "flags": []
+  "syntax": "0.1.0",
+  "engine": {
+    "kind": "PISA",
+    "flags": []
+  },
+  "elements": [
+    {
+      "ptr": 0,
+      "deps": [
+        1
+      ],
+      "kind": "state",
+      "data": {
+        "kind": "persistent",
+        "fields": [
+          {
+            "slot": 0,
+            "label": "registry",
+            "type": "map[string]Person"
+          }
+        ]
+      }
     },
-    "elements": [
-      {
-        "ptr": 0,
-        "kind": "state",
-        "deps": [
-          1
+    {
+      "ptr": 1,
+      "kind": "class",
+      "data": {
+        "name": "Person",
+        "fields": [
+          {
+            "slot": 0,
+            "label": "name",
+            "type": "string"
+          },
+          {
+            "slot": 1,
+            "label": "age",
+            "type": "u64"
+          },
+          {
+            "slot": 2,
+            "label": "gender",
+            "type": "string"
+          }
         ],
-        "data": {
-          "kind": "persisatent",
-          "fields": [
-            {
-              "slot": 0,
-              "label": "registry",
-              "type": "map[string]Person"
-            }
+        "methods": [
+          {
+            "ptr": 6,
+            "code": 16
+          },
+          {
+            "ptr": 8,
+            "code": 17
+          },
+          {
+            "ptr": 11,
+            "code": 18
+          }
+        ]
+      }
+    },
+    {
+      "ptr": 2,
+      "deps": [
+        0,
+        1
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "StorePerson!",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            81,
+            1,
+            0,
+            0,
+            128,
+            2,
+            0,
+            84,
+            2,
+            1,
+            0,
+            129,
+            2,
+            0
           ]
         }
-      },
-      {
-        "ptr": 1,
-        "kind": "class",
-        "data": {
-          "name": "Person",
-          "fields": [
-            {
-              "slot": 0,
-              "label": "name",
-              "type": "string"
-            },
-            {
-              "slot": 1,
-              "label": "age",
-              "type": "uint64"
-            },
-            {
-              "slot": 2,
-              "label": "gender",
-              "type": "string"
-            }
+      }
+    },
+    {
+      "ptr": 3,
+      "deps": [
+        0,
+        1
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "GetPerson",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "name",
+            "type": "string"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
+          }
+        ],
+        "executes": {
+          "bin": [
+            128,
+            0,
+            0,
+            4,
+            1,
+            0,
+            83,
+            2,
+            0,
+            1,
+            5,
+            2,
+            0
           ]
         }
-      },
-      {
-        "ptr": 2,
-        "kind": "routine",
-        "deps": [
-          0,
-          1
-        ],
-        "data": {
-          "name": "StorePerson!",
-          "kind": "invokable",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "person",
-              "type": "Person"
-            }
-          ],
-          "executes": {
-            "bin": [
-              4,
-              0,
-              0,
-              81,
-              1,
-              0,
-              0,
-              128,
-              2,
-              0,
-              84,
-              2,
-              1,
-              0,
-              129,
-              2,
-              0
-            ]
+      }
+    },
+    {
+      "ptr": 4,
+      "deps": [
+        1
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "GetNameOf",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
           }
-        }
-      },
-      {
-        "ptr": 3,
-        "kind": "routine",
-        "deps": [
-          0,
-          1
         ],
-        "data": {
-          "name": "GetPerson",
-          "kind": "invokable",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "name",
-              "type": "string"
-            }
-          ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "person",
-              "type": "Person"
-            }
-          ],
-          "executes": {
-            "bin": [
-              128,
-              0,
-              0,
-              4,
-              1,
-              0,
-              83,
-              2,
-              0,
-              1,
-              5,
-              2,
-              0
-            ]
+        "returns": [
+          {
+            "slot": 0,
+            "label": "name",
+            "type": "string"
           }
-        }
-      },
-      {
-        "ptr": 4,
-        "kind": "routine",
-        "deps": [
-          1
         ],
-        "data": {
-          "name": "GetNameOf",
-          "kind": "invokable",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "person",
-              "type": "Person"
-            }
-          ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "name",
-              "type": "string"
-            }
-          ],
-          "executes": {
-            "bin": [
-              4,
-              0,
-              0,
-              81,
-              1,
-              0,
-              0,
-              5,
-              1,
-              0
-            ]
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            81,
+            1,
+            0,
+            0,
+            5,
+            1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 5,
+      "deps": [
+        1
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "DoubleAge",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
           }
-        }
-      },
-      {
-        "ptr": 5,
-        "kind": "routine",
-        "deps": [
-          1
         ],
-        "data": {
-          "name": "DoubleAge",
-          "kind": "invokable",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "person",
-              "type": "Person"
-            }
-          ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "person",
-              "type": "Person"
-            }
-          ],
-          "executes": {
-            "bin": [
-              4,
-              0,
-              0,
-              81,
-              1,
-              0,
-              1,
-              36,
-              2,
-              1,
-              101,
-              2,
-              2,
-              1,
-              82,
-              0,
-              1,
-              2,
-              5,
-              0,
-              0
-            ]
+        "returns": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
           }
-        }
-      },
-      {
-        "ptr": 6,
-        "kind": "routine",
-        "deps": [
-          0
         ],
-        "data": {
-          "name": "Setup!",
-          "kind": "deployer",
-          "executes": null,
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            81,
+            1,
+            0,
+            1,
+            36,
+            2,
+            1,
+            101,
+            2,
+            2,
+            1,
+            82,
+            0,
+            1,
+            2,
+            5,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 6,
+      "deps": [
+        1
+      ],
+      "kind": "method",
+      "data": {
+        "name": "Rename",
+        "class": "Person",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "self",
+            "type": "Person"
+          },
+          {
+            "slot": 1,
+            "label": "name",
+            "type": "string"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "out",
+            "type": "Person"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            4,
+            1,
+            1,
+            82,
+            0,
+            0,
+            1,
+            5,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 7,
+      "deps": [
+        1,
+        6
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "RenamePerson",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
+          },
+          {
+            "slot": 1,
+            "label": "name",
+            "type": "string"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "res",
+            "type": "Person"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            4,
+            1,
+            1,
+            10,
+            2,
+            82,
+            2,
+            0,
+            0,
+            82,
+            2,
+            1,
+            1,
+            13,
+            3,
+            16,
+            2,
+            81,
+            4,
+            3,
+            0,
+            5,
+            4,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 8,
+      "deps": [
+        1
+      ],
+      "kind": "method",
+      "data": {
+        "name": "nameisalpha",
+        "class": "Person",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "self",
+            "type": "Person"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "ok",
+            "type": "bool"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            81,
+            1,
+            0,
+            0,
+            10,
+            2,
+            82,
+            2,
+            0,
+            1,
+            13,
+            3,
+            18,
+            2,
+            81,
+            4,
+            3,
+            0,
+            5,
+            4,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 9,
+      "deps": [
+        1,
+        8
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "CheckNameAlpha",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "ok",
+            "type": "bool"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            10,
+            2,
+            82,
+            2,
+            0,
+            0,
+            13,
+            3,
+            17,
+            2,
+            81,
+            4,
+            3,
+            0,
+            5,
+            4,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 10,
+      "deps": [
+        0
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "Setup!",
+        "kind": "deployer",
+        "executes": {
           "bin": []
         }
       }
-    ]
-  }
+    },
+    {
+      "ptr": 11,
+      "deps": [
+        1,
+        13
+      ],
+      "kind": "method",
+      "data": {
+        "name": "olderthan12",
+        "class": "Person",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "self",
+            "type": "Person"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "ok",
+            "type": "bool"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            81,
+            1,
+            0,
+            1,
+            17,
+            2,
+            13,
+            16,
+            2,
+            2,
+            69,
+            3,
+            1,
+            2,
+            5,
+            3,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 12,
+      "deps": [
+        1,
+        11
+      ],
+      "kind": "routine",
+      "data": {
+        "name": "CheckPersonAge",
+        "kind": "invokable",
+        "accepts": [
+          {
+            "slot": 0,
+            "label": "person",
+            "type": "Person"
+          }
+        ],
+        "returns": [
+          {
+            "slot": 0,
+            "label": "ok",
+            "type": "bool"
+          }
+        ],
+        "executes": {
+          "bin": [
+            4,
+            0,
+            0,
+            10,
+            2,
+            82,
+            2,
+            0,
+            0,
+            13,
+            3,
+            18,
+            2,
+            81,
+            4,
+            3,
+            0,
+            5,
+            4,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "ptr": 13,
+      "kind": "constant",
+      "data": {
+        "type": "u64",
+        "value": "0x030c"
+      }
+    }
+  ]
+}

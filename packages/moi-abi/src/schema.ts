@@ -84,6 +84,23 @@ export class Schema {
         }
     }
 
+    public static PISA_METHOD_FIELD_SCHEMA = {
+        kind: "array",
+        fields: {
+            values: {
+                kind: "struct",
+                fields: {
+                    ptr: {
+                        kind: "integer"
+                    },
+                    code: {
+                        kind: "integer"
+                    }
+                }
+            }
+        }
+    }
+
     public static PISA_INSTRUCTIONS_SCHEMA = {
         kind: "struct",
         fields: {
@@ -141,6 +158,9 @@ export class Schema {
             },
             fields: {
                 ...Schema.PISA_TYPE_FIELD_SCHEMA
+            },
+            methods: {
+                ...Schema.PISA_METHOD_FIELD_SCHEMA
             }
         }
     }
@@ -152,6 +172,35 @@ export class Schema {
                 kind: "string"
             },
             kind: {
+                kind: "string"
+            },
+            accepts: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            },
+            returns: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA
+            },
+            executes: {
+                ...Schema.PISA_INSTRUCTIONS_SCHEMA
+            },
+            catches: {
+                kind: "array",
+                fields: {
+                    values: {
+                        kind: "string"
+                    }
+                }
+            }
+        }
+    }
+
+    public static PISA_METHOD_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string"
+            },
+            class: {
                 kind: "string"
             },
             accepts: {

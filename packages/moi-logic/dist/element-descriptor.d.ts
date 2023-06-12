@@ -1,6 +1,6 @@
 import { LogicManifest } from "moi-utils";
 import { ContextStateMatrix } from "./state";
-import { CallSite } from "../types/logic";
+import { CallSite, MethodDef } from "../types/logic";
 /**
  * ElementDescriptor Class
  *
@@ -11,6 +11,7 @@ export default class ElementDescriptor {
     protected elements: Map<number, LogicManifest.Element>;
     protected callSites: Map<string, CallSite>;
     protected classDefs: Map<string, number>;
+    protected methodDefs: Map<string, MethodDef>;
     constructor(elements: LogicManifest.Element[]);
     /**
      * getStateMatrix
@@ -45,25 +46,53 @@ export default class ElementDescriptor {
      */
     getClassDefs(): Map<string, number>;
     /**
+     * getMethodDefs
+     *
+     * Retrieves the map of method definitions associated with the ElementDescriptor.
+     *
+     * @returns {Map<string, MethodDef>} The method definitions map.
+     */
+    getMethodDefs(): Map<string, MethodDef>;
+    /**
+     * getClassMethods
+     *
+     * Retrieves the methods of a class based on the given class name.
+     *
+     * @param {string} className - The name of the class.
+     * @returns {Map<string, LogicManifest.Method>} The methods of the class.
+     * @throws Error if the class name is invalid.
+     */
+    getClassMethods(className: string): Map<string, LogicManifest.Method>;
+    /**
      * getRoutineElement
      *
      * Retrieves the element from the logic manifest based on the given
      routine name.
      *
-     * @param {string} name - The name of the routine.
-     * @returns {LogicManifest.Element} The routine element, or throws an error
-     if the routine name is invalid.
+     * @param {string} routineName - The name of the routine.
+     * @returns {LogicManifest.Element} The routine element.
+     * @throws Error if the routine name is invalid.
      */
-    getRoutineElement(name: string): LogicManifest.Element;
+    getRoutineElement(routineName: string): LogicManifest.Element;
     /**
      * getClassElement
      *
      * Retrieves the element from the logic manifest based on the given
      class name.
      *
-     * @param {string} name - The name of the class.
-     * @returns {LogicManifest.Element} The class element, or throws an error
-     if the class name is invalid.
+     * @returns {LogicManifest.Element} The class element.
+     * @throws Error if the class name is invalid.
      */
-    getClassElement(name: string): LogicManifest.Element;
+    getClassElement(className: string): LogicManifest.Element;
+    /**
+     * getMethodElement
+     *
+     * Retrieves the element from the logic manifest based on the given
+     method name.
+     *
+     * @param {string} methodName - The name of the method.
+     * @returns {LogicManifest.Element} The method element.
+     * @throws Error if the method name is invalid.
+     */
+    getMethodElement(methodName: string): LogicManifest.Element;
 }

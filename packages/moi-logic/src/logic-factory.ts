@@ -91,30 +91,30 @@ export class LogicFactory extends LogicBase {
         const builder = Object.values(this.manifest.elements)
         .find(element => {
             if(element.kind === "routine"){
-                element.data = element.data as LogicManifest.Routine
-                return element.data.kind === "deployer" && 
-                builderName === element.data.name
+                const routine = element.data as LogicManifest.Routine;
+                return routine.kind === "deployer" && 
+                builderName === routine.name;
             }
 
-            return false
+            return false;
         })
 
         if(builder) {
-            builder.data = builder.data as LogicManifest.Routine
+            const builderRoutine = builder.data as LogicManifest.Routine;
 
-            if(builder.data.accepts && Object.keys(builder.data.accepts).length != args.length) {
+            if(builderRoutine.accepts && Object.keys(builderRoutine.accepts).length != args.length) {
                 ErrorUtils.throwError(
                     "One or more required arguments are missing.",
                     ErrorCode.MISSING_ARGUMENT
-                )
+                );
             }
     
-            return this.createIxObject(builder.data, ...args)
+            return this.createIxObject(builderRoutine, ...args);
         }
 
         ErrorUtils.throwError(
             "Invalid builder name, builder not found!",
             ErrorCode.INVALID_ARGUMENT
-        )
+        );
     }
 }
