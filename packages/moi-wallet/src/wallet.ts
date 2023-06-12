@@ -10,6 +10,17 @@ import { serializeIxObject } from "./serializer";
 
 const SECP256K1 = "secp256k1"
 
+/**
+ * privateMapGet
+ *
+ * Retrieves the value associated with the receiver from a private map.
+ * Throws an error if the receiver is not found in the map.
+ *
+ * @param receiver - The receiver object.
+ * @param privateMap - The private map containing the receiver and its associated value.
+ * @returns The value associated with the receiver.
+ * @throws Error if the receiver is not found in the private map.
+ */
 const privateMapGet = (receiver: any, privateMap: any) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateGet()
@@ -21,6 +32,18 @@ const privateMapGet = (receiver: any, privateMap: any) => {
     return descriptor.value;
 }
 
+/**
+ * privateMapSet
+ *
+ * Sets the value associated with the receiver in a private map.
+ * Throws an error if the receiver is not found in the map.
+ *
+ * @param receiver - The receiver object.
+ * @param privateMap - The private map containing the receiver and its associated value.
+ * @param value - The value to set.
+ * @returns The updated value.
+ * @throws Error if the receiver is not found in the private map.
+ */
 const privateMapSet = (receiver: any, privateMap: any, value: any) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateSet()
@@ -36,6 +59,11 @@ const privateMapSet = (receiver: any, privateMap: any, value: any) => {
 
 const __vault = new WeakMap();
 
+/**
+ * Wallet
+ *
+ * A class representing a wallet that can sign interactions and manage keys.
+ */
 export class Wallet extends Signer {
     constructor(provider?: AbstractProvider) {
         super(provider)
@@ -44,6 +72,17 @@ export class Wallet extends Signer {
         })
     }
 
+    /**
+     * load
+     *
+     * Initializes the wallet with a private key, mnemonic, and curve.
+     *
+     * @param key - The private key as a Buffer.
+     * @param mnemonic - The mnemonic associated with the wallet.
+     * @param curve - The elliptic curve algorithm used for key generation.
+     * @throws Error if the key is undefined or if an error occurs during the 
+     * initialization process.
+     */
     public load(key: Buffer, mnemonic: string, curve: string) {
         try {
             let privKey: string, pubKey: string;
@@ -75,6 +114,13 @@ export class Wallet extends Signer {
         }
     }
 
+    /**
+     * isInitialized
+     *
+     * Checks if the wallet is initialized.
+     *
+     * @returns true if the wallet is initialized, false otherwise.
+     */
     public isInitialized(): boolean {
         if(privateMapGet(this, __vault)) {
             return true
@@ -83,6 +129,13 @@ export class Wallet extends Signer {
         return false;
     }
 
+    /**
+     * createRandom
+     *
+     * Generates a random mnemonic and initializes the wallet from it.
+     *
+     * @throws Error if there is an error generating the random mnemonic.
+     */
     public async createRandom() {
         try {
             const _random16Bytes = randomBytes(16)
@@ -97,6 +150,16 @@ export class Wallet extends Signer {
         }
     }
     
+    /**
+     * fromMnemonic
+     *
+     * Intializes the wallet from a provided mnemonic.
+     *
+     * @param mnemonic - The mnemonic associated with the wallet.
+     * @param path - The derivation path for the HDNode. (optional)
+     * @param wordlist - The wordlist for the mnemonic. (optional)
+     * @throws Error if there is an error loading the wallet from the mnemonic.
+     */
     public async fromMnemonic(mnemonic: string, path?: string, wordlist?: string[]) {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
@@ -113,6 +176,14 @@ export class Wallet extends Signer {
         }
     }
 
+    /**
+     * privateKey
+     *
+     * Retrieves the private key associated with the wallet.
+     *
+     * @returns The private key as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
     public privateKey() { 
         if(this.isInitialized()) {
             return privateMapGet(this, __vault)._key
@@ -124,6 +195,14 @@ export class Wallet extends Signer {
         )
     }
 
+    /**
+     * mnemonic
+     *
+     * Retrieves the mnemonic associated with the wallet.
+     *
+     * @returns The mnemonic as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
     public mnemonic() { 
         if(this.isInitialized()) {
             return privateMapGet(this, __vault)._mnemonic
@@ -135,6 +214,14 @@ export class Wallet extends Signer {
         )
     }
 
+    /**
+     * publicKey
+     *
+     * Retrieves the public key associated with the wallet.
+     *
+     * @returns The public key as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
     public publicKey() { 
         if(this.isInitialized()) {
             return privateMapGet(this, __vault)._public
@@ -146,6 +233,14 @@ export class Wallet extends Signer {
         )        
     }
 
+    /**
+     * curve
+     *
+     * Retrieves the curve used by the wallet.
+     *
+     * @returns The curve as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
     public curve() { 
         if(this.isInitialized()) {
             return privateMapGet(this, __vault)._curve
@@ -157,17 +252,41 @@ export class Wallet extends Signer {
         ) 
     }
 
-    // Signer methods
+    /**
+     * getAddress
+     *
+     * Retrieves the address associated with the wallet.
+     *
+     * @returns The address as a string.
+     */
     public getAddress(): string {
         const publicKey = this.publicKey();
 
         return "0x" + publicKey.slice(2,);
     }
 
+    /**
+     * connect
+     *
+     * Connects the wallet to a provider and returns a new instance of the wallet.
+     *
+     * @param provider - The provider to connect.
+     * @returns A new instance of the wallet connected to the specified provider.
+     */
     public connect(provider: AbstractProvider): Signer {
         return new Wallet(provider)
     }
 
+    /**
+     * sign
+     *
+     * Signs a message using the wallet's private key and the specified signature algorithm.
+     *
+     * @param message - The message to sign as a Uint8Array.
+     * @param sigAlgo - The signature algorithm to use.
+     * @returns The signature as a string.
+     * @throws Error if the signature type is unsupported or undefined, or if there is an error during signing.
+     */
     public sign(message: Uint8Array, sigAlgo: SigType): string {
         if(sigAlgo) {
             switch(sigAlgo.sigName) {
@@ -192,6 +311,18 @@ export class Wallet extends Signer {
         )
     }
 
+    /**
+     * signInteraction
+     *
+     * Signs an interaction object using the wallet's private key and the specified signature algorithm.
+     * The interaction object is serialized into POLO bytes before signing.
+     *
+     * @param ixObject - The interaction object to sign.
+     * @param sigAlgo - The signature algorithm to use.
+     * @returns The signed interaction request containing the serialized 
+     * interaction object and the signature.
+     * @throws Error if there is an error during signing or serialization.
+     */
     public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
         try {
             const ixData = serializeIxObject(ixObject);
