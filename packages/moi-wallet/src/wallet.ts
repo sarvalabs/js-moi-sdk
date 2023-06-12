@@ -4,7 +4,7 @@ import { HDNode } from "moi-hdnode";
 import { randomBytes } from "crypto";
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { AbstractProvider, InteractionRequest } from "moi-providers";
-import { ErrorCode, ErrorUtils, bytesToHex, hexToUint8 } from "moi-utils";
+import { ErrorCode, ErrorUtils, bytesToHex, bufferToUint8 } from "moi-utils";
 import * as SigningKeyErrors from "./errors";
 import { serializeIxObject } from "./serializer";
 
@@ -55,7 +55,7 @@ export class Wallet extends Signer {
             }
 
             const ecPrivKey = new elliptic.ec(SECP256K1);
-            const keyInBytes = hexToUint8(key)
+            const keyInBytes = bufferToUint8(key)
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes)
             privKey = keyPair.getPrivate("hex")
             pubKey = keyPair.getPublic(true, "hex")
@@ -73,6 +73,14 @@ export class Wallet extends Signer {
                 { originalError: err }
             );
         }
+    }
+
+    public isInitialized(): boolean {
+        if(privateMapGet(this, __vault)) {
+            return true
+        }
+
+        return false;
     }
 
     public async createRandom() {
@@ -105,14 +113,55 @@ export class Wallet extends Signer {
         }
     }
 
-    public privateKey() { return privateMapGet(this, __vault)._key }
-    public mnemonic() { return privateMapGet(this, __vault)._mnemonic }
-    public publicKey() { return privateMapGet(this, __vault)._public }
-    public curve() { return privateMapGet(this, __vault)._curve }
+    public privateKey() { 
+        if(this.isInitialized()) {
+            return privateMapGet(this, __vault)._key
+        }
+     
+        ErrorUtils.throwError(
+            "Private key not found. The wallet has not been loaded or initialized.",
+            ErrorCode.NOT_INITIALIZED
+        )
+    }
+
+    public mnemonic() { 
+        if(this.isInitialized()) {
+            return privateMapGet(this, __vault)._mnemonic
+        }
+
+        ErrorUtils.throwError(
+            "Mnemonic not found. The wallet has not been loaded or initialized.",
+            ErrorCode.NOT_INITIALIZED
+        )
+    }
+
+    public publicKey() { 
+        if(this.isInitialized()) {
+            return privateMapGet(this, __vault)._public
+        }
+
+        ErrorUtils.throwError(
+            "Public key not found. The wallet has not been loaded or initialized.",
+            ErrorCode.NOT_INITIALIZED
+        )        
+    }
+
+    public curve() { 
+        if(this.isInitialized()) {
+            return privateMapGet(this, __vault)._curve
+        }
+
+        ErrorUtils.throwError(
+            "Curve not found. The wallet has not been loaded or initialized.",
+            ErrorCode.NOT_INITIALIZED
+        ) 
+    }
 
     // Signer methods
     public getAddress(): string {
-        return this.publicKey();
+        const publicKey = this.publicKey();
+
+        return "0x" + publicKey.slice(2,);
     }
 
     public connect(provider: AbstractProvider): Signer {
@@ -121,16 +170,9 @@ export class Wallet extends Signer {
 
     public sign(message: Uint8Array, sigAlgo: SigType): string {
         if(sigAlgo) {
-            const privateKey = this.privateKey();
-            if (!privateKey) {
-                ErrorUtils.throwError(
-                    "Private key not found. The wallet has not been loaded or initialized.",
-                    ErrorCode.NOT_INITIALIZED
-                )
-            }
-
             switch(sigAlgo.sigName) {
                 case "ECDSA_S256": {
+                    const privateKey = this.privateKey();
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
                     const sigBytes = _sig.sign(Buffer.from(message), privateKey);
                     return sigBytes.serialize().toString('hex');

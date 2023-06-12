@@ -74,7 +74,7 @@ class Wallet extends moi_signer_1.Signer {
                 moi_utils_1.ErrorUtils.throwError("Key is required, cannot be undefined", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             const ecPrivKey = new elliptic_1.default.ec(SECP256K1);
-            const keyInBytes = (0, moi_utils_1.hexToUint8)(key);
+            const keyInBytes = (0, moi_utils_1.bufferToUint8)(key);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
             pubKey = keyPair.getPublic(true, "hex");
@@ -88,6 +88,12 @@ class Wallet extends moi_signer_1.Signer {
         catch (err) {
             moi_utils_1.ErrorUtils.throwError("Failed to load wallet", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
+    }
+    isInitialized() {
+        if (privateMapGet(this, __vault)) {
+            return true;
+        }
+        return false;
     }
     async createRandom() {
         try {
@@ -111,25 +117,43 @@ class Wallet extends moi_signer_1.Signer {
             moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
-    privateKey() { return privateMapGet(this, __vault)._key; }
-    mnemonic() { return privateMapGet(this, __vault)._mnemonic; }
-    publicKey() { return privateMapGet(this, __vault)._public; }
-    curve() { return privateMapGet(this, __vault)._curve; }
+    privateKey() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._key;
+        }
+        moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    mnemonic() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._mnemonic;
+        }
+        moi_utils_1.ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    publicKey() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._public;
+        }
+        moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    curve() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._curve;
+        }
+        moi_utils_1.ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
     // Signer methods
     getAddress() {
-        return this.publicKey();
+        const publicKey = this.publicKey();
+        return "0x" + publicKey.slice(2);
     }
     connect(provider) {
         return new Wallet(provider);
     }
     sign(message, sigAlgo) {
         if (sigAlgo) {
-            const privateKey = this.privateKey();
-            if (!privateKey) {
-                moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
-            }
             switch (sigAlgo.sigName) {
                 case "ECDSA_S256": {
+                    const privateKey = this.privateKey();
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
                     const sigBytes = _sig.sign(Buffer.from(message), privateKey);
                     return sigBytes.serialize().toString('hex');

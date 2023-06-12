@@ -4,6 +4,7 @@ import { AbstractProvider, InteractionRequest } from "moi-providers";
 export declare class Wallet extends Signer {
     constructor(provider?: AbstractProvider);
     load(key: Buffer, mnemonic: string, curve: string): void;
+    isInitialized(): boolean;
     createRandom(): Promise<void>;
     fromMnemonic(mnemonic: string, path?: string, wordlist?: string[]): Promise<void>;
     privateKey(): any;
