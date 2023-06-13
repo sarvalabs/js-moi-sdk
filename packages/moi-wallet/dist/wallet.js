@@ -35,6 +35,7 @@ const moi_signer_1 = require("moi-signer");
 const moi_utils_1 = require("moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
 const serializer_1 = require("./serializer");
+const keystore_1 = require("./keystore");
 var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
@@ -165,6 +166,27 @@ class Wallet extends moi_signer_1.Signer {
         }
     }
     /**
+     * generateKeystore
+     *
+     * Generates a keystore file from the wallet's private key, encrypted with a password.
+     *
+     * @param password Used for encrypting the keystore data.
+     * @returns The generated keystore object.
+     * @throws Error if the wallet is not initialized or loaded, or if there is an error generating the keystore.
+     */
+    generateKeystore(password) {
+        if (!this.isInitialized()) {
+            moi_utils_1.ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        }
+        try {
+            const data = Buffer.from(this.privateKey(), "hex");
+            return (0, keystore_1.encryptKeystoreData)(data, password);
+        }
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to generate keystore", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
      * fromMnemonic
      *
      * Intializes the wallet from a provided mnemonic.
@@ -184,6 +206,25 @@ class Wallet extends moi_signer_1.Signer {
         }
         catch (err) {
             moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
+     * fromKeystore
+     *
+     * Initializes the wallet by decrypting and loading the private key from a keystore file.
+     *
+     * @param keystore The keystore object as a JSON string.
+     * @param password The password used for decrypting the keystore.
+     * @throws Error if there is an error parsing the keystore, decrypting the keystore data, or loading the private key.
+     */
+    fromKeystore(keystore, password) {
+        try {
+            const keystoreJson = JSON.parse(keystore);
+            const privateKey = (0, keystore_1.decryptKeystoreData)(keystoreJson, password);
+            this.load(privateKey, CURVE.SECP256K1);
+        }
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     /**

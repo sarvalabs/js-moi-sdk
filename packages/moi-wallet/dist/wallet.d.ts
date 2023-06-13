@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { AbstractProvider, InteractionRequest } from "moi-providers";
+import { Keystore } from "../types/keystore";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"
 }
@@ -40,6 +41,16 @@ export declare class Wallet extends Signer {
      */
     createRandom(): Promise<void>;
     /**
+     * generateKeystore
+     *
+     * Generates a keystore file from the wallet's private key, encrypted with a password.
+     *
+     * @param password Used for encrypting the keystore data.
+     * @returns The generated keystore object.
+     * @throws Error if the wallet is not initialized or loaded, or if there is an error generating the keystore.
+     */
+    generateKeystore(password: string): Keystore;
+    /**
      * fromMnemonic
      *
      * Intializes the wallet from a provided mnemonic.
@@ -50,6 +61,16 @@ export declare class Wallet extends Signer {
      * @throws Error if there is an error loading the wallet from the mnemonic.
      */
     fromMnemonic(mnemonic: string, path?: string, wordlist?: string[]): Promise<void>;
+    /**
+     * fromKeystore
+     *
+     * Initializes the wallet by decrypting and loading the private key from a keystore file.
+     *
+     * @param keystore The keystore object as a JSON string.
+     * @param password The password used for decrypting the keystore.
+     * @throws Error if there is an error parsing the keystore, decrypting the keystore data, or loading the private key.
+     */
+    fromKeystore(keystore: string, password: string): void;
     /**
      * privateKey
      *
