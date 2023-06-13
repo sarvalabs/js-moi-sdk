@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Wallet = void 0;
+exports.Wallet = exports.CURVE = void 0;
 const bip39 = __importStar(require("bip39"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const moi_hdnode_1 = require("moi-hdnode");
@@ -35,7 +35,10 @@ const moi_signer_1 = require("moi-signer");
 const moi_utils_1 = require("moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
 const serializer_1 = require("./serializer");
-const SECP256K1 = "secp256k1";
+var CURVE;
+(function (CURVE) {
+    CURVE["SECP256K1"] = "secp256k1";
+})(CURVE || (exports.CURVE = CURVE = {}));
 /**
  * privateMapGet
  *
@@ -101,18 +104,21 @@ class Wallet extends moi_signer_1.Signer {
      * Initializes the wallet with a private key, mnemonic, and curve.
      *
      * @param key - The private key as a Buffer.
-     * @param mnemonic - The mnemonic associated with the wallet.
      * @param curve - The elliptic curve algorithm used for key generation.
+     * @param mnemonic - The mnemonic associated with the wallet. (optional)
      * @throws Error if the key is undefined or if an error occurs during the
      * initialization process.
      */
-    load(key, mnemonic, curve) {
+    load(key, curve, mnemonic) {
         try {
             let privKey, pubKey;
             if (!key) {
                 moi_utils_1.ErrorUtils.throwError("Key is required, cannot be undefined", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
-            const ecPrivKey = new elliptic_1.default.ec(SECP256K1);
+            if (curve !== CURVE.SECP256K1) {
+                moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            }
+            const ecPrivKey = new elliptic_1.default.ec(curve);
             const keyInBytes = (0, moi_utils_1.bufferToUint8)(key);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
@@ -174,7 +180,7 @@ class Wallet extends moi_signer_1.Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const hdNode = new moi_hdnode_1.HDNode();
             hdNode.fromSeed(seed, path);
-            this.load(hdNode.privateKey(), mnemonic, SECP256K1);
+            this.load(hdNode.privateKey(), CURVE.SECP256K1, mnemonic);
         }
         catch (err) {
             moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });

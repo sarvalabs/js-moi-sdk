@@ -1,6 +1,9 @@
 /// <reference types="node" />
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { AbstractProvider, InteractionRequest } from "moi-providers";
+export declare enum CURVE {
+    SECP256K1 = "secp256k1"
+}
 /**
  * Wallet
  *
@@ -14,12 +17,12 @@ export declare class Wallet extends Signer {
      * Initializes the wallet with a private key, mnemonic, and curve.
      *
      * @param key - The private key as a Buffer.
-     * @param mnemonic - The mnemonic associated with the wallet.
      * @param curve - The elliptic curve algorithm used for key generation.
+     * @param mnemonic - The mnemonic associated with the wallet. (optional)
      * @throws Error if the key is undefined or if an error occurs during the
      * initialization process.
      */
-    load(key: Buffer, mnemonic: string, curve: string): void;
+    load(key: Buffer, curve: string, mnemonic?: string): void;
     /**
      * isInitialized
      *
