@@ -38,15 +38,14 @@ export interface LogicPayload {
 
 export interface InteractionObject {
     type: IxType;
-    // Todo check if this mandatory or optional
     nonce?: number | bigint;
 
     sender: string;
     receiver?: string;
     payer?: string;
 
-    transfer_values?: Record<string, number | bigint>;
-    perceived_values?: Record<string, number | bigint>;
+    transfer_values?: Map<string, number | bigint>;
+    perceived_values?: Map<string, number | bigint>;
 
     fuel_price: number | bigint;
     fuel_limit: number | bigint;
