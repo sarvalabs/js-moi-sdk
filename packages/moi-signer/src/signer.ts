@@ -156,7 +156,7 @@ export abstract class Signer {
             this.checkInteraction(ixObject, nonce)
 
             if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-                ixObject.nonce =  Number(nonce) + 1;
+                ixObject.nonce =  nonce;
             }
 
             // Sign the interaction object

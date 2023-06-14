@@ -125,7 +125,7 @@ class Signer {
             // Check the validity of the interaction object
             this.checkInteraction(ixObject, nonce);
             if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-                ixObject.nonce = Number(nonce) + 1;
+                ixObject.nonce = nonce;
             }
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo);
