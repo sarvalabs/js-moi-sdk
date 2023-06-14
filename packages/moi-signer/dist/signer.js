@@ -51,9 +51,9 @@ class Signer {
             const provider = this.getProvider();
             const address = this.getAddress();
             if (!options) {
-                return provider.getPendingInteractionCount(address);
+                return await provider.getPendingInteractionCount(address);
             }
-            return provider.getInteractionCount(address, options);
+            return await provider.getInteractionCount(address, options);
         }
         catch (err) {
             throw err;
@@ -99,7 +99,7 @@ class Signer {
             moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
         }
         if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            if (ixObject.nonce < nonce) {
+            if (ixObject.nonce <= nonce) {
                 moi_utils_1.ErrorUtils.throwError("Invalid nonce", moi_utils_1.ErrorCode.NONCE_EXPIRED);
             }
         }
@@ -124,6 +124,9 @@ class Signer {
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             // Check the validity of the interaction object
             this.checkInteraction(ixObject, nonce);
+            if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
+                ixObject.nonce = Number(nonce) + 1;
+            }
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo);
             // Send the interaction request and return the response

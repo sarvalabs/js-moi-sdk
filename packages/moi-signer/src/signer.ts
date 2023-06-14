@@ -68,10 +68,10 @@ export abstract class Signer {
             const address = this.getAddress();
 
             if(!options) {
-                return provider.getPendingInteractionCount(address)
+                return await provider.getPendingInteractionCount(address)
             }
 
-            return provider.getInteractionCount(address, options)
+            return await provider.getInteractionCount(address, options)
         } catch(err) {
             throw err;
         }
@@ -126,7 +126,7 @@ export abstract class Signer {
         }
 
         if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            if(ixObject.nonce < nonce) {
+            if(ixObject.nonce <= nonce) {
                 ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
             }
         }
@@ -154,6 +154,10 @@ export abstract class Signer {
 
             // Check the validity of the interaction object
             this.checkInteraction(ixObject, nonce)
+
+            if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
+                ixObject.nonce =  Number(nonce) + 1;
+            }
 
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo)
