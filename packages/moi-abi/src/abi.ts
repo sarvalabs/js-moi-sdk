@@ -216,7 +216,7 @@ export class ABICoder {
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
     public decodeOutput(output: string, fields: LogicManifest.TypeField[]): unknown | null {
-        if(output && output != "0x") {
+        if(output && output != "0x" && fields && fields.length) {
             const decodedOutput = hexToBytes(output)
             const depolorizer = new Depolorizer(decodedOutput)
             const schema = this.schema.parseFields(fields);

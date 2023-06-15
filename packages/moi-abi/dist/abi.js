@@ -168,7 +168,7 @@ class ABICoder {
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
     decodeOutput(output, fields) {
-        if (output && output != "0x") {
+        if (output && output != "0x" && fields && fields.length) {
             const decodedOutput = (0, moi_utils_1.hexToBytes)(output);
             const depolorizer = new js_polo_1.Depolorizer(decodedOutput);
             const schema = this.schema.parseFields(fields);
