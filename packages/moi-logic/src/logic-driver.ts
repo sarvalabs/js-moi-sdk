@@ -63,7 +63,7 @@ export class LogicDriver extends LogicDescriptor {
     
                     // Define routine properties
                     this.routines[routineName].isMutable = (): boolean => {
-                        return this.isMutableRoutine(routineName)
+                        return this.isMutableRoutine(routine.name)
                     }
     
                     this.routines[routineName].accepts = (): LogicManifest.TypeField[] | null => {

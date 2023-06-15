@@ -52,7 +52,7 @@ export const toQuantity = (value: number | bigint | BN): string => {
  * @returns {string} - The hexadecimal string representation of the Uint8Array.
  */
 export const encodeToString = (data: Uint8Array): string => {
-    return Buffer.from(data).toString('hex');
+    return "0x" + Buffer.from(data).toString('hex');
 }
 
 /**

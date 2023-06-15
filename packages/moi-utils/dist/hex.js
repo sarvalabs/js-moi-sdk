@@ -55,7 +55,7 @@ exports.toQuantity = toQuantity;
  * @returns {string} - The hexadecimal string representation of the Uint8Array.
  */
 const encodeToString = (data) => {
-    return Buffer.from(data).toString('hex');
+    return "0x" + Buffer.from(data).toString('hex');
 };
 exports.encodeToString = encodeToString;
 /**

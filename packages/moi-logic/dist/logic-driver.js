@@ -49,7 +49,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                     });
                     // Define routine properties
                     this.routines[routineName].isMutable = () => {
-                        return this.isMutableRoutine(routineName);
+                        return this.isMutableRoutine(routine.name);
                     };
                     this.routines[routineName].accepts = () => {
                         return routine.accepts ? routine.accepts : null;
