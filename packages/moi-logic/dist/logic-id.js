@@ -10,7 +10,7 @@ const moi_utils_1 = require("moi-utils");
 class LogicId {
     logic;
     constructor(logicId) {
-        this.logic = new Uint8Array(Buffer.from(logicId, "hex"));
+        this.logic = (0, moi_utils_1.hexToBytes)(logicId);
     }
     /**
      * hex
@@ -20,7 +20,7 @@ class LogicId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     hex() {
-        return Buffer.from(this.logic).toString('hex');
+        return "0x" + Buffer.from(this.logic).toString('hex');
     }
     /**
      * isValid

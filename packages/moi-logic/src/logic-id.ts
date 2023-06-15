@@ -1,4 +1,4 @@
-import { bytesToHex } from "moi-utils";
+import { bytesToHex, hexToBytes } from "moi-utils";
 
 /**
  * LogicId
@@ -9,7 +9,7 @@ export class LogicId {
     private logic: Uint8Array;
 
     constructor(logicId: string) {
-        this.logic = new Uint8Array(Buffer.from(logicId, "hex"))
+        this.logic = hexToBytes(logicId)
     }
 
     /**
@@ -20,7 +20,7 @@ export class LogicId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     public hex(): string {
-        return Buffer.from(this.logic).toString('hex');
+        return "0x" + Buffer.from(this.logic).toString('hex');
     }
 
     /**
