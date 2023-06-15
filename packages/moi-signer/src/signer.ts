@@ -126,7 +126,7 @@ export abstract class Signer {
         }
 
         if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            if(ixObject.nonce <= nonce) {
+            if(ixObject.nonce < nonce) {
                 ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
             }
         }

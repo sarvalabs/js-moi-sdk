@@ -99,7 +99,7 @@ class Signer {
             moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
         }
         if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            if (ixObject.nonce <= nonce) {
+            if (ixObject.nonce < nonce) {
                 moi_utils_1.ErrorUtils.throwError("Invalid nonce", moi_utils_1.ErrorCode.NONCE_EXPIRED);
             }
         }

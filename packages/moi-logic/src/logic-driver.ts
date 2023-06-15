@@ -1,6 +1,6 @@
 import { ABICoder } from "moi-abi";
 import { LogicPayload, Signer } from "moi-signer";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, LogicManifest, hexToBytes } from "moi-utils";
 import { Options } from "moi-providers";
 import { Routine, Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
@@ -126,17 +126,18 @@ export class LogicDriver extends LogicDescriptor {
      * @returns {LogicPayload} The logic payload.
      */
     protected createPayload(ixObject: LogicIxObject): LogicPayload {
-        const payload: any = {
+        const payload = {
             logic_id: this.getLogicId(),
             callsite: ixObject.routine.name,
-        }
+        } as LogicPayload
 
         if(ixObject.routine.accepts && 
         Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.abiCoder.encodeArguments(
+            const calldata = this.abiCoder.encodeArguments(
                 ixObject.routine.accepts, 
                 ixObject.arguments
             );
+            payload.calldata = hexToBytes(calldata);
         }
 
         return payload;

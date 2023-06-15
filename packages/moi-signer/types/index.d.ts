@@ -32,8 +32,8 @@ export interface AssetMintOrBurnPayload {
 export interface LogicPayload {
     logic_id?: string;
     callsite: string;
-    calldata: string;
-    manifest?: string;
+    calldata: Uint8Array;
+    manifest?: Uint8Array;
 }
 
 export interface InteractionObject {

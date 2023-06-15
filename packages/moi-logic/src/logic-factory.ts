@@ -1,5 +1,5 @@
 import { ABICoder } from "moi-abi";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, LogicManifest, hexToBytes } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { LogicDeployRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -40,16 +40,17 @@ export class LogicFactory extends LogicBase {
      * @returns {LogicPayload} The logic payload.
      */
     protected createPayload(ixObject: LogicIxObject): LogicPayload {
-        const payload: any = {
-            manifest: this.encodedManifest,
+        const payload = {
+            manifest: hexToBytes(this.encodedManifest),
             callsite: ixObject.routine.name
-        }
+        } as LogicPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.abiCoder.encodeArguments(
+            const calldata = this.abiCoder.encodeArguments(
                 ixObject.routine.accepts, 
                 ixObject.arguments
             );
+            payload.calldata = hexToBytes(calldata);
         }
 
         return payload;

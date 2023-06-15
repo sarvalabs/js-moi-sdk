@@ -37,11 +37,12 @@ class LogicFactory extends logic_base_1.LogicBase {
      */
     createPayload(ixObject) {
         const payload = {
-            manifest: this.encodedManifest,
+            manifest: (0, moi_utils_1.hexToBytes)(this.encodedManifest),
             callsite: ixObject.routine.name
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.abiCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            const calldata = this.abiCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            payload.calldata = (0, moi_utils_1.hexToBytes)(calldata);
         }
         return payload;
     }
