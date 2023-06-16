@@ -118,12 +118,11 @@ export declare class Wallet extends Signer {
     /**
      * connect
      *
-     * Connects the wallet to a provider and returns a new instance of the wallet.
+     * Connects the wallet to the given provider.
      *
      * @param provider - The provider to connect.
-     * @returns A new instance of the wallet connected to the specified provider.
      */
-    connect(provider: AbstractProvider): Signer;
+    connect(provider: AbstractProvider): void;
     /**
      * sign
      *

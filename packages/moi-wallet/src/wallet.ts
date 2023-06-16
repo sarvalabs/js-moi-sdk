@@ -331,13 +331,12 @@ export class Wallet extends Signer {
     /**
      * connect
      *
-     * Connects the wallet to a provider and returns a new instance of the wallet.
+     * Connects the wallet to the given provider.
      *
      * @param provider - The provider to connect.
-     * @returns A new instance of the wallet connected to the specified provider.
      */
-    public connect(provider: AbstractProvider): Signer {
-        return new Wallet(provider)
+    public connect(provider: AbstractProvider): void {
+        this.provider = provider
     }
 
     /**

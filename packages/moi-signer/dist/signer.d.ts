@@ -11,7 +11,7 @@ export declare abstract class Signer {
     signingAlgorithms: SigningAlgorithms;
     constructor(provider?: AbstractProvider);
     abstract getAddress(): string;
-    abstract connect(provider: AbstractProvider): Signer;
+    abstract connect(provider: AbstractProvider): void;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
     /**

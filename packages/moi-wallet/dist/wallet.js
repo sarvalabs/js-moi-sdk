@@ -297,13 +297,12 @@ class Wallet extends moi_signer_1.Signer {
     /**
      * connect
      *
-     * Connects the wallet to a provider and returns a new instance of the wallet.
+     * Connects the wallet to the given provider.
      *
      * @param provider - The provider to connect.
-     * @returns A new instance of the wallet connected to the specified provider.
      */
     connect(provider) {
-        return new Wallet(provider);
+        this.provider = provider;
     }
     /**
      * sign
