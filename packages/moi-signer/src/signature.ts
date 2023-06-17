@@ -1,10 +1,10 @@
 export default class Signature {
-    private prefix: Buffer;
-    private digest: Buffer;
-    private extraData: Buffer;
+    private prefix: Uint8Array;
+    private digest: Uint8Array;
+    private extraData: Uint8Array;
     private name: String
 
-    constructor(prefix?: Buffer, digest?: Buffer, extraData?: Buffer, signatureName?: String) {
+    constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: String) {
         this.prefix = prefix;
         this.digest = digest;
         this.extraData = extraData;
@@ -26,7 +26,7 @@ export default class Signature {
         this.name = this.getSignatureName(sig[0].valueOf())
     }
 
-    public Digest(): Buffer {
+    public Digest(): Uint8Array {
         return this.digest;
     }
 
@@ -38,11 +38,11 @@ export default class Signature {
         return this.name;
     }
 
-    public Extra(): Buffer {
+    public Extra(): Uint8Array {
         return this.extraData;
     }
 
-    public Serialize(): Buffer {
+    public Serialize(): Uint8Array {
         if(this.name == "") {
             throw new Error("signature is not intialized");
         }

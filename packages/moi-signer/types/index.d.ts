@@ -3,6 +3,6 @@ import Signature from "../src/signature";
 export interface SigType {
     prefix: number;
     sigName: String;
-    sign(message: Buffer, vault: Wallet): Signature
-    verify(message: Buffer, signature: Signature, publicKey: Buffer): Boolean
+    sign(message: Uint8Array, vault: Wallet): Signature
+    verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): Boolean
 }

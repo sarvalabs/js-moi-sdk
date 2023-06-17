@@ -39,9 +39,9 @@
     "bn.js": "^5.2.1",
     "elliptic": "^6.5.4",
     "hdkey": "^2.1.0",
-    "tiny-secp256k1": "^2.2.1",
     "websocket": "^1.0.34",
-    "bitcoinjs-lib": "^4.0.2",
-    "blake2b": "^2.1.4"
+    "blake2b": "^2.1.4",
+    "@noble/hashes": "^1.1.5",
+    "@noble/secp256k1": "^1.7.1"
   }
 }
