@@ -1,28 +1,36 @@
 import { 
-    AssetCreationReceipt, 
-    AssetKind, 
-    IxType, 
+    AssetKind,
+    AssetCreationReceipt,
+    AssetMintOrBurnReceipt, 
     LogicDeployReceipt, 
     LogicExecuteReceipt 
 } from "moi-utils";
 
-interface Options {
+export interface Options {
     tesseract_number?: number;
     tesseract_hash?: string;
     address?: string;
 }
 
-interface ContextInfo {
+export interface ContextInfo {
     behaviour_nodes: string[];
     random_nodes: string[];
     storage_nodes: string[];
 }
 
-interface TDU {
-    [assetId: string]: number | bigint;
+interface TDUBase {
+    asset_id: string;
 }
 
-interface AccountState {
+export interface TDU extends TDUBase {
+    amount: number | bigint; 
+}
+
+export interface TDUResponse extends TDUBase {
+    amount: string; 
+}
+
+export interface AccountState {
     nonce: string;
     acc_type: number;
     balance: string;
@@ -33,7 +41,7 @@ interface AccountState {
     file_root: string
 }
 
-interface AccountMetaInfo {
+export interface AccountMetaInfo {
     type: number;
     address: string;
     height: string;
@@ -42,144 +50,112 @@ interface AccountMetaInfo {
     state_exists: boolean;
 }
 
-interface AssetCreationPayload {
-    type: AssetKind;
-    symbol: string;
-    supply: string;
-    dimension?: string;
-    decimals?: string;
-    is_fungible?: boolean;
-    is_mintable?: boolean;
-    is_transferable?: boolean;
-    logic_id?: string;
+export interface InteractionRequest {
+    ix_args: string;
+    signature: string;
 }
 
-interface LogicDeployPayload {
-    manifest: string;
-    callsite: string;
-    calldata: string
-}
-
-interface LogicInvokePayload {
-    logic_id: string;
-    callsite: string;
-    calldata: string;
-}
-
-interface InteractionObject {
-    type: IxType;
-    nonce?: string;
-
-    sender: string;
-    receiver?: string;
-    payer?: string;
-
-    transfer_values?: Record<string, string>;
-    perceived_values?: Record<string, string>;
-
-    fuel_price: string;
-    fuel_limit: string;
-    
-    payload?: AssetCreationPayload | LogicDeployPayload | LogicInvokePayload
-}
-
-interface InteractionResponse {
+export interface InteractionResponse {
     hash: string;
-    wait: (interactionHash: string, timeout?: number) => Promise<InteractionReceipt>,
-    result: (interactionHash: string, timeout?: number) => Promise<any>
+    wait: (timeout?: number) => Promise<InteractionReceipt>,
+    result: (timeout?: number) => Promise<any>
 }
 
-interface StateHash {
+export interface StateHash {
     address: string;
     hash: string;
 }
 
-interface ContextHash {
+export interface ContextHash {
     address: string;
     hash: string;
 }
 
-interface InteractionReceipt {
+export interface InteractionReceipt {
     ix_type: string;
     ix_hash: string;
     status: number;
     fuel_used: string;
     state_hashes: StateHash[];
     context_hashes: ContextHash[];
-    extra_data: AssetCreationReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
     from: string;
     to: string;
     ix_index: string;
     parts: string;
 }
 
-interface AssetInfo {
-    type: number;
+export interface AssetInfo {
+    type: AssetKind;
     symbol: string;
     owner: string;
     supply: string;
     dimension: string
-    decimals: string
-    is_fungible: boolean
-    is_mintable: boolean
-    is_transferable: boolean
-    logic_id: string
+    standard: string
+    is_logical: boolean
+    is_stateful: boolean
+    logic_id?: string
 }
 
-interface AccountParamsBase {
+export interface Registry {
+    asset_id: string;
+    asset_info: AssetInfo;
+}
+
+export interface AccountParamsBase {
     address: string,
     options?: Options 
 }
 
-interface AccountStateParams {
+export interface AccountStateParams {
     address: string,
     options?: Options 
 }
 
-interface AccountMetaInfoParams {
+export interface AccountMetaInfoParams {
     address: string
 }
 
-interface BalanceParams extends AccountParamsBase {
+export interface BalanceParams extends AccountParamsBase {
     asset_id: string,
 }
 
-interface TesseractParams extends AccountParamsBase {
+export interface TesseractParams extends AccountParamsBase {
     with_interactions: boolean
 }
 
-interface AssetInfoParams {
+export interface AssetInfoParams {
     asset_id: string 
 }
 
-interface InteractionParams {
+export interface InteractionParams {
     hash: string
 }
 
-interface InteractionByTesseractParams extends AccountParamsBase {
+export interface InteractionByTesseractParams extends AccountParamsBase {
     ix_index: string
 }
 
-interface StorageParams {
+export interface StorageParams {
     logic_id: string;
     storage_key: string;
     options: Options;
 }
 
-interface DBEntryParams {
+export interface DBEntryParams {
     key: string;
 }
 
 // Type alias for encoding type
 type Encoding = "JSON" | "POLO";
 
-interface LogicManifestParams {
+export interface LogicManifestParams {
     logic_id: string;
     encoding: Encoding;
     options: Options;
 }
 
-interface InteractionInfo {
+export interface InteractionInfo {
     nonce: string;
     type: string;
     sender: string;
@@ -191,49 +167,49 @@ interface InteractionInfo {
     hash: string;
 }
 
-interface Content {
+export interface Content {
     pending: Map<string, Map<number | bigint, InteractionInfo>>;
     queued: Map<string, Map<number | bigint, InteractionInfo>>;
 }
 
-interface ContentFrom {
+export interface ContentFrom {
     pending: Map<number | bigint, InteractionInfo>;
     queued: Map<number | bigint, InteractionInfo>;
 }
 
-interface Status {
+export interface Status {
     pending: number | bigint;
     queued: number | bigint;
 }
 
-interface WaitTime {
+export interface WaitTime {
     expired: boolean,
     time: number | bigint
 }
 
-interface Inspect {
+export interface Inspect {
     pending: Map<string, Map<string, string>>;
     queued: Map<string, Map<string, string>>;
     wait_time: Map<string, WaitTime>;
 }
 
-interface RpcErrorResponse {
+export interface RpcErrorResponse {
     code: number;
     message: string;
 }
 
-interface RpcResult {
+export interface RpcResult {
     data?: any
     error?: RpcErrorResponse
 }
 
-interface RpcError {
+export interface RpcError {
     code: number,
     message: string,
     data: any
 }
 
-interface RpcResponse {
+export interface RpcResponse {
     jsonrpc: string;
     result: RpcResult;
     error?: RpcError,

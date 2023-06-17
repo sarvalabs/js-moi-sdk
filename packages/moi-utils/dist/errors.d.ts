@@ -1,26 +1,75 @@
+/**
+ * Enum representing error codes.
+ */
 export declare enum ErrorCode {
-    UNKNOWN_ERROR = "UNKNOWN_ERROR",
-    NOT_IMPLEMENTED = "NOT_IMPLEMENTED",
-    UNSUPPORTED_OPERATION = "UNSUPPORTED_OPERATION",
-    NETWORK_ERROR = "NETWORK_ERROR",
-    SERVER_ERROR = "SERVER_ERROR",
-    TIMEOUT = "TIMEOUT",
-    BUFFER_OVERRUN = "BUFFER_OVERRUN",
-    NUMERIC_FAULT = "NUMERIC_FAULT",
-    MISSING_NEW = "MISSING_NEW",
-    INVALID_ARGUMENT = "INVALID_ARGUMENT",
-    MISSING_ARGUMENT = "MISSING_ARGUMENT",
-    UNEXPECTED_ARGUMENT = "UNEXPECTED_ARGUMENT",
-    CALL_EXCEPTION = "CALL_EXCEPTION",
-    INSUFFICIENT_FUNDS = "INSUFFICIENT_FUNDS",
-    NONCE_EXPIRED = "NONCE_EXPIRED",
-    REPLACEMENT_UNDERPRICED = "REPLACEMENT_UNDERPRICED",
-    UNPREDICTABLE_GAS_LIMIT = "UNPREDICTABLE_GAS_LIMIT",
-    TRANSACTION_REPLACED = "TRANSACTION_REPLACED",
-    ACTION_REJECTED = "ACTION_REJECTED"
+    UNKNOWN_ERROR = "ERROR_UNKNOWN",
+    NOT_IMPLEMENTED = "ERROR_NOT_IMPLEMENTED",
+    UNSUPPORTED_OPERATION = "ERROR_UNSUPPORTED_OPERATION",
+    NETWORK_ERROR = "ERROR_NETWORK",
+    SERVER_ERROR = "ERROR_SERVER",
+    TIMEOUT = "ERROR_TIMEOUT",
+    BUFFER_OVERRUN = "ERROR_BUFFER_OVERRUN",
+    NUMERIC_FAULT = "ERROR_NUMERIC_FAULT",
+    MISSING_NEW = "ERROR_MISSING_NEW",
+    INVALID_ARGUMENT = "ERROR_INVALID_ARGUMENT",
+    MISSING_ARGUMENT = "ERROR_MISSING_ARGUMENT",
+    UNEXPECTED_ARGUMENT = "ERROR_UNEXPECTED_ARGUMENT",
+    NOT_INITIALIZED = "ERROR_NOT_INITIALIZED",
+    PROPERTY_NOT_DEFINED = "ERROR_PROPERTY_NOT_DEFINED",
+    CALL_EXCEPTION = "ERROR_CALL_EXCEPTION",
+    INSUFFICIENT_FUNDS = "ERROR_INSUFFICIENT_FUNDS",
+    NONCE_EXPIRED = "ERROR_NONCE_EXPIRED",
+    INTERACTION_UNDERPRICED = "ERROR_INTERACTION_UNDERPRICED",
+    UNPREDICTABLE_FUEL_LIMIT = "ERROR_UNPREDICTABLE_FUEL_LIMIT",
+    ACTION_REJECTED = "ERROR_ACTION_REJECTED",
+    INVALID_SIGNATURE = "ERROR_INVALID_SIGNATURE"
 }
-export declare class Errors {
-    private static createError;
-    static throwError(message: string, code?: ErrorCode, params?: any): never;
+/**
+ * Interface representing error parameters.
+ */
+interface ErrorParams {
+    [name: string]: any;
+}
+/**
+ * CustomError class that extends the Error class.
+ */
+export declare class CustomError extends Error {
+    code: ErrorCode;
+    reason: string;
+    params: ErrorParams;
+    constructor(message: string, code?: ErrorCode, params?: ErrorParams);
+    /**
+     * toString
+     *
+     * Overrides the toString() method to provide a string representation of the error.
+     * @returns {string} - The string representation of the error.
+     */
+    toString(): string;
+}
+/**
+ * ErrorUtils class with static helper methods for handling errors.
+ */
+export declare class ErrorUtils {
+    /**
+     * throwError
+     *
+     * Throws a CustomError with the specified message, error code, and parameters.
+     * @param {string} message - The error message.
+     * @param {ErrorCode} code - The error code.
+     * @param {ErrorParams} params - The parameters of the error.
+     * @throws {CustomError} - Throws a CustomError.
+     */
+    static throwError(message: string, code?: ErrorCode, params?: ErrorParams): never;
+    /**
+     * throwArgumentError
+     *
+     * Throws a CustomError with the specified argument-related error message,
+     * argument name, and value.
+     * @param {string} message - The error message.
+     * @param {string} name - The name of the argument.
+     * @param {any} value - The value of the argument.
+     * @throws {CustomError} - Throws a CustomError.
+     */
     static throwArgumentError(message: string, name: string, value: any): never;
 }
+export {};

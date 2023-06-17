@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IxType = void 0;
+/**
+ * Enumerates the types of Interactions in the system.
+ */
 var IxType;
 (function (IxType) {
     IxType[IxType["INVALID_IX"] = 0] = "INVALID_IX";
@@ -24,4 +27,4 @@ var IxType;
     IxType[IxType["STAKE_BOND"] = 18] = "STAKE_BOND";
     IxType[IxType["STAKE_UNBOND"] = 19] = "STAKE_UNBOND";
     IxType[IxType["STAKE_TRANSFER"] = 20] = "STAKE_TRANSFER";
-})(IxType = exports.IxType || (exports.IxType = {}));
+})(IxType || (exports.IxType = IxType = {}));

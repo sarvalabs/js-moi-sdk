@@ -11,6 +11,11 @@ import Signature from "./signature";
 
 nobleECC.utils.hmacSha256Sync = (key, ...msgs) => hmac(sha256, key, nobleECC.utils.concatBytes(...msgs));
 
+/**
+ * ECDSA_S256
+ *
+ * Represents the ECDSA_S256 signature type.
+ */
 export default class ECDSA_S256 implements SigType {
     prefix: number;
     sigName: string;

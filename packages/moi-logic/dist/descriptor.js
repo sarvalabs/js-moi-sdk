@@ -8,7 +8,7 @@ var EngineKind;
 (function (EngineKind) {
     EngineKind["PISA"] = "PISA";
     EngineKind["MERU"] = "MERU";
-})(EngineKind = exports.EngineKind || (exports.EngineKind = {}));
+})(EngineKind || (exports.EngineKind = EngineKind = {}));
 class LogicDescriptor {
     logicId;
     manifest;

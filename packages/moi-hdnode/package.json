@@ -13,5 +13,9 @@
     "hdnode"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "moi-constants": "0.1.0",
+    "moi-utils": "0.1.0"
+  }
 }

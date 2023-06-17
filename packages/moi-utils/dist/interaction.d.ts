@@ -1,3 +1,6 @@
+/**
+ * Enumerates the types of Interactions in the system.
+ */
 export declare enum IxType {
     INVALID_IX = 0,
     VALUE_TRANSFER = 1,

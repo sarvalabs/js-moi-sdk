@@ -1,12 +1,13 @@
 import { hexToBytes } from "moi-utils";
+import { ErrorCode, ErrorUtils } from "moi-utils";
 
 export default class Signature {
     private prefix: Uint8Array;
     private digest: Uint8Array;
     private extraData: Uint8Array;
-    private name: String
+    private name: string
 
-    constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: String) {
+    constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: string) {
         this.prefix = prefix;
         this.digest = digest;
         this.extraData = extraData;
@@ -33,11 +34,33 @@ export default class Signature {
         return this.digest;
     }
 
-    public SigByte(): number {
-        return this.prefix[0].valueOf();
+    /**
+     * getSigByte
+     *
+     * Retrieves the signature byte of the signature prefix.
+     *
+     * @returns The signature byte as a number.
+     * @throws Error if the signature byte is invalid.
+     */
+    public getSigByte(): number {
+        if (typeof this.prefix[0] !== "number") {
+            ErrorUtils.throwError(
+                "Invalid signature byte.",
+                ErrorCode.INVALID_SIGNATURE
+            )
+        }
+
+        return this.prefix[0];
     }
 
-    public Name(): String {
+    /**
+     * getName
+     *
+     * Retrieves the name of the signature algorithm.
+     *
+     * @returns The name of the signature algorithm as a string.
+     */
+    public getName(): string {
         return this.name;
     }
 
@@ -47,7 +70,7 @@ export default class Signature {
 
     public Serialize(): Uint8Array {
         if (this.name === "") {
-          throw new Error("Signature is not initialized");
+          ErrorUtils.throwError("Signature is not initialized", ErrorCode.NOT_INITIALIZED);
         }
       
         const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
@@ -56,10 +79,18 @@ export default class Signature {
         return finalSigBytes;
     }
 
-    private getSignatureName(sigIndex: number): String {
-        switch(sigIndex) {
-            case 1: return "ECDSA_S256"
-            default: return ""
+    /**
+     * getSignatureName
+     *
+     * Retrieves the name of the signature algorithm based on the given signature index.
+     *
+     * @param sigIndex - The signature index used to determine the signature algorithm name.
+     * @returns The name of the signature algorithm as a string.
+     */
+    private getSignatureName(sigIndex: number): string {
+        switch (sigIndex) {
+            case 1: return "ECDSA_S256";
+            default: return "";
         }
     }
 }

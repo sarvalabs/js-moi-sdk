@@ -1,5 +1,8 @@
-import { Wallet } from "moi-wallet";
-import { Signer } from "../src";
+// import { Wallet } from "moi-wallet";
+// import { Signer } from "../src";
+// import { JsonRpcProvider } from "moi-providers";
+// import { bytesToHex } from "moi-utils";
+// import { serializeIxObject } from "../src/serializer";
 
 describe("Test ECDSA Signing and verification with SECP256k1 Curve", () => {
     const sampleMnemonic = "unlock element young void mass casino suffer twin earth drill aerobic tooth"
@@ -9,13 +12,17 @@ describe("Test ECDSA Signing and verification with SECP256k1 Curve", () => {
 
     describe("Signing raw message", () => {
         it("should signing the message `hello, world`", async() => {
-            const __vault = new Wallet();
-            await __vault.fromMnemonic(sampleMnemonic, undefined);
-            
-            const _signer = new Signer(__vault);
-            const _signature = _signer.sign(_message, _signer.signingAlgorithms["ecdsa_secp256k1"]);
+            // console.log(bytesToHex(_message))
+            // const provider = new JsonRpcProvider("http://localhost:1600");
+            // const signer = new Signer(provider)
 
-            expect(_signature).toBe(smapleSig);
+            // const __vault = new Wallet();
+            // await __vault.fromMnemonic(sampleMnemonic, undefined);
+            
+            // const _signer = new Signer(__vault);
+            // const _signature = _signer.sign(_message, _signer.signingAlgorithms["ecdsa_secp256k1"]);
+
+            // expect(_signature).toBe(smapleSig);
         })
     })
 

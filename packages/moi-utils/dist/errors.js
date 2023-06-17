@@ -1,66 +1,112 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Errors = exports.ErrorCode = void 0;
+exports.ErrorUtils = exports.CustomError = exports.ErrorCode = void 0;
+/**
+ * Enum representing error codes.
+ */
 var ErrorCode;
 (function (ErrorCode) {
-    ErrorCode["UNKNOWN_ERROR"] = "UNKNOWN_ERROR";
-    ErrorCode["NOT_IMPLEMENTED"] = "NOT_IMPLEMENTED";
-    ErrorCode["UNSUPPORTED_OPERATION"] = "UNSUPPORTED_OPERATION";
-    ErrorCode["NETWORK_ERROR"] = "NETWORK_ERROR";
-    ErrorCode["SERVER_ERROR"] = "SERVER_ERROR";
-    ErrorCode["TIMEOUT"] = "TIMEOUT";
-    ErrorCode["BUFFER_OVERRUN"] = "BUFFER_OVERRUN";
-    ErrorCode["NUMERIC_FAULT"] = "NUMERIC_FAULT";
-    ErrorCode["MISSING_NEW"] = "MISSING_NEW";
-    ErrorCode["INVALID_ARGUMENT"] = "INVALID_ARGUMENT";
-    ErrorCode["MISSING_ARGUMENT"] = "MISSING_ARGUMENT";
-    ErrorCode["UNEXPECTED_ARGUMENT"] = "UNEXPECTED_ARGUMENT";
-    ErrorCode["CALL_EXCEPTION"] = "CALL_EXCEPTION";
-    ErrorCode["INSUFFICIENT_FUNDS"] = "INSUFFICIENT_FUNDS";
-    ErrorCode["NONCE_EXPIRED"] = "NONCE_EXPIRED";
-    ErrorCode["REPLACEMENT_UNDERPRICED"] = "REPLACEMENT_UNDERPRICED";
-    ErrorCode["UNPREDICTABLE_GAS_LIMIT"] = "UNPREDICTABLE_GAS_LIMIT";
-    ErrorCode["TRANSACTION_REPLACED"] = "TRANSACTION_REPLACED";
-    ErrorCode["ACTION_REJECTED"] = "ACTION_REJECTED";
-})(ErrorCode = exports.ErrorCode || (exports.ErrorCode = {}));
-;
-class Errors {
-    static createError(message, code, params) {
-        if (!code) {
-            code = ErrorCode.UNKNOWN_ERROR;
-        }
-        if (!params) {
-            params = {};
-        }
-        let messageDetails = [];
-        Object.keys(params).map(key => {
-            try {
-                messageDetails.push(key + '=' + JSON.stringify(params[key]));
-            }
-            catch (error) {
-                messageDetails.push(key + '=' + JSON.stringify(params[key].toString()));
-            }
-        });
-        let errorMessageStack = "";
-        if (messageDetails.length) {
-            errorMessageStack += ' (' + messageDetails.join(', ') + ')';
-        }
-        const error = new Error(message);
-        error.code = code;
-        error.reason = message;
-        if (errorMessageStack) {
-            error.stack = errorMessageStack;
-        }
-        return error;
+    ErrorCode["UNKNOWN_ERROR"] = "ERROR_UNKNOWN";
+    ErrorCode["NOT_IMPLEMENTED"] = "ERROR_NOT_IMPLEMENTED";
+    ErrorCode["UNSUPPORTED_OPERATION"] = "ERROR_UNSUPPORTED_OPERATION";
+    ErrorCode["NETWORK_ERROR"] = "ERROR_NETWORK";
+    ErrorCode["SERVER_ERROR"] = "ERROR_SERVER";
+    ErrorCode["TIMEOUT"] = "ERROR_TIMEOUT";
+    ErrorCode["BUFFER_OVERRUN"] = "ERROR_BUFFER_OVERRUN";
+    ErrorCode["NUMERIC_FAULT"] = "ERROR_NUMERIC_FAULT";
+    ErrorCode["MISSING_NEW"] = "ERROR_MISSING_NEW";
+    ErrorCode["INVALID_ARGUMENT"] = "ERROR_INVALID_ARGUMENT";
+    ErrorCode["MISSING_ARGUMENT"] = "ERROR_MISSING_ARGUMENT";
+    ErrorCode["UNEXPECTED_ARGUMENT"] = "ERROR_UNEXPECTED_ARGUMENT";
+    ErrorCode["NOT_INITIALIZED"] = "ERROR_NOT_INITIALIZED";
+    ErrorCode["PROPERTY_NOT_DEFINED"] = "ERROR_PROPERTY_NOT_DEFINED";
+    ErrorCode["CALL_EXCEPTION"] = "ERROR_CALL_EXCEPTION";
+    ErrorCode["INSUFFICIENT_FUNDS"] = "ERROR_INSUFFICIENT_FUNDS";
+    ErrorCode["NONCE_EXPIRED"] = "ERROR_NONCE_EXPIRED";
+    ErrorCode["INTERACTION_UNDERPRICED"] = "ERROR_INTERACTION_UNDERPRICED";
+    ErrorCode["UNPREDICTABLE_FUEL_LIMIT"] = "ERROR_UNPREDICTABLE_FUEL_LIMIT";
+    ErrorCode["ACTION_REJECTED"] = "ERROR_ACTION_REJECTED";
+    ErrorCode["INVALID_SIGNATURE"] = "ERROR_INVALID_SIGNATURE";
+})(ErrorCode || (exports.ErrorCode = ErrorCode = {}));
+/**
+ * CustomError class that extends the Error class.
+ */
+class CustomError extends Error {
+    code;
+    reason;
+    params;
+    constructor(message, code = ErrorCode.UNKNOWN_ERROR, params = {}) {
+        super(message);
+        this.code = code;
+        this.reason = message;
+        this.params = params;
+        Object.setPrototypeOf(this, CustomError.prototype);
     }
-    static throwError(message, code, params) {
-        throw this.createError(message, code, params);
+    /**
+     * toString
+     *
+     * Overrides the toString() method to provide a string representation of the error.
+     * @returns {string} - The string representation of the error.
+     */
+    toString() {
+        const messageDetails = Object.entries(this.params)
+            .map(([key, value]) => `${key}=${serializeValue(value)}`)
+            .join(', ');
+        const errorMessageStack = messageDetails ? ` (${messageDetails})` : '';
+        return `${this.reason}${errorMessageStack}`;
     }
+}
+exports.CustomError = CustomError;
+/**
+ * ErrorUtils class with static helper methods for handling errors.
+ */
+class ErrorUtils {
+    /**
+     * throwError
+     *
+     * Throws a CustomError with the specified message, error code, and parameters.
+     * @param {string} message - The error message.
+     * @param {ErrorCode} code - The error code.
+     * @param {ErrorParams} params - The parameters of the error.
+     * @throws {CustomError} - Throws a CustomError.
+     */
+    static throwError(message, code = ErrorCode.UNKNOWN_ERROR, params = {}) {
+        throw new CustomError(message, code, params);
+    }
+    /**
+     * throwArgumentError
+     *
+     * Throws a CustomError with the specified argument-related error message,
+     * argument name, and value.
+     * @param {string} message - The error message.
+     * @param {string} name - The name of the argument.
+     * @param {any} value - The value of the argument.
+     * @throws {CustomError} - Throws a CustomError.
+     */
     static throwArgumentError(message, name, value) {
-        return this.throwError(message, ErrorCode.INVALID_ARGUMENT, {
+        ErrorUtils.throwError(message, ErrorCode.INVALID_ARGUMENT, {
             argument: name,
-            value: value
+            value: serializeValue(value),
         });
     }
 }
-exports.Errors = Errors;
+exports.ErrorUtils = ErrorUtils;
+// helper functions
+/**
+ * serializeValue
+ *
+ * Serializes a value into a string representation.
+ * If the value can be successfully converted to a JSON string, it is returned.
+ * Otherwise, the value is converted to a string using the `String` function.
+ *
+ * @param {any} value - The value to serialize.
+ * @returns {string} - The serialized string representation of the value.
+ */
+const serializeValue = (value) => {
+    try {
+        return JSON.stringify(value);
+    }
+    catch (error) {
+        return String(value);
+    }
+};

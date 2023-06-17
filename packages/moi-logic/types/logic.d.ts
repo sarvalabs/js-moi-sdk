@@ -1,4 +1,5 @@
 import { InteractionResponse } from "moi-providers";
+import { LogicManifest } from "moi-utils";
 
 export interface LogicDeployRequest {
     send: (args: any) => Promise<InteractionResponse>;
@@ -11,11 +12,23 @@ export interface LogicExecuteRequest {
     estimateGas: (args: any) => Promise<any>;
 }
 
+export interface Routine {
+    (args?: any[]): any;
+    isMutable: () => boolean;
+    accepts: () => LogicManifest.TypeField[] | null;
+    returns: () => LogicManifest.TypeField[] | null;
+}
+  
 export interface Routines {
-    [name: string]: (args?: any[]) => any
+    [name: string]: Routine;
 }
 
 export interface CallSite {
     ptr: number,
     kind: string
+}
+
+export interface MethodDef {
+    ptr: number;
+    class: string;
 }

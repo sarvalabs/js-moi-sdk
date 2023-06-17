@@ -1,8 +1,4 @@
 "use strict";
-/*
-    This module/directory is responsible for
-    handling wallet
-*/
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -30,15 +26,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Wallet = void 0;
+exports.Wallet = exports.CURVE = void 0;
 const bip39 = __importStar(require("bip39"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const moi_hdnode_1 = require("moi-hdnode");
 const crypto_1 = require("crypto");
-/* Internal imports */
+const moi_signer_1 = require("moi-signer");
 const moi_utils_1 = require("moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
-const SECP256K1 = "secp256k1";
+const serializer_1 = require("./serializer");
+const keystore_1 = require("./keystore");
+var CURVE;
+(function (CURVE) {
+    CURVE["SECP256K1"] = "secp256k1";
+})(CURVE || (exports.CURVE = CURVE = {}));
+/**
+ * privateMapGet
+ *
+ * Retrieves the value associated with the receiver from a private map.
+ * Throws an error if the receiver is not found in the map.
+ *
+ * @param receiver - The receiver object.
+ * @param privateMap - The private map containing the receiver and its associated value.
+ * @returns The value associated with the receiver.
+ * @throws Error if the receiver is not found in the private map.
+ */
 const privateMapGet = (receiver, privateMap) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateGet();
@@ -49,6 +61,18 @@ const privateMapGet = (receiver, privateMap) => {
     }
     return descriptor.value;
 };
+/**
+ * privateMapSet
+ *
+ * Sets the value associated with the receiver in a private map.
+ * Throws an error if the receiver is not found in the map.
+ *
+ * @param receiver - The receiver object.
+ * @param privateMap - The private map containing the receiver and its associated value.
+ * @param value - The value to set.
+ * @returns The updated value.
+ * @throws Error if the receiver is not found in the private map.
+ */
 const privateMapSet = (receiver, privateMap, value) => {
     if (!privateMap.has(receiver)) {
         SigningKeyErrors.ErrPrivateSet();
@@ -63,20 +87,40 @@ const privateMapSet = (receiver, privateMap, value) => {
     return value;
 };
 const __vault = new WeakMap();
-class Wallet {
-    constructor() {
+/**
+ * Wallet
+ *
+ * A class representing a wallet that can sign interactions and manage keys.
+ */
+class Wallet extends moi_signer_1.Signer {
+    constructor(provider) {
+        super(provider);
         __vault.set(this, {
             value: void 0
         });
     }
-    load(key, mnemonic, curve) {
+    /**
+     * load
+     *
+     * Initializes the wallet with a private key, mnemonic, and curve.
+     *
+     * @param key - The private key as a Buffer.
+     * @param curve - The elliptic curve algorithm used for key generation.
+     * @param mnemonic - The mnemonic associated with the wallet. (optional)
+     * @throws Error if the key is undefined or if an error occurs during the
+     * initialization process.
+     */
+    load(key, curve, mnemonic) {
         try {
             let privKey, pubKey;
             if (!key) {
-                throw new Error("key cannot be undefined");
+                moi_utils_1.ErrorUtils.throwError("Key is required, cannot be undefined", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
-            const ecPrivKey = new elliptic_1.default.ec(SECP256K1);
-            const keyInBytes = (0, moi_utils_1.hexToUint8)(key);
+            if (curve !== CURVE.SECP256K1) {
+                moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            }
+            const ecPrivKey = new elliptic_1.default.ec(curve);
+            const keyInBytes = (0, moi_utils_1.bufferToUint8)(key);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
             pubKey = keyPair.getPublic(true, "hex");
@@ -88,34 +132,228 @@ class Wallet {
             });
         }
         catch (err) {
-            throw err;
+            moi_utils_1.ErrorUtils.throwError("Failed to load wallet", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
+    /**
+     * isInitialized
+     *
+     * Checks if the wallet is initialized.
+     *
+     * @returns true if the wallet is initialized, false otherwise.
+     */
+    isInitialized() {
+        if (privateMapGet(this, __vault)) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * createRandom
+     *
+     * Generates a random mnemonic and initializes the wallet from it.
+     *
+     * @throws Error if there is an error generating the random mnemonic.
+     */
     async createRandom() {
         try {
             const _random16Bytes = (0, crypto_1.randomBytes)(16);
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             await this.fromMnemonic(mnemonic, undefined);
         }
-        catch (e) {
-            throw new Error(e.message);
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
-    async fromMnemonic(mnemonic, wordlist) {
+    /**
+     * generateKeystore
+     *
+     * Generates a keystore file from the wallet's private key, encrypted with a password.
+     *
+     * @param password Used for encrypting the keystore data.
+     * @returns The generated keystore object.
+     * @throws Error if the wallet is not initialized or loaded, or if there is an error generating the keystore.
+     */
+    generateKeystore(password) {
+        if (!this.isInitialized()) {
+            moi_utils_1.ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        }
+        try {
+            const data = Buffer.from(this.privateKey(), "hex");
+            return (0, keystore_1.encryptKeystoreData)(data, password);
+        }
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to generate keystore", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
+     * fromMnemonic
+     *
+     * Intializes the wallet from a provided mnemonic.
+     *
+     * @param mnemonic - The mnemonic associated with the wallet.
+     * @param path - The derivation path for the HDNode. (optional)
+     * @param wordlist - The wordlist for the mnemonic. (optional)
+     * @throws Error if there is an error loading the wallet from the mnemonic.
+     */
+    async fromMnemonic(mnemonic, path, wordlist) {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const hdNode = new moi_hdnode_1.HDNode();
-            hdNode.fromSeed(seed);
-            this.load(hdNode.privateKey(), mnemonic, SECP256K1);
+            hdNode.fromSeed(seed, path);
+            this.load(hdNode.privateKey(), CURVE.SECP256K1, mnemonic);
         }
-        catch (e) {
-            throw new Error(e.message);
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
-    privateKey() { return privateMapGet(this, __vault)._key; }
-    mnemonic() { return privateMapGet(this, __vault)._mnemonic; }
-    publicKey() { return privateMapGet(this, __vault)._public; }
-    curve() { return privateMapGet(this, __vault)._curve; }
+    /**
+     * fromKeystore
+     *
+     * Initializes the wallet by decrypting and loading the private key from a keystore file.
+     *
+     * @param keystore The keystore object as a JSON string.
+     * @param password The password used for decrypting the keystore.
+     * @throws Error if there is an error parsing the keystore, decrypting the keystore data, or loading the private key.
+     */
+    fromKeystore(keystore, password) {
+        try {
+            const keystoreJson = JSON.parse(keystore);
+            const privateKey = (0, keystore_1.decryptKeystoreData)(keystoreJson, password);
+            this.load(privateKey, CURVE.SECP256K1);
+        }
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
+     * privateKey
+     *
+     * Retrieves the private key associated with the wallet.
+     *
+     * @returns The private key as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
+    privateKey() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._key;
+        }
+        moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    /**
+     * mnemonic
+     *
+     * Retrieves the mnemonic associated with the wallet.
+     *
+     * @returns The mnemonic as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
+    mnemonic() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._mnemonic;
+        }
+        moi_utils_1.ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    /**
+     * publicKey
+     *
+     * Retrieves the public key associated with the wallet.
+     *
+     * @returns The public key as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
+    publicKey() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._public;
+        }
+        moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    /**
+     * curve
+     *
+     * Retrieves the curve used by the wallet.
+     *
+     * @returns The curve as a string.
+     * @throws Error if the wallet is not loaded or initialized.
+     */
+    curve() {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._curve;
+        }
+        moi_utils_1.ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
+    }
+    /**
+     * getAddress
+     *
+     * Retrieves the address associated with the wallet.
+     *
+     * @returns The address as a string.
+     */
+    getAddress() {
+        const publicKey = this.publicKey();
+        return "0x" + publicKey.slice(2);
+    }
+    /**
+     * connect
+     *
+     * Connects the wallet to the given provider.
+     *
+     * @param provider - The provider to connect.
+     */
+    connect(provider) {
+        this.provider = provider;
+    }
+    /**
+     * sign
+     *
+     * Signs a message using the wallet's private key and the specified signature algorithm.
+     *
+     * @param message - The message to sign as a Uint8Array.
+     * @param sigAlgo - The signature algorithm to use.
+     * @returns The signature as a string.
+     * @throws Error if the signature type is unsupported or undefined, or if there is an error during signing.
+     */
+    sign(message, sigAlgo) {
+        if (sigAlgo) {
+            switch (sigAlgo.sigName) {
+                case "ECDSA_S256": {
+                    const privateKey = this.privateKey();
+                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
+                    return sigBytes.serialize().toString('hex');
+                }
+                default: {
+                    moi_utils_1.ErrorUtils.throwError("Unsupported signature type", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+                }
+            }
+        }
+        moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefiend", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    }
+    /**
+     * signInteraction
+     *
+     * Signs an interaction object using the wallet's private key and the specified signature algorithm.
+     * The interaction object is serialized into POLO bytes before signing.
+     *
+     * @param ixObject - The interaction object to sign.
+     * @param sigAlgo - The signature algorithm to use.
+     * @returns The signed interaction request containing the serialized
+     * interaction object and the signature.
+     * @throws Error if there is an error during signing or serialization.
+     */
+    signInteraction(ixObject, sigAlgo) {
+        try {
+            const ixData = (0, serializer_1.serializeIxObject)(ixObject);
+            const signature = this.sign(ixData, sigAlgo);
+            return {
+                ix_args: (0, moi_utils_1.bytesToHex)(ixData),
+                signature: signature
+            };
+        }
+        catch (err) {
+            moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
 }
 exports.Wallet = Wallet;

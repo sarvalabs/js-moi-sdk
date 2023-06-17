@@ -8,16 +8,18 @@ const moi_abi_1 = require("moi-abi");
 const moi_utils_1 = require("moi-utils");
 const errors_1 = __importDefault(require("./errors"));
 const errors_2 = __importDefault(require("./errors"));
-class LogicFactory {
+const element_descriptor_1 = __importDefault(require("./element-descriptor"));
+class LogicFactory extends element_descriptor_1.default {
     manifest;
     encodedManifest;
     provider;
     abiCoder;
     constructor(manifest, provider) {
+        super(manifest.elements);
         this.manifest = manifest;
         this.encodedManifest = moi_abi_1.ABICoder.encodeABI(manifest);
         this.provider = provider;
-        this.abiCoder = new moi_abi_1.ABICoder();
+        this.abiCoder = new moi_abi_1.ABICoder(this.elements, this.classDefs);
     }
     createPayload(ixObject) {
         const payload = {

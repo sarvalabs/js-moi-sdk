@@ -41,8 +41,17 @@ class ECDSA_S256 {
         this.prefix = 1;
         this.sigName = "ECDSA_S256";
     }
-    sign(message, vault) {
-        let signingKey = vault.privateKey();
+    /**
+     * sign
+     *
+     * Signs a message using the ECDSA_S256 signature algorithm.
+     *
+     * @param message - The message to be signed, as a Buffer.
+     * @param signingKey - The private key used for signing, either as
+     * a hexadecimal string or a Buffer.
+     * @returns A Signature object representing the signed message.
+     */
+    sign(message, signingKey) {
         let _signingKey;
         if (typeof signingKey === "string") {
             _signingKey = (0, moi_utils_1.hexToBytes)(signingKey);
@@ -66,6 +75,16 @@ class ECDSA_S256 {
         const sig = new signature_1.default(prefixArray, signature, parityByte, this.sigName);
         return sig;
     }
+    /**
+     * verify
+     *
+     * Verifies the signature of a message using the ECDSA_S256 signature algorithm.
+     *
+     * @param message - The message to be verified, as a Buffer.
+     * @param signature - The signature to be verified, as a Signature instance.
+     * @param publicKey - The public key used for verification, as a Buffer.
+     * @returns A boolean indicating whether the signature is valid.
+     */
     verify(message, signature, publicKey) {
         let verificationKey = Buffer.concat([signature.Extra(), publicKey]);
         let rawSignature = signature.Digest();

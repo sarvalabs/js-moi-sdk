@@ -7,9 +7,9 @@ exports.getLogicDriver = exports.LogicDriver = void 0;
 const moi_abi_1 = require("moi-abi");
 const moi_utils_1 = require("moi-utils");
 const state_1 = require("./state");
-const descriptor_1 = __importDefault(require("./descriptor"));
+const logic_descriptor_1 = __importDefault(require("./logic-descriptor"));
 const errors_1 = __importDefault(require("./errors"));
-class LogicDriver extends descriptor_1.default {
+class LogicDriver extends logic_descriptor_1.default {
     provider;
     abiCoder;
     routines;

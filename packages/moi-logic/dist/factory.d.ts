@@ -1,7 +1,8 @@
 import { LogicManifest } from "moi-utils";
 import { JsonRpcProvider } from "moi-providers";
 import { LogicDeployRequest } from "../types/logic";
-export declare class LogicFactory {
+import ElementDescriptor from "./element-descriptor";
+export declare class LogicFactory extends ElementDescriptor {
     private manifest;
     private encodedManifest;
     private provider;

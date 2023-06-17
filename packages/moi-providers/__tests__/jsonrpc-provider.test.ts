@@ -1,29 +1,33 @@
-import { JsonRpcProvider } from "../src/jsonrpc-provider";
-import { InteractionReceipt } from "moi-providers/types/jsonrpc";
-import { AssetCreationReceipt, hexToBN, IxType } from "moi-utils";
+import { AssetCreationReceipt, AssetKind, hexToBN, IxType } from "moi-utils";
+import { JsonRpcProvider } from "../dist/jsonrpc-provider";
+import { InteractionReceipt } from "../types/jsonrpc";
+import { initializeWallet } from "./utils/utils";
 
 describe("Test JsonRpcProvider Query Calls", () => {
-    const address = "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084";
+    const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
     let provider:JsonRpcProvider;
     let ixHash: string;
     let ixReceipt: InteractionReceipt
 
     beforeAll(async() => {
       provider = new JsonRpcProvider('http://localhost:1600');
-      const ixResponse = await provider.sendInteraction({
+      const signer = await initializeWallet(provider)
+      const nonce = await signer.getNonce();
+      const ixResponse = await signer.sendInteraction({
         type: IxType.ASSET_CREATE,
+        nonce: nonce,
         sender: address,
-        fuel_price: "0x130D41",
-        fuel_limit: "0x130D41",
+        fuel_price: 1,
+        fuel_limit: 200,
         payload: {
-          type: 2,
-          symbol: "MOI",
-          supply: "0x130D41"
+            type: AssetKind.ASSET_KIND_CONTEXT,
+            symbol: "TEST",
+            supply: 1248577
         }
       })
 
       ixHash = ixResponse.hash;
-      ixReceipt = await ixResponse.wait(ixHash)
+      ixReceipt = await ixResponse.wait()
     });
 
     describe('getBalance', () => {

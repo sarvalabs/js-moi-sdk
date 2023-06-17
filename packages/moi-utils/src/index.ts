@@ -11,7 +11,8 @@ export * from "./hexToUint8";
 export * from "./json";
 export { Hex } from "../types/hex";
 export { 
-    AssetCreationReceipt, 
+    AssetCreationReceipt,
+    AssetMintOrBurnReceipt, 
     LogicDeployReceipt, 
     LogicExecuteReceipt 
 } from "../types/receipt";
