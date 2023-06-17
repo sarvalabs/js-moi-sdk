@@ -39,7 +39,7 @@ class ECDSA_S256 {
         // Hashing raw message with blake2b to get 32 bytes digest 
         const messageHash = (0, blake2b_1.default)(256 / 8).update(message).digest();
         const keyPair = bitcoinjs_lib_1.ECPair.fromPrivateKey(_signingKey, { network: bitcoinjs_lib_1.networks.bitcoin });
-        let signature = bitcoinjs_lib_1.script.signature.encode(keyPair.sign(messageHash), bitcoinjs_lib_1.Transaction.SIGHASH_ALL);
+        let signature = bitcoinjs_lib_1.script.signature.encode(keyPair.sign(Buffer.from(messageHash)), bitcoinjs_lib_1.Transaction.SIGHASH_ALL);
         // Removing last byte, since it's always 0x01 because of SIGHASH_ALL hashType
         signature = signature.slice(0, signature.length - 1);
         const prefixArray = new Uint8Array(2);

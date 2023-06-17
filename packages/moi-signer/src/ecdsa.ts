@@ -40,7 +40,7 @@ export default class ECDSA_S256 implements SigType {
         
         const keyPair = ECPair.fromPrivateKey(_signingKey, { network: networks.bitcoin });
         let signature = script.signature.encode(
-          keyPair.sign(messageHash),
+          keyPair.sign(Buffer.from(messageHash)),
           Transaction.SIGHASH_ALL
         );
                      
