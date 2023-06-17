@@ -1,3 +1,5 @@
+import { hexToBytes } from "moi-utils";
+
 export default class Signature {
     private prefix: Uint8Array;
     private digest: Uint8Array;
@@ -11,20 +13,21 @@ export default class Signature {
         this.name = signatureName
     }
     
-    public UnMarshall(signature: Buffer | String) {
-        let sig: Buffer;
-        if(typeof signature === "string") {
-            sig = Buffer.from(signature, 'hex')
-        }else {
-            sig = Buffer.from(signature)
+    public UnMarshall(signature: Uint8Array | String) {
+        let sig: Uint8Array;
+        if (typeof signature === "string") {
+            sig = hexToBytes(signature)
+        } else {
+            sig = signature as Uint8Array
         }
 
-        const sigLen = sig[1].valueOf();
-        this.prefix = sig.subarray(0,2);
-        this.digest = sig.subarray(2, 2+sigLen);
-        this.extraData = sig.subarray(2+sigLen)
-        this.name = this.getSignatureName(sig[0].valueOf())
+        const sigLen = sig[1];
+        this.prefix = sig.subarray(0, 2);
+        this.digest = sig.subarray(2, 2 + sigLen);
+        this.extraData = sig.subarray(2 + sigLen);
+        this.name = this.getSignatureName(sig[0]);
     }
+    
 
     public Digest(): Uint8Array {
         return this.digest;
@@ -43,11 +46,13 @@ export default class Signature {
     }
 
     public Serialize(): Uint8Array {
-        if(this.name == "") {
-            throw new Error("signature is not intialized");
+        if (this.name === "") {
+          throw new Error("Signature is not initialized");
         }
-        const finalSigBytesWithoutExtra = Buffer.concat([Buffer.from(this.prefix), this.digest]);
-        const finalSigBytes = Buffer.concat([finalSigBytesWithoutExtra, this.extraData]);
+      
+        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
+        const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);
+        
         return finalSigBytes;
     }
 

@@ -7,6 +7,7 @@ import ECDSA_S256 from "./ecdsa"
 import { SigType } from "../types"
 import { Wallet } from "moi-wallet"
 import Signature from "./signature"
+import { bytesToHex, hexToBytes } from "moi-utils"
 
 export class Signer {
     private signingVault: Wallet
@@ -19,13 +20,14 @@ export class Signer {
         }
     }
 
-    public sign(message: Buffer, sigAlgo: SigType): String {
+    public sign(message: Uint8Array, sigAlgo: SigType): String {
         if(sigAlgo) {
             switch(sigAlgo.sigName) {
                 case "ECDSA_S256": {
-                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(message, this.signingVault);
-                    return sigBytes.Serialize().toString('hex');
+                    const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sig = _sigAlgo.sign(message, this.signingVault);
+                    const sigBytes =  sig.Serialize()
+                    return bytesToHex(sigBytes)
                 }
                 default: {
                     throw new Error("invalid signature type")
@@ -35,27 +37,28 @@ export class Signer {
         throw new Error("signature type cannot be undefiend")
     }
 
-    public verify(message: Buffer, signature: string|Buffer, publicKey: string|Buffer): boolean {
-        let verificationKey: Buffer;
+    public verify(message: Uint8Array, signature: string | Uint8Array, publicKey: String | Uint8Array): boolean {
+        let verificationKey: Uint8Array;
 
-        if(typeof publicKey === "string") {
-            verificationKey = Buffer.from(publicKey, 'hex');
-        }else {
-            verificationKey = Buffer.from(publicKey)
+        if (typeof publicKey === "string") {
+            verificationKey = hexToBytes(publicKey as string)
+        } else {
+            verificationKey = publicKey as Uint8Array
         }
-        
+
         const sig = new Signature();
         sig.UnMarshall(signature);
 
-        switch(sig.SigByte()) {
+        switch (sig.SigByte()) {
             case 1: {
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
 
                 return _sig.verify(message, sig, verificationKey);
             }
             default: {
-                throw new Error("invalid signature")
+                throw new Error("Invalid signature");
             }
         }
+
     }
 }

@@ -54,7 +54,9 @@ export default class ECDSA_S256 implements SigType {
     }
 
     verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): Boolean {  
-        let verificationKey = Buffer.concat([signature.Extra(), publicKey])
+        let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
+        verificationKey.set(signature.Extra());
+        verificationKey.set(publicKey, signature.Extra().length);
 
         let derSignature = signature.Digest();
 
