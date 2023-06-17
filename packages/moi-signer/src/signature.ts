@@ -14,7 +14,7 @@ export default class Signature {
         this.name = signatureName
     }
     
-    public UnMarshall(signature: Uint8Array | String) {
+    public unmarshall(signature: Uint8Array | String) {
         let sig: Uint8Array;
         if (typeof signature === "string") {
             sig = hexToBytes(signature)
