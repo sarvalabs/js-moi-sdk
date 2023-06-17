@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
+exports.trimHexPrefix = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
 /**
  * numToHex
@@ -119,3 +119,18 @@ const bytesToHex = (data) => {
     return Buffer.from(data).toString('hex');
 };
 exports.bytesToHex = bytesToHex;
+/**
+ * trimHexPrefix
+ *
+ * Removes the '0x' prefix from a hexadecimal string if present.
+ *
+ * @param {string} hex - The input string.
+ * @returns {string} - The trimmed hexadecimal string.
+ */
+const trimHexPrefix = (hex) => {
+    if (hex.startsWith('0x')) {
+        hex = hex.slice(2);
+    }
+    return hex;
+};
+exports.trimHexPrefix = trimHexPrefix;

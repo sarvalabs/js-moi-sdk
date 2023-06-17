@@ -61,3 +61,12 @@ export declare const hexToBN: (hex: string) => bigint | number;
  * @returns {string} - The hexadecimal string representation of the Uint8Array.
  */
 export declare const bytesToHex: (data: Uint8Array) => string;
+/**
+ * trimHexPrefix
+ *
+ * Removes the '0x' prefix from a hexadecimal string if present.
+ *
+ * @param {string} hex - The input string.
+ * @returns {string} - The trimmed hexadecimal string.
+ */
+export declare const trimHexPrefix: (hex: string) => string;

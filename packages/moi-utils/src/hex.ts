@@ -121,3 +121,19 @@ export const hexToBN = (hex: string): bigint | number => {
 export const bytesToHex = (data: Uint8Array): string => {
   return Buffer.from(data).toString('hex');
 }
+
+/**
+ * trimHexPrefix
+ * 
+ * Removes the '0x' prefix from a hexadecimal string if present.
+ *
+ * @param {string} hex - The input string.
+ * @returns {string} - The trimmed hexadecimal string.
+ */
+export const trimHexPrefix = (hex: string): string => {
+  if (hex.startsWith('0x')) {
+    hex = hex.slice(2);
+  }
+
+  return hex;
+};

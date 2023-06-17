@@ -700,48 +700,35 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                         break;
                     case moi_utils_1.IxType.ASSET_CREATE:
                         if (receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data;
-                            resolve(receipt.extra_data.asset_id);
+                            resolve(receipt.extra_data);
                         }
-                        reject({ message: "asset id not found" });
+                        reject(new Error("Failed to retrieve asset creation response"));
                         break;
                     case moi_utils_1.IxType.ASSET_MINT:
                     case moi_utils_1.IxType.ASSET_BURN:
                         if (receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data;
-                            resolve(receipt.extra_data["total_supply"]);
+                            resolve(receipt.extra_data);
                         }
-                        reject({ message: "total supply not found" });
+                        reject(new Error("Failed to retrieve asset mint/burn response"));
                         break;
                     case moi_utils_1.IxType.LOGIC_DEPLOY:
                         if (receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data;
                             resolve(receipt.extra_data);
                         }
-                        reject({
-                            message: "invalid logic deploy response",
-                            error: null
-                        });
+                        reject(new Error("Failed to retrieve logic deploy response"));
                         break;
                     case moi_utils_1.IxType.LOGIC_INVOKE:
                         if (receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data;
                             resolve(receipt.extra_data);
                         }
-                        reject({
-                            message: "invalid logic invoke response",
-                            error: null
-                        });
+                        reject(new Error("Failed to retrieve logic invoke response"));
                         break;
                     default:
-                        reject({
-                            message: "unsupported interaction type",
-                            error: null
-                        });
+                        reject(new Error("Unsupported interaction type encountered"));
                 }
             }
             catch (err) {
-                throw err;
+                reject(new Error(`An error occurred while waiting for result: ${err.message}`));
             }
         });
     }

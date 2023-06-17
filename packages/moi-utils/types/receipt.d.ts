@@ -1,6 +1,7 @@
 
 export interface AssetCreationReceipt {
     asset_id: string;
+    address: string;
 }
 
 export interface AssetMintOrBurnReceipt {
@@ -8,7 +9,7 @@ export interface AssetMintOrBurnReceipt {
 }
 
 export interface LogicDeployReceipt {
-    logic_id: string;
+    logic_id?: string;
     error: string
 }
 

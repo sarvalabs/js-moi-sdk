@@ -814,55 +814,42 @@ export class BaseProvider extends AbstractProvider {
                         break;
                     case IxType.ASSET_CREATE:
                         if(receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data as AssetCreationReceipt;
-                            resolve(receipt.extra_data.asset_id);
+                            resolve(receipt.extra_data as AssetCreationReceipt);
                         }
 
-                        reject({message: "asset id not found"});
+                        reject(new Error("Failed to retrieve asset creation response"));
 
                         break;
                     case IxType.ASSET_MINT:
                     case IxType.ASSET_BURN:
                         if(receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data as AssetMintOrBurnReceipt;
-                            resolve(receipt.extra_data["total_supply"]);
+                            resolve(receipt.extra_data as AssetMintOrBurnReceipt);
                         }
 
-                        reject({message: "total supply not found"});
+                        reject(new Error("Failed to retrieve asset mint/burn response"));
 
                         break;
                     case IxType.LOGIC_DEPLOY:
                         if(receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data as LogicDeployReceipt;
-                            resolve(receipt.extra_data);
+                            resolve(receipt.extra_data as LogicDeployReceipt);
                         }
 
-                        reject({
-                            message: "invalid logic deploy response", 
-                            error: null
-                        })
+                        reject(new Error("Failed to retrieve logic deploy response"));
 
                         break;
                     case IxType.LOGIC_INVOKE:
                         if(receipt.extra_data) {
-                            receipt.extra_data = receipt.extra_data as LogicExecuteReceipt;
-                            resolve(receipt.extra_data);
+                            resolve(receipt.extra_data as LogicExecuteReceipt);
                         }
 
-                        reject({
-                            message: "invalid logic invoke response", 
-                            error: null
-                        });
+                        reject(new Error("Failed to retrieve logic invoke response"));
 
                         break;
                     default:
-                        reject({
-                            message: "unsupported interaction type", 
-                            error: null
-                        });
+                        reject(new Error("Unsupported interaction type encountered"));
                 }
             } catch(err) {
-                throw err;
+                reject(new Error(`An error occurred while waiting for result: ${err.message}`));
             }
         })
     }

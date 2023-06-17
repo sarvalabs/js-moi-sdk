@@ -36,6 +36,8 @@ export interface LogicPayload {
     manifest?: Uint8Array;
 }
 
+export type InteractionPayload = AssetCreatePayload | AssetMintOrBurnPayload | LogicPayload;
+
 export interface InteractionObject {
     type: IxType;
     nonce?: number | bigint;
@@ -50,5 +52,22 @@ export interface InteractionObject {
     fuel_price: number | bigint;
     fuel_limit: number | bigint;
     
-    payload?: AssetCreatePayload | AssetMintOrBurnPayload | LogicPayload;
+    payload?: InteractionPayload;
+}
+
+export interface ProcessedIxObject {
+    type: IxType;
+    nonce?: number | bigint;
+
+    sender: Uint8Array;
+    receiver: Uint8Array;
+    payer: Uint8Array;
+
+    transfer_values?: Map<string, number | bigint>;
+    perceived_values?: Map<string, number | bigint>;
+
+    fuel_price: number | bigint;
+    fuel_limit: number | bigint;
+    
+    payload?: InteractionPayload;
 }
