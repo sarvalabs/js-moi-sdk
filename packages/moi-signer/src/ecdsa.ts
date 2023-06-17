@@ -2,7 +2,6 @@ import Blake2b from "blake2b";
 import * as nobleECC from '@noble/secp256k1';
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
-import { Wallet } from "moi-wallet";
 import { hexToBytes } from "moi-utils";
 
 import { toDER, bip66Encode, SigDigest, bip66Decode, JoinSignature, fromDER } from "./utils";
@@ -25,8 +24,17 @@ export default class ECDSA_S256 implements SigType {
         this.sigName = "ECDSA_S256";
     }
 
-    sign(message: Uint8Array, vault: Wallet): Signature {
-        let signingKey = vault.privateKey();
+    /**
+     * sign
+     *
+     * Signs a message using the ECDSA_S256 signature algorithm.
+     *
+     * @param message - The message to be signed, as a Buffer.
+     * @param signingKey - The private key used for signing, either as 
+     * a hexadecimal string or a Buffer.
+     * @returns A Signature object representing the signed message.
+     */
+     public sign(message: Buffer, signingKey: Buffer | string): Signature {
         let _signingKey: Uint8Array
         if(typeof signingKey === "string") {
             _signingKey = hexToBytes(signingKey)

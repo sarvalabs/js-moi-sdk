@@ -7,7 +7,7 @@ var ContextStateKind;
 (function (ContextStateKind) {
     ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
     ContextStateKind[ContextStateKind["EphemeralState"] = 1] = "EphemeralState";
-})(ContextStateKind || (exports.ContextStateKind = ContextStateKind = {}));
+})(ContextStateKind = exports.ContextStateKind || (exports.ContextStateKind = {}));
 /**
  * ContextStateMatrix
  *

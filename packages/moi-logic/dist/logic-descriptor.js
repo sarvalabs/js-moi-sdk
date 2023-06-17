@@ -9,7 +9,7 @@ var EngineKind;
 (function (EngineKind) {
     EngineKind["PISA"] = "PISA";
     EngineKind["MERU"] = "MERU";
-})(EngineKind || (exports.EngineKind = EngineKind = {}));
+})(EngineKind = exports.EngineKind || (exports.EngineKind = {}));
 /**
  * LogicDescriptor
  *

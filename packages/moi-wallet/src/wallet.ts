@@ -354,9 +354,10 @@ export class Wallet extends Signer {
             switch(sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const privateKey = this.privateKey();
-                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
-                    return sigBytes.serialize().toString('hex');
+                    const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sig = _sigAlgo.sign(Buffer.from(message), privateKey);
+                    const sigBytes = sig.serialize();
+                    return bytesToHex(sigBytes);
                 }
                 default: {
                     ErrorUtils.throwError(

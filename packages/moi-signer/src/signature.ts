@@ -68,7 +68,7 @@ export default class Signature {
         return this.extraData;
     }
 
-    public Serialize(): Uint8Array {
+    public serialize(): Uint8Array {
         if (this.name === "") {
           ErrorUtils.throwError("Signature is not initialized", ErrorCode.NOT_INITIALIZED);
         }

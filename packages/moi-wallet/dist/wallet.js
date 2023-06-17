@@ -39,7 +39,7 @@ const keystore_1 = require("./keystore");
 var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
-})(CURVE || (exports.CURVE = CURVE = {}));
+})(CURVE = exports.CURVE || (exports.CURVE = {}));
 /**
  * privateMapGet
  *
@@ -319,9 +319,10 @@ class Wallet extends moi_signer_1.Signer {
             switch (sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const privateKey = this.privateKey();
-                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
-                    return sigBytes.serialize().toString('hex');
+                    const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sig = _sigAlgo.sign(Buffer.from(message), privateKey);
+                    const sigBytes = sig.serialize();
+                    return (0, moi_utils_1.bytesToHex)(sigBytes);
                 }
                 default: {
                     moi_utils_1.ErrorUtils.throwError("Unsupported signature type", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

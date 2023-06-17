@@ -34,6 +34,11 @@ const moi_utils_1 = require("moi-utils");
 const utils_1 = require("./utils");
 const signature_1 = __importDefault(require("./signature"));
 nobleECC.utils.hmacSha256Sync = (key, ...msgs) => (0, hmac_1.hmac)(sha256_1.sha256, key, nobleECC.utils.concatBytes(...msgs));
+/**
+ * ECDSA_S256
+ *
+ * Represents the ECDSA_S256 signature type.
+ */
 class ECDSA_S256 {
     prefix;
     sigName;
@@ -75,22 +80,13 @@ class ECDSA_S256 {
         const sig = new signature_1.default(prefixArray, signature, parityByte, this.sigName);
         return sig;
     }
-    /**
-     * verify
-     *
-     * Verifies the signature of a message using the ECDSA_S256 signature algorithm.
-     *
-     * @param message - The message to be verified, as a Buffer.
-     * @param signature - The signature to be verified, as a Signature instance.
-     * @param publicKey - The public key used for verification, as a Buffer.
-     * @returns A boolean indicating whether the signature is valid.
-     */
     verify(message, signature, publicKey) {
-        let verificationKey = Buffer.concat([signature.Extra(), publicKey]);
-        let rawSignature = signature.Digest();
-        // Hashing raw message with blake2b to get 32 bytes digest 
+        let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
+        verificationKey.set(signature.Extra());
+        verificationKey.set(publicKey, signature.Extra().length);
+        let derSignature = signature.Digest();
         const messageHash = (0, blake2b_1.default)(256 / 8).update(message).digest();
-        const _digest = (0, utils_1.bip66Decode)(rawSignature);
+        const _digest = (0, utils_1.bip66Decode)(derSignature);
         const sigDigest = {
             _r: (0, utils_1.fromDER)(_digest._r),
             _s: (0, utils_1.fromDER)(_digest._s)
