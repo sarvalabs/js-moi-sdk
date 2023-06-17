@@ -10,6 +10,7 @@ exports.Signer = void 0;
     using different Curves and Algorithms
 */
 const ecdsa_1 = __importDefault(require("./ecdsa"));
+const signature_1 = __importDefault(require("./signature"));
 class Signer {
     signingVault;
     signingAlgorithms;
@@ -24,7 +25,8 @@ class Signer {
             switch (sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    return _sig.sign(message, this.signingVault);
+                    const sigBytes = _sig.sign(message, this.signingVault);
+                    return sigBytes.Serialize().toString('hex');
                 }
                 default: {
                     throw new Error("invalid signature type");
@@ -34,22 +36,19 @@ class Signer {
         throw new Error("signature type cannot be undefiend");
     }
     verify(message, signature, publicKey) {
-        let _verificationKey;
+        let verificationKey;
         if (typeof publicKey === "string") {
-            _verificationKey = Buffer.from(publicKey, 'hex');
+            verificationKey = Buffer.from(publicKey, 'hex');
         }
         else {
-            _verificationKey = publicKey;
+            verificationKey = Buffer.from(publicKey);
         }
-        const signatureInBytes = Buffer.from(signature, 'hex');
-        switch (signatureInBytes[0]) {
+        const sig = new signature_1.default();
+        sig.UnMarshall(signature);
+        switch (sig.SigByte()) {
             case 1: {
-                if (_verificationKey.length === 32) {
-                    _verificationKey = Buffer.concat([Buffer.from([0x03]), _verificationKey]);
-                }
-                const sigLength = signatureInBytes[1];
                 const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                return _sig.verify(message, signatureInBytes.subarray(2, 2 + sigLength), _verificationKey);
+                return _sig.verify(message, sig, verificationKey);
             }
             default: {
                 throw new Error("invalid signature");

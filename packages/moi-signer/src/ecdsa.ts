@@ -5,7 +5,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { Wallet } from "moi-wallet";
 import { hexToBytes } from "moi-utils";
 
-import { toDER, bip66Encode } from "./utils";
+import { toDER, bip66Encode, SigDigest, bip66Decode, JoinSignature, fromDER } from "./utils";
 import { SigType } from "../types";
 import Signature from "./signature";
 
@@ -34,10 +34,12 @@ export default class ECDSA_S256 implements SigType {
         
         const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false }); 
         
-        const _r = toDER(sigParts.slice(0, 32))
-        const _s = toDER(sigParts.slice(32, 64))
-        const signature = bip66Encode(_r, _s);
-        console.log(signature);
+        const digest: SigDigest = {
+            _r: toDER(sigParts.slice(0, 32)),
+            _s: toDER(sigParts.slice(32, 64))
+        }
+
+        const signature = bip66Encode(digest);
         
         const prefixArray = new Uint8Array(2);
         prefixArray[0] = this.prefix;
@@ -47,13 +49,23 @@ export default class ECDSA_S256 implements SigType {
 
         const parityByte = new Uint8Array([pubKey[0]]);
         const sig = new Signature(prefixArray, signature, parityByte, this.sigName);
-        console.log(sig);
 
         return sig;
     }
 
     verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): Boolean {  
-        // yet to implement
-        return true;
+        let verificationKey = Buffer.concat([signature.Extra(), publicKey])
+
+        let derSignature = signature.Digest();
+
+        const messageHash = Blake2b(256 / 8).update(message).digest();
+
+        const _digest = bip66Decode(derSignature)
+        const sigDigest: SigDigest = {
+            _r: fromDER(_digest._r),
+            _s: fromDER(_digest._s)
+        }
+
+        return nobleECC.verify(JoinSignature(sigDigest), messageHash, verificationKey, { strict: true })
     }
 }

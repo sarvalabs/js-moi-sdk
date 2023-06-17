@@ -6,5 +6,5 @@ export declare class Signer {
     signingAlgorithms: any;
     constructor(vault?: Wallet);
     sign(message: Buffer, sigAlgo: SigType): String;
-    verify(message: Buffer, signature: string, publicKey: string | Buffer): boolean;
+    verify(message: Buffer, signature: string | Buffer, publicKey: string | Buffer): boolean;
 }
