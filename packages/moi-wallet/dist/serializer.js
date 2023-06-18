@@ -64,10 +64,10 @@ const logicSchema = {
             kind: "string"
         },
         calldata: {
-            kind: "string"
+            kind: "bytes"
         },
         manifest: {
-            kind: "string"
+            kind: "bytes"
         }
     }
 };
