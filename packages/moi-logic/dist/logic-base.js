@@ -33,6 +33,13 @@ class LogicBase extends element_descriptor_1.default {
         return "";
     }
     /**
+     * Updates the signer or establishes a connection with a new signer.
+     * @param signer - The updated signer object or the new signer object to connect.
+     */
+    connect(signer) {
+        this.signer = signer;
+    }
+    /**
      * executeRoutine
      *
      * Executes a routine with the given arguments and returns the interaction response.

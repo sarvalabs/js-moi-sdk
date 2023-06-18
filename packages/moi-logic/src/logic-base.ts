@@ -42,6 +42,14 @@ export abstract class LogicBase extends ElementDescriptor {
     }
 
     /**
+     * Updates the signer or establishes a connection with a new signer.
+     * @param signer - The updated signer object or the new signer object to connect.
+     */
+    public connect(signer: Signer): void {
+        this.signer = signer;
+    }
+
+    /**
      * executeRoutine
      * 
      * Executes a routine with the given arguments and returns the interaction response.
