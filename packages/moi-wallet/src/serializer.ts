@@ -197,6 +197,7 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
                 processedIxObject.transfer_values = processValues(ixObject.transfer_values);
                 break;
             case IxType.ASSET_CREATE:
+                break;
             case IxType.ASSET_MINT:
             case IxType.ASSET_BURN:
             case IxType.LOGIC_DEPLOY:
