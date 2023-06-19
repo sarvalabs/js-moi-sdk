@@ -200,9 +200,9 @@ class Wallet extends moi_signer_1.Signer {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
-            const hdNode = new moi_hdnode_1.HDNode();
-            hdNode.fromSeed(seed, path);
-            this.load(hdNode.privateKey(), CURVE.SECP256K1, mnemonic);
+            const masterNode = moi_hdnode_1.HDNode.fromSeed(seed);
+            const childNode = masterNode.derivePath(path);
+            this.load(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
         }
         catch (err) {
             moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });

@@ -6,6 +6,7 @@ export * from "./asset";
 export * from "./interaction";
 export * from "./properties";
 export * from "./address";
+export * from "./mnemonic";
 export * from "./hex";
 export * from "./hexToUint8";
 export * from "./json";

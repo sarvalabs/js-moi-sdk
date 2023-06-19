@@ -204,9 +204,9 @@ export class Wallet extends Signer {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
-            const hdNode = new HDNode()
-            hdNode.fromSeed(seed, path);
-            this.load(hdNode.privateKey(), CURVE.SECP256K1, mnemonic)
+            const masterNode = HDNode.fromSeed(seed);
+            const childNode = masterNode.derivePath(path)
+            this.load(childNode.privateKey(), CURVE.SECP256K1, mnemonic)
         } catch(err) {
             ErrorUtils.throwError(
                 "Failed to load wallet from mnemonic",
