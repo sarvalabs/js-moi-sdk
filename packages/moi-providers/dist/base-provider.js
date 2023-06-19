@@ -409,13 +409,15 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      *
      * Retrieves the asset information for a specific asset id.
      * @param assetId - The asset id for which to retrieve the asset information.
+     * @param options - The tesseract options. (optional)
      * @returns A Promise that resolves to the asset information.
      * @throws Error if there is an error executing the RPC call.
      */
-    async getAssetInfoByAssetID(assetId) {
+    async getAssetInfoByAssetID(assetId, options) {
         try {
             const params = {
-                asset_id: assetId
+                asset_id: assetId,
+                options: options ? options : defaultOptions,
             };
             const response = await this.execute("moi.AssetInfoByAssetID", params);
             return this.processResponse(response);

@@ -125,7 +125,8 @@ export interface TesseractParams extends AccountParamsBase {
 }
 
 export interface AssetInfoParams {
-    asset_id: string 
+    asset_id: string;
+    options: Options;
 }
 
 export interface InteractionParams {
