@@ -31,6 +31,7 @@ const bip39 = __importStar(require("bip39"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const moi_hdnode_1 = require("moi-hdnode");
 const crypto_1 = require("crypto");
+const moi_constants_1 = require("moi-constants");
 const moi_signer_1 = require("moi-signer");
 const moi_utils_1 = require("moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
@@ -159,7 +160,7 @@ class Wallet extends moi_signer_1.Signer {
         try {
             const _random16Bytes = (0, crypto_1.randomBytes)(16);
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
-            await this.fromMnemonic(mnemonic, undefined);
+            await this.fromMnemonic(mnemonic);
         }
         catch (err) {
             moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -201,7 +202,7 @@ class Wallet extends moi_signer_1.Signer {
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = moi_hdnode_1.HDNode.fromSeed(seed);
-            const childNode = masterNode.derivePath(path);
+            const childNode = masterNode.derivePath(path ? path : moi_constants_1.MOI_DERIVATION_PATH);
             this.load(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
         }
         catch (err) {
