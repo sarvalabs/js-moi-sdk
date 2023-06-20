@@ -75,9 +75,6 @@ const logicSchema = {
 const assetCreateSchema = {
     kind: "struct",
     fields: {
-        type: {
-            kind: "integer"
-        },
         symbol: {
             kind: "string"
         },

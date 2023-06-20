@@ -14,7 +14,6 @@ export interface SigningAlgorithms {
 }
 
 export interface AssetCreatePayload {
-    type: AssetKind;
     symbol: string;
     supply: number | bigint;
     standard?: number;
