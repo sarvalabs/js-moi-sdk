@@ -1,4 +1,4 @@
-import { AssetKind, IxType } from "moi-utils";
+import { AssetStandard, IxType } from "moi-utils";
 import Signature from "../src/signature";
 import ECDSA_S256 from "../src/ecdsa";
 
@@ -16,7 +16,7 @@ export interface SigningAlgorithms {
 export interface AssetCreatePayload {
     symbol: string;
     supply: number | bigint;
-    standard?: number;
+    standard?: AssetStandard;
     dimension?: number;
     is_stateful?: boolean;
     is_logical?: boolean;

@@ -1,5 +1,4 @@
-import { 
-    AssetKind,
+import {
     AssetCreationReceipt,
     AssetMintOrBurnReceipt, 
     LogicDeployReceipt, 
@@ -9,7 +8,6 @@ import {
 export interface Options {
     tesseract_number?: number;
     tesseract_hash?: string;
-    address?: string;
 }
 
 export interface ContextInfo {
@@ -86,9 +84,8 @@ export interface InteractionReceipt {
 }
 
 export interface AssetInfo {
-    type: AssetKind;
     symbol: string;
-    owner: string;
+    operator: string;
     supply: string;
     dimension: string
     standard: string
