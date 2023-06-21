@@ -87,11 +87,11 @@ export interface AssetInfo {
     symbol: string;
     operator: string;
     supply: string;
-    dimension: string
-    standard: string
-    is_logical: boolean
-    is_stateful: boolean
-    logic_id?: string
+    dimension: string;
+    standard: string;
+    is_logical: boolean;
+    is_stateful: boolean;
+    logic_id?: string;
 }
 
 export interface Registry {
