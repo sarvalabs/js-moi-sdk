@@ -13,7 +13,7 @@
     "wallet"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "moi-hdnode": "0.1.0",
     "moi-signer": "0.1.0",

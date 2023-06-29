@@ -13,7 +13,7 @@
     "abi"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "js-polo": "file:../../../js-polo",
     "moi-utils": "0.1.0"
