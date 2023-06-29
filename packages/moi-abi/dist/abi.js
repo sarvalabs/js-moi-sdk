@@ -107,6 +107,8 @@ class ABICoder {
             return doc.document;
         };
         switch (schema.kind) {
+            case "string":
+                return (0, moi_utils_1.trimHexPrefix)(arg);
             case "bytes":
                 if (typeof arg === "string") {
                     return (0, moi_utils_1.hexToBytes)(arg);

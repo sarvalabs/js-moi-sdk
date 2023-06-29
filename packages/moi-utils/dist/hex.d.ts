@@ -62,11 +62,20 @@ export declare const hexToBN: (hex: string) => bigint | number;
  */
 export declare const bytesToHex: (data: Uint8Array) => string;
 /**
+ * isHex
+ *
+ * Checks if a given string is a valid hexadecimal value.
+ *
+ * @param {string} data - The input string.
+ * @returns {boolean} - True if the input is a valid hexadecimal string, false otherwise.
+ */
+export declare const isHex: (data: string) => boolean;
+/**
  * trimHexPrefix
  *
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
- * @param {string} hex - The input string.
+ * @param {string} data - The input string.
  * @returns {string} - The trimmed hexadecimal string.
  */
-export declare const trimHexPrefix: (hex: string) => string;
+export declare const trimHexPrefix: (data: string) => string;

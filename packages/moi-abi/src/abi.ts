@@ -1,7 +1,7 @@
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
 import { Schema } from "./schema";
 import { Exception } from "../types/response";
-import { bytesToHex, hexToBytes, LogicManifest, ErrorUtils, ErrorCode } from "moi-utils";
+import { bytesToHex, hexToBytes, LogicManifest, ErrorUtils, ErrorCode, trimHexPrefix } from "moi-utils";
 
 /**
  * ABICoder is a class that provides encoding and decoding functionality for ABI 
@@ -143,6 +143,9 @@ export class ABICoder {
         }
 
         switch(schema.kind) {
+            case "string":
+                return trimHexPrefix(arg);
+
             case "bytes":
                 if (typeof arg === "string") {
                     return hexToBytes(arg);
