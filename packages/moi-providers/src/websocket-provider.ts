@@ -213,14 +213,16 @@ export class WebSocketProvider extends JsonRpcProvider {
      */
     private onClose = (event) => {
         if(!this.isConnectionFailed(event)) {
+            this.subsIds = {};
+            this.subscriptions = new Map();
+            this.emit(WebSocketEvents.CLOSE, event);
+
             if(this.wsConnOptions.reconnectOptions.auto && 
             (![1000, 1001].includes(event.code) || event.wasClean === false)) {
                 this.reconnect();
     
                 return;
             }
-    
-            this.emit(WebSocketEvents.CLOSE, event)
     
             if (this.requestQueue.size > 0) {
                 this.requestQueue.forEach((request, key) => {

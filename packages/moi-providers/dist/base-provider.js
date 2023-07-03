@@ -886,16 +886,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             return this.removeAllListeners(eventName);
         }
         const stopped = [];
-        let found = false;
         let eventTag = getEventTag(eventName);
         this._events = this._events.filter((event) => {
             if (event.tag !== eventTag || event.listener != listener) {
                 return true;
             }
-            if (found) {
-                return true;
-            }
-            found = true;
             stopped.push(event);
             return false;
         });
