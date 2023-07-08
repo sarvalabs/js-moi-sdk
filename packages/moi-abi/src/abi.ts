@@ -139,7 +139,7 @@ export class ABICoder {
                 delete schema.fields;
             }
 
-            return doc.document;
+            return doc.getData();
         }
 
         switch(schema.kind) {
