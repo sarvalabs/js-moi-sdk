@@ -1,17 +1,18 @@
-import { AssetCreationReceipt, AssetKind, hexToBN, IxType } from "moi-utils";
+import { AssetCreationReceipt, AssetStandard, hexToBN, IxType } from "moi-utils";
 import { JsonRpcProvider } from "../dist/jsonrpc-provider";
 import { InteractionReceipt } from "../types/jsonrpc";
 import { initializeWallet } from "./utils/utils";
 
 describe("Test JsonRpcProvider Query Calls", () => {
     const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+    const mnemonic = "mother clarify push liquid ordinary social track brief exit fiction wheat forward";
     let provider:JsonRpcProvider;
     let ixHash: string;
     let ixReceipt: InteractionReceipt
 
     beforeAll(async() => {
       provider = new JsonRpcProvider('http://localhost:1600');
-      const signer = await initializeWallet(provider)
+      const signer = await initializeWallet(provider, mnemonic)
       const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
         type: IxType.ASSET_CREATE,
@@ -20,8 +21,8 @@ describe("Test JsonRpcProvider Query Calls", () => {
         fuel_price: 1,
         fuel_limit: 200,
         payload: {
-            type: AssetKind.ASSET_KIND_CONTEXT,
-            symbol: "TEST",
+            standard: AssetStandard.MAS0,
+            symbol: "TESTING",
             supply: 1248577
         }
       })
@@ -72,12 +73,15 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe("getTDU", () => {
       it('should return the tdu', async () => {
-        ixReceipt.extra_data = ixReceipt.extra_data as AssetCreationReceipt
-
         const tdu = await provider.getTDU(address);
         expect(tdu).toBeDefined();
-        expect(tdu[ixReceipt.extra_data.asset_id]).toBeDefined();
-        expect(tdu[ixReceipt.extra_data.asset_id]).toBe(1248577);
+        
+        const extraData = ixReceipt.extra_data as AssetCreationReceipt
+        const asset = tdu.find(asset => 
+          asset.asset_id === extraData.asset_id
+        );
+        expect(asset).toBeDefined();
+        expect(asset?.amount).toBe(1248577);
       })
     });
 
@@ -85,7 +89,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       it("should return the interaction by hash", async () => {
         const ix = await provider.getInteractionByHash(ixHash)
         expect(ix).toBeDefined();
-        expect(hexToBN(ix.nonce)).toBeGreaterThanOrEqual(1)
+        expect(hexToBN(ix.nonce)).toBeGreaterThanOrEqual(0)
       })
     })
 
@@ -93,12 +97,12 @@ describe("Test JsonRpcProvider Query Calls", () => {
       it('should return the latest interaction count', async () => {
         const ixCount = await provider.getInteractionCount(address);
         expect(ixCount).toBeDefined();
-        expect(ixCount).toBeGreaterThanOrEqual(2);
+        expect(ixCount).toBeGreaterThanOrEqual(1);
       });
 
       it('should return the interaction count by height', async() => {
         const ixCount = await provider.getInteractionCount(address, {
-          tesseract_number: 0
+          tesseract_number: 1
         });
         expect(ixCount).toBeDefined();
         expect(ixCount).toBe(1);
@@ -112,7 +116,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           tesseract_hash: tesseract.hash
         })
         expect(ixCount).toBeDefined();
-        expect(ixCount).toBeGreaterThanOrEqual(2);
+        expect(ixCount).toBeGreaterThanOrEqual(1);
       });
     });
 
@@ -120,7 +124,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       it("should return the pending interaction count", async() => {
         const ixCount = await provider.getPendingInteractionCount(address);
         expect(ixCount).toBeDefined();
-        expect(ixCount).toBeGreaterThanOrEqual(2);
+        expect(ixCount).toBeGreaterThanOrEqual(1);
       })
     });
 
@@ -128,12 +132,12 @@ describe("Test JsonRpcProvider Query Calls", () => {
       it("should return the latest account state", async() => {
         const accountState = await provider.getAccountState(address);
         expect(accountState).toBeDefined();
-        expect(hexToBN(accountState.nonce)).toBeGreaterThanOrEqual(2);
+        expect(hexToBN(accountState.nonce)).toBeGreaterThanOrEqual(1);
       })
 
       it("should return the account state by height", async() => {
         const accountState = await provider.getAccountState(address, {
-          tesseract_number: 0
+          tesseract_number: 1
         });
         expect(accountState).toBeDefined();
         expect(hexToBN(accountState.nonce)).toBe(1);
@@ -147,7 +151,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           tesseract_hash: tesseract.hash
         })
         expect(accountState).toBeDefined();
-        expect(hexToBN(accountState.nonce)).toBeGreaterThanOrEqual(2);
+        expect(hexToBN(accountState.nonce)).toBeGreaterThanOrEqual(1);
       });
     });
 

@@ -43,4 +43,5 @@ module.exports = {
         },
     ],
     testTimeout: 700000,
+    maxConcurrency: 1
 }
