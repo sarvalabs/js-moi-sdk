@@ -14,9 +14,8 @@
     "zkp"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
-    "js-polo": "file:../../../js-polo",
     "moi-wallet": "0.1.0",
     "moi-utils": "0.1.0"
   }

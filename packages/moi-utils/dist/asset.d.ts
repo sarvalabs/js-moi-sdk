@@ -1,9 +1,8 @@
 /**
- * Enumerates the kinds of assets in the system.
+ * Enumerates the standard of assets in the system.
+ * MAS is moi asset standard.
  */
-export declare enum AssetKind {
-    ASSET_KIND_VALUE = 0,
-    ASSET_KIND_FILE = 1,
-    ASSET_KIND_LOGIC = 2,
-    ASSET_KIND_CONTEXT = 3
+export declare enum AssetStandard {
+    MAS0 = 0,
+    MAS1 = 1
 }

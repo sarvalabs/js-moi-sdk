@@ -104,9 +104,11 @@ class ABICoder {
                 schema.kind = "document";
                 delete schema.fields;
             }
-            return doc.document;
+            return doc.getData();
         };
         switch (schema.kind) {
+            case "string":
+                return (0, moi_utils_1.trimHexPrefix)(arg);
             case "bytes":
                 if (typeof arg === "string") {
                     return (0, moi_utils_1.hexToBytes)(arg);

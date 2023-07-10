@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AssetKind = void 0;
+exports.AssetStandard = void 0;
 /**
- * Enumerates the kinds of assets in the system.
+ * Enumerates the standard of assets in the system.
+ * MAS is moi asset standard.
  */
-var AssetKind;
-(function (AssetKind) {
-    AssetKind[AssetKind["ASSET_KIND_VALUE"] = 0] = "ASSET_KIND_VALUE";
-    AssetKind[AssetKind["ASSET_KIND_FILE"] = 1] = "ASSET_KIND_FILE";
-    AssetKind[AssetKind["ASSET_KIND_LOGIC"] = 2] = "ASSET_KIND_LOGIC";
-    AssetKind[AssetKind["ASSET_KIND_CONTEXT"] = 3] = "ASSET_KIND_CONTEXT";
-})(AssetKind = exports.AssetKind || (exports.AssetKind = {}));
+var AssetStandard;
+(function (AssetStandard) {
+    AssetStandard[AssetStandard["MAS0"] = 0] = "MAS0";
+    AssetStandard[AssetStandard["MAS1"] = 1] = "MAS1";
+})(AssetStandard || (exports.AssetStandard = AssetStandard = {}));

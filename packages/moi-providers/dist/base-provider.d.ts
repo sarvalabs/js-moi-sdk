@@ -188,10 +188,11 @@ export declare class BaseProvider extends AbstractProvider {
      *
      * Retrieves the asset information for a specific asset id.
      * @param assetId - The asset id for which to retrieve the asset information.
+     * @param options - The tesseract options. (optional)
      * @returns A Promise that resolves to the asset information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
+    getAssetInfoByAssetID(assetId: string, options?: Options): Promise<AssetInfo>;
     /**
      * getInteractionReceipt
      *

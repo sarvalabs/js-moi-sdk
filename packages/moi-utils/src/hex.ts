@@ -123,17 +123,29 @@ export const bytesToHex = (data: Uint8Array): string => {
 }
 
 /**
+ * isHex
+ *
+ * Checks if a given string is a valid hexadecimal value.
+ *
+ * @param {string} data - The input string.
+ * @returns {boolean} - True if the input is a valid hexadecimal string, false otherwise.
+ */
+export const isHex = (data: string): boolean => {
+  return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+};
+
+/**
  * trimHexPrefix
  * 
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
- * @param {string} hex - The input string.
+ * @param {string} data - The input string.
  * @returns {string} - The trimmed hexadecimal string.
  */
-export const trimHexPrefix = (hex: string): string => {
-  if (hex.startsWith('0x')) {
-    hex = hex.slice(2);
+export const trimHexPrefix = (data: string): string => {
+  if (isHex(data) && data.startsWith('0x')) {
+    data = data.slice(2);
   }
 
-  return hex;
+  return data;
 };

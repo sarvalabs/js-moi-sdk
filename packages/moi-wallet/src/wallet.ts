@@ -2,6 +2,7 @@ import * as bip39 from "bip39";
 import elliptic from "elliptic";
 import { HDNode } from "moi-hdnode";
 import { randomBytes } from "crypto";
+import { MOI_DERIVATION_PATH } from "moi-constants";
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { AbstractProvider, InteractionRequest } from "moi-providers";
 import { ErrorCode, ErrorUtils, bytesToHex, bufferToUint8 } from "moi-utils";
@@ -151,7 +152,7 @@ export class Wallet extends Signer {
         try {
             const _random16Bytes = randomBytes(16)
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
-            await this.fromMnemonic(mnemonic, undefined);
+            await this.fromMnemonic(mnemonic);
         } catch(err) {
             ErrorUtils.throwError(
                 "Failed to create random mnemonic",
@@ -204,9 +205,9 @@ export class Wallet extends Signer {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
-            const hdNode = new HDNode()
-            hdNode.fromSeed(seed, path);
-            this.load(hdNode.privateKey(), CURVE.SECP256K1, mnemonic)
+            const masterNode = HDNode.fromSeed(seed);
+            const childNode = masterNode.derivePath(path ? path : MOI_DERIVATION_PATH)
+            this.load(childNode.privateKey(), CURVE.SECP256K1, mnemonic)
         } catch(err) {
             ErrorUtils.throwError(
                 "Failed to load wallet from mnemonic",

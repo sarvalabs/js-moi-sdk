@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trimHexPrefix = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
+exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
 /**
  * numToHex
@@ -120,17 +120,29 @@ const bytesToHex = (data) => {
 };
 exports.bytesToHex = bytesToHex;
 /**
+ * isHex
+ *
+ * Checks if a given string is a valid hexadecimal value.
+ *
+ * @param {string} data - The input string.
+ * @returns {boolean} - True if the input is a valid hexadecimal string, false otherwise.
+ */
+const isHex = (data) => {
+    return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+};
+exports.isHex = isHex;
+/**
  * trimHexPrefix
  *
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
- * @param {string} hex - The input string.
+ * @param {string} data - The input string.
  * @returns {string} - The trimmed hexadecimal string.
  */
-const trimHexPrefix = (hex) => {
-    if (hex.startsWith('0x')) {
-        hex = hex.slice(2);
+const trimHexPrefix = (data) => {
+    if ((0, exports.isHex)(data) && data.startsWith('0x')) {
+        data = data.slice(2);
     }
-    return hex;
+    return data;
 };
 exports.trimHexPrefix = trimHexPrefix;

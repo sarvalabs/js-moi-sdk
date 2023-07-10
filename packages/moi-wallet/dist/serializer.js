@@ -64,19 +64,16 @@ const logicSchema = {
             kind: "string"
         },
         calldata: {
-            kind: "string"
+            kind: "bytes"
         },
         manifest: {
-            kind: "string"
+            kind: "bytes"
         }
     }
 };
 const assetCreateSchema = {
     kind: "struct",
     fields: {
-        type: {
-            kind: "integer"
-        },
         symbol: {
             kind: "string"
         },
@@ -180,6 +177,7 @@ const processIxObject = (ixObject) => {
                 processedIxObject.transfer_values = processValues(ixObject.transfer_values);
                 break;
             case moi_utils_1.IxType.ASSET_CREATE:
+                break;
             case moi_utils_1.IxType.ASSET_MINT:
             case moi_utils_1.IxType.ASSET_BURN:
             case moi_utils_1.IxType.LOGIC_DEPLOY:

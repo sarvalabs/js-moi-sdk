@@ -28,6 +28,11 @@ export declare abstract class LogicBase extends ElementDescriptor {
      */
     protected getLogicId(): string;
     /**
+     * Updates the signer or establishes a connection with a new signer.
+     * @param signer - The updated signer object or the new signer object to connect.
+     */
+    connect(signer: Signer): void;
+    /**
      * executeRoutine
      *
      * Executes a routine with the given arguments and returns the interaction response.

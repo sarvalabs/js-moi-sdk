@@ -486,13 +486,15 @@ export class BaseProvider extends AbstractProvider {
      * 
      * Retrieves the asset information for a specific asset id.
      * @param assetId - The asset id for which to retrieve the asset information.
+     * @param options - The tesseract options. (optional)
      * @returns A Promise that resolves to the asset information.
      * @throws Error if there is an error executing the RPC call.
      */
-    public async getAssetInfoByAssetID(assetId: string): Promise<AssetInfo> {
+    public async getAssetInfoByAssetID(assetId: string, options?: Options): Promise<AssetInfo> {
         try {
             const params: AssetInfoParams = {
-                asset_id: assetId
+                asset_id: assetId,
+                options: options ? options : defaultOptions,
             }
     
             const response: RpcResponse = await this.execute("moi.AssetInfoByAssetID", params)
@@ -1026,7 +1028,6 @@ export class BaseProvider extends AbstractProvider {
         const stopped: Array<Event> = [ ];
 
         let found = false;
-
         let eventTag = getEventTag(eventName);
         this._events = this._events.filter((event) => {
             if (event.tag !== eventTag || event.listener != listener) { return true; }
