@@ -1,13 +1,18 @@
 import Blake2b from "blake2b";
-import * as nobleECC from '@noble/secp256k1';
-import { hmac } from '@noble/hashes/hmac';
-import { sha256 } from '@noble/hashes/sha256';
 import { hexToBytes } from "moi-utils";
+import { hmac } from '@noble/hashes/hmac';
+import * as nobleECC from '@noble/secp256k1';
+import { sha256 } from '@noble/hashes/sha256';
 
-import { toDER, bip66Encode, SigDigest, bip66Decode, JoinSignature, fromDER } from "./utils";
 import { SigType } from "../types";
 import Signature from "./signature";
+import { toDER, bip66Encode, SigDigest, bip66Decode, JoinSignature, fromDER } from "./utils";
 
+/**
+ * Setting the `hmacSha256Sync` with custom hashing logic 
+ * @param key 
+ * @param msgs 
+ */
 nobleECC.utils.hmacSha256Sync = (key, ...msgs) => hmac(sha256, key, nobleECC.utils.concatBytes(...msgs));
 
 /**
@@ -32,7 +37,7 @@ export default class ECDSA_S256 implements SigType {
      * @param message - The message to be signed, as a Buffer.
      * @param signingKey - The private key used for signing, either as 
      * a hexadecimal string or a Buffer.
-     * @returns A Signature object representing the signed message.
+     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
      */
      public sign(message: Buffer, signingKey: Buffer | string): Signature {
         let _signingKey: Uint8Array
@@ -66,6 +71,18 @@ export default class ECDSA_S256 implements SigType {
         return sig;
     }
 
+    /**
+     * verify
+     * 
+     * Verifies the ECDSA signature with the given secp256k1 publicKey
+     * 
+     * @param message the message being signed
+     * @param signature the Signature instance with parity byte 
+     * as extra data to determine the public key's X & Y co-ordinates 
+     * having same or different sign
+     * @param publicKey the compressed public key
+     * @returns boolean, to determine whether verification is success/failure
+     */
     verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): boolean {  
         let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
         verificationKey.set(signature.Extra());
