@@ -116,6 +116,77 @@ send HTTP (or HTTPS) requests and retrieve data from the blockchain.
     // Example
     const provider = new JsonRpcProvider("http://localhost:1600");
 
+Usage
+~~~~~
+
+Tesseract
+^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const address  = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+    const options = { 
+        tesseract_number: 1 
+    }
+    const tesseract = provider.getTesseract(address, true, options);
+    console.log(tesseract)
+
+    // Output:
+    /*
+        {
+            "header": {
+                "address": "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b",
+                "prev_hash": "0x034e75e7d8b2910004e70d6d45157166e87fb1d47485248edf8919108179307e",
+                "height": "0x1",
+                "fuel_used": "0x64",
+                "fuel_limit": "0x3e8",
+                ...
+            },
+            "body": {
+                "state_hash": "0x82543da922babd1c32b4856edd44a4bf5881edc3714cfe90b6d1576e00164aee",
+                "context_hash": "0xa1058908a4db1594632be49790b24211cd4920a0f27b3d2b876808f910b3e320",
+                "interaction_hash": "0x8aab5bc0817393d2ea163482c13ccc0f8f3e01cef0c889b8b3cffb51e4d76894",
+                "receipt_hash": "0x3e35a1f481df15da518ef6821f7b6f340f74f4f9c3f3eb30b15944ffea144f75",
+                ...
+            },
+            "ixns": [
+                {
+                    "type": 3,
+                    "nonce": "0x0",
+                    "sender": "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b",
+                    "receiver": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    ...
+                    "hash": "0x7750a0f1c848e05f1e52204e464af0d9d2f06470117e9187bb3643216c4c4ee9"
+                }
+            ],
+            "seal": "0x0460afdac7733765afa6410e58ebe0d69d484dfe021fba989438c51c69c078d6677446f179176681f005c0d755979bf81c090e02fdf8544bc618463e86c2778b7764b90c813f58a5965a47c5572bcf5784743e4c6c425e4bfa0f18b043e9aff21183",
+            "hash": "0xd343a7336df38590b47e5b20cb65940f463c358a08cded7af7cd6cde63a5575f"
+        }
+    */
+
+Context Info
+^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b"
+    const contextInfo = provider.getContextInfo(address)
+    console.log(contextInfo)
+
+    // Output
+    /*
+        {
+            "behaviour_nodes": [
+                "3Wywv4WykAqs6mH1YAWNHKYFw77tuF4iFkcQPxyFgzT9XEPPEkaK.16Uiu2HAkzhT4eoJoQWz9P7S65j6F6dSHEVGN925AXg5kqhisgSai",
+                "3Wy3MY7saXna1ypZMYVooUPD9k3hU7vWXQvTRFdpabmSC7pr8om9.16Uiu2HAm3hy8wAw9hjuxXqGGmnpQQrU7ouZWwJuDAQJbesvg49hX"
+            ],
+            "random_nodes": [],
+            "storage_nodes": []
+        }
+    */
 
 WebSocket Provider
 ------------------
@@ -143,12 +214,15 @@ added in upcoming releases of the protocol.
     const provider = new WebSocketProvider("ws://localhost:1600/ws", {
         reconnectOptions: {
             auto: true,
-            delay: 5000
+            delay: 5000,
+            maxAttempts: 50
         }
     });
 
+WebSocket Events
+~~~~~~~~~~~~~~~~
 The event's listed below are related to the WebSocketProvider itself and 
-its connection status and operation. Theses are not specific to blockchain data.
+its connection status and operation. These are not specific to blockchain data.
 
 ``CONNECT`` - This event is triggered when the WebSocketProvider successfully 
 establishes a connection with the MOI node. It indicates that the WebSocket 
@@ -170,13 +244,96 @@ WebSocketProvider's operation. It indicates that something unexpected or
 erroneous has happened, such as a network error, an invalid response from the 
 MOI node, or any other unforeseen issue.
 
-.. ``ALL_TESSERACTS`` - This event is triggered when a new tesseract is mined on 
-.. the blockchain. It provides information about the tesseract, such as its 
-.. height, hash, timestamp, and other relevant data.
+Protocol Events
+~~~~~~~~~~~~~~~
+The event's listed below are specific to blockchain data.
+
+``ALL_TESSERACTS`` - This event is triggered when a new tesseract is mined on 
+the blockchain. It provides information about the tesseract, such as its 
+height, hash, timestamp, and other relevant data.
+
+``0x...`` (address) - This event is triggered when a new tesseract belonging to 
+the given address is mined on the blockchain. It provides information about the 
+tesseract.
+
+Usage
+~~~~~
+
+Subscribing to all tesseracts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const handleTesseracts = async (tesseract) => {
+        console.log("New tesseract finalized", tesseract);
+    };
+
+    // Listen for "connect" event
+    provider.on(WebSocketEvents.CONNECT, () => {
+        console.log("WebSocket connection established successfully");
+
+        // Listen for "tesseracts" event
+        provider.on(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
+    });
+
+    // Listen for "debug" event
+    provider.on(WebSocketEvents.DEBUG, (info) => {
+        console.log("WebSocket provider debug info:", info);
+    });
+
+    // Handle WebSocket connection errors
+    provider.on(WebSocketEvents.ERROR, (err) => {
+        console.log("WebSocket connection error:", err);
+    });
+
+    // Handle WebSocket connection close
+    provider.on(WebSocketEvents.CLOSE, (info) => {
+        console.log("WebSocket connection closed: ", info);
+
+        // Remove "tesseracts" event listener
+        provider.off(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
+    });
+
+Subscribing to account specific tesseracts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const adddress = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+    const handleTesseracts = async (tesseract) => {
+        console.log("New tesseract finalized", tesseract);
+    };
+
+    // Listen for "connect" event
+    provider.on(WebSocketEvents.CONNECT, () => {
+        console.log("WebSocket connection established successfully");
+
+        // Listen for "tesseracts" event
+        provider.on(adddress, handleTesseracts);
+    });
+
+    // Listen for "debug" event
+    provider.on(WebSocketEvents.DEBUG, (info) => {
+        console.log("WebSocket provider debug info:", info);
+    });
+
+    // Handle WebSocket connection errors
+    provider.on(WebSocketEvents.ERROR, (err) => {
+        console.log("WebSocket connection error:", err);
+    });
+
+    // Handle WebSocket connection close
+    provider.on(WebSocketEvents.CLOSE, (info) => {
+        console.log("WebSocket connection closed: ", info);
+
+        // Remove "tesseracts" event listener
+        provider.off(adddress, handleTesseracts);
+    });
 
 Voyage Provider
 ---------------
-
 The **VoyageProvider** is a subclass of ``BaseProvider`` it allows users to 
 connect their applications to the MOI network using the voyage service.
 Voyage is a reliable and scalable infrastructure provider for MOI, offering a 
@@ -188,3 +345,65 @@ complexities of node management, synchronization, and data retrieval.
 
     // Example
     const provider = new VoyageProvider("babylon");
+
+Usage
+~~~~~
+
+Account State
+^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+    const options = {
+        tesseract_number: 1
+    }
+    const account = provider.getAccountState(address, options)
+    console.log(account)
+
+    // Output
+    /*
+        {
+            "acc_type": 2,
+            "asset_approvals": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "asset_registry": "0x6800fedfcca2fa63d9b404d09c2b206476930468013e6150178d7f37aad120ac",
+            "balance": "0x48b8dbcc3d7979c47f6272010ed74f59101b2bfe9d261d6797772dacd37f4400",
+            "context_hash": "0xa1058908a4db1594632be49790b24211cd4920a0f27b3d2b876808f910b3e320",
+            "file_root": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "logic_root": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "nonce": "0x1",
+            "storage_root": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+    */
+
+Interaction By Hash
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const ixHash = "0x7750a0f1c848e05f1e52204e464af0d9d2f06470117e9187bb3643216c4c4ee9";
+    const interaction = provider.getInteractionByHash(ixHash)
+    console.log(interaction)
+
+    // Output
+    /*
+        {
+            "type": 3,
+            "nonce": "0x0",
+            "sender": "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b",
+            "receiver": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            ...
+            "payload": {
+                "symbol": "TESTING",
+                "supply": "0x130d41",
+                ...
+            },
+            ...
+            "hash": "0x7750a0f1c848e05f1e52204e464af0d9d2f06470117e9187bb3643216c4c4ee9",
+            "signature": "0x01473045022100d6491012bf4c3c9adbfd919100afb1de570079542197c472fb08295ab97df5f502200e58ec59d0243d8a76a20ee1e676e9f1098d351dd7c7ad55ea5777fb4ec26e5202",
+            ...
+            "ix_index": "0x0"
+        }
+    */

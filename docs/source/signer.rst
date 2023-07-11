@@ -52,8 +52,57 @@ Regular Methods
 
 .. autofunction:: getProvider
 
+.. code-block:: javascript
+    
+    // Example
+    const provider = signer.getProvider();
+
 .. autofunction:: getNonce
+
+.. code-block:: javascript
+
+    // Example
+    const nonce = await signer.getNonce();
+    console.log(nonce)
+
+    >> 5
 
 .. autofunction:: Signer#sendInteraction
 
+.. code-block:: javascript
+
+    // Example
+    const response = await signer.sendInteraction({
+        type: IxType.ASSET_CREATE,
+        fuel_price: 1,
+        fuel_limit: 200,
+        payload: {
+            standard: AssetStandard.MAS0,
+            symbol: "TOKYO",
+            supply: 1248577
+        }
+    })
+
+    console.log(response)
+
+    // Output
+    /*
+        {
+            hash: '0x3492b59462fc7b8b9ec83296c6e04f314d0c93beb1cb2bfd267874b8e17c702c',
+            wait: [Function: bound waitForInteraction] AsyncFunction,
+            result: [Function: bound processResult] AsyncFunction
+        }
+    */
+
 .. autofunction:: Signer#verify
+
+.. code-block:: javascript
+
+    // Example
+    const message = Buffer.from("Hello, MOI", "utf-8");
+    const signature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
+    const publicKey = Buffer.from(wallet.publicKey(), 'hex')
+    const isVerified = wallet.verify(message, signature, publicKey)
+    console.log(isVerified)
+
+    >> true

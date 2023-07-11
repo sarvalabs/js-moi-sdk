@@ -27,5 +27,6 @@ need to unlock the full potential of the MOI Blockchain.
    logic
    hierarchical-deterministic-node
    hierarchical-deterministic-wallet
+   utilities
    contributions
    license-and-copyright

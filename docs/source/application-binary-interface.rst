@@ -54,7 +54,6 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const abi = { ... }
     const encodedABI = ABICoder.encodeABI(abi)
     console.log(encodedABI)
 
@@ -65,7 +64,6 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const abi = { ... }
     const routine = abi.elements.find(element => 
         // Seeder! is the name of a routine which is available in the abi
         element.data.name === "Seeder!"
@@ -91,7 +89,6 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const abi = { ... }
     const routine = abi.elements.find(element => 
         // BalanceOf is the name of a routine which is available in the abi
         element.data.name === "BalanceOf"
@@ -112,7 +109,7 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const error= "0x0e4f0666ae03737472696e67536f6d657468696e672077656e742077726f6e673f06b60166756e6374696f6e31282966756e6374696f6e322829";
+    const error = "0x0e4f0666ae03737472696e67536f6d657468696e672077656e742077726f6e673f06b60166756e6374696f6e31282966756e6374696f6e322829";
 
     const exception = ABICoder.decodeException(error);
 
@@ -125,7 +122,16 @@ Methods
 .. code-block:: javascript
 
     // Example
+    const data = "0x064c4f4749432d546f6b656e";
 
+    const state = manifest.elements.find(element =>
+        element.kind === "state"
+    )
+
+    const output = abiCoder.decodeState(data, "name", state.data.fields)
+    console.log(output)
+
+    >> RIO
 
 Schema
 ------
@@ -160,13 +166,12 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const abi = { ... }
     const routine = abi.elements.find(element => 
         // BalanceOf is the name of a routine which is available in the abi
         element.data.name === "BalanceOf"
     )
     const fields = routine.data.accepts ? routine.data.accepts : [];
-    const routineSchema = schema.parseFields()
+    const routineSchema = schema.parseFields(fields)
     
     console.log(routineSchema)
 
