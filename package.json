@@ -42,7 +42,9 @@
     "crypto": "npm:crypto-browserify",
     "elliptic": "^6.5.4",
     "hdkey": "^2.1.0",
-    "js-polo": "^0.1.0",
+    "@noble/hashes": "^1.1.5",
+    "@noble/secp256k1": "^1.7.1",
+    "js-polo": "^0.1.0-rc2",
     "keccak": "^3.0.3",
     "stream": "npm:stream-browserify",
     "websocket": "^1.0.34"
