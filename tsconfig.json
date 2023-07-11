@@ -40,6 +40,7 @@
     { "path": "./packages/moi-utils"},
     { "path": "./packages/moi-hdnode"},
     { "path": "./packages/moi-wallet"},
+    { "path": "./packages/moi-bip39"},
   ],
   "include": [
     "./manifests"

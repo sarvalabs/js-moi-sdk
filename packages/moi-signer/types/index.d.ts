@@ -6,7 +6,7 @@ export interface SigType {
     prefix: number;
     sigName: String;
     sign(message: Buffer, signingKey: string | Buffer): Signature
-    verify(message: Buffer, signature: Signature, publicKey: Buffer): Boolean
+    verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): boolean
 }
 
 export interface SigningAlgorithms {

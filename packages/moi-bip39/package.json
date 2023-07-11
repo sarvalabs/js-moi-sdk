@@ -1,5 +1,5 @@
 {
-  "name": "moi-wallet",
+  "name": "moi-bip39",
   "version": "0.1.0",
   "description": "Module to interact with the moichain accounts stored in the node.",
   "main": "dist/index.js",
@@ -10,7 +10,8 @@
   "keywords": [
     "moichain",
     "moi",
-    "wallet"
+    "wallet",
+    "bip39"
   ],
   "author": "",
   "license": "UNLICENSED",
@@ -18,7 +19,6 @@
     "moi-hdnode": "0.1.0",
     "moi-signer": "0.1.0",
     "moi-constants": "0.1.0",
-    "moi-utils": "0.1.0",
-    "moi-bip39": "0.1.0"
+    "moi-utils": "0.1.0"
   }
 }

@@ -1,4 +1,4 @@
-import * as bip39 from "bip39";
+import * as bip39 from "moi-bip39";
 import elliptic from "elliptic";
 import { HDNode } from "moi-hdnode";
 import { randomBytes } from "crypto";
@@ -6,6 +6,8 @@ import { MOI_DERIVATION_PATH } from "moi-constants";
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { AbstractProvider, InteractionRequest } from "moi-providers";
 import { ErrorCode, ErrorUtils, bytesToHex, bufferToUint8 } from "moi-utils";
+import { Buffer } from "buffer";
+
 import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";
 import { serializeIxObject } from "./serializer";
@@ -355,9 +357,10 @@ export class Wallet extends Signer {
             switch(sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const privateKey = this.privateKey();
-                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
-                    return sigBytes.serialize().toString('hex');
+                    const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sig = _sigAlgo.sign(Buffer.from(message), privateKey);
+                    const sigBytes = sig.serialize();
+                    return bytesToHex(sigBytes);
                 }
                 default: {
                     ErrorUtils.throwError(
