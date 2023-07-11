@@ -21,7 +21,7 @@ need to unlock the full potential of the MOI Blockchain.
 
    getting-started
    constants
-   application-binary-interface
+   manifest-call-encoder
    providers
    signer
    logic

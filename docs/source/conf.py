@@ -25,7 +25,7 @@ release = u'v0.1.0'
 extensions = ['sphinx_js']
 root_for_relative_js_paths = '~/'
 js_source_path = [
-    '../../packages/moi-abi/dist', 
+    '../../packages/moi-manifest/dist', 
     '../../packages/moi-providers/dist',
     '../../packages/moi-signer/dist',
     '../../packages/moi-logic/dist',
