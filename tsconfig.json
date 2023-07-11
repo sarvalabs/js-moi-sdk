@@ -32,7 +32,7 @@
   },
   "references": [
     { "path": "./packages/moi" },
-    { "path": "./packages/moi-abi" },
+    { "path": "./packages/moi-manifest" },
     { "path": "./packages/moi-constants" },
     { "path": "./packages/moi-logic" },
     { "path": "./packages/moi-providers" },
@@ -40,6 +40,7 @@
     { "path": "./packages/moi-utils"},
     { "path": "./packages/moi-hdnode"},
     { "path": "./packages/moi-wallet"},
+    { "path": "./packages/moi-bip39"},
   ],
   "include": [
     "./manifests"

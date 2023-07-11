@@ -1,0 +1,24 @@
+{
+  "name": "moi-bip39",
+  "version": "0.1.0",
+  "description": "Module to interact with the moichain accounts stored in the node.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "wallet",
+    "bip39"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "moi-hdnode": "0.1.0",
+    "moi-signer": "0.1.0",
+    "moi-constants": "0.1.0",
+    "moi-utils": "0.1.0"
+  }
+}

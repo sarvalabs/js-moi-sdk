@@ -1,4 +1,4 @@
-import * as bip39 from 'bip39';
+import * as bip39 from 'moi-bip39';
 import { ErrorUtils, ErrorCode } from './errors';
 
 /**

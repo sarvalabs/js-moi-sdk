@@ -1,4 +1,4 @@
-import { ABICoder } from "moi-abi";
+import { ManifestCoder } from "moi-manifest";
 import { ErrorCode, ErrorUtils, IxType, LogicManifest } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { InteractionResponse } from "moi-providers";
@@ -15,13 +15,13 @@ import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from 
  */
 export abstract class LogicBase extends ElementDescriptor {
     protected signer: Signer;
-    protected abiCoder: ABICoder;
+    protected manifestCoder: ManifestCoder;
 
     constructor(manifest: LogicManifest.Manifest, signer: Signer) {
         super(manifest.elements)
         
         this.signer = signer;
-        this.abiCoder = new ABICoder(this.elements, this.classDefs)
+        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs)
     }
 
     // abstract methods to be implemented by subclasses

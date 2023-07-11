@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicDescriptor = exports.EngineKind = void 0;
-const moi_abi_1 = require("moi-abi");
+const moi_manifest_1 = require("moi-manifest");
 const logic_id_1 = require("./logic-id");
 const logic_base_1 = require("./logic-base");
 const state_1 = require("./state");
@@ -27,7 +27,7 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         super(manifest, signer);
         this.logicId = new logic_id_1.LogicId(logicId);
         this.manifest = manifest;
-        this.encodedManifest = moi_abi_1.ABICoder.encodeABI(this.manifest);
+        this.encodedManifest = moi_manifest_1.ManifestCoder.encodeManifest(this.manifest);
         this.engine = this.manifest.engine.kind;
         this.sealed = false;
         this.assetLogic = false;

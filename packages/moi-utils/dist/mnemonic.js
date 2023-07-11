@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidSeed = exports.mnemonicToSeed = void 0;
-const bip39 = __importStar(require("bip39"));
+const bip39 = __importStar(require("moi-bip39"));
 const errors_1 = require("./errors");
 /**
  * mnemonicToSeed

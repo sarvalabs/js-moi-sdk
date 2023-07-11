@@ -1,5 +1,5 @@
 export * from "moi-providers";
-export * from "moi-abi";
+export * from "moi-manifest";
 export * from "moi-logic";
 export * from "moi-hdnode";
 export * from "moi-wallet";

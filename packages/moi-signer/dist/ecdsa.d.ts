@@ -18,18 +18,20 @@ export default class ECDSA_S256 implements SigType {
      * @param message - The message to be signed, as a Buffer.
      * @param signingKey - The private key used for signing, either as
      * a hexadecimal string or a Buffer.
-     * @returns A Signature object representing the signed message.
+     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
      */
     sign(message: Buffer, signingKey: Buffer | string): Signature;
     /**
      * verify
      *
-     * Verifies the signature of a message using the ECDSA_S256 signature algorithm.
+     * Verifies the ECDSA signature with the given secp256k1 publicKey
      *
-     * @param message - The message to be verified, as a Buffer.
-     * @param signature - The signature to be verified, as a Signature instance.
-     * @param publicKey - The public key used for verification, as a Buffer.
-     * @returns A boolean indicating whether the signature is valid.
+     * @param message the message being signed
+     * @param signature the Signature instance with parity byte
+     * as extra data to determine the public key's X & Y co-ordinates
+     * having same or different sign
+     * @param publicKey the compressed public key
+     * @returns boolean, to determine whether verification is success/failure
      */
-    verify(message: Buffer, signature: Signature, publicKey: Buffer): boolean;
+    verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): boolean;
 }

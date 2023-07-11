@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
-const moi_abi_1 = require("moi-abi");
+const moi_manifest_1 = require("moi-manifest");
 const moi_utils_1 = require("moi-utils");
 const state_1 = require("./state");
 const logic_descriptor_1 = require("./logic-descriptor");
@@ -29,7 +29,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            this.persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.abiCoder, provider);
+            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, provider);
+            (0, moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
     }
     /**
@@ -38,28 +39,30 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * Creates an interface for executing routines defined in the logic manifest.
      */
     createRoutines() {
+        const routines = {};
         this.manifest.elements.forEach((element) => {
             if (element.kind === "routine") {
                 const routine = element.data;
                 if (routine.kind === "invokable") {
                     const routineName = this.normalizeRoutineName(routine.name);
                     // Create a routine execution function
-                    this.routines[routineName] = ((args = []) => {
+                    routines[routineName] = ((args = []) => {
                         return this.createIxObject(routine, ...args);
                     });
                     // Define routine properties
-                    this.routines[routineName].isMutable = () => {
+                    routines[routineName].isMutable = () => {
                         return this.isMutableRoutine(routine.name);
                     };
-                    this.routines[routineName].accepts = () => {
+                    routines[routineName].accepts = () => {
                         return routine.accepts ? routine.accepts : null;
                     };
-                    this.routines[routineName].returns = () => {
+                    routines[routineName].returns = () => {
                         return routine.returns ? routine.returns : null;
                     };
                 }
             }
         });
+        (0, moi_utils_1.defineReadOnly)(this, "routines", routines);
     }
     /**
      * isMutableRoutine
@@ -111,7 +114,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.abiCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
             payload.calldata = (0, moi_utils_1.hexToBytes)(calldata);
         }
         return payload;
@@ -132,8 +135,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             const routine = this.getRoutineElement(response.routine_name);
             const result = await response.result(timeout);
             const data = {
-                output: this.abiCoder.decodeOutput(result.outputs, routine.data["returns"]),
-                error: moi_abi_1.ABICoder.decodeException(result.error)
+                output: this.manifestCoder.decodeOutput(result.outputs, routine.data["returns"]),
+                error: moi_manifest_1.ManifestCoder.decodeException(result.error)
             };
             if (data.output || data.error) {
                 return data;

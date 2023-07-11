@@ -3,6 +3,7 @@
     cryptographic activity like signing and verification 
     using different Curves and Algorithms
 */
+import { hexToBytes } from "moi-utils"
 import { AbstractProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
 import ECDSA_S256 from "./ecdsa";
 import { SigType, InteractionObject, SigningAlgorithms } from "../types";
@@ -76,7 +77,6 @@ export abstract class Signer {
             throw err;
         }
     }
-
     /**
      * checkInteraction
      *
@@ -181,15 +181,15 @@ export abstract class Signer {
      * @returns A boolean indicating whether the signature is valid or not.
      * @throws Error if the signature is invalid or the signature byte is not recognized.
      */
-    public verify(message: Buffer, signature: string|Buffer, publicKey: string|Buffer): boolean {
-        let verificationKey: Buffer;
+    public verify(message: Uint8Array, signature: string|Uint8Array, publicKey: string|Uint8Array): boolean {
+        let verificationKey: Uint8Array;
 
-        if(typeof publicKey === "string") {
-            verificationKey = Buffer.from(publicKey, 'hex');
+        if (typeof publicKey === "string") {
+            verificationKey = hexToBytes(publicKey as string)
         } else {
-            verificationKey = Buffer.from(publicKey)
+            verificationKey = publicKey as Uint8Array
         }
-        
+
         const sig = new Signature();
         sig.unmarshall(signature);
 
@@ -206,5 +206,6 @@ export abstract class Signer {
                 )
             }
         }
+
     }
 }

@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { AbstractProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
 import { SigType, InteractionObject, SigningAlgorithms } from "../types";
 /**
@@ -69,5 +68,5 @@ export declare abstract class Signer {
      * @returns A boolean indicating whether the signature is valid or not.
      * @throws Error if the signature is invalid or the signature byte is not recognized.
      */
-    verify(message: Buffer, signature: string | Buffer, publicKey: string | Buffer): boolean;
+    verify(message: Uint8Array, signature: string | Uint8Array, publicKey: string | Uint8Array): boolean;
 }
