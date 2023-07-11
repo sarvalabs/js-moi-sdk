@@ -3,8 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const moi_utils_1 = require("moi-utils");
 const state_1 = require("./state");
 /**
- * ElementDescriptor Class
- *
  * This class represents a descriptor for elements in the logic manifest.
  */
 class ElementDescriptor {
@@ -45,8 +43,6 @@ class ElementDescriptor {
         });
     }
     /**
-     * getStateMatrix
-     *
      * Retrieves the state matrix associated with the ElementDescriptor.
      *
      * @returns {ContextStateMatrix} The state matrix.
@@ -55,8 +51,6 @@ class ElementDescriptor {
         return this.stateMatrix;
     }
     /**
-     * getElements
-     *
      * Retrieves the map of elements associated with the ElementDescriptor.
      *
      * @returns {Map<number, LogicManifest.Element>} The elements map.
@@ -65,8 +59,6 @@ class ElementDescriptor {
         return this.elements;
     }
     /**
-     * getCallsites
-     *
      * Retrieves the map of call sites associated with the ElementDescriptor.
      *
      * @returns {Map<string, CallSite>} The call sites map.
@@ -75,8 +67,6 @@ class ElementDescriptor {
         return this.callSites;
     }
     /**
-     * getClassDefs
-     *
      * Retrieves the map of class definitions associated with the ElementDescriptor.
      *
      * @returns {Map<string, number>} The class definitions map.
@@ -85,8 +75,6 @@ class ElementDescriptor {
         return this.classDefs;
     }
     /**
-     * getMethodDefs
-     *
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
      * @returns {Map<string, MethodDef>} The method definitions map.
@@ -95,13 +83,11 @@ class ElementDescriptor {
         return this.methodDefs;
     }
     /**
-     * getClassMethods
-     *
      * Retrieves the methods of a class based on the given class name.
      *
      * @param {string} className - The name of the class.
      * @returns {Map<string, LogicManifest.Method>} The methods of the class.
-     * @throws Error if the class name is invalid.
+     * @throws {Error} if the class name is invalid.
      */
     getClassMethods(className) {
         const classPtr = this.classDefs.get(className);
@@ -118,14 +104,12 @@ class ElementDescriptor {
         return classMethods;
     }
     /**
-     * getRoutineElement
-     *
      * Retrieves the element from the logic manifest based on the given
      routine name.
      *
      * @param {string} routineName - The name of the routine.
      * @returns {LogicManifest.Element} The routine element.
-     * @throws Error if the routine name is invalid.
+     * @throws {Error} if the routine name is invalid.
      */
     getRoutineElement(routineName) {
         const callsite = this.callSites.get(routineName);
@@ -135,13 +119,11 @@ class ElementDescriptor {
         return this.elements.get(callsite.ptr);
     }
     /**
-     * getClassElement
-     *
      * Retrieves the element from the logic manifest based on the given
      class name.
      *
      * @returns {LogicManifest.Element} The class element.
-     * @throws Error if the class name is invalid.
+     * @throws {Error} if the class name is invalid.
      */
     getClassElement(className) {
         const ptr = this.classDefs.get(className);
@@ -151,14 +133,12 @@ class ElementDescriptor {
         return this.elements.get(ptr);
     }
     /**
-     * getMethodElement
-     *
      * Retrieves the element from the logic manifest based on the given
      method name.
      *
      * @param {string} methodName - The name of the method.
      * @returns {LogicManifest.Element} The method element.
-     * @throws Error if the method name is invalid.
+     * @throws {Error} if the method name is invalid.
      */
     getMethodElement(methodName) {
         const methodDef = this.methodDefs.get(methodName);

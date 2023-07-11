@@ -1,6 +1,4 @@
 /**
- * mnemonicToSeed
- *
  * Converts a mnemonic phrase to a seed buffer using BIP39.
  *
  * @param {string} mnemonic - The mnemonic phrase.
@@ -10,8 +8,6 @@
  */
 export declare const mnemonicToSeed: (mnemonic: string, wordlist?: string[]) => Promise<Buffer>;
 /**
- * isValidSeed
- *
  * Checks if a seed is valid according to BIP39 standards.
  *
  * @param {string} seed - The seed to check.

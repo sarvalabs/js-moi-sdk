@@ -23,9 +23,9 @@ const isClass = (type: string, classDefs: Map<string, number>): boolean => {
 
 /**
  * Schema is a class that provides schema parsing functionality for encoding and
- decoding manifest, arguments, logic states and other data based on 
- a predefined schema. It supports parsing fields and generating a schema for 
- decoding purposes.
+ * decoding manifest, arguments, logic states and other data based on 
+ * a predefined schema. It supports parsing fields and generating a schema for 
+ * decoding purposes.
  *
  * @class
  */
@@ -256,8 +256,6 @@ export class Schema {
     }
 
     /**
-     * extractArrayDataType
-     * 
      * Extracts the array data type from the provided data type string.
      *
      * @param {string} dataType - The array data type, eg:"[]u64".
@@ -287,8 +285,6 @@ export class Schema {
     }
     
     /**
-     * extractMapDataType
-     * 
      * Extracts the key and value data types from the provided map data type string.
      *
      * @param {string} dataType - The map data type. eg:"map[u64]string".
@@ -332,8 +328,6 @@ export class Schema {
     }
     
     /**
-     * convertPrimitiveDataType
-     * 
      * Converts the primitive data type to a standardized representation.
      *
      * @param {string} type - The primitive data type.
@@ -364,8 +358,6 @@ export class Schema {
     }
 
     /**
-     * parseClassFields
-     * 
      * Parses the fields of a class data type and generates the schema for the class.
      *
      * @param {string} className - The name of the class.
@@ -396,11 +388,10 @@ export class Schema {
     }
 
     /**
-     * parseDataType
-     * 
      * Parses a data type and generates the corresponding schema based on the 
-     data type. The parsing is performed recursively to handle nested data types, 
-     such as arrays, maps and class.
+     * data type. The parsing is performed recursively to handle nested data types, 
+     * such as arrays, maps and class.
+     *   
      * @param {string} type - The data type string.
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
@@ -439,8 +430,6 @@ export class Schema {
     }
     
     /**
-     * parseFields
-     * 
      * Parses an array of fields and generates the schema based on the fields.
      *
      * @param {LogicManifest.TypeField[]} fields - The array of fields.

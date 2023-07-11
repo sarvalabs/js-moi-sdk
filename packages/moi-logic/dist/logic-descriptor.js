@@ -11,8 +11,6 @@ var EngineKind;
     EngineKind["MERU"] = "MERU";
 })(EngineKind || (exports.EngineKind = EngineKind = {}));
 /**
- * LogicDescriptor
- *
  * Abstract class representing a logic descriptor, which provides information
  about a logic.
  */
@@ -33,8 +31,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         this.assetLogic = false;
     }
     /**
-     * getLogicId
-     *
      * Returns the logic id of the logic.
      *
      * @returns {string} The logic id.
@@ -43,8 +39,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.logicId.hex();
     }
     /**
-     * getEngine
-     *
      * Returns the logic execution engine type.
      *
      * @returns {EngineKind} The engine type.
@@ -53,8 +47,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.engine;
     }
     /**
-     * getManifest
-     *
      * Returns the logic manifest.
      *
      * @returns {LogicManifest.Manifest} The logic manifest.
@@ -63,8 +55,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.manifest;
     }
     /**
-     * getEncodedManifest
-     *
      * Returns the POLO encoded logic manifest.
      *
      * @returns {string} The POLO encoded logic manifest.
@@ -73,8 +63,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.encodedManifest;
     }
     /**
-     * isSealed
-     *
      * Checks if the logic is sealed.
      *
      * @returns {boolean} True if the logic is sealed, false otherwise.
@@ -83,8 +71,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.sealed;
     }
     /**
-     * isAssetLogic
-     *
      * Checks if the logic represents an asset logic.
      *
      * @returns {boolean} True if the logic is an representation of asset logic, false otherwise.
@@ -93,8 +79,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.assetLogic;
     }
     /**
-     * allowsInteractions
-     *
      * Checks if the logic allows interactions.
      *
      * @returns {boolean} True if the logic allows interactions, false otherwise.
@@ -103,8 +87,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.logicId.isInteractive();
     }
     /**
-     * isStateful
-     *
      * Checks if the logic is stateful.
      *
      * @returns {boolean} True if the logic is stateful, false otherwise.
@@ -113,8 +95,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return this.logicId.isStateful();
     }
     /**
-     * hasPersistentState
-     *
      * Checks if the logic has persistent state.
      *
      * @returns {[number, boolean]} A tuple containing the pointer to the
@@ -128,8 +108,6 @@ class LogicDescriptor extends logic_base_1.LogicBase {
         return [0, false];
     }
     /**
-     * hasEphemeralState
-     *
      * Checks if the logic has ephemeral state.
      *
      * @returns {[number, boolean]} A tuple containing the pointer to the

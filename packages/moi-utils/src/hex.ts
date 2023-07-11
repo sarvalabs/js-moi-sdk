@@ -2,8 +2,6 @@ import BN from "bn.js";
 import { Buffer } from "buffer";
 
 /**
- * numToHex
- * 
  * Converts a number, bigint, or BN instance to a hexadecimal string representation.
  * If the input value is not already a BN instance, it is converted to one.
  * Throws an error if the input value is a negative number.
@@ -27,8 +25,6 @@ export const numToHex = (value: number | bigint | BN): string => {
 }
 
 /**
- * toQuantity
- * 
  * Converts a number, bigint, or BN instance to a quantity string representation.
  * The quantity string is prefixed with "0x" and is obtained by calling `numToHex` function.
  *
@@ -45,8 +41,6 @@ export const toQuantity = (value: number | bigint | BN): string => {
 }
 
 /**
- * encodeToString
- * 
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to encode as a hexadecimal string.
@@ -57,8 +51,6 @@ export const encodeToString = (data: Uint8Array): string => {
 }
 
 /**
- * hexToBytes
- * 
  * Converts a hexadecimal string to a Uint8Array.
  *
  * @param {string} str - The hexadecimal string to convert to a Uint8Array.
@@ -80,8 +72,6 @@ export const hexToBytes = (str: string): Uint8Array => {
 }
 
 /**
- * hexToBN
- * 
  * Converts a hexadecimal string to a bigint or number.
  * If the resulting value is too large to fit in a number, it is returned as a BigInt.
  * Otherwise, it is returned as a number.
@@ -112,8 +102,6 @@ export const hexToBN = (hex: string): bigint | number => {
 }
 
 /**
- * bytesToHex
- * 
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to convert to a hexadecimal string.
@@ -124,8 +112,6 @@ export const bytesToHex = (data: Uint8Array): string => {
 }
 
 /**
- * isHex
- *
  * Checks if a given string is a valid hexadecimal value.
  *
  * @param {string} data - The input string.
@@ -136,8 +122,6 @@ export const isHex = (data: string): boolean => {
 };
 
 /**
- * trimHexPrefix
- * 
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
  * @param {string} data - The input string.

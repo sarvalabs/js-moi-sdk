@@ -5,8 +5,6 @@ InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status,
 Inspect, ContentFrom, Encoding, Registry } from "../types/jsonrpc";
 
 /**
- * AbstractProvider
- * 
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
  */
@@ -53,8 +51,6 @@ export abstract class AbstractProvider {
     // Alias for "on"
 
     /**
-     * addListener
-     * 
      * Alias for "on" method.
      * 
      * @param eventName - The name of the event.
@@ -68,8 +64,6 @@ export abstract class AbstractProvider {
     // Alias for "off"
 
     /**
-     * removeListener
-     * 
      * Alias for "off" method.
      * 
      * @param eventName - The name of the event.

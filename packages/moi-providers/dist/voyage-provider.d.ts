@@ -7,6 +7,7 @@ export declare class VoyageProvider extends BaseProvider {
     constructor(network: string);
     /**
      * Executes an RPC method with the given parameters.
+     *
      * @param {string} method - The method to execute.
      * @param {any} params - The parameters for the method.
      * @returns {Promise<any>} A promise that resolves to the result of the RPC call.

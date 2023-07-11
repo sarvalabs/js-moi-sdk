@@ -1,6 +1,4 @@
 /**
- * hexToUint8
- *
  * Converts a hexadecimal string or hexable value to a Uint8Array.
  *
  * @param {any} value - The value to convert to Uint8Array.

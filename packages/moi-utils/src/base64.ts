@@ -16,8 +16,6 @@ export const encodeBase64 = (uint8Array: Uint8Array): string => {
 }
 
 /**
- * decodeBase64
- * 
  * Decodes a base64 string into a Uint8Array.
  *
  * @param {string} base64String - The base64 string to decode.

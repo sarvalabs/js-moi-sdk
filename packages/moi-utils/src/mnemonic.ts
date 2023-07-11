@@ -2,8 +2,6 @@ import * as bip39 from 'moi-bip39';
 import { ErrorUtils, ErrorCode } from './errors';
 
 /**
- * mnemonicToSeed
- *
  * Converts a mnemonic phrase to a seed buffer using BIP39.
  *
  * @param {string} mnemonic - The mnemonic phrase.
@@ -30,8 +28,6 @@ export const mnemonicToSeed = async(mnemonic: string, wordlist?: string[]): Prom
 
 
 /**
- * isValidSeed
- * 
  * Checks if a seed is valid according to BIP39 standards.
  * 
  * @param {string} seed - The seed to check.

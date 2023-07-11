@@ -4,8 +4,6 @@
 export type Bytes = ArrayLike<number>;
 
 /**
- * isInteger
- * 
  * Checks if the given value is an integer.
  *
  * @param {number} value - The value to check.
@@ -16,8 +14,6 @@ export const isInteger = (value: number) => {
 }
 
 /**
- * isBytes
- * 
  * Checks if the given value is a valid byte array.
  *
  * @param {any} value - The value to check.
@@ -38,8 +34,6 @@ export const isBytes = (value: any): value is Bytes => {
 }
 
 /**
- * hexDataLength
- * 
  * Calculates the length of the data represented by a hexadecimal string.
  *
  * @param {string} data - The hexadecimal string.
@@ -57,8 +51,6 @@ export const hexDataLength = (data: string) => {
 }
 
 /**
- * isHexString
- * 
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.
@@ -74,8 +66,6 @@ export const isHexString = (value: any, length?: number): boolean => {
 }
 
 /**
- * bufferToUint8
- * 
  * Converts a Buffer to a Uint8Array.
  *
  * @param {Buffer} target - The Buffer to convert.

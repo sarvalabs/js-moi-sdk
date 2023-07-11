@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bufferToUint8 = exports.isHexString = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
 /**
- * isInteger
- *
  * Checks if the given value is an integer.
  *
  * @param {number} value - The value to check.
@@ -14,8 +12,6 @@ const isInteger = (value) => {
 };
 exports.isInteger = isInteger;
 /**
- * isBytes
- *
  * Checks if the given value is a valid byte array.
  *
  * @param {any} value - The value to check.
@@ -44,8 +40,6 @@ const isBytes = (value) => {
 };
 exports.isBytes = isBytes;
 /**
- * hexDataLength
- *
  * Calculates the length of the data represented by a hexadecimal string.
  *
  * @param {string} data - The hexadecimal string.
@@ -62,8 +56,6 @@ const hexDataLength = (data) => {
 };
 exports.hexDataLength = hexDataLength;
 /**
- * isHexString
- *
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.
@@ -81,8 +73,6 @@ const isHexString = (value, length) => {
 };
 exports.isHexString = isHexString;
 /**
- * bufferToUint8
- *
  * Converts a Buffer to a Uint8Array.
  *
  * @param {Buffer} target - The Buffer to convert.

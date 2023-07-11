@@ -1,6 +1,4 @@
 /**
- * isValidAddress
- * 
  * Checks if the given address is a valid address.
  *
  * @param {string} address - The address to validate.

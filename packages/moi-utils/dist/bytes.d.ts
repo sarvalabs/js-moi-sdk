@@ -1,11 +1,8 @@
-/// <reference types="node" />
 /**
  * Array-like type representing bytes.
  */
 export type Bytes = ArrayLike<number>;
 /**
- * isInteger
- *
  * Checks if the given value is an integer.
  *
  * @param {number} value - The value to check.
@@ -13,8 +10,6 @@ export type Bytes = ArrayLike<number>;
  */
 export declare const isInteger: (value: number) => boolean;
 /**
- * isBytes
- *
  * Checks if the given value is a valid byte array.
  *
  * @param {any} value - The value to check.
@@ -22,8 +17,6 @@ export declare const isInteger: (value: number) => boolean;
  */
 export declare const isBytes: (value: any) => value is Bytes;
 /**
- * hexDataLength
- *
  * Calculates the length of the data represented by a hexadecimal string.
  *
  * @param {string} data - The hexadecimal string.
@@ -32,8 +25,6 @@ export declare const isBytes: (value: any) => value is Bytes;
  */
 export declare const hexDataLength: (data: string) => number;
 /**
- * isHexString
- *
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.
@@ -42,8 +33,6 @@ export declare const hexDataLength: (data: string) => number;
  */
 export declare const isHexString: (value: any, length?: number) => boolean;
 /**
- * bufferToUint8
- *
  * Converts a Buffer to a Uint8Array.
  *
  * @param {Buffer} target - The Buffer to convert.

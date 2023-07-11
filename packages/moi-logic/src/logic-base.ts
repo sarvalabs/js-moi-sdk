@@ -7,8 +7,6 @@ import { LogicExecuteRequest } from "../types/logic";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 
 /**
- * LogicBase Class
- * 
  * This abstract class extends the ElementDescriptor class and serves as a base 
  class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
@@ -31,8 +29,6 @@ export abstract class LogicBase extends ElementDescriptor {
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null>;
 
     /**
-     * getLogicId
-     * 
      * Returns the logic ID associated with the LogicBase instance.
      * 
      * @returns {string} The logic ID.
@@ -43,23 +39,22 @@ export abstract class LogicBase extends ElementDescriptor {
 
     /**
      * Updates the signer or establishes a connection with a new signer.
-     * @param signer - The updated signer object or the new signer object to connect.
+     * 
+     * @param {Signer} signer - The updated signer object or the new signer object to connect.
      */
     public connect(signer: Signer): void {
         this.signer = signer;
     }
 
     /**
-     * executeRoutine
-     * 
      * Executes a routine with the given arguments and returns the interaction response.
      * 
      * @param {any} ixObject - The interaction object.
      * @param {any[]} args - The arguments for the routine.
      * @returns {Promise<InteractionResponse>} A promise that resolves to the 
      * interaction response.
-     * @throws Error if the provider is not initialized within 
-     * the signer, if the logic id is not defined, if the method type is unsupported,
+     * @throws {Error} if the provider is not initialized within the signer, 
+     * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
     protected async executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionResponse> {
@@ -100,8 +95,6 @@ export abstract class LogicBase extends ElementDescriptor {
     }
 
     /**
-     * processArguments
-     * 
      * Processes the interaction arguments and returns the processed arguments object.
      * 
      * @param {LogicIxObject} ixObject - The interaction object.
@@ -136,8 +129,6 @@ export abstract class LogicBase extends ElementDescriptor {
     }
 
     /**
-     * createIxRequest
-     * 
      * Creates a logic execute request object based on the given interaction object.
      * 
      * @param {LogicIxObject} ixObject - The interaction object.
@@ -152,8 +143,6 @@ export abstract class LogicBase extends ElementDescriptor {
     }
 
     /**
-     * createIxObject
-     * 
      * Creates a logic execute request object with the specified routine and arguments.
      * 
      * @param {LogicManifest.Routine} routine - The routine for the logic execute request.

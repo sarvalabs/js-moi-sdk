@@ -4,8 +4,6 @@ import { LogicDeployRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 /**
- * LogicFactory Class
- *
  * This class represents a factory for deploying logic.
  */
 export declare class LogicFactory extends LogicBase {
@@ -13,16 +11,12 @@ export declare class LogicFactory extends LogicBase {
     private encodedManifest;
     constructor(manifest: LogicManifest.Manifest, signer: Signer);
     /**
-     * getIxType
-     *
      * Retrieves the interaction type associated with the LogicFactory.
      *
      * @returns {IxType} The interaction type.
      */
     protected getIxType(): IxType;
     /**
-     * createPayload
-     *
      * Creates the payload for the logic interaction object.
      *
      * @param {LogicIxObject} ixObject - The logic interaction object.
@@ -30,8 +24,6 @@ export declare class LogicFactory extends LogicBase {
      */
     protected createPayload(ixObject: LogicIxObject): LogicPayload;
     /**
-     * processResult
-     *
      * Processes the result of a logic interaction response.
      *
      * @param {LogicIxResponse} response - The logic interaction response.
@@ -40,16 +32,12 @@ export declare class LogicFactory extends LogicBase {
      */
     protected processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
     /**
-     * getEncodedManifest
-     *
      * Returns the POLO encoded manifest in hexadecimal format.
      *
      * @returns {string} The encoded manifest.
      */
     getEncodedManifest(): string;
     /**
-     * deploy
-     *
      * Deploys a logic.
      *
      * @param {string} builderName - The name of the builder routine.

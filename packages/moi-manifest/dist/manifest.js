@@ -18,8 +18,6 @@ class ManifestCoder {
         this.schema = new schema_1.Schema(elements, classDefs);
     }
     /**
-     * encodeManifest
-     *
      * Encodes a logic manifest into POLO format. The manifest is processed and
      * serialized according to the predefined schema.
      * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
@@ -69,8 +67,6 @@ class ManifestCoder {
         return "0x" + (0, moi_utils_1.bytesToHex)(bytes);
     }
     /**
-     * parseCalldata
-     *
      * Parses the calldata arguments based on the provided POLO Schema.
      * The calldata arguments is recursively processed and transformed according to the schema.
      *
@@ -133,8 +129,6 @@ class ManifestCoder {
         return arg;
     }
     /**
-     * encodeArguments
-     *
      * Encodes the provided arguments based on the given manifest routine
      * parmeters and its types (the accepts property in routine).
      *
@@ -160,8 +154,6 @@ class ManifestCoder {
         return data;
     }
     /**
-     * decodeOutput
-     *
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
@@ -181,8 +173,6 @@ class ManifestCoder {
         return null;
     }
     /**
-     * decodeException
-     *
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.
      * Returns the decoded exception object, or null if the error is empty.
@@ -202,8 +192,6 @@ class ManifestCoder {
         return null;
     }
     /**
-     * decodeState
-     *
      * Decodes a specific state field from the data retrieved from a logic.
      * The state data is decoded using the provided fields and schema.
      * Returns the decoded value of the specified field, or null if the data is empty.

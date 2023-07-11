@@ -1,6 +1,4 @@
 /**
- * marshal
- *
  * Marshals the given json object into a Uint8Array by converting it to
  * JSON string and encoding as UTF-8.
  *
@@ -9,8 +7,6 @@
  */
 export declare const marshal: (data: object) => Uint8Array;
 /**
- * unmarshal
- *
  * Unmarshals the given Uint8Array into its original json object by decoding
  * it as UTF-8 and parsing the JSON string.
  *

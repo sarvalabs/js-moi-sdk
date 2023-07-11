@@ -7,8 +7,6 @@ exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = e
 const bn_js_1 = __importDefault(require("bn.js"));
 const buffer_1 = require("buffer");
 /**
- * numToHex
- *
  * Converts a number, bigint, or BN instance to a hexadecimal string representation.
  * If the input value is not already a BN instance, it is converted to one.
  * Throws an error if the input value is a negative number.
@@ -29,8 +27,6 @@ const numToHex = (value) => {
 };
 exports.numToHex = numToHex;
 /**
- * toQuantity
- *
  * Converts a number, bigint, or BN instance to a quantity string representation.
  * The quantity string is prefixed with "0x" and is obtained by calling `numToHex` function.
  *
@@ -48,8 +44,6 @@ const toQuantity = (value) => {
 };
 exports.toQuantity = toQuantity;
 /**
- * encodeToString
- *
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to encode as a hexadecimal string.
@@ -60,8 +54,6 @@ const encodeToString = (data) => {
 };
 exports.encodeToString = encodeToString;
 /**
- * hexToBytes
- *
  * Converts a hexadecimal string to a Uint8Array.
  *
  * @param {string} str - The hexadecimal string to convert to a Uint8Array.
@@ -81,8 +73,6 @@ const hexToBytes = (str) => {
 };
 exports.hexToBytes = hexToBytes;
 /**
- * hexToBN
- *
  * Converts a hexadecimal string to a bigint or number.
  * If the resulting value is too large to fit in a number, it is returned as a BigInt.
  * Otherwise, it is returned as a number.
@@ -109,8 +99,6 @@ const hexToBN = (hex) => {
 };
 exports.hexToBN = hexToBN;
 /**
- * bytesToHex
- *
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to convert to a hexadecimal string.
@@ -121,8 +109,6 @@ const bytesToHex = (data) => {
 };
 exports.bytesToHex = bytesToHex;
 /**
- * isHex
- *
  * Checks if a given string is a valid hexadecimal value.
  *
  * @param {string} data - The input string.
@@ -133,8 +119,6 @@ const isHex = (data) => {
 };
 exports.isHex = isHex;
 /**
- * trimHexPrefix
- *
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
  * @param {string} data - The input string.

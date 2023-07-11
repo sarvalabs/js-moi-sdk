@@ -3,8 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.hexToUint8 = void 0;
 const errors_1 = require("./errors");
 /**
- * isHexable
- *
  * Checks if the given value has a "toHexString" method, indicating it is hexable.
  *
  * @param {any} value - The value to check.
@@ -14,8 +12,6 @@ const isHexable = (value) => {
     return !!(value.toHexString);
 };
 /**
- * addSlice
- *
  * Adds the "slice" method to the array if it is not already present.
  * This is used to ensure that the array is sliceable.
  *
@@ -32,8 +28,6 @@ const addSlice = (array) => {
     return array;
 };
 /**
- * isArrayish
- *
  * Checks if the given value is arrayish.
  * An arrayish value is an array-like object with valid integer values within the range [0, 255].
  *
@@ -53,8 +47,6 @@ const isArrayish = (value) => {
     return true;
 };
 /**
- * hexToUint8
- *
  * Converts a hexadecimal string or hexable value to a Uint8Array.
  *
  * @param {any} value - The value to convert to Uint8Array.

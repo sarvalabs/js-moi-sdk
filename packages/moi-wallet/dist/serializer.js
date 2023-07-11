@@ -108,8 +108,6 @@ const assetMintOrBurnSchema = {
 };
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000000000000000000000000000";
 /**
- * processPayload
- *
  * Processes the payload based on the interaction type.
  *
  * @param {IxType} ixType - The interaction type.
@@ -139,8 +137,6 @@ const processPayload = (ixType, payload) => {
     }
 };
 /**
- * processValues
- *
  * Trims the "0x" prefix from the keys of a Map and returns a new Map.
  *
  * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
@@ -152,8 +148,6 @@ const processValues = (values) => {
     return entries;
 };
 /**
- * processIxObject
- *
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {InteractionObject} ixObject - The interaction object to be processed.
@@ -197,13 +191,11 @@ const processIxObject = (ixObject) => {
     }
 };
 /**
- * serializeIxObject
- *
  * POLO encodes an interaction object into a Uint8Array representation.
  *
- * @param ixObject - The interaction object to be encoded.
- * @returns The encoded interaction object as a Uint8Array.
- * @throws Error if there is an error during encoding or if the payload is missing.
+ * @param {InteractionObject} ixObject - The interaction object to be encoded.
+ * @returns {Uint8Array} The encoded interaction object as a Uint8Array.
+ * @throws {Error} if there is an error during encoding or if the payload is missing.
  */
 const serializeIxObject = (ixObject) => {
     try {

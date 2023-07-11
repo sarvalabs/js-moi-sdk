@@ -11,8 +11,6 @@ export enum EngineKind {
 }
 
 /**
- * LogicDescriptor
- * 
  * Abstract class representing a logic descriptor, which provides information 
  about a logic.
  */
@@ -35,8 +33,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * getLogicId
-     * 
      * Returns the logic id of the logic.
      * 
      * @returns {string} The logic id.
@@ -46,8 +42,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * getEngine
-     * 
      * Returns the logic execution engine type.
      * 
      * @returns {EngineKind} The engine type.
@@ -57,8 +51,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * getManifest
-     * 
      * Returns the logic manifest.
      * 
      * @returns {LogicManifest.Manifest} The logic manifest.
@@ -68,8 +60,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * getEncodedManifest
-     * 
      * Returns the POLO encoded logic manifest.
      * 
      * @returns {string} The POLO encoded logic manifest.
@@ -79,8 +69,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * isSealed
-     * 
      * Checks if the logic is sealed.
      * 
      * @returns {boolean} True if the logic is sealed, false otherwise.
@@ -90,8 +78,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * isAssetLogic
-     * 
      * Checks if the logic represents an asset logic.
      * 
      * @returns {boolean} True if the logic is an representation of asset logic, false otherwise.
@@ -101,8 +87,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * allowsInteractions
-     * 
      * Checks if the logic allows interactions.
      * 
      * @returns {boolean} True if the logic allows interactions, false otherwise.
@@ -112,8 +96,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * isStateful
-     * 
      * Checks if the logic is stateful.
      * 
      * @returns {boolean} True if the logic is stateful, false otherwise.
@@ -123,8 +105,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * hasPersistentState
-     * 
      * Checks if the logic has persistent state.
      * 
      * @returns {[number, boolean]} A tuple containing the pointer to the 
@@ -141,8 +121,6 @@ export abstract class LogicDescriptor extends LogicBase {
     }
 
     /**
-     * hasEphemeralState
-     * 
      * Checks if the logic has ephemeral state.
      * 
      * @returns {[number, boolean]} A tuple containing the pointer to the 

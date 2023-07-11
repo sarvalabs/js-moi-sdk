@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidAddress = void 0;
 /**
- * isValidAddress
- *
  * Checks if the given address is a valid address.
  *
  * @param {string} address - The address to validate.

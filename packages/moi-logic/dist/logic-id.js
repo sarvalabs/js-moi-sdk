@@ -3,8 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicId = void 0;
 const moi_utils_1 = require("moi-utils");
 /**
- * LogicId
- *
  * Represents a LogicID, which is an identifier for a logic.
  */
 class LogicId {
@@ -13,8 +11,6 @@ class LogicId {
         this.logic = (0, moi_utils_1.hexToBytes)(logicId);
     }
     /**
-     * hex
-     *
      * Returns the LogicID as a hex encoded string.
      *
      * @returns {string} The LogicID as a hex encoded string.
@@ -23,8 +19,6 @@ class LogicId {
         return "0x" + Buffer.from(this.logic).toString('hex');
     }
     /**
-     * isValid
-     *
      * Checks if the LogicID is valid.
      *
      * @returns {boolean} True if the LogicID is valid, false otherwise.
@@ -42,8 +36,6 @@ class LogicId {
         }
     }
     /**
-     * getVersion
-     *
      * Returns the version of the LogicID.
      * Returns -1 if the LogicID is not valid.
      *
@@ -58,8 +50,6 @@ class LogicId {
         return this.logic[0] & 0xf0;
     }
     /**
-     * isStateful
-     *
      * Checks if the stateful flag is set for the LogicID.
      * Returns false if the LogicID is invalid.
      *
@@ -76,8 +66,6 @@ class LogicId {
         return bit !== 0;
     }
     /**
-     * isInteractive
-     *
      * Checks if the interactive flag is set for the LogicID.
      * Returns false if the LogicID is invalid.
      *
@@ -94,8 +82,6 @@ class LogicId {
         return bit !== 0;
     }
     /**
-     * getEdition
-     *
      * Returns the edition number of the LogicID.
      * Returns 0 if the LogicID is invalid.
      *
@@ -113,8 +99,6 @@ class LogicId {
         return edition;
     }
     /**
-     * getAddress
-     *
      * Returns the address associated with the LogicID.
      * Returns null if the LogicID is invalid or the version is not 0.
      *

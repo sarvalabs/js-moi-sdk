@@ -6,8 +6,6 @@ import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interact
 import { LogicBase } from "./logic-base";
 
 /**
- * LogicFactory Class
- * 
  * This class represents a factory for deploying logic.
  */
 export class LogicFactory extends LogicBase {
@@ -21,8 +19,6 @@ export class LogicFactory extends LogicBase {
     }
 
     /**
-     * getIxType
-     * 
      * Retrieves the interaction type associated with the LogicFactory.
      * 
      * @returns {IxType} The interaction type.
@@ -32,8 +28,6 @@ export class LogicFactory extends LogicBase {
     }
 
     /**
-     * createPayload
-     * 
      * Creates the payload for the logic interaction object.
      * 
      * @param {LogicIxObject} ixObject - The logic interaction object.
@@ -57,8 +51,6 @@ export class LogicFactory extends LogicBase {
     }
 
     /**
-     * processResult
-     * 
      * Processes the result of a logic interaction response.
      * 
      * @param {LogicIxResponse} response - The logic interaction response.
@@ -79,8 +71,6 @@ export class LogicFactory extends LogicBase {
     }
 
     /**
-     * getEncodedManifest
-     * 
      * Returns the POLO encoded manifest in hexadecimal format.
      * 
      * @returns {string} The encoded manifest.
@@ -90,8 +80,6 @@ export class LogicFactory extends LogicBase {
     }
 
     /**
-     * deploy
-     * 
      * Deploys a logic.
      * 
      * @param {string} builderName - The name of the builder routine.

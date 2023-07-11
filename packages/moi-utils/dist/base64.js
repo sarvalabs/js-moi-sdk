@@ -18,8 +18,6 @@ const encodeBase64 = (uint8Array) => {
 };
 exports.encodeBase64 = encodeBase64;
 /**
- * decodeBase64
- *
  * Decodes a base64 string into a Uint8Array.
  *
  * @param {string} base64String - The base64 string to decode.
