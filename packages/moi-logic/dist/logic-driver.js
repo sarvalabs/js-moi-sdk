@@ -29,7 +29,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            this.persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.abiCoder, provider);
+            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.abiCoder, provider);
+            (0, moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
     }
     /**
@@ -38,28 +39,30 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * Creates an interface for executing routines defined in the logic manifest.
      */
     createRoutines() {
+        const routines = {};
         this.manifest.elements.forEach((element) => {
             if (element.kind === "routine") {
                 const routine = element.data;
                 if (routine.kind === "invokable") {
                     const routineName = this.normalizeRoutineName(routine.name);
                     // Create a routine execution function
-                    this.routines[routineName] = ((args = []) => {
+                    routines[routineName] = ((args = []) => {
                         return this.createIxObject(routine, ...args);
                     });
                     // Define routine properties
-                    this.routines[routineName].isMutable = () => {
+                    routines[routineName].isMutable = () => {
                         return this.isMutableRoutine(routine.name);
                     };
-                    this.routines[routineName].accepts = () => {
+                    routines[routineName].accepts = () => {
                         return routine.accepts ? routine.accepts : null;
                     };
-                    this.routines[routineName].returns = () => {
+                    routines[routineName].returns = () => {
                         return routine.returns ? routine.returns : null;
                     };
                 }
             }
         });
+        (0, moi_utils_1.defineReadOnly)(this, "routines", routines);
     }
     /**
      * isMutableRoutine

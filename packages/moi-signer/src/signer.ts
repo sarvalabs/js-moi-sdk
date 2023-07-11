@@ -7,7 +7,7 @@ import { AbstractProvider, Options, InteractionResponse, InteractionRequest } fr
 import ECDSA_S256 from "./ecdsa";
 import { SigType, InteractionObject, SigningAlgorithms } from "../types";
 import Signature from "./signature";
-import { ErrorCode, ErrorUtils, IxType, isValidAddress } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, defineReadOnly, isValidAddress } from "moi-utils";
 
 
 /**
@@ -16,21 +16,22 @@ import { ErrorCode, ErrorUtils, IxType, isValidAddress } from "moi-utils";
  * An abstract class representing a signer responsible for cryptographic activities like signing and verification.
  */
 export abstract class Signer {
-    public provider?: AbstractProvider;
-    public signingAlgorithms: SigningAlgorithms;
+    protected provider?: AbstractProvider;
+    public readonly signingAlgorithms: SigningAlgorithms;
 
     constructor(provider?: AbstractProvider) {
-        this.provider = provider;
-        this.signingAlgorithms = {
+        const signingAlgorithms = {
             ecdsa_secp256k1: new ECDSA_S256()
         };
+
+        this.provider = provider;
+        defineReadOnly(this, "signingAlgorithms", signingAlgorithms);
     }
 
     abstract getAddress(): string;
     abstract connect(provider: AbstractProvider): void;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
-
 
     /**
      * getProvider

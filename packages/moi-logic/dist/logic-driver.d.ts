@@ -11,9 +11,9 @@ import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interact
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export declare class LogicDriver extends LogicDescriptor {
-    routines: Routines;
-    persistentState: PersistentState;
-    ephemeralState: EphemeralState;
+    readonly routines: Routines;
+    readonly persistentState: PersistentState;
+    readonly ephemeralState: EphemeralState;
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
     /**
      * createState

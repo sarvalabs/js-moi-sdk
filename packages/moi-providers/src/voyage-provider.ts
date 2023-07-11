@@ -11,7 +11,7 @@ const config = {
  * A provider for making RPC calls to voyage nodes.
  */
 export class VoyageProvider extends BaseProvider {
-  public host: string;
+  private host: string;
 
   constructor(network: string) {
     super();

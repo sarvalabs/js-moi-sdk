@@ -3,7 +3,7 @@ import { BaseProvider } from './base-provider';
  * A provider for making RPC calls to voyage nodes.
  */
 export declare class VoyageProvider extends BaseProvider {
-    host: string;
+    private host;
     constructor(network: string);
     /**
      * Executes an RPC method with the given parameters.

@@ -35,7 +35,7 @@ module.exports = {
         {
             displayName: 'moi-providers',
             testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/moi-providers/__tests__/*.test.ts'],
+            testMatch: ['<rootDir>/packages/moi-logic/__tests__/*.test.ts'],
             transform: {
                 '^.+\\.tsx?$': 'ts-jest',
             },

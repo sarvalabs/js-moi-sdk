@@ -7,8 +7,8 @@ import { SigType, InteractionObject, SigningAlgorithms } from "../types";
  * An abstract class representing a signer responsible for cryptographic activities like signing and verification.
  */
 export declare abstract class Signer {
-    provider?: AbstractProvider;
-    signingAlgorithms: SigningAlgorithms;
+    protected provider?: AbstractProvider;
+    readonly signingAlgorithms: SigningAlgorithms;
     constructor(provider?: AbstractProvider);
     abstract getAddress(): string;
     abstract connect(provider: AbstractProvider): void;

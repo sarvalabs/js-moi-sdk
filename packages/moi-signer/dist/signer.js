@@ -16,10 +16,11 @@ class Signer {
     provider;
     signingAlgorithms;
     constructor(provider) {
-        this.provider = provider;
-        this.signingAlgorithms = {
+        const signingAlgorithms = {
             ecdsa_secp256k1: new ecdsa_1.default()
         };
+        this.provider = provider;
+        (0, moi_utils_1.defineReadOnly)(this, "signingAlgorithms", signingAlgorithms);
     }
     /**
      * getProvider

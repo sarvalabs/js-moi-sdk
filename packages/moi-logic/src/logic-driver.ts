@@ -1,6 +1,6 @@
 import { ABICoder } from "moi-abi";
 import { LogicPayload, Signer } from "moi-signer";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest, hexToBytes } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, LogicManifest, defineReadOnly, hexToBytes } from "moi-utils";
 import { Options } from "moi-providers";
 import { Routine, Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";
@@ -13,9 +13,9 @@ import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interact
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export class LogicDriver extends LogicDescriptor {
-    public routines: Routines = {};
-    public persistentState: PersistentState;
-    public ephemeralState: EphemeralState;
+    public readonly routines: Routines = {};
+    public readonly persistentState: PersistentState;
+    public readonly ephemeralState: EphemeralState;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
         super(logicId, manifest, signer)
@@ -34,12 +34,14 @@ export class LogicDriver extends LogicDescriptor {
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
 
         if(persistentStateExists) {
-            this.persistentState = new PersistentState(
+            const persistentState = new PersistentState(
                 this.logicId.hex(),
                 this.elements.get(persistentStatePtr),
                 this.abiCoder,
                 provider
             )
+
+            defineReadOnly(this, "persistentState", persistentState)
         }
     }
 
@@ -49,6 +51,8 @@ export class LogicDriver extends LogicDescriptor {
      * Creates an interface for executing routines defined in the logic manifest.
      */
     private createRoutines() {
+        const routines = {};
+
         this.manifest.elements.forEach((element: LogicManifest.Element) => {
             if(element.kind === "routine") {
                 const routine = element.data as LogicManifest.Routine;
@@ -57,25 +61,27 @@ export class LogicDriver extends LogicDescriptor {
                     const routineName = this.normalizeRoutineName(routine.name)
 
                     // Create a routine execution function
-                    this.routines[routineName] = ((args: any[] = []) => {
+                    routines[routineName] = ((args: any[] = []) => {
                         return this.createIxObject(routine, ...args);
                     }) as Routine;
     
                     // Define routine properties
-                    this.routines[routineName].isMutable = (): boolean => {
+                    routines[routineName].isMutable = (): boolean => {
                         return this.isMutableRoutine(routine.name)
                     }
     
-                    this.routines[routineName].accepts = (): LogicManifest.TypeField[] | null => {
+                    routines[routineName].accepts = (): LogicManifest.TypeField[] | null => {
                         return routine.accepts ? routine.accepts : null
                     }
 
-                    this.routines[routineName].returns = (): LogicManifest.TypeField[] | null => {
+                    routines[routineName].returns = (): LogicManifest.TypeField[] | null => {
                         return routine.returns ? routine.returns : null
                     }
                 }
             }
         })
+
+        defineReadOnly(this, "routines", routines);
     }
 
     /**
