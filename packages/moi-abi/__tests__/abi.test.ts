@@ -76,13 +76,14 @@ describe("Test ABICoder", () => {
         })
     })
 
-    // test("Decode polo encoded property of a state", () => {
-    //     // const data = "0x0e1f0305f5e100";
+    test("Decode polo encoded property of a state", () => {
+        const data = "0x0652494f";
 
-    //     // const state = manifest.elements.find(element =>
-    //     //     element.kind === "state"
-    //     // )
+        const state:any = manifest.elements.find(element =>
+            element.kind === "state"
+        )
 
-    //     // const output = abiCoder.decodeState(data, "")
-    // })
+        const output = abiCoder.decodeState(data, "name", state?.data.fields)
+        expect(output).toBe("RIO")
+    })
 });
