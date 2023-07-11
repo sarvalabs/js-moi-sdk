@@ -1,34 +1,51 @@
 import { JsonRpcProvider } from "moi-providers";
+import { AssetStandard } from "moi-utils";
 import { Wallet } from "../src/index";
 
 describe("Test Wallet", () => {
-    test("Wallet testing", async () => {
-        // let testSeed = "behind wish visual father mixture tackle together nurse asset stumble attack erode";
-        const wallet = new Wallet()
-        await wallet.createRandom()
-        console.log(wallet.mnemonic())
-    })
+    let wallet: Wallet;
 
-    test("Sign Interaction", async () => {
+    beforeAll(async () => {
         const mnemonic = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
         const derivationPath = "m/44'/6174'/0'/0/1";
+        const provider = new JsonRpcProvider("http://localhost:1600");
+        wallet = new Wallet(provider);
+        await wallet.fromMnemonic(mnemonic, derivationPath);
+    });
+
+    test("Sign Message", async () => {
+        const message = "Hello, MOI";
+        const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+        const signature = wallet.sign(Buffer.from(message), sigAlgo);
+        expect(signature).toBe("0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402");
+    });
+
+    test("Sign Interaction", async () => {
         const ixObject = {
             type: 3,
             nonce: 0,
-            sender: "870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b",
+            sender: "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b",
             fuel_price: 1,
             fuel_limit: 200,
             payload: {
-                type: 3,
-                symbol: "MOI",
+                standard: AssetStandard.MAS0,
+                symbol: "SIG",
                 supply: 1248577
             }
         }
-        const provider = new JsonRpcProvider("http://localhost:1600");
-        const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic, derivationPath)
         const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"]
         const ixArgs = wallet.signInteraction(ixObject, sigAlgo)
-        console.log(ixArgs)
-    })
+        expect(ixArgs).toEqual({
+            ix_args: "0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f06336363616160534947130d41",
+            signature: "0147304502210089d5c9125fbc605eaa7c51ba1157ed774896cc02483992bb9b3180555ba20c1a02202aad27b8c6ce498a9ce6167924b6286fb13865ec9d9e3767d32b8c6a250b3e9e02"
+        })
+    });
+
+    test("Signature Verification", () => {
+        const message = Buffer.from("Hello, MOI", "utf-8");
+        const signature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
+        const publicKey = Buffer.from(wallet.publicKey(), 'hex')
+        const isVerified = wallet.verify(message, signature, publicKey)
+        expect(isVerified).toBe(true);
+    });
 })
