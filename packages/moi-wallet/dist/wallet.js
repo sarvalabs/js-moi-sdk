@@ -40,7 +40,7 @@ const keystore_1 = require("./keystore");
 var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
-})(CURVE = exports.CURVE || (exports.CURVE = {}));
+})(CURVE || (exports.CURVE = CURVE = {}));
 /**
  * privateMapGet
  *
@@ -198,7 +198,7 @@ class Wallet extends moi_signer_1.Signer {
      * @throws Error if there is an error loading the wallet from the mnemonic.
      */
     async fromMnemonic(mnemonic, path, wordlist) {
-        mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
+        // mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
         try {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = moi_hdnode_1.HDNode.fromSeed(seed);
@@ -206,6 +206,7 @@ class Wallet extends moi_signer_1.Signer {
             this.load(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
         }
         catch (err) {
+            console.log(err);
             moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }

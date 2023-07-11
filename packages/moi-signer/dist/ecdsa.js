@@ -27,12 +27,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const blake2b_1 = __importDefault(require("blake2b"));
-const nobleECC = __importStar(require("@noble/secp256k1"));
-const hmac_1 = require("@noble/hashes/hmac");
-const sha256_1 = require("@noble/hashes/sha256");
 const moi_utils_1 = require("moi-utils");
-const utils_1 = require("./utils");
+const hmac_1 = require("@noble/hashes/hmac");
+const nobleECC = __importStar(require("@noble/secp256k1"));
+const sha256_1 = require("@noble/hashes/sha256");
 const signature_1 = __importDefault(require("./signature"));
+const utils_1 = require("./utils");
+/**
+ * Setting the `hmacSha256Sync` with custom hashing logic
+ * @param key
+ * @param msgs
+ */
 nobleECC.utils.hmacSha256Sync = (key, ...msgs) => (0, hmac_1.hmac)(sha256_1.sha256, key, nobleECC.utils.concatBytes(...msgs));
 /**
  * ECDSA_S256
@@ -54,7 +59,7 @@ class ECDSA_S256 {
      * @param message - The message to be signed, as a Buffer.
      * @param signingKey - The private key used for signing, either as
      * a hexadecimal string or a Buffer.
-     * @returns A Signature object representing the signed message.
+     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
      */
     sign(message, signingKey) {
         let _signingKey;
@@ -80,6 +85,18 @@ class ECDSA_S256 {
         const sig = new signature_1.default(prefixArray, signature, parityByte, this.sigName);
         return sig;
     }
+    /**
+     * verify
+     *
+     * Verifies the ECDSA signature with the given secp256k1 publicKey
+     *
+     * @param message the message being signed
+     * @param signature the Signature instance with parity byte
+     * as extra data to determine the public key's X & Y co-ordinates
+     * having same or different sign
+     * @param publicKey the compressed public key
+     * @returns boolean, to determine whether verification is success/failure
+     */
     verify(message, signature, publicKey) {
         let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
         verificationKey.set(signature.Extra());

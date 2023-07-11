@@ -27,7 +27,7 @@ var ErrorCode;
     ErrorCode["UNPREDICTABLE_FUEL_LIMIT"] = "ERROR_UNPREDICTABLE_FUEL_LIMIT";
     ErrorCode["ACTION_REJECTED"] = "ERROR_ACTION_REJECTED";
     ErrorCode["INVALID_SIGNATURE"] = "ERROR_INVALID_SIGNATURE";
-})(ErrorCode = exports.ErrorCode || (exports.ErrorCode = {}));
+})(ErrorCode || (exports.ErrorCode = ErrorCode = {}));
 /**
  * CustomError class that extends the Error class.
  */

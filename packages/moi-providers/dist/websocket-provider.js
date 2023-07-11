@@ -43,7 +43,7 @@ var WebSocketEvents;
     WebSocketEvents["CLOSE"] = "close";
     WebSocketEvents["DEBUG"] = "debug";
     WebSocketEvents["ERROR"] = "error";
-})(WebSocketEvents = exports.WebSocketEvents || (exports.WebSocketEvents = {}));
+})(WebSocketEvents || (exports.WebSocketEvents = WebSocketEvents = {}));
 /**
  * WebSocketProvider
  *
