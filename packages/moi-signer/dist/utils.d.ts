@@ -1,3 +1,9 @@
-export declare const generateRandomSeed: (count: number) => Uint8Array;
-export declare const getBytesFromString: (str: string) => any[];
-export declare const getSigTypeAttributes: (sigType: string | undefined) => string[];
+export type SigDigest = {
+    _r: Uint8Array;
+    _s: Uint8Array;
+};
+export declare function toDER(x: Uint8Array): Uint8Array;
+export declare function fromDER(x: Uint8Array): Uint8Array;
+export declare function bip66Encode(rAndS: SigDigest): Uint8Array;
+export declare function bip66Decode(buffer: Uint8Array): SigDigest;
+export declare function JoinSignature(digest: SigDigest): Uint8Array;

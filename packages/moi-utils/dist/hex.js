@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
+const buffer_1 = require("buffer");
 /**
  * numToHex
  *
@@ -55,7 +56,7 @@ exports.toQuantity = toQuantity;
  * @returns {string} - The hexadecimal string representation of the Uint8Array.
  */
 const encodeToString = (data) => {
-    return "0x" + Buffer.from(data).toString('hex');
+    return "0x" + buffer_1.Buffer.from(data).toString('hex');
 };
 exports.encodeToString = encodeToString;
 /**
@@ -116,7 +117,7 @@ exports.hexToBN = hexToBN;
  * @returns {string} - The hexadecimal string representation of the Uint8Array.
  */
 const bytesToHex = (data) => {
-    return Buffer.from(data).toString('hex');
+    return buffer_1.Buffer.from(data).toString('hex');
 };
 exports.bytesToHex = bytesToHex;
 /**

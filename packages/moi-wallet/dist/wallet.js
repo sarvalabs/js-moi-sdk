@@ -27,13 +27,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = exports.CURVE = void 0;
-const bip39 = __importStar(require("bip39"));
+const bip39 = __importStar(require("moi-bip39"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const moi_hdnode_1 = require("moi-hdnode");
 const crypto_1 = require("crypto");
 const moi_constants_1 = require("moi-constants");
 const moi_signer_1 = require("moi-signer");
 const moi_utils_1 = require("moi-utils");
+const buffer_1 = require("buffer");
 const SigningKeyErrors = __importStar(require("./errors"));
 const serializer_1 = require("./serializer");
 const keystore_1 = require("./keystore");
@@ -180,7 +181,7 @@ class Wallet extends moi_signer_1.Signer {
             moi_utils_1.ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         try {
-            const data = Buffer.from(this.privateKey(), "hex");
+            const data = buffer_1.Buffer.from(this.privateKey(), "hex");
             return (0, keystore_1.encryptKeystoreData)(data, password);
         }
         catch (err) {
@@ -320,9 +321,10 @@ class Wallet extends moi_signer_1.Signer {
             switch (sigAlgo.sigName) {
                 case "ECDSA_S256": {
                     const privateKey = this.privateKey();
-                    const _sig = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sigBytes = _sig.sign(Buffer.from(message), privateKey);
-                    return sigBytes.serialize().toString('hex');
+                    const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+                    const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), privateKey);
+                    const sigBytes = sig.serialize();
+                    return (0, moi_utils_1.bytesToHex)(sigBytes);
                 }
                 default: {
                     moi_utils_1.ErrorUtils.throwError("Unsupported signature type", moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

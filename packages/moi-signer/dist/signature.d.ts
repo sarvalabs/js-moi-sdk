@@ -1,34 +1,11 @@
-/// <reference types="node" />
-/**
- * Signature
- *
- * Represents a signature object, storing its components and providing methods for
- * manipulation and serialization.
- */
 export default class Signature {
     private prefix;
     private digest;
     private extraData;
     private name;
-    constructor(prefix?: Buffer, digest?: Buffer, extraData?: Buffer, signatureName?: string);
-    /**
-     * unmarshall
-     *
-     * Unmarshalls a serialized signature into its individual components.
-     *
-     * @param signature - The serialized signature to be unmarshalled, as a
-     * Buffer or hexadecimal string.
-     * @throws Error if the signature length or index is invalid.
-     */
-    unmarshall(signature: Buffer | string): void;
-    /**
-     * getDigest
-     *
-     * Retrieves the digest bytes of the signature.
-     *
-     * @returns The digest bytes of the signature as a Buffer.
-     */
-    getDigest(): Buffer;
+    constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: string);
+    unmarshall(signature: Uint8Array | String): void;
+    Digest(): Uint8Array;
     /**
      * getSigByte
      *
@@ -46,23 +23,8 @@ export default class Signature {
      * @returns The name of the signature algorithm as a string.
      */
     getName(): string;
-    /**
-     * getExtra
-     *
-     * Retrieves the additional data associated with the signature.
-     *
-     * @returns The extra data as a Buffer.
-     */
-    getExtra(): Buffer;
-    /**
-     * serialize
-     *
-     * Serializes the signature into a Buffer.
-     *
-     * @returns The serialized signature as a Buffer.
-     * @throws Error if the signature is not initialized.
-     */
-    serialize(): Buffer;
+    Extra(): Uint8Array;
+    serialize(): Uint8Array;
     /**
      * getSignatureName
      *
