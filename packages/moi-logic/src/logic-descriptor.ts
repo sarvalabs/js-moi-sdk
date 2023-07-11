@@ -1,4 +1,4 @@
-import { ABICoder } from "moi-abi";
+import { ManifestCoder } from "moi-manifest";
 import { LogicManifest } from "moi-utils";
 import { Signer } from "moi-signer";
 import {LogicId} from "./logic-id";
@@ -28,7 +28,7 @@ export abstract class LogicDescriptor extends LogicBase {
         super(manifest, signer)
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
-        this.encodedManifest = ABICoder.encodeABI(this.manifest);
+        this.encodedManifest = ManifestCoder.encodeManifest(this.manifest);
         this.engine = this.manifest.engine.kind as EngineKind;
         this.sealed = false;
         this.assetLogic = false;

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicFactory = void 0;
-const moi_abi_1 = require("moi-abi");
+const moi_manifest_1 = require("moi-manifest");
 const moi_utils_1 = require("moi-utils");
 const logic_base_1 = require("./logic-base");
 /**
@@ -15,7 +15,7 @@ class LogicFactory extends logic_base_1.LogicBase {
     constructor(manifest, signer) {
         super(manifest, signer);
         this.manifest = manifest;
-        this.encodedManifest = moi_abi_1.ABICoder.encodeABI(manifest);
+        this.encodedManifest = moi_manifest_1.ManifestCoder.encodeManifest(manifest);
     }
     /**
      * getIxType
@@ -41,7 +41,7 @@ class LogicFactory extends logic_base_1.LogicBase {
             callsite: ixObject.routine.name
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.abiCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
             payload.calldata = (0, moi_utils_1.hexToBytes)(calldata);
         }
         return payload;
@@ -60,7 +60,7 @@ class LogicFactory extends logic_base_1.LogicBase {
             const result = await response.result(timeout);
             return {
                 logic_id: result.logic_id ? result.logic_id : "",
-                error: moi_abi_1.ABICoder.decodeException(result.error)
+                error: moi_manifest_1.ManifestCoder.decodeException(result.error)
             };
         }
         catch (err) {

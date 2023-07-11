@@ -1,4 +1,4 @@
-import { ABICoder } from "moi-abi";
+import { ManifestCoder } from "moi-manifest";
 import { IxType, LogicManifest } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { InteractionResponse } from "moi-providers";
@@ -14,7 +14,7 @@ import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from 
  */
 export declare abstract class LogicBase extends ElementDescriptor {
     protected signer: Signer;
-    protected abiCoder: ABICoder;
+    protected manifestCoder: ManifestCoder;
     constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract getIxType(): IxType;

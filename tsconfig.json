@@ -32,7 +32,7 @@
   },
   "references": [
     { "path": "./packages/moi" },
-    { "path": "./packages/moi-abi" },
+    { "path": "./packages/moi-manifest" },
     { "path": "./packages/moi-constants" },
     { "path": "./packages/moi-logic" },
     { "path": "./packages/moi-providers" },

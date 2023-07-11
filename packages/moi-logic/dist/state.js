@@ -77,12 +77,12 @@ class PersistentState {
     types;
     logicId;
     provider;
-    abiCoder;
+    manifestCoder;
     element;
-    constructor(logicId, element, abiCoder, provider) {
+    constructor(logicId, element, manifestCoder, provider) {
         this.logicId = logicId;
         this.provider = provider;
-        this.abiCoder = abiCoder;
+        this.manifestCoder = manifestCoder;
         this.element = element;
         this.slots = new Map();
         this.types = new Map();
@@ -119,7 +119,7 @@ class PersistentState {
             if (slotHash) {
                 const entry = await this.provider.getStorageAt(this.logicId, slotHash);
                 this.element.data = this.element.data;
-                return this.abiCoder.decodeState(entry, label, this.element.data.fields);
+                return this.manifestCoder.decodeState(entry, label, this.element.data.fields);
             }
             moi_utils_1.ErrorUtils.throwError(`The provided slot "${label}" does not exist.`, moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }

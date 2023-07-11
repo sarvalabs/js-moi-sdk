@@ -1,7 +1,7 @@
 import { ErrorCode, ErrorUtils, LogicManifest, encodeToString } from "moi-utils";
 import { blake2b } from 'blakejs';
 import { AbstractProvider } from "moi-providers";
-import { ABICoder } from "moi-abi";
+import { ManifestCoder } from "moi-manifest";
 
 export enum ContextStateKind {
     PersistentState,
@@ -91,18 +91,18 @@ export class PersistentState {
     private types:Map<string, string>;
     private logicId: string;
     private provider: AbstractProvider;
-    private abiCoder: ABICoder;
+    private manifestCoder: ManifestCoder;
     private element: LogicManifest.Element;
 
     constructor(
         logicId: string, 
         element: LogicManifest.Element, 
-        abiCoder: ABICoder, 
+        manifestCoder: ManifestCoder, 
         provider: AbstractProvider
     ) {
         this.logicId = logicId;
         this.provider = provider;
-        this.abiCoder = abiCoder;
+        this.manifestCoder = manifestCoder;
         this.element = element;
         this.slots = new Map()
         this.types = new Map()
@@ -144,7 +144,7 @@ export class PersistentState {
             if(slotHash) {
                 const entry = await this.provider.getStorageAt(this.logicId, slotHash);
                 this.element.data = this.element.data as LogicManifest.State;
-                return this.abiCoder.decodeState(entry, label, this.element.data.fields);
+                return this.manifestCoder.decodeState(entry, label, this.element.data.fields);
             }
 
             ErrorUtils.throwError(

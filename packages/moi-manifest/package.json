@@ -1,5 +1,5 @@
 {
-  "name": "moi-abi",
+  "name": "moi-manifest",
   "version": "0.1.0",
   "description": "Web3 module encode and decode PISA in/output.",
   "main": "dist/index.js",
@@ -10,7 +10,7 @@
   "keywords": [
     "moichain",
     "moi.js",
-    "abi"
+    "manifest"
   ],
   "author": "",
   "license": "UNLICENSED",

@@ -1,4 +1,4 @@
-import { ABICoder } from "moi-abi";
+import { ManifestCoder } from "moi-manifest";
 import { LogicPayload, Signer } from "moi-signer";
 import { ErrorCode, ErrorUtils, IxType, LogicManifest, defineReadOnly, hexToBytes } from "moi-utils";
 import { Options } from "moi-providers";
@@ -37,7 +37,7 @@ export class LogicDriver extends LogicDescriptor {
             const persistentState = new PersistentState(
                 this.logicId.hex(),
                 this.elements.get(persistentStatePtr),
-                this.abiCoder,
+                this.manifestCoder,
                 provider
             )
 
@@ -139,7 +139,7 @@ export class LogicDriver extends LogicDescriptor {
 
         if(ixObject.routine.accepts && 
         Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.abiCoder.encodeArguments(
+            const calldata = this.manifestCoder.encodeArguments(
                 ixObject.routine.accepts, 
                 ixObject.arguments
             );
@@ -165,11 +165,11 @@ export class LogicDriver extends LogicDescriptor {
             const routine = this.getRoutineElement(response.routine_name)
             const result = await response.result(timeout);
             const data = { 
-                output: this.abiCoder.decodeOutput(
+                output: this.manifestCoder.decodeOutput(
                     result.outputs,
                     routine.data["returns"]
                 ), 
-                error: ABICoder.decodeException(result.error) 
+                error: ManifestCoder.decodeException(result.error) 
             };
     
             if(data.output || data.error) {

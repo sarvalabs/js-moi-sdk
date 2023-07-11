@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
-const moi_abi_1 = require("moi-abi");
+const moi_manifest_1 = require("moi-manifest");
 const moi_utils_1 = require("moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 /**
@@ -16,11 +16,11 @@ const element_descriptor_1 = __importDefault(require("./element-descriptor"));
  */
 class LogicBase extends element_descriptor_1.default {
     signer;
-    abiCoder;
+    manifestCoder;
     constructor(manifest, signer) {
         super(manifest.elements);
         this.signer = signer;
-        this.abiCoder = new moi_abi_1.ABICoder(this.elements, this.classDefs);
+        this.manifestCoder = new moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
     }
     /**
      * getLogicId

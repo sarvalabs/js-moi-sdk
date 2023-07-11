@@ -1,4 +1,4 @@
-import { ABICoder } from "moi-abi";
+import { ManifestCoder } from "moi-manifest";
 import { ErrorCode, ErrorUtils, IxType, LogicManifest, hexToBytes } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { LogicDeployRequest } from "../types/logic";
@@ -17,7 +17,7 @@ export class LogicFactory extends LogicBase {
     constructor(manifest: LogicManifest.Manifest, signer: Signer) {
         super(manifest, signer);
         this.manifest = manifest;
-        this.encodedManifest = ABICoder.encodeABI(manifest);
+        this.encodedManifest = ManifestCoder.encodeManifest(manifest);
     }
 
     /**
@@ -46,7 +46,7 @@ export class LogicFactory extends LogicBase {
         } as LogicPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.abiCoder.encodeArguments(
+            const calldata = this.manifestCoder.encodeArguments(
                 ixObject.routine.accepts, 
                 ixObject.arguments
             );
@@ -71,7 +71,7 @@ export class LogicFactory extends LogicBase {
 
             return { 
                 logic_id: result.logic_id ? result.logic_id : "", 
-                error: ABICoder.decodeException(result.error) 
+                error: ManifestCoder.decodeException(result.error) 
             };
         } catch(err) {
             throw err;

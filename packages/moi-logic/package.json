@@ -15,7 +15,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "moi-abi": "0.1.0",
+    "moi-manifest": "0.1.0",
     "moi-utils": "0.1.0",
     "moi-providers": "0.1.0"
   },
