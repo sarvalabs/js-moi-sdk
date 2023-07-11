@@ -1,4 +1,4 @@
-import * as bip39 from "bip39";
+import * as bip39 from "moi-bip39";
 import elliptic from "elliptic";
 import { HDNode } from "moi-hdnode";
 import { randomBytes } from "crypto";
@@ -6,6 +6,8 @@ import { MOI_DERIVATION_PATH } from "moi-constants";
 import { Signer, SigType, InteractionObject } from "moi-signer";
 import { AbstractProvider, InteractionRequest } from "moi-providers";
 import { ErrorCode, ErrorUtils, bytesToHex, bufferToUint8 } from "moi-utils";
+import { Buffer } from "buffer";
+
 import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";
 import { serializeIxObject } from "./serializer";
