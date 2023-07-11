@@ -1,7 +1,19 @@
+import Blake2b from "blake2b";
+import { hexToBytes } from "moi-utils";
+import { hmac } from '@noble/hashes/hmac';
+import * as nobleECC from '@noble/secp256k1';
+import { sha256 } from '@noble/hashes/sha256';
+
 import { SigType } from "../types";
 import Signature from "./signature";
-import { ECPair, script, Transaction, networks } from "bitcoinjs-lib";
-import Blake2b from "blake2b";
+import { toDER, bip66Encode, SigDigest, bip66Decode, JoinSignature, fromDER } from "./utils";
+
+/**
+ * Setting the `hmacSha256Sync` with custom hashing logic 
+ * @param key 
+ * @param msgs 
+ */
+nobleECC.utils.hmacSha256Sync = (key, ...msgs) => hmac(sha256, key, nobleECC.utils.concatBytes(...msgs));
 
 /**
  * ECDSA_S256
@@ -25,12 +37,12 @@ export default class ECDSA_S256 implements SigType {
      * @param message - The message to be signed, as a Buffer.
      * @param signingKey - The private key used for signing, either as 
      * a hexadecimal string or a Buffer.
-     * @returns A Signature object representing the signed message.
+     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
      */
-    public sign(message: Buffer, signingKey: Buffer | string): Signature {
-        let _signingKey: Buffer
+     public sign(message: Buffer, signingKey: Buffer | string): Signature {
+        let _signingKey: Uint8Array
         if(typeof signingKey === "string") {
-            _signingKey = Buffer.from(signingKey, 'hex');
+            _signingKey = hexToBytes(signingKey)
         }else {
             _signingKey = signingKey
         }
@@ -38,47 +50,54 @@ export default class ECDSA_S256 implements SigType {
         // Hashing raw message with blake2b to get 32 bytes digest 
         const messageHash = Blake2b(256 / 8).update(message).digest();
         
-        const keyPair = ECPair.fromPrivateKey(_signingKey, { network: networks.bitcoin });
-        let signature = script.signature.encode(
-          keyPair.sign(Buffer.from(messageHash)),
-          Transaction.SIGHASH_ALL
-        );
-                     
-        // Removing last byte, since it's always 0x01 because of SIGHASH_ALL hashType
-        signature = signature.slice(0, signature.length - 1);
+        const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false }); 
+        
+        const digest: SigDigest = {
+            _r: toDER(sigParts.slice(0, 32)),
+            _s: toDER(sigParts.slice(32, 64))
+        }
+
+        const signature = bip66Encode(digest);
         
         const prefixArray = new Uint8Array(2);
         prefixArray[0] = this.prefix;
         prefixArray[1] = signature.length;
 
-        const sig = new Signature(Buffer.from(prefixArray), signature, Buffer.from([keyPair.publicKey[0]]), this.sigName);
+        const pubKey = nobleECC.getPublicKey(_signingKey, true);
+
+        const parityByte = new Uint8Array([pubKey[0]]);
+        const sig = new Signature(prefixArray, signature, parityByte, this.sigName);
+
         return sig;
     }
 
     /**
      * verify
-     *
-     * Verifies the signature of a message using the ECDSA_S256 signature algorithm.
-     *
-     * @param message - The message to be verified, as a Buffer.
-     * @param signature - The signature to be verified, as a Signature instance.
-     * @param publicKey - The public key used for verification, as a Buffer.
-     * @returns A boolean indicating whether the signature is valid.
+     * 
+     * Verifies the ECDSA signature with the given secp256k1 publicKey
+     * 
+     * @param message the message being signed
+     * @param signature the Signature instance with parity byte 
+     * as extra data to determine the public key's X & Y co-ordinates 
+     * having same or different sign
+     * @param publicKey the compressed public key
+     * @returns boolean, to determine whether verification is success/failure
      */
-    public verify(message: Buffer, signature: Signature, publicKey: Buffer): boolean {  
+    verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): boolean {  
+        let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
+        verificationKey.set(signature.Extra());
+        verificationKey.set(publicKey, signature.Extra().length);
 
-        let verificationKey = Buffer.concat([signature.getExtra(), publicKey])
+        let derSignature = signature.Digest();
 
-        let rawSignature = signature.getDigest();
-        // Appending the byte that was removed at the time of signing      
-        let sigComps = script.signature.decode(
-            Buffer.concat([rawSignature, Buffer.from([0x01])])
-        );
-
-        // Hashing raw message with blake2b to get 32 bytes digest 
         const messageHash = Blake2b(256 / 8).update(message).digest();
-        const parsedPubkey = ECPair.fromPublicKey(verificationKey, { network: networks.bitcoin });
 
-        return parsedPubkey.verify(messageHash, sigComps.signature)
+        const _digest = bip66Decode(derSignature)
+        const sigDigest: SigDigest = {
+            _r: fromDER(_digest._r),
+            _s: fromDER(_digest._s)
+        }
+
+        return nobleECC.verify(JoinSignature(sigDigest), messageHash, verificationKey, { strict: true })
     }
 }
