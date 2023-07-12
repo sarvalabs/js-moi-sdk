@@ -6,7 +6,7 @@ import BN from "bn.js";
  *
  * @param {number | bigint | BN} value - The value to convert to a hexadecimal string.
  * @returns {string} - The hexadecimal string representation of the value.
- * @throws {Error} - If the input value is a negative number.
+ * @throws {Error} If the input value is a negative number.
  */
 export declare const numToHex: (value: number | bigint | BN) => string;
 /**
@@ -15,14 +15,14 @@ export declare const numToHex: (value: number | bigint | BN) => string;
  *
  * @param {number | bigint | BN} value - The value to convert to a quantity string.
  * @returns {string} - The quantity string representation of the value.
- * @throws {Error} - If an error occurs during the conversion.
+ * @throws {Error} If an error occurs during the conversion.
  */
 export declare const toQuantity: (value: number | bigint | BN) => string;
 /**
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to encode as a hexadecimal string.
- * @returns {string} - The hexadecimal string representation of the Uint8Array.
+ * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 export declare const encodeToString: (data: Uint8Array) => string;
 /**
@@ -30,7 +30,7 @@ export declare const encodeToString: (data: Uint8Array) => string;
  *
  * @param {string} str - The hexadecimal string to convert to a Uint8Array.
  * @returns {Uint8Array} - The Uint8Array representation of the hexadecimal string.
- * @throws {Error} - If the input string is not a valid hexadecimal string.
+ * @throws {Error} If the input string is not a valid hexadecimal string.
  */
 export declare const hexToBytes: (str: string) => Uint8Array;
 /**
@@ -39,27 +39,27 @@ export declare const hexToBytes: (str: string) => Uint8Array;
  * Otherwise, it is returned as a number.
  *
  * @param {string} hex - The hexadecimal string to convert.
- * @returns {bigint | number} - The resulting value as a bigint or number.
+ * @returns {bigint | number} The resulting value as a bigint or number.
  */
 export declare const hexToBN: (hex: string) => bigint | number;
 /**
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to convert to a hexadecimal string.
- * @returns {string} - The hexadecimal string representation of the Uint8Array.
+ * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 export declare const bytesToHex: (data: Uint8Array) => string;
 /**
  * Checks if a given string is a valid hexadecimal value.
  *
  * @param {string} data - The input string.
- * @returns {boolean} - True if the input is a valid hexadecimal string, false otherwise.
+ * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
  */
 export declare const isHex: (data: string) => boolean;
 /**
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
  * @param {string} data - The input string.
- * @returns {string} - The trimmed hexadecimal string.
+ * @returns {string} The trimmed hexadecimal string.
  */
 export declare const trimHexPrefix: (data: string) => string;

@@ -6,7 +6,7 @@ exports.unmarshal = exports.marshal = void 0;
  * JSON string and encoding as UTF-8.
  *
  * @param {object} data - The data object to marshal.
- * @returns {Uint8Array} - The marshaled data as a Uint8Array.
+ * @returns {Uint8Array} The marshaled data as a Uint8Array.
  */
 const marshal = (data) => {
     const jsonString = JSON.stringify(data);
@@ -18,8 +18,8 @@ exports.marshal = marshal;
  * it as UTF-8 and parsing the JSON string.
  *
  * @param {Uint8Array} bytes - The bytes to unmarshal.
- * @returns {any} - The unmarshaled data object.
- * @throws {Error} - If there is an error while deserializing the data.
+ * @returns {any} The unmarshaled data object.
+ * @throws {Error} If there is an error while deserializing the data.
  */
 const unmarshal = (bytes) => {
     try {

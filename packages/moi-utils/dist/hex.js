@@ -13,7 +13,7 @@ const buffer_1 = require("buffer");
  *
  * @param {number | bigint | BN} value - The value to convert to a hexadecimal string.
  * @returns {string} - The hexadecimal string representation of the value.
- * @throws {Error} - If the input value is a negative number.
+ * @throws {Error} If the input value is a negative number.
  */
 const numToHex = (value) => {
     if (!bn_js_1.default.isBN(value)) {
@@ -32,7 +32,7 @@ exports.numToHex = numToHex;
  *
  * @param {number | bigint | BN} value - The value to convert to a quantity string.
  * @returns {string} - The quantity string representation of the value.
- * @throws {Error} - If an error occurs during the conversion.
+ * @throws {Error} If an error occurs during the conversion.
  */
 const toQuantity = (value) => {
     try {
@@ -47,7 +47,7 @@ exports.toQuantity = toQuantity;
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to encode as a hexadecimal string.
- * @returns {string} - The hexadecimal string representation of the Uint8Array.
+ * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const encodeToString = (data) => {
     return "0x" + buffer_1.Buffer.from(data).toString('hex');
@@ -58,7 +58,7 @@ exports.encodeToString = encodeToString;
  *
  * @param {string} str - The hexadecimal string to convert to a Uint8Array.
  * @returns {Uint8Array} - The Uint8Array representation of the hexadecimal string.
- * @throws {Error} - If the input string is not a valid hexadecimal string.
+ * @throws {Error} If the input string is not a valid hexadecimal string.
  */
 const hexToBytes = (str) => {
     const hex = str.replace(/^0x/, '').trim();
@@ -78,7 +78,7 @@ exports.hexToBytes = hexToBytes;
  * Otherwise, it is returned as a number.
  *
  * @param {string} hex - The hexadecimal string to convert.
- * @returns {bigint | number} - The resulting value as a bigint or number.
+ * @returns {bigint | number} The resulting value as a bigint or number.
  */
 const hexToBN = (hex) => {
     let value;
@@ -102,7 +102,7 @@ exports.hexToBN = hexToBN;
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to convert to a hexadecimal string.
- * @returns {string} - The hexadecimal string representation of the Uint8Array.
+ * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const bytesToHex = (data) => {
     return buffer_1.Buffer.from(data).toString('hex');
@@ -112,7 +112,7 @@ exports.bytesToHex = bytesToHex;
  * Checks if a given string is a valid hexadecimal value.
  *
  * @param {string} data - The input string.
- * @returns {boolean} - True if the input is a valid hexadecimal string, false otherwise.
+ * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
  */
 const isHex = (data) => {
     return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
@@ -122,7 +122,7 @@ exports.isHex = isHex;
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
  * @param {string} data - The input string.
- * @returns {string} - The trimmed hexadecimal string.
+ * @returns {string} The trimmed hexadecimal string.
  */
 const trimHexPrefix = (data) => {
     if ((0, exports.isHex)(data) && data.startsWith('0x')) {

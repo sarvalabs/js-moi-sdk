@@ -216,17 +216,16 @@ Json
 
     >> { name: "John", age: 30 }
 
-Mnemonics
----------
-
-.. autofunction:: mnemonicToSeed
-
-.. autofunction:: isValidSeed
-
 Properties
 ----------
 
 .. autofunction:: defineReadOnly
+
+.. code-block:: javascript
+
+    // Example
+    const data = {}
+    defineReadOnly(data, "foo", true)
 
 Errors
 ------
@@ -236,7 +235,17 @@ CustomError
 The CustomError class extends the Error class and provides additional utility 
 methods.
 
+.. code-block:: javascript
+
+    // Example
+    const error = new CustomError("Invalid argument provided")
+
 .. autofunction:: toString
+
+.. code-block:: javascript
+
+    // Example
+    const error = error.toString();
 
 ErrorUtils
 ----------
@@ -244,5 +253,14 @@ The ErrorUtils class contains static helper methods for handling errors.
 
 .. autofunction:: throwError
 
+.. code-block:: javascript
+
+    // Example
+    ErrorUtils.throwError("Invalid argument provided", ErrorCode.INVALID_ARGUMENT)
+
 .. autofunction:: throwArgumentError
 
+.. code-block:: javascript
+
+    // Example
+    ErrorUtils.throwArgumentError("Invalid argument provided", "nonce", "2")

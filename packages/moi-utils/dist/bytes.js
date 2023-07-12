@@ -60,7 +60,7 @@ exports.hexDataLength = hexDataLength;
  *
  * @param {any} value - The value to check.
  * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} - Returns true if the value is a valid hexadecimal string, otherwise false.
+ * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
  */
 const isHexString = (value, length) => {
     if (typeof (value) !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
@@ -76,7 +76,7 @@ exports.isHexString = isHexString;
  * Converts a Buffer to a Uint8Array.
  *
  * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} - The Uint8Array representation of the Buffer.
+ * @returns {Uint8Array} The Uint8Array representation of the Buffer.
  */
 const bufferToUint8 = (target) => {
     return new Uint8Array(target);

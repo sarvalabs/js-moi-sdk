@@ -29,13 +29,13 @@ export declare const hexDataLength: (data: string) => number;
  *
  * @param {any} value - The value to check.
  * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} - Returns true if the value is a valid hexadecimal string, otherwise false.
+ * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
  */
 export declare const isHexString: (value: any, length?: number) => boolean;
 /**
  * Converts a Buffer to a Uint8Array.
  *
  * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} - The Uint8Array representation of the Buffer.
+ * @returns {Uint8Array} The Uint8Array representation of the Buffer.
  */
 export declare const bufferToUint8: (target: Buffer) => Uint8Array;
