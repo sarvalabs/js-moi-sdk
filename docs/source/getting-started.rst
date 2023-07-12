@@ -67,15 +67,23 @@ unique identifier for the Asset.
 
 **Logic**
 
-Todo: pending has to be updated
+Logic is a program stored on the blockchain that operates based on predefined 
+rules and conditions, eliminating the need for intermediaries and ensuring 
+transparency, security, and immutability of interactions.
+
+Logic is typically used to facilitate and automate various types of digital 
+interactions, ranging from financial interactions to supply chain management and 
+decentralized applications (DApps).
 
 **Manifest**
 
-Todo: pending has to be updated
+Manifest is a specification that defines the structure of logic object which 
+includes routines, classes, methods, and state. It facilitates seamless 
+interaction, accurate encoding and decoding of data for invoking routines.
 
 **Receipt**
 
-After a interaction is executed on the network, a receipt is generated and 
+After an interaction is executed on the network, a receipt is generated and 
 stored on the blockchain as a record of that interaction's execution. Receipts 
 contains detailed information about the interaction's execution, including 
 whether it was successful, the fuel used, and other relevant data.

@@ -79,13 +79,13 @@ The **moi.js** package consists of several sub-packages, each offering independe
 
 - [moi-providers](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-providers) This package enables you to connect to MOI nodes and retrieve blockchain data, such as account balances and interaction history. It provides an interface for interacting with the MOI protocol and fetching information from the network.
 
-- [moi-signer](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-signer) This package represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign transactions securely and authenticate interactions on the MOI network.
+- [moi-signer](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-signer) This package represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign interactions securely and authenticate interactions on the MOI network.
 
 - [moi-bip39](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-bip39) Provides functionality for connecting to moi nodes and retrieving blockchain data.
 
 - [moi-hdnode](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-hdnode) This package represents a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
 
-- [moi-wallet](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-wallet) This package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing transactions.
+- [moi-wallet](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-wallet) This package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
 
 - [moi-manifest](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-manifest) This package encodes and decodes data according to the MOI Manifest specification, facilitating interaction with logic objects. It simplifies the process of encoding and decoding data structures, making it easier to work with MOI logic objects.
 

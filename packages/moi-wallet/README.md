@@ -19,7 +19,7 @@
 
 This is a sub-package of [moi.js](https://github.com/sarvalabs/moi.js).
 
-The **moi-wallet** package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing transactions.
+The **moi-wallet** package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
 
 ## Installation
 Install the latest [release](https://github.com/sarvalabs/moi.js/releases) using the following command.

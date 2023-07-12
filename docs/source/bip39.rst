@@ -51,7 +51,7 @@ Functions
 
     >> Buffer
 
-.. autofunction:: entropyToMnemonic
+.. autofunction:: bip39.entropyToMnemonic
 
 .. code-block:: javascript
 
@@ -62,7 +62,7 @@ Functions
 
     >> 6ce1535a6fdd4b10efae6f27fa0835b7
 
-.. autofunction:: generateMnemonic
+.. autofunction:: bip39.generateMnemonic
 
 .. code-block:: javascript
 
@@ -72,7 +72,7 @@ Functions
 
     >> gaze hole neither spring effort fringe kit neck girl lamp smart afraid
 
-.. autofunction:: validateMnemonic
+.. autofunction:: bip39.validateMnemonic
 
 .. code-block:: javascript
 
@@ -83,7 +83,7 @@ Functions
 
     >> false
 
-.. autofunction:: getDefaultWordlist
+.. autofunction:: bip39.getDefaultWordlist
 
 .. code-block:: javascript
 
