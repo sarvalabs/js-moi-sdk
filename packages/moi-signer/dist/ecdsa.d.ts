@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { Buffer } from "buffer";
 import { SigType } from "../types";
 import Signature from "./signature";
 /**

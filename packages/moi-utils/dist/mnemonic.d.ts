@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 /**
  * Converts a mnemonic phrase to a seed buffer using BIP39.
  *

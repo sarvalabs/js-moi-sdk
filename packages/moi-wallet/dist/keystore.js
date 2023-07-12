@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.decryptKeystoreData = exports.encryptKeystoreData = exports.getKDFKeyForKeystore = exports.aesCTRWithXOR = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const keccak_1 = __importDefault(require("keccak"));
+const buffer_1 = require("buffer");
 const moi_utils_1 = require("moi-utils");
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
@@ -18,7 +19,7 @@ const moi_utils_1 = require("moi-utils");
 const aesCTRWithXOR = (key, input, iv) => {
     const aesBlock = crypto_1.default.createCipheriv('aes-128-ctr', key, iv);
     const output = aesBlock.update(input);
-    return Buffer.concat([output, aesBlock.final()]);
+    return buffer_1.Buffer.concat([output, aesBlock.final()]);
 };
 exports.aesCTRWithXOR = aesCTRWithXOR;
 /**
@@ -31,8 +32,8 @@ exports.aesCTRWithXOR = aesCTRWithXOR;
  * @throws {Error} If the KDF is unsupported.
  */
 const getKDFKeyForKeystore = (keystore, password) => {
-    const pwBuf = Buffer.from(password);
-    const salt = Buffer.from(keystore.kdfparams.salt, 'hex');
+    const pwBuf = buffer_1.Buffer.from(password);
+    const salt = buffer_1.Buffer.from(keystore.kdfparams.salt, 'hex');
     const dkLen = keystore.kdfparams.dklen;
     if (keystore.kdf === 'scrypt') {
         const n = keystore.kdfparams.n;
@@ -62,7 +63,7 @@ const encryptKeystoreData = (data, password) => {
     const iv = crypto_1.default.randomBytes(16);
     const cipherText = (0, exports.aesCTRWithXOR)(encryptKey, data, iv);
     const mac = new keccak_1.default('keccak256')
-        .update(Buffer.concat([derivedKey.slice(16, 32), cipherText]))
+        .update(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]))
         .digest();
     return {
         cipher: 'aes-128-ctr',
@@ -94,13 +95,13 @@ const decryptKeystoreData = (keystore, password) => {
     if (keystore.cipher !== 'aes-128-ctr') {
         moi_utils_1.ErrorUtils.throwError(`Cipher not supported: ${keystore.cipher}`, moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
-    const mac = Buffer.from(keystore.mac, 'hex');
-    const iv = Buffer.from(keystore.cipherparams.IV, 'hex');
-    const cipherText = Buffer.from(keystore.ciphertext, 'hex');
+    const mac = buffer_1.Buffer.from(keystore.mac, 'hex');
+    const iv = buffer_1.Buffer.from(keystore.cipherparams.IV, 'hex');
+    const cipherText = buffer_1.Buffer.from(keystore.ciphertext, 'hex');
     const derivedKey = (0, exports.getKDFKeyForKeystore)(keystore, password);
     const hash = new keccak_1.default('keccak256');
-    hash.update(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
-    const calculatedMAC = Buffer.from(hash.digest());
+    hash.update(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
+    const calculatedMAC = buffer_1.Buffer.from(hash.digest());
     if (!calculatedMAC.equals(mac)) {
         moi_utils_1.ErrorUtils.throwError("Could not decrypt key with the given password");
     }

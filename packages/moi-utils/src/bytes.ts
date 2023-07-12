@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 /**
  * Array-like type representing bytes.
  */

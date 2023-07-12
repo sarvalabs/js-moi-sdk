@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import keccak from "keccak";
+import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils } from "moi-utils";
 import { Keystore } from "../types/keystore";
 

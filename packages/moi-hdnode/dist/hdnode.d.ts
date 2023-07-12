@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import HDKey from "hdkey";
+import { Buffer } from "buffer";
 /**
  * HDNode Class
  *

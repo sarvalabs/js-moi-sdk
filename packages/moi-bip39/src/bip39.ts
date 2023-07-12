@@ -1,9 +1,9 @@
+import { Buffer } from "buffer";
 import { sha256 } from "@noble/hashes/sha256";
 import { sha512 } from "@noble/hashes/sha512";
 import { randomBytes } from "@noble/hashes/utils";
 import { pbkdf2, pbkdf2Async } from "@noble/hashes/pbkdf2";
 import { wordlists, _default } from "./_wordlists";
-import { Buffer } from "buffer";
 
 let DEFAULT_WORDLIST = _default;
 const INVALID_MNEMONIC = 'Invalid mnemonic';

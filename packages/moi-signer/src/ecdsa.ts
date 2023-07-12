@@ -1,4 +1,5 @@
 import Blake2b from "blake2b";
+import { Buffer } from "buffer";
 import { hexToBytes } from "moi-utils";
 import { hmac } from '@noble/hashes/hmac';
 import * as nobleECC from '@noble/secp256k1';

@@ -1,4 +1,5 @@
 import HDKey from "hdkey";
+import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils } from "moi-utils";
 
 /**
