@@ -12,8 +12,12 @@ public keys, derive MOI account addresses, and serialize/deserialize HDNode
 instances. It simplifies the management of multiple addresses and keys within 
 a single wallet, enhancing security and organization.
 
+HDNode
+------
+A class representing a Hierarchical Deterministic (HD) Node used in cryptographic key generation and derivation.
+
 Methods
--------
+~~~~~~~
 
 .. autofunction:: HDNode.fromSeed
 

@@ -13,7 +13,7 @@ export {
     AssetCreationReceipt,
     AssetMintOrBurnReceipt, 
     LogicDeployReceipt, 
-    LogicExecuteReceipt 
+    LogicInvokeReceipt 
 } from "../types/receipt";
 
 export { Tesseract } from "../types/tesseract";

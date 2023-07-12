@@ -18,6 +18,62 @@ methods handle the signing process and address retrieval. By adhering to the
 Signer class's interface, derived classes ensure compatibility and consistency 
 when working with different types of signers.
 
+Types
+~~~~~
+
+**SigningAlgorithms**
+
+The ``SigningAlgorithms`` interface represents signing algorithms for cryptographic operations. It has the following property:
+
+* ``ecdsa_secp256k1`` - ``ECDSA_S256``: The ECDSA with secp256k1 signing algorithm.
+
+**AssetCreatePayload**
+
+The ``AssetCreatePayload`` interface represents a payload for creating an asset. It has the following properties:
+
+* ``symbol`` - ``string``: The symbol of the asset.
+* ``supply`` - ``number | bigint``: The supply of the asset.
+* ``standard`` - ``AssetStandard``: The asset standard (optional).
+* ``dimension`` - ``number``: The dimension of the asset (optional).
+* ``is_stateful`` - ``boolean``: Indicates whether the asset is stateful (optional).
+* ``is_logical`` - ``boolean``: Indicates whether the asset is logical (optional).
+* ``logic_payload`` - ``LogicPayload``: The payload for the associated logic (optional).
+
+**AssetMintOrBurnPayload**
+
+The ``AssetMintOrBurnPayload`` interface represents a payload for minting or burning an asset. It has the following properties:
+
+* ``asset_id`` - ``string``: The ID of the asset.
+* ``amount`` - ``number | bigint``: The amount to mint or burn.
+
+**LogicPayload**
+
+The ``LogicPayload`` interface represents a payload for logic execution. It has the following properties:
+
+* ``logic_id`` - ``string``: The ID of the logic (optional).
+* ``callsite`` - ``string``: The callsite for the logic execution.
+* ``calldata`` - ``Uint8Array``: The data for the logic execution.
+* ``manifest`` - ``Uint8Array``: The manifest associated with the logic execution (optional).
+
+**InteractionPayload**
+
+The ``InteractionPayload`` type represents a payload for an interaction. It can be one of the following types: ``AssetCreatePayload``, ``AssetMintOrBurnPayload``, or ``LogicPayload``.
+
+**InteractionObject**
+
+The ``InteractionObject`` interface represents an interaction object. It has the following properties:
+
+* ``type`` - ``IxType``: The type of the interaction.
+* ``nonce`` - ``number | bigint``: The nonce value (optional).
+* ``sender`` - ``string``: The sender of the interaction (optional).
+* ``receiver`` - ``string``: The receiver of the interaction (optional).
+* ``payer`` - ``string``: The payer of the interaction (optional).
+* ``transfer_values`` - ``Map<string, number | bigint>``: Transfer values associated with the interaction (optional).
+* ``perceived_values`` - ``Map<string, number | bigint>``: Perceived values associated with the interaction (optional).
+* ``fuel_price`` - ``number | bigint``: The fuel price for the interaction.
+* ``fuel_limit`` - ``number | bigint``: The fuel limit for the interaction.
+* ``payload`` - ``InteractionPayload``: The payload of the interaction (optional).
+
 Abstract Methods
 ~~~~~~~~~~~~~~~~
 

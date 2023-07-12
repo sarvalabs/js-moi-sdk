@@ -15,6 +15,29 @@ module, users can seamlessly manage tasks such as checking nonce, sending
 interactions, and interacting with logic objects, providing a streamlined 
 experience for MOI applications.
 
+Types
+-----
+**Keystore**
+
+The ``Keystore`` interface represents a keystore object. It has the following properties:
+
+* ``cipher`` - ``string``: The cipher used for encryption.
+* ``ciphertext`` - ``string``: The encrypted ciphertext.
+* ``cipherparams`` - ``object``: Parameters for the cipher, containing the following property:
+  - ``IV`` - ``string``: The initialization vector used for encryption.
+* ``kdf`` - ``string``: The key derivation function used.
+* ``kdfparams`` - ``object``: Parameters for the key derivation function, containing the following properties:
+  - ``dklen`` - ``number``: The length of the derived key.
+  - ``n`` - ``number``: The iteration count.
+  - ``p`` - ``number``: The parallelization factor.
+  - ``r`` - ``number``: The block size.
+  - ``salt`` - ``string``: The salt value.
+* ``mac`` - ``string``: The message authentication code.
+
+Wallet
+------
+A class representing a Hierarchical Deterministic Wallet that can sign interactions and manage accounts.
+
 .. code-block:: javascript
 
     // Example

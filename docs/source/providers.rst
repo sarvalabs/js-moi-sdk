@@ -16,6 +16,209 @@ history, or logic information, the providers module simplifies the process of
 connecting to MOI nodes and fetching data, making it easier for developers to 
 build applications that interact with the MOI network.
 
+Types
+-----
+**InteractionInfo**
+
+The ``InteractionInfo`` interface represents information about an interaction. It has the following properties:
+
+* ``nonce`` - ``string``: The nonce value.
+* ``type`` - ``string``: The type of the interaction.
+* ``sender`` - ``string``: The sender of the interaction.
+* ``receiver`` - ``string``: The receiver of the interaction.
+* ``cost`` - ``string``: The cost of the interaction.
+* ``fuel_price`` - ``string``: The fuel price for the interaction.
+* ``fuel_limit`` - ``string``: The fuel limit for the interaction.
+* ``input`` - ``string``: The input data for the interaction.
+* ``hash`` - ``string``: The hash of the interaction.
+
+**Content**
+
+The ``Content`` interface represents content information. It has the following properties:
+
+* ``pending`` - ``Map<string, Map<number | bigint, InteractionInfo>>``: A map representing pending content.
+* ``queued`` - ``Map<string, Map<number | bigint, InteractionInfo>>``: A map representing queued content.
+
+**ContentFrom**
+
+The ``ContentFrom`` interface represents content information based on the sender. It has the following properties:
+
+* ``pending`` - ``Map<number | bigint, InteractionInfo>``: A map representing pending content from a specific sender.
+* ``queued`` - ``Map<number | bigint, InteractionInfo>``: A map representing queued content from a specific sender.
+
+**Status**
+
+The ``Status`` interface represents the status of content. It has the following properties:
+
+* ``pending`` - ``number | bigint``: The number or bigint value representing pending status.
+* ``queued`` - ``number | bigint``: The number or bigint value representing queued status.
+
+**WaitTime**
+
+The ``WaitTime`` interface represents wait time information. It has the following properties:
+
+* ``expired`` - ``boolean``: A boolean indicating if the wait time has expired.
+* ``time`` - ``number | bigint``: The number or bigint value representing the wait time.
+
+**Inspect**
+
+The ``Inspect`` interface represents inspection information. It has the following properties:
+
+* ``pending`` - ``Map<string, Map<string, string>>``: A map representing pending inspection data.
+* ``queued`` - ``Map<string, Map<string, string>>``: A map representing queued inspection data.
+* ``wait_time`` - ``Map<string, WaitTime>``: A map representing wait times for inspection.
+
+**Options**
+
+The ``Options`` interface represents a set of options. It has the following properties:
+
+* ``tesseract_number`` (optional) - ``number``: The Tesseract number.
+* ``tesseract_hash`` (optional) - ``string``: The Tesseract hash.
+
+**ContextInfo**
+
+The ``ContextInfo`` interface represents information about the context. It has the following properties:
+
+* ``behaviour_nodes`` - ``string[]``: An array of strings representing behavior nodes.
+* ``random_nodes`` - ``string[]``: An array of strings representing random nodes.
+* ``storage_nodes`` - ``string[]``: An array of strings representing storage nodes.
+
+**TDUBase**
+
+The ``TDUBase`` interface represents the base structure for TDU (Transaction Data Unit). It has the following properties:
+
+* ``asset_id`` - ``string``: The asset ID.
+
+**TDU**
+
+The ``TDU`` interface extends ``TDUBase`` and represents a Transaction Data Unit. It has the following additional property:
+
+* ``amount`` - ``number | bigint``: The amount associated with the TDU.
+
+**TDUResponse**
+
+The ``TDUResponse`` interface extends ``TDUBase`` and represents a response for a Transaction Data Unit. It has the following additional property:
+
+* ``amount`` - ``string``: The amount associated with the TDU as a string.
+
+**AccountState**
+
+The ``AccountState`` interface represents the state of an account. It has the following properties:
+
+* ``nonce`` - ``string``: The nonce value.
+* ``acc_type`` - ``number``: The account type.
+* ``balance`` - ``string``: The account balance.
+* ``asset_approvals`` - ``string``: The asset approvals.
+* ``context_hash`` - ``string``: The context hash.
+* ``storage_root`` - ``string``: The storage root.
+* ``logic_root`` - ``string``: The logic root.
+* ``file_root`` - ``string``: The file root.
+
+**AccountMetaInfo**
+
+The ``AccountMetaInfo`` interface represents meta-information about an account. It has the following properties:
+
+* ``type`` - ``number``: The account type.
+* ``address`` - ``string``: The account address.
+* ``height`` - ``string``: The account height.
+* ``tesseract_hash`` - ``string``: The Tesseract hash.
+* ``lattice_exists`` - ``boolean``: Indicates whether a lattice exists for the account.
+* ``state_exists`` - ``boolean``: Indicates whether a state exists for the account.
+
+**InteractionRequest**
+
+The ``InteractionRequest`` interface represents a request for interaction. It has the following properties:
+
+* ``ix_args`` - ``string``: The arguments for the interaction.
+* ``signature`` - ``string``: The signature for the interaction.
+
+**InteractionResponse**
+
+The ``InteractionResponse`` interface represents a response to an interaction. It has the following properties:
+
+* ``hash`` - ``string``: The hash of the interaction.
+* ``wait`` - ``function``: A function that returns a promise for the interaction receipt after waiting for a specified timeout.
+* ``result`` - ``function``: A function that returns a promise for the result of the interaction after waiting for a specified timeout.
+
+**StateHash**
+
+The ``StateHash`` interface represents state hash information. It has the following properties:
+
+* ``address`` - ``string``: The address associated with the state hash.
+* ``hash`` - ``string``: The state hash value.
+
+**ContextHash**
+
+The ``ContextHash`` interface represents context hash information. It has the following properties:
+
+* ``address`` - ``string``: The address associated with the context hash.
+* ``hash`` - ``string``: The context hash value.
+
+**InteractionReceipt**
+
+The ``InteractionReceipt`` interface represents a receipt for an interaction. It has the following properties:
+
+* ``ix_type`` - ``string``: The type of the interaction.
+* ``ix_hash`` - ``string``: The hash of the interaction.
+* ``status`` - ``number``: The status of the interaction.
+* ``fuel_used`` - ``string``: The amount of fuel used for the interaction.
+* ``state_hashes`` - ``StateHash[]``: An array of state hash objects.
+* ``context_hashes`` - ``ContextHash[]``: An array of context hash objects.
+* ``extra_data`` - ``AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null``: Additional data specific to the interaction type or null.
+* ``from`` - ``string``: The sender of the interaction.
+* ``to`` - ``string``: The receiver of the interaction.
+* ``ix_index`` - ``string``: The index of the interaction.
+* ``parts`` - ``string``: The parts of the interaction.
+
+**AssetInfo**
+
+The ``AssetInfo`` interface represents information about an asset. It has the following properties:
+
+* ``symbol`` - ``string``: The symbol of the asset.
+* ``operator`` - ``string``: The operator of the asset.
+* ``supply`` - ``string``: The supply of the asset.
+* ``dimension`` - ``string``: The dimension of the asset.
+* ``standard`` - ``string``: The standard of the asset.
+* ``is_logical`` - ``boolean``: Indicates whether the asset is logical.
+* ``is_stateful`` - ``boolean``: Indicates whether the asset is stateful.
+* ``logic_id`` (optional) - ``string``: The ID of the logic associated with the asset (if applicable).
+
+**Registry**
+
+The ``Registry`` interface represents registry information. It has the following properties:
+
+* ``asset_id`` - ``string``: The ID of the asset in the registry.
+* ``asset_info`` - ``AssetInfo``: Information about the asset in the registry.
+
+**WsReconnectOptions**
+
+The ``WsReconnectOptions`` interface represents options for websocket reconnection. It has the following properties:
+
+* ``auto`` - ``boolean``: Specifies if automatic reconnection should be enabled (optional).
+* ``delay`` - ``number``: The delay duration in milliseconds between reconnection attempts (optional).
+* ``maxAttempts`` - ``number``: The maximum number of reconnection attempts (optional).
+* ``onTimeout`` - ``boolean``: Specifies whether the reconnection attempts should be triggered on timeout (optional).
+
+**WebsocketProviderOptions**
+
+The ``WebsocketProviderOptions`` interface represents options for a websocket provider. It has the following properties:
+
+* ``host`` - ``string``: The host of the websocket connection (optional).
+* ``timeout`` - ``number``: The timeout value for the connection (optional).
+* ``reconnect`` - ``any``: Reconnection options for the websocket connection (optional).
+* ``reconnectDelay`` - ``number``: The delay duration for reconnection attempts (optional).
+* ``reconnectOptions`` - ``WsReconnectOptions``: Additional options for reconnection (optional).
+* ``headers`` - ``any``: Custom headers for the websocket connection (optional).
+* ``protocol`` - ``string``: The protocol to be used for the connection (optional).
+* ``clientConfig`` - ``object``: Configuration options for the websocket client (optional).
+* ``requestOptions`` - ``any``: Additional options for the websocket connection request (optional).
+* ``origin`` - ``string``: The origin for the websocket connection (optional).
+
+.. note::
+
+   **Important:** Please note that the current version of moi.js only supports the `reconnectOptions` property of `WebsocketProviderOptions`. Other properties may not be available or functional in the current version.
+
+
 Abstract Provider
 -----------------
 AbstractProvider is an abstract class that defines the common interface and 

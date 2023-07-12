@@ -21,6 +21,125 @@ data structures, enabling them to extract meaningful information. This
 capability greatly aids in the efficient processing and interpretation of data 
 obtained from the MOI network.
 
+Types
+-----
+
+**LogicManifest**
+
+The ``LogicManifest`` module defines the schema for a logic manifest.
+
+    **EngineConfig**
+
+    The ``EngineConfig`` interface defines the configuration for the logic engine. It has two properties:
+
+    * ``kind`` - ``string``: The type of logic engine.
+    * ``flags`` - ``string[]``: A list of flags.
+
+    **TypeField**
+
+    The ``TypeField`` interface defines a field within a type. It has three properties:
+
+    * ``slot`` - ``number``: The slot number of the field.
+    * ``label`` - ``string``: The label or name of the field.
+    * ``type`` - ``string``: The type of the field.
+
+    **MethodField**
+
+    The ``MethodField`` interface defines a field within a method. It has two properties:
+
+    * ``ptr`` - ``number | bigint``: The pointer value of the field.
+    * ``code`` - ``number | bigint``: The code value of the field.
+
+    **Class**
+
+    The ``Class`` interface defines a class within the logic manifest. It has three properties:
+
+    * ``name`` - ``string``: The name of the class.
+    * ``fields`` - ``TypeField[] | null``: An optional array of fields within the class.
+    * ``methods`` - ``MethodField[] | null``: An optional array of methods within the class.
+
+    **State**
+
+    The ``State`` interface defines the state within the logic manifest. It has two properties:
+
+    * ``kind`` - ``string``: The kind or type of the state.
+    * ``fields`` - ``TypeField[]``: An array of fields within the state.
+
+    **Constant**
+
+    The ``Constant`` interface defines a constant within the logic manifest. It has two properties:
+
+    * ``type`` - ``string``: The type of the constant.
+    * ``value`` - ``string``: The value of the constant.
+
+    **Instructions**
+
+    The ``Instructions`` interface defines the instructions within the logic manifest. It has three optional properties:
+
+    * ``bin`` - ``number[] | null``: An optional array of binary values.
+    * ``hex`` - ``string``: A hexadecimal representation of the instructions.
+    * ``asm`` - ``string[] | null``: An optional array of assembly instructions.
+
+    **Routine**
+
+    The ``Routine`` interface defines a routine within the logic manifest. It has five properties:
+
+    * ``name`` - ``string``: The name of the routine.
+    * ``kind`` - ``string``: The kind or type of the routine.
+    * ``accepts`` - ``TypeField[] | null``: An optional array of input fields that the routine accepts.
+    * ``returns`` - ``TypeField[] | null``: An optional array of output fields that the routine returns.
+    * ``executes`` - ``Instructions``: The instructions executed by the routine.
+    * ``catches`` - ``string[] | null``: An optional array of exceptions caught by the routine.
+
+    **Method**
+
+    The ``Method`` interface defines a method within a class in the logic manifest. It has six properties:
+
+    * ``name`` - ``string``: The name of the method.
+    * ``class`` - ``string``: The name of the class the method belongs to.
+    * ``accepts`` - ``TypeField[] | null``: An optional array of input fields that the method accepts.
+    * ``returns`` - ``TypeField[] | null``: An optional array of output fields that the method returns.
+    * ``executes`` - ``Instructions``: The instructions executed by the method.
+    * ``catches`` - ``string[] | null``: An optional array of exceptions caught by the method.
+
+    **TypeDef**
+
+    The ``TypeDef`` type represents a string type definition.
+
+    **Element**
+
+    The ``Element`` interface represents an element within the logic manifest. It has four properties:
+
+    * ``ptr`` - ``number``: The pointer value of the element.
+    * ``kind`` - ``string``: The kind or type of the element.
+    * ``deps`` - ``number[] | null``: An optional array of dependencies for the element.
+    * ``data`` - ``State | Constant | TypeDef | Routine | Class | Method``: The data associated with the element.
+
+    **Manifest**
+
+    The ``Manifest`` interface represents the overall logic manifest. It has three properties:
+
+    * ``syntax`` - ``string``: The syntax used in the manifest.
+    * ``engine`` - ``EngineConfig``: The configuration of the logic engine.
+    * ``elements`` - ``Element[]``: An array of elements within the manifest.
+
+**Exception**
+
+The `Exception` interface defines an exception. It has three properties:
+
+* ``class`` - ``string``: The class of the exception.
+* ``data`` - ``string``: The exception message.
+* ``trace`` - ``string[]``: The stack trace of the exception.
+
+**PoloSchema**
+
+The `PoloSchema` interface defines a schema used by polo of serialization and 
+deserialization. It has two properties:
+
+
+* ``kind`` - ``string``: The type or kind of the schema.
+* ``fields`` - ``Record<string, any>``: The fields within the schema. It is a dictionary-like structure where keys are strings and values can be of any type (optional).
+
 ManifestCoder
 -------------
 

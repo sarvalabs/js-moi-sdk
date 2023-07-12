@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { LogicManifest } from "moi-manifest";
 import { ErrorCode, ErrorUtils, IxType, AssetCreationReceipt, AssetMintOrBurnReceipt,
-LogicDeployReceipt, LogicExecuteReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
+LogicDeployReceipt, LogicInvokeReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
 hexToBytes, unmarshal, hexToBN, toQuantity } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
@@ -841,7 +841,7 @@ export class BaseProvider extends AbstractProvider {
                         break;
                     case IxType.LOGIC_INVOKE:
                         if(receipt.extra_data) {
-                            resolve(receipt.extra_data as LogicExecuteReceipt);
+                            resolve(receipt.extra_data as LogicInvokeReceipt);
                         }
 
                         reject(new Error("Failed to retrieve logic invoke response"));

@@ -13,12 +13,12 @@ export interface LogicDeployReceipt {
     error: string
 }
 
-export interface LogicExecuteReceipt {
+export interface LogicInvokeReceipt {
     outputs: string;
     error: string
 }
 
-export type IxReceiptData = string | LogicDeployReceipt | LogicExecuteReceipt
+export type IxReceiptData = string | LogicDeployReceipt | LogicInvokeReceipt
 
 export interface Receipt {
     ix_type: number;
@@ -26,7 +26,5 @@ export interface Receipt {
     fuel_used: bigint;
     state_hashes: Map<string, string>;
     context_hashes: Map<string, string>;
-    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null;
 }
-
-export type Receipts = Map<string, Receipt>;

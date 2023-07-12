@@ -1,6 +1,5 @@
 import { TesseractPart } from "./common";
-import { Interactions } from "./interaction"
-import { Receipts } from "./receipt";
+import { Interactions } from "./interaction";
 
 export interface ContextLockInfo {
     address: string;
@@ -65,7 +64,6 @@ export interface Tesseract {
     header: TesseractHeader;
     body: TesseractBody;
     ixns: Interactions;
-    receipts?: Receipts;
     seal: string;
     hash: string;
 }

@@ -20,6 +20,50 @@ Integration with the wallet and signer modules ensures secure interaction
 signing and authorization. Users can choose from different signers, such as 
 wallet-based signers, or custom signers.
 
+Types
+-----
+**LogicDeployRequest**
+
+The ``LogicDeployRequest`` interface represents a request to deploy logic. It has the following properties:
+
+* ``send`` - ``function``: A function that sends the deployment request and returns a promise for an ``InteractionResponse``.
+* ``estimateGas`` - ``function``: A function that estimates the gas required for the deployment request and returns a promise.
+
+**LogicExecuteRequest**
+
+The ``LogicExecuteRequest`` interface represents a request to execute logic. It has the following properties:
+
+* ``call`` - ``function``: A function that calls the logic with the provided arguments and returns a promise for the result.
+* ``send`` - ``function``: A function that sends the execution request and returns a promise for an ``InteractionResponse``.
+* ``estimateGas`` - ``function``: A function that estimates the gas required for the execution request and returns a promise.
+
+**Routine**
+
+The ``Routine`` interface represents a routine function. It has the following properties:
+
+* A function that can be called with an optional array of arguments and returns a value.
+* ``isMutable`` - ``function``: A function that returns a boolean indicating whether the routine is mutable.
+* ``accepts`` - ``function``: A function that returns an array of ``TypeField`` representing the types of arguments accepted by the routine, or ``null`` if no arguments are accepted.
+* ``returns`` - ``function``: A function that returns an array of ``TypeField`` representing the types of values returned by the routine, or ``null`` if no values are returned.
+
+**Routines**
+
+The ``Routines`` interface represents a collection of routines. It is an object with named properties where the property name is the routine name and the property value is a ``Routine``.
+
+**CallSite**
+
+The ``CallSite`` interface represents a callsite. It has the following properties:
+
+* ``ptr`` - ``number``: The pointer to the callsite.
+* ``kind`` - ``string``: The kind of the callsite.
+
+**MethodDef**
+
+The ``MethodDef`` interface represents a method definition. It has the following properties:
+
+* ``ptr`` - ``number``: The pointer to the method.
+* ``class`` - ``string``: The name of the class.
+
 Element Descriptor
 ------------------
 The ElementDescriptor class represents a descriptor for elements in the 
