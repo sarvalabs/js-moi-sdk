@@ -7,8 +7,6 @@ exports.HDNode = void 0;
 const hdkey_1 = __importDefault(require("hdkey"));
 const moi_utils_1 = require("moi-utils");
 /**
- * HDNode Class
- *
  * This class represents a Hierarchical Deterministic (HD) Node used in
  cryptographic key generation and derivation.
  */
@@ -18,8 +16,6 @@ class HDNode {
         this.node = node;
     }
     /**
-     * fromSeed
-     *
      * Generates an HDNode from a seed buffer.
      *
      * @param {Buffer} seed - The seed buffer.
@@ -37,8 +33,6 @@ class HDNode {
         }
     }
     /**
-     * fromExtendedKey
-     *
      * Generates an HDNode from an extended key.
      *
      * @param {string} extendedKey - The extended key.
@@ -54,8 +48,6 @@ class HDNode {
         }
     }
     /**
-     * derivePath
-     *
      * Derives a child HDNode from the current HDNode using the specified path.
      *
      * @param {string} path - The derivation path for the child HDNode.
@@ -70,8 +62,6 @@ class HDNode {
         return new HDNode(childNode);
     }
     /**
-     * deriveChild
-     *
      * Derives a child HDNode from the current HDNode using the specified index.
      *
      * @param {number} index - The child index.
@@ -86,8 +76,6 @@ class HDNode {
         return new HDNode(childNode);
     }
     /**
-     * publicKey
-     *
      * Retrieves the public key associated with the HDNode.
      *
      * @returns {Buffer} The public key.
@@ -100,8 +88,6 @@ class HDNode {
         return this.node._publicKey;
     }
     /**
-     * privateKey
-     *
      * Retrieves the private key associated with the HDNode.
      *
      * @returns {Buffer} The private key.

@@ -3,8 +3,6 @@ import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils } from "moi-utils";
 
 /**
- * HDNode Class
- * 
  * This class represents a Hierarchical Deterministic (HD) Node used in 
  cryptographic key generation and derivation.
  */
@@ -16,8 +14,6 @@ export class HDNode {
   }
 
   /**
-   * fromSeed
-   *
    * Generates an HDNode from a seed buffer.
    *
    * @param {Buffer} seed - The seed buffer.
@@ -39,8 +35,6 @@ export class HDNode {
   }
 
   /**
-   * fromExtendedKey
-   * 
    * Generates an HDNode from an extended key.
    * 
    * @param {string} extendedKey - The extended key.
@@ -60,8 +54,6 @@ export class HDNode {
   }
 
   /**
-   * derivePath
-   * 
    * Derives a child HDNode from the current HDNode using the specified path.
    * 
    * @param {string} path - The derivation path for the child HDNode.
@@ -77,8 +69,6 @@ export class HDNode {
   }
 
   /**
-   * deriveChild
-   *
    * Derives a child HDNode from the current HDNode using the specified index.
    *
    * @param {number} index - The child index.
@@ -95,8 +85,6 @@ export class HDNode {
   }
 
   /**
-   * publicKey
-   *
    * Retrieves the public key associated with the HDNode.
    *
    * @returns {Buffer} The public key.
@@ -110,8 +98,6 @@ export class HDNode {
   }
 
   /**
-   * privateKey
-   *
    * Retrieves the private key associated with the HDNode.
    *
    * @returns {Buffer} The private key.

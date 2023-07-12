@@ -20,5 +20,6 @@ __exportStar(require("moi-logic"), exports);
 __exportStar(require("moi-hdnode"), exports);
 __exportStar(require("moi-wallet"), exports);
 __exportStar(require("moi-signer"), exports);
+__exportStar(require("moi-bip39"), exports);
 __exportStar(require("moi-constants"), exports);
 __exportStar(require("moi-utils"), exports);
