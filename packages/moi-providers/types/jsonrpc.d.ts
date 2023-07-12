@@ -2,7 +2,7 @@ import {
     AssetCreationReceipt,
     AssetMintOrBurnReceipt, 
     LogicDeployReceipt, 
-    LogicExecuteReceipt 
+    LogicInvokeReceipt 
 } from "moi-utils";
 
 export interface Options {
@@ -76,7 +76,7 @@ export interface InteractionReceipt {
     fuel_used: string;
     state_hashes: StateHash[];
     context_hashes: ContextHash[];
-    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicExecuteReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null;
     from: string;
     to: string;
     ix_index: string;

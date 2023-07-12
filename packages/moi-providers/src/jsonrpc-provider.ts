@@ -10,8 +10,6 @@ const config = {
 }
 
 /**
- * JsonRpcProvider
- *
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
  */
 export class JsonRpcProvider extends BaseProvider {
@@ -30,8 +28,6 @@ export class JsonRpcProvider extends BaseProvider {
     }
 
     /**
-     * execute
-     *
      * Executes an RPC call by sending a method and parameters.
      *
      * @param method - The method to call.
@@ -48,8 +44,6 @@ export class JsonRpcProvider extends BaseProvider {
     }
 
     /**
-     * send
-     *
      * Sends an RPC request to the JSON-RPC endpoint.
      *
      * @param method - The method to call.
@@ -84,8 +78,6 @@ export class JsonRpcProvider extends BaseProvider {
     }
 
     /**
-     * _startEvent
-     *
      * Starts an event.
      *
      * @param event - The event to start.
@@ -95,8 +87,6 @@ export class JsonRpcProvider extends BaseProvider {
     }
 
     /**
-     * _stopEvent
-     *
      * Stops an event.
      *
      * @param event - The event to stop.

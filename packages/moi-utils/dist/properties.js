@@ -7,7 +7,6 @@ exports.defineReadOnly = void 0;
  * @param {object} object - The object on which to define the property.
  * @param {string | symbol} name - The name of the property.
  * @param {any} value - The value of the property.
- * @returns {void}
  */
 const defineReadOnly = (object, name, value) => {
     Object.defineProperty(object, name, {

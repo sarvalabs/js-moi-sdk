@@ -30,8 +30,6 @@ const jsonrpc_provider_1 = require("./jsonrpc-provider");
 const errors = __importStar(require("./errors"));
 let nextReqId = 1;
 /**
- * WebSocketEvents
- *
  * Enum defining the WebSocket events.
  */
 var WebSocketEvents;
@@ -45,9 +43,8 @@ var WebSocketEvents;
     WebSocketEvents["ERROR"] = "error";
 })(WebSocketEvents || (exports.WebSocketEvents = WebSocketEvents = {}));
 /**
- * WebSocketProvider
- *
- * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based communication with the JSON-RPC endpoint.
+ * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based
+ * communication with the JSON-RPC endpoint.
  */
 class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     requestQueue;
@@ -89,8 +86,6 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         moi_utils_1.ErrorUtils.throwError("Invalid websocket request url!", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     /**
-     * connect
-     *
      * Establishes a WebSocket connection with the provided host.
      * Creates a new WebSocket connection instance and sets up event handlers.
      */
@@ -99,8 +94,6 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.addEventListener();
     };
     /**
-     * addEventListener
-     *
      * Sets up event listeners for the WebSocket connection.
      */
     addEventListener = () => {
@@ -113,8 +106,6 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         }
     };
     /**
-     * removeEventListener
-     *
      * Removes event listeners from the WebSocket connection.
      */
     removeEventListener = () => {
@@ -123,8 +114,6 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.connection.onmessage = null;
     };
     /**
-     * reconnect
-     *
      * Initiates a reconnection to the WebSocket server.
      * If there are pending requests in the response queue, their callbacks are
      * invoked with a reconnection error.
@@ -166,8 +155,6 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         }
     }
     /**
-     * onConnect
-     *
      * Event handler triggered when the WebSocket connection is successfully established.
      * Invokes pending requests in the request queue if any.
      */
@@ -188,9 +175,8 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         }
     };
     /**
-     * isConnectionFailed
-     *
      * Checks if the WebSocket connection has failed based on the close event.
+     *
      * @param event The close event object.
      * @returns A boolean indicating whether the connection has failed.
      */
@@ -199,6 +185,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     };
     /**
      * Method called when the WebSocket connection is closed.
+     *
      * @param event - The close event.
      */
     onClose = (event) => {
@@ -229,6 +216,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     };
     /**
      * Method called when a message is received through the WebSocket connection.
+     *
      * @param event - The message event.
      */
     onMessage = (event) => {
@@ -276,6 +264,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     };
     /**
      * Method called when the WebSocket connection fails to connect.
+     *
      * @param event - The connect failed event.
      */
     onConnectFailed = (event) => {
@@ -311,9 +300,8 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.emit(WebSocketEvents.CLOSE, event);
     };
     /**
-     * sendRequest
-     *
      * Sends a request over the WebSocket connection.
+     *
      * @param requestId - The ID of the request.
      * @param request - The request object.
      */
@@ -334,10 +322,9 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         }
     }
     /**
-     * send
-     *
      * Sends a request over the WebSocket connection and returns a Promise that
      * resolves with the response.
+     *
      * @param method - The method of the request.
      * @param params - The parameters of the request.
      * @returns A Promise that resolves with the response or rejects with an error.
@@ -369,9 +356,8 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         });
     }
     /**
-     * _subscribe
-     *
      * Subscribes to an event.
+     *
      * @param tag - The tag associated with the subscription.
      * @param param - The parameters of the subscription.
      * @param processFunc - The function to process the subscription result.
@@ -389,9 +375,8 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
         this.subscriptions[subId] = { tag, processFunc };
     }
     /**
-     * _startEvent
-     *
      * Starts listening to an event.
+     *
      * @param event - The event to start listening to.
      */
     _startEvent(event) {
@@ -422,6 +407,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     }
     /**
      * Stops listening to an event.
+     *
      * @param event - The event to stop listening to.
      */
     _stopEvent(event) {
@@ -445,6 +431,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     }
     /**
      * Disconnects the WebSocket connection.
+     *
      * @returns A Promise that resolves when the disconnect operation is complete.
      */
     async disconnect() {

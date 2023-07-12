@@ -5,8 +5,6 @@ const moi_manifest_1 = require("moi-manifest");
 const moi_utils_1 = require("moi-utils");
 const logic_base_1 = require("./logic-base");
 /**
- * LogicFactory Class
- *
  * This class represents a factory for deploying logic.
  */
 class LogicFactory extends logic_base_1.LogicBase {
@@ -18,8 +16,6 @@ class LogicFactory extends logic_base_1.LogicBase {
         this.encodedManifest = moi_manifest_1.ManifestCoder.encodeManifest(manifest);
     }
     /**
-     * getIxType
-     *
      * Retrieves the interaction type associated with the LogicFactory.
      *
      * @returns {IxType} The interaction type.
@@ -28,8 +24,6 @@ class LogicFactory extends logic_base_1.LogicBase {
         return moi_utils_1.IxType.LOGIC_DEPLOY;
     }
     /**
-     * createPayload
-     *
      * Creates the payload for the logic interaction object.
      *
      * @param {LogicIxObject} ixObject - The logic interaction object.
@@ -47,8 +41,6 @@ class LogicFactory extends logic_base_1.LogicBase {
         return payload;
     }
     /**
-     * processResult
-     *
      * Processes the result of a logic interaction response.
      *
      * @param {LogicIxResponse} response - The logic interaction response.
@@ -68,8 +60,6 @@ class LogicFactory extends logic_base_1.LogicBase {
         }
     }
     /**
-     * getEncodedManifest
-     *
      * Returns the POLO encoded manifest in hexadecimal format.
      *
      * @returns {string} The encoded manifest.
@@ -78,8 +68,6 @@ class LogicFactory extends logic_base_1.LogicBase {
         return this.encodedManifest;
     }
     /**
-     * deploy
-     *
      * Deploys a logic.
      *
      * @param {string} builderName - The name of the builder routine.

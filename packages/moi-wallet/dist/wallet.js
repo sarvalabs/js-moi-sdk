@@ -43,8 +43,6 @@ var CURVE;
     CURVE["SECP256K1"] = "secp256k1";
 })(CURVE || (exports.CURVE = CURVE = {}));
 /**
- * privateMapGet
- *
  * Retrieves the value associated with the receiver from a private map.
  * Throws an error if the receiver is not found in the map.
  *
@@ -64,8 +62,6 @@ const privateMapGet = (receiver, privateMap) => {
     return descriptor.value;
 };
 /**
- * privateMapSet
- *
  * Sets the value associated with the receiver in a private map.
  * Throws an error if the receiver is not found in the map.
  *
@@ -102,14 +98,12 @@ class Wallet extends moi_signer_1.Signer {
         });
     }
     /**
-     * load
-     *
      * Initializes the wallet with a private key, mnemonic, and curve.
      *
-     * @param key - The private key as a Buffer.
-     * @param curve - The elliptic curve algorithm used for key generation.
-     * @param mnemonic - The mnemonic associated with the wallet. (optional)
-     * @throws Error if the key is undefined or if an error occurs during the
+     * @param {Buffer} key - The private key as a Buffer.
+     * @param {string} curve - The elliptic curve algorithm used for key generation.
+     * @param {string} mnemonic - The mnemonic associated with the wallet. (optional)
+     * @throws {Error} if the key is undefined or if an error occurs during the
      * initialization process.
      */
     load(key, curve, mnemonic) {
@@ -138,11 +132,9 @@ class Wallet extends moi_signer_1.Signer {
         }
     }
     /**
-     * isInitialized
-     *
      * Checks if the wallet is initialized.
      *
-     * @returns true if the wallet is initialized, false otherwise.
+     * @returns {boolean} true if the wallet is initialized, false otherwise.
      */
     isInitialized() {
         if (privateMapGet(this, __vault)) {
@@ -151,11 +143,9 @@ class Wallet extends moi_signer_1.Signer {
         return false;
     }
     /**
-     * createRandom
-     *
      * Generates a random mnemonic and initializes the wallet from it.
      *
-     * @throws Error if there is an error generating the random mnemonic.
+     * @throws {Error} if there is an error generating the random mnemonic.
      */
     async createRandom() {
         try {
@@ -168,13 +158,12 @@ class Wallet extends moi_signer_1.Signer {
         }
     }
     /**
-     * generateKeystore
-     *
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
-     * @param password Used for encrypting the keystore data.
-     * @returns The generated keystore object.
-     * @throws Error if the wallet is not initialized or loaded, or if there is an error generating the keystore.
+     * @param {string} password Used for encrypting the keystore data.
+     * @returns {Keystore} The generated keystore object.
+     * @throws {Error} if the wallet is not initialized or loaded, or if there
+     * is an error generating the keystore.
      */
     generateKeystore(password) {
         if (!this.isInitialized()) {
@@ -189,14 +178,12 @@ class Wallet extends moi_signer_1.Signer {
         }
     }
     /**
-     * fromMnemonic
-     *
      * Intializes the wallet from a provided mnemonic.
      *
-     * @param mnemonic - The mnemonic associated with the wallet.
-     * @param path - The derivation path for the HDNode. (optional)
-     * @param wordlist - The wordlist for the mnemonic. (optional)
-     * @throws Error if there is an error loading the wallet from the mnemonic.
+     * @param {string} mnemonic - The mnemonic associated with the wallet.
+     * @param {string} path - The derivation path for the HDNode. (optional)
+     * @param {string[]} wordlist - The wordlist for the mnemonic. (optional)
+     * @throws {Error} if there is an error loading the wallet from the mnemonic.
      */
     async fromMnemonic(mnemonic, path, wordlist) {
         mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
@@ -211,13 +198,13 @@ class Wallet extends moi_signer_1.Signer {
         }
     }
     /**
-     * fromKeystore
+     * Initializes the wallet by decrypting and loading the private key from
+     * a keystore file.
      *
-     * Initializes the wallet by decrypting and loading the private key from a keystore file.
-     *
-     * @param keystore The keystore object as a JSON string.
-     * @param password The password used for decrypting the keystore.
-     * @throws Error if there is an error parsing the keystore, decrypting the keystore data, or loading the private key.
+     * @param {string} keystore The keystore object as a JSON string.
+     * @param {string} password The password used for decrypting the keystore.
+     * @throws {Error} if there is an error parsing the keystore, decrypting
+     * the keystore data, or loading the private key.
      */
     fromKeystore(keystore, password) {
         try {
@@ -230,12 +217,10 @@ class Wallet extends moi_signer_1.Signer {
         }
     }
     /**
-     * privateKey
-     *
      * Retrieves the private key associated with the wallet.
      *
-     * @returns The private key as a string.
-     * @throws Error if the wallet is not loaded or initialized.
+     * @returns {string} The private key as a string.
+     * @throws {Error} if the wallet is not loaded or initialized.
      */
     privateKey() {
         if (this.isInitialized()) {
@@ -244,12 +229,10 @@ class Wallet extends moi_signer_1.Signer {
         moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * mnemonic
-     *
      * Retrieves the mnemonic associated with the wallet.
      *
-     * @returns The mnemonic as a string.
-     * @throws Error if the wallet is not loaded or initialized.
+     * @returns {string} The mnemonic as a string.
+     * @throws {Error} if the wallet is not loaded or initialized.
      */
     mnemonic() {
         if (this.isInitialized()) {
@@ -258,12 +241,10 @@ class Wallet extends moi_signer_1.Signer {
         moi_utils_1.ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * publicKey
-     *
      * Retrieves the public key associated with the wallet.
      *
-     * @returns The public key as a string.
-     * @throws Error if the wallet is not loaded or initialized.
+     * @returns {string} The public key as a string.
+     * @throws {Error} if the wallet is not loaded or initialized.
      */
     publicKey() {
         if (this.isInitialized()) {
@@ -272,12 +253,10 @@ class Wallet extends moi_signer_1.Signer {
         moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * curve
-     *
      * Retrieves the curve used by the wallet.
      *
-     * @returns The curve as a string.
-     * @throws Error if the wallet is not loaded or initialized.
+     * @returns {string} The curve as a string.
+     * @throws {Error} if the wallet is not loaded or initialized.
      */
     curve() {
         if (this.isInitialized()) {
@@ -286,35 +265,31 @@ class Wallet extends moi_signer_1.Signer {
         moi_utils_1.ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * getAddress
-     *
      * Retrieves the address associated with the wallet.
      *
-     * @returns The address as a string.
+     * @returns {string} The address as a string.
      */
     getAddress() {
         const publicKey = this.publicKey();
         return "0x" + publicKey.slice(2);
     }
     /**
-     * connect
-     *
      * Connects the wallet to the given provider.
      *
-     * @param provider - The provider to connect.
+     * @param {AbstractProvider} provider - The provider to connect.
      */
     connect(provider) {
         this.provider = provider;
     }
     /**
-     * sign
+     * Signs a message using the wallet's private key and the specified
+     * signature algorithm.
      *
-     * Signs a message using the wallet's private key and the specified signature algorithm.
-     *
-     * @param message - The message to sign as a Uint8Array.
-     * @param sigAlgo - The signature algorithm to use.
-     * @returns The signature as a string.
-     * @throws Error if the signature type is unsupported or undefined, or if there is an error during signing.
+     * @param {Uint8Array} message - The message to sign as a Uint8Array.
+     * @param {SigType} sigAlgo - The signature algorithm to use.
+     * @returns {string} The signature as a string.
+     * @throws {Error} if the signature type is unsupported or undefined, or if
+     * there is an error during signing.
      */
     sign(message, sigAlgo) {
         if (sigAlgo) {
@@ -334,16 +309,15 @@ class Wallet extends moi_signer_1.Signer {
         moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefiend", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     /**
-     * signInteraction
+     * Signs an interaction object using the wallet's private key and the
+     * specified signature algorithm. The interaction object is serialized
+     * into POLO bytes before signing.
      *
-     * Signs an interaction object using the wallet's private key and the specified signature algorithm.
-     * The interaction object is serialized into POLO bytes before signing.
-     *
-     * @param ixObject - The interaction object to sign.
-     * @param sigAlgo - The signature algorithm to use.
-     * @returns The signed interaction request containing the serialized
-     * interaction object and the signature.
-     * @throws Error if there is an error during signing or serialization.
+     * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} sigAlgo - The signature algorithm to use.
+     * @returns {InteractionRequest} The signed interaction request containing
+     * the serialized interaction object and the signature.
+     * @throws {Error} if there is an error during signing or serialization.
      */
     signInteraction(ixObject, sigAlgo) {
         try {

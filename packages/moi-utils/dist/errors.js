@@ -43,9 +43,8 @@ class CustomError extends Error {
         Object.setPrototypeOf(this, CustomError.prototype);
     }
     /**
-     * toString
-     *
      * Overrides the toString() method to provide a string representation of the error.
+     *
      * @returns {string} - The string representation of the error.
      */
     toString() {
@@ -62,9 +61,8 @@ exports.CustomError = CustomError;
  */
 class ErrorUtils {
     /**
-     * throwError
-     *
      * Throws a CustomError with the specified message, error code, and parameters.
+     *
      * @param {string} message - The error message.
      * @param {ErrorCode} code - The error code.
      * @param {ErrorParams} params - The parameters of the error.
@@ -74,10 +72,9 @@ class ErrorUtils {
         throw new CustomError(message, code, params);
     }
     /**
-     * throwArgumentError
-     *
      * Throws a CustomError with the specified argument-related error message,
      * argument name, and value.
+     *
      * @param {string} message - The error message.
      * @param {string} name - The name of the argument.
      * @param {any} value - The value of the argument.
@@ -93,8 +90,6 @@ class ErrorUtils {
 exports.ErrorUtils = ErrorUtils;
 // helper functions
 /**
- * serializeValue
- *
  * Serializes a value into a string representation.
  * If the value can be successfully converted to a JSON string, it is returned.
  * Otherwise, the value is converted to a string using the `String` function.

@@ -1,9 +1,8 @@
-import { Tesseract, LogicManifest, Interaction } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
+import { Tesseract, Interaction } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, Inspect, ContentFrom, Encoding, Registry } from "../types/jsonrpc";
 /**
- * AbstractProvider
- *
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
  */
@@ -40,8 +39,6 @@ export declare abstract class AbstractProvider {
     abstract off(eventName: EventType, listener?: Listener): AbstractProvider;
     abstract removeAllListeners(eventName?: EventType): AbstractProvider;
     /**
-     * addListener
-     *
      * Alias for "on" method.
      *
      * @param eventName - The name of the event.
@@ -50,8 +47,6 @@ export declare abstract class AbstractProvider {
      */
     addListener(eventName: EventType, listener: Listener): AbstractProvider;
     /**
-     * removeListener
-     *
      * Alias for "off" method.
      *
      * @param eventName - The name of the event.

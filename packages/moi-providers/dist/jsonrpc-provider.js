@@ -13,8 +13,6 @@ const config = {
     },
 };
 /**
- * JsonRpcProvider
- *
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
  */
 class JsonRpcProvider extends base_provider_1.BaseProvider {
@@ -28,8 +26,6 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
         moi_utils_1.ErrorUtils.throwError("Invalid request url!", moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     /**
-     * execute
-     *
      * Executes an RPC call by sending a method and parameters.
      *
      * @param method - The method to call.
@@ -46,8 +42,6 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
         }
     }
     /**
-     * send
-     *
      * Sends an RPC request to the JSON-RPC endpoint.
      *
      * @param method - The method to call.
@@ -73,8 +67,6 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
         });
     }
     /**
-     * _startEvent
-     *
      * Starts an event.
      *
      * @param event - The event to start.
@@ -83,8 +75,6 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
         super._startEvent(event);
     }
     /**
-     * _stopEvent
-     *
      * Stops an event.
      *
      * @param event - The event to stop.

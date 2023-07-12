@@ -1,7 +1,7 @@
 {
   "name": "moi-manifest",
   "version": "0.1.0",
-  "description": "Web3 module encode and decode PISA in/output.",
+  "description": "Module encode and decode PISA input and output.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

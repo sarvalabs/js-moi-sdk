@@ -1,8 +1,3 @@
-/*
-    This module/directory is responsible for handling 
-    cryptographic activity like signing and verification 
-    using different Curves and Algorithms
-*/
 import { hexToBytes } from "moi-utils"
 import { AbstractProvider, Options, InteractionResponse, InteractionRequest } from "moi-providers";
 import ECDSA_S256 from "./ecdsa";
@@ -12,9 +7,8 @@ import { ErrorCode, ErrorUtils, IxType, isValidAddress } from "moi-utils";
 
 
 /**
- * Signer
- *
- * An abstract class representing a signer responsible for cryptographic activities like signing and verification.
+ * An abstract class representing a signer responsible for cryptographic 
+ * activities like signing and verification.
  */
 export abstract class Signer {
     public provider?: AbstractProvider;
@@ -34,12 +28,10 @@ export abstract class Signer {
 
 
     /**
-     * getProvider
-     *
      * Retrieves the connected provider instance.
      *
      * @returns The connected provider instance.
-     * @throws Error if the provider is not initialized.
+     * @throws {Error} if the provider is not initialized.
      */
     public getProvider() {
         if(this.provider) {
@@ -53,14 +45,13 @@ export abstract class Signer {
     }
 
     /**
-     * getNonce
-     *
      * Retrieves the nonce (interaction count) for the signer's address 
      * from the provider.
      *
-     * @param options - The options for retrieving the nonce. (optional)
-     * @returns A Promise that resolves to the nonce as a number or bigint.
-     * @throws Error if there is an error retrieving the nonce or the provider 
+     * @param {Options} options - The options for retrieving the nonce. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the nonce 
+     * as a number or bigint.
+     * @throws {Error} if there is an error retrieving the nonce or the provider 
      * is not initialized.
      */
     public async getNonce(options?: Options): Promise<number | bigint> {
@@ -78,13 +69,11 @@ export abstract class Signer {
         }
     }
     /**
-     * checkInteraction
-     *
      * Checks the validity of an interaction object by performing various checks.
      *
-     * @param ixObject - The interaction object to be checked.
-     * @param nonce - The nonce (interaction count) for comparison.
-     * @throws Error if any of the checks fail, indicating an invalid interaction.
+     * @param {InteractionObject} ixObject - The interaction object to be checked.
+     * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
+     * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
     private checkInteraction(ixObject: InteractionObject, nonce: number | bigint): void {
         if(ixObject.type === undefined || ixObject.type === null) {
@@ -129,14 +118,13 @@ export abstract class Signer {
     }
 
     /**
-     * sendInteraction
-     *
      * Sends an interaction object by signing it with the appropriate signature algorithm
      * and forwarding it to the connected provider.
      *
-     * @param ixObject - The interaction object to send.
-     * @returns A Promise that resolves to the interaction response.
-     * @throws Error if there is an error sending the interaction, if the provider 
+     * @param {InteractionObject} ixObject - The interaction object to send.
+     * @returns {Promise<InteractionResponse>} A Promise that resolves to the 
+     * interaction response.
+     * @throws {Error} if there is an error sending the interaction, if the provider 
      * is not initialized, or if the interaction object fails the validity checks.
      */
     public async sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse> {
@@ -170,16 +158,16 @@ export abstract class Signer {
     }
 
     /**
-     * verify
-     *
      * Verifies the authenticity of a signature by performing signature verification 
      * using the provided parameters.
      *
-     * @param message - The message that was signed.
-     * @param signature - The signature to verify, as a string or Buffer.
-     * @param publicKey - The public key used for verification, as a string or Buffer.
-     * @returns A boolean indicating whether the signature is valid or not.
-     * @throws Error if the signature is invalid or the signature byte is not recognized.
+     * @param {Uint8Array} message - The message that was signed.
+     * @param {string|Uint8Array} signature - The signature to verify, as a 
+     * string or Buffer.
+     * @param {string|Uint8Array} publicKey - The public key used for 
+     * verification, as a string or Buffer.
+     * @returns {boolean} A boolean indicating whether the signature is valid or not.
+     * @throws {Error} if the signature is invalid or the signature byte is not recognized.
      */
     public verify(message: Uint8Array, signature: string|Uint8Array, publicKey: string|Uint8Array): boolean {
         let verificationKey: Uint8Array;

@@ -39,9 +39,8 @@ export declare class CustomError extends Error {
     params: ErrorParams;
     constructor(message: string, code?: ErrorCode, params?: ErrorParams);
     /**
-     * toString
-     *
      * Overrides the toString() method to provide a string representation of the error.
+     *
      * @returns {string} - The string representation of the error.
      */
     toString(): string;
@@ -51,9 +50,8 @@ export declare class CustomError extends Error {
  */
 export declare class ErrorUtils {
     /**
-     * throwError
-     *
      * Throws a CustomError with the specified message, error code, and parameters.
+     *
      * @param {string} message - The error message.
      * @param {ErrorCode} code - The error code.
      * @param {ErrorParams} params - The parameters of the error.
@@ -61,10 +59,9 @@ export declare class ErrorUtils {
      */
     static throwError(message: string, code?: ErrorCode, params?: ErrorParams): never;
     /**
-     * throwArgumentError
-     *
      * Throws a CustomError with the specified argument-related error message,
      * argument name, and value.
+     *
      * @param {string} message - The error message.
      * @param {string} name - The name of the argument.
      * @param {any} value - The value of the argument.

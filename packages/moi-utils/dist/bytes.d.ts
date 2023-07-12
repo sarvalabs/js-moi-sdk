@@ -4,8 +4,6 @@ import { Buffer } from "buffer";
  */
 export type Bytes = ArrayLike<number>;
 /**
- * isInteger
- *
  * Checks if the given value is an integer.
  *
  * @param {number} value - The value to check.
@@ -13,8 +11,6 @@ export type Bytes = ArrayLike<number>;
  */
 export declare const isInteger: (value: number) => boolean;
 /**
- * isBytes
- *
  * Checks if the given value is a valid byte array.
  *
  * @param {any} value - The value to check.
@@ -22,8 +18,6 @@ export declare const isInteger: (value: number) => boolean;
  */
 export declare const isBytes: (value: any) => value is Bytes;
 /**
- * hexDataLength
- *
  * Calculates the length of the data represented by a hexadecimal string.
  *
  * @param {string} data - The hexadecimal string.
@@ -32,21 +26,17 @@ export declare const isBytes: (value: any) => value is Bytes;
  */
 export declare const hexDataLength: (data: string) => number;
 /**
- * isHexString
- *
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.
  * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} - Returns true if the value is a valid hexadecimal string, otherwise false.
+ * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
  */
 export declare const isHexString: (value: any, length?: number) => boolean;
 /**
- * bufferToUint8
- *
  * Converts a Buffer to a Uint8Array.
  *
  * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} - The Uint8Array representation of the Buffer.
+ * @returns {Uint8Array} The Uint8Array representation of the Buffer.
  */
 export declare const bufferToUint8: (target: Buffer) => Uint8Array;

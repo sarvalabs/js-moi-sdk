@@ -2,8 +2,6 @@ import { Buffer } from "buffer";
 import { bytesToHex, hexToBytes } from "moi-utils";
 
 /**
- * LogicId
- * 
  * Represents a LogicID, which is an identifier for a logic.
  */
 export class LogicId {
@@ -14,8 +12,6 @@ export class LogicId {
     }
 
     /**
-     * hex
-     * 
      * Returns the LogicID as a hex encoded string.
      * 
      * @returns {string} The LogicID as a hex encoded string.
@@ -25,8 +21,6 @@ export class LogicId {
     }
 
     /**
-     * isValid
-     * 
      * Checks if the LogicID is valid.
      * 
      * @returns {boolean} True if the LogicID is valid, false otherwise.
@@ -46,8 +40,6 @@ export class LogicId {
     }
   
     /**
-     * getVersion
-     * 
      * Returns the version of the LogicID.
      * Returns -1 if the LogicID is not valid.
      * 
@@ -64,8 +56,6 @@ export class LogicId {
     }
 
     /**
-     * isStateful
-     * 
      * Checks if the stateful flag is set for the LogicID.
      * Returns false if the LogicID is invalid.
      * 
@@ -84,8 +74,6 @@ export class LogicId {
     }
 
     /**
-     * isInteractive
-     * 
      * Checks if the interactive flag is set for the LogicID.
      * Returns false if the LogicID is invalid.
      * 
@@ -104,8 +92,6 @@ export class LogicId {
     }
 
     /**
-     * getEdition
-     * 
      * Returns the edition number of the LogicID.
      * Returns 0 if the LogicID is invalid.
      * 
@@ -126,8 +112,6 @@ export class LogicId {
     }
   
     /**
-     * getAddress
-     * 
      * Returns the address associated with the LogicID.
      * Returns null if the LogicID is invalid or the version is not 0.
      * 

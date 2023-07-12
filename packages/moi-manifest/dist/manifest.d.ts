@@ -1,5 +1,5 @@
+import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { LogicManifest } from "moi-utils";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -12,8 +12,6 @@ export declare class ManifestCoder {
     private schema;
     constructor(elements: Map<number, LogicManifest.Element>, classDefs: Map<string, number>);
     /**
-     * encodeManifest
-     *
      * Encodes a logic manifest into POLO format. The manifest is processed and
      * serialized according to the predefined schema.
      * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
@@ -24,8 +22,6 @@ export declare class ManifestCoder {
      */
     static encodeManifest(manifest: LogicManifest.Manifest): string;
     /**
-     * parseCalldata
-     *
      * Parses the calldata arguments based on the provided POLO Schema.
      * The calldata arguments is recursively processed and transformed according to the schema.
      *
@@ -37,8 +33,6 @@ export declare class ManifestCoder {
      */
     private parseCalldata;
     /**
-     * encodeArguments
-     *
      * Encodes the provided arguments based on the given manifest routine
      * parmeters and its types (the accepts property in routine).
      *
@@ -54,8 +48,6 @@ export declare class ManifestCoder {
      */
     encodeArguments(fields: LogicManifest.TypeField[], args: any[]): string;
     /**
-     * decodeOutput
-     *
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
@@ -67,8 +59,6 @@ export declare class ManifestCoder {
      */
     decodeOutput(output: string, fields: LogicManifest.TypeField[]): unknown | null;
     /**
-     * decodeException
-     *
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.
      * Returns the decoded exception object, or null if the error is empty.
@@ -80,8 +70,6 @@ export declare class ManifestCoder {
      */
     static decodeException(error: string): Exception | null;
     /**
-     * decodeState
-     *
      * Decodes a specific state field from the data retrieved from a logic.
      * The state data is decoded using the provided fields and schema.
      * Returns the decoded value of the specified field, or null if the data is empty.

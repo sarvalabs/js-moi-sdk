@@ -27,8 +27,6 @@ exports.isValidSeed = exports.mnemonicToSeed = void 0;
 const bip39 = __importStar(require("moi-bip39"));
 const errors_1 = require("./errors");
 /**
- * mnemonicToSeed
- *
  * Converts a mnemonic phrase to a seed buffer using BIP39.
  *
  * @param {string} mnemonic - The mnemonic phrase.
@@ -51,8 +49,6 @@ const mnemonicToSeed = async (mnemonic, wordlist) => {
 };
 exports.mnemonicToSeed = mnemonicToSeed;
 /**
- * isValidSeed
- *
  * Checks if a seed is valid according to BIP39 standards.
  *
  * @param {string} seed - The seed to check.

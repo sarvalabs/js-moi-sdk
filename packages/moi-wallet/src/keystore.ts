@@ -6,10 +6,11 @@ import { Keystore } from "../types/keystore";
 
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
- * @param key - Encryption key.
- * @param input - Input data to encrypt.
- * @param iv - Initialization vector.
- * @returns Encrypted data.
+ * 
+ * @param {Buffer} key - Encryption key.
+ * @param {Buffer} input - Input data to encrypt.
+ * @param {Buffer} iv - Initialization vector.
+ * @returns {Buffer} Encrypted data.
  */
 export const aesCTRWithXOR = (key: Buffer, input: Buffer, iv: Buffer): Buffer => {
     const aesBlock = crypto.createCipheriv('aes-128-ctr', key, iv);
@@ -18,10 +19,12 @@ export const aesCTRWithXOR = (key: Buffer, input: Buffer, iv: Buffer): Buffer =>
 }
 
 /**
- * Derives the key for a keystore based on the provided password and KDF parameters.
- * @param keystore - Keystore object.
- * @param password - Password for key derivation.
- * @returns Derived key.
+ * Derives the key for a keystore based on the provided password and 
+ * KDF parameters.
+ * 
+ * @param {Keystore} keystore - Keystore object.
+ * @param {string} password - Password for key derivation.
+ * @returns {Buffer} Derived key.
  * @throws {Error} If the KDF is unsupported.
  */
 export const getKDFKeyForKeystore = (keystore: Keystore, password: string): Buffer => {
@@ -45,9 +48,10 @@ export const getKDFKeyForKeystore = (keystore: Keystore, password: string): Buff
 /**
  * Encrypts the input data using AES-128-CTR mode with XOR encryption and 
  * creates a keystore object.
- * @param data - Data to be encrypted.
- * @param password - Password for encryption.
- * @returns Encrypted keystore object.
+ * 
+ * @param {Buffer} data - Data to be encrypted.
+ * @param {string} password - Password for encryption.
+ * @returns {Keystore} Encrypted keystore object.
  */
 export const encryptKeystoreData = (data: Buffer, password: string): Keystore => {
     const salt = crypto.randomBytes(32);
@@ -85,9 +89,10 @@ export const encryptKeystoreData = (data: Buffer, password: string): Keystore =>
 
 /**
  * Decrypts the keystore data using the provided password.
- * @param keystore - Keystore object to decrypt.
- * @param password - Password for decryption.
- * @returns Decrypted data.
+ * 
+ * @param {Keystore} keystore - Keystore object to decrypt.
+ * @param {string} password - Password for decryption.
+ * @returns {Buffer} Decrypted data.
  * @throws {Error} If the cipher is not supported or the password is incorrect.
  */
 export const decryptKeystoreData = (keystore: Keystore, password: string): Buffer => {

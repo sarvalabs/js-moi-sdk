@@ -9,8 +9,6 @@ import { InflightRequest, TesseractParams, Subscription } from "../types/websock
 let nextReqId = 1;
 
 /**
- * WebSocketEvents
- * 
  * Enum defining the WebSocket events.
  */
 export enum WebSocketEvents {
@@ -24,9 +22,8 @@ export enum WebSocketEvents {
 }
 
 /**
- * WebSocketProvider
- * 
- * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based communication with the JSON-RPC endpoint.
+ * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based 
+ * communication with the JSON-RPC endpoint.
  */
 export class WebSocketProvider extends JsonRpcProvider {
     private requestQueue: Map<number, InflightRequest>;
@@ -77,8 +74,6 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * connect
-     *
      * Establishes a WebSocket connection with the provided host.
      * Creates a new WebSocket connection instance and sets up event handlers.
      */
@@ -96,8 +91,6 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * addEventListener
-     *
      * Sets up event listeners for the WebSocket connection.
      */
     private addEventListener = () => {
@@ -113,8 +106,6 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * removeEventListener
-     * 
      * Removes event listeners from the WebSocket connection.
      */
     private removeEventListener = () => {
@@ -124,8 +115,6 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * reconnect
-     * 
      * Initiates a reconnection to the WebSocket server.
      * If there are pending requests in the response queue, their callbacks are 
      * invoked with a reconnection error.
@@ -174,8 +163,6 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * onConnect
-     * 
      * Event handler triggered when the WebSocket connection is successfully established.
      * Invokes pending requests in the request queue if any.
      */
@@ -197,9 +184,8 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * isConnectionFailed
-     * 
      * Checks if the WebSocket connection has failed based on the close event.
+     * 
      * @param event The close event object.
      * @returns A boolean indicating whether the connection has failed.
      */
@@ -209,6 +195,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     /**
      * Method called when the WebSocket connection is closed.
+     * 
      * @param event - The close event.
      */
     private onClose = (event) => {
@@ -245,6 +232,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     /**
      * Method called when a message is received through the WebSocket connection.
+     * 
      * @param event - The message event.
      */
     private onMessage = (event: { data: string }) => {
@@ -296,6 +284,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     /**
      * Method called when the WebSocket connection fails to connect.
+     * 
      * @param event - The connect failed event.
      */
     private onConnectFailed = (event): void => {
@@ -339,9 +328,8 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * sendRequest
-     * 
      * Sends a request over the WebSocket connection.
+     * 
      * @param requestId - The ID of the request.
      * @param request - The request object.
      */
@@ -366,10 +354,9 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * send
-     * 
      * Sends a request over the WebSocket connection and returns a Promise that 
      * resolves with the response.
+     * 
      * @param method - The method of the request.
      * @param params - The parameters of the request.
      * @returns A Promise that resolves with the response or rejects with an error.
@@ -406,9 +393,8 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * _subscribe
-     * 
      * Subscribes to an event.
+     * 
      * @param tag - The tag associated with the subscription.
      * @param param - The parameters of the subscription.
      * @param processFunc - The function to process the subscription result.
@@ -427,9 +413,8 @@ export class WebSocketProvider extends JsonRpcProvider {
     }
 
     /**
-     * _startEvent
-     * 
      * Starts listening to an event.
+     * 
      * @param event - The event to start listening to.
      */
     protected _startEvent(event: Event): void {
@@ -468,6 +453,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     /**
      * Stops listening to an event.
+     * 
      * @param event - The event to stop listening to.
      */
     protected _stopEvent(event: Event): void {
@@ -491,6 +477,7 @@ export class WebSocketProvider extends JsonRpcProvider {
 
     /**
      * Disconnects the WebSocket connection.
+     * 
      * @returns A Promise that resolves when the disconnect operation is complete.
      */
     public async disconnect(): Promise<void> {
