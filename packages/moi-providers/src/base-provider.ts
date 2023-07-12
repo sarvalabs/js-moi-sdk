@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest, AssetCreationReceipt, AssetMintOrBurnReceipt,
+import { LogicManifest } from "moi-manifest";
+import { ErrorCode, ErrorUtils, IxType, AssetCreationReceipt, AssetMintOrBurnReceipt,
 LogicDeployReceipt, LogicExecuteReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
 hexToBytes, unmarshal, hexToBN, toQuantity } from "moi-utils";
 import { EventType, Listener } from "../types/event";

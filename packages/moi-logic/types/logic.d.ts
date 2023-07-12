@@ -1,5 +1,5 @@
 import { InteractionResponse } from "moi-providers";
-import { LogicManifest } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
 
 export interface LogicDeployRequest {
     send: (args: any) => Promise<InteractionResponse>;

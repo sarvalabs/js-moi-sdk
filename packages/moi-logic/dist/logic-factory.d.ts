@@ -1,4 +1,5 @@
-import { IxType, LogicManifest } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
+import { IxType } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { LogicDeployRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";

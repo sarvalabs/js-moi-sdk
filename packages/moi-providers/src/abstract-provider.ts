@@ -1,4 +1,5 @@
-import { Tesseract, LogicManifest, Interaction } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
+import { Tesseract, Interaction } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, 
 InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, 

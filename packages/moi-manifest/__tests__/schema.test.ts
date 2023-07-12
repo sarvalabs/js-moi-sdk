@@ -1,6 +1,6 @@
 import { Schema } from "../src/schema";
 import manifest from "../manifests/erc20.json";
-import { LogicManifest } from "moi-utils";
+import { LogicManifest } from "../types/manifest";
 
 describe("Test Schema", () => {
     const elements = new Map();

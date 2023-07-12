@@ -1,5 +1,6 @@
-import { LogicManifest, ErrorCode, ErrorUtils } from "moi-utils";
-import { Schema as PoloSchema } from "js-polo"
+import { ErrorCode, ErrorUtils } from "moi-utils";
+import { Schema as PoloSchema } from "js-polo";
+import { LogicManifest } from "../types/manifest";
 
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "i64", "bigint"

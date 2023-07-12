@@ -1,5 +1,5 @@
+import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { LogicManifest } from "moi-utils";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as

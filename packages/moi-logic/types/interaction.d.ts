@@ -1,7 +1,6 @@
-import { Exception } from "moi-manifest";
+import { LogicManifest, Exception } from "moi-manifest";
 import { InteractionResponse } from "moi-providers";
 import { InteractionObject, LogicPayload } from "moi-signer";
-import { LogicManifest } from "moi-utils";
 
 export interface LogicIxObject {
     routine: LogicManifest.Routine;

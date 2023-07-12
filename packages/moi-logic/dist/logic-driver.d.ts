@@ -1,5 +1,6 @@
+import { LogicManifest } from "moi-manifest";
 import { LogicPayload, Signer } from "moi-signer";
-import { IxType, LogicManifest } from "moi-utils";
+import { IxType } from "moi-utils";
 import { Options } from "moi-providers";
 import { Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";

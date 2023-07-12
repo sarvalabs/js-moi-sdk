@@ -1,5 +1,5 @@
-import { ManifestCoder } from "moi-manifest";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest, hexToBytes } from "moi-utils";
+import { LogicManifest, ManifestCoder } from "moi-manifest";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { LogicDeployRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";

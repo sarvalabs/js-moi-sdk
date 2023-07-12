@@ -6,43 +6,89 @@ import { wordlists, _default } from "./_wordlists";
 import { Buffer } from "buffer";
 
 let DEFAULT_WORDLIST = _default;
-let INVALID_MNEMONIC = 'Invalid mnemonic';
-let INVALID_ENTROPY = 'Invalid entropy';
-let INVALID_CHECKSUM = 'Invalid mnemonic checksum';
-let WORDLIST_REQUIRED = 'A wordlist is required but a default could not be found.\n' +
+const INVALID_MNEMONIC = 'Invalid mnemonic';
+const INVALID_ENTROPY = 'Invalid entropy';
+const INVALID_CHECKSUM = 'Invalid mnemonic checksum';
+const WORDLIST_REQUIRED = 'A wordlist is required but a default could not be found.\n' +
     'Please pass a 2048 word array explicitly.';
 
-function normalize(str: string): string {
+/**
+ * Normalizes a string by converting it to Unicode Normalization Form KD (NFKD).
+ *
+ * @param {string} str - The string to normalize.
+ * @returns {string} The normalized string.
+ */
+const normalize = (str: string): string => {
     return (str || '').normalize('NFKD');
 }
 
-function lpad(str: string, padString: string, length: number): string {
+/**
+ * Left pad a string with a padString to a specific length.
+ *
+ * @param {string} str - The string to pad.
+ * @param {string} padString - The string used for padding.
+ * @param {number} length - The target length of the padded string.
+ * @returns {string} The padded string.
+ */
+const lpad = (str: string, padString: string, length: number): string => {
     while (str.length < length) {
         str = padString + str;
     }
     return str;
 }
 
-function binaryToByte(bin: string): number {
+
+/**
+ * Convert a binary string to a byte (number).
+ *
+ * @param {string} bin - The binary string to convert.
+ * @returns {number} The converted byte.
+ */
+const binaryToByte = (bin: string): number => {
     return parseInt(bin, 2);
 }
 
-function bytesToBinary(bytes: number[]): string {
+/**
+ * Convert an array of bytes to a binary string.
+ *
+ * @param {number[]} bytes - The array of bytes to convert.
+ * @returns {string} The converted binary string.
+ */
+const bytesToBinary = (bytes: number[]): string => {
     return bytes.map((x) => lpad(x.toString(2), '0', 8)).join('');
 }
 
-function deriveChecksumBits(entropyBuffer: Uint8Array): string {
+/**
+ * Derive the checksum bits from an entropy buffer.
+ *
+ * @param {Uint8Array} entropyBuffer - The entropy buffer.
+ * @returns {string} The derived checksum bits.
+ */
+const deriveChecksumBits = (entropyBuffer: Uint8Array): string => {
     const ENT = entropyBuffer.length * 8;
     const CS = ENT / 32;
     const hash = sha256(Uint8Array.from(entropyBuffer));
     return bytesToBinary(Array.from(hash)).slice(0, CS);
 }
 
-function salt(password: string): string {
+/**
+ * Generate a salt for PBKDF2 using a password.
+ *
+ * @param {string} password - The password.
+ * @returns {string} The generated salt.
+ */
+const salt = (password: string): string => {
     return 'mnemonic' + (password || '');
 }
 
-export function mnemonicToSeedSync(mnemonic: string, password?: string): Buffer {
+/**
+ * Synchronously convert a mnemonic to a seed.
+ *
+ * @param {string} mnemonic - The mnemonic phrase.
+ * @param {string} [password] - The optional password.
+ * @returns {Buffer} The generated seed.
+ */
+export const mnemonicToSeedSync = (mnemonic: string, password?: string): Buffer => {
     const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), 'utf8'));
     const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password as string)), 'utf8'));
     const res = pbkdf2(sha512, mnemonicBuffer, saltBuffer, {
@@ -52,7 +98,15 @@ export function mnemonicToSeedSync(mnemonic: string, password?: string): Buffer 
     return Buffer.from(res);
 }
 
-export async function mnemonicToSeed(mnemonic: string, password?: string): Promise<Buffer> {
+/**
+ * Asynchronously convert a mnemonic to a seed.
+ *
+ * @param {string} mnemonic - The mnemonic phrase.
+ * @param {string} [password] - The optional password.
+ * @returns {Promise<Buffer>} The generated seed.
+ * @throws {Error} If an error occurs during the conversion.
+ */
+export const mnemonicToSeed = async(mnemonic: string, password?: string): Promise<Buffer> => {
     try {
         const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), 'utf8'));
         const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password as string)), 'utf8'));
@@ -67,7 +121,15 @@ export async function mnemonicToSeed(mnemonic: string, password?: string): Promi
     }
 }
 
-export function mnemonicToEntropy(mnemonic: string, wordlist?: string[]): string {
+/**
+ * Convert a mnemonic to its corresponding entropy value.
+ *
+ * @param {string} mnemonic - The mnemonic phrase.
+ * @param {string[]} [wordlist] - The optional wordlist.
+ * @returns {string} The corresponding entropy.
+ * @throws {Error} If the mnemonic is invalid or a wordlist is required but not found.
+ */
+export const mnemonicToEntropy = (mnemonic: string, wordlist?: string[]): string => {
     wordlist = wordlist || DEFAULT_WORDLIST;
     if (!wordlist) {
         throw new Error(WORDLIST_REQUIRED);
@@ -111,7 +173,15 @@ export function mnemonicToEntropy(mnemonic: string, wordlist?: string[]): string
     return entropy.toString('hex');
 }
 
-export function entropyToMnemonic(entropy: Buffer | string, wordlist?: string[]): string {
+/**
+ * Convert entropy to its corresponding mnemonic.
+ *
+ * @param {Buffer|string} entropy - The entropy value or buffer.
+ * @param {string[]} [wordlist] - The optional wordlist.
+ * @returns {string} The corresponding mnemonic phrase.
+ * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
+ */
+export const entropyToMnemonic = (entropy: Buffer | string, wordlist?: string[]): string => {
     if (!Buffer.isBuffer(entropy)) {
         entropy = Buffer.from(entropy, 'hex');
     }
@@ -144,11 +214,20 @@ export function entropyToMnemonic(entropy: Buffer | string, wordlist?: string[])
     : words.join(' ');
 }
 
-export function generateMnemonic(
+/**
+ * Generate a mnemonic phrase with the specified strength (in bits).
+ *
+ * @param {number} [strength=128] - The strength of the mnemonic in bits.
+ * @param {(size: number) => Buffer} [rng] - The random number generator function.
+ * @param {string[]} [wordlist] - The optional wordlist.
+ * @returns {string} The generated mnemonic phrase.
+ * @throws {TypeError} If the strength is not divisible by 32.
+ */
+export const generateMnemonic = (
     strength?: number,
     rng?: (size: number) => Buffer,
     wordlist?: string[]
-): string {
+): string => {
     strength = strength || 128;
     if (strength % 32 !== 0) {
         throw new TypeError(INVALID_ENTROPY);
@@ -157,7 +236,14 @@ export function generateMnemonic(
     return entropyToMnemonic(rng(strength / 8), wordlist);
 }
 
-export function validateMnemonic(mnemonic: string, wordlist?: string[]): boolean {
+/**
+ * Validate a mnemonic phrase.
+ *
+ * @param {string} mnemonic - The mnemonic phrase to validate.
+ * @param {string[]} [wordlist] - The optional wordlist.
+ * @returns {boolean} True if the mnemonic is valid, false otherwise.
+ */
+export const validateMnemonic = (mnemonic: string, wordlist?: string[]): boolean => {
     try {
         mnemonicToEntropy(mnemonic, wordlist);
     } catch (e) {
@@ -166,7 +252,13 @@ export function validateMnemonic(mnemonic: string, wordlist?: string[]): boolean
     return true;
 }
 
-export function setDefaultWordlist(language: string): void {
+/**
+ * Set the default wordlist based on the language.
+ *
+ * @param {string} language - The language code.
+ * @throws {Error} If the wordlist for the given language is not found.
+ */
+export const setDefaultWordlist = (language: string): void => {
     const result = wordlists.wordlists[language];
     if (result) {
         DEFAULT_WORDLIST = result;
@@ -175,7 +267,13 @@ export function setDefaultWordlist(language: string): void {
     }
 }
 
-export function getDefaultWordlist(): string {
+/**
+ * Get the currently set default wordlist.
+ *
+ * @returns {string} The language code of the default wordlist.
+ * @throws {Error} If the default wordlist is not set.
+ */
+export const getDefaultWordlist = (): string => {
     if (!DEFAULT_WORDLIST) {
         throw new Error('No Default Wordlist set');
     }

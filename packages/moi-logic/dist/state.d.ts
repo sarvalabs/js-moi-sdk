@@ -1,4 +1,4 @@
-import { LogicManifest } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
 import { AbstractProvider } from "moi-providers";
 import { ManifestCoder } from "moi-manifest";
 export declare enum ContextStateKind {

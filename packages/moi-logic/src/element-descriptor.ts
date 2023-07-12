@@ -1,4 +1,5 @@
-import { ErrorCode, ErrorUtils, LogicManifest } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
+import { ErrorCode, ErrorUtils } from "moi-utils";
 import { ContextStateMatrix } from "./state";
 import { CallSite, MethodDef } from "../types/logic";
 

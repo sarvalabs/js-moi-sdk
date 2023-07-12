@@ -1,7 +1,8 @@
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
 import { Schema } from "./schema";
+import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { bytesToHex, hexToBytes, LogicManifest, ErrorUtils, ErrorCode, trimHexPrefix } from "moi-utils";
+import { bytesToHex, hexToBytes, ErrorUtils, ErrorCode, trimHexPrefix } from "moi-utils";
 
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality 

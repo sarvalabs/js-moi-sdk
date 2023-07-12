@@ -1,5 +1,5 @@
-import { ManifestCoder } from "moi-manifest";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest } from "moi-utils";
+import { LogicManifest, ManifestCoder } from "moi-manifest";
+import { ErrorCode, ErrorUtils, IxType } from "moi-utils";
 import { LogicPayload, Signer } from "moi-signer";
 import { InteractionResponse } from "moi-providers";
 import ElementDescriptor from "./element-descriptor";

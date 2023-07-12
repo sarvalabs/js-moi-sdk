@@ -1,6 +1,6 @@
 import { ManifestCoder } from "../src/manifest";
 import manifest from "../manifests/erc20.json";
-import { LogicManifest } from "moi-utils";
+import { LogicManifest } from "../types/manifest";
 
 describe("Test ManifestCoder", () => {
     const elements = new Map();

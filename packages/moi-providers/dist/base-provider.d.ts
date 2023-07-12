@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
-import { LogicManifest, Tesseract, Interaction } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
+import { Tesseract, Interaction } from "moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";

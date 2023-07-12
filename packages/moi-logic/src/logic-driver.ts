@@ -1,6 +1,6 @@
-import { ManifestCoder } from "moi-manifest";
+import { LogicManifest, ManifestCoder } from "moi-manifest";
 import { LogicPayload, Signer } from "moi-signer";
-import { ErrorCode, ErrorUtils, IxType, LogicManifest, defineReadOnly, hexToBytes } from "moi-utils";
+import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "moi-utils";
 import { Options } from "moi-providers";
 import { Routine, Routines } from "../types/logic";
 import { EphemeralState, PersistentState } from "./state";

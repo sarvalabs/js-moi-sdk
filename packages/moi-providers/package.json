@@ -13,7 +13,8 @@
     "providers"
   ],
   "dependencies": {
-    "moi-utils": "0.1.0"
+    "moi-utils": "0.1.0",
+    "moi-manifest": "0.1.0"
   },
   "author": "",
   "license": "UNLICENSED"

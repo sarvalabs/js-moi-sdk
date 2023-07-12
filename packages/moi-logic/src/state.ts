@@ -1,4 +1,5 @@
-import { ErrorCode, ErrorUtils, LogicManifest, encodeToString } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
+import { ErrorCode, ErrorUtils, encodeToString } from "moi-utils";
 import { blake2b } from 'blakejs';
 import { AbstractProvider } from "moi-providers";
 import { ManifestCoder } from "moi-manifest";

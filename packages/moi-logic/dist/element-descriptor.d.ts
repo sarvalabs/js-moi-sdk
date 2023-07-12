@@ -1,4 +1,4 @@
-import { LogicManifest } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
 import { ContextStateMatrix } from "./state";
 import { CallSite, MethodDef } from "../types/logic";
 /**

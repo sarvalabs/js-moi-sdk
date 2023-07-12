@@ -1,4 +1,4 @@
-import { LogicManifest } from "moi-utils";
+import { LogicManifest } from "moi-manifest";
 import { Signer } from "moi-signer";
 import { LogicId } from "./logic-id";
 import { LogicBase } from "./logic-base";

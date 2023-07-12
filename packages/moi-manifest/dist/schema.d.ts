@@ -1,5 +1,5 @@
-import { LogicManifest } from "moi-utils";
 import { Schema as PoloSchema } from "js-polo";
+import { LogicManifest } from "../types/manifest";
 /**
  * Schema is a class that provides schema parsing functionality for encoding and
  * decoding manifest, arguments, logic states and other data based on
