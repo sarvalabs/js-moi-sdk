@@ -12,11 +12,15 @@
     "moi"
   ],
   "dependencies": {
+    "moi-providers": "0.1.0",
     "moi-manifest": "0.1.0",
     "moi-logic": "0.1.0",
-    "moi-providers": "0.1.0",
-    "moi-utils": "0.1.0",
-    "moi-constants": "0.1.0"
+    "moi-hdnode": "0.1.0",
+    "moi-wallet": "0.1.0",
+    "moi-signer": "0.1.0",
+    "moi-bip39": "0.1.0",
+    "moi-constants": "0.1.0",
+    "moi-utils": "0.1.0"
   },
   "author": "",
   "license": "UNLICENSED"
