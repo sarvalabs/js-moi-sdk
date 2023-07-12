@@ -35,7 +35,6 @@ describe("Test Websocket Provider", () => {
         signer.sendInteraction({
             type: IxType.ASSET_CREATE,
             nonce: nonce,
-            sender: address,
             fuel_price: 1,
             fuel_limit: 200,
             payload: {
@@ -59,7 +58,6 @@ describe("Test Websocket Provider", () => {
         signer.sendInteraction({
             type: IxType.ASSET_CREATE,
             nonce: Number(nonce) + 1,
-            sender: address,
             fuel_price: 1,
             fuel_limit: 200,
             payload: {

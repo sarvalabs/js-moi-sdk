@@ -17,7 +17,6 @@ describe("Test JsonRpcProvider Query Calls", () => {
       const ixResponse = await signer.sendInteraction({
         type: IxType.ASSET_CREATE,
         nonce: nonce,
-        sender: address,
         fuel_price: 1,
         fuel_limit: 200,
         payload: {

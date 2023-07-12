@@ -91,10 +91,6 @@ export abstract class Signer {
             ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
         }
 
-        if(!ixObject.sender) {
-            ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
-        }
-
         if(!isValidAddress(ixObject.sender)) {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
@@ -151,6 +147,10 @@ export abstract class Signer {
 
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+
+            if (!ixObject.sender) {
+                ixObject.sender = this.getAddress();
+            }
 
             // Check the validity of the interaction object
             this.checkInteraction(ixObject, nonce)

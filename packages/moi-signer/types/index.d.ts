@@ -41,7 +41,7 @@ export interface InteractionObject {
     type: IxType;
     nonce?: number | bigint;
 
-    sender: string;
+    sender?: string;
     receiver?: string;
     payer?: string;
 
