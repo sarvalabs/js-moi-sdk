@@ -1,3 +1,15 @@
+/**
+ * This code is based on the bitcoinjs/bip39 by Wei Lu and Danieal Cousens
+ * Modifications have been made to adapt it to the needs of moi-bip39 
+ * including enhancements for browser compatibility and TypeScript conversion.
+ * 
+ * Original module available at: https://github.com/bitcoinjs/bip39
+ * Modified version available at: https://github.com/sarvalabs/moi.js/tree/main/packages/moi-bip39
+ * 
+ * Copyright (c) 2014, Wei Lu <luwei.here@gmail.com> and Daniel Cousens <email@dcousens.com>
+ * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
+ * 
+ **/
 import { Buffer } from "buffer";
 import { sha256 } from "@noble/hashes/sha256";
 import { sha512 } from "@noble/hashes/sha512";
