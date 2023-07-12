@@ -1,46 +1,46 @@
 module.exports = {
     projects: [
-        // {
-        //     displayName: 'moi-abi',
-        //     testEnvironment: 'ts-node',
-        //     testMatch: ['<rootDir>/packages/moi-abi/__tests__/*.test.ts'],
-        //     transform: {
-        //         '^.+\\.tsx?$': 'ts-jest',
-        //     },
-        // },
-        // {
-        //     displayName: 'moi-logic',
-        //     testEnvironment: 'ts-node',
-        //     testMatch: ['<rootDir>/packages/moi-logic/__tests__/*.test.ts'],
-        //     transform: {
-        //         '^.+\\.tsx?$': 'ts-jest',
-        //     },
-        // },
-        // {
-        //     displayName: 'moi-core',
-        //     testEnvironment: 'ts-node',
-        //     testMatch: ['<rootDir>/packages/moi-core/__tests__/*.test.ts'],
-        //     transform: {
-        //         '^.+\\.tsx?$': 'ts-jest',
-        //     },
-        // },
-        // {
-        //     displayName: 'moi-utils',
-        //     testEnvironment: 'ts-node',
-        //     testMatch: ['<rootDir>/packages/moi-utils/__tests__/*.test.ts'],
-        //     transform: {
-        //         '^.+\\.tsx?$': 'ts-jest',
-        //     },
-        // }
         {
-            displayName: 'moi-providers',
+            displayName: 'moi-bip39',
             testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/moi-logic/__tests__/*.test.ts'],
+            testMatch: ['<rootDir>/packages/moi-bip39/__tests__/*.test.ts'],
             transform: {
                 '^.+\\.tsx?$': 'ts-jest',
             },
             moduleFileExtensions: ['js', 'ts', 'd.ts'],
         },
+        {
+            displayName: 'moi-hdnode',
+            testEnvironment: 'ts-node',
+            testMatch: ['<rootDir>/packages/moi-hdnode/__tests__/*.test.ts'],
+            transform: {
+                '^.+\\.tsx?$': 'ts-jest',
+            },
+        },
+        {
+            displayName: 'moi-wallet',
+            testEnvironment: 'ts-node',
+            testMatch: ['<rootDir>/packages/moi-wallet/__tests__/*.test.ts'],
+            transform: {
+                '^.+\\.tsx?$': 'ts-jest',
+            },
+        },
+        {
+            displayName: 'moi-manifest',
+            testEnvironment: 'ts-node',
+            testMatch: ['<rootDir>/packages/moi-manifest/__tests__/*.test.ts'],
+            transform: {
+                '^.+\\.tsx?$': 'ts-jest',
+            },
+        },
+        {
+            displayName: 'moi-utils',
+            testEnvironment: 'ts-node',
+            testMatch: ['<rootDir>/packages/moi-utils/__tests__/*.test.ts'],
+            transform: {
+                '^.+\\.tsx?$': 'ts-jest',
+            },
+        }
     ],
     testTimeout: 700000,
     maxConcurrency: 1

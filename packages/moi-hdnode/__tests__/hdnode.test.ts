@@ -1,4 +1,4 @@
-import { mnemonicToSeed } from "bip39";
+import { mnemonicToSeed } from "moi-bip39";
 import { HDNode } from "../src/hdnode";
 
 describe("Test HDNode",() => {

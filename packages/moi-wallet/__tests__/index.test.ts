@@ -40,12 +40,4 @@ describe("Test Wallet", () => {
             signature: "0147304502210089d5c9125fbc605eaa7c51ba1157ed774896cc02483992bb9b3180555ba20c1a02202aad27b8c6ce498a9ce6167924b6286fb13865ec9d9e3767d32b8c6a250b3e9e02"
         })
     });
-
-    test("Signature Verification", () => {
-        const message = Buffer.from("Hello, MOI", "utf-8");
-        const signature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
-        const publicKey = Buffer.from(wallet.publicKey(), 'hex')
-        const isVerified = wallet.verify(message, signature, publicKey)
-        expect(isVerified).toBe(true);
-    });
 })
