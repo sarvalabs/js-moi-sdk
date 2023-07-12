@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import { bytesToHex, hexToBytes } from "moi-utils";
 
 /**

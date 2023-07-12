@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import { AssetStandard, IxType } from "moi-utils";
 import Signature from "../src/signature";
 import ECDSA_S256 from "../src/ecdsa";

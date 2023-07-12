@@ -1,4 +1,5 @@
 import * as bip39 from 'moi-bip39';
+import { Buffer } from "buffer";
 import { ErrorUtils, ErrorCode } from './errors';
 
 /**

@@ -1,4 +1,4 @@
-/// <reference types="node" />
+import { Buffer } from "buffer";
 import { Keystore } from "../types/keystore";
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
