@@ -1,7 +1,7 @@
 {
   "name": "moi-logic",
   "version": "0.1.0",
-  "description": "Web3 module to interact with MOI smart contracts.",
+  "description": "Module to interact with MOI Logic Objects.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

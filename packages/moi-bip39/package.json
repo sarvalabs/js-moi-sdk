@@ -1,7 +1,7 @@
 {
   "name": "moi-bip39",
   "version": "0.1.0",
-  "description": "Module to interact with the moichain accounts stored in the node.",
+  "description": "Bitcoin BIP39 package for deterministic key generation using mnemonic code",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
