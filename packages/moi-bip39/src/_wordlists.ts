@@ -1,56 +1,27 @@
-export const wordlists: { [key: string]: string[] } = {};
+import czech from './wordlists/czech.json';
+import chinese_simplified from './wordlists/chinese_simplified.json';
+import chinese_traditional from './wordlists/chinese_traditional.json';
+import korean from './wordlists/korean.json';
+import french from './wordlists/french.json';
+import italian from './wordlists/italian.json';
+import spanish from './wordlists/spanish.json';
+import japanese from './wordlists/japanese.json';
+import portuguese from './wordlists/portuguese.json';
+import english from './wordlists/english.json';
 
-let _default: string[];
-export { _default };
+export const wordlists: { [key: string]: string[] } = {
+    czech: czech,
+    chinese_simplified: chinese_simplified,
+    chinese_traditional: chinese_traditional,
+    korean: korean,
+    french: french,
+    italian: italian,
+    spanish: spanish,
+    japanese: japanese,
+    JA: japanese,
+    portuguese: portuguese,
+    english: english,
+    EN: english,
+};
 
-try {
-    _default = require('./wordlists/czech.json');
-    wordlists.czech = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/chinese_simplified.json');
-    wordlists.chinese_simplified = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/chinese_traditional.json');
-    wordlists.chinese_traditional = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/korean.json');
-    wordlists.korean = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/french.json');
-    wordlists.french = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/italian.json');
-    wordlists.italian = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/spanish.json');
-    wordlists.spanish = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/japanese.json');
-    wordlists.japanese = _default;
-  wordlists.JA = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/portuguese.json');
-    wordlists.portuguese = _default;
-} catch (err) {}
-
-try {
-    _default = require('./wordlists/english.json');
-    wordlists.english = _default;
-    wordlists.EN = _default;
-} catch (err) {}
+export const _default: string[] = english;

@@ -25,6 +25,7 @@ need to unlock the full potential of the MOI Blockchain.
    providers
    signer
    logic
+   bip39
    hierarchical-deterministic-node
    hierarchical-deterministic-wallet
    utilities

@@ -29,6 +29,7 @@ js_source_path = [
     '../../packages/moi-providers/dist',
     '../../packages/moi-signer/dist',
     '../../packages/moi-logic/dist',
+    '../../packages/moi-bip39/dist',
     '../../packages/moi-hdnode/dist',
     '../../packages/moi-wallet/dist',
     '../../packages/moi-utils/dist'

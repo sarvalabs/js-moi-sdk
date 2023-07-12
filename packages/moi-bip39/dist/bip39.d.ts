@@ -37,8 +37,8 @@ export declare const entropyToMnemonic: (entropy: Buffer | string, wordlist?: st
 /**
  * Generate a mnemonic phrase with the specified strength (in bits).
  *
- * @param {number} [strength=128] - The strength of the mnemonic in bits.
- * @param {(size: number) => Buffer} [rng] - The random number generator function.
+ * @param {number} strength - The strength of the mnemonic in bits.
+ * @param {Function} rng - The random number generator function.
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The generated mnemonic phrase.
  * @throws {TypeError} If the strength is not divisible by 32.

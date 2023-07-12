@@ -217,8 +217,8 @@ export const entropyToMnemonic = (entropy: Buffer | string, wordlist?: string[])
 /**
  * Generate a mnemonic phrase with the specified strength (in bits).
  *
- * @param {number} [strength=128] - The strength of the mnemonic in bits.
- * @param {(size: number) => Buffer} [rng] - The random number generator function.
+ * @param {number} strength - The strength of the mnemonic in bits.
+ * @param {Function} rng - The random number generator function.
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The generated mnemonic phrase.
  * @throws {TypeError} If the strength is not divisible by 32.
@@ -253,21 +253,6 @@ export const validateMnemonic = (mnemonic: string, wordlist?: string[]): boolean
 }
 
 /**
- * Set the default wordlist based on the language.
- *
- * @param {string} language - The language code.
- * @throws {Error} If the wordlist for the given language is not found.
- */
-export const setDefaultWordlist = (language: string): void => {
-    const result = wordlists.wordlists[language];
-    if (result) {
-        DEFAULT_WORDLIST = result;
-    } else {
-        throw new Error('Could not find wordlist for language "' + language + '"');
-    }
-}
-
-/**
  * Get the currently set default wordlist.
  *
  * @returns {string} The language code of the default wordlist.
@@ -277,10 +262,11 @@ export const getDefaultWordlist = (): string => {
     if (!DEFAULT_WORDLIST) {
         throw new Error('No Default Wordlist set');
     }
-    return Object.keys(wordlists.wordlists).filter((lang) => {
+
+    return Object.keys(wordlists).filter((lang) => {
         if (lang === 'JA' || lang === 'EN') {
         return false;
         }
-        return wordlists.wordlists[lang].every((word, index) => word === DEFAULT_WORDLIST[index]);
+        return wordlists[lang].every((word, index) => word === DEFAULT_WORDLIST[index]);
     })[0];
 }
