@@ -48,12 +48,12 @@ The ``AssetMintOrBurnPayload`` interface represents a payload for minting or bur
 
 **LogicPayload**
 
-The ``LogicPayload`` interface represents a payload for logic execution. It has the following properties:
+The ``LogicPayload`` interface represents a payload for logic deployment or invokation. It has the following properties:
 
 * ``logic_id`` - ``string``: The ID of the logic (optional).
 * ``callsite`` - ``string``: The callsite for the logic execution.
-* ``calldata`` - ``Uint8Array``: The data for the logic execution.
-* ``manifest`` - ``Uint8Array``: The manifest associated with the logic execution (optional).
+* ``calldata`` - ``Uint8Array``: The calldata for the logic execution.
+* ``manifest`` - ``Uint8Array``: The encoded manifest to deploy (optional).
 
 **InteractionPayload**
 
@@ -158,7 +158,7 @@ Regular Methods
     const message = Buffer.from("Hello, MOI", "utf-8");
     const signature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
     const publicKey = Buffer.from(wallet.publicKey(), 'hex')
-    const isVerified = wallet.verify(message, signature, publicKey)
+    const isVerified = signer.verify(message, signature, publicKey)
     console.log(isVerified)
 
     >> true

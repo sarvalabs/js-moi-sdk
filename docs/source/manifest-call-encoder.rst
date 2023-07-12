@@ -6,17 +6,17 @@ Manifest Call Encoder
 
 The Manifest Call Encoder module enables the encoding and decoding of data 
 according to the MOI Manifest specification. This specification defines the 
-structure of data and routine signatures within logic object, allowing for 
-seamless interaction with their properties and routines.
+structure of routines, classes, methods, and state within logic object, allowing 
+for seamless interaction with their properties.
 
 Through this module, developers can encode data in compliance with the 
-expected format specified by the Manifest. This is particularly valuable when 
-preparing data for invoking routines on logic object. By correctly encoding 
+expected format specified by the logic Manifest. This is particularly valuable 
+when preparing data for invoking routines on logic object. By correctly encoding 
 routine parameters according to the logic Manifest, developers can generate 
 accurate input data that aligns with the logic objects's expectations.
 
 In addition, this facilitates the decoding of data received from the blockchain 
-or logic objects. Users can decode routine call results, and other Manifest-encoded 
+or logic objects. Developers can decode routine call results, and other Manifest-encoded 
 data structures, enabling them to extract meaningful information. This 
 capability greatly aids in the efficient processing and interpretation of data 
 obtained from the MOI network.
@@ -37,7 +37,7 @@ The ``LogicManifest`` module defines the schema for a logic manifest.
 
     **TypeField**
 
-    The ``TypeField`` interface defines a field within a type. It has three properties:
+    The ``TypeField`` interface defines a field type. It has three properties:
 
     * ``slot`` - ``number``: The slot number of the field.
     * ``label`` - ``string``: The label or name of the field.
@@ -45,7 +45,7 @@ The ``LogicManifest`` module defines the schema for a logic manifest.
 
     **MethodField**
 
-    The ``MethodField`` interface defines a field within a method. It has two properties:
+    The ``MethodField`` interface defines a method field. It has two properties:
 
     * ``ptr`` - ``number | bigint``: The pointer value of the field.
     * ``code`` - ``number | bigint``: The code value of the field.
@@ -77,7 +77,7 @@ The ``LogicManifest`` module defines the schema for a logic manifest.
     The ``Instructions`` interface defines the instructions within the logic manifest. It has three optional properties:
 
     * ``bin`` - ``number[] | null``: An optional array of binary values.
-    * ``hex`` - ``string``: A hexadecimal representation of the instructions.
+    * ``hex`` - ``string``: A hexadecimal representation of the instructions (optional).
     * ``asm`` - ``string[] | null``: An optional array of assembly instructions.
 
     **Routine**
@@ -104,7 +104,7 @@ The ``LogicManifest`` module defines the schema for a logic manifest.
 
     **TypeDef**
 
-    The ``TypeDef`` type represents a string type definition.
+    The ``TypeDef`` represents a ``string`` type definition.
 
     **Element**
 
@@ -127,7 +127,7 @@ The ``LogicManifest`` module defines the schema for a logic manifest.
 
 The `Exception` interface defines an exception. It has three properties:
 
-* ``class`` - ``string``: The class of the exception.
+* ``class`` - ``string``: The exception class.
 * ``data`` - ``string``: The exception message.
 * ``trace`` - ``string[]``: The stack trace of the exception.
 
@@ -138,7 +138,7 @@ deserialization. It has two properties:
 
 
 * ``kind`` - ``string``: The type or kind of the schema.
-* ``fields`` - ``Record<string, any>``: The fields within the schema. It is a dictionary-like structure where keys are strings and values can be of any type (optional).
+* ``fields`` - ``Record<string, any>``: The fields within the schema. It is a dictionary-like structure where keys are strings and values are object (optional).
 
 ManifestCoder
 -------------

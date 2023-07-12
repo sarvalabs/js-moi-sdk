@@ -8,9 +8,7 @@ The BIP39 module provides utility functions for working with mnemonic phrases,
 entropy, and seed generation. It includes methods for converting mnemonic phrases 
 to seeds synchronously and asynchronously, converting mnemonic phrases to their 
 corresponding entropy values and vice versa, generating mnemonic phrases with 
-specified strengths, and validating the correctness of mnemonic phrases. The 
-class also supports setting and retrieving the default wordlist for mnemonic 
-conversion.
+specified strengths, and validating the correctness of mnemonic phrases.
 
 Functions
 ---------

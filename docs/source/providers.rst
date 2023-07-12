@@ -6,7 +6,7 @@ Providers
 
 A Provider is a convenient interface for connecting to MOI nodes and retrieving 
 data from the blockchain. With the providers module, developers can choose from 
-various MOI providers, such as Voyage, to establish a connection with the MOI 
+various MOI providers such as Voyage to establish a connection with the MOI 
 network. 
 
 The Provider class abstracts away the complexities of interacting directly 
@@ -34,43 +34,43 @@ The ``InteractionInfo`` interface represents information about an interaction. I
 
 **Content**
 
-The ``Content`` interface represents content information. It has the following properties:
+The ``Content`` interface represents ixpool information. It has the following properties:
 
-* ``pending`` - ``Map<string, Map<number | bigint, InteractionInfo>>``: A map representing pending content.
-* ``queued`` - ``Map<string, Map<number | bigint, InteractionInfo>>``: A map representing queued content.
+* ``pending`` - ``Map<string, Map<number | bigint, InteractionInfo>>``: A map representing pending interactions in the ixpool.
+* ``queued`` - ``Map<string, Map<number | bigint, InteractionInfo>>``: A map representing queued interactions in the ixpool.
 
 **ContentFrom**
 
-The ``ContentFrom`` interface represents content information based on the sender. It has the following properties:
+The ``ContentFrom`` interface represents ixpool information based on the sender. It has the following properties:
 
-* ``pending`` - ``Map<number | bigint, InteractionInfo>``: A map representing pending content from a specific sender.
-* ``queued`` - ``Map<number | bigint, InteractionInfo>``: A map representing queued content from a specific sender.
+* ``pending`` - ``Map<number | bigint, InteractionInfo>``: A map representing pending interactions in the ixpool belonging to a specific sender.
+* ``queued`` - ``Map<number | bigint, InteractionInfo>``: A map representing queued interactions in the ixpool belonging to a specific sender.
 
 **Status**
 
-The ``Status`` interface represents the status of content. It has the following properties:
+The ``Status`` interface represents the status of ixpool. It has the following properties:
 
-* ``pending`` - ``number | bigint``: The number or bigint value representing pending status.
-* ``queued`` - ``number | bigint``: The number or bigint value representing queued status.
+* ``pending`` - ``number | bigint``: The number or bigint value representing the number of pending interactions in ixpool.
+* ``queued`` - ``number | bigint``: The number or bigint value representing the number of queued interactions in ixpool.
 
 **WaitTime**
 
-The ``WaitTime`` interface represents wait time information. It has the following properties:
+The ``WaitTime`` interface represents ixpool wait time information. It has the following properties:
 
 * ``expired`` - ``boolean``: A boolean indicating if the wait time has expired.
 * ``time`` - ``number | bigint``: The number or bigint value representing the wait time.
 
 **Inspect**
 
-The ``Inspect`` interface represents inspection information. It has the following properties:
+The ``Inspect`` interface represents ixpool inspection information. It has the following properties:
 
-* ``pending`` - ``Map<string, Map<string, string>>``: A map representing pending inspection data.
-* ``queued`` - ``Map<string, Map<string, string>>``: A map representing queued inspection data.
-* ``wait_time`` - ``Map<string, WaitTime>``: A map representing wait times for inspection.
+* ``pending`` - ``Map<string, Map<string, string>>``: A map representing the pending interactions in ixpool.
+* ``queued`` - ``Map<string, Map<string, string>>``: A map representing the queued interactions in ixpool.
+* ``wait_time`` - ``Map<string, WaitTime>``: A map representing the wait times of each account in ixpool.
 
 **Options**
 
-The ``Options`` interface represents a set of options. It has the following properties:
+The ``Options`` interface represents the **tesseract** options. It has the following properties:
 
 * ``tesseract_number`` (optional) - ``number``: The Tesseract number.
 * ``tesseract_hash`` (optional) - ``string``: The Tesseract hash.
@@ -85,21 +85,15 @@ The ``ContextInfo`` interface represents information about the context. It has t
 
 **TDUBase**
 
-The ``TDUBase`` interface represents the base structure for TDU (Transaction Data Unit). It has the following properties:
+The ``TDUBase`` interface represents the base structure for TDU (Total Digital Utility). It has the following properties:
 
-* ``asset_id`` - ``string``: The asset ID.
+* ``asset_id`` - ``string``: The asset id.
 
 **TDU**
 
-The ``TDU`` interface extends ``TDUBase`` and represents a Transaction Data Unit. It has the following additional property:
+The ``TDU`` interface extends ``TDUBase`` and represents a Total Digital Utility. It has the following additional property:
 
-* ``amount`` - ``number | bigint``: The amount associated with the TDU.
-
-**TDUResponse**
-
-The ``TDUResponse`` interface extends ``TDUBase`` and represents a response for a Transaction Data Unit. It has the following additional property:
-
-* ``amount`` - ``string``: The amount associated with the TDU as a string.
+* ``amount`` - ``number | bigint``: The amount associated with the asset id.
 
 **AccountState**
 
@@ -127,9 +121,9 @@ The ``AccountMetaInfo`` interface represents meta-information about an account. 
 
 **InteractionRequest**
 
-The ``InteractionRequest`` interface represents a request for interaction. It has the following properties:
+The ``InteractionRequest`` interface represents a signed interaction request. It has the following properties:
 
-* ``ix_args`` - ``string``: The arguments for the interaction.
+* ``ix_args`` - ``string``: The encoded interaction parameters.
 * ``signature`` - ``string``: The signature for the interaction.
 
 **InteractionResponse**

@@ -34,7 +34,7 @@ The ``Interaction`` interface represents an interaction object. It has the follo
 * ``mode`` - ``string``: The mode of the interaction.
 * ``compute_hash`` - ``string``: The hash of the compute.
 * ``compute_nodes`` - ``string[]``: The compute nodes involved in the interaction.
-* ``mtq`` - ``string``: The MTQ (Master Trust Quorum) value for the interaction.
+* ``mtq`` - ``string``: The MTQ value for the interaction.
 * ``trust_nodes`` - ``string[]``: The trust nodes associated with the interaction.
 * ``hash`` - ``string``: The hash of the interaction.
 * ``signature`` - ``string``: The signature of the interaction.
@@ -104,7 +104,7 @@ The ``DeltaGroup`` interface represents a group of delta nodes. It has the follo
 
 **PoXCData**
 
-The ``PoXCData`` interface represents Proof-of-Execution Consensus (PoXC) data. It has the following properties:
+The ``PoXCData`` interface represents PoXC data. It has the following properties:
 
 * ``binary_hash`` - ``string``: The hash of the binary.
 * ``identity_hash`` - ``string``: The hash of the identity.
