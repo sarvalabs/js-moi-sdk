@@ -67,9 +67,6 @@ class Signer {
         if (ixObject.type === undefined || ixObject.type === null) {
             moi_utils_2.ErrorUtils.throwError("Interaction type is missing", moi_utils_2.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!ixObject.sender) {
-            moi_utils_2.ErrorUtils.throwError("Sender address is missing", moi_utils_2.ErrorCode.MISSING_ARGUMENT);
-        }
         if (!(0, moi_utils_2.isValidAddress)(ixObject.sender)) {
             moi_utils_2.ErrorUtils.throwError("Invalid sender address", moi_utils_2.ErrorCode.INVALID_ARGUMENT);
         }
@@ -116,6 +113,9 @@ class Signer {
             const nonce = await this.getNonce();
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+            if (!ixObject.sender) {
+                ixObject.sender = this.getAddress();
+            }
             // Check the validity of the interaction object
             this.checkInteraction(ixObject, nonce);
             if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
