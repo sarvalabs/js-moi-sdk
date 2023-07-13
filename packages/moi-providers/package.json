@@ -7,15 +7,25 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "homepage": "https://docs.moi.technology/docs/build/packages/moi.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sarvalabs/moi.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sarvalabs/moi.js/issues"
+  },
   "keywords": [
     "moichain",
     "moi",
     "providers"
   ],
+  "author": "Sarva Labs Inc. & MOI Protocol Developers",
+  "license": "Apache-2.0 OR MIT",
   "dependencies": {
     "moi-utils": "0.1.0",
-    "moi-manifest": "0.1.0"
-  },
-  "author": "",
-  "license": "UNLICENSED"
+    "moi-manifest": "0.1.0",
+    "axios": "^1.3.4",
+    "websocket": "^1.0.34"
+  }
 }
