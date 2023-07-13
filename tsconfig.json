@@ -31,16 +31,16 @@
     "esm": true
   },
   "references": [
-    { "path": "./packages/moi" },
-    { "path": "./packages/moi-manifest" },
-    { "path": "./packages/moi-constants" },
-    { "path": "./packages/moi-logic" },
-    { "path": "./packages/moi-providers" },
-    { "path": "./packages/moi-signer" },
-    { "path": "./packages/moi-utils"},
-    { "path": "./packages/moi-hdnode"},
-    { "path": "./packages/moi-wallet"},
-    { "path": "./packages/moi-bip39"},
+    { "path": "./packages/js-moi" },
+    { "path": "./packages/js-moi-manifest" },
+    { "path": "./packages/js-moi-constants" },
+    { "path": "./packages/js-moi-logic" },
+    { "path": "./packages/js-moi-providers" },
+    { "path": "./packages/js-moi-signer" },
+    { "path": "./packages/js-moi-utils"},
+    { "path": "./packages/js-moi-hdnode"},
+    { "path": "./packages/js-moi-wallet"},
+    { "path": "./packages/js-moi-bip39"},
   ],
   "include": [
     "./manifests"

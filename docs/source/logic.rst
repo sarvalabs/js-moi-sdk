@@ -4,7 +4,7 @@ Logic
 
 --------------------------------------------------------------------------------
 
-The logic module in moi.js is a powerful component that simplifies the 
+The logic module in js-moi-sdk is a powerful component that simplifies the 
 interaction with MOI logic objects. It provides a user-friendly interface 
 for deploying, interacting with, and querying logic objects on the MOI network.
 

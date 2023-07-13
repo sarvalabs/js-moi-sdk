@@ -4,40 +4,40 @@ Getting Started
 
 --------------------------------------------------------------------------------
 
-Kickstart your journey with moi.js by installing and importing it. Unleash its 
+Kickstart your journey with js-moi-sdk by installing and importing it. Unleash its 
 potential through comprehensive documentation and resources to supercharge 
 your application development.
 
 Installing
 ------------
-Install the latest `release <https://github.com/sarvalabs/moi.js/releases>`_ 
+Install the latest `release <https://github.com/sarvalabs/js-moi-sdk/releases>`_ 
 using the following command:
 
 .. code-block:: shell
 
-    npm install moi.js
+    npm install js-moi-sdk
 
 Importing
 -----------
 If you are using CommonJS or ES5, the require statement is used for 
-importing `moi.js`.
+importing `js-moi-sdk`.
 
 .. code-block:: javascript
 
-   const moi = require("moi.js")
+   const moi = require("js-moi-sdk")
 
 If you are using ES6 or above, you can use the import statement to 
-import `moi.js`.
+import `js-moi-sdk`.
 
 .. code-block:: javascript
 
-   import * as moi from "moi.js"
+   import * as moi from "js-moi-sdk"
 
 Key Concepts
 ------------
 To begin, it's crucial to grasp the fundamental concepts that underpin the 
-moi.js framework. Acquainting yourself with these concepts will empower you to 
-utilize the moi.js package efficiently during your application development 
+js-moi-sdk framework. Acquainting yourself with these concepts will empower you to 
+utilize the js-moi-sdk package efficiently during your application development 
 process.
 
 **Tesseract**

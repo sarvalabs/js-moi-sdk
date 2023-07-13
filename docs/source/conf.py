@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'moi.js'
+project = 'js-moi-sdk'
 copyright = '2023, Sarva Labs Inc. & MOI Protocol Developers'
 author = 'Sarva Labs Inc'
 
@@ -25,14 +25,14 @@ release = u'v0.1.0'
 extensions = ['sphinx_js']
 root_for_relative_js_paths = '~/'
 js_source_path = [
-    '../../packages/moi-manifest/dist', 
-    '../../packages/moi-providers/dist',
-    '../../packages/moi-signer/dist',
-    '../../packages/moi-logic/dist',
-    '../../packages/moi-bip39/dist',
-    '../../packages/moi-hdnode/dist',
-    '../../packages/moi-wallet/dist',
-    '../../packages/moi-utils/dist'
+    '../../packages/js-moi-manifest/dist', 
+    '../../packages/js-moi-providers/dist',
+    '../../packages/js-moi-signer/dist',
+    '../../packages/js-moi-logic/dist',
+    '../../packages/js-moi-bip39/dist',
+    '../../packages/js-moi-hdnode/dist',
+    '../../packages/js-moi-wallet/dist',
+    '../../packages/js-moi-utils/dist'
 ]
 primary_domain = 'js'
 
