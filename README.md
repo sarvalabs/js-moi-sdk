@@ -1,35 +1,35 @@
 ![image](https://moi-js.s3.amazonaws.com/moi-banner.png)
 
-[latestrelease]: https://github.com/sarvalabs/moi.js/releases/latest
-[issueslink]: https://github.com/sarvalabs/moi.js/issues
-[pullslink]: https://github.com/sarvalabs/moi.js/pulls
-[pkgdocs]: https://docs.moi.technology/docs/build/packages/moi.js
+[latestrelease]: https://github.com/sarvalabs/js-moi-sdk/releases/latest
+[issueslink]: https://github.com/sarvalabs/js-moi-sdk/issues
+[pullslink]: https://github.com/sarvalabs/js-moi-sdk/pulls
+[pkgdocs]: https://docs.moi.technology/docs/build/packages/js-moi-sdk
 
 [![docs](https://img.shields.io/badge/npm-documentation-red?style=for-the-badge)][pkgdocs]
-[![npm version](https://img.shields.io/npm/v/moi.js.svg?style=for-the-badge)](https://npmjs.com/moi.js)
+[![npm version](https://img.shields.io/npm/v/js-moi-sdk.svg?style=for-the-badge)](https://npmjs.com/js-moi-sdk)
 ![license](https://img.shields.io/badge/license-MIT%2FApache--2.0-informational?style=for-the-badge)
 
-[![latest tag](https://img.shields.io/github/v/tag/sarvalabs/moi.js?color=blue&label=latest%20tag&sort=semver&style=for-the-badge)][latestrelease]
-[![issue count](https://img.shields.io/github/issues/sarvalabs/moi.js?style=for-the-badge&color=yellow)][issueslink]
-[![pulls count](https://img.shields.io/github/issues-pr/sarvalabs/moi.js?style=for-the-badge&color=brightgreen)][pullslink]
-![test status](https://img.shields.io/github/actions/workflow/status/sarvalabs/moi.js/test.yml?label=test&style=for-the-badge)
+[![latest tag](https://img.shields.io/github/v/tag/sarvalabs/js-moi-sdk?color=blue&label=latest%20tag&sort=semver&style=for-the-badge)][latestrelease]
+[![issue count](https://img.shields.io/github/issues/sarvalabs/js-moi-sdk?style=for-the-badge&color=yellow)][issueslink]
+[![pulls count](https://img.shields.io/github/issues-pr/sarvalabs/js-moi-sdk?style=for-the-badge&color=brightgreen)][pullslink]
+![test status](https://img.shields.io/github/actions/workflow/status/sarvalabs/js-moi-sdk/test.yml?label=test&style=for-the-badge)
 
 
-# moi.js
+# js-moi-sdk
 
-**moi.js** is a Javascript/Typescript implementation of a feature-rich library designed to seamlessly interact with the MOI Protocol and its extensive ecosystem. It provides a convenient interface for interacting with the MOI protocol, allowing developers to create, sign, and send interactions, retrieve account balances, access interaction history, and more.
+**js-moi-sdk** is a Javascript/Typescript implementation of a feature-rich library designed to seamlessly interact with the MOI Protocol and its extensive ecosystem. It provides a convenient interface for interacting with the MOI protocol, allowing developers to create, sign, and send interactions, retrieve account balances, access interaction history, and more.
 
 ## Installation
-Install the latest [release](https://github.com/sarvalabs/moi.js/releases) using the following command.
+Install the latest [release](https://github.com/sarvalabs/js-moi-sdk/releases) using the following command.
 
 ```sh
-npm install moi.js
+npm install js-moi-sdk
 ```
 
 ## Usage
 
 ```javascript
-    import { JsonRpcProvider } from "moi.js";
+    import { JsonRpcProvider } from "js-moi-sdk";
 
     const provider = new JsonRpcProvider("http://localhost:1600");
     const address  = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
@@ -73,25 +73,25 @@ npm install moi.js
 
 ## Sub Packages
 
-The **moi.js** package consists of several sub-packages, each offering independent functionality that can be utilized separately to enhance your development experience. 
+The **js-moi-sdk** package consists of several sub-packages, each offering independent functionality that can be utilized separately to enhance your development experience. 
 
-- [moi-constants](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-constants) This package includes common constants used within the moi.js ecosystem. These constants provide predefined values for various aspects of MOI, making it easier to work with the protocol.
+- [js-moi-constants](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-constants) This package includes common constants used within the js-moi-sdk ecosystem. These constants provide predefined values for various aspects of MOI, making it easier to work with the protocol.
 
-- [moi-providers](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-providers) This package enables you to connect to MOI nodes and retrieve blockchain data, such as account balances and interaction history. It provides an interface for interacting with the MOI protocol and fetching information from the network.
+- [js-moi-providers](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-providers) This package enables you to connect to MOI nodes and retrieve blockchain data, such as account balances and interaction history. It provides an interface for interacting with the MOI protocol and fetching information from the network.
 
-- [moi-signer](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-signer) This package represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign interactions securely and authenticate interactions on the MOI network.
+- [js-moi-signer](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-signer) This package represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign interactions securely and authenticate interactions on the MOI network.
 
-- [moi-bip39](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-bip39) Provides functionality for connecting to moi nodes and retrieving blockchain data.
+- [js-moi-bip39](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-bip39) Provides functionality for connecting to moi nodes and retrieving blockchain data.
 
-- [moi-hdnode](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-hdnode) This package represents a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
+- [js-moi-hdnode](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-hdnode) This package represents a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
 
-- [moi-wallet](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-wallet) This package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
+- [js-moi-wallet](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-wallet) This package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
 
-- [moi-manifest](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-manifest) This package encodes and decodes data according to the MOI Manifest specification, facilitating interaction with logic objects. It simplifies the process of encoding and decoding data structures, making it easier to work with MOI logic objects.
+- [js-moi-manifest](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-manifest) This package encodes and decodes data according to the MOI Manifest specification, facilitating interaction with logic objects. It simplifies the process of encoding and decoding data structures, making it easier to work with MOI logic objects.
 
-- [moi-logic](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-logic) This package simplifies interaction with MOI logic objects by offering deployment, interaction, and querying capabilities. It provides a higher-level interface for working with MOI logic, allowing you to deploy logic objects, send interactions, and retrieve results.
+- [js-moi-logic](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-logic) This package simplifies interaction with MOI logic objects by offering deployment, interaction, and querying capabilities. It provides a higher-level interface for working with MOI logic, allowing you to deploy logic objects, send interactions, and retrieve results.
 
-- [moi-utils](https://github.com/sarvalabs/moi.js/tree/docs/main/packages/moi-utils) This package offers a comprehensive set of tools and functions to enhance development with MOI. It provides utility functions that simplify common tasks, making your development experience smoother and more efficient.
+- [js-moi-utils](https://github.com/sarvalabs/js-moi-sdk/tree/docs/main/packages/js-moi-utils) This package offers a comprehensive set of tools and functions to enhance development with MOI. It provides utility functions that simplify common tasks, making your development experience smoother and more efficient.
 
 ## Contributing
 Unless you explicitly state otherwise, any contribution intentionally submitted

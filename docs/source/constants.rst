@@ -9,12 +9,12 @@ The constants module contains the following constant variables.
 Version
 -------
 The ``VERSION`` constant represents the version number of the 
-moi.js package.
+js-moi-sdk package.
 
 .. code-block:: javascript
 
     // Example
-    import * as moi from "moi.js";
+    import * as moi from "js-moi-sdk";
 
     console.log(moi.VERSION)
 
@@ -29,7 +29,7 @@ derivation process.
 .. code-block:: javascript
 
     // Example
-    import * as moi from "moi.js";
+    import * as moi from "js-moi-sdk";
 
     console.log(moi.MOI_DERIVATION_PATH)
 
@@ -45,7 +45,7 @@ addresses.
 .. code-block:: javascript
 
     // Example
-    import * as moi from "moi.js";
+    import * as moi from "js-moi-sdk";
 
     console.log(moi.MOI_DERIVATION_BASE_PATH)
 

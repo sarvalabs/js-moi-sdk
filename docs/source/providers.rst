@@ -210,7 +210,7 @@ The ``WebsocketProviderOptions`` interface represents options for a websocket pr
 
 .. note::
 
-   **Important:** Please note that the current version of moi.js only supports the `reconnectOptions` property of `WebsocketProviderOptions`. Other properties may not be available or functional in the current version.
+   **Important:** Please note that the current version of js-moi-sdk only supports the `reconnectOptions` property of `WebsocketProviderOptions`. Other properties may not be available or functional in the current version.
 
 
 Abstract Provider

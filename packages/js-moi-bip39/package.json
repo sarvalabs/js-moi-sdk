@@ -1,0 +1,34 @@
+{
+  "name": "js-moi-bip39",
+  "version": "0.1.0",
+  "description": "Bitcoin BIP39 package for deterministic key generation using mnemonic code",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sarvalabs/js-moi-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sarvalabs/js-moi-sdk/issues"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "wallet",
+    "bip39"
+  ],
+  "author": "Sarva Labs Inc. & MOI Protocol Developers",
+  "license": "Apache-2.0 OR MIT",
+  "dependencies": {
+    "js-moi-hdnode": "^0.1.0",
+    "js-moi-signer": "^0.1.0",
+    "js-moi-constants": "^0.1.0",
+    "js-moi-utils": "^0.1.0",
+    "buffer": "^6.0.3",
+    "@noble/hashes": "^1.1.5"
+  }
+}

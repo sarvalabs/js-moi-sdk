@@ -1,0 +1,25 @@
+{
+  "name": "js-moi-constants",
+  "version": "0.1.0",
+  "description": "Collection of constant variables used in js-moi-sdk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sarvalabs/js-moi-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sarvalabs/js-moi-sdk/issues"
+  },
+  "keywords": [
+    "moichain",
+    "moi",
+    "constants"
+  ],
+  "author": "Sarva Labs Inc. & MOI Protocol Developers",
+  "license": "Apache-2.0 OR MIT"
+}
