@@ -1,5 +1,5 @@
 {
-  "name": "moi.js",
+  "name": "moi",
   "version": "0.1.0",
   "description": "JavaScript library to interact with MOI Protocol via RPC API",
   "private": true,
