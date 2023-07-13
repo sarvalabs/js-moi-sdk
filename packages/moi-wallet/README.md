@@ -33,10 +33,12 @@ npm install moi-wallet
 ```javascript
     import { Wallet } from "moi-wallet";
 
-    const wallet = new Wallet();
-    const mnemonic = "hollow appear story text start mask salt social child ...";
-    const path = "m/44'/7567'/0'/0/1";
-    await wallet.fromMnemonic(mnemonic, path);
+    (async() => {
+        const wallet = new Wallet();
+        const mnemonic = "hollow appear story text start mask salt social child ...";
+        const path = "m/44'/7567'/0'/0/1";
+        await wallet.fromMnemonic(mnemonic, path);
+    })()
 ```
 
 ## Contributing

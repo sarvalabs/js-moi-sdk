@@ -33,9 +33,11 @@ npm install moi-providers
 ```javascript
     import { JsonRpcProvider } from "moi-providers";
 
-    const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b"
-    const contextInfo = provider.getContextInfo(address)
-    console.log(contextInfo)
+    (async() => {
+        const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+        const contextInfo = await provider.getContextInfo(address);
+        console.log(contextInfo);
+    })()
 
     // Output
     /*

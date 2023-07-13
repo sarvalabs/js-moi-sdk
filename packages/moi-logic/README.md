@@ -32,11 +32,27 @@ npm install moi-wallet
 
 ```javascript
     import { Wallet } from "moi-wallet";
+    import { getLogicDriver } from "moi-logic";
 
-    const wallet = new Wallet();
-    const mnemonic = "hollow appear story text start mask salt social child ...";
-    const path = "m/44'/7567'/0'/0/1";
-    await wallet.fromMnemonic(mnemonic, path);
+    const initWallet = async () => {
+        const mnemonic = "mother clarify push liquid ordinary social track ...";
+        const provider = new JsonRpcProvider("http://localhost:1600/");
+        const wallet = new Wallet(provider);
+        await wallet.fromMnemonic(mnemonic);
+    }
+
+    (async () => {
+        const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+        const wallet = await initWallet();
+        const logicDriver = await getLogicDriver(logicId, wallet);
+        const name = await logicDriver.persistentState.get("name");
+        console.log(name)
+    })()
+
+    // Output
+    /*
+        TOKYO
+    */
 ```
 
 ## Contributing
