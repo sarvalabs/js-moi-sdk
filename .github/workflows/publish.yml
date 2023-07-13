@@ -4,7 +4,9 @@ on:
   release:
     types: 
       - created
-    
+
+  workflow_dispatch:
+
 jobs:
   test:
     name: "Test"
@@ -35,7 +37,7 @@ jobs:
 
           for package in */; do
             cd "$package"
-            npm publish
-            sleep 5
+            npm publish || true
+            sleep 20
             cd ..
           done
