@@ -12,7 +12,7 @@
 [![latest tag](https://img.shields.io/github/v/tag/sarvalabs/moi.js?color=blue&label=latest%20tag&sort=semver&style=for-the-badge)][latestrelease]
 [![issue count](https://img.shields.io/github/issues/sarvalabs/moi.js?style=for-the-badge&color=yellow)][issueslink]
 [![pulls count](https://img.shields.io/github/issues-pr/sarvalabs/moi.js?style=for-the-badge&color=brightgreen)][pullslink]
-![ci status](https://img.shields.io/github/actions/workflow/status/sarvalabs/moi.js/ci.yml?label=ci&style=for-the-badge)
+![test status](https://img.shields.io/github/actions/workflow/status/sarvalabs/moi.js/test.yml?label=test&style=for-the-badge)
 
 
 # moi-signer
