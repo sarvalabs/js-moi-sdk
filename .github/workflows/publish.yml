@@ -38,6 +38,6 @@ jobs:
           for package in */; do
             cd "$package"
             npm publish || true
-            sleep 20
+            sleep 10
             cd ..
           done

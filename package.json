@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "JavaScript library to interact with MOI Protocol via RPC API",
   "private": true,
-  "main": "packages/moi/dist/index.js",
-  "types": "packages/moi/dist/index.d.ts",
+  "main": "packages/js-moi/dist/index.js",
+  "types": "packages/js-moi/dist/index.d.ts",
   "scripts": {
     "build": "tsc -b && rm -rf dist",
     "test": "jest --env=node --colors --verbose"
