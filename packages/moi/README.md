@@ -1,4 +1,4 @@
-![image](https://moi-js.s3.amazonaws.com/banner.png)
+![image](./.github/banner.png)
 
 [latestrelease]: https://github.com/sarvalabs/moi.js/releases/latest
 [issueslink]: https://github.com/sarvalabs/moi.js/issues
