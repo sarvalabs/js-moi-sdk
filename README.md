@@ -31,10 +31,13 @@ npm install js-moi-sdk
 ```javascript
     import { JsonRpcProvider } from "js-moi-sdk";
 
-    const provider = new JsonRpcProvider("http://localhost:1600");
-    const address  = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
-    const tesseract = provider.getTesseract(address, true);
-    console.log(tesseract)
+    (async() => {
+        const provider = new JsonRpcProvider("http://localhost:1600");
+        const address  = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+        const tesseract = await provider.getTesseract(address, true);
+        console.log(tesseract);
+    })()
+
 
     // Output:
     /*
