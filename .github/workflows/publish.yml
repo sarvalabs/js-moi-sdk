@@ -1,0 +1,41 @@
+name: Publish
+
+on:
+  release:
+    types: 
+      - created
+    
+jobs:
+  test:
+    name: "Test"
+    uses: ./.github/workflows/test.yml
+
+  publish:
+    name: "Publish Packages"
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+        run: |
+          cd packages
+
+          echo "//registry.npmjs.org/:_authToken=\${NODE_AUTH_TOKEN}" > .npmrc
+
+          for package in */; do
+            cd "$package"
+            npm publish
+            sleep 5
+            cd ..
+          done

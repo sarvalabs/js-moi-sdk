@@ -1,0 +1,29 @@
+{
+  "name": "moi-manifest",
+  "version": "0.1.0",
+  "description": "Module to encode and decode MOI Logic Engine input and output.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://docs.moi.technology/docs/build/packages/moi.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sarvalabs/moi.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sarvalabs/moi.js/issues"
+  },
+  "keywords": [
+    "moichain",
+    "moi.js",
+    "manifest"
+  ],
+  "author": "Sarva Labs Inc. & MOI Protocol Developers",
+  "license": "Apache-2.0 OR MIT",
+  "dependencies": {
+    "moi-utils": "^0.1.0",
+    "js-polo": "^0.1.1"
+  }
+}

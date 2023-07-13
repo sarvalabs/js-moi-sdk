@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "lib": [
+      "es6",
+      "esnext",
+      "dom"
+    ],
+    "module": "commonjs",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "composite": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "preserveSymlinks": true,
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+  },
+  "ts-node": {
+    "esm": true
+  },
+  "references": [
+    { "path": "./packages/moi" },
+    { "path": "./packages/moi-manifest" },
+    { "path": "./packages/moi-constants" },
+    { "path": "./packages/moi-logic" },
+    { "path": "./packages/moi-providers" },
+    { "path": "./packages/moi-signer" },
+    { "path": "./packages/moi-utils"},
+    { "path": "./packages/moi-hdnode"},
+    { "path": "./packages/moi-wallet"},
+    { "path": "./packages/moi-bip39"},
+  ],
+  "include": [
+    "./manifests"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+}
