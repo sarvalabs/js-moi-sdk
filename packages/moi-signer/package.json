@@ -7,16 +7,26 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "homepage": "https://docs.moi.technology/docs/build/packages/moi.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sarvalabs/moi.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sarvalabs/moi.js/issues"
+  },
   "keywords": [
     "moichain",
     "moi",
-    "mudra",
-    "zkp"
+    "signer"
   ],
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "Sarva Labs Inc. & MOI Protocol Developers",
+  "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "moi-wallet": "0.1.0",
-    "moi-utils": "0.1.0"
+    "moi-utils": "^0.1.0",
+    "blake2b": "^2.1.4",
+    "buffer": "^6.0.3",
+    "@noble/hashes": "^1.1.5",
+    "@noble/secp256k1": "^1.7.1"
   }
 }

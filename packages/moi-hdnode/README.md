@@ -19,7 +19,7 @@
 
 This is a sub-package of [moi.js](https://github.com/sarvalabs/moi.js).
 
-The **moi-hdnode** package represents a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
+The **moi-hdnode** package represents a Hierarchical Deterministic (HD) Node, which can be used for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
 
 ## Installation
 Install the latest [release](https://github.com/sarvalabs/moi.js/releases) using the following command.
