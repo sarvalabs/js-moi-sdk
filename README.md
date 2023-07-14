@@ -83,7 +83,7 @@ The **js-moi-sdk** package consists of several sub-packages, each offering indep
 
 - [js-moi-signer](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-signer) This package represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign interactions securely and authenticate interactions on the MOI network.
 
-- [js-moi-bip39](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-bip39) This package package offers the features necessary for generating and handling mnemonic phrases in accordance with the BIP39 standard.
+- [js-moi-bip39](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-bip39) This package offers the features necessary for generating and handling mnemonic phrases in accordance with the BIP39 standard.
 
 - [js-moi-hdnode](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-hdnode) This package represents a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
 
