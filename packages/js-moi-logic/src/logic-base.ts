@@ -103,7 +103,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
     protected processArguments(ixObject: LogicIxObject, args: any[]): LogicIxArguments {
-        if(args.length < 2 || !args[1].sender) {
+        if(args.length < 2) {
             ErrorUtils.throwError(
                 "One or more required arguments are missing.",
                 ErrorCode.MISSING_ARGUMENT
@@ -113,7 +113,7 @@ export abstract class LogicBase extends ElementDescriptor {
         const processedArgs: any = {
             type: args[0],
             params: {
-                sender: args[1].sender
+                sender: this.signer.getAddress()
             }
         }
 

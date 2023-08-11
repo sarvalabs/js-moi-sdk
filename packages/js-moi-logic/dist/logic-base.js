@@ -83,13 +83,13 @@ class LogicBase extends element_descriptor_1.default {
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
     processArguments(ixObject, args) {
-        if (args.length < 2 || !args[1].sender) {
+        if (args.length < 2) {
             js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
         const processedArgs = {
             type: args[0],
             params: {
-                sender: args[1].sender
+                sender: this.signer.getAddress()
             }
         };
         if (args[0] === "send") {
