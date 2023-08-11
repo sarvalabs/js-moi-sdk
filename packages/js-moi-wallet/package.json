@@ -1,6 +1,6 @@
 {
   "name": "js-moi-wallet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Module to interact with the MOI accounts.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
     "elliptic": "^6.5.4",
-    "js-polo": "^0.1.1",
+    "js-polo": "^0.1.2",
     "keccak": "^3.0.3"
   }
 }

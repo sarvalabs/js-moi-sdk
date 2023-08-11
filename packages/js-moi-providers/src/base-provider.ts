@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, IxType, AssetCreationReceipt, AssetMintOrBurnReceipt,
 LogicDeployReceipt, LogicInvokeReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
@@ -857,13 +856,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Checks if the error object represents a server error.
+     * Checks if the response object represents a server error.
      * 
-     * @param {AxiosError} error - The AxiosError object.
+     * @param {Response} response - The Response object.
      * @returns {boolean} A boolean indicating whether the error is a server error.
      */
-    protected isServerError(error: AxiosError): boolean {
-        return error.response && error.response.status >= 500 && error.response.status < 600;
+    protected isServerError(response: Response): boolean {
+        return response && response.status >= 500 && response.status < 600;
     }
 
     /**

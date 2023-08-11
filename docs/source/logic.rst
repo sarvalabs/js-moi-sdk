@@ -169,7 +169,6 @@ Methods
     ]
 
     const response = await factory.deploy("Seeder!", args).send({
-        sender: "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084",
         fuelPrice: 1,
         fuelLimit: 1000
     });
@@ -292,7 +291,6 @@ Usage
 
     // Invoking a routine
     const response = await logicDriver.routines.BalanceOf([seeder]).send({
-        sender: sender,
         fuelPrice: 1,
         fuelLimit: 1000
     });
