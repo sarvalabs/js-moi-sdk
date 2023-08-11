@@ -1,11 +1,6 @@
-import axios from 'axios';
+import fetch from 'cross-fetch';
 import { BaseProvider } from './base-provider';
-
-const config = {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-};
+import { ErrorCode, ErrorUtils, CustomError } from "js-moi-utils";
 
 /**
  * A provider for making RPC calls to voyage nodes.
@@ -50,20 +45,45 @@ export class VoyageProvider extends BaseProvider {
    * @throws {Error} Throws any error encountered during the RPC call.
    */
   protected async send(method: string, params: any[]): Promise<any> {
-    const payload = {
-      method: method,
-      params: params,
-      jsonrpc: '2.0',
-      id: 1,
-    };
-
-    return axios
-      .post(this.host, JSON.stringify(payload), config)
-      .then((res) => {
-        return res.data;
+    try {
+      const payload = {
+        method: method,
+        params: params,
+        jsonrpc: '2.0',
+        id: 1,
+      };
+  
+      const response = await fetch(this.host, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+            'Content-Type': 'application/json'
+        }
       })
-      .catch((err) => {
+
+      if (!response.ok) {
+        const errMessage = await response.text();
+
+        if (this.isServerError(response)) {
+            ErrorUtils.throwError(
+                `Error: ${errMessage}`,
+                ErrorCode.SERVER_ERROR
+            )
+        }
+
+        throw new Error(errMessage)
+      }
+
+      return await response.json()
+    } catch(err) {
+      if(err instanceof CustomError) {
         throw err;
-      });
+      }
+
+      ErrorUtils.throwError(
+          `Error: ${err.message}`,
+          ErrorCode.NETWORK_ERROR
+      )
+    }
   }
 }

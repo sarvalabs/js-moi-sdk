@@ -326,7 +326,7 @@ Tesseract
     const options = { 
         tesseract_number: 1 
     }
-    const tesseract = provider.getTesseract(address, true, options);
+    const tesseract = await provider.getTesseract(address, true, options);
     console.log(tesseract)
 
     // Output:
@@ -370,7 +370,7 @@ Context Info
 
     // Example
     const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b"
-    const contextInfo = provider.getContextInfo(address)
+    const contextInfo = await provider.getContextInfo(address)
     console.log(contextInfo)
 
     // Output
@@ -556,7 +556,7 @@ Account State
     const options = {
         tesseract_number: 1
     }
-    const account = provider.getAccountState(address, options)
+    const account = await provider.getAccountState(address, options)
     console.log(account)
 
     // Output
@@ -581,7 +581,7 @@ Interaction By Hash
 
     // Example
     const ixHash = "0x7750a0f1c848e05f1e52204e464af0d9d2f06470117e9187bb3643216c4c4ee9";
-    const interaction = provider.getInteractionByHash(ixHash)
+    const interaction = await provider.getInteractionByHash(ixHash)
     console.log(interaction)
 
     // Output

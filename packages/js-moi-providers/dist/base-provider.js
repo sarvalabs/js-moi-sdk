@@ -734,13 +734,13 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         });
     }
     /**
-     * Checks if the error object represents a server error.
+     * Checks if the response object represents a server error.
      *
-     * @param {AxiosError} error - The AxiosError object.
+     * @param {Response} response - The Response object.
      * @returns {boolean} A boolean indicating whether the error is a server error.
      */
-    isServerError(error) {
-        return error.response && error.response.status >= 500 && error.response.status < 600;
+    isServerError(response) {
+        return response && response.status >= 500 && response.status < 600;
     }
     /**
      * Executes an RPC method with the specified parameters.

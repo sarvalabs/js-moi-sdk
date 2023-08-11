@@ -4,13 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoyageProvider = void 0;
-const axios_1 = __importDefault(require("axios"));
+const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const base_provider_1 = require("./base-provider");
-const config = {
-    headers: {
-        'Content-Type': 'application/json',
-    },
-};
+const js_moi_utils_1 = require("js-moi-utils");
 /**
  * A provider for making RPC calls to voyage nodes.
  */
@@ -51,20 +47,35 @@ class VoyageProvider extends base_provider_1.BaseProvider {
      * @throws {Error} Throws any error encountered during the RPC call.
      */
     async send(method, params) {
-        const payload = {
-            method: method,
-            params: params,
-            jsonrpc: '2.0',
-            id: 1,
-        };
-        return axios_1.default
-            .post(this.host, JSON.stringify(payload), config)
-            .then((res) => {
-            return res.data;
-        })
-            .catch((err) => {
-            throw err;
-        });
+        try {
+            const payload = {
+                method: method,
+                params: params,
+                jsonrpc: '2.0',
+                id: 1,
+            };
+            const response = await (0, cross_fetch_1.default)(this.host, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                const errMessage = await response.text();
+                if (this.isServerError(response)) {
+                    js_moi_utils_1.ErrorUtils.throwError(`Error: ${errMessage}`, js_moi_utils_1.ErrorCode.SERVER_ERROR);
+                }
+                throw new Error(errMessage);
+            }
+            return await response.json();
+        }
+        catch (err) {
+            if (err instanceof js_moi_utils_1.CustomError) {
+                throw err;
+            }
+            js_moi_utils_1.ErrorUtils.throwError(`Error: ${err.message}`, js_moi_utils_1.ErrorCode.NETWORK_ERROR);
+        }
     }
 }
 exports.VoyageProvider = VoyageProvider;

@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { LogicManifest } from "js-moi-manifest";
 import { Tesseract, Interaction } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
@@ -303,12 +302,12 @@ export declare class BaseProvider extends AbstractProvider {
      */
     protected waitForResult(interactionHash: string, timeout?: number): Promise<any>;
     /**
-     * Checks if the error object represents a server error.
+     * Checks if the response object represents a server error.
      *
-     * @param {AxiosError} error - The AxiosError object.
+     * @param {Response} response - The Response object.
      * @returns {boolean} A boolean indicating whether the error is a server error.
      */
-    protected isServerError(error: AxiosError): boolean;
+    protected isServerError(response: Response): boolean;
     /**
      * Executes an RPC method with the specified parameters.
      *

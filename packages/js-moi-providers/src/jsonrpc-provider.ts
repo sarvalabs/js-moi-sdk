@@ -1,13 +1,7 @@
-import axios from "axios";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import fetch from "cross-fetch";
+import { ErrorCode, ErrorUtils, CustomError } from "js-moi-utils";
 import { BaseProvider } from "./base-provider";
 import Event from "./event";
-
-const config = {
-    headers: { 
-      'Content-Type': 'application/json'
-    },
-}
 
 /**
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
@@ -52,29 +46,46 @@ export class JsonRpcProvider extends BaseProvider {
      * @throws Error if there is an error sending the RPC request.
      */
     protected async send(method: string, params: any[]): Promise<any> {
-        const payload = {
-            method: method,
-            params: params,
-            jsonrpc: "2.0",
-            id: 1
-        };
-        
-        return axios.post(this.host, JSON.stringify(payload), config)
-        .then(res => {
-            return res.data;
-        }).catch(err => {
-            if(this.isServerError(err)) {
-                ErrorUtils.throwError(
-                    `Error: ${err.message}`,
-                    ErrorCode.SERVER_ERROR
-                )
+        try {
+            const payload = {
+                method: method,
+                params: params,
+                jsonrpc: "2.0",
+                id: 1
+            };
+            
+            const response = await fetch(this.host, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                const errMessage = await response.text();
+    
+                if (this.isServerError(response)) {
+                    ErrorUtils.throwError(
+                        `Error: ${errMessage}`,
+                        ErrorCode.SERVER_ERROR
+                    )
+                }
+    
+                throw new Error(errMessage)
             }
-
+    
+            return await response.json()
+        } catch(error) {
+            if(error instanceof CustomError) {
+                throw error;
+            }
+    
             ErrorUtils.throwError(
-                `Error: ${err.message}`,
+                `Error: ${error.message}`,
                 ErrorCode.NETWORK_ERROR
             )
-        });
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 {
   "name": "js-moi-signer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "This package enables users to sign and verify messages in their applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
