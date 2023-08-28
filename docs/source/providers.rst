@@ -184,6 +184,80 @@ The ``Registry`` interface represents registry information. It has the following
 * ``asset_id`` - ``string``: The ID of the asset in the registry.
 * ``asset_info`` - ``AssetInfo``: Information about the asset in the registry.
 
+**NodeInfo**
+
+The ``NodeInfo`` interface represents information about a node. It has the following property:
+
+* ``krama_id`` - ``string``: The krama id associated with the node.
+
+**ConnectionsInfo**
+
+The ``ConnectionsInfo`` interface provides information about connections and active pub-sub topics. It consists of the following properties:
+
+* ``connections`` - A list of connections, each containing:
+    * ``peer_id`` - ``string``: The ID of the peer associated with the connection.
+    * ``streams`` - A list of streams, each containing:
+        * ``protocol`` - ``string``: The protocol of the stream.
+        * ``direction`` - ``number``: The direction of the stream.
+
+* ``inbound_conn_count`` - ``number``: The count of inbound connections.
+* ``outbound_conn_count`` - ``number``: The count of outbound connections.
+* ``active_pub_sub_topics`` - A dictionary where the keys are topic strings and the values are numbers representing the count of active connections for each topic.
+
+**AssetCreatePayload**
+
+The ``AssetCreatePayload`` interface represents a payload for creating an asset. It has the following properties:
+
+* ``symbol`` - ``string``: The symbol of the asset.
+* ``supply`` - ``number | bigint``: The supply of the asset.
+* ``standard`` - ``AssetStandard``: The asset standard (optional).
+* ``dimension`` - ``number``: The dimension of the asset (optional).
+* ``is_stateful`` - ``boolean``: Indicates whether the asset is stateful (optional).
+* ``is_logical`` - ``boolean``: Indicates whether the asset is logical (optional).
+* ``logic_payload`` - ``LogicPayload``: The payload for the associated logic (optional).
+
+**AssetMintOrBurnPayload**
+
+The ``AssetMintOrBurnPayload`` interface represents a payload for minting or burning an asset. It has the following properties:
+
+* ``asset_id`` - ``string``: The ID of the asset.
+* ``amount`` - ``number | bigint``: The amount to mint or burn.
+
+**LogicPayload**
+
+The ``LogicPayload`` interface represents a payload for logic deployment or invokation. It has the following properties:
+
+* ``logic_id`` - ``string``: The ID of the logic (optional).
+* ``callsite`` - ``string``: The callsite for the logic execution.
+* ``calldata`` - ``Uint8Array``: The calldata for the logic execution.
+* ``manifest`` - ``Uint8Array``: The encoded manifest to deploy (optional).
+
+**InteractionPayload**
+
+The ``InteractionPayload`` type represents a payload for an interaction. It can be one of the following types: ``AssetCreatePayload``, ``AssetMintOrBurnPayload``, or ``LogicPayload``.
+
+**InteractionObject**
+
+The ``InteractionObject`` interface represents an interaction object. It has the following properties:
+
+* ``type`` - ``IxType``: The type of the interaction.
+* ``nonce`` - ``number | bigint``: The nonce value (optional).
+* ``sender`` - ``string``: The sender of the interaction (optional).
+* ``receiver`` - ``string``: The receiver of the interaction (optional).
+* ``payer`` - ``string``: The payer of the interaction (optional).
+* ``transfer_values`` - ``Map<string, number | bigint>``: Transfer values associated with the interaction (optional).
+* ``perceived_values`` - ``Map<string, number | bigint>``: Perceived values associated with the interaction (optional).
+* ``fuel_price`` - ``number | bigint``: The fuel price for the interaction.
+* ``fuel_limit`` - ``number | bigint``: The fuel limit for the interaction.
+* ``payload`` - ``InteractionPayload``: The payload of the interaction (optional).
+
+**CallorEstimateIxObject**
+
+The ``CallorEstimateIxObject`` interface extends ``InteractionObject`` and represents an interaction object. It has the following properties:
+
+* ``nonce`` - ``number | bigint``: The nonce value.
+* ``sender`` - ``string``: The sender of the interaction.
+
 **WsReconnectOptions**
 
 The ``WsReconnectOptions`` interface represents options for websocket reconnection. It has the following properties:
@@ -264,6 +338,10 @@ Account Methods
 Execution Methods
 ~~~~~~~~~~~~~~~~~
 
+.. autofunction:: BaseProvider#call
+
+.. autofunction:: BaseProvider#estimateFuel
+
 .. autofunction:: BaseProvider#sendInteraction
 
 Query Methods
@@ -283,9 +361,17 @@ Query Methods
 
 .. autofunction:: getInspect
 
+.. autofunction:: getPeers
+
+.. autofunction:: BaseProvider#getVersion
+
+.. autofunction:: getNodeInfo
+
 .. autofunction:: getDBEntry
 
 .. autofunction:: getAccounts
+
+.. autofunction:: getConnections
 
 Event Methods
 ~~~~~~~~~~~~~
