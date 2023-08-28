@@ -23,8 +23,8 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-utils": "^0.1.2",
-    "js-moi-manifest": "^0.1.2",
+    "js-moi-utils": "^0.1.1",
+    "js-moi-manifest": "^0.1.1",
     "cross-fetch": "^4.0.0",
     "websocket": "^1.0.34"
   }
