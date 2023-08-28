@@ -9,7 +9,8 @@ InteractionReceipt, InteractionParams, InteractionResponse,
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
 Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, 
-Registry, TDUResponse } from "../types/jsonrpc";
+Registry, TDUResponse, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo } from "../types/jsonrpc";
+import { processIxObject } from "./interaction";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
@@ -432,6 +433,58 @@ export class BaseProvider extends AbstractProvider {
     // Execution Methods
 
     /**
+     * Invokes a routine in logic using the provided interaction object.
+     * 
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<InteractionReceipt>} A Promise resolving to the 
+     * interaction receipt.
+     * @throws {Error} if there's an issue executing the RPC call or 
+     * processing the response.
+     */
+    public async call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionReceipt> {
+        try {
+            const params = {
+                ix_args: processIxObject(ixObject),
+                options : options
+            }
+
+            const response: RpcResponse = await this.execute("moi.Call", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    /**
+     * Estimates the amount of fuel required for a logic routine call.
+     * 
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<number | bigint>} A Promise resolving to the estimated 
+     * fuel amount.
+     * @throws {Error} if there's an issue executing the RPC call or 
+     * processing the response.
+     */
+    public async estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint> {
+        try {
+            const params = {
+                ix_args: processIxObject(ixObject),
+                options : options
+            }
+
+            const response: RpcResponse = await this.execute("moi.FuelEstimate", params)
+
+            const fuelPrice = this.processResponse(response)
+
+            return  hexToBN(fuelPrice)
+        } catch (error) {
+            throw error
+        }
+    }
+    
+    /**
      * Sends an interaction request.
      * 
      * @param {InteractionRequest} ixObject - The interaction request object.
@@ -538,7 +591,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response = await this.execute("moi.Storage", params)
+            const response = await this.execute("moi.LogicStorage", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -708,6 +761,40 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
+     * Retrieves the version of the connected network.
+     * 
+     * @returns {Promise<string>} A Promise that resolves to the network 
+     * version as a string.
+     * @throws {Error} if there is an error executing the RPC call or processing 
+     * the response.
+     */
+    public async getVersion(): Promise<string> {
+        try {
+            const response: RpcResponse = await this.execute("net.Version", null)
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    /**
+     * Retrieves detailed information about the connected node.
+     * 
+     * @returns {Promise<NodeInfo>} A Promise that resolves to an object 
+     * containing node information.
+     * @throws {Error} if there is an error executing the RPC call or processing 
+     * the response.
+     */
+    public async getNodeInfo(): Promise<NodeInfo> {
+        try {
+            const response: RpcResponse = await this.execute("net.Info", null)
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Retrieves the value of a database entry with the specified key.
      * 
      * @param {string} key - The key of the database entry.
@@ -741,6 +828,23 @@ export class BaseProvider extends AbstractProvider {
     public async getAccounts(): Promise<string[]> {
         try {
             const response: RpcResponse = await this.execute("debug.Accounts", null)
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves information about active network connections.
+     * 
+     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of 
+     * connection response object.
+     * @throws {Error} if there is an error executing the RPC call or processing 
+     * the response.
+     */
+    public async getConnections(): Promise<ConnectionsInfo> {
+        try {
+            const response: RpcResponse = await this.execute("debug.Connections", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;

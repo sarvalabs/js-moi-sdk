@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { Buffer } from "buffer";
-import { Signer, SigType, InteractionObject } from "js-moi-signer";
-import { AbstractProvider, InteractionRequest } from "js-moi-providers";
+import { Signer, SigType } from "js-moi-signer";
+import { AbstractProvider, InteractionRequest, InteractionObject } from "js-moi-providers";
 import { Keystore } from "../types/keystore";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"

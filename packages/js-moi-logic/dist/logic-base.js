@@ -54,8 +54,9 @@ class LogicBase extends element_descriptor_1.default {
         }
         switch (processedArgs.type) {
             case "call":
+                return this.signer.call(processedArgs.params);
             case "estimate":
-                break;
+                return this.signer.estimateFuel(processedArgs.params);
             case "send":
                 return this.signer.sendInteraction(processedArgs.params)
                     .then((response) => {
@@ -110,7 +111,7 @@ class LogicBase extends element_descriptor_1.default {
         return {
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateGas: ixObject.estimateGas.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject)
         };
     }
     /**
@@ -125,15 +126,15 @@ class LogicBase extends element_descriptor_1.default {
             routine: routine,
             arguments: args
         };
-        // Define call, send, estimateGas methods on ixObject
+        // Define call, send, estimateFuel methods on ixObject
         ixObject.call = (...args) => {
             return this.executeRoutine(ixObject, "call", ...args);
         };
         ixObject.send = (...args) => {
             return this.executeRoutine(ixObject, "send", ...args);
         };
-        ixObject.estimateGas = (...args) => {
-            return this.executeRoutine(ixObject, "estimateGas", ...args);
+        ixObject.estimateFuel = (...args) => {
+            return this.executeRoutine(ixObject, "estimate", ...args);
         };
         ixObject.createPayload = () => {
             return this.createPayload(ixObject);

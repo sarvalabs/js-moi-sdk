@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseProvider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const interaction_1 = require("./interaction");
 const abstract_provider_1 = require("./abstract-provider");
 const event_1 = __importDefault(require("./event"));
 // Default timeout value in seconds
@@ -365,6 +366,53 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     }
     // Execution Methods
     /**
+     * Invokes a routine in logic using the provided interaction object.
+     *
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<InteractionReceipt>} A Promise resolving to the
+     * interaction receipt.
+     * @throws {Error} if there's an issue executing the RPC call or
+     * processing the response.
+     */
+    async call(ixObject, options) {
+        try {
+            const params = {
+                ix_args: (0, interaction_1.processIxObject)(ixObject),
+                options: options
+            };
+            const response = await this.execute("moi.Call", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Estimates the amount of fuel required for a logic routine call.
+     *
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<number | bigint>} A Promise resolving to the estimated
+     * fuel amount.
+     * @throws {Error} if there's an issue executing the RPC call or
+     * processing the response.
+     */
+    async estimateFuel(ixObject, options) {
+        try {
+            const params = {
+                ix_args: (0, interaction_1.processIxObject)(ixObject),
+                options: options
+            };
+            const response = await this.execute("moi.FuelEstimate", params);
+            const fuelPrice = this.processResponse(response);
+            return (0, js_moi_utils_1.hexToBN)(fuelPrice);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
      * Sends an interaction request.
      *
      * @param {InteractionRequest} ixObject - The interaction request object.
@@ -456,7 +504,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
             };
-            const response = await this.execute("moi.Storage", params);
+            const response = await this.execute("moi.LogicStorage", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -605,6 +653,40 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
+     * Retrieves the version of the connected network.
+     *
+     * @returns {Promise<string>} A Promise that resolves to the network
+     * version as a string.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    async getVersion() {
+        try {
+            const response = await this.execute("net.Version", null);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves detailed information about the connected node.
+     *
+     * @returns {Promise<NodeInfo>} A Promise that resolves to an object
+     * containing node information.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    async getNodeInfo() {
+        try {
+            const response = await this.execute("net.Info", null);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
      * Retrieves the value of a database entry with the specified key.
      *
      * @param {string} key - The key of the database entry.
@@ -636,6 +718,23 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async getAccounts() {
         try {
             const response = await this.execute("debug.Accounts", null);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves information about active network connections.
+     *
+     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of
+     * connection response object.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    async getConnections() {
+        try {
+            const response = await this.execute("debug.Connections", null);
             return this.processResponse(response);
         }
         catch (error) {

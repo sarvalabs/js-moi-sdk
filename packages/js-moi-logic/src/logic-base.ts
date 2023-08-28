@@ -1,6 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import { LogicPayload, Signer } from "js-moi-signer";
+import { InteractionReceipt, LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
 import { InteractionResponse } from "js-moi-providers";
 import ElementDescriptor from "./element-descriptor";
 import { LogicExecuteRequest } from "../types/logic";
@@ -57,7 +58,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected async executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionResponse> {
+    protected async executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionReceipt | number | bigint | InteractionResponse> {
         const processedArgs = this.processArguments(ixObject, args)
 
         if(this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
@@ -69,8 +70,9 @@ export abstract class LogicBase extends ElementDescriptor {
 
         switch(processedArgs.type) {
             case "call":
+                return this.signer.call(processedArgs.params)
             case "estimate":
-                break;
+                return this.signer.estimateFuel(processedArgs.params)
             case "send":
                 return this.signer.sendInteraction(processedArgs.params)
                 .then((response) => {
@@ -138,7 +140,7 @@ export abstract class LogicBase extends ElementDescriptor {
         return {
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateGas: ixObject.estimateGas.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject)
         }
     }
 
@@ -155,17 +157,17 @@ export abstract class LogicBase extends ElementDescriptor {
             arguments: args
         } as LogicIxObject
 
-        // Define call, send, estimateGas methods on ixObject
-        ixObject.call = (...args: any[]): Promise<InteractionResponse> => {
-            return this.executeRoutine(ixObject, "call", ...args)
+        // Define call, send, estimateFuel methods on ixObject
+        ixObject.call = (...args: any[]): Promise<InteractionReceipt> => {
+            return this.executeRoutine(ixObject, "call", ...args) as Promise<InteractionReceipt>
         }
 
         ixObject.send = (...args: any[]): Promise<InteractionResponse> => {
-            return this.executeRoutine(ixObject, "send", ...args)
+            return this.executeRoutine(ixObject, "send", ...args) as Promise<InteractionResponse>
         }
 
-        ixObject.estimateGas = (...args: any[]): Promise<InteractionResponse> => {
-            return this.executeRoutine(ixObject, "estimateGas", ...args)
+        ixObject.estimateFuel = (...args: any[]): Promise<number|bigint> => {
+            return this.executeRoutine(ixObject, "estimate", ...args) as Promise<number | bigint>
         }
 
         ixObject.createPayload = (): LogicPayload => {

@@ -1,6 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { IxType } from "js-moi-utils";
-import { LogicPayload, Signer } from "js-moi-signer";
+import { InteractionReceipt, LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
 import { InteractionResponse } from "js-moi-providers";
 import ElementDescriptor from "./element-descriptor";
 import { LogicExecuteRequest } from "../types/logic";
@@ -40,7 +41,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionResponse>;
+    protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionReceipt | number | bigint | InteractionResponse>;
     /**
      * Processes the interaction arguments and returns the processed arguments object.
      *

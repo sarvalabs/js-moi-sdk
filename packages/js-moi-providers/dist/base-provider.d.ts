@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Tesseract, Interaction } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 /**
@@ -163,6 +163,28 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getRegistry(address: string, options?: Options): Promise<Registry>;
     /**
+     * Invokes a routine in logic using the provided interaction object.
+     *
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<InteractionReceipt>} A Promise resolving to the
+     * interaction receipt.
+     * @throws {Error} if there's an issue executing the RPC call or
+     * processing the response.
+     */
+    call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionReceipt>;
+    /**
+     * Estimates the amount of fuel required for a logic routine call.
+     *
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<number | bigint>} A Promise resolving to the estimated
+     * fuel amount.
+     * @throws {Error} if there's an issue executing the RPC call or
+     * processing the response.
+     */
+    estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>;
+    /**
      * Sends an interaction request.
      *
      * @param {InteractionRequest} ixObject - The interaction request object.
@@ -259,6 +281,24 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getPeers(): Promise<string[]>;
     /**
+     * Retrieves the version of the connected network.
+     *
+     * @returns {Promise<string>} A Promise that resolves to the network
+     * version as a string.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    getVersion(): Promise<string>;
+    /**
+     * Retrieves detailed information about the connected node.
+     *
+     * @returns {Promise<NodeInfo>} A Promise that resolves to an object
+     * containing node information.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    getNodeInfo(): Promise<NodeInfo>;
+    /**
      * Retrieves the value of a database entry with the specified key.
      *
      * @param {string} key - The key of the database entry.
@@ -277,6 +317,15 @@ export declare class BaseProvider extends AbstractProvider {
      * the response.
      */
     getAccounts(): Promise<string[]>;
+    /**
+     * Retrieves information about active network connections.
+     *
+     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of
+     * connection response object.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    getConnections(): Promise<ConnectionsInfo>;
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.

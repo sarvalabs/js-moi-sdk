@@ -1,6 +1,8 @@
 import {
     AssetCreationReceipt,
     AssetMintOrBurnReceipt, 
+    AssetStandard, 
+    IxType, 
     LogicDeployReceipt, 
     LogicInvokeReceipt 
 } from "js-moi-utils";
@@ -190,6 +192,75 @@ export interface Inspect {
     queued: Map<string, Map<string, string>>;
     wait_time: Map<string, WaitTime>;
 }
+
+export interface NodeInfo {
+    krama_id: string;
+}
+
+interface Stream {
+    protocol: string;
+    direction: number;
+}
+
+interface Connection {
+    peer_id: string;
+    streams: Stream[];
+}
+
+export interface ConnectionsInfo {
+    connections: Connection[];
+    inbound_conn_count: number;
+    outbound_conn_count: number;
+    active_pub_sub_topics: { [topic: string]: number };
+}
+
+export interface AssetCreatePayload {
+    symbol: string;
+    supply: number | bigint;
+    standard?: AssetStandard;
+    dimension?: number;
+    is_stateful?: boolean;
+    is_logical?: boolean;
+    logic_payload?: LogicPayload;
+}
+
+export interface AssetMintOrBurnPayload {
+    asset_id: string;
+    amount: number | bigint;
+}
+
+export interface LogicPayload {
+    logic_id?: string;
+    callsite: string;
+    calldata: Uint8Array;
+    manifest?: Uint8Array;
+}
+
+export type InteractionPayload = AssetCreatePayload | AssetMintOrBurnPayload | LogicPayload;
+
+interface InteractionObject {
+    type: IxType;
+    nonce?: number | bigint;
+
+    sender?: string;
+    receiver?: string;
+    payer?: string;
+
+    transfer_values?: Map<string, number | bigint>;
+    perceived_values?: Map<string, number | bigint>;
+
+    fuel_price: number | bigint;
+    fuel_limit: number | bigint;
+    
+    payload?: InteractionPayload;
+}
+
+export interface CallorEstimateIxObject extends InteractionObject {
+    nonce: number | bigint;
+    sender: string
+}
+
+export type CallorEstimateOptions = Record<string, Options>
 
 export interface RpcErrorResponse {
     code: number;

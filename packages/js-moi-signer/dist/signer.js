@@ -97,6 +97,60 @@ class Signer {
         }
     }
     /**
+     * Prepares the interaction object by populating necessary fields and
+     * performing validity checks.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to prepare.
+     * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
+     * @throws {Error} if the interaction object is not valid or if there is
+     * an error during preparation.
+     */
+    async prepareInteraction(ixObject) {
+        const nonce = await this.getNonce();
+        if (!ixObject.sender) {
+            ixObject.sender = this.getAddress();
+        }
+        // Check the validity of the interaction object
+        this.checkInteraction(ixObject, nonce);
+        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
+            ixObject.nonce = nonce;
+        }
+    }
+    /**
+     * Initiates an interaction by calling a method on the connected provider.
+     * The interaction object is prepared and sent to the provider for execution.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to be executed.
+     * @returns {Promise<InteractionReceipt>} A Promise that resolves to the
+     * interaction receipt.
+     * @throws {Error} if there is an error during the interaction, if the provider
+     * is not initialized,or if the interaction object fails validity checks.
+     */
+    async call(ixObject) {
+        // Get the provider
+        const provider = this.getProvider();
+        await this.prepareInteraction(ixObject);
+        return await provider.call(ixObject);
+    }
+    /**
+     * Estimates the fuel required for executing an interaction.
+     * The interaction object is used to estimate the amount of fuel needed for execution.
+     *
+     * @param {InteractionObject} ixObject - The interaction object for which
+     * fuel estimation is needed.
+     * @returns {Promise<number | bigint>} A Promise that resolves to the
+     * estimated fuel amount.
+     * @throws {Error} if there is an error during fuel estimation, if the
+     * provider is not initialized, or if the interaction object fails
+     * validity checks.
+     */
+    async estimateFuel(ixObject) {
+        // Get the provider
+        const provider = this.getProvider();
+        await this.prepareInteraction(ixObject);
+        return await provider.estimateFuel(ixObject);
+    }
+    /**
      * Sends an interaction object by signing it with the appropriate signature algorithm
      * and forwarding it to the connected provider.
      *
@@ -108,19 +162,11 @@ class Signer {
      */
     async sendInteraction(ixObject) {
         try {
-            // Get the provider and nonce
+            // Get the provider
             const provider = this.getProvider();
-            const nonce = await this.getNonce();
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-            if (!ixObject.sender) {
-                ixObject.sender = this.getAddress();
-            }
-            // Check the validity of the interaction object
-            this.checkInteraction(ixObject, nonce);
-            if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-                ixObject.nonce = nonce;
-            }
+            await this.prepareInteraction(ixObject);
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo);
             // Send the interaction request and return the response

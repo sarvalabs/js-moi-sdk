@@ -22,5 +22,6 @@ __exportStar(require("./asset"), exports);
 __exportStar(require("./interaction"), exports);
 __exportStar(require("./properties"), exports);
 __exportStar(require("./address"), exports);
+__exportStar(require("./schema"), exports);
 __exportStar(require("./hex"), exports);
 __exportStar(require("./json"), exports);

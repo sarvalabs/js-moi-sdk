@@ -1,6 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, IxType, hexToBytes } from "js-moi-utils";
-import { LogicPayload, Signer } from "js-moi-signer";
+import { LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
 import { LogicDeployRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";

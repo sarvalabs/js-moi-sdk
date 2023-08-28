@@ -6,6 +6,7 @@ export * from "./asset";
 export * from "./interaction";
 export * from "./properties";
 export * from "./address";
+export * from "./schema";
 export * from "./hex";
 export * from "./json";
 export { Hex } from "../types/hex";
