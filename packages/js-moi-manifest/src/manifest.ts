@@ -2,7 +2,7 @@ import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js
 import { Schema } from "./schema";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { bytesToHex, hexToBytes, ErrorUtils, ErrorCode, trimHexPrefix } from "js-moi-utils";
+import { bytesToHex, hexToBytes, ErrorUtils, ErrorCode, trimHexPrefix, deepCopy } from "js-moi-utils";
 
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality 
@@ -93,6 +93,16 @@ export class ManifestCoder {
     private parseCalldata(schema: PoloSchema, arg: any, updateType: boolean = true): any {
         const parsableKinds = ["bytes", "array", "map", "struct"];
 
+        const reconstructSchema = (schema: PoloSchema): PoloSchema => {
+            Object.keys(schema.fields).forEach(key => {
+                if(schema.fields[key].kind === "struct") {
+                    schema.fields[key].kind = "document";
+                }
+            });
+        
+            return schema;
+        }
+
         const parseArray = (schema: PoloSchema, arg: any[]) => {
             return arg.map((value: any, index: number) => 
                 this.parseCalldata(schema, value, arg.length - 1 === index)
@@ -126,10 +136,10 @@ export class ManifestCoder {
 
         const parseStruct = (schema: PoloSchema, arg: any, updateType: boolean) => {
             Object.keys(arg).forEach(key => {
-                arg[key] = this.parseCalldata(schema.fields[key], arg[key])
+                arg[key] = this.parseCalldata(schema.fields[key], arg[key], false)
             });
 
-            const doc = documentEncode(arg, schema);
+            const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)))
 
             if(updateType) {
                 schema.kind = "document";

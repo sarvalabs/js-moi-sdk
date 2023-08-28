@@ -163,7 +163,7 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getRegistry(address: string, options?: Options): Promise<Registry>;
     /**
-     * Invokes a routine in logic using the provided interaction object.
+     * Handles the interaction without modifying the account's current state.
      *
      * @param {CallorEstimateIxObject} ixObject - The interaction object.
      * @param {CallorEstimateOptions} options - The interaction options. (optional)
@@ -174,7 +174,7 @@ export declare class BaseProvider extends AbstractProvider {
      */
     call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionReceipt>;
     /**
-     * Estimates the amount of fuel required for a logic routine call.
+     * Estimates the amount of fuel required for processing the interaction.
      *
      * @param {CallorEstimateIxObject} ixObject - The interaction object.
      * @param {CallorEstimateOptions} options - The interaction options. (optional)

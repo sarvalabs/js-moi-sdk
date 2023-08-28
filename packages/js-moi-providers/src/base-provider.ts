@@ -433,7 +433,7 @@ export class BaseProvider extends AbstractProvider {
     // Execution Methods
 
     /**
-     * Invokes a routine in logic using the provided interaction object.
+     * Handles the interaction without modifying the account's current state.
      * 
      * @param {CallorEstimateIxObject} ixObject - The interaction object.
      * @param {CallorEstimateOptions} options - The interaction options. (optional)
@@ -458,7 +458,7 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Estimates the amount of fuel required for a logic routine call.
+     * Estimates the amount of fuel required for processing the interaction.
      * 
      * @param {CallorEstimateIxObject} ixObject - The interaction object.
      * @param {CallorEstimateOptions} options - The interaction options. (optional)
