@@ -4,10 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Signer = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
 const ecdsa_1 = __importDefault(require("./ecdsa"));
 const signature_1 = __importDefault(require("./signature"));
-const js_moi_utils_2 = require("js-moi-utils");
+const js_moi_utils_1 = require("js-moi-utils");
 /**
  * An abstract class representing a signer responsible for cryptographic
  * activities like signing and verification.
@@ -31,7 +30,7 @@ class Signer {
         if (this.provider) {
             return this.provider;
         }
-        js_moi_utils_2.ErrorUtils.throwError("Provider is not initialized!", js_moi_utils_2.ErrorCode.NOT_INITIALIZED);
+        js_moi_utils_1.ErrorUtils.throwError("Provider is not initialized!", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
      * Retrieves the nonce (interaction count) for the signer's address
@@ -65,34 +64,34 @@ class Signer {
      */
     checkInteraction(ixObject, nonce) {
         if (ixObject.type === undefined || ixObject.type === null) {
-            js_moi_utils_2.ErrorUtils.throwError("Interaction type is missing", js_moi_utils_2.ErrorCode.MISSING_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError("Interaction type is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!(0, js_moi_utils_2.isValidAddress)(ixObject.sender)) {
-            js_moi_utils_2.ErrorUtils.throwError("Invalid sender address", js_moi_utils_2.ErrorCode.INVALID_ARGUMENT);
+        if (!(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid sender address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         if (ixObject.sender !== this.getAddress()) {
-            js_moi_utils_2.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_2.ErrorCode.UNEXPECTED_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
-        if (ixObject.type === js_moi_utils_2.IxType.VALUE_TRANSFER) {
+        if (ixObject.type === js_moi_utils_1.IxType.VALUE_TRANSFER) {
             if (!ixObject.receiver) {
-                js_moi_utils_2.ErrorUtils.throwError("Receiver address is missing", js_moi_utils_2.ErrorCode.MISSING_ARGUMENT);
+                js_moi_utils_1.ErrorUtils.throwError("Receiver address is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
-            if (!(0, js_moi_utils_2.isValidAddress)(ixObject.receiver)) {
-                js_moi_utils_2.ErrorUtils.throwError("Invalid receiver address", js_moi_utils_2.ErrorCode.INVALID_ARGUMENT);
+            if (!(0, js_moi_utils_1.isValidAddress)(ixObject.receiver)) {
+                js_moi_utils_1.ErrorUtils.throwError("Invalid receiver address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
         }
         if (ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
-            js_moi_utils_2.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_2.ErrorCode.MISSING_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
         if (ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
-            js_moi_utils_2.ErrorUtils.throwError("Fuel limit is missing", js_moi_utils_2.ErrorCode.MISSING_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError("Fuel limit is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
         if (ixObject.fuel_limit === 0) {
-            js_moi_utils_2.ErrorUtils.throwError("Invalid fuel limit", js_moi_utils_2.ErrorCode.INTERACTION_UNDERPRICED);
+            js_moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
         }
         if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
             if (ixObject.nonce < nonce) {
-                js_moi_utils_2.ErrorUtils.throwError("Invalid nonce", js_moi_utils_2.ErrorCode.NONCE_EXPIRED);
+                js_moi_utils_1.ErrorUtils.throwError("Invalid nonce", js_moi_utils_1.ErrorCode.NONCE_EXPIRED);
             }
         }
     }
@@ -204,7 +203,7 @@ class Signer {
                 return _sig.verify(message, sig, verificationKey);
             }
             default: {
-                js_moi_utils_2.ErrorUtils.throwError("Invalid signature provided. Unable to verify the signature.", js_moi_utils_2.ErrorCode.INVALID_SIGNATURE);
+                js_moi_utils_1.ErrorUtils.throwError("Invalid signature provided. Unable to verify the signature.", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
             }
         }
     }

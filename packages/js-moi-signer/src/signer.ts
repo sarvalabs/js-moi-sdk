@@ -1,10 +1,8 @@
-import { hexToBytes } from "js-moi-utils"
 import { AbstractProvider, Options, InteractionResponse, InteractionRequest, CallorEstimateIxObject, InteractionCallResponse, InteractionObject } from "js-moi-providers";
 import ECDSA_S256 from "./ecdsa";
 import { SigType, SigningAlgorithms } from "../types";
 import Signature from "./signature";
-import { ErrorCode, ErrorUtils, IxType, isValidAddress } from "js-moi-utils";
-
+import { ErrorCode, ErrorUtils, hexToBytes, IxType, isValidAddress } from "js-moi-utils";
 
 /**
  * An abstract class representing a signer responsible for cryptographic 
