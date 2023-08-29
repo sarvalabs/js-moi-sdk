@@ -1,5 +1,6 @@
 import { LogicManifest } from "js-moi-manifest";
-import { LogicPayload, Signer } from "js-moi-signer";
+import { LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { Options } from "js-moi-providers";
 import { Routines } from "../types/logic";

@@ -1,5 +1,6 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { LogicPayload, Signer } from "js-moi-signer";
+import { LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { Options } from "js-moi-providers";
 import { Routine, Routines } from "../types/logic";

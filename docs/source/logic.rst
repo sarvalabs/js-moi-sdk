@@ -22,20 +22,13 @@ wallet-based signers, or custom signers.
 
 Types
 -----
-**LogicDeployRequest**
+**LogicIxRequest**
 
-The ``LogicDeployRequest`` interface represents a request to deploy logic. It has the following properties:
+The ``LogicIxRequest`` interface represents a request to deploy or execute a logic. It has the following properties:
 
-* ``send`` - ``function``: A function that sends the deployment request and returns a promise for an ``InteractionResponse``.
-* ``estimateGas`` - ``function``: A function that estimates the gas required for the deployment request and returns a promise.
-
-**LogicExecuteRequest**
-
-The ``LogicExecuteRequest`` interface represents a request to execute logic. It has the following properties:
-
-* ``call`` - ``function``: A function that calls the logic with the provided arguments and returns a promise for the result.
-* ``send`` - ``function``: A function that sends the execution request and returns a promise for an ``InteractionResponse``.
-* ``estimateGas`` - ``function``: A function that estimates the gas required for the execution request and returns a promise.
+* ``call`` - ``function``: A function that facilitates the execution of an logic interaction request, while maintaining the integrity of the current state. It returns a promise that resolves to an ``InteractionCallResponse``.
+* ``send`` - ``function``: A function that sends the logic interaction request and returns a promise that resolves to an ``InteractionResponse``.
+* ``estimateFuel`` - ``function``: A function that estimates the fuel required for the interaction request and returns a promise.
 
 **Routine**
 

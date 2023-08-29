@@ -1,9 +1,10 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { IxType } from "js-moi-utils";
-import { LogicPayload, Signer } from "js-moi-signer";
-import { InteractionResponse } from "js-moi-providers";
+import { LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
+import { InteractionResponse, InteractionCallResponse } from "js-moi-providers";
 import ElementDescriptor from "./element-descriptor";
-import { LogicExecuteRequest } from "../types/logic";
+import { LogicIxRequest } from "../types/logic";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -40,7 +41,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionResponse>;
+    protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionCallResponse | number | bigint | InteractionResponse>;
     /**
      * Processes the interaction arguments and returns the processed arguments object.
      *
@@ -51,18 +52,18 @@ export declare abstract class LogicBase extends ElementDescriptor {
      */
     protected processArguments(ixObject: LogicIxObject, args: any[]): LogicIxArguments;
     /**
-     * Creates a logic execute request object based on the given interaction object.
+     * Creates a logic interaction request object based on the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.
-     * @returns {LogicExecuteRequest} The logic execute request object.
+     * @returns {LogicIxRequest} The logic interaction request object.
      */
-    protected createIxRequest(ixObject: LogicIxObject): LogicExecuteRequest;
+    protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest;
     /**
-     * Creates a logic execute request object with the specified routine and arguments.
+     * Creates a logic interaction request object with the specified routine and arguments.
      *
-     * @param {LogicManifest.Routine} routine - The routine for the logic execute request.
-     * @param {any[]} args - The arguments for the logic execute request.
-     * @returns {LogicExecuteRequest} The logic execute request object.
+     * @param {LogicManifest.Routine} routine - The routine for the logic interaction request.
+     * @param {any[]} args - The arguments for the logic interaction request.
+     * @returns {LogicIxRequest} The logic interaction request object.
      */
-    protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicExecuteRequest;
+    protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicIxRequest;
 }
