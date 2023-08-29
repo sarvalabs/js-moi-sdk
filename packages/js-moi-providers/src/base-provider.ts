@@ -9,7 +9,7 @@ InteractionReceipt, InteractionParams, InteractionResponse,
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
 Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, 
-Registry, TDUResponse, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo } from "../types/jsonrpc";
+Registry, TDUResponse, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo, InteractionCallResponse, SyncStatus, SyncStatusParams } from "../types/jsonrpc";
 import { processIxObject } from "./interaction";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -430,6 +430,27 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
+    /**
+     * Retrieves the synchronization status for a specific account.
+     * 
+     * @param {string} address - The address for which to retrieve the synchronization status.
+     * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getSyncStatus(address: string): Promise<SyncStatus> {
+        try {
+            const params: SyncStatusParams = {
+                address: address
+            }
+    
+            const response: RpcResponse = await this.execute("moi.Syncing", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // Execution Methods
 
     /**
@@ -437,12 +458,12 @@ export class BaseProvider extends AbstractProvider {
      * 
      * @param {CallorEstimateIxObject} ixObject - The interaction object.
      * @param {CallorEstimateOptions} options - The interaction options. (optional)
-     * @returns {Promise<InteractionReceipt>} A Promise resolving to the 
-     * interaction receipt.
+     * @returns {Promise<InteractionCallResponse>} A Promise resolving to the 
+     * interaction call response.
      * @throws {Error} if there's an issue executing the RPC call or 
      * processing the response.
      */
-    public async call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionReceipt> {
+    public async call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse> {
         try {
             const params = {
                 ix_args: processIxObject(ixObject),
@@ -451,7 +472,14 @@ export class BaseProvider extends AbstractProvider {
 
             const response: RpcResponse = await this.execute("moi.Call", params)
 
-            return this.processResponse(response)
+            const receipt: InteractionReceipt = this.processResponse(response)
+
+            // TODO: overwritten ix_type has to be removed once the interaction 
+            // call receipt bug is resolved in the protocol.
+            return {
+                receipt: receipt,
+                result: this.processReceipt.bind(this, {...receipt, ix_type: toQuantity(ixObject.type)})
+            }
         } catch (error) {
             throw error
         }
@@ -897,6 +925,45 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
+     * Process the interaction receipt to determine the appropriate result based on the
+     * interaction type.
+     * 
+     * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
+     * @returns {any} The processed result based on the interaction type.
+     * @throws {Error} If the interaction type is unsupported or the expected response
+     * data is missing.
+     */
+    protected processReceipt(receipt: InteractionReceipt): any {
+        switch (hexToBN(receipt.ix_type)) {
+            case IxType.VALUE_TRANSFER:
+                return null;
+            case IxType.ASSET_CREATE:
+                if (receipt.extra_data) {
+                    return receipt.extra_data as AssetCreationReceipt;
+                }
+                throw new Error("Failed to retrieve asset creation response");
+            case IxType.ASSET_MINT:
+            case IxType.ASSET_BURN:
+                if (receipt.extra_data) {
+                    return receipt.extra_data as AssetMintOrBurnReceipt;
+                }
+                throw new Error("Failed to retrieve asset mint/burn response");
+            case IxType.LOGIC_DEPLOY:
+                if (receipt.extra_data) {
+                    return receipt.extra_data as LogicDeployReceipt;
+                }
+                throw new Error("Failed to retrieve logic deploy response");
+            case IxType.LOGIC_INVOKE:
+                if (receipt.extra_data) {
+                    return receipt.extra_data as LogicInvokeReceipt;
+                }
+                throw new Error("Failed to retrieve logic invoke response");
+            default:
+                throw new Error("Unsupported interaction type encountered");
+        }
+    }
+
+    /**
      * Waits for the interaction with the specified hash to be included in a 
      * tesseract and returns the result based on the interaction type.
      * 
@@ -911,48 +978,8 @@ export class BaseProvider extends AbstractProvider {
         return new Promise(async(resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-
-                switch(hexToBN(receipt.ix_type)) {
-                    case IxType.VALUE_TRANSFER:
-                        resolve(null);
-                        
-                        break;
-                    case IxType.ASSET_CREATE:
-                        if(receipt.extra_data) {
-                            resolve(receipt.extra_data as AssetCreationReceipt);
-                        }
-
-                        reject(new Error("Failed to retrieve asset creation response"));
-
-                        break;
-                    case IxType.ASSET_MINT:
-                    case IxType.ASSET_BURN:
-                        if(receipt.extra_data) {
-                            resolve(receipt.extra_data as AssetMintOrBurnReceipt);
-                        }
-
-                        reject(new Error("Failed to retrieve asset mint/burn response"));
-
-                        break;
-                    case IxType.LOGIC_DEPLOY:
-                        if(receipt.extra_data) {
-                            resolve(receipt.extra_data as LogicDeployReceipt);
-                        }
-
-                        reject(new Error("Failed to retrieve logic deploy response"));
-
-                        break;
-                    case IxType.LOGIC_INVOKE:
-                        if(receipt.extra_data) {
-                            resolve(receipt.extra_data as LogicInvokeReceipt);
-                        }
-
-                        reject(new Error("Failed to retrieve logic invoke response"));
-
-                        break;
-                    default:
-                        reject(new Error("Unsupported interaction type encountered"));
-                }
+                const result = this.processReceipt(receipt);
+                resolve(result);
             } catch(err) {
                 reject(new Error(`An error occurred while waiting for result: ${err.message}`));
             }

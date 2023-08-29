@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, IxType, hexToBytes } from "js-moi-utils";
 import { LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { LogicDeployRequest } from "../types/logic";
+import { LogicIxRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 
@@ -85,10 +85,10 @@ export class LogicFactory extends LogicBase {
      * 
      * @param {string} builderName - The name of the builder routine.
      * @param {any[]} args - Optional arguments for the deployment.
-     * @returns {LogicDeployRequest} The logic deployment request object.
+     * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    public deploy(builderName: string, args: any[] = []): LogicDeployRequest {
+    public deploy(builderName: string, args: any[] = []): LogicIxRequest {
         const builder = Object.values(this.manifest.elements)
         .find(element => {
             if(element.kind === "routine"){

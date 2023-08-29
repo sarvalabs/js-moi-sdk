@@ -1,4 +1,4 @@
-import { AbstractProvider, Options, InteractionResponse, InteractionRequest, InteractionReceipt, InteractionObject } from "js-moi-providers";
+import { AbstractProvider, Options, InteractionResponse, InteractionRequest, InteractionCallResponse, InteractionObject } from "js-moi-providers";
 import { SigType, SigningAlgorithms } from "../types";
 /**
  * An abstract class representing a signer responsible for cryptographic
@@ -53,12 +53,12 @@ export declare abstract class Signer {
      * The interaction object is prepared and sent to the provider for execution.
      *
      * @param {InteractionObject} ixObject - The interaction object to be executed.
-     * @returns {Promise<InteractionReceipt>} A Promise that resolves to the
-     * interaction receipt.
+     * @returns {Promise<InteractionCallResponse>} A Promise that resolves to the
+     * interaction call response.
      * @throws {Error} if there is an error during the interaction, if the provider
      * is not initialized,or if the interaction object fails validity checks.
      */
-    call(ixObject: InteractionObject): Promise<InteractionReceipt>;
+    call(ixObject: InteractionObject): Promise<InteractionCallResponse>;
     /**
      * Estimates the fuel required for executing an interaction.
      * The interaction object is used to estimate the amount of fuel needed for execution.

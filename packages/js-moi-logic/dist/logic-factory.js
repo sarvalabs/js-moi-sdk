@@ -72,7 +72,7 @@ class LogicFactory extends logic_base_1.LogicBase {
      *
      * @param {string} builderName - The name of the builder routine.
      * @param {any[]} args - Optional arguments for the deployment.
-     * @returns {LogicDeployRequest} The logic deployment request object.
+     * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
     deploy(builderName, args = []) {

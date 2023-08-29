@@ -1,11 +1,11 @@
 import { LogicManifest, Exception } from "js-moi-manifest";
-import { InteractionReceipt, InteractionResponse, InteractionObject, LogicPayload } from "js-moi-providers";
+import { InteractionResponse, InteractionObject, LogicPayload, InteractionCallResponse } from "js-moi-providers";
 
 export interface LogicIxObject {
     routine: LogicManifest.Routine;
     arguments: any[];
 
-    call(...args: any[]): Promise<InteractionReceipt>;
+    call(...args: any[]): Promise<InteractionCallResponse>;
     send(...args: any[]): Promise<InteractionResponse>;
     estimateFuel(...args: any[]): Promise<number|bigint>;
     createPayload(): LogicPayload;

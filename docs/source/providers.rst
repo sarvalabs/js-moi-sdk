@@ -119,6 +119,30 @@ The ``AccountMetaInfo`` interface represents meta-information about an account. 
 * ``lattice_exists`` - ``boolean``: Indicates whether a lattice exists for the account.
 * ``state_exists`` - ``boolean``: Indicates whether a state exists for the account.
 
+**AccSyncStatus**
+
+The ``AccSyncStatus`` interface encapsulates information about account synchronization. It includes the following properties:
+
+* ``current_height`` - ``string``: The current tesseract height.
+* ``expected_height`` - ``string``: The expected tesseract height.
+* ``is_primary_sync_done`` - ``boolean``: Indicates whether the primary sync is completed.
+
+**NodeSyncStatus**
+
+The ``NodeSyncStatus`` interface encapsulates information about node synchronization. It includes the following properties:
+
+* ``total_pending_accounts`` - ``string``: The total no of unsynced accounts.
+* ``is_principal_sync_done`` - ``boolean``: Indicates whether the principal sync is completed.
+* ``principal_sync_done_time`` - ``string``: The time at which principal sync got completed.
+* ``is_initial_sync_done`` - ``boolean``: Indicates whether the initial sync is completed.
+
+**SyncStatus**
+
+The ``SyncStatus`` interface represents synchronization status information of an account and it's nodes. It has the following properties:
+
+* ``acc_sync_status`` - ``AccSyncStatus``: The account sync information.
+* ``node_sync_status`` - ``NodeSyncStatus | null``: The node sync information.
+
 **InteractionRequest**
 
 The ``InteractionRequest`` interface represents a signed interaction request. It has the following properties:
@@ -133,6 +157,13 @@ The ``InteractionResponse`` interface represents a response to an interaction. I
 * ``hash`` - ``string``: The hash of the interaction.
 * ``wait`` - ``function``: A function that returns a promise for the interaction receipt after waiting for a specified timeout.
 * ``result`` - ``function``: A function that returns a promise for the result of the interaction after waiting for a specified timeout.
+
+**InteractionCallResponse**
+
+The ``InteractionCallResponse`` interface represents a response to an interaction. It has the following properties:
+
+* ``receipt`` - ``InteractionReceipt``: The receipt of the interaction.
+* ``result`` - ``function``: A function that returns the result of an interaction.
 
 **StateHash**
 
@@ -334,6 +365,8 @@ Account Methods
 .. autofunction:: getLogicIds
 
 .. autofunction:: getRegistry
+
+.. autofunction:: getSyncStatus
 
 Execution Methods
 ~~~~~~~~~~~~~~~~~

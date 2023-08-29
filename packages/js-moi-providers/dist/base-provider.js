@@ -364,14 +364,33 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
+    /**
+     * Retrieves the synchronization status for a specific account.
+     *
+     * @param {string} address - The address for which to retrieve the synchronization status.
+     * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getSyncStatus(address) {
+        try {
+            const params = {
+                address: address
+            };
+            const response = await this.execute("moi.Syncing", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     // Execution Methods
     /**
-     * Processes the interaction without modifying the account's current state.
+     * Handles the interaction without modifying the account's current state.
      *
      * @param {CallorEstimateIxObject} ixObject - The interaction object.
      * @param {CallorEstimateOptions} options - The interaction options. (optional)
-     * @returns {Promise<InteractionReceipt>} A Promise resolving to the
-     * interaction receipt.
+     * @returns {Promise<InteractionCallResponse>} A Promise resolving to the
+     * interaction call response.
      * @throws {Error} if there's an issue executing the RPC call or
      * processing the response.
      */
@@ -382,7 +401,13 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 options: options
             };
             const response = await this.execute("moi.Call", params);
-            return this.processResponse(response);
+            const receipt = this.processResponse(response);
+            // TODO: overwritten ix_type has to be removed once the interaction 
+            // call receipt bug is resolved in the protocol.
+            return {
+                receipt: receipt,
+                result: this.processReceipt.bind(this, { ...receipt, ix_type: (0, js_moi_utils_1.toQuantity)(ixObject.type) })
+            };
         }
         catch (error) {
             throw error;
@@ -780,6 +805,44 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         });
     }
     /**
+     * Process the interaction receipt to determine the appropriate result based on the
+     * interaction type.
+     *
+     * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
+     * @returns {any} The processed result based on the interaction type.
+     * @throws {Error} If the interaction type is unsupported or the expected response
+     * data is missing.
+     */
+    processReceipt(receipt) {
+        switch ((0, js_moi_utils_1.hexToBN)(receipt.ix_type)) {
+            case js_moi_utils_1.IxType.VALUE_TRANSFER:
+                return null;
+            case js_moi_utils_1.IxType.ASSET_CREATE:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve asset creation response");
+            case js_moi_utils_1.IxType.ASSET_MINT:
+            case js_moi_utils_1.IxType.ASSET_BURN:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve asset mint/burn response");
+            case js_moi_utils_1.IxType.LOGIC_DEPLOY:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve logic deploy response");
+            case js_moi_utils_1.IxType.LOGIC_INVOKE:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve logic invoke response");
+            default:
+                throw new Error("Unsupported interaction type encountered");
+        }
+    }
+    /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.
      *
@@ -794,38 +857,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return new Promise(async (resolve, reject) => {
             try {
                 const receipt = await this.waitForInteraction(interactionHash, timeout);
-                switch ((0, js_moi_utils_1.hexToBN)(receipt.ix_type)) {
-                    case js_moi_utils_1.IxType.VALUE_TRANSFER:
-                        resolve(null);
-                        break;
-                    case js_moi_utils_1.IxType.ASSET_CREATE:
-                        if (receipt.extra_data) {
-                            resolve(receipt.extra_data);
-                        }
-                        reject(new Error("Failed to retrieve asset creation response"));
-                        break;
-                    case js_moi_utils_1.IxType.ASSET_MINT:
-                    case js_moi_utils_1.IxType.ASSET_BURN:
-                        if (receipt.extra_data) {
-                            resolve(receipt.extra_data);
-                        }
-                        reject(new Error("Failed to retrieve asset mint/burn response"));
-                        break;
-                    case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-                        if (receipt.extra_data) {
-                            resolve(receipt.extra_data);
-                        }
-                        reject(new Error("Failed to retrieve logic deploy response"));
-                        break;
-                    case js_moi_utils_1.IxType.LOGIC_INVOKE:
-                        if (receipt.extra_data) {
-                            resolve(receipt.extra_data);
-                        }
-                        reject(new Error("Failed to retrieve logic invoke response"));
-                        break;
-                    default:
-                        reject(new Error("Unsupported interaction type encountered"));
-                }
+                const result = this.processReceipt(receipt);
+                resolve(result);
             }
             catch (err) {
                 reject(new Error(`An error occurred while waiting for result: ${err.message}`));

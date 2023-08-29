@@ -1,5 +1,5 @@
 import { hexToBytes } from "js-moi-utils"
-import { AbstractProvider, Options, InteractionResponse, InteractionRequest, CallorEstimateIxObject, InteractionReceipt, InteractionObject } from "js-moi-providers";
+import { AbstractProvider, Options, InteractionResponse, InteractionRequest, CallorEstimateIxObject, InteractionCallResponse, InteractionObject } from "js-moi-providers";
 import ECDSA_S256 from "./ecdsa";
 import { SigType, SigningAlgorithms } from "../types";
 import Signature from "./signature";
@@ -147,12 +147,12 @@ export abstract class Signer {
      * The interaction object is prepared and sent to the provider for execution.
      *
      * @param {InteractionObject} ixObject - The interaction object to be executed.
-     * @returns {Promise<InteractionReceipt>} A Promise that resolves to the 
-     * interaction receipt.
+     * @returns {Promise<InteractionCallResponse>} A Promise that resolves to the 
+     * interaction call response.
      * @throws {Error} if there is an error during the interaction, if the provider 
      * is not initialized,or if the interaction object fails validity checks.
      */
-    public async call(ixObject: InteractionObject): Promise<InteractionReceipt> {
+    public async call(ixObject: InteractionObject): Promise<InteractionCallResponse> {
         // Get the provider
         const provider = this.getProvider();
 

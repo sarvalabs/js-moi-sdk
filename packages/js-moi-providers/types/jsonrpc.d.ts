@@ -61,6 +61,11 @@ export interface InteractionResponse {
     result: (timeout?: number) => Promise<any>
 }
 
+export interface InteractionCallResponse {
+    receipt: InteractionReceipt,
+    result: () => any
+}
+
 export interface StateHash {
     address: string;
     hash: string;
@@ -101,6 +106,24 @@ export interface Registry {
     asset_info: AssetInfo;
 }
 
+interface AccSyncStatus {
+    current_height: string; 
+    expected_height: string;
+    is_primary_sync_done: boolean;
+}
+
+interface NodeSyncStatus {
+    total_pending_accounts: string; 
+    is_principal_sync_done: boolean;
+    principal_sync_done_time: string; 
+    is_initial_sync_done: boolean;
+}
+
+interface SyncStatus {
+    acc_sync_status: AccSyncStatus;
+    node_sync_status: NodeSyncStatus | null;
+}
+
 export interface AccountParamsBase {
     address: string,
     options?: Options 
@@ -134,6 +157,10 @@ export interface InteractionParams {
 
 export interface InteractionByTesseractParams extends AccountParamsBase {
     ix_index: string
+}
+
+export interface SyncStatusParams {
+    address: string
 }
 
 export interface StorageParams {

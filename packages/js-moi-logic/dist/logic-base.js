@@ -54,7 +54,18 @@ class LogicBase extends element_descriptor_1.default {
         }
         switch (processedArgs.type) {
             case "call":
-                return this.signer.call(processedArgs.params);
+                return this.signer.call(processedArgs.params)
+                    .then((response) => {
+                    return {
+                        ...response,
+                        result: this.processResult.bind(this, {
+                            ...response,
+                            routine_name: ixObject.routine.name
+                        })
+                    };
+                }).catch((err) => {
+                    throw err;
+                });
             case "estimate":
                 return this.signer.estimateFuel(processedArgs.params);
             case "send":
@@ -87,25 +98,22 @@ class LogicBase extends element_descriptor_1.default {
         if (args.length < 2) {
             js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        const processedArgs = {
+        return {
             type: args[0],
             params: {
-                sender: this.signer.getAddress()
+                sender: this.signer.getAddress(),
+                type: this.getIxType(),
+                fuel_price: args[1].fuelPrice,
+                fuel_limit: args[1].fuelLimit,
+                payload: ixObject.createPayload()
             }
         };
-        if (args[0] === "send") {
-            processedArgs.params.type = this.getIxType();
-            processedArgs.params.fuel_price = args[1].fuelPrice;
-            processedArgs.params.fuel_limit = args[1].fuelLimit;
-        }
-        processedArgs.params.payload = ixObject.createPayload();
-        return processedArgs;
     }
     /**
-     * Creates a logic execute request object based on the given interaction object.
+     * Creates a logic interaction request object based on the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.
-     * @returns {LogicExecuteRequest} The logic execute request object.
+     * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxRequest(ixObject) {
         return {
@@ -115,11 +123,11 @@ class LogicBase extends element_descriptor_1.default {
         };
     }
     /**
-     * Creates a logic execute request object with the specified routine and arguments.
+     * Creates a logic interaction request object with the specified routine and arguments.
      *
-     * @param {LogicManifest.Routine} routine - The routine for the logic execute request.
-     * @param {any[]} args - The arguments for the logic execute request.
-     * @returns {LogicExecuteRequest} The logic execute request object.
+     * @param {LogicManifest.Routine} routine - The routine for the logic interaction request.
+     * @param {any[]} args - The arguments for the logic interaction request.
+     * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
         const ixObject = {

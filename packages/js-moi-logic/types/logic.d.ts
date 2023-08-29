@@ -1,13 +1,8 @@
-import { InteractionReceipt, InteractionResponse } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
 import { LogicManifest } from "js-moi-manifest";
 
-export interface LogicDeployRequest {
-    send: (args: any) => Promise<InteractionResponse>;
-    estimateFuel: (args: any) => Promise<number | bigint>;
-}
-
-export interface LogicExecuteRequest {
-    call: (args: any) => Promise<InteractionReceipt>;
+export interface LogicIxRequest {
+    call: (args: any) => Promise<InteractionCallResponse>;
     send: (args: any) => Promise<InteractionResponse>;
     estimateFuel: (args: any) => Promise<number|bigint>;
 }

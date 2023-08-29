@@ -121,8 +121,8 @@ class Signer {
      * The interaction object is prepared and sent to the provider for execution.
      *
      * @param {InteractionObject} ixObject - The interaction object to be executed.
-     * @returns {Promise<InteractionReceipt>} A Promise that resolves to the
-     * interaction receipt.
+     * @returns {Promise<InteractionCallResponse>} A Promise that resolves to the
+     * interaction call response.
      * @throws {Error} if there is an error during the interaction, if the provider
      * is not initialized,or if the interaction object fails validity checks.
      */
