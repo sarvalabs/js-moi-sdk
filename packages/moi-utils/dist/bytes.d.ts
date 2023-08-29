@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * Array-like type representing bytes.
  */

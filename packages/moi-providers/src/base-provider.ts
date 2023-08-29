@@ -545,7 +545,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response = await this.execute("moi.Storage", params)
+            const response = await this.execute("moi.LogicStorage", params)
 
             return this.processResponse(response)
         } catch (error) {

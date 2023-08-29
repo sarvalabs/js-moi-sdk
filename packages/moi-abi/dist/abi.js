@@ -104,7 +104,7 @@ class ABICoder {
                 schema.kind = "document";
                 delete schema.fields;
             }
-            return doc.document;
+            return doc;
         };
         switch (schema.kind) {
             case "string":
