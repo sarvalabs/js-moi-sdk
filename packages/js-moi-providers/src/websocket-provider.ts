@@ -19,6 +19,7 @@ export enum WebSocketEvents {
     CLOSE = 'close',
     DEBUG = 'debug',
     ERROR = 'error',
+    NEW_PENDING_INTERACTIONS = 'new_pending_interactions'
 }
 
 /**
@@ -433,7 +434,13 @@ export class WebSocketProvider extends JsonRpcProvider {
                     this.emit(WebSocketEvents.ALL_TESSERACTS, result);
                 });
                 break;
-            
+                
+            case WebSocketEvents.NEW_PENDING_INTERACTIONS: 
+                this._subscribe("new_pending_interactions", ["newPendingInteractions"], (result: any) => {
+                    this.emit(WebSocketEvents.NEW_PENDING_INTERACTIONS, result);
+                });
+                break;
+                
             case WebSocketEvents.CONNECT:
 
             case WebSocketEvents.RECONNECT:
