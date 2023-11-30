@@ -1,8 +1,8 @@
-import { AbstractProvider, Options, InteractionResponse, InteractionRequest, CallorEstimateIxObject, InteractionCallResponse, InteractionObject } from "js-moi-providers";
-import ECDSA_S256 from "./ecdsa";
+import { AbstractProvider, CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, isValidAddress } from "js-moi-utils";
 import { SigType, SigningAlgorithms } from "../types";
+import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
-import { ErrorCode, ErrorUtils, hexToBytes, IxType, isValidAddress } from "js-moi-utils";
 
 /**
  * An abstract class representing a signer responsible for cryptographic 
@@ -126,7 +126,9 @@ export abstract class Signer {
      * an error during preparation.
      */
     private async prepareInteraction(ixObject: InteractionObject): Promise<void> {
-        const nonce = await this.getNonce();
+        const nonce = await this.getNonce({
+            tesseract_number: -1,
+        });
 
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
