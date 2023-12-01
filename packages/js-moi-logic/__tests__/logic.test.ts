@@ -30,7 +30,6 @@ describe("Test Logic Deploy", () => {
         ]
 
         const response = await factory.deploy("Seeder!", args).send({
-            sender: wallet.getAddress(),
             fuelPrice: 1,
             fuelLimit: 2000
         });
@@ -55,7 +54,6 @@ describe("Test Logic Deploy", () => {
         expect(name).toBe("LOGIC-Token")
 
         const response = await logicDriver.routines.BalanceOf([seeder]).send({
-            sender: wallet.getAddress(),
             fuelPrice: 1,
             fuelLimit: 2000
         });

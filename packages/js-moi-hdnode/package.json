@@ -1,6 +1,6 @@
 {
   "name": "js-moi-hdnode",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "BIP32 HD Node for cryptocurrency key management.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,7 +23,7 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-utils": "^0.1.0",
+    "js-moi-utils": "^0.1.2",
     "buffer": "^6.0.3",
     "hdkey": "^2.1.0",
     "assert": "^2.0.0",

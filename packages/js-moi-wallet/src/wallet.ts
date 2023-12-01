@@ -4,8 +4,8 @@ import { HDNode } from "js-moi-hdnode";
 import { randomBytes } from "crypto";
 import { Buffer } from "buffer";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
-import { Signer, SigType, InteractionObject } from "js-moi-signer";
-import { AbstractProvider, InteractionRequest } from "js-moi-providers";
+import { Signer, SigType } from "js-moi-signer";
+import { AbstractProvider, InteractionRequest, InteractionObject } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, bytesToHex, bufferToUint8 } from "js-moi-utils";
 
 import { Keystore } from "../types/keystore";

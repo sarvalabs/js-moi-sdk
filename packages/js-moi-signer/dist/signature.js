@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const js_moi_utils_1 = require("js-moi-utils");
-const js_moi_utils_2 = require("js-moi-utils");
 class Signature {
     prefix;
     digest;
@@ -40,7 +39,7 @@ class Signature {
      */
     getSigByte() {
         if (typeof this.prefix[0] !== "number") {
-            js_moi_utils_2.ErrorUtils.throwError("Invalid signature byte.", js_moi_utils_2.ErrorCode.INVALID_SIGNATURE);
+            js_moi_utils_1.ErrorUtils.throwError("Invalid signature byte.", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
         }
         return this.prefix[0];
     }
@@ -59,7 +58,7 @@ class Signature {
     }
     serialize() {
         if (this.name === "") {
-            js_moi_utils_2.ErrorUtils.throwError("Signature is not initialized", js_moi_utils_2.ErrorCode.NOT_INITIALIZED);
+            js_moi_utils_1.ErrorUtils.throwError("Signature is not initialized", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
         const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);

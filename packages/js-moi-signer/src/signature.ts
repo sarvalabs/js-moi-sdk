@@ -1,5 +1,4 @@
-import { hexToBytes } from "js-moi-utils";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 
 export default class Signature {
     private prefix: Uint8Array;

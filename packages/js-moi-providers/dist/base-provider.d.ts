@@ -1,8 +1,7 @@
-import { AxiosError } from "axios";
 import { LogicManifest } from "js-moi-manifest";
 import { Tesseract, Interaction } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo, InteractionCallResponse, SyncStatus } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 /**
@@ -164,6 +163,36 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getRegistry(address: string, options?: Options): Promise<Registry>;
     /**
+     * Retrieves the synchronization status for a specific account.
+     *
+     * @param {string} address - The address for which to retrieve the synchronization status.
+     * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getSyncStatus(address: string): Promise<SyncStatus>;
+    /**
+     * Handles the interaction without modifying the account's current state.
+     *
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<InteractionCallResponse>} A Promise resolving to the
+     * interaction call response.
+     * @throws {Error} if there's an issue executing the RPC call or
+     * processing the response.
+     */
+    call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
+    /**
+     * Estimates the amount of fuel required for processing the interaction.
+     *
+     * @param {CallorEstimateIxObject} ixObject - The interaction object.
+     * @param {CallorEstimateOptions} options - The interaction options. (optional)
+     * @returns {Promise<number | bigint>} A Promise resolving to the estimated
+     * fuel amount.
+     * @throws {Error} if there's an issue executing the RPC call or
+     * processing the response.
+     */
+    estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>;
+    /**
      * Sends an interaction request.
      *
      * @param {InteractionRequest} ixObject - The interaction request object.
@@ -260,6 +289,24 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getPeers(): Promise<string[]>;
     /**
+     * Retrieves the version of the connected network.
+     *
+     * @returns {Promise<string>} A Promise that resolves to the network
+     * version as a string.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    getVersion(): Promise<string>;
+    /**
+     * Retrieves detailed information about the connected node.
+     *
+     * @returns {Promise<NodeInfo>} A Promise that resolves to an object
+     * containing node information.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    getNodeInfo(): Promise<NodeInfo>;
+    /**
      * Retrieves the value of a database entry with the specified key.
      *
      * @param {string} key - The key of the database entry.
@@ -279,6 +326,15 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getAccounts(): Promise<string[]>;
     /**
+     * Retrieves information about active network connections.
+     *
+     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of
+     * connection response object.
+     * @throws {Error} if there is an error executing the RPC call or processing
+     * the response.
+     */
+    getConnections(): Promise<ConnectionsInfo>;
+    /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
      *
@@ -290,6 +346,16 @@ export declare class BaseProvider extends AbstractProvider {
      * the response, or the timeout is reached.
      */
     protected waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>;
+    /**
+     * Process the interaction receipt to determine the appropriate result based on the
+     * interaction type.
+     *
+     * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
+     * @returns {any} The processed result based on the interaction type.
+     * @throws {Error} If the interaction type is unsupported or the expected response
+     * data is missing.
+     */
+    protected processReceipt(receipt: InteractionReceipt): any;
     /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.
@@ -303,12 +369,12 @@ export declare class BaseProvider extends AbstractProvider {
      */
     protected waitForResult(interactionHash: string, timeout?: number): Promise<any>;
     /**
-     * Checks if the error object represents a server error.
+     * Checks if the response object represents a server error.
      *
-     * @param {AxiosError} error - The AxiosError object.
+     * @param {Response} response - The Response object.
      * @returns {boolean} A boolean indicating whether the error is a server error.
      */
-    protected isServerError(error: AxiosError): boolean;
+    protected isServerError(response: Response): boolean;
     /**
      * Executes an RPC method with the specified parameters.
      *

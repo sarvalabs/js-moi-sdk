@@ -2,111 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeIxObject = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
-const ixObjectSchema = {
-    kind: "struct",
-    fields: {
-        type: {
-            kind: "integer"
-        },
-        nonce: {
-            kind: "integer"
-        },
-        sender: {
-            kind: "bytes"
-        },
-        receiver: {
-            kind: "bytes"
-        },
-        payer: {
-            kind: "bytes"
-        },
-        transfer_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
-        },
-        perceived_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
-        },
-        fuel_price: {
-            kind: "integer"
-        },
-        fuel_limit: {
-            kind: "integer"
-        },
-        payload: {
-            kind: "bytes"
-        }
-    }
-};
-const logicSchema = {
-    kind: "struct",
-    fields: {
-        logic_id: {
-            kind: "string"
-        },
-        callsite: {
-            kind: "string"
-        },
-        calldata: {
-            kind: "bytes"
-        },
-        manifest: {
-            kind: "bytes"
-        }
-    }
-};
-const assetCreateSchema = {
-    kind: "struct",
-    fields: {
-        symbol: {
-            kind: "string"
-        },
-        supply: {
-            kind: "integer"
-        },
-        standard: {
-            kind: "integer"
-        },
-        dimension: {
-            kind: "integer"
-        },
-        is_stateful: {
-            kind: "bool"
-        },
-        is_logical: {
-            kind: "bool"
-        },
-        logic_payload: logicSchema
-    }
-};
-const assetMintOrBurnSchema = {
-    kind: "struct",
-    fields: {
-        asset_id: {
-            kind: "string"
-        },
-        amount: {
-            kind: "integer"
-        }
-    }
-};
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000000000000000000000000000";
 /**
  * Processes the payload based on the interaction type.
  *
@@ -159,8 +56,8 @@ const processIxObject = (ixObject) => {
         const processedIxObject = {
             ...ixObject,
             sender: (0, js_moi_utils_1.hexToBytes)(ixObject.sender),
-            receiver: (0, js_moi_utils_1.hexToBytes)(ZERO_ADDRESS),
-            payer: (0, js_moi_utils_1.hexToBytes)(ZERO_ADDRESS)
+            receiver: (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
+            payer: (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS)
         };
         switch (ixObject.type) {
             case js_moi_utils_1.IxType.VALUE_TRANSFER:
@@ -203,30 +100,30 @@ const serializeIxObject = (ixObject) => {
         const processedIxObject = processIxObject(ixObject);
         switch (processedIxObject.type) {
             case js_moi_utils_1.IxType.VALUE_TRANSFER: {
-                polorizer.polorize(processedIxObject, ixObjectSchema);
+                polorizer.polorize(processedIxObject, js_moi_utils_1.ixObjectSchema);
                 return polorizer.bytes();
             }
             case js_moi_utils_1.IxType.ASSET_CREATE: {
-                polorizer.polorize(processedIxObject.payload, assetCreateSchema);
+                polorizer.polorize(processedIxObject.payload, js_moi_utils_1.assetCreateSchema);
                 const payload = polorizer.bytes();
                 polorizer = new js_polo_1.Polorizer();
-                polorizer.polorize({ ...processedIxObject, payload }, ixObjectSchema);
+                polorizer.polorize({ ...processedIxObject, payload }, js_moi_utils_1.ixObjectSchema);
                 return polorizer.bytes();
             }
             case js_moi_utils_1.IxType.ASSET_MINT:
             case js_moi_utils_1.IxType.ASSET_BURN: {
-                polorizer.polorize(processedIxObject.payload, assetMintOrBurnSchema);
+                polorizer.polorize(processedIxObject.payload, js_moi_utils_1.assetMintOrBurnSchema);
                 const payload = polorizer.bytes();
                 polorizer = new js_polo_1.Polorizer();
-                polorizer.polorize({ ...processedIxObject, payload }, ixObjectSchema);
+                polorizer.polorize({ ...processedIxObject, payload }, js_moi_utils_1.ixObjectSchema);
                 return polorizer.bytes();
             }
             case js_moi_utils_1.IxType.LOGIC_DEPLOY:
             case js_moi_utils_1.IxType.LOGIC_INVOKE: {
-                polorizer.polorize(processedIxObject.payload, logicSchema);
+                polorizer.polorize(processedIxObject.payload, js_moi_utils_1.logicSchema);
                 const payload = polorizer.bytes();
                 polorizer = new js_polo_1.Polorizer();
-                polorizer.polorize({ ...processedIxObject, payload }, ixObjectSchema);
+                polorizer.polorize({ ...processedIxObject, payload }, js_moi_utils_1.ixObjectSchema);
                 return polorizer.bytes();
             }
             default:

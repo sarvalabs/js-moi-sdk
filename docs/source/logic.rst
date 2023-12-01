@@ -22,20 +22,13 @@ wallet-based signers, or custom signers.
 
 Types
 -----
-**LogicDeployRequest**
+**LogicIxRequest**
 
-The ``LogicDeployRequest`` interface represents a request to deploy logic. It has the following properties:
+The ``LogicIxRequest`` interface represents a request to deploy or execute a logic. It has the following properties:
 
-* ``send`` - ``function``: A function that sends the deployment request and returns a promise for an ``InteractionResponse``.
-* ``estimateGas`` - ``function``: A function that estimates the gas required for the deployment request and returns a promise.
-
-**LogicExecuteRequest**
-
-The ``LogicExecuteRequest`` interface represents a request to execute logic. It has the following properties:
-
-* ``call`` - ``function``: A function that calls the logic with the provided arguments and returns a promise for the result.
-* ``send`` - ``function``: A function that sends the execution request and returns a promise for an ``InteractionResponse``.
-* ``estimateGas`` - ``function``: A function that estimates the gas required for the execution request and returns a promise.
+* ``call`` - ``function``: A function that facilitates the execution of an logic interaction request, while maintaining the integrity of the current state. It returns a promise that resolves to an ``InteractionCallResponse``.
+* ``send`` - ``function``: A function that sends the logic interaction request and returns a promise that resolves to an ``InteractionResponse``.
+* ``estimateFuel`` - ``function``: A function that estimates the fuel required for the interaction request and returns a promise.
 
 **Routine**
 
@@ -137,7 +130,7 @@ applications on the MOI network.
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        return await wallet.fromMnemonic(mnemonic);
     }
 
     const manifest = { ... }
@@ -169,7 +162,6 @@ Methods
     ]
 
     const response = await factory.deploy("Seeder!", args).send({
-        sender: "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084",
         fuelPrice: 1,
         fuelLimit: 1000
     });
@@ -273,7 +265,7 @@ Functions
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        return await wallet.fromMnemonic(mnemonic);
     }
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
@@ -292,7 +284,6 @@ Usage
 
     // Invoking a routine
     const response = await logicDriver.routines.BalanceOf([seeder]).send({
-        sender: sender,
         fuelPrice: 1,
         fuelLimit: 1000
     });

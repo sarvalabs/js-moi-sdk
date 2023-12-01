@@ -5,8 +5,8 @@ import { WebSocketProvider,WebSocketEvents } from "../dist/websocket-provider"
 import { initializeWallet } from "./utils/utils";
 
 describe("Test Websocket Provider", () => {
-    const address = "0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba";
-    const mnemonic = "disease into limb company taxi unaware collect vehicle upper final problem proof";
+    const address = "0xd958d29acc5e108657563b76601a6acae329623e62ce6d7f09c3a575c0df0789";
+    const mnemonic = "script swing flight jacket term wise depend wrong wave people strong capable";
     let signer: Signer;
     let nonce: number | bigint;
     let wsProvider: WebSocketProvider;
