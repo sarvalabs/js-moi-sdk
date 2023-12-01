@@ -14,12 +14,12 @@ let nextReqId = 1;
 export enum WebSocketEvents {
     TESSERACT = 'tesseract',
     ALL_TESSERACTS = 'all_tesseracts',
+    PENDING_INTERACTIONS = 'pending_interactions',
     CONNECT = "connect",
     RECONNECT = 'reconnect',
     CLOSE = 'close',
     DEBUG = 'debug',
     ERROR = 'error',
-    NEW_PENDING_INTERACTIONS = 'new_pending_interactions'
 }
 
 /**
@@ -435,9 +435,9 @@ export class WebSocketProvider extends JsonRpcProvider {
                 });
                 break;
                 
-            case WebSocketEvents.NEW_PENDING_INTERACTIONS: 
-                this._subscribe("new_pending_interactions", ["newPendingInteractions"], (result: any) => {
-                    this.emit(WebSocketEvents.NEW_PENDING_INTERACTIONS, result);
+            case WebSocketEvents.PENDING_INTERACTIONS: 
+                this._subscribe("pending_interactions", ["newPendingInteractions"], (result: any) => {
+                    this.emit(WebSocketEvents.PENDING_INTERACTIONS, result);
                 });
                 break;
                 
