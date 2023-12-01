@@ -130,14 +130,11 @@ export abstract class Signer {
             ixObject.sender = this.getAddress();
         }
 
-        const nonce = ixObject.nonce ? ixObject.nonce : await this.getNonce();
-        
-        // Check the validity of the interaction object
-        this.checkInteraction(ixObject, nonce);
-
-        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            ixObject.nonce =  nonce;
+        if (ixObject.nonce == null) {
+            ixObject.nonce =  await this.getNonce();
         }
+
+        this.checkInteraction(ixObject, ixObject.nonce);
     }
 
     /**
