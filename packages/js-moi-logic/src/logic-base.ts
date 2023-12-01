@@ -130,10 +130,10 @@ export abstract class LogicBase extends ElementDescriptor {
             params: {
                 sender: this.signer.getAddress(),
                 type: this.getIxType(),
+                nonce: args[1].nonce,
                 fuel_price: args[1].fuelPrice,
                 fuel_limit: args[1].fuelLimit,
                 payload: ixObject.createPayload(),
-                nonce: args[1].nonce
             }
         }
     }

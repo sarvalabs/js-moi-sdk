@@ -126,14 +126,12 @@ export abstract class Signer {
      * an error during preparation.
      */
     private async prepareInteraction(ixObject: InteractionObject): Promise<void> {
-        const nonce = await this.getNonce({
-            tesseract_number: -1,
-        });
-
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
 
+        const nonce = ixObject.nonce ? ixObject.nonce : await this.getNonce();
+        
         // Check the validity of the interaction object
         this.checkInteraction(ixObject, nonce);
 
