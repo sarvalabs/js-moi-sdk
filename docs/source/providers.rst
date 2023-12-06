@@ -572,6 +572,9 @@ height, hash, timestamp, and other relevant data.
 the given address is mined on the blockchain. It provides information about the 
 tesseract.
 
+``PENDING_INTERACTIONS`` - This event is triggered when a new pending interaction
+occurs in the blockchain, providing a unique hash for the interaction.
+
 Usage
 ~~~~~
 
@@ -591,6 +594,9 @@ Subscribing to all tesseracts
 
         // Listen for "tesseracts" event
         provider.on(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
+
+        // Listen for "pending_interactions" event
+        provider.on(WebSocketEvents.PENDING_INTERACTIONS, handleInteraction);
     });
 
     // Listen for "debug" event
