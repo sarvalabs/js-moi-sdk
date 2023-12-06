@@ -1,12 +1,12 @@
 import { AssetStandard, hexToBN, IxType } from "js-moi-utils";
 import { Signer } from "js-moi-signer";
-import { JsonRpcProvider } from "../dist/jsonrpc-provider"
-import { WebSocketProvider,WebSocketEvents } from "../dist/websocket-provider"
+import { JsonRpcProvider } from "../src/jsonrpc-provider"
+import { WebSocketProvider,WebSocketEvents } from "../src/websocket-provider"
 import { initializeWallet } from "./utils/utils";
 
 describe("Test Websocket Provider", () => {
-    const address = "0xd958d29acc5e108657563b76601a6acae329623e62ce6d7f09c3a575c0df0789";
-    const mnemonic = "script swing flight jacket term wise depend wrong wave people strong capable";
+    const address = "0x2c1fe83b9d6a5c81c5e6d4da20d2d0509ac3c1eb154e5f5b1fc7d5fd4a03b9cc";
+    const mnemonic = "cushion tissue toss meadow glare math custom because inform describe vacant combine";
     let signer: Signer;
     let nonce: number | bigint;
     let wsProvider: WebSocketProvider;
