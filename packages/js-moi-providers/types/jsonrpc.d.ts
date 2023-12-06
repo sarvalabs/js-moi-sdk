@@ -175,6 +175,14 @@ export interface ContentFrom {
     queued: Map<number | bigint, InteractionInfo>;
 }
 
+export interface Filter {
+    id: string;
+}
+
+export interface DeletionStatus {
+    status: boolean;
+}
+
 export interface Status {
     pending: number | bigint;
     queued: number | bigint;

@@ -184,6 +184,18 @@ The ``Registry`` interface represents registry information. It has the following
 * ``asset_id`` - ``string``: The ID of the asset in the registry.
 * ``asset_info`` - ``AssetInfo``: Information about the asset in the registry.
 
+**Filter**
+
+The ``Filter`` interface represents a filter with a unique identifier. It has the following properties:
+
+* ``id`` - ``string``: The unique identifier for the filter.
+
+**DeletionStatus**
+
+The ``DeletionStatus`` interface represents the status of a deletion operation. It has the following properties:
+
+* ``status`` - ``boolean``: Indicates whether the deletion was successful (true) or not (false).
+
 **WsReconnectOptions**
 
 The ``WsReconnectOptions`` interface represents options for websocket reconnection. It has the following properties:
@@ -261,6 +273,8 @@ Account Methods
 
 .. autofunction:: getRegistry
 
+.. autofunction:: getNewTesseractsByAccountFilter
+
 Execution Methods
 ~~~~~~~~~~~~~~~~~
 
@@ -286,6 +300,14 @@ Query Methods
 .. autofunction:: getDBEntry
 
 .. autofunction:: getAccounts
+
+.. autofunction:: getNewTesseractFilter
+
+.. autofunction:: getPendingInteractionFilter
+
+.. autofunction:: getFilterChanges
+
+.. autofunction:: removeFilter
 
 Event Methods
 ~~~~~~~~~~~~~
