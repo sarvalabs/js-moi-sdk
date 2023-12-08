@@ -572,8 +572,8 @@ height, hash, timestamp, and other relevant data.
 the given address is mined on the blockchain. It provides information about the 
 tesseract.
 
-``PENDING_INTERACTIONS`` - This event is triggered when a new pending interaction
-occurs in the blockchain, providing a unique hash for the interaction.
+``PENDING_INTERACTIONS`` - This event is emitted when a new interaction is added to
+interaction pool. It provides an interaction hash.
 
 Usage
 ~~~~~

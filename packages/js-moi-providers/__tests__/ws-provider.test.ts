@@ -1,7 +1,7 @@
 import { AssetStandard, hexToBN, IxType } from "js-moi-utils";
 import { Signer } from "js-moi-signer";
 import { JsonRpcProvider } from "../src/jsonrpc-provider"
-import { WebSocketProvider,WebSocketEvents } from "../src/websocket-provider"
+import { WebSocketProvider, WebSocketEvents } from "../src/websocket-provider"
 import { initializeWallet } from "./utils/utils";
 
 describe("Test Websocket Provider", () => {
@@ -25,7 +25,7 @@ describe("Test Websocket Provider", () => {
     
     it('should receive new tesseracts', (done) => {
         // subscribe to new tesseracts
-        wsProvider.on(address, (tesseract) => {
+        wsProvider.on(WebSocketEvents.ALL_TESSERACTS, (tesseract) => {
             // check if the tesseract height has increased
             expect(hexToBN(tesseract.header.height)).toBeGreaterThan(0);
             done();
