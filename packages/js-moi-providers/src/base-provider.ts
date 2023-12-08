@@ -10,7 +10,7 @@ InteractionReceipt, InteractionParams, InteractionResponse,
 LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
 Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
 Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, 
-Registry, TDUResponse, Filter, DeletionStatus } from "../types/jsonrpc";
+Registry, TDUResponse, Filter, FilterDeletionResult } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 
@@ -363,14 +363,12 @@ export class BaseProvider extends AbstractProvider {
      * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
      * the timeout is reset to 1 minute.
      * 
-     * @returns {Promise<string[]>} An object containing the filter id for the NewTesseractFilter.
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
      * @throws {Error} Throws an error if there is an issue executing the RPC call.
      */
     public async getNewTesseractFilter(): Promise<Filter> {
         try {
-            const params = null;
-
-            const response: RpcResponse = await this.execute("moi.NewTesseractFilter", params);
+            const response: RpcResponse = await this.execute("moi.NewTesseractFilter", null);
 
             return this.processResponse(response);
         } catch (error) {
@@ -384,7 +382,7 @@ export class BaseProvider extends AbstractProvider {
      * timeout period, and with each subsequent request, the timeout is reset to 1 minute.
      *
      * @param {string} address - The address of the target account for which new tesseracts are filtered.
-     * @returns {Promise<string[]>} An array containing the filter id for the NewTesseractFilter.
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
      * @throws {Error} Throws an error if there is an error executing the RPC call.
      */
     public async getNewTesseractsByAccountFilter(address: string): Promise<Filter> {
@@ -426,10 +424,10 @@ export class BaseProvider extends AbstractProvider {
      * object.
      * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
      * 
-     * @returns {Promise<DeletionStatus>} A Promise that resolves to an object with a `status` propertyindicating the success of the filter removal.
+     * @returns {Promise<FilterDeletionResult>} A Promise that resolves to an object with a `status` property indicating the success of the filter removal.
      * @throws {Error} Throws an error if there is an error executing the RPC call.
      */
-    public async removeFilter(filter: Filter): Promise<DeletionStatus> {
+    public async removeFilter(filter: Filter): Promise<FilterDeletionResult> {
         try {
             const params = {
                 id: filter.id

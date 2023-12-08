@@ -1,8 +1,8 @@
 import {
     AssetCreationReceipt,
-    AssetMintOrBurnReceipt, 
-    LogicDeployReceipt, 
-    LogicInvokeReceipt 
+    AssetMintOrBurnReceipt,
+    LogicDeployReceipt,
+    LogicInvokeReceipt
 } from "js-moi-utils";
 
 export interface Options {
@@ -179,7 +179,7 @@ export interface Filter {
     id: string;
 }
 
-export interface DeletionStatus {
+export interface FilterDeletionResult {
     status: boolean;
 }
 

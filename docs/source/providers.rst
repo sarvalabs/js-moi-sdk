@@ -190,9 +190,9 @@ The ``Filter`` interface represents a filter with a unique identifier. It has th
 
 * ``id`` - ``string``: The unique identifier for the filter.
 
-**DeletionStatus**
+**FilterDeletionStatus**
 
-The ``DeletionStatus`` interface represents the status of a deletion operation. It has the following properties:
+The ``FilterDeletionStatus`` interface represents the status of a deletion operation. It has the following properties:
 
 * ``status`` - ``boolean``: Indicates whether the deletion was successful (true) or not (false).
 
@@ -273,8 +273,6 @@ Account Methods
 
 .. autofunction:: getRegistry
 
-.. autofunction:: getNewTesseractsByAccountFilter
-
 Execution Methods
 ~~~~~~~~~~~~~~~~~
 
@@ -302,6 +300,8 @@ Query Methods
 .. autofunction:: getAccounts
 
 .. autofunction:: getNewTesseractFilter
+
+.. autofunction:: getNewTesseractsByAccountFilter
 
 .. autofunction:: getPendingInteractionFilter
 

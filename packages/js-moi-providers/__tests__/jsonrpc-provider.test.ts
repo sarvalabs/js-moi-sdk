@@ -285,7 +285,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(result.status).toBe(true);
       })
 
-      it("should return a object with status false when filter is deleted or not exist", async () => {
+      it("should return object with status 'false' for deleted or non-existent filters", async () => {
         const NOT_EXISTING_FILTER_ID = "678384f8-04e4-4984-9d51-44bfa5b185eb"
         const filter: Filter = {
           id: NOT_EXISTING_FILTER_ID
@@ -321,7 +321,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           }
         });
 
-        await Promise.all([ixResponse.wait(), ixResponse.result()])
+        await ixResponse.wait()
         const tesseracts = await provider.getFilterChanges(filter);
 
         expect(Array.isArray(tesseracts)).toBeTruthy()
