@@ -1,7 +1,8 @@
 import { hexToBytes } from "js-moi-utils";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ISignature } from "../types";
 
-export default class Signature {
+export default class Signature implements ISignature {
     private prefix: Uint8Array;
     private digest: Uint8Array;
     private extraData: Uint8Array;
