@@ -131,8 +131,7 @@ export abstract class Signer {
         }
 
         if (ixObject.nonce != null) {
-            const nonce = await this.getNonce({ tesseract_number: -1 });
-            this.checkInteraction(ixObject, nonce);
+            this.checkInteraction(ixObject, await this.getNonce({ tesseract_number: -1 }));
             return;
         }
 
