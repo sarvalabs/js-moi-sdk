@@ -3,7 +3,7 @@ import { Tesseract, Interaction } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, 
 InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, 
-Inspect, ContentFrom, Encoding, Registry, Filter, DeletionStatus } from "../types/jsonrpc";
+Inspect, ContentFrom, Encoding, Registry, Filter, FilterDeletionResult } from "../types/jsonrpc";
 
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
@@ -44,7 +44,7 @@ export abstract class AbstractProvider {
     abstract getNewTesseractsByAccountFilter(address: string): Promise<Filter>
     abstract getPendingInteractionFilter(): Promise<Filter>
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>
-    abstract removeFilter(filter: Filter): Promise<DeletionStatus>
+    abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>
 
     // Event Emitter (ish)
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;

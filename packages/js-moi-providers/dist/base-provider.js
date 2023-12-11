@@ -298,6 +298,110 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
+     * Initializes a filter for retrieving newly detected terreracts.
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
+     * the timeout is reset to 1 minute.
+     *
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     */
+    async getNewTesseractFilter() {
+        try {
+            const response = await this.execute("moi.NewTesseractFilter", null);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Initiates a filtering mechanism to fetch recently identified tesseracts
+     * associated with a specific account. The filter setup triggers a 1-minute
+     * timeout period, and with each subsequent request, the timeout is reset to 1 minute.
+     *
+     * @param {string} address - The address of the target account for which new tesseracts are filtered.
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    async getNewTesseractsByAccountFilter(address) {
+        try {
+            const params = {
+                address: address
+            };
+            const response = await this.execute("moi.NewTesseractsByAccountFilter", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Initiates a filtering mechanism to fetch recently identified pending interaction.
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent request,
+     * the timeout is reset to 1 minute.
+     *
+     * @returns {Promise<Filter>} A object containing the Filter ID for PendingIxnsFilter
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    async getPendingInteractionFilter() {
+        try {
+            const params = null;
+            const response = await this.execute('moi.PendingIxnsFilter', params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Asynchronously removes the filter and returns a Promise that resolves to a
+     * object.
+     * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
+     *
+     * @returns {Promise<FilterDeletionResult>} A Promise that resolves to an object with a `status` property indicating the success of the filter removal.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    async removeFilter(filter) {
+        try {
+            const params = {
+                id: filter.id
+            };
+            const response = await this.execute("moi.RemoveFilter", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves all filter changes since the last poll.
+     *
+     * The specific result varies depending on the type of filter used.
+     *
+     * @param {Filter} filter - The filter object for which changes are to be retrieved.
+     *
+     * @returns {Promise<T>} A promise that resolves to an object containing information about the changes made to the specified filter since the last poll. The structure of the object is determined by the type of filter provided.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     *
+     * @template T - The type of the object returned, dependent on the provided filter.
+     */
+    async getFilterChanges(filter) {
+        try {
+            const params = {
+                id: filter.id
+            };
+            const response = await this.execute("moi.GetFilterChanges", params);
+            if (response.result.data === null) {
+                return response.result.data;
+            }
+            console.log(response);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
      * Retrieves a Tesseract for a specific address.
      *
      * @param {string} address - The address for which to retrieve the Tesseract.
