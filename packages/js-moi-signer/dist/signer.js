@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Signer = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 const ecdsa_1 = __importDefault(require("./ecdsa"));
 const signature_1 = __importDefault(require("./signature"));
-const js_moi_utils_1 = require("js-moi-utils");
 /**
  * An abstract class representing a signer responsible for cryptographic
  * activities like signing and verification.
@@ -105,15 +105,13 @@ class Signer {
      * an error during preparation.
      */
     async prepareInteraction(ixObject) {
-        const nonce = await this.getNonce();
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
-        // Check the validity of the interaction object
-        this.checkInteraction(ixObject, nonce);
-        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            ixObject.nonce = nonce;
+        if (ixObject.nonce == null) {
+            ixObject.nonce = await this.getNonce();
         }
+        this.checkInteraction(ixObject, ixObject.nonce);
     }
     /**
      * Initiates an interaction by calling a method on the connected provider.

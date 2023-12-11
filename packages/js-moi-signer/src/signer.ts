@@ -110,7 +110,7 @@ export abstract class Signer {
         }
 
         if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            if(ixObject.nonce < nonce) {
+            if(ixObject.nonce <= nonce) {
                 ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
             }
         }
@@ -130,11 +130,13 @@ export abstract class Signer {
             ixObject.sender = this.getAddress();
         }
 
-        if (ixObject.nonce == null) {
-            ixObject.nonce =  await this.getNonce();
+        if (ixObject.nonce != null) {
+            const nonce = await this.getNonce({ tesseract_number: -1 });
+            this.checkInteraction(ixObject, nonce);
+            return;
         }
 
-        this.checkInteraction(ixObject, ixObject.nonce);
+        ixObject.nonce = await this.getNonce();
     }
 
     /**
