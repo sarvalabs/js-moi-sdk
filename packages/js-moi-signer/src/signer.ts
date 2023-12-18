@@ -74,7 +74,7 @@ export abstract class Signer {
      * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    private checkInteraction(ixObject: InteractionObject, nonce: number | bigint): void {
+    private async checkInteraction(ixObject: InteractionObject): Promise<void> {
         if(ixObject.type === undefined || ixObject.type === null) {
             ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
         }
@@ -110,7 +110,8 @@ export abstract class Signer {
         }
 
         if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            if(ixObject.nonce <= nonce) {
+            const nonce = await this.getNonce({ tesseract_number: -1 });
+            if(ixObject.nonce < nonce) {
                 ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
             }
         }
@@ -131,7 +132,7 @@ export abstract class Signer {
         }
 
         if (ixObject.nonce != null) {
-            this.checkInteraction(ixObject, await this.getNonce({ tesseract_number: -1 }));
+            await this.checkInteraction(ixObject);
             return;
         }
 
