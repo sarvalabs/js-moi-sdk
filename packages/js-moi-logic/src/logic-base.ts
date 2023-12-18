@@ -128,7 +128,7 @@ export abstract class LogicBase extends ElementDescriptor {
         return {
             type: args[0],
             params: {
-                sender: this.signer.getAddress(),
+                sender: this.signer.isInitialized() ? this.signer.getAddress() : args[1].sender,
                 type: this.getIxType(),
                 fuel_price: args[1].fuelPrice,
                 fuel_limit: args[1].fuelLimit,

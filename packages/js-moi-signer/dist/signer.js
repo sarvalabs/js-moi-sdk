@@ -69,7 +69,7 @@ class Signer {
         if (!(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid sender address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        if (ixObject.sender !== this.getAddress()) {
+        if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.type === js_moi_utils_1.IxType.VALUE_TRANSFER) {
