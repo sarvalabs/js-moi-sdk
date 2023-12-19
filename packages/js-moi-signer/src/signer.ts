@@ -84,6 +84,10 @@ export abstract class Signer {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
+        if(ixObject.sender == null) {
+            ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
+        }
+
         if(this.isInitialized() && ixObject.sender !== this.getAddress()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
