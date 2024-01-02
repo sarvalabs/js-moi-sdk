@@ -22,8 +22,10 @@ export interface SigType {
     verify(message: Uint8Array, signature: ISignature, publicKey: Uint8Array): boolean
 }
 
+export interface ECDSA_S256 extends SigType {}
+
 export interface SigningAlgorithms {
-    ecdsa_secp256k1: SigType
+    ecdsa_secp256k1: ECDSA_S256
 }
 
 export interface AssetCreatePayload {
