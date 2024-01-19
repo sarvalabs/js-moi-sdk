@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
-const state_1 = require("./state");
 const logic_descriptor_1 = require("./logic-descriptor");
+const state_1 = require("./state");
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
@@ -35,26 +35,34 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     createRoutines() {
         const routines = {};
         this.manifest.elements.forEach((element) => {
-            if (element.kind === "routine") {
-                const routine = element.data;
-                if (routine.kind === "invokable") {
-                    const routineName = this.normalizeRoutineName(routine.name);
-                    // Create a routine execution function
-                    routines[routineName] = ((args = []) => {
-                        return this.createIxObject(routine, ...args);
-                    });
-                    // Define routine properties
-                    routines[routineName].isMutable = () => {
-                        return this.isMutableRoutine(routine.name);
-                    };
-                    routines[routineName].accepts = () => {
-                        return routine.accepts ? routine.accepts : null;
-                    };
-                    routines[routineName].returns = () => {
-                        return routine.returns ? routine.returns : null;
-                    };
-                }
+            if (element.kind !== "routine") {
+                return;
             }
+            const routine = element.data;
+            if (routine.kind !== "invokable") {
+                return;
+            }
+            const name = this.normalizeRoutineName(routine.name);
+            routines[name] = async (...params) => {
+                const paramsLength = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
+                if (routine.accepts && paramsLength < routine.accepts.length) {
+                    js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+                }
+                const ixObject = this.createIxObject(routine, ...params);
+                if (!this.isMutableRoutine(routine.name)) {
+                    return ixObject.unwrap();
+                }
+                return ixObject.send;
+            };
+            routines[name].isMutable = () => {
+                return this.isMutableRoutine(routine.name);
+            };
+            routines[name].accepts = () => {
+                return routine.accepts ? routine.accepts : null;
+            };
+            routines[name].returns = () => {
+                return routine.returns ? routine.returns : null;
+            };
         });
         (0, js_moi_utils_1.defineReadOnly)(this, "routines", routines);
     }

@@ -1,11 +1,10 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { IxType } from "js-moi-utils";
-import { LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { InteractionResponse, InteractionCallResponse } from "js-moi-providers";
-import ElementDescriptor from "./element-descriptor";
-import { LogicIxRequest } from "../types/logic";
+import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxRequest } from "../types/logic";
+import ElementDescriptor from "./element-descriptor";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  class for logic-related operations.
@@ -41,7 +40,10 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionCallResponse | number | bigint | InteractionResponse>;
+    protected executeRoutine(ixObject: LogicIxObject, type: string, option: {
+        fuelPrice: number;
+        fuelLimit: number;
+    }): Promise<InteractionCallResponse | number | bigint | InteractionResponse>;
     /**
      * Processes the interaction arguments and returns the processed arguments object.
      *
@@ -50,7 +52,10 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    protected processArguments(ixObject: LogicIxObject, args: any[]): LogicIxArguments;
+    protected processArguments(ixObject: LogicIxObject, type: string, option: {
+        fuelPrice: number;
+        fuelLimit: number;
+    }): LogicIxArguments;
     /**
      * Creates a logic interaction request object based on the given interaction object.
      *

@@ -1,0 +1,316 @@
+{
+    "syntax": "0.1.0",
+    "engine": {
+      "kind": "PISA",
+      "flags": []
+    },
+    "elements": [
+      {
+        "ptr": 0,
+        "deps": null,
+        "kind": "constant",
+        "data": {
+          "type": "string",
+          "value": "0x064e6f7420616e204f776e6572"
+        }
+      },
+      {
+        "ptr": 1,
+        "deps": [
+          2
+        ],
+        "kind": "typedef",
+        "data": "[]Todo"
+      },
+      {
+        "ptr": 2,
+        "deps": null,
+        "kind": "class",
+        "data": {
+          "name": "Todo",
+          "fields": [
+            {
+              "slot": 0,
+              "label": "name",
+              "type": "string"
+            },
+            {
+              "slot": 1,
+              "label": "completed",
+              "type": "bool"
+            }
+          ],
+          "methods": []
+        }
+      },
+      {
+        "ptr": 3,
+        "deps": [
+          2
+        ],
+        "kind": "state",
+        "data": {
+          "kind": "persistent",
+          "fields": [
+            {
+              "slot": 0,
+              "label": "todos",
+              "type": "[]Todo"
+            },
+            {
+              "slot": 1,
+              "label": "owner",
+              "type": "address"
+            }
+          ]
+        }
+      },
+      {
+        "ptr": 4,
+        "deps": [
+          0,
+          3
+        ],
+        "kind": "routine",
+        "data": {
+          "name": "onlyOwner",
+          "kind": "local",
+          "accepts": [],
+          "returns": [],
+          "executes": {
+            "bin": [
+              128,
+              0,
+              1,
+              115,
+              1,
+              73,
+              1,
+              1,
+              70,
+              0,
+              1,
+              0,
+              98,
+              0,
+              0,
+              98,
+              0,
+              0,
+              17,
+              1,
+              11,
+              3,
+              1,
+              0,
+              17,
+              0,
+              0,
+              16,
+              0,
+              0,
+              65,
+              0,
+              1
+            ],
+            "hex": "",
+            "asm": null
+          },
+          "catches": null
+        }
+      },
+      {
+        "ptr": 5,
+        "deps": [
+          3
+        ],
+        "kind": "routine",
+        "data": {
+          "name": "InitOwner!",
+          "kind": "deployer",
+          "accepts": [],
+          "returns": [],
+          "executes": {
+            "bin": [
+              115,
+              0,
+              73,
+              0,
+              0,
+              129,
+              0,
+              1
+            ],
+            "hex": "",
+            "asm": null
+          },
+          "catches": null
+        }
+      },
+      {
+        "ptr": 6,
+        "deps": [
+          2,
+          4,
+          3
+        ],
+        "kind": "routine",
+        "data": {
+          "name": "AddTodo!",
+          "kind": "invokable",
+          "accepts": [
+            {
+              "slot": 0,
+              "label": "name",
+              "type": "string"
+            }
+          ],
+          "returns": [],
+          "executes": {
+            "bin": [
+              10,
+              0,
+              17,
+              1,
+              4,
+              12,
+              0,
+              1,
+              0,
+              17,
+              0,
+              2,
+              40,
+              0,
+              0,
+              4,
+              1,
+              0,
+              82,
+              0,
+              0,
+              1,
+              41,
+              1,
+              1,
+              82,
+              0,
+              1,
+              1,
+              128,
+              2,
+              0,
+              87,
+              2,
+              0,
+              36,
+              1,
+              2,
+              129,
+              1,
+              0
+            ],
+            "hex": "",
+            "asm": null
+          },
+          "catches": null
+        }
+      },
+      {
+        "ptr": 7,
+        "deps": [
+          4,
+          3
+        ],
+        "kind": "routine",
+        "data": {
+          "name": "MarkTodoCompleted!",
+          "kind": "invokable",
+          "accepts": [
+            {
+              "slot": 0,
+              "label": "id",
+              "type": "u64"
+            }
+          ],
+          "returns": [],
+          "executes": {
+            "bin": [
+              10,
+              0,
+              17,
+              1,
+              4,
+              12,
+              0,
+              1,
+              0,
+              128,
+              0,
+              0,
+              4,
+              1,
+              0,
+              83,
+              2,
+              0,
+              1,
+              41,
+              4,
+              1,
+              98,
+              3,
+              4,
+              82,
+              2,
+              1,
+              3,
+              84,
+              0,
+              1,
+              2,
+              129,
+              0,
+              0
+            ],
+            "hex": "",
+            "asm": null
+          },
+          "catches": null
+        }
+      },
+      {
+        "ptr": 8,
+        "deps": [
+          2,
+          3
+        ],
+        "kind": "routine",
+        "data": {
+          "name": "GetTodos",
+          "kind": "invokable",
+          "accepts": [],
+          "returns": [
+            {
+              "slot": 0,
+              "label": "allTodos",
+              "type": "[]Todo"
+            }
+          ],
+          "executes": {
+            "bin": [
+              128,
+              0,
+              0,
+              5,
+              0,
+              0
+            ],
+            "hex": "",
+            "asm": null
+          },
+          "catches": null
+        }
+      }
+    ]
+  }

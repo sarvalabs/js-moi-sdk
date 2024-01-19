@@ -1,11 +1,10 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import { LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { InteractionResponse, InteractionCallResponse } from "js-moi-providers";
-import ElementDescriptor from "./element-descriptor";
-import { LogicIxRequest } from "../types/logic";
+import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxRequest } from "../types/logic";
+import ElementDescriptor from "./element-descriptor";
 
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base 
@@ -60,9 +59,8 @@ export abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected async executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
-        const processedArgs = this.processArguments(ixObject, args)
-
+    protected async executeRoutine(ixObject: LogicIxObject, type: string, option: { fuelPrice: number, fuelLimit: number }): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
+        const processedArgs = this.processArguments(ixObject, type, option);
         if(this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
                 "This logic object doesn\'t have address set yet, please set an address first.",
@@ -117,21 +115,14 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    protected processArguments(ixObject: LogicIxObject, args: any[]): LogicIxArguments {
-        if(args.length < 2) {
-            ErrorUtils.throwError(
-                "One or more required arguments are missing.",
-                ErrorCode.MISSING_ARGUMENT
-            )
-        }
-
+    protected processArguments(ixObject: LogicIxObject, type: string, option: { fuelPrice: number, fuelLimit: number }): LogicIxArguments {
         return {
-            type: args[0],
+            type,
             params: {
                 sender: this.signer.getAddress(),
                 type: this.getIxType(),
-                fuel_price: args[1].fuelPrice,
-                fuel_limit: args[1].fuelLimit,
+                fuel_price: option.fuelPrice,
+                fuel_limit: option.fuelLimit,
                 payload: ixObject.createPayload()
             }
         }
@@ -144,7 +135,19 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest {
+        const unwrap = async () => {
+            const ix = await ixObject.call();
+            const result = await ix.result()
+
+            if(result.error) {
+                throw result.error
+            }
+
+            return result.output
+        }
+
         return {
+            unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
             estimateFuel: ixObject.estimateFuel.bind(ixObject)
@@ -159,22 +162,35 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicIxRequest {
+        const DEFAULT_FUEL_PRICE = 1;
+        const DEFAULT_FUEL_LIMIT = 1000
+
+        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
+
+
         const ixObject: LogicIxObject = {
             routine: routine,
             arguments: args
         } as LogicIxObject
+        
+        ixObject.estimateFuel = (): Promise<number|bigint> => {
+            option.fuelPrice ??= DEFAULT_FUEL_PRICE;
+            option.fuelLimit ??= DEFAULT_FUEL_LIMIT;
 
-        // Define call, send, estimateFuel methods on ixObject
-        ixObject.call = (...args: any[]): Promise<InteractionCallResponse> => {
-            return this.executeRoutine(ixObject, "call", ...args) as Promise<InteractionCallResponse>
+            return this.executeRoutine(ixObject, "estimate", option) as Promise<number | bigint>
         }
 
-        ixObject.send = (...args: any[]): Promise<InteractionResponse> => {
-            return this.executeRoutine(ixObject, "send", ...args) as Promise<InteractionResponse>
+        ixObject.call = async (): Promise<InteractionCallResponse> => {
+            option.fuelPrice ??= DEFAULT_FUEL_PRICE;
+            option.fuelLimit ??= await ixObject.estimateFuel();
+
+            return this.executeRoutine(ixObject, "call", option) as Promise<InteractionCallResponse>
         }
 
-        ixObject.estimateFuel = (...args: any[]): Promise<number|bigint> => {
-            return this.executeRoutine(ixObject, "estimate", ...args) as Promise<number | bigint>
+        ixObject.send = async (): Promise<InteractionResponse> => {
+            option.fuelPrice ??= DEFAULT_FUEL_PRICE;
+            option.fuelLimit ??= await ixObject.estimateFuel();
+            return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }
 
         ixObject.createPayload = (): LogicPayload => {

@@ -1,18 +1,18 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { LogicPayload } from "js-moi-providers";
+import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
-import { Options } from "js-moi-providers";
-import { Routine, Routines } from "../types/logic";
-import { EphemeralState, PersistentState } from "./state";
-import { LogicDescriptor } from "./logic-descriptor";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { Routines } from "../types/logic";
+import { LogicDescriptor } from "./logic-descriptor";
+import { EphemeralState, PersistentState } from "./state";
 
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
-export class LogicDriver extends LogicDescriptor {
-    public readonly routines: Routines = {};
+export class LogicDriver<TRoutines extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
+    public readonly routines: Routines<TRoutines> = {} as Routines<TRoutines>;
+
     public readonly persistentState: PersistentState;
     public readonly ephemeralState: EphemeralState;
 
@@ -49,34 +49,51 @@ export class LogicDriver extends LogicDescriptor {
         const routines = {};
 
         this.manifest.elements.forEach((element: LogicManifest.Element) => {
-            if(element.kind === "routine") {
-                const routine = element.data as LogicManifest.Routine;
+            if (element.kind !== "routine") {
+                return;
+            }
 
-                if (routine.kind === "invokable") {
-                    const routineName = this.normalizeRoutineName(routine.name)
+            const routine = element.data as LogicManifest.Routine;
 
-                    // Create a routine execution function
-                    routines[routineName] = ((args: any[] = []) => {
-                        return this.createIxObject(routine, ...args);
-                    }) as Routine;
-    
-                    // Define routine properties
-                    routines[routineName].isMutable = (): boolean => {
-                        return this.isMutableRoutine(routine.name)
-                    }
-    
-                    routines[routineName].accepts = (): LogicManifest.TypeField[] | null => {
-                        return routine.accepts ? routine.accepts : null
-                    }
+            if (routine.kind !== "invokable") {
+                return;
+            }
 
-                    routines[routineName].returns = (): LogicManifest.TypeField[] | null => {
-                        return routine.returns ? routine.returns : null
-                    }
+            const name = this.normalizeRoutineName(routine.name);
+
+            routines[name] = async (...params: any[]) => {
+                const paramsLength = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
+
+                if (routine.accepts && paramsLength < routine.accepts.length) {
+                    ErrorUtils.throwError(
+                        "One or more required arguments are missing.",
+                        ErrorCode.INVALID_ARGUMENT
+                    )
                 }
+
+                const ixObject = this.createIxObject(routine, ...params);
+
+                if (!this.isMutableRoutine(routine.name)) {
+                    return ixObject.unwrap();
+                }
+
+                return ixObject.send;
+            };
+
+            routines[name].isMutable = (): boolean => {
+                return this.isMutableRoutine(routine.name)
+            }
+
+            routines[name].accepts = (): LogicManifest.TypeField[] | null => {
+                return routine.accepts ? routine.accepts : null
+            }
+
+            routines[name].returns = (): LogicManifest.TypeField[] | null => {
+                return routine.returns ? routine.returns : null
             }
         })
 
-        defineReadOnly(this, "routines", routines);
+        defineReadOnly(this, "routines", routines as any);
     }
 
     /**
@@ -177,13 +194,13 @@ export class LogicDriver extends LogicDescriptor {
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async (logicId: string, signer: Signer, options?: Options): Promise<LogicDriver> => {
+export const getLogicDriver = async <TRoutines extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<TRoutines>> => {
     try {
         const provider = signer.getProvider()
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
         if (typeof manifest === 'object') {
-            return new LogicDriver(logicId, manifest, signer);
+            return new LogicDriver<TRoutines>(logicId, manifest, signer);
         }
 
         ErrorUtils.throwError(

@@ -1,13 +1,12 @@
-import erc20 from "../manifests/erc20.json";
-import {JsonRpcProvider} from "js-moi-providers";
-import {LogicFactory} from "../src/logic-factory";
-import { getLogicDriver } from "../src/logic-driver";
-import { initializeWallet } from "./utils/utils";
+import { JsonRpcProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { Wallet } from "js-moi-wallet";
+import todo from "../manifests/todo.json";
+import { getLogicDriver } from "../src/logic-driver";
+import { LogicFactory } from "../src/logic-factory";
+import { initializeProvider, initializeWallet } from "./utils/utils";
 
 describe("Test Logic Deploy", () => {
-    let logicId: string;
     let wallet: Signer;
 
     test.concurrent("should initialize the wallet", async () => {
@@ -17,22 +16,14 @@ describe("Test Logic Deploy", () => {
         expect(wallet).toBeInstanceOf(Wallet);
     })
 
-    test.concurrent("should deploy the erc20 logic", async() => {
-        expect(wallet).toBeDefined();
+    test.concurrent("should deploy the Todo contract with routine request options", async() => {
+        const provider = initializeProvider();
+        const mnemonic = "crisp seed misery heart hire record can lab exchange skirt always that"
+        const wallet  = await initializeWallet(provider, mnemonic);
 
-        const factory = new LogicFactory(erc20, wallet);
+        const factory = new LogicFactory(todo, wallet);
 
-        const args = [
-            "LOGIC-Token", 
-            "LOGIC", 
-            100000000, 
-            "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-        ]
-
-        const response = await factory.deploy("Seeder!", args).send({
-            fuelPrice: 1,
-            fuelLimit: 2000
-        });
+        const response = await factory.deploy("InitOwner!")
         expect(response).toBeDefined();
 
         const receipt = await response.wait();
@@ -42,33 +33,78 @@ describe("Test Logic Deploy", () => {
         expect(result).toBeDefined();
         expect(result.error).not.toBe("0x");
 
-        logicId = result.logic_id;
+        // logicId = result.logic_id;
     });
 
-    test.concurrent("should execute the erc20 routine", async() => {
-        expect(logicId).toBeDefined();
+    test.concurrent("should deploy the todo routine with routine request options", async() => {
+        const provider = initializeProvider();
+        const mnemonic = "crisp seed misery heart hire record can lab exchange skirt always that"
+        const wallet  = await initializeWallet(provider, mnemonic);
 
-        const seeder = "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34";
-        const logicDriver = await getLogicDriver(logicId, wallet);
-        const name = await logicDriver.persistentState.get("name")
-        expect(name).toBe("LOGIC-Token")
+        console.log(wallet.getAddress())
 
-        const response = await logicDriver.routines.BalanceOf([seeder]).send({
+        const factory = new LogicFactory(todo, wallet);
+
+        const response = await factory.deploy("InitOwner!", {
             fuelPrice: 1,
-            fuelLimit: 2000
-        });
-
-        console.log(response)
+            fuelLimit: 1000
+        })
+        expect(response).toBeDefined();
 
         const receipt = await response.wait();
         expect(receipt).toBeDefined();
 
-        console.log(receipt)
+        const result = await response.result();
+        expect(result).toBeDefined();
+        expect(result.error).not.toBe("0x");
+    });
+
+    test.concurrent("show able to insert add without routine options", async() => {
+        const logicId = "0x080000c613b3d1ec878c2879f9e122e795733bb7e98298af3080256466ab133407fce6"
+        const provider = initializeProvider();
+        const mnemonic = "crisp seed misery heart hire record can lab exchange skirt always that"
+        const wallet  = await initializeWallet(provider, mnemonic);
+
+        const logicDriver = await getLogicDriver(logicId, wallet);
+
+        const title = `Todo ${Math.floor(Math.random() * 1000)}`
+        const response = await logicDriver.routines.AddTodo(title)
+
+        const receipt = await response.wait();
+        expect(receipt).toBeDefined();
 
         const result = await response.result();
         expect(result).toBeDefined();
-        expect(result.output.balance).toBe(100000000)
-
-        console.log(result)
     });
+
+    test.concurrent("show able to retrieve the todo list", async () => {
+        const logicId = "0x0800004bf40852ac85851a2f75a657e4bd2b35d753d5ccc1d904c93733511ae2c3111a"
+        const provider = initializeProvider();
+        const mnemonic = "crisp seed misery heart hire record can lab exchange skirt always that"
+        const wallet  = await initializeWallet(provider, mnemonic);
+
+        const logicDriver = await getLogicDriver(logicId, wallet);
+
+        const result = await logicDriver.routines.GetTodos();
+
+        expect("allTodos" in result).toBeTruthy();
+    });
+
+    test.concurrent("show able to retrieve the todo list with routine options", async () => {
+        const logicId = "0x0800004bf40852ac85851a2f75a657e4bd2b35d753d5ccc1d904c93733511ae2c3111a"
+        const provider = initializeProvider();
+        const mnemonic = "crisp seed misery heart hire record can lab exchange skirt always that"
+        const wallet  = await initializeWallet(provider, mnemonic);
+
+        const logicDriver = await getLogicDriver(logicId, wallet);
+
+        const result = await logicDriver.routines.GetTodos({
+            fuelPrice: 1,
+            fuelLimit: 1000
+        });
+
+        expect("allTodos" in result).toBeTruthy();
+    });
+ 
+
 })
