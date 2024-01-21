@@ -161,10 +161,7 @@ Methods
         "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
     ]
 
-    const response = await factory.deploy("Seeder!", args).send({
-        fuelPrice: 1,
-        fuelLimit: 1000
-    });
+    const response = await factory.deploy("InitOwner!", args)
 
     // interaction response
     console.log("--------");
@@ -283,10 +280,15 @@ Usage
     console.log('name - ' + name)
 
     // Invoking a routine
-    const response = await logicDriver.routines.BalanceOf([seeder]).send({
-        fuelPrice: 1,
-        fuelLimit: 1000
-    });
+    const response = await logicDriver.routines.GetTodos();
+
+    // If you want to pass externally fuelLimit or fuelPrice. Pass the routine options 
+    // as the last argument in routine call
+    // For example:
+    // const response = await logicDriver.routines.GetTodos({
+    //      fuelPrice: 1,
+    //      fuelLimit: 1000,
+    // });
 
     // interaction response
     console.log("--------");
