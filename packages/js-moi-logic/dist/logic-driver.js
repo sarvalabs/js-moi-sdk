@@ -52,7 +52,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 if (!this.isMutableRoutine(routine.name)) {
                     return ixObject.unwrap();
                 }
-                return ixObject.send;
+                return ixObject.send();
             };
             routines[name].isMutable = () => {
                 return this.isMutableRoutine(routine.name);

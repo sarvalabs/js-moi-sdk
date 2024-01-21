@@ -77,7 +77,7 @@ export class LogicDriver<TRoutines extends Record<string, (...args: any) => any>
                     return ixObject.unwrap();
                 }
 
-                return ixObject.send;
+                return ixObject.send();
             };
 
             routines[name].isMutable = (): boolean => {
