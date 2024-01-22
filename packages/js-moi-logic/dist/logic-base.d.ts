@@ -1,11 +1,10 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { IxType } from "js-moi-utils";
-import { LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { InteractionResponse, InteractionCallResponse } from "js-moi-providers";
-import ElementDescriptor from "./element-descriptor";
-import { LogicIxRequest } from "../types/logic";
+import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxRequest } from "../types/logic";
+import ElementDescriptor from "./element-descriptor";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  class for logic-related operations.

@@ -98,10 +98,13 @@ class LogicBase extends element_descriptor_1.default {
         if (args.length < 2) {
             js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
+        if (args[1].sender == null && this.signer.isInitialized()) {
+            args[1].sender = this.signer.getAddress();
+        }
         return {
             type: args[0],
             params: {
-                sender: this.signer.isInitialized() ? this.signer.getAddress() : args[1].sender,
+                sender: args[1].sender,
                 type: this.getIxType(),
                 nonce: args[1].nonce,
                 fuel_price: args[1].fuelPrice,
