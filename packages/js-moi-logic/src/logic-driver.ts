@@ -62,9 +62,9 @@ export class LogicDriver<TRoutines extends Record<string, (...args: any) => any>
             const name = this.normalizeRoutineName(routine.name);
 
             routines[name] = async (...params: any[]) => {
-                const paramsLength = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
+                const argsLen = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
 
-                if (routine.accepts && paramsLength < routine.accepts.length) {
+                if (routine.accepts && argsLen < routine.accepts.length) {
                     ErrorUtils.throwError(
                         "One or more required arguments are missing.",
                         ErrorCode.INVALID_ARGUMENT
@@ -74,10 +74,10 @@ export class LogicDriver<TRoutines extends Record<string, (...args: any) => any>
                 const ixObject = this.createIxObject(routine, ...params);
 
                 if (!this.isMutableRoutine(routine.name)) {
-                    return ixObject.unwrap();
+                    return await ixObject.unwrap();
                 }
 
-                return ixObject.send();
+                return await ixObject.send();
             };
 
             routines[name].isMutable = (): boolean => {
@@ -93,7 +93,7 @@ export class LogicDriver<TRoutines extends Record<string, (...args: any) => any>
             }
         })
 
-        defineReadOnly(this, "routines", routines as any);
+        defineReadOnly(this, "routines", routines as Routines<TRoutines>);
     }
 
     /**

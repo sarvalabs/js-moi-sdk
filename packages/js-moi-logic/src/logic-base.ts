@@ -59,8 +59,8 @@ export abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected async executeRoutine(ixObject: LogicIxObject, type: string, option: RoutineRequestOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
-        const processedArgs = this.processArguments(ixObject, type, option);
+    protected async executeRoutine(ixObject: LogicIxObject, method: string, option: RoutineRequestOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
+        const processedArgs = this.processArguments(ixObject, method, option);
         if(this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
                 "This logic object doesn\'t have address set yet, please set an address first.",
