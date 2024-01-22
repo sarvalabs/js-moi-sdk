@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Tesseract, Interaction } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, Inspect, ContentFrom, Encoding, Registry } from "../types/jsonrpc";
+import { AccountState, AccountMetaInfo, AssetInfo, ContextInfo, Options, TDU, InteractionRequest, InteractionResponse, InteractionReceipt, Content, Status, Inspect, ContentFrom, Encoding, Registry, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo, InteractionCallResponse, SyncStatus } from "../types/jsonrpc";
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
@@ -19,8 +19,11 @@ export declare abstract class AbstractProvider {
     abstract getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo>;
     abstract getLogicIds(address: string, options?: Options): Promise<string[]>;
     abstract getRegistry(address: string, options?: Options): Promise<Registry>;
+    abstract getSyncStatus(address: string): Promise<SyncStatus>;
     abstract getContentFrom(address: string): Promise<ContentFrom>;
     abstract getWaitTime(address: string): Promise<number | bigint>;
+    abstract call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
+    abstract estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>;
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>;
     abstract getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
@@ -30,8 +33,11 @@ export declare abstract class AbstractProvider {
     abstract getStatus(): Promise<Status>;
     abstract getInspect(): Promise<Inspect>;
     abstract getPeers(): Promise<string[]>;
+    abstract getVersion(): Promise<string>;
+    abstract getNodeInfo(): Promise<NodeInfo>;
     abstract getDBEntry(key: string): Promise<string>;
     abstract getAccounts(): Promise<string[]>;
+    abstract getConnections(): Promise<ConnectionsInfo>;
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;
     abstract once(eventName: EventType, listener: Listener): AbstractProvider;
     abstract listenerCount(eventName?: EventType): number;

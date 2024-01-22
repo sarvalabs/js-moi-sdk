@@ -1,5 +1,5 @@
-import { AbstractProvider, Options, InteractionResponse, InteractionRequest } from "js-moi-providers";
-import { SigType, InteractionObject, SigningAlgorithms } from "../types";
+import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
+import { SigType, SigningAlgorithms } from "../types";
 /**
  * An abstract class representing a signer responsible for cryptographic
  * activities like signing and verification.
@@ -38,6 +38,40 @@ export declare abstract class Signer {
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
     private checkInteraction;
+    /**
+     * Prepares the interaction object by populating necessary fields and
+     * performing validity checks.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to prepare.
+     * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
+     * @throws {Error} if the interaction object is not valid or if there is
+     * an error during preparation.
+     */
+    private prepareInteraction;
+    /**
+     * Initiates an interaction by calling a method on the connected provider.
+     * The interaction object is prepared and sent to the provider for execution.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to be executed.
+     * @returns {Promise<InteractionCallResponse>} A Promise that resolves to the
+     * interaction call response.
+     * @throws {Error} if there is an error during the interaction, if the provider
+     * is not initialized,or if the interaction object fails validity checks.
+     */
+    call(ixObject: InteractionObject): Promise<InteractionCallResponse>;
+    /**
+     * Estimates the fuel required for executing an interaction.
+     * The interaction object is used to estimate the amount of fuel needed for execution.
+     *
+     * @param {InteractionObject} ixObject - The interaction object for which
+     * fuel estimation is needed.
+     * @returns {Promise<number | bigint>} A Promise that resolves to the
+     * estimated fuel amount.
+     * @throws {Error} if there is an error during fuel estimation, if the
+     * provider is not initialized, or if the interaction object fails
+     * validity checks.
+     */
+    estimateFuel(ixObject: InteractionObject): Promise<number | bigint>;
     /**
      * Sends an interaction object by signing it with the appropriate signature algorithm
      * and forwarding it to the connected provider.

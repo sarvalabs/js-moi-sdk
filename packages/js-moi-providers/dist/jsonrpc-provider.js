@@ -4,14 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
-const axios_1 = __importDefault(require("axios"));
+const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const js_moi_utils_1 = require("js-moi-utils");
 const base_provider_1 = require("./base-provider");
-const config = {
-    headers: {
-        'Content-Type': 'application/json'
-    },
-};
 /**
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
  */
@@ -50,21 +45,35 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
      * @throws Error if there is an error sending the RPC request.
      */
     async send(method, params) {
-        const payload = {
-            method: method,
-            params: params,
-            jsonrpc: "2.0",
-            id: 1
-        };
-        return axios_1.default.post(this.host, JSON.stringify(payload), config)
-            .then(res => {
-            return res.data;
-        }).catch(err => {
-            if (this.isServerError(err)) {
-                js_moi_utils_1.ErrorUtils.throwError(`Error: ${err.message}`, js_moi_utils_1.ErrorCode.SERVER_ERROR);
+        try {
+            const payload = {
+                method: method,
+                params: params,
+                jsonrpc: "2.0",
+                id: 1
+            };
+            const response = await (0, cross_fetch_1.default)(this.host, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                const errMessage = await response.text();
+                if (this.isServerError(response)) {
+                    js_moi_utils_1.ErrorUtils.throwError(`Error: ${errMessage}`, js_moi_utils_1.ErrorCode.SERVER_ERROR);
+                }
+                throw new Error(errMessage);
             }
-            js_moi_utils_1.ErrorUtils.throwError(`Error: ${err.message}`, js_moi_utils_1.ErrorCode.NETWORK_ERROR);
-        });
+            return await response.json();
+        }
+        catch (error) {
+            if (error instanceof js_moi_utils_1.CustomError) {
+                throw error;
+            }
+            js_moi_utils_1.ErrorUtils.throwError(`Error: ${error.message}`, js_moi_utils_1.ErrorCode.NETWORK_ERROR);
+        }
     }
     /**
      * Starts an event.

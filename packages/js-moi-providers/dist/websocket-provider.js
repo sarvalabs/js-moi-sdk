@@ -36,6 +36,7 @@ var WebSocketEvents;
 (function (WebSocketEvents) {
     WebSocketEvents["TESSERACT"] = "tesseract";
     WebSocketEvents["ALL_TESSERACTS"] = "all_tesseracts";
+    WebSocketEvents["PENDING_INTERACTIONS"] = "pending_interactions";
     WebSocketEvents["CONNECT"] = "connect";
     WebSocketEvents["RECONNECT"] = "reconnect";
     WebSocketEvents["CLOSE"] = "close";
@@ -392,6 +393,11 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             case WebSocketEvents.ALL_TESSERACTS:
                 this._subscribe("all_tesseracts", ["newTesseracts"], (result) => {
                     this.emit(WebSocketEvents.ALL_TESSERACTS, result);
+                });
+                break;
+            case WebSocketEvents.PENDING_INTERACTIONS:
+                this._subscribe("pending_interactions", ["newPendingInteractions"], (result) => {
+                    this.emit(WebSocketEvents.PENDING_INTERACTIONS, result);
                 });
                 break;
             case WebSocketEvents.CONNECT:

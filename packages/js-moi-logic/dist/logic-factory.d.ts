@@ -1,7 +1,8 @@
 import { LogicManifest } from "js-moi-manifest";
 import { IxType } from "js-moi-utils";
-import { LogicPayload, Signer } from "js-moi-signer";
-import { LogicDeployRequest } from "../types/logic";
+import { LogicPayload } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
+import { LogicIxRequest } from "../types/logic";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 /**
@@ -43,8 +44,8 @@ export declare class LogicFactory extends LogicBase {
      *
      * @param {string} builderName - The name of the builder routine.
      * @param {any[]} args - Optional arguments for the deployment.
-     * @returns {LogicDeployRequest} The logic deployment request object.
+     * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    deploy(builderName: string, args?: any[]): LogicDeployRequest;
+    deploy(builderName: string, args?: any[]): LogicIxRequest;
 }

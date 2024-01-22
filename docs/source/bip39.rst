@@ -44,22 +44,21 @@ Functions
 
     // Example
     const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
-    const password = 'password';
-    const seed = mnemonicToSeedSync(mnemonic, password);
-    console.log(seed)
+    const entropy = mnemonicToEntropy(mnemonic);
+    console.log(entropy)
 
-    >> Buffer
+    >> 6ce1535a6fdd4b10efae6f27fa0835b7
 
 .. autofunction:: bip39.entropyToMnemonic
 
 .. code-block:: javascript
 
     // Example
-    const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
-    const entropy = mnemonicToEntropy(mnemonic);
-    console.log(entropy)
+    const entropy = 'c1f651a1fb62bebf8db1ecacf66a6a3d';
+    const mnemonic = entropyToMnemonic(entropy);
+    console.log(mnemonic)
 
-    >> 6ce1535a6fdd4b10efae6f27fa0835b7
+    >> sea raw half walnut cloud garlic cycle diesel provide rebuild once key
 
 .. autofunction:: bip39.generateMnemonic
 

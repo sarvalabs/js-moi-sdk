@@ -119,6 +119,30 @@ The ``AccountMetaInfo`` interface represents meta-information about an account. 
 * ``lattice_exists`` - ``boolean``: Indicates whether a lattice exists for the account.
 * ``state_exists`` - ``boolean``: Indicates whether a state exists for the account.
 
+**AccSyncStatus**
+
+The ``AccSyncStatus`` interface encapsulates information about account synchronization. It includes the following properties:
+
+* ``current_height`` - ``string``: The current tesseract height.
+* ``expected_height`` - ``string``: The expected tesseract height.
+* ``is_primary_sync_done`` - ``boolean``: Indicates whether the primary sync is completed.
+
+**NodeSyncStatus**
+
+The ``NodeSyncStatus`` interface encapsulates information about node synchronization. It includes the following properties:
+
+* ``total_pending_accounts`` - ``string``: The total no of unsynced accounts.
+* ``is_principal_sync_done`` - ``boolean``: Indicates whether the principal sync is completed.
+* ``principal_sync_done_time`` - ``string``: The time at which principal sync got completed.
+* ``is_initial_sync_done`` - ``boolean``: Indicates whether the initial sync is completed.
+
+**SyncStatus**
+
+The ``SyncStatus`` interface represents synchronization status information of an account and it's nodes. It has the following properties:
+
+* ``acc_sync_status`` - ``AccSyncStatus``: The account sync information.
+* ``node_sync_status`` - ``NodeSyncStatus | null``: The node sync information.
+
 **InteractionRequest**
 
 The ``InteractionRequest`` interface represents a signed interaction request. It has the following properties:
@@ -133,6 +157,13 @@ The ``InteractionResponse`` interface represents a response to an interaction. I
 * ``hash`` - ``string``: The hash of the interaction.
 * ``wait`` - ``function``: A function that returns a promise for the interaction receipt after waiting for a specified timeout.
 * ``result`` - ``function``: A function that returns a promise for the result of the interaction after waiting for a specified timeout.
+
+**InteractionCallResponse**
+
+The ``InteractionCallResponse`` interface represents a response to an interaction. It has the following properties:
+
+* ``receipt`` - ``InteractionReceipt``: The receipt of the interaction.
+* ``result`` - ``function``: A function that returns the result of an interaction.
 
 **StateHash**
 
@@ -183,6 +214,80 @@ The ``Registry`` interface represents registry information. It has the following
 
 * ``asset_id`` - ``string``: The ID of the asset in the registry.
 * ``asset_info`` - ``AssetInfo``: Information about the asset in the registry.
+
+**NodeInfo**
+
+The ``NodeInfo`` interface represents information about a node. It has the following property:
+
+* ``krama_id`` - ``string``: The krama id associated with the node.
+
+**ConnectionsInfo**
+
+The ``ConnectionsInfo`` interface provides information about connections and active pub-sub topics. It consists of the following properties:
+
+* ``connections`` - A list of connections, each containing:
+    * ``peer_id`` - ``string``: The ID of the peer associated with the connection.
+    * ``streams`` - A list of streams, each containing:
+        * ``protocol`` - ``string``: The protocol of the stream.
+        * ``direction`` - ``number``: The direction of the stream.
+
+* ``inbound_conn_count`` - ``number``: The count of inbound connections.
+* ``outbound_conn_count`` - ``number``: The count of outbound connections.
+* ``active_pub_sub_topics`` - A dictionary where the keys are topic strings and the values are numbers representing the count of active connections for each topic.
+
+**AssetCreatePayload**
+
+The ``AssetCreatePayload`` interface represents a payload for creating an asset. It has the following properties:
+
+* ``symbol`` - ``string``: The symbol of the asset.
+* ``supply`` - ``number | bigint``: The supply of the asset.
+* ``standard`` - ``AssetStandard``: The asset standard (optional).
+* ``dimension`` - ``number``: The dimension of the asset (optional).
+* ``is_stateful`` - ``boolean``: Indicates whether the asset is stateful (optional).
+* ``is_logical`` - ``boolean``: Indicates whether the asset is logical (optional).
+* ``logic_payload`` - ``LogicPayload``: The payload for the associated logic (optional).
+
+**AssetMintOrBurnPayload**
+
+The ``AssetMintOrBurnPayload`` interface represents a payload for minting or burning an asset. It has the following properties:
+
+* ``asset_id`` - ``string``: The ID of the asset.
+* ``amount`` - ``number | bigint``: The amount to mint or burn.
+
+**LogicPayload**
+
+The ``LogicPayload`` interface represents a payload for logic deployment or invokation. It has the following properties:
+
+* ``logic_id`` - ``string``: The ID of the logic (optional).
+* ``callsite`` - ``string``: The callsite for the logic execution.
+* ``calldata`` - ``Uint8Array``: The calldata for the logic execution.
+* ``manifest`` - ``Uint8Array``: The encoded manifest to deploy (optional).
+
+**InteractionPayload**
+
+The ``InteractionPayload`` type represents a payload for an interaction. It can be one of the following types: ``AssetCreatePayload``, ``AssetMintOrBurnPayload``, or ``LogicPayload``.
+
+**InteractionObject**
+
+The ``InteractionObject`` interface represents an interaction object. It has the following properties:
+
+* ``type`` - ``IxType``: The type of the interaction.
+* ``nonce`` - ``number | bigint``: The nonce value (optional).
+* ``sender`` - ``string``: The sender of the interaction (optional).
+* ``receiver`` - ``string``: The receiver of the interaction (optional).
+* ``payer`` - ``string``: The payer of the interaction (optional).
+* ``transfer_values`` - ``Map<string, number | bigint>``: Transfer values associated with the interaction (optional).
+* ``perceived_values`` - ``Map<string, number | bigint>``: Perceived values associated with the interaction (optional).
+* ``fuel_price`` - ``number | bigint``: The fuel price for the interaction.
+* ``fuel_limit`` - ``number | bigint``: The fuel limit for the interaction.
+* ``payload`` - ``InteractionPayload``: The payload of the interaction (optional).
+
+**CallorEstimateIxObject**
+
+The ``CallorEstimateIxObject`` interface extends ``InteractionObject`` and represents an interaction object. It has the following properties:
+
+* ``nonce`` - ``number | bigint``: The nonce value.
+* ``sender`` - ``string``: The sender of the interaction.
 
 **WsReconnectOptions**
 
@@ -261,8 +366,14 @@ Account Methods
 
 .. autofunction:: getRegistry
 
+.. autofunction:: getSyncStatus
+
 Execution Methods
 ~~~~~~~~~~~~~~~~~
+
+.. autofunction:: BaseProvider#call
+
+.. autofunction:: BaseProvider#estimateFuel
 
 .. autofunction:: BaseProvider#sendInteraction
 
@@ -283,9 +394,17 @@ Query Methods
 
 .. autofunction:: getInspect
 
+.. autofunction:: getPeers
+
+.. autofunction:: BaseProvider#getVersion
+
+.. autofunction:: getNodeInfo
+
 .. autofunction:: getDBEntry
 
 .. autofunction:: getAccounts
+
+.. autofunction:: getConnections
 
 Event Methods
 ~~~~~~~~~~~~~
@@ -326,7 +445,7 @@ Tesseract
     const options = { 
         tesseract_number: 1 
     }
-    const tesseract = provider.getTesseract(address, true, options);
+    const tesseract = await provider.getTesseract(address, true, options);
     console.log(tesseract)
 
     // Output:
@@ -370,7 +489,7 @@ Context Info
 
     // Example
     const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b"
-    const contextInfo = provider.getContextInfo(address)
+    const contextInfo = await provider.getContextInfo(address)
     console.log(contextInfo)
 
     // Output
@@ -453,6 +572,9 @@ height, hash, timestamp, and other relevant data.
 the given address is mined on the blockchain. It provides information about the 
 tesseract.
 
+``PENDING_INTERACTIONS`` - This event is emitted when a new interaction is added to
+interaction pool. It provides an interaction hash.
+
 Usage
 ~~~~~
 
@@ -472,6 +594,9 @@ Subscribing to all tesseracts
 
         // Listen for "tesseracts" event
         provider.on(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
+
+        // Listen for "pending_interactions" event
+        provider.on(WebSocketEvents.PENDING_INTERACTIONS, handleInteraction);
     });
 
     // Listen for "debug" event
@@ -556,7 +681,7 @@ Account State
     const options = {
         tesseract_number: 1
     }
-    const account = provider.getAccountState(address, options)
+    const account = await provider.getAccountState(address, options)
     console.log(account)
 
     // Output
@@ -581,7 +706,7 @@ Interaction By Hash
 
     // Example
     const ixHash = "0x7750a0f1c848e05f1e52204e464af0d9d2f06470117e9187bb3643216c4c4ee9";
-    const interaction = provider.getInteractionByHash(ixHash)
+    const interaction = await provider.getInteractionByHash(ixHash)
     console.log(interaction)
 
     // Output

@@ -54,8 +54,20 @@ class LogicBase extends element_descriptor_1.default {
         }
         switch (processedArgs.type) {
             case "call":
+                return this.signer.call(processedArgs.params)
+                    .then((response) => {
+                    return {
+                        ...response,
+                        result: this.processResult.bind(this, {
+                            ...response,
+                            routine_name: ixObject.routine.name
+                        })
+                    };
+                }).catch((err) => {
+                    throw err;
+                });
             case "estimate":
-                break;
+                return this.signer.estimateFuel(processedArgs.params);
             case "send":
                 return this.signer.sendInteraction(processedArgs.params)
                     .then((response) => {
@@ -83,57 +95,55 @@ class LogicBase extends element_descriptor_1.default {
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
     processArguments(ixObject, args) {
-        if (args.length < 2 || !args[1].sender) {
+        if (args.length < 2) {
             js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        const processedArgs = {
+        return {
             type: args[0],
             params: {
-                sender: args[1].sender
+                sender: this.signer.getAddress(),
+                type: this.getIxType(),
+                nonce: args[1].nonce,
+                fuel_price: args[1].fuelPrice,
+                fuel_limit: args[1].fuelLimit,
+                payload: ixObject.createPayload(),
             }
         };
-        if (args[0] === "send") {
-            processedArgs.params.type = this.getIxType();
-            processedArgs.params.fuel_price = args[1].fuelPrice;
-            processedArgs.params.fuel_limit = args[1].fuelLimit;
-        }
-        processedArgs.params.payload = ixObject.createPayload();
-        return processedArgs;
     }
     /**
-     * Creates a logic execute request object based on the given interaction object.
+     * Creates a logic interaction request object based on the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.
-     * @returns {LogicExecuteRequest} The logic execute request object.
+     * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxRequest(ixObject) {
         return {
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateGas: ixObject.estimateGas.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject)
         };
     }
     /**
-     * Creates a logic execute request object with the specified routine and arguments.
+     * Creates a logic interaction request object with the specified routine and arguments.
      *
-     * @param {LogicManifest.Routine} routine - The routine for the logic execute request.
-     * @param {any[]} args - The arguments for the logic execute request.
-     * @returns {LogicExecuteRequest} The logic execute request object.
+     * @param {LogicManifest.Routine} routine - The routine for the logic interaction request.
+     * @param {any[]} args - The arguments for the logic interaction request.
+     * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
         const ixObject = {
             routine: routine,
             arguments: args
         };
-        // Define call, send, estimateGas methods on ixObject
+        // Define call, send, estimateFuel methods on ixObject
         ixObject.call = (...args) => {
             return this.executeRoutine(ixObject, "call", ...args);
         };
         ixObject.send = (...args) => {
             return this.executeRoutine(ixObject, "send", ...args);
         };
-        ixObject.estimateGas = (...args) => {
-            return this.executeRoutine(ixObject, "estimateGas", ...args);
+        ixObject.estimateFuel = (...args) => {
+            return this.executeRoutine(ixObject, "estimate", ...args);
         };
         ixObject.createPayload = () => {
             return this.createPayload(ixObject);

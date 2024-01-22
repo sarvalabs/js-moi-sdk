@@ -1,14 +1,15 @@
 import { AssetCreationReceipt, AssetStandard, hexToBN, IxType } from "js-moi-utils";
-import { JsonRpcProvider } from "../dist/jsonrpc-provider";
+import { JsonRpcProvider } from "../src/jsonrpc-provider";
 import { InteractionReceipt } from "../types/jsonrpc";
 import { initializeWallet } from "./utils/utils";
 
 describe("Test JsonRpcProvider Query Calls", () => {
-    const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
-    const mnemonic = "mother clarify push liquid ordinary social track brief exit fiction wheat forward";
+    const address = "0x898ca25ac7a51a36894b9c9f55ec6212500dd8e0c01f6591f0eb9f5b0bc84655";
+    const mnemonic = "hockey airport rather chef nasty shrimp tragic embrace olive another own hen";
     let provider:JsonRpcProvider;
     let ixHash: string;
-    let ixReceipt: InteractionReceipt
+    let ixReceipt: InteractionReceipt;
+    let nextNonce = 0;
 
     beforeAll(async() => {
       provider = new JsonRpcProvider('http://localhost:1600');
@@ -27,7 +28,8 @@ describe("Test JsonRpcProvider Query Calls", () => {
       })
 
       ixHash = ixResponse.hash;
-      ixReceipt = await ixResponse.wait()
+      ixReceipt = await ixResponse.wait();
+      nextNonce = Number(nonce) + 1
     });
 
     describe('getBalance', () => {
@@ -189,6 +191,44 @@ describe("Test JsonRpcProvider Query Calls", () => {
         });
     });
 
+    describe("call", () => {
+      it('should return the receipt by executing the interaction', async () => {
+        const receipt = await provider.call({
+          type: IxType.ASSET_CREATE,
+          nonce: nextNonce,
+          sender: address,
+          fuel_price: 1,
+          fuel_limit: 200,
+          payload: {
+              standard: AssetStandard.MAS0,
+              symbol: "CALL",
+              supply: 1248577
+          }
+        })
+
+        expect(receipt).toBeDefined()
+      });
+    })
+
+    describe("estimateFuel", () => {
+      it('should return the estimated fuel by executing the interaction', async () => {
+        const fuelPrice = await provider.estimateFuel({
+          type: IxType.ASSET_CREATE,
+          nonce: nextNonce,
+          sender: address,
+          fuel_price: 1,
+          fuel_limit: 200,
+          payload: {
+              standard: AssetStandard.MAS0,
+              symbol: "ESTIMATE",
+              supply: 1248577
+          }
+        })
+
+        expect(fuelPrice).toBeDefined()
+      });
+    })
+
     describe("getContentFrom", () => {
       it('should return the ixpool content for a given address', async () => {
         const content = await provider.getContentFrom(address);
@@ -234,6 +274,20 @@ describe("Test JsonRpcProvider Query Calls", () => {
       });
     });
 
+    describe("getVersion", () => {
+      it('should return the network version', async () => {
+        const version = await provider.getVersion();
+        expect(version).toBeDefined();
+      });
+    });
+
+    describe("getNodeInfo", () => {
+      it('should return the node info', async () => {
+        const nodeInfo = await provider.getNodeInfo();
+        expect(nodeInfo).toBeDefined();
+      });
+    });
+
     describe("getAccounts", () => {
       it('should return the accounts', async () => {
         const accounts = await provider.getAccounts();
@@ -241,4 +295,11 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(accounts.length).toBeGreaterThanOrEqual(2)
       });
     });
+
+    describe("getConnections", () => {
+      it('should return the connections info', async () => {
+        const info = await provider.getConnections();
+        expect(info).toBeDefined();
+      });
+    })
 });
