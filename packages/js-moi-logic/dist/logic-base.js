@@ -94,15 +94,22 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    processArguments(ixObject, type, option) {
+    processArguments(ixObject, args) {
+        if (args.length < 2) {
+            js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        if (args[1].sender == null && this.signer.isInitialized()) {
+            args[1].sender = this.signer.getAddress();
+        }
         return {
             type,
             params: {
-                sender: this.signer.getAddress(),
+                sender: args[1].sender,
                 type: this.getIxType(),
-                fuel_price: option.fuelPrice,
-                fuel_limit: option.fuelLimit,
-                payload: ixObject.createPayload()
+                nonce: args[1].nonce,
+                fuel_price: args[1].fuelPrice,
+                fuel_limit: args[1].fuelLimit,
+                payload: ixObject.createPayload(),
             }
         };
     }

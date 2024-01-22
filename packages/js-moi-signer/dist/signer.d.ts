@@ -1,4 +1,4 @@
-import { AbstractProvider, Options, InteractionResponse, InteractionRequest, InteractionCallResponse, InteractionObject } from "js-moi-providers";
+import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
 import { SigType, SigningAlgorithms } from "../types";
 /**
  * An abstract class representing a signer responsible for cryptographic
@@ -11,6 +11,7 @@ export declare abstract class Signer {
     abstract getAddress(): string;
     abstract connect(provider: AbstractProvider): void;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
+    abstract isInitialized(): boolean;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
     /**
      * Retrieves the connected provider instance.

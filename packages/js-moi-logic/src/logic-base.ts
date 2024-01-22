@@ -3,7 +3,7 @@ import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-m
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
-import { LogicIxRequest } from "../types/logic";
+import { LogicIxRequest, RoutineRequestOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
 
 /**
@@ -59,7 +59,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected async executeRoutine(ixObject: LogicIxObject, type: string, option: { fuelPrice: number, fuelLimit: number }): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
+    protected async executeRoutine(ixObject: LogicIxObject, type: string, option: RoutineRequestOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
         const processedArgs = this.processArguments(ixObject, type, option);
         if(this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
@@ -115,15 +115,19 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    protected processArguments(ixObject: LogicIxObject, type: string, option: { fuelPrice: number, fuelLimit: number }): LogicIxArguments {
+    protected processArguments(ixObject: LogicIxObject, type: string, option: RoutineRequestOption): LogicIxArguments {
+        if(option.sender == null && this.signer.isInitialized()) {
+            option.sender = this.signer.getAddress();
+        }
+
         return {
             type,
             params: {
-                sender: this.signer.getAddress(),
+                sender: option.sender,
                 type: this.getIxType(),
                 fuel_price: option.fuelPrice,
                 fuel_limit: option.fuelLimit,
-                payload: ixObject.createPayload()
+                payload: ixObject.createPayload(),
             }
         }
     }

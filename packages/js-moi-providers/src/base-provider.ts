@@ -1,18 +1,22 @@
 import { LogicManifest } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, IxType, AssetCreationReceipt, AssetMintOrBurnReceipt,
-LogicDeployReceipt, LogicInvokeReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
-hexToBytes, unmarshal, hexToBN, toQuantity } from "js-moi-utils";
+import {
+    AssetCreationReceipt, AssetMintOrBurnReceipt, ErrorCode, ErrorUtils, Interaction,
+    IxType, LogicDeployReceipt, LogicInvokeReceipt, Tesseract, bytesToHex, hexDataLength,
+    hexToBN, hexToBytes, toQuantity, unmarshal
+} from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
-AssetInfoParams, BalanceParams, ContextInfo, InteractionRequest, 
-InteractionReceipt, InteractionParams, InteractionResponse, 
-LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
-Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
-Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, 
-Registry, TDUResponse, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo, InteractionCallResponse, SyncStatus, SyncStatusParams } from "../types/jsonrpc";
-import { processIxObject } from "./interaction";
+import {
+    AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
+    AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
+    ConnectionsInfo, Content, ContentFrom, ContextInfo, DBEntryParams, Encoding, Filter,
+    FilterDeletionResult, Inspect, InteractionByTesseractParams, InteractionCallResponse,
+    InteractionParams, InteractionReceipt, InteractionRequest, InteractionResponse,
+    LogicManifestParams, NodeInfo, Options, Registry, RpcResponse, Status, StorageParams,
+    SyncStatus, SyncStatusParams, TDU, TDUResponse, TesseractParams
+} from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
+import { processIxObject } from "./interaction";
 
 // Default timeout value in seconds
 const defaultTimeout: number = 120;
@@ -47,7 +51,7 @@ export class BaseProvider extends AbstractProvider {
      */
     protected processResponse(response: RpcResponse): any {
         if(response.result) {
-            if(response.result.data) {
+            if(response.result.data || response.result.data === null) {
                 return response.result.data;
             }
 
@@ -353,6 +357,116 @@ export class BaseProvider extends AbstractProvider {
             const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
 
             return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Initializes a filter for retrieving newly detected terreracts. 
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
+     * the timeout is reset to 1 minute.
+     * 
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     */
+    public async getNewTesseractFilter(): Promise<Filter> {
+        try {
+            const response: RpcResponse = await this.execute("moi.NewTesseractFilter", null);
+
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Initiates a filtering mechanism to fetch recently identified tesseracts
+     * associated with a specific account. The filter setup triggers a 1-minute
+     * timeout period, and with each subsequent request, the timeout is reset to 1 minute.
+     *
+     * @param {string} address - The address of the target account for which new tesseracts are filtered.
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    public async getNewTesseractsByAccountFilter(address: string): Promise<Filter> {
+        try {
+            const params = {
+                address: address
+            };
+
+            const response: RpcResponse = await this.execute("moi.NewTesseractsByAccountFilter", params);
+
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;   
+        }
+    }
+
+    /**
+     * Initiates a filtering mechanism to fetch recently identified pending interaction.
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent request,
+     * the timeout is reset to 1 minute.
+     * 
+     * @returns {Promise<Filter>} A object containing the Filter ID for PendingIxnsFilter
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    public async getPendingInteractionFilter(): Promise<Filter> {
+        try {
+            const params = null;
+
+            const response: RpcResponse = await this.execute('moi.PendingIxnsFilter', params);
+            
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Asynchronously removes the filter and returns a Promise that resolves to a
+     * object.
+     * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
+     * 
+     * @returns {Promise<FilterDeletionResult>} A Promise that resolves to an object with a `status` property indicating the success of the filter removal.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    public async removeFilter(filter: Filter): Promise<FilterDeletionResult> {
+        try {
+            const params = {
+                id: filter.id
+            };
+
+            const response: RpcResponse = await this.execute("moi.RemoveFilter", params);
+
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
+    /**
+     * Retrieves all filter changes since the last poll.
+     *
+     * The specific result varies depending on the type of filter used.
+     * 
+     * @param {Filter} filter - The filter object for which changes are to be retrieved.
+     *
+     * @returns {Promise<T>} A promise that resolves to an object containing information about the changes made to the specified filter since the last poll. The structure of the object is determined by the type of filter provided.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     * 
+     * @template T - The type of the object returned, dependent on the provided filter.
+     */
+    async getFilterChanges<T extends any>(filter: Filter): Promise<T> {
+        try {
+            const params = {
+                id: filter.id
+            };
+
+            const response = await this.execute("moi.GetFilterChanges", params);
+
+            return this.processResponse(response);
         } catch (error) {
             throw error;
         }

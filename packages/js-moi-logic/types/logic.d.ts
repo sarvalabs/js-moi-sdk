@@ -24,6 +24,11 @@ export interface RoutineRequestOption {
      * The fuel limit for the logic interaction request.
      */
     fuelLimit?: number;
+
+    /**
+     * The sender address for the logic interaction request.
+     */
+    sender?: string;
 }
 
 export interface Routine<T extends (...args: any[]) => any> {

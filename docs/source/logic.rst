@@ -130,7 +130,8 @@ applications on the MOI network.
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
-        return await wallet.fromMnemonic(mnemonic);
+        await wallet.fromMnemonic(mnemonic);
+        return wallet;
     }
 
     const manifest = { ... }
@@ -262,7 +263,8 @@ Functions
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
-        return await wallet.fromMnemonic(mnemonic);
+        await wallet.fromMnemonic(mnemonic);
+        return wallet;
     }
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";

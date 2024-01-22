@@ -7,6 +7,7 @@ import { WebsocketProviderOptions } from "../types/provider";
 export declare enum WebSocketEvents {
     TESSERACT = "tesseract",
     ALL_TESSERACTS = "all_tesseracts",
+    PENDING_INTERACTIONS = "pending_interactions",
     CONNECT = "connect",
     RECONNECT = "reconnect",
     CLOSE = "close",
