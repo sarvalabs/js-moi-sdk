@@ -2,26 +2,9 @@ import { LogicManifest } from "js-moi-manifest";
 import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
 
 export interface LogicIxRequest {
-    /**
-     * Calls the logic interaction request.
-     * @returns {Promise<InteractionCallResponse>} a promise that resolves to the logic interaction call response.
-     */
     call: () => Promise<InteractionCallResponse>;
-    /**
-     * Sends the logic interaction request.
-     * @returns {Promise<InteractionResponse>} a promise that resolves to the logic interaction response.
-     */
     send: () => Promise<InteractionResponse>;
-    /**
-     * Estimates the fuel for the logic interaction request.
-     * @returns {Promise<number | bigint>} a promise that resolves to the estimated fuel for the logic interaction request.
-     */
     estimateFuel: () => Promise<number | bigint>;
-    /**
-     * Call the logic interaction request and returns the result.
-     * @returns {Promise<any>} a promise that resolves to the result of the logic interaction request.
-     * @throws {Error} if the logic interaction request fails.
-     */
     unwrap: () => Promise<any>;
 }
 

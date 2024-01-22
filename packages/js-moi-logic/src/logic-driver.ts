@@ -10,8 +10,8 @@ import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
-export class LogicDriver<TRoutines extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
-    public readonly routines: Routines<TRoutines> = {} as Routines<TRoutines>;
+export class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
+    public readonly routines: Routines<T> = {} as Routines<T>;
 
     public readonly persistentState: PersistentState;
     public readonly ephemeralState: EphemeralState;
@@ -93,7 +93,7 @@ export class LogicDriver<TRoutines extends Record<string, (...args: any) => any>
             }
         })
 
-        defineReadOnly(this, "routines", routines as Routines<TRoutines>);
+        defineReadOnly(this, "routines", routines as Routines<T>);
     }
 
     /**
@@ -194,13 +194,13 @@ export class LogicDriver<TRoutines extends Record<string, (...args: any) => any>
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async <TRoutines extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<TRoutines>> => {
+export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<T>> => {
     try {
         const provider = signer.getProvider()
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
         if (typeof manifest === 'object') {
-            return new LogicDriver<TRoutines>(logicId, manifest, signer);
+            return new LogicDriver<T>(logicId, manifest, signer);
         }
 
         ErrorUtils.throwError(

@@ -47,8 +47,8 @@ class LogicBase extends element_descriptor_1.default {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    async executeRoutine(ixObject, type, option) {
-        const processedArgs = this.processArguments(ixObject, type, option);
+    async executeRoutine(ixObject, method, option) {
+        const processedArgs = this.processArguments(ixObject, method, option);
         if (this.getIxType() !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn\'t have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
@@ -94,21 +94,17 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    processArguments(ixObject, args) {
-        if (args.length < 2) {
-            js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-        }
-        if (args[1].sender == null && this.signer.isInitialized()) {
-            args[1].sender = this.signer.getAddress();
+    processArguments(ixObject, type, option) {
+        if (option.sender == null && this.signer.isInitialized()) {
+            option.sender = this.signer.getAddress();
         }
         return {
             type,
             params: {
-                sender: args[1].sender,
+                sender: option.sender,
                 type: this.getIxType(),
-                nonce: args[1].nonce,
-                fuel_price: args[1].fuelPrice,
-                fuel_limit: args[1].fuelLimit,
+                fuel_price: option.fuelPrice,
+                fuel_limit: option.fuelLimit,
                 payload: ixObject.createPayload(),
             }
         };

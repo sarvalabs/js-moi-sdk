@@ -102,8 +102,11 @@ export class LogicFactory extends LogicBase {
 
         if(builder) {
             const builderRoutine = builder.data as LogicManifest.Routine;
+
+            const argsLen = args.at(-1) && typeof args.at(-1) === "object" ? args.length - 1 : args.length;
+
             
-            if(builderRoutine.accepts && (args.length < Object.keys(builderRoutine.accepts).length)) {
+            if(builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
                 ErrorUtils.throwError(
                     "One or more required arguments are missing.",
                     ErrorCode.MISSING_ARGUMENT

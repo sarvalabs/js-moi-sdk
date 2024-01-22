@@ -155,13 +155,6 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const args = [
-        "LOG-FAC", 
-        "LOG", 
-        100000000, 
-        "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-    ]
-
     const response = await factory.deploy("InitOwner!", "LOG-FAC", "LOG", 100000000, "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34");
 
     // In-case you want to pass externally fuelLimit or fuelPrice. Pass the deploy options
@@ -299,70 +292,4 @@ Usage
     //      fuelPrice: 1,
     //      fuelLimit: 1000,
     // });
-
-    // interaction response
-    console.log("--------");
-    console.log("Response");
-    console.log("--------");
-    console.log(response)
-
-    // interaction receipt
-    const receipt = await response.wait();
-    console.log("-------");
-    console.log("Receipt");
-    console.log("-------");
-    console.log(receipt)
-
-    // interaction result containes the decoded output/error
-    const result = await response.result();
-    console.log("-------");
-    console.log("Result");
-    console.log("-------");
-    console.log(result);
-
-    // Output
-    /*
-        name - LOG-FAC
-
-        --------
-        response
-        --------
-        {
-            hash: '0x3492b59462fc7b8b9ec83296c6e04f314d0c93beb1cb2bfd267874b8e17c702c',
-            wait: [Function: bound waitForInteraction] AsyncFunction,
-            result: [Function: bound processResult] AsyncFunction
-        }
-
-        -------
-        receipt
-        -------
-
-        {
-            "ix_type": "0x9",
-            "ix_hash": "0x3492b59462fc7b8b9ec83296c6e04f314d0c93beb1cb2bfd267874b8e17c702c",
-            "status": 0,
-            "fuel_used": "0x46",
-            "hashes": [
-                ...
-            ],
-            "extra_data": {
-                "output": "0x0d2f067562616c616e63650305f5e100",
-                "error": "0x"
-            },
-            "from": "0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba",
-            "to": "0x9fe670db024784ec1b9b3b21cabbafa11f8c0a4fc063c376b453d20deda188de",
-            "ix_index": "0x0",
-            "parts": [
-                ...
-            ]
-        }
-
-        ------
-        result
-        ------
-
-        {
-            output: { balance: 100000000 },
-            error: null
-        }
     */

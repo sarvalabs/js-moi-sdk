@@ -9,8 +9,8 @@ import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
-export declare class LogicDriver<TRoutines extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
-    readonly routines: Routines<TRoutines>;
+export declare class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
+    readonly routines: Routines<T>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
@@ -70,4 +70,4 @@ export declare class LogicDriver<TRoutines extends Record<string, (...args: any)
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export declare const getLogicDriver: <TRoutines extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver<TRoutines>>;
+export declare const getLogicDriver: <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver<T>>;

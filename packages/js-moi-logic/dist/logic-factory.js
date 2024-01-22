@@ -87,7 +87,8 @@ class LogicFactory extends logic_base_1.LogicBase {
         });
         if (builder) {
             const builderRoutine = builder.data;
-            if (builderRoutine.accepts && (args.length < Object.keys(builderRoutine.accepts).length)) {
+            const argsLen = args.at(-1) && typeof args.at(-1) === "object" ? args.length - 1 : args.length;
+            if (builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
                 js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
             return this.createIxObject(builderRoutine, ...args).send();

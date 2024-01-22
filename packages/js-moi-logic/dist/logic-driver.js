@@ -44,15 +44,15 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             }
             const name = this.normalizeRoutineName(routine.name);
             routines[name] = async (...params) => {
-                const paramsLength = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
-                if (routine.accepts && paramsLength < routine.accepts.length) {
+                const argsLen = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
+                if (routine.accepts && argsLen < routine.accepts.length) {
                     js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
                 const ixObject = this.createIxObject(routine, ...params);
                 if (!this.isMutableRoutine(routine.name)) {
-                    return ixObject.unwrap();
+                    return await ixObject.unwrap();
                 }
-                return ixObject.send();
+                return await ixObject.send();
             };
             routines[name].isMutable = () => {
                 return this.isMutableRoutine(routine.name);
