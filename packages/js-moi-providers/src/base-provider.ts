@@ -503,8 +503,6 @@ export class BaseProvider extends AbstractProvider {
                 return response.result.data;
             }
 
-            console.log(response)
-
             return this.processResponse(response);
         } catch (error) {
             throw error;

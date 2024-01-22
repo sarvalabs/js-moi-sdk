@@ -395,7 +395,6 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             if (response.result.data === null) {
                 return response.result.data;
             }
-            console.log(response);
             return this.processResponse(response);
         }
         catch (error) {
