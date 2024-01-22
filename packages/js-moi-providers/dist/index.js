@@ -17,4 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./abstract-provider"), exports);
 __exportStar(require("./base-provider"), exports);
 __exportStar(require("./jsonrpc-provider"), exports);
+__exportStar(require("./voyage-provider"), exports);
 __exportStar(require("./websocket-provider"), exports);

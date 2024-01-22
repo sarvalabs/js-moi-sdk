@@ -78,6 +78,14 @@ class ManifestCoder {
      */
     parseCalldata(schema, arg, updateType = true) {
         const parsableKinds = ["bytes", "array", "map", "struct"];
+        const reconstructSchema = (schema) => {
+            Object.keys(schema.fields).forEach(key => {
+                if (schema.fields[key].kind === "struct") {
+                    schema.fields[key].kind = "document";
+                }
+            });
+            return schema;
+        };
         const parseArray = (schema, arg) => {
             return arg.map((value, index) => this.parseCalldata(schema, value, arg.length - 1 === index));
         };
@@ -93,9 +101,9 @@ class ManifestCoder {
         };
         const parseStruct = (schema, arg, updateType) => {
             Object.keys(arg).forEach(key => {
-                arg[key] = this.parseCalldata(schema.fields[key], arg[key]);
+                arg[key] = this.parseCalldata(schema.fields[key], arg[key], false);
             });
-            const doc = (0, js_polo_1.documentEncode)(arg, schema);
+            const doc = (0, js_polo_1.documentEncode)(arg, reconstructSchema((0, js_moi_utils_1.deepCopy)(schema)));
             if (updateType) {
                 schema.kind = "document";
                 delete schema.fields;
