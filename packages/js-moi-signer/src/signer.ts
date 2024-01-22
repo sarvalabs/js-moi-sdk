@@ -1,8 +1,8 @@
-import { AbstractProvider, Options, InteractionResponse, InteractionRequest, CallorEstimateIxObject, InteractionCallResponse, InteractionObject } from "js-moi-providers";
-import ECDSA_S256 from "./ecdsa";
+import { AbstractProvider, CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, isValidAddress } from "js-moi-utils";
 import { SigType, SigningAlgorithms } from "../types";
+import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
-import { ErrorCode, ErrorUtils, hexToBytes, IxType, isValidAddress } from "js-moi-utils";
 
 /**
  * An abstract class representing a signer responsible for cryptographic 
@@ -74,7 +74,7 @@ export abstract class Signer {
      * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    private checkInteraction(ixObject: InteractionObject, nonce: number | bigint): void {
+    private async checkInteraction(ixObject: InteractionObject): Promise<void> {
         if(ixObject.type === undefined || ixObject.type === null) {
             ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
         }
@@ -110,6 +110,7 @@ export abstract class Signer {
         }
 
         if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
+            const nonce = await this.getNonce({ tesseract_number: -1 });
             if(ixObject.nonce < nonce) {
                 ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
             }
@@ -126,17 +127,14 @@ export abstract class Signer {
      * an error during preparation.
      */
     private async prepareInteraction(ixObject: InteractionObject): Promise<void> {
-        const nonce = await this.getNonce();
-
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
-
-        // Check the validity of the interaction object
-        this.checkInteraction(ixObject, nonce);
-
-        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            ixObject.nonce =  nonce;
+        
+        await this.checkInteraction(ixObject);
+        
+        if (ixObject.nonce != null) {
+            ixObject.nonce = await this.getNonce();
         }
     }
 

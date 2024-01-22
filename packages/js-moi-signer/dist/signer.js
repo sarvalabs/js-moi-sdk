@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Signer = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 const ecdsa_1 = __importDefault(require("./ecdsa"));
 const signature_1 = __importDefault(require("./signature"));
-const js_moi_utils_1 = require("js-moi-utils");
 /**
  * An abstract class representing a signer responsible for cryptographic
  * activities like signing and verification.
@@ -62,7 +62,7 @@ class Signer {
      * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    checkInteraction(ixObject, nonce) {
+    async checkInteraction(ixObject) {
         if (ixObject.type === undefined || ixObject.type === null) {
             js_moi_utils_1.ErrorUtils.throwError("Interaction type is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
@@ -90,6 +90,7 @@ class Signer {
             js_moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
         }
         if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
+            const nonce = await this.getNonce({ tesseract_number: -1 });
             if (ixObject.nonce < nonce) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid nonce", js_moi_utils_1.ErrorCode.NONCE_EXPIRED);
             }
@@ -105,14 +106,12 @@ class Signer {
      * an error during preparation.
      */
     async prepareInteraction(ixObject) {
-        const nonce = await this.getNonce();
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
-        // Check the validity of the interaction object
-        this.checkInteraction(ixObject, nonce);
-        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            ixObject.nonce = nonce;
+        await this.checkInteraction(ixObject);
+        if (ixObject.nonce != null) {
+            ixObject.nonce = await this.getNonce();
         }
     }
     /**
