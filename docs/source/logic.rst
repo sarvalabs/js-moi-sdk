@@ -162,12 +162,12 @@ Methods
         "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
     ]
 
-    const response = await factory.deploy("InitOwner!", args)
+    const response = await factory.deploy("InitOwner!", "LOG-FAC", "LOG", 100000000, "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34");
 
     // In-case you want to pass externally fuelLimit or fuelPrice. Pass the deploy options
     // as the last argument in deploy call
     // For example:
-    // const response = await factory.deploy("InitOwner!", args, {
+    // const response = await factory.deploy("InitOwner!", "LOG-FAC", "LOG", 100000000, "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34", {
     //      fuelPrice: 1,
     //      fuelLimit: 1000,
     // });
