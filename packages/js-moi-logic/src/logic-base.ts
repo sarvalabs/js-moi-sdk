@@ -1,11 +1,10 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import { LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { InteractionResponse, InteractionCallResponse } from "js-moi-providers";
-import ElementDescriptor from "./element-descriptor";
-import { LogicIxRequest } from "../types/logic";
+import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxRequest } from "../types/logic";
+import ElementDescriptor from "./element-descriptor";
 
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base 
@@ -124,11 +123,15 @@ export abstract class LogicBase extends ElementDescriptor {
                 ErrorCode.MISSING_ARGUMENT
             )
         }
+        
+        if(args[1].sender == null && this.signer.isInitialized()) {
+            args[1].sender = this.signer.getAddress()
+        }
 
         return {
             type: args[0],
             params: {
-                sender: this.signer.getAddress(),
+                sender: args[1].sender,
                 type: this.getIxType(),
                 nonce: args[1].nonce,
                 fuel_price: args[1].fuelPrice,

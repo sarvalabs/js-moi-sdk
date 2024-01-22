@@ -5,10 +5,8 @@ import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { initializeWallet } from "./utils/utils";
 
 describe("Test JsonRpcProvider Query Calls", () => {
-    const address =
-      "0x2c1fe83b9d6a5c81c5e6d4da20d2d0509ac3c1eb154e5f5b1fc7d5fd4a03b9cc";
-    const mnemonic =
-      "cushion tissue toss meadow glare math custom because inform describe vacant combine";
+  const address = "0x898ca25ac7a51a36894b9c9f55ec6212500dd8e0c01f6591f0eb9f5b0bc84655";
+  const mnemonic = "hockey airport rather chef nasty shrimp tragic embrace olive another own hen";
     let provider: JsonRpcProvider;
     let ixHash: string;
     let signer: Signer;

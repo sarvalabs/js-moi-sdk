@@ -22,6 +22,7 @@ export abstract class Signer {
     abstract getAddress(): string;
     abstract connect(provider: AbstractProvider): void;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
+    abstract isInitialized(): boolean;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
 
 
@@ -83,7 +84,11 @@ export abstract class Signer {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
-        if(ixObject.sender !== this.getAddress()) {
+        if(ixObject.sender == null) {
+            ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
+        }
+
+        if(this.isInitialized() && ixObject.sender !== this.getAddress()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
