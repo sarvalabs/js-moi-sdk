@@ -130,6 +130,7 @@ The `Exception` interface defines an exception. It has three properties:
 * ``class`` - ``string``: The exception class.
 * ``data`` - ``string``: The exception message.
 * ``trace`` - ``string[]``: The stack trace of the exception.
+* ``revert`` - ``boolean``: Represents the interaction revert status.
 
 **PoloSchema**
 

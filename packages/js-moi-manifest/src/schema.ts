@@ -240,6 +240,9 @@ export class Schema {
                         kind: "string"
                     }
                 }
+            },
+            revert: {
+                kind: "bool"
             }
         }
     }

@@ -1,19 +1,23 @@
+import { Signer } from "js-moi-signer";
 import { AssetCreationReceipt, AssetStandard, hexToBN, IxType } from "js-moi-utils";
 import { JsonRpcProvider } from "../src/jsonrpc-provider";
-import { InteractionReceipt } from "../types/jsonrpc";
+import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { initializeWallet } from "./utils/utils";
 
 describe("Test JsonRpcProvider Query Calls", () => {
-    const address = "0x898ca25ac7a51a36894b9c9f55ec6212500dd8e0c01f6591f0eb9f5b0bc84655";
-    const mnemonic = "hockey airport rather chef nasty shrimp tragic embrace olive another own hen";
-    let provider:JsonRpcProvider;
+    const address =
+      "0x2c1fe83b9d6a5c81c5e6d4da20d2d0509ac3c1eb154e5f5b1fc7d5fd4a03b9cc";
+    const mnemonic =
+      "cushion tissue toss meadow glare math custom because inform describe vacant combine";
+    let provider: JsonRpcProvider;
     let ixHash: string;
+    let signer: Signer;
     let ixReceipt: InteractionReceipt;
     let nextNonce = 0;
 
     beforeAll(async() => {
       provider = new JsonRpcProvider('http://localhost:1600');
-      const signer = await initializeWallet(provider, mnemonic)
+      signer = await initializeWallet(provider, mnemonic)
       const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
         type: IxType.ASSET_CREATE,
@@ -296,6 +300,91 @@ describe("Test JsonRpcProvider Query Calls", () => {
       });
     });
 
+    describe("getNewTesseractFilter", () => {
+      it("should return the filter object containing the filter id", async () => {
+        const filter = await provider.getNewTesseractFilter();
+
+        expect(filter).toBeDefined();
+        expect(filter).toHaveProperty("id");
+        expect(typeof filter.id).toBe("string");
+      });
+    });
+
+    describe("getNewTesseractsByAccountFilter", () => {
+      it("should return a filter object containing filter id", async () => {
+        const filter = await provider.getNewTesseractsByAccountFilter(address);
+
+        expect(filter).toBeDefined();
+        expect(filter).toHaveProperty("id");
+        expect(typeof filter.id).toBe("string");
+      })
+    });
+
+    describe("getPendingInteractionFilter", () => {
+      it("should return a filter object containing filter id", async () => {
+        const filter = await provider.getPendingInteractionFilter();
+
+        expect(filter).toBeDefined();
+        expect(filter).toHaveProperty("id");
+        expect(typeof filter.id).toBe("string");
+      })
+    });
+
+    describe("removeFilter", () => {
+      it("should a return a object containing status of removal", async () => {
+        const filter = await provider.getNewTesseractsByAccountFilter(address);
+
+        const result = await provider.removeFilter(filter);
+
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty("status");
+        expect(result.status).toBe(true);
+      })
+
+      it("should return object with status 'false' for deleted or non-existent filters", async () => {
+        const NOT_EXISTING_FILTER_ID = "678384f8-04e4-4984-9d51-44bfa5b185eb"
+        const filter: Filter = {
+          id: NOT_EXISTING_FILTER_ID
+        }
+
+        const result = await provider.removeFilter(filter);
+        
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty("status");
+        expect(result.status).toBe(false);
+      })
+    });
+
+    describe("getFilterChanges", () => {
+      it("should return null when no changes made", async () => {
+        const filter = await provider.getNewTesseractFilter();
+        const result = await provider.getFilterChanges(filter);
+        expect(result).toBeNull();
+      });
+
+      it("should return an array of terreracts", async () => {
+        const nonce = await signer.getNonce();
+        const filter = await provider.getNewTesseractFilter();
+        const ixResponse = await signer.sendInteraction({
+          type: IxType.ASSET_CREATE,
+          nonce: nonce,
+          fuel_price: 1,
+          fuel_limit: 200,
+          payload: {
+              standard: AssetStandard.MAS0,
+              symbol: "TESTING",
+              supply: 1248577
+          }
+        });
+
+        await ixResponse.wait()
+        const tesseracts = await provider.getFilterChanges(filter);
+
+        expect(Array.isArray(tesseracts)).toBeTruthy()
+        expect(Array.length).toBeGreaterThanOrEqual(1);
+      })
+    });
+    
     describe("getConnections", () => {
       it('should return the connections info', async () => {
         const info = await provider.getConnections();

@@ -1,10 +1,10 @@
 import {
     AssetCreationReceipt,
-    AssetMintOrBurnReceipt, 
-    AssetStandard, 
-    IxType, 
-    LogicDeployReceipt, 
-    LogicInvokeReceipt 
+    AssetMintOrBurnReceipt,
+    AssetStandard,
+    IxType,
+    LogicDeployReceipt,
+    LogicInvokeReceipt
 } from "js-moi-utils";
 
 export interface Options {
@@ -202,6 +202,14 @@ export interface Content {
 export interface ContentFrom {
     pending: Map<number | bigint, InteractionInfo>;
     queued: Map<number | bigint, InteractionInfo>;
+}
+
+export interface Filter {
+    id: string;
+}
+
+export interface FilterDeletionResult {
+    status: boolean;
 }
 
 export interface Status {
