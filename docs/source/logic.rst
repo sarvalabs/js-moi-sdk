@@ -164,6 +164,14 @@ Methods
 
     const response = await factory.deploy("InitOwner!", args)
 
+    // In-case you want to pass externally fuelLimit or fuelPrice. Pass the deploy options
+    // as the last argument in deploy call
+    // For example:
+    // const response = await factory.deploy("InitOwner!", args, {
+    //      fuelPrice: 1,
+    //      fuelLimit: 1000,
+    // });
+
     // interaction response
     console.log("--------");
     console.log("Response");
