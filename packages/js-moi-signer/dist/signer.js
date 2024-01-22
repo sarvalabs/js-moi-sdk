@@ -109,11 +109,10 @@ class Signer {
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
+        await this.checkInteraction(ixObject);
         if (ixObject.nonce != null) {
-            await this.checkInteraction(ixObject);
-            return;
+            ixObject.nonce = await this.getNonce();
         }
-        ixObject.nonce = await this.getNonce();
     }
     /**
      * Initiates an interaction by calling a method on the connected provider.
