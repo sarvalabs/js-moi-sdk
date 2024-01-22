@@ -84,7 +84,7 @@ export class BaseProvider extends AbstractProvider {
      */
     protected processResponse(response: RpcResponse): any {
         if(response.result) {
-            if(response.result.data) {
+            if(response.result.data || response.result.data === null) {
                 return response.result.data;
             }
 
@@ -498,10 +498,6 @@ export class BaseProvider extends AbstractProvider {
             };
 
             const response = await this.execute("moi.GetFilterChanges", params);
-
-            if(response.result.data === null) {
-                return response.result.data;
-            }
 
             return this.processResponse(response);
         } catch (error) {

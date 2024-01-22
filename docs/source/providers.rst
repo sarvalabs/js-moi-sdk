@@ -221,9 +221,9 @@ The ``Filter`` interface represents a filter with a unique identifier. It has th
 
 * ``id`` - ``string``: The unique identifier for the filter.
 
-**FilterDeletionStatus**
+**FilterDeletionResult**
 
-The ``FilterDeletionStatus`` interface represents the status of a deletion operation. It has the following properties:
+The ``FilterDeletionResult`` interface represents the result of a deletion operation. It has the following properties:
 
 * ``status`` - ``boolean``: Indicates whether the deletion was successful (true) or not (false).
 **NodeInfo**
