@@ -215,6 +215,17 @@ The ``Registry`` interface represents registry information. It has the following
 * ``asset_id`` - ``string``: The ID of the asset in the registry.
 * ``asset_info`` - ``AssetInfo``: Information about the asset in the registry.
 
+**Filter**
+
+The ``Filter`` interface represents a filter with a unique identifier. It has the following properties:
+
+* ``id`` - ``string``: The unique identifier for the filter.
+
+**FilterDeletionResult**
+
+The ``FilterDeletionResult`` interface represents the result of a deletion operation. It has the following properties:
+
+* ``status`` - ``boolean``: Indicates whether the deletion was successful (true) or not (false).
 **NodeInfo**
 
 The ``NodeInfo`` interface represents information about a node. It has the following property:
@@ -404,6 +415,16 @@ Query Methods
 
 .. autofunction:: getAccounts
 
+.. autofunction:: getNewTesseractFilter
+
+.. autofunction:: getNewTesseractsByAccountFilter
+
+.. autofunction:: getPendingInteractionFilter
+
+.. autofunction:: getFilterChanges
+
+.. autofunction:: removeFilter
+
 .. autofunction:: getConnections
 
 Event Methods
@@ -572,6 +593,9 @@ height, hash, timestamp, and other relevant data.
 the given address is mined on the blockchain. It provides information about the 
 tesseract.
 
+``PENDING_INTERACTIONS`` - This event is emitted when a new interaction is added to
+interaction pool. It provides an interaction hash.
+
 Usage
 ~~~~~
 
@@ -591,6 +615,9 @@ Subscribing to all tesseracts
 
         // Listen for "tesseracts" event
         provider.on(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
+
+        // Listen for "pending_interactions" event
+        provider.on(WebSocketEvents.PENDING_INTERACTIONS, handleInteraction);
     });
 
     // Listen for "debug" event

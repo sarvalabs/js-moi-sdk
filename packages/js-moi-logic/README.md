@@ -39,6 +39,7 @@ npm install js-moi-wallet
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
         await wallet.fromMnemonic(mnemonic);
+        return wallet;
     }
 
     (async () => {
