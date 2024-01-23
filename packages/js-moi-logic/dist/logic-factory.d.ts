@@ -3,7 +3,7 @@ import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
-import { RoutineRequestOption } from "../types/logic";
+import { RoutineOption } from "../types/logic";
 import { LogicBase } from "./logic-base";
 /**
  * This class represents a factory for deploying logic.
@@ -47,5 +47,5 @@ export declare class LogicFactory extends LogicBase {
      * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    deploy(builderName: string, ...args: [...any, option?: RoutineRequestOption]): Promise<InteractionResponse>;
+    deploy(builderName: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse>;
 }

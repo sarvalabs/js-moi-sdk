@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
+const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
 const state_1 = require("./state");
@@ -12,20 +13,23 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     routines = {};
     persistentState;
     ephemeralState;
-    constructor(logicId, manifest, signer) {
-        super(logicId, manifest, signer);
+    constructor(logicId, manifest, value) {
+        super(logicId, manifest, value);
         this.createState();
         this.createRoutines();
+    }
+    connect(signer) {
+        super.connect(signer);
+        this.createState();
     }
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
      */
     createState() {
-        const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, provider);
+            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.provider);
             (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
     }
@@ -44,7 +48,9 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             }
             const name = this.normalizeRoutineName(routine.name);
             routines[name] = async (...params) => {
-                const argsLen = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
+                const argsLen = params.at(-1) && typeof params.at(-1) === "object"
+                    ? params.length - 1
+                    : params.length;
                 if (routine.accepts && argsLen < routine.accepts.length) {
                     js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
@@ -152,10 +158,13 @@ exports.LogicDriver = LogicDriver;
  */
 const getLogicDriver = async (logicId, signer, options) => {
     try {
-        const provider = signer.getProvider();
+        const provider = signer instanceof js_moi_signer_1.Signer ? signer.getProvider() : signer;
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
-        if (typeof manifest === 'object') {
-            return new LogicDriver(logicId, manifest, signer);
+        if (typeof manifest === "object") {
+            // this check is required for type safety
+            return signer instanceof js_moi_signer_1.Signer
+                ? new LogicDriver(logicId, manifest, signer)
+                : new LogicDriver(logicId, manifest, signer);
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }

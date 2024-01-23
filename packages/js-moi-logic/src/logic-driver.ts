@@ -1,5 +1,5 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { LogicPayload, Options } from "js-moi-providers";
+import { AbstractProvider, LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -12,14 +12,20 @@ import { EphemeralState, PersistentState } from "./state";
  */
 export class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
     public readonly routines: Routines<T> = {} as Routines<T>;
-
     public readonly persistentState: PersistentState;
     public readonly ephemeralState: EphemeralState;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
-        super(logicId, manifest, signer)
+    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: AbstractProvider);
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
+    constructor(logicId: string, manifest: LogicManifest.Manifest, value: Signer | AbstractProvider) {
+        super(logicId, manifest, value)
         this.createState();
         this.createRoutines();
+    }
+
+    public override connect(signer: Signer): void {
+        super.connect(signer);
+        this.createState();
     }
 
     /**
@@ -27,7 +33,6 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      if available in logic manifest.
      */
     private createState() {
-        const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
 
         if(persistentStateExists) {
@@ -35,7 +40,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 this.logicId.hex(),
                 this.elements.get(persistentStatePtr),
                 this.manifestCoder,
-                provider
+                this.provider
             )
 
             defineReadOnly(this, "persistentState", persistentState)
@@ -62,13 +67,16 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             const name = this.normalizeRoutineName(routine.name);
 
             routines[name] = async (...params: any[]) => {
-                const argsLen = params.at(-1) && typeof params.at(-1) === "object" ? params.length - 1 : params.length;
+                const argsLen =
+                    params.at(-1) && typeof params.at(-1) === "object"
+                        ? params.length - 1
+                        : params.length;
 
                 if (routine.accepts && argsLen < routine.accepts.length) {
                     ErrorUtils.throwError(
                         "One or more required arguments are missing.",
                         ErrorCode.INVALID_ARGUMENT
-                    )
+                    );
                 }
 
                 const ixObject = this.createIxObject(routine, ...params);
@@ -194,19 +202,23 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<T>> => {
+export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer | AbstractProvider, options?: Options): Promise<LogicDriver<T>> => {
     try {
-        const provider = signer.getProvider()
+        const provider =
+            signer instanceof Signer ? signer.getProvider() : signer;
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
-        if (typeof manifest === 'object') {
-            return new LogicDriver<T>(logicId, manifest, signer);
+        if (typeof manifest === "object") {
+            // this check is required for type safety
+            return signer instanceof Signer
+                ? new LogicDriver<T>(logicId, manifest, signer)
+                : new LogicDriver<T>(logicId, manifest, signer);
         }
 
         ErrorUtils.throwError(
             "Invalid logic manifest",
             ErrorCode.INVALID_ARGUMENT
-        )
+        );
     } catch(err) {
         throw err;
     }

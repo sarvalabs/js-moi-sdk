@@ -62,37 +62,37 @@ class Signer {
      * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    async checkInteraction(ixObject) {
-        if (ixObject.type === undefined || ixObject.type === null) {
+    async checkInteraction(ixObject, options) {
+        if (ixObject.type == null) {
             js_moi_utils_1.ErrorUtils.throwError("Interaction type is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
+        if (!options.ignore?.sender && !(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid sender address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        if (ixObject.sender == null) {
+        if (!options.ignore?.sender && ixObject.sender == null) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
+        if (!options.ignore?.sender && (this.isInitialized() && ixObject.sender !== this.getAddress())) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.type === js_moi_utils_1.IxType.VALUE_TRANSFER) {
-            if (!ixObject.receiver) {
+            if (!options.ignore?.receiver && !ixObject.receiver) {
                 js_moi_utils_1.ErrorUtils.throwError("Receiver address is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
-            if (!(0, js_moi_utils_1.isValidAddress)(ixObject.receiver)) {
+            if (!options.ignore?.receiver && !(0, js_moi_utils_1.isValidAddress)(ixObject.receiver)) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid receiver address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
         }
-        if (ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
+        if (!options.ignore?.fuel_price && ixObject.fuel_price == null) {
             js_moi_utils_1.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
+        if (!options.ignore?.fuel_limit && ixObject.fuel_limit == null) {
             js_moi_utils_1.ErrorUtils.throwError("Fuel limit is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (ixObject.fuel_limit === 0) {
+        if (!options.ignore?.fuel_limit && ixObject.fuel_limit === 0) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
         }
-        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
+        if (!options.ignore?.nonce && ixObject.nonce != null) {
             const nonce = await this.getNonce({ tesseract_number: -1 });
             if (ixObject.nonce < nonce) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid nonce", js_moi_utils_1.ErrorCode.NONCE_EXPIRED);
@@ -104,15 +104,17 @@ class Signer {
      * performing validity checks.
      *
      * @param {InteractionObject} ixObject - The interaction object to prepare.
+     * @param {Options} options - The options for preparing the interaction object. (optional)
+     * @param {object} options.ignore - The fields to ignore validation during preparation. (optional)
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is
      * an error during preparation.
      */
-    async prepareInteraction(ixObject) {
+    async prepareInteraction(ixObject, options = {}) {
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
-        await this.checkInteraction(ixObject);
+        await this.checkInteraction(ixObject, options);
         if (ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }
@@ -130,7 +132,9 @@ class Signer {
     async call(ixObject) {
         // Get the provider
         const provider = this.getProvider();
-        await this.prepareInteraction(ixObject);
+        await this.prepareInteraction(ixObject, {
+            ignore: { fuel_limit: true, fuel_price: true }
+        });
         return await provider.call(ixObject);
     }
     /**
@@ -148,7 +152,9 @@ class Signer {
     async estimateFuel(ixObject) {
         // Get the provider
         const provider = this.getProvider();
-        await this.prepareInteraction(ixObject);
+        await this.prepareInteraction(ixObject, { 
+            ignore: { fuel_limit: true, fuel_price: true } 
+        });
         return await provider.estimateFuel(ixObject);
     }
     /**

@@ -37,7 +37,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      */
     processResponse(response) {
         if (response.result) {
-            if (response.result.data || response.result.data === null) {
+            if (response.result.data) {
                 return response.result.data;
             }
             js_moi_utils_1.ErrorUtils.throwError(response.result.error.message, js_moi_utils_1.ErrorCode.SERVER_ERROR);
@@ -392,6 +392,9 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 id: filter.id
             };
             const response = await this.execute("moi.GetFilterChanges", params);
+            if (response.result.data == null) {
+                return null;
+            }
             return this.processResponse(response);
         }
         catch (error) {

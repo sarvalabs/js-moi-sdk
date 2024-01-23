@@ -1,5 +1,5 @@
 import { LogicManifest } from "js-moi-manifest";
-import { LogicPayload, Options } from "js-moi-providers";
+import { AbstractProvider, LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -13,7 +13,9 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
     readonly routines: Routines<T>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
+    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: AbstractProvider);
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
+    connect(signer: Signer): void;
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
@@ -70,4 +72,4 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export declare const getLogicDriver: <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver<T>>;
+export declare const getLogicDriver: <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer | AbstractProvider, options?: Options) => Promise<LogicDriver<T>>;
