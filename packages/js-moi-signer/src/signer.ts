@@ -138,7 +138,7 @@ export abstract class Signer {
         
         await this.checkInteraction(ixObject);
         
-        if (ixObject.nonce != null) {
+        if (ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }
     }
