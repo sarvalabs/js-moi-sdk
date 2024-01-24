@@ -1,108 +1,158 @@
 import { JsonRpcProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { Wallet } from "js-moi-wallet";
-import todo from "../manifests/todo.json";
+
 import { getLogicDriver } from "../src/logic-driver";
 import { LogicFactory } from "../src/logic-factory";
-import { initializeProvider, initializeWallet } from "./utils/utils";
+
+import manifest from "../manifests/erc20.json";
 
 describe("Test Logic Deploy", () => {
-    let wallet: Signer;
+    const HOST = "http://localhost:1600/";
+    const MNEMONIC = "main story burst wonder sausage spice okay pioneer person unaware force bubble";
+    const INITIAL_SUPPLY = 100000000;
+    const SYMBOL = "MOI";
+    const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
+    const deviationPath: string | undefined = "m/44'/6174'/0'/0/1";
+    let signer: Signer;
+    let logicId: string | undefined;
 
-    test.concurrent("should initialize the wallet", async () => {
-        const provider = new JsonRpcProvider("http://localhost:1600/");
-        const mnemonic = "disease into limb company taxi unaware collect vehicle upper final problem proof";
-        wallet = await initializeWallet(provider, mnemonic);
-        expect(wallet).toBeInstanceOf(Wallet);
-    })
+    beforeAll(async () => {
+        const provider = new JsonRpcProvider(HOST);
+        const wallet = new Wallet(provider);
 
-    test.concurrent("should deploy the Todo contract with routine request options", async() => {
-        const provider = initializeProvider() as JsonRpcProvider;
-        const mnemonic = "crisp seed misery heart hire cat can lab exchange skirt always mice"
-        const wallet  = await initializeWallet(provider, mnemonic);
-
-        const factory = new LogicFactory(todo, wallet);
-
-        const response = await factory.deploy("InitOwner!")
-        expect(response).toBeDefined();
-
-        const receipt = await response.wait();
-        expect(receipt).toBeDefined();
-
-        const result = await response.result();
-        expect(result).toBeDefined();
-        expect(result.error).not.toBe("0x");
-
-        // logicId = result.logic_id;
+        await wallet.fromMnemonic(MNEMONIC, deviationPath);
+        signer = wallet;
     });
 
-    test.concurrent("should deploy the todo routine with routine request options", async() => {
-        const provider = initializeProvider() as JsonRpcProvider;
-        const mnemonic = "crisp seed misery heart hire cat can lab exchange skirt always mice"
-        const wallet  = await initializeWallet(provider, mnemonic);
-
-        const factory = new LogicFactory(todo, wallet);
-
-        const response = await factory.deploy("InitOwner!", {
-            fuelPrice: 1,
-            fuelLimit: 1000
-        })
-        expect(response).toBeDefined();
-
-        const receipt = await response.wait();
-        expect(receipt).toBeDefined();
-
-        const result = await response.result();
-        expect(result).toBeDefined();
-        expect(result.error).not.toBe("0x");
+    test("should initialize the wallet", async () => {
+        expect(signer).toBeInstanceOf(Wallet);
+        expect(signer.getAddress()).toBeDefined();
     });
 
-    test.concurrent("show able to insert add without routine options", async() => {
-        const logicId = "0x080000c613b3d1ec878c2879f9e122e795733bb7e98298af3080256466ab133407fce6"
-        const provider = initializeProvider() as JsonRpcProvider;
-        const mnemonic = "crisp seed misery heart hire cat can lab exchange skirt always mice"
-        const wallet  = await initializeWallet(provider, mnemonic);
+    describe("should deploy contract", () => {
+        test("should deploy contract without options", async () => {
+            const factory = new LogicFactory(manifest, signer);
 
-        const logicDriver = await getLogicDriver(logicId, wallet);
+            const symbol = SYMBOL;
+            const supply = INITIAL_SUPPLY;
 
-        const title = `Todo ${Math.floor(Math.random() * 1000)}`
-        const response = await logicDriver.routines.AddTodo(title)
+            const ix = await factory.deploy("Seed!", symbol, supply);
+            
+            const receipt = await ix.wait();
+            const result = await ix.result();
+            logicId = result.logic_id;
 
-        const receipt = await response.wait();
-        expect(receipt).toBeDefined();
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
 
-        const result = await response.result();
-        expect(result).toBeDefined();
-    });
-
-    test.concurrent("show able to retrieve the todo list", async () => {
-        const logicId = "0x0800004bf40852ac85851a2f75a657e4bd2b35d753d5ccc1d904c93733511ae2c3111a"
-        const provider = initializeProvider() as JsonRpcProvider;
-        const mnemonic = "crisp seed misery heart hire cat can lab exchange skirt always mice"
-        const wallet  = await initializeWallet(provider, mnemonic);
-
-        const logicDriver = await getLogicDriver(logicId, wallet);
-
-        const result = await logicDriver.routines.GetTodos();
-
-        expect("allTodos" in result).toBeTruthy();
-    });
-
-    test.concurrent("show able to retrieve the todo list with routine options", async () => {
-        const logicId = "0x0800004bf40852ac85851a2f75a657e4bd2b35d753d5ccc1d904c93733511ae2c3111a"
-        const provider = initializeProvider() as JsonRpcProvider;
-        const mnemonic = "crisp seed misery heart hire cat can lab exchange skirt always mice"
-        const wallet  = await initializeWallet(provider, mnemonic);
-
-        const logicDriver = await getLogicDriver(logicId, wallet);
-
-        const result = await logicDriver.routines.GetTodos({
-            fuelPrice: 1,
-            fuelLimit: 1000
         });
 
-        expect("allTodos" in result).toBeTruthy();
-    });
- 
 
+        test("should deploy contract with options", async () => {
+            const factory = new LogicFactory(manifest, signer);
+            const symbol = "MOI";
+            const supply = 100000000;
+            const option = { fuelPrice: 1, fuelLimit: 3000 + Math.floor(Math.random() * 3000) }
+            const ix = await factory.deploy("Seed!", symbol, supply, option);
+            
+            const receipt = await ix.wait();
+            const result = await ix.result();
+            logicId = result.logic_id;
+
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+        });
+    });
+
+    test("should able to retrieve balance of the address", async () => {
+        if(logicId == null) {
+            throw new Error("logicId is not defined");
+        };
+
+        if (signer == null) {
+            throw new Error("signer is not defined");
+        };
+
+        const logic = await getLogicDriver(logicId, signer);
+
+        if(logic == null) {
+            throw new Error("logic is not defined");
+        }
+
+        const output = await logic.routines.BalanceOf(signer.getAddress());
+        
+        expect(output.balance).toBe(INITIAL_SUPPLY);
+    });
+
+    describe('should able to do mutating routine call', () => { 
+        test("should able to transfer without option", async () => {
+            if(logicId == null) {
+                throw new Error("logicId is not defined");
+            };
+
+            if (signer == null) {
+                throw new Error("signer is not defined");
+            };
+
+            const logic = await getLogicDriver(logicId, signer);
+
+            if(logic == null) {
+                throw new Error("logic is not defined");
+            }
+
+            const amount = 1000;
+            const ix = await logic.routines.Transfer(RECEIVER, amount);
+            const receipt = await ix.wait();
+
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+        })
+
+        test("should able to transfer with option", async () => {
+            if(logicId == null) {
+                throw new Error("logicId is not defined");
+            };
+
+            if (signer == null) {
+                throw new Error("signer is not defined");
+            };
+
+            const logic = await getLogicDriver(logicId, signer);
+
+            if(logic == null) {
+                throw new Error("logic is not defined");
+            }
+
+            const amount = Math.floor(Math.random() * 1000);
+            const option = { fuelPrice: 1, fuelLimit: 1000 + Math.floor(Math.random() * 1000) }
+            const ix = await logic.routines.Transfer(RECEIVER, amount, option);
+            const receipt = await ix.wait();
+            const output = await logic.routines.BalanceOf(RECEIVER);
+
+            expect(output.balance).toBeGreaterThanOrEqual(amount);
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+        })
+    });
+
+    test("should be able to read from persistent storage", async () => {
+        if(logicId == null) {
+            throw new Error("logicId is not defined");
+        };
+
+        if (signer == null) {
+            throw new Error("signer is not defined");
+        };
+
+        const logic = await getLogicDriver(logicId, signer);
+
+        if(logic == null) {
+            throw new Error("logic is not defined");
+        }
+
+        const symbol = await logic.persistentState.get("symbol");
+
+        expect(symbol).toBe(SYMBOL);
+    });
 })
