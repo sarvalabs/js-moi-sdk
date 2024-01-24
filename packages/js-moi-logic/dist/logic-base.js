@@ -64,11 +64,6 @@ class LogicBase extends element_descriptor_1.default {
         if (isSignerRequired && this.signer == null) {
             js_moi_utils_1.ErrorUtils.throwError("Signer is not initialized!", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
-        // console.log("-".repeat(20), "Params Start", "-".repeat(20));
-        // console.log("Method ::", type);
-        // console.log(params);
-        // console.log("-".repeat(20), "Params End", "-".repeat(20));
-        // console.log("\n");
         switch (type) {
             case "call": {
                 const response = await this.provider.call(params);

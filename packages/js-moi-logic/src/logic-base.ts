@@ -87,12 +87,6 @@ export abstract class LogicBase extends ElementDescriptor {
             );
         }
 
-        // console.log("-".repeat(20), "Params Start", "-".repeat(20));
-        // console.log("Method ::", type);
-        // console.log(params);
-        // console.log("-".repeat(20), "Params End", "-".repeat(20));
-        // console.log("\n");
-
         switch (type) {
             case "call": {
                 const response = await this.provider.call(params as CallorEstimateIxObject);
