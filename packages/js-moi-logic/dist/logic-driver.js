@@ -150,8 +150,12 @@ exports.LogicDriver = LogicDriver;
 /**
  * Returns a logic driver instance based on the given logic id.
  *
+ * If a signer is provided, the logic driver will be able to execute mutable
+ * routines. Otherwise, it will throw an error when trying to execute a mutable routine.
+ * In case of non-mutable routines, the logic driver will be able to execute them.
+ *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer} signer - The signer instance for signing the interactions.
+ * @param {Signer | AbstractProvider} signer - The signer or provider instance.
  * @param {Options} options - The custom tesseract options for retrieving
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.

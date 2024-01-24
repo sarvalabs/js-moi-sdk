@@ -154,82 +154,38 @@ Methods
 
 .. code-block:: javascript
 
-    // Example
-    const response = await factory.deploy("InitOwner!", "LOG-FAC", "LOG", 100000000, "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34");
+    import { LogicFactory } from "js-moi-sdk";
+    import { wallet } from "./wallet";
 
-    // In-case you want to pass externally fuelLimit or fuelPrice. Pass the deploy options
-    // as the last argument in deploy call
-    // For example:
-    // const response = await factory.deploy("InitOwner!", "LOG-FAC", "LOG", 100000000, "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34", {
-    //      fuelPrice: 1,
-    //      fuelLimit: 1000,
-    // });
+    const factory = new LogicFactory(manifest, wallet);
+    
+    const symbol = "MOI";
+    const supply = 1000000;
+    
+    const ix = await factory.deploy("Seed!", symbol, supply);
 
-    // interaction response
-    console.log("--------");
-    console.log("Response");
-    console.log("--------");
-    console.log(response)
+    console.log(result.logic_id); // 0x0800007d70c34ed6e...
 
-    // interaction receipt
-    const receipt = await response.wait();
-    console.log("-------");
-    console.log("Receipt");
-    console.log("-------");
-    console.log(receipt);
+In case you want to pass externally fuelLimit or fuelPrice. Pass the deploy options
+as the last argument in deploy call.
 
-    // interaction result containes the logic id or decoded output/error
-    const result = await response.result();
-    console.log("-------");
-    console.log("Result");
-    console.log("-------");
-    console.log(result);
+.. code-block:: javascript
 
-    // Output
-    /*
+    import { LogicFactory } from "js-moi-sdk";
+    import { wallet } from "./wallet";
 
-        --------
-        response
-        --------
-        {
-            hash: '0x778d37c13d3081742837176af9f2b8070c72c4c29e536751e8f846335744de2a',
-            wait: [Function: bound waitForInteraction] AsyncFunction,
-            result: [Function: bound processResult] AsyncFunction
-        }
+    const factory = new LogicFactory(manifest, wallet);
+    
+    const symbol = "MOI";
+    const supply = 1000000;
+    const option = {
+        fuelPrice: 1,
+        fuelLimit: 6420,
+    }
+    
+    const ix = await factory.deploy("Seed!", symbol, supply, option);
 
-        -------
-        receipt
-        -------
-
-        {
-            "ix_type": "0x8",
-            "ix_hash": "0x778d37c13d3081742837176af9f2b8070c72c4c29e536751e8f846335744de2a",
-            "status": 0,
-            "fuel_used": "0x2b2",
-            "hashes": [
-                ...
-            ],
-            "extra_data": {
-                "logic_id": "0x080000e383d6d11848abf0bb741c4bcbbf6c70679442b5d5072d1578b1b6e31c564599",
-                "error": "0x"
-            },
-            "from": "0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba",
-            "to": "0xe383d6d11848abf0bb741c4bcbbf6c70679442b5d5072d1578b1b6e31c564599",
-            "ix_index": "0x0",
-            "parts": [
-                ...
-            ]
-        }
-
-        ------
-        result
-        ------
-
-        {
-            logic_id: "0x080000e383d6d11848abf0bb741c4bcbbf6c70679442b5d5072d1578b1b6e31c564599",
-            error: null
-        }
-    */
+    console.log(result.logic_id); // 0x010000423d3233...
 
 Logic Driver
 ------------
@@ -275,21 +231,83 @@ Functions
 Usage
 ~~~~~
 
+**Example 1**: Calling a routine using the logic driver
+
 .. code-block:: javascript
 
-    const sender = "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084";
-    const seeder = "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-    const name = await logicDriver.persistentState.get("name")
-    console.log('name - ' + name)
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
 
-    // Invoking a routine
-    const response = await logicDriver.routines.GetTodos();
+    const logicId = "0x0800007d70c34ed6ec...";
+    const address = "0xd13dfs...";
 
-    // If you want to pass externally fuelLimit or fuelPrice. Pass the routine options 
-    // as the last argument in routine call
-    // For example:
-    // const response = await logicDriver.routines.GetTodos({
-    //      fuelPrice: 1,
-    //      fuelLimit: 1000,
-    // });
-    */
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Call the logic routine
+    const output = await logic.routines.GetBalance(address);
+
+    console.log(output.balance); // 1000000
+
+**Example 2**: Retrieving from the persistent state of a logic
+
+.. code-block:: javascript
+
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const logicId = "0x0800007d70c34ed6ec...";
+    const address = "0xd13dfs...";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Get the persistent state
+    const symbol = await logic.persistentState.get("symbol");
+
+    console.log(symbol); // MOI
+
+**Example 3**: Executing a mutating routine call
+
+.. code-block:: javascript
+
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const logicId = "0x0800007d70c34ed6ec...";
+    const address = "0xd13dfs...";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Execute a mutating routine call
+    const ix = await logic.routines.Transfer(address, 1000);
+    console.log(ix.hash); //  0x010000423d3233...
+
+    const receipt = await ix.wait();
+    console.log(receipt); // { ... }
+
+Incase you want to pass externally fuelLimit or fuelPrice. Pass the options
+as the last argument in routine call.
+
+.. code-block:: javascript
+
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const logicId = "0x0800007d70c34ed6ec...";
+    const address = "0xd13dfs...";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Execute a mutating routine call
+    const option = {
+        fuelPrice: 1,
+        fuelLimit: 6420,
+    }
+    const ix = await logic.routines.Transfer(address, 1000, option);
+    console.log(ix.hash); //  0x010000423d3233...
+
+    const receipt = await ix.wait();
+    console.log(receipt); // { ... }
