@@ -70,8 +70,6 @@ export abstract class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     protected async executeRoutine(ixObject: LogicIxObject, method: string, option: RoutineOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
-        const processedArgs = this.processArguments(ixObject, method, option);
-
         if (this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
                 "This logic object doesn't have address set yet, please set an address first.",
@@ -79,7 +77,8 @@ export abstract class LogicBase extends ElementDescriptor {
             );
         }
 
-        const isSignerRequired = ["send", "estimate"].includes(processedArgs.type);
+        const { type, params } = this.processArguments(ixObject, method, option);
+        const isSignerRequired = ["send", "estimate"].includes(type);
 
         if(isSignerRequired && this.signer == null) {
             ErrorUtils.throwError(
@@ -88,9 +87,15 @@ export abstract class LogicBase extends ElementDescriptor {
             );
         }
 
-        switch (processedArgs.type) {
+        // console.log("-".repeat(20), "Params Start", "-".repeat(20));
+        // console.log("Method ::", type);
+        // console.log(params);
+        // console.log("-".repeat(20), "Params End", "-".repeat(20));
+        // console.log("\n");
+
+        switch (type) {
             case "call": {
-                const response = await this.provider.call(processedArgs.params as CallorEstimateIxObject);
+                const response = await this.provider.call(params as CallorEstimateIxObject);
 
                 return {
                     ...response,
@@ -101,10 +106,10 @@ export abstract class LogicBase extends ElementDescriptor {
                 };
             }
             case "estimate": {
-                return this.signer.estimateFuel(processedArgs.params as CallorEstimateIxObject);
+                return this.signer.estimateFuel(params as CallorEstimateIxObject);
             }
             case "send": {
-                const response = await this.signer.sendInteraction(processedArgs.params);
+                const response = await this.signer.sendInteraction(params);
 
                 return {
                     ...response,
@@ -118,10 +123,7 @@ export abstract class LogicBase extends ElementDescriptor {
               break;
         }
 
-        ErrorUtils.throwError(
-          'Method "' + processedArgs.type + '" not supported.',
-          ErrorCode.UNSUPPORTED_OPERATION
-        );
+        ErrorUtils.throwError('Method "' + type + '" not supported.',ErrorCode.UNSUPPORTED_OPERATION);
     }
 
     /**
@@ -153,12 +155,8 @@ export abstract class LogicBase extends ElementDescriptor {
         if(option.fuelLimit != null) {
             params.fuel_limit = option.fuelLimit;
         }
-        
-        if(option.nonce != null) {
-            params.nonce = option.nonce;
-        }
 
-        return { type, params }
+        return { type, params: { ...params, ...option } }
     }
 
     /**
@@ -198,7 +196,6 @@ export abstract class LogicBase extends ElementDescriptor {
 
         const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
 
-
         const ixObject: LogicIxObject = {
             routine: routine,
             arguments: args
@@ -211,8 +208,8 @@ export abstract class LogicBase extends ElementDescriptor {
         ixObject.send = async (): Promise<InteractionResponse> => {
             const DEFAULT_FUEL_PRICE = 1;
 
-            option.fuelPrice ??= DEFAULT_FUEL_PRICE;
-            option.fuelLimit ??= await ixObject.estimateFuel();
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             
             return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }

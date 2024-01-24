@@ -56,17 +56,22 @@ class LogicBase extends element_descriptor_1.default {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        const processedArgs = this.processArguments(ixObject, method, option);
         if (this.getIxType() !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
-        const isSignerRequired = ["send", "estimate"].includes(processedArgs.type);
+        const { type, params } = this.processArguments(ixObject, method, option);
+        const isSignerRequired = ["send", "estimate"].includes(type);
         if (isSignerRequired && this.signer == null) {
             js_moi_utils_1.ErrorUtils.throwError("Signer is not initialized!", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
-        switch (processedArgs.type) {
+        // console.log("-".repeat(20), "Params Start", "-".repeat(20));
+        // console.log("Method ::", type);
+        // console.log(params);
+        // console.log("-".repeat(20), "Params End", "-".repeat(20));
+        // console.log("\n");
+        switch (type) {
             case "call": {
-                const response = await this.provider.call(processedArgs.params);
+                const response = await this.provider.call(params);
                 return {
                     ...response,
                     result: this.processResult.bind(this, {
@@ -76,10 +81,10 @@ class LogicBase extends element_descriptor_1.default {
                 };
             }
             case "estimate": {
-                return this.signer.estimateFuel(processedArgs.params);
+                return this.signer.estimateFuel(params);
             }
             case "send": {
-                const response = await this.signer.sendInteraction(processedArgs.params);
+                const response = await this.signer.sendInteraction(params);
                 return {
                     ...response,
                     result: this.processResult.bind(this, {
@@ -91,7 +96,7 @@ class LogicBase extends element_descriptor_1.default {
             default:
                 break;
         }
-        js_moi_utils_1.ErrorUtils.throwError('Method "' + processedArgs.type + '" not supported.', js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+        js_moi_utils_1.ErrorUtils.throwError('Method "' + type + '" not supported.', js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
     /**
      * Processes the interaction arguments and returns the processed arguments object.
@@ -120,10 +125,7 @@ class LogicBase extends element_descriptor_1.default {
         if (option.fuelLimit != null) {
             params.fuel_limit = option.fuelLimit;
         }
-        if (option.nonce != null) {
-            params.nonce = option.nonce;
-        }
-        return { type, params };
+        return { type, params: { ...params, ...option } };
     }
     /**
      * Creates a logic interaction request object based on the given interaction object.
@@ -165,8 +167,8 @@ class LogicBase extends element_descriptor_1.default {
         };
         ixObject.send = async () => {
             const DEFAULT_FUEL_PRICE = 1;
-            option.fuelPrice ??= DEFAULT_FUEL_PRICE;
-            option.fuelLimit ??= await ixObject.estimateFuel();
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

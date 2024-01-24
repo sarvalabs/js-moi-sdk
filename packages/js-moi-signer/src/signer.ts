@@ -205,7 +205,7 @@ export abstract class Signer {
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
 
-            await this.prepareInteraction(ixObject)
+            await this.prepareInteraction(ixObject);
 
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo)

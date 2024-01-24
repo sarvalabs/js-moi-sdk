@@ -41,8 +41,6 @@ describe("Test Logic Deploy", () => {
         const mnemonic = "crisp seed misery heart hire cat can lab exchange skirt always mice"
         const wallet  = await initializeWallet(provider, mnemonic);
 
-        console.log(wallet.getAddress())
-
         const factory = new LogicFactory(todo, wallet);
 
         const response = await factory.deploy("InitOwner!", {
