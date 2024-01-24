@@ -1,7 +1,7 @@
-import { Polorizer } from "js-polo"
-import { ErrorCode, ErrorUtils, IxType, toQuantity, trimHexPrefix, assetCreateSchema, assetMintOrBurnSchema, logicSchema, bytesToHex } from "js-moi-utils"
-import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { Polorizer } from "js-polo";
 import { ProcessedIxObject } from "../types/interaction";
+import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";
 
 const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Array => {
     let polorizer = new Polorizer()
@@ -31,12 +31,11 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
  * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
  * @returns {Map<string, number | bigint>} - A new Map with trimmed keys.
  */
-const processValues = (values: Map<string, number | bigint>): Map<string, string> => {
-    const entries = new Map();
-
-    values.forEach((value, key) => entries.set(trimHexPrefix(key), toQuantity(value)))
-
-    return entries
+const processValues = (values: Map<string, number | bigint>): Record<string, string> => {
+    return Array.from(values).reduce((entries: Record<string, string>, [key, value]) => {
+        entries[key] = toQuantity(value);
+        return entries;
+    }, {});
 };
 
 /**
@@ -63,7 +62,7 @@ export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxOb
             processedIxObject.payload = "0x" + bytesToHex(serializePayload(ixObject.type, ixObject.payload))
         }
 
-        return processedIxObject as unknown as ProcessedIxObject;
+        return processedIxObject;
     } catch(err) {
         ErrorUtils.throwError(
             "Failed to process interaction object",

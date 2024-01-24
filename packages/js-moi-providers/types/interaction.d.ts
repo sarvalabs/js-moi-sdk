@@ -8,7 +8,7 @@ export interface ProcessedIxObject {
     receiver?: string;
     payer?: string;
 
-    transfer_values?: Map<string, string>;
+    transfer_values?: Record<string, string>;
     perceived_values?: Map<string, string>;
 
     fuel_price: string;

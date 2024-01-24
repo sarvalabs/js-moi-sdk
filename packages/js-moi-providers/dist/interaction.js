@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processIxObject = void 0;
-const js_polo_1 = require("js-polo");
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
 const serializePayload = (ixType, payload) => {
     let polorizer = new js_polo_1.Polorizer();
     switch (ixType) {
@@ -28,9 +28,10 @@ const serializePayload = (ixType, payload) => {
  * @returns {Map<string, number | bigint>} - A new Map with trimmed keys.
  */
 const processValues = (values) => {
-    const entries = new Map();
-    values.forEach((value, key) => entries.set((0, js_moi_utils_1.trimHexPrefix)(key), (0, js_moi_utils_1.toQuantity)(value)));
-    return entries;
+    return Array.from(values).reduce((entries, [key, value]) => {
+        entries[key] = (0, js_moi_utils_1.toQuantity)(value);
+        return entries;
+    }, {});
 };
 /**
  * Processes the interaction object based on its type and returns the processed object.

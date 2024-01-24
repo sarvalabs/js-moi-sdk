@@ -1,5 +1,5 @@
-import { CallorEstimateIxObject } from "../types/jsonrpc";
 import { ProcessedIxObject } from "../types/interaction";
+import { CallorEstimateIxObject } from "../types/jsonrpc";
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
