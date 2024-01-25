@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_providers_1 = require("js-moi-providers");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 /**
@@ -16,16 +15,10 @@ const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 class LogicBase extends element_descriptor_1.default {
     signer;
     manifestCoder;
-    provider;
     constructor(manifest, signer) {
         super(manifest.elements);
         this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
-        if (signer instanceof js_moi_providers_1.AbstractProvider) {
-            this.provider = signer;
-            return;
-        }
         this.signer = signer;
-        this.provider = signer.getProvider();
     }
     /**
      * Returns the logic ID associated with the LogicBase instance.
@@ -42,7 +35,6 @@ class LogicBase extends element_descriptor_1.default {
      */
     connect(signer) {
         this.signer = signer;
-        this.provider = signer.getProvider();
     }
     /**
      * Executes a routine with the given arguments and returns the interaction response.
@@ -60,13 +52,9 @@ class LogicBase extends element_descriptor_1.default {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
-        const isSignerRequired = ["send", "estimate"].includes(type);
-        if (isSignerRequired && this.signer == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Signer is not initialized!", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
-        }
         switch (type) {
             case "call": {
-                const response = await this.provider.call(params);
+                const response = await this.signer.call(params);
                 return {
                     ...response,
                     result: this.processResult.bind(this, {

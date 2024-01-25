@@ -1,5 +1,5 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { AbstractProvider, CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
+import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -12,23 +12,14 @@ import ElementDescriptor from "./element-descriptor";
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export abstract class LogicBase extends ElementDescriptor {
-    protected signer?: Signer;
+    protected signer: Signer;
     protected manifestCoder: ManifestCoder;
-    protected provider: AbstractProvider;
 
-    constructor(manifest: LogicManifest.Manifest, signer: Signer | AbstractProvider) {
+    constructor(manifest: LogicManifest.Manifest, signer: Signer) {
         super(manifest.elements)
 
         this.manifestCoder = new ManifestCoder(this.elements, this.classDefs)
-        
-        if(signer instanceof AbstractProvider) {
-            this.provider = signer;
-            return;
-        }
-          
-          this.signer = signer;
-          this.provider = signer.getProvider();
-
+        this.signer = signer;
     }
 
     // abstract methods to be implemented by subclasses
@@ -55,7 +46,6 @@ export abstract class LogicBase extends ElementDescriptor {
      */
     public connect(signer: Signer): void {
         this.signer = signer;
-        this.provider = signer.getProvider();
     }
 
     /**
@@ -78,18 +68,10 @@ export abstract class LogicBase extends ElementDescriptor {
         }
 
         const { type, params } = this.processArguments(ixObject, method, option);
-        const isSignerRequired = ["send", "estimate"].includes(type);
-
-        if(isSignerRequired && this.signer == null) {
-            ErrorUtils.throwError(
-                "Signer is not initialized!",
-                ErrorCode.NOT_INITIALIZED
-            );
-        }
-
+     
         switch (type) {
             case "call": {
-                const response = await this.provider.call(params as CallorEstimateIxObject);
+                const response = await this.signer.call(params as CallorEstimateIxObject);
 
                 return {
                     ...response,
@@ -195,13 +177,17 @@ export abstract class LogicBase extends ElementDescriptor {
             arguments: args
         } as LogicIxObject
 
+        const DEFAULT_FUEL_PRICE = 1;
+        const DEFAULT_FUEL_LIMIT = 5000;
+
         ixObject.call = async (): Promise<InteractionCallResponse> => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+
             return this.executeRoutine(ixObject, "call", option) as Promise<InteractionCallResponse>
         }
 
         ixObject.send = async (): Promise<InteractionResponse> => {
-            const DEFAULT_FUEL_PRICE = 1;
-
             option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             
@@ -209,6 +195,9 @@ export abstract class LogicBase extends ElementDescriptor {
         }
         
         ixObject.estimateFuel = (): Promise<number|bigint> => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : DEFAULT_FUEL_LIMIT;
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+
             return this.executeRoutine(ixObject, "estimate", option) as Promise<number | bigint>
         }
 

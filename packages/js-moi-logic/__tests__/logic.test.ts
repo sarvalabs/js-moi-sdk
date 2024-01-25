@@ -66,39 +66,6 @@ describe("Logic", () => {
         });
     });
 
-    describe("logic driver initialized using provider", () => {
-        let logic: LogicDriver;
-
-        beforeAll(async () => {
-            if(logicId == null) {
-                throw new Error("logicId is not defined");
-            };
-
-            logic = await getLogicDriver(logicId, provider);
-        });
-
-
-        it("should be able to retrieve balance of account", async () => {
-            const output = await logic.routines.BalanceOf(signer.getAddress());
-
-            expect(output.balance).toBe(INITIAL_SUPPLY);
-        });
-
-        it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get("symbol");
-
-            expect(symbol).toBe(SYMBOL);
-        });
-
-        it("should throw error when trying to mutate with provider", async () => {
-            const amount = 1000;
-
-            await expect(async () => {
-                await logic.routines.Transfer(RECEIVER, amount);
-              }).rejects.toThrow("Signer is not initialized!");
-        });
-    });
-
     describe("logic driver initialized using signer", () => {
         let logic: LogicDriver;
 

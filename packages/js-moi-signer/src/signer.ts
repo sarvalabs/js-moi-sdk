@@ -159,9 +159,7 @@ export abstract class Signer {
         // Get the provider
         const provider = this.getProvider();
 
-        await this.prepareInteraction(ixObject, {
-            ignore: { fuel_limit: true, fuel_price: true }
-        });
+        await this.prepareInteraction(ixObject);
 
         return await provider.call(ixObject as CallorEstimateIxObject)
     }
@@ -182,7 +180,7 @@ export abstract class Signer {
         // Get the provider
         const provider = this.getProvider();
 
-        await this.prepareInteraction(ixObject, { ignore: { fuel_limit: true, fuel_price: true } });
+        await this.prepareInteraction(ixObject);
 
         return await provider.estimateFuel(ixObject as CallorEstimateIxObject)
     }

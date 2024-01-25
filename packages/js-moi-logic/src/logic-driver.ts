@@ -1,5 +1,5 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { AbstractProvider, LogicPayload, Options } from "js-moi-providers";
+import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -15,17 +15,10 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     public readonly persistentState: PersistentState;
     public readonly ephemeralState: EphemeralState;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: AbstractProvider);
-    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
-    constructor(logicId: string, manifest: LogicManifest.Manifest, value: Signer | AbstractProvider) {
+    constructor(logicId: string, manifest: LogicManifest.Manifest, value: Signer) {
         super(logicId, manifest, value)
         this.createState();
         this.createRoutines();
-    }
-
-    public override connect(signer: Signer): void {
-        super.connect(signer);
-        this.createState();
     }
 
     /**
@@ -40,7 +33,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 this.logicId.hex(),
                 this.elements.get(persistentStatePtr),
                 this.manifestCoder,
-                this.provider
+                this.signer.getProvider()
             )
 
             defineReadOnly(this, "persistentState", persistentState)
@@ -196,27 +189,19 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
 /**
  * Returns a logic driver instance based on the given logic id.
  * 
- * If a signer is provided, the logic driver will be able to execute mutable
- * routines. Otherwise, it will throw an error when trying to execute a mutable routine.
- * In case of non-mutable routines, the logic driver will be able to execute them.
- * 
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signer - The signer or provider instance. 
+ * @param {Signer} signer - The signer or provider instance. 
  * @param {Options} options - The custom tesseract options for retrieving 
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer | AbstractProvider, options?: Options): Promise<LogicDriver<T>> => {
+export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<T>> => {
     try {
-        const provider =
-            signer instanceof Signer ? signer.getProvider() : signer;
+        const provider = signer.getProvider();
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
         if (typeof manifest === "object") {
-            // this check is required for type safety
-            return signer instanceof Signer
-                ? new LogicDriver<T>(logicId, manifest, signer)
-                : new LogicDriver<T>(logicId, manifest, signer);
+            return  new LogicDriver<T>(logicId, manifest, signer);
         }
 
         ErrorUtils.throwError(

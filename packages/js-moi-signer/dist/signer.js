@@ -132,9 +132,7 @@ class Signer {
     async call(ixObject) {
         // Get the provider
         const provider = this.getProvider();
-        await this.prepareInteraction(ixObject, {
-            ignore: { fuel_limit: true, fuel_price: true }
-        });
+        await this.prepareInteraction(ixObject);
         return await provider.call(ixObject);
     }
     /**
@@ -152,7 +150,7 @@ class Signer {
     async estimateFuel(ixObject) {
         // Get the provider
         const provider = this.getProvider();
-        await this.prepareInteraction(ixObject, { ignore: { fuel_limit: true, fuel_price: true } });
+        await this.prepareInteraction(ixObject);
         return await provider.estimateFuel(ixObject);
     }
     /**

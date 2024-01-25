@@ -1,5 +1,5 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { AbstractProvider, InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
@@ -11,10 +11,9 @@ import ElementDescriptor from "./element-descriptor";
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export declare abstract class LogicBase extends ElementDescriptor {
-    protected signer?: Signer;
+    protected signer: Signer;
     protected manifestCoder: ManifestCoder;
-    protected provider: AbstractProvider;
-    constructor(manifest: LogicManifest.Manifest, signer: Signer | AbstractProvider);
+    constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract getIxType(): IxType;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null>;

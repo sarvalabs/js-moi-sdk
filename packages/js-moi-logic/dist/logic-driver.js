@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
 const state_1 = require("./state");
@@ -18,10 +17,6 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         this.createState();
         this.createRoutines();
     }
-    connect(signer) {
-        super.connect(signer);
-        this.createState();
-    }
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
@@ -29,7 +24,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     createState() {
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.provider);
+            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.signer.getProvider());
             (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
     }
@@ -150,25 +145,18 @@ exports.LogicDriver = LogicDriver;
 /**
  * Returns a logic driver instance based on the given logic id.
  *
- * If a signer is provided, the logic driver will be able to execute mutable
- * routines. Otherwise, it will throw an error when trying to execute a mutable routine.
- * In case of non-mutable routines, the logic driver will be able to execute them.
- *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signer - The signer or provider instance.
+ * @param {Signer} signer - The signer or provider instance.
  * @param {Options} options - The custom tesseract options for retrieving
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
 const getLogicDriver = async (logicId, signer, options) => {
     try {
-        const provider = signer instanceof js_moi_signer_1.Signer ? signer.getProvider() : signer;
+        const provider = signer.getProvider();
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
         if (typeof manifest === "object") {
-            // this check is required for type safety
-            return signer instanceof js_moi_signer_1.Signer
-                ? new LogicDriver(logicId, manifest, signer)
-                : new LogicDriver(logicId, manifest, signer);
+            return new LogicDriver(logicId, manifest, signer);
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
