@@ -90,7 +90,7 @@ describe("Logic", () => {
             expect(symbol).toBe(SYMBOL);
         });
 
-        it("should throw error when trying to mutate with signer", async () => {
+        it("should throw error when trying to mutate with provider", async () => {
             const amount = 1000;
 
             await expect(async () => {
