@@ -27,7 +27,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
     /**
      * Updates the signer or establishes a connection with a new signer.
      *
-     * @param {Signer} signer -  he updated signer object or the new signer object to connect.
+     * @param {Signer} signer -  The updated signer object or the new signer object to connect.
      */
     connect(signer: Signer): void;
     /**
