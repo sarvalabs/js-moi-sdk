@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
@@ -163,7 +163,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @returns {Promise<LogicIxResult | null>} A promise that resolves to the 
      logic interaction result or null.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null> {
+    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null> {
         try {
             const routine = this.getRoutineElement(response.routine_name)
             const result = await response.result(timeout);
@@ -174,12 +174,20 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 ), 
                 error: ManifestCoder.decodeException(result.error) 
             };
-    
-            if(data.output || data.error) {
-                return data
+
+            if(data.error) {
+                const error = new Error(data.error.data, {
+                     cause: data.error,
+                });
+
+                throw error;
             }
 
-            return null
+            if (data.output) {
+                return data.output;
+            }
+
+            return null;
         } catch(err) {
             throw err;
         }

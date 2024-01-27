@@ -131,8 +131,14 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 output: this.manifestCoder.decodeOutput(result.outputs, routine.data["returns"]),
                 error: js_moi_manifest_1.ManifestCoder.decodeException(result.error)
             };
-            if (data.output || data.error) {
-                return data;
+            if (data.error) {
+                const error = new Error(data.error.data, {
+                    cause: data.error,
+                });
+                throw error;
+            }
+            if (data.output) {
+                return data.output;
             }
             return null;
         }

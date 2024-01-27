@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
 
@@ -28,7 +28,7 @@ export abstract class LogicBase extends ElementDescriptor {
     protected abstract getIxType(): IxType;
     
     // TODO: Logic Call Result should be handled seperately
-    protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null>;
+    protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
 
     /**
      * Returns the logic ID associated with the LogicBase instance.
