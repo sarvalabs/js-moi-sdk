@@ -145,16 +145,21 @@ class LogicBase extends element_descriptor_1.default {
             routine: routine,
             arguments: args
         };
+        const DEFAULT_FUEL_PRICE = 1;
+        const DEFAULT_FUEL_LIMIT = 5000;
         ixObject.call = async () => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            const DEFAULT_FUEL_PRICE = 1;
             option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : DEFAULT_FUEL_LIMIT;
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "estimate", option);
         };
         ixObject.createPayload = () => {
