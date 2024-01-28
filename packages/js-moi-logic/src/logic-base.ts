@@ -144,13 +144,7 @@ export abstract class LogicBase extends ElementDescriptor {
     protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const result = await ix.result()
-
-            if(result.error) {
-                throw result.error
-            }
-
-            return result.output
+            return await ix.result();
         }
 
         return {

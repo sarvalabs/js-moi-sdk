@@ -119,11 +119,7 @@ class LogicBase extends element_descriptor_1.default {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const result = await ix.result();
-            if (result.error) {
-                throw result.error;
-            }
-            return result.output;
+            return await ix.result();
         };
         return {
             unwrap,

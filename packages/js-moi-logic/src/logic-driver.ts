@@ -167,6 +167,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
         try {
             const routine = this.getRoutineElement(response.routine_name)
             const result = await response.result(timeout);
+
             const data = { 
                 output: this.manifestCoder.decodeOutput(
                     result.outputs,
@@ -176,18 +177,12 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             };
 
             if(data.error) {
-                const error = new Error(data.error.data, {
-                     cause: data.error,
+                ErrorUtils.throwError(data.error.data, ErrorCode.ACTION_REJECTED, {
+                    ...data.error,
                 });
-
-                throw error;
             }
 
-            if (data.output) {
-                return data.output;
-            }
-
-            return null;
+            return data.output ? data.output : null;
         } catch(err) {
             throw err;
         }
