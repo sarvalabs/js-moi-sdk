@@ -1,6 +1,6 @@
-import { LogicManifest } from "js-moi-manifest";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import {
-    AssetCreationReceipt, AssetMintOrBurnReceipt, ErrorCode, ErrorUtils, Interaction,
+    AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
     IxType, LogicDeployReceipt, LogicInvokeReceipt, Tesseract, bytesToHex, hexDataLength,
     hexToBN, hexToBytes, toQuantity, unmarshal
 } from "js-moi-utils";
@@ -1017,15 +1017,35 @@ export class BaseProvider extends AbstractProvider {
             let intervalId: ReturnType<typeof setInterval>;
             let timeoutId: ReturnType<typeof setTimeout>;
 
+            const clearTimers = () => {
+                clearInterval(intervalId);
+                clearTimeout(timeoutId);
+            }
+
             const checkReceipt = async() => {
                 try {
                     const receipt = await this.getInteractionReceipt(interactionHash);
     
-                    if(receipt) {
-                        resolve(receipt)
-                        clearInterval(intervalId)
-                        clearTimeout(timeoutId)
+                    if(receipt == null) {
+                        return;
                     }
+
+                    clearTimers();
+
+                    const result = this.processReceipt(receipt);
+                    const error = "error" in result 
+                        ? ManifestCoder.decodeException(result.error)
+                        : null;
+                    
+                    if(error) {
+                        reject(new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
+                            ...error,
+                            receipt
+                        }));
+                        return;
+                    }
+
+                    resolve(receipt)
                 } catch(err) {
 
                 }
@@ -1093,15 +1113,8 @@ export class BaseProvider extends AbstractProvider {
      * response, or the timeout is reached.
      */
     protected async waitForResult(interactionHash: string, timeout?: number): Promise<any> {
-        return new Promise(async(resolve, reject) => {
-            try {
-                const receipt = await this.waitForInteraction(interactionHash, timeout);
-                const result = this.processReceipt(receipt);
-                resolve(result);
-            } catch(err) {
-                reject(new Error(`An error occurred while waiting for result: ${err.message}`));
-            }
-        })
+        const receipt = await this.waitForInteraction(interactionHash, timeout);
+        return await this.processReceipt(receipt);
     }
 
     /**

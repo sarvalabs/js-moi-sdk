@@ -1,4 +1,4 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { LogicManifest } from "js-moi-manifest";
 import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
@@ -168,21 +168,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             const routine = this.getRoutineElement(response.routine_name)
             const result = await response.result(timeout);
 
-            const data = { 
-                output: this.manifestCoder.decodeOutput(
-                    result.outputs,
-                    routine.data["returns"]
-                ), 
-                error: ManifestCoder.decodeException(result.error) 
-            };
-
-            if(data.error) {
-                ErrorUtils.throwError(data.error.data, ErrorCode.ACTION_REJECTED, {
-                    ...data.error,
-                });
-            }
-
-            return data.output ? data.output : null;
+            return this.manifestCoder.decodeOutput(result.outputs, routine.data["returns"]);
         } catch(err) {
             throw err;
         }

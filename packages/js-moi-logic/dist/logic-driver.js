@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
-const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
 const state_1 = require("./state");
@@ -127,16 +126,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         try {
             const routine = this.getRoutineElement(response.routine_name);
             const result = await response.result(timeout);
-            const data = {
-                output: this.manifestCoder.decodeOutput(result.outputs, routine.data["returns"]),
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result.error)
-            };
-            if (data.error) {
-                js_moi_utils_1.ErrorUtils.throwError(data.error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
-                    ...data.error,
-                });
-            }
-            return data.output ? data.output : null;
+            return this.manifestCoder.decodeOutput(result.outputs, routine.data["returns"]);
         }
         catch (err) {
             throw err;

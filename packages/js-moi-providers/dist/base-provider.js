@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseProvider = void 0;
+const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const abstract_provider_1 = require("./abstract-provider");
 const event_1 = __importDefault(require("./event"));
@@ -887,14 +888,29 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return new Promise(async (resolve, reject) => {
             let intervalId;
             let timeoutId;
+            const clearTimers = () => {
+                clearInterval(intervalId);
+                clearTimeout(timeoutId);
+            };
             const checkReceipt = async () => {
                 try {
                     const receipt = await this.getInteractionReceipt(interactionHash);
-                    if (receipt) {
-                        resolve(receipt);
-                        clearInterval(intervalId);
-                        clearTimeout(timeoutId);
+                    if (receipt == null) {
+                        return;
                     }
+                    clearTimers();
+                    const result = this.processReceipt(receipt);
+                    const error = "error" in result
+                        ? js_moi_manifest_1.ManifestCoder.decodeException(result.error)
+                        : null;
+                    if (error) {
+                        reject(new js_moi_utils_1.CustomError(error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
+                            ...error,
+                            receipt
+                        }));
+                        return;
+                    }
+                    resolve(receipt);
                 }
                 catch (err) {
                 }
@@ -957,16 +973,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * response, or the timeout is reached.
      */
     async waitForResult(interactionHash, timeout) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const receipt = await this.waitForInteraction(interactionHash, timeout);
-                const result = this.processReceipt(receipt);
-                resolve(result);
-            }
-            catch (err) {
-                reject(new Error(`An error occurred while waiting for result: ${err.message}`));
-            }
-        });
+        const receipt = await this.waitForInteraction(interactionHash, timeout);
+        return await this.processReceipt(receipt);
     }
     /**
      * Checks if the response object represents a server error.

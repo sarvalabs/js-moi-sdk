@@ -104,6 +104,29 @@ describe("Logic", () => {
             expect(receipt).toBeDefined();
         });
 
+        it("`result` should throw error if contract routine calls throws error", async () => {
+            const { balance } = await logic.routines.BalanceOf(signer.getAddress());
+            const amount = balance + 1
+            const ix = await logic.routines.Transfer(RECEIVER, amount);
+
+            expect(async () => {
+                await ix.result();
+            }).rejects.toThrow("insufficient balance for sender");
+        });
+
+        it("`wait` should throw error if contract method throw error", async () => {
+            const { balance } = await logic.routines.BalanceOf(signer.getAddress());
+            const amount = balance + 1
+            const ix = await logic.routines.Transfer(RECEIVER, amount);
+
+            try {
+                await ix.wait();
+            } catch (error) {
+                expect(error.message).toBe("insufficient balance for sender");
+                expect("receipt" in error.params).toBeTruthy();
+            }
+        });
+
         it("should be able to read from persistent storage", async () => {
             const symbol = await logic.persistentState.get("symbol");
     
