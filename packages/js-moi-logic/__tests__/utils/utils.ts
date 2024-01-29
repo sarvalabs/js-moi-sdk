@@ -1,4 +1,4 @@
-import { BaseProvider, JsonRpcProvider, VoyageProvider } from "js-moi-providers";
+import { JsonRpcProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { Wallet } from "js-moi-wallet";
 
@@ -8,8 +8,4 @@ export const initializeWallet = async (provider: JsonRpcProvider, mnemonic: stri
     await wallet.fromMnemonic(mnemonic, derivationPath);
 
     return wallet;
-}
-
-export const initializeProvider = (host?: string): BaseProvider => {
-    return host ? new JsonRpcProvider(host) : new VoyageProvider("babylon");
 }

@@ -15,8 +15,8 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     public readonly persistentState: PersistentState;
     public readonly ephemeralState: EphemeralState;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, value: Signer) {
-        super(logicId, manifest, value)
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
+        super(logicId, manifest, signer)
         this.createState();
         this.createRoutines();
     }

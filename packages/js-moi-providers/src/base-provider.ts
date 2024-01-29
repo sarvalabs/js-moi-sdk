@@ -1033,19 +1033,20 @@ export class BaseProvider extends AbstractProvider {
                     clearTimers();
 
                     const result = this.processReceipt(receipt);
-                    const error = "error" in result 
-                        ? ManifestCoder.decodeException(result.error)
-                        : null;
+                    const error = ManifestCoder.decodeException(result.error);
                     
-                    if(error) {
-                        reject(new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
-                            ...error,
-                            receipt
-                        }));
+                    if (error == null) {
+                        resolve(receipt);
                         return;
                     }
 
-                    resolve(receipt)
+                    const err = new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
+                        ...error,
+                        receipt,
+                    });
+
+                    reject(err);
+
                 } catch(err) {
 
                 }

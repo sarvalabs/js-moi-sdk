@@ -1,5 +1,4 @@
 import { JsonRpcProvider } from "js-moi-providers";
-import { Signer } from "js-moi-signer";
 import { Wallet } from "js-moi-wallet";
 
 import { LogicDriver, getLogicDriver } from "../src/logic-driver";
@@ -15,17 +14,16 @@ const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103d
 const deviationPath: string | undefined = "m/44'/6174'/0'/0/1";
 const provider = new JsonRpcProvider(HOST);
 
-let signer: Signer;
+let wallet: Wallet;
 
 beforeAll(async () => {
-    const wallet = new Wallet(provider);
+    wallet = new Wallet(provider);
     await wallet.fromMnemonic(MNEMONIC, deviationPath);
-    signer = wallet;
 });
 
 it("should initialize the wallet", async () => {
-    expect(signer).toBeInstanceOf(Wallet);
-    expect(signer.getAddress()).toBeDefined();
+    expect(wallet).toBeInstanceOf(Wallet);
+    expect(wallet.getAddress()).toBeDefined();
 });
 
 describe("Logic", () => {
@@ -33,7 +31,7 @@ describe("Logic", () => {
 
     describe("deploy logic", () => {
         it("should deploy logic without options", async () => {
-            const factory = new LogicFactory(manifest, signer);
+            const factory = new LogicFactory(manifest, wallet);
 
             const symbol = SYMBOL;
             const supply = INITIAL_SUPPLY;
@@ -51,7 +49,7 @@ describe("Logic", () => {
 
 
         it("should deploy logic with options", async () => {
-            const factory = new LogicFactory(manifest, signer);
+            const factory = new LogicFactory(manifest, wallet);
             const symbol = "MOI";
             const supply = 100000000;
             const option = { fuelPrice: 1, fuelLimit: 3000 + Math.floor(Math.random() * 3000) }
@@ -71,23 +69,24 @@ describe("Logic", () => {
 
         beforeAll(async () => {
             if(logicId == null) {
-                throw new Error("logicId is not defined");
+                expect(logicId).toBeDefined();
+                return;
             };
 
-            logic = await getLogicDriver(logicId, signer);
+            logic = await getLogicDriver(logicId, wallet);
         });
 
         it("should able to retrieve balance of the account", async () => {
-            const balance = await logic.routines.BalanceOf(signer.getAddress());
+            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
             
             expect(balance).toBe(INITIAL_SUPPLY);
         });
 
-        it("should able to get tuple when returned values is more than one in logic", async () => {
-            const values = await logic.routines.DoubleReturnValue(signer.getAddress());
-            const [symbol, supply] = values;
+        it("should return object when multiple values are returned", async () => {
+            const values = await logic.routines.DoubleReturnValue(wallet.getAddress());
+            const { symbol, supply } = values;
 
-            expect(Array.isArray(values)).toBeTruthy();
+            expect(values).toBeDefined();
             expect(typeof symbol).toBe('string');
             expect(typeof supply).toBe('number');
         });
@@ -96,9 +95,11 @@ describe("Logic", () => {
             const amount = Math.floor(Math.random() * 1000);
             const ix = await logic.routines.Transfer(RECEIVER, amount);
             const receipt = await ix.wait();
+            const { success } = await ix.result();
 
             expect(ix.hash).toBeDefined();
             expect(receipt).toBeDefined();
+            expect(typeof success).toBe('boolean');
         });
 
         it("should able to transfer with option", async () => {
@@ -106,15 +107,20 @@ describe("Logic", () => {
             const option = { fuelPrice: 1, fuelLimit: 1000 + Math.floor(Math.random() * 1000) }
             const ix = await logic.routines.Transfer(RECEIVER, amount, option);
             const receipt = await ix.wait();
-            const balance = await logic.routines.BalanceOf(RECEIVER);
+            const result = await ix.result();
+            const { balance } = await logic.routines.BalanceOf(RECEIVER);
+
+            console.log(result);
+            const { success } = result;
 
             expect(balance).toBeGreaterThanOrEqual(amount);
             expect(ix.hash).toBeDefined();
             expect(receipt).toBeDefined();
+            expect(typeof success).toBe('boolean');
         });
 
         it("should throw error when logic execution throw error using `result()`", async () => {
-            const balance = await logic.routines.BalanceOf(signer.getAddress());
+            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
             const amount = balance + 1
             const ix = await logic.routines.Transfer(RECEIVER, amount);
 
@@ -127,7 +133,7 @@ describe("Logic", () => {
         });
 
         it("should throw error when logic execution throw error using `wait()`", async () => {
-            const balance = await logic.routines.BalanceOf(signer.getAddress());
+            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
             const amount = balance + 1
             const ix = await logic.routines.Transfer(RECEIVER, amount);
 
@@ -143,6 +149,14 @@ describe("Logic", () => {
             const symbol = await logic.persistentState.get("symbol");
     
             expect(symbol).toBe(SYMBOL);
+        });
+
+        it("should throw error when reading from persistent storage with invalid key", async () => {
+            const invalidKey = "invalid-key";
+            
+            expect(async () => {
+                await logic.persistentState.get(invalidKey);
+            }).rejects.toThrow(`The provided slot "${invalidKey}" does not exist.`);
         });
     });
 })

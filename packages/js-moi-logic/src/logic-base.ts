@@ -6,6 +6,9 @@ import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/inter
 import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
 
+const DEFAULT_FUEL_PRICE = 1;
+const DEFAULT_FUEL_LIMIT = 5000;
+
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base 
  class for logic-related operations.
@@ -141,21 +144,10 @@ export abstract class LogicBase extends ElementDescriptor {
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicIxRequest} The logic interaction request object.
      */
-    protected createIxRequest(routine: LogicManifest.Routine, ixObject: LogicIxObject): LogicIxRequest {
+    protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const result = await ix.result();
-            const values = routine.returns.map(field => result[field.label]);
-
-            if (values.length === 0) {
-                return undefined;
-            }
-
-            if (values.length === 1) {
-                return values[0];
-            }
-
-            return values;
+            return await ix.result();
         }
 
         return {
@@ -182,9 +174,6 @@ export abstract class LogicBase extends ElementDescriptor {
             arguments: args
         } as LogicIxObject
 
-        const DEFAULT_FUEL_PRICE = 1;
-        const DEFAULT_FUEL_LIMIT = 5000;
-
         ixObject.call = async (): Promise<InteractionCallResponse> => {
             option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
@@ -210,6 +199,6 @@ export abstract class LogicBase extends ElementDescriptor {
             return this.createPayload(ixObject)
         }
 
-        return this.createIxRequest(routine, ixObject);
+        return this.createIxRequest(ixObject);
     }
 }

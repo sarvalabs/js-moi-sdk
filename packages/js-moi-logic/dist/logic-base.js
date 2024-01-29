@@ -7,6 +7,8 @@ exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
+const DEFAULT_FUEL_PRICE = 1;
+const DEFAULT_FUEL_LIMIT = 5000;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  class for logic-related operations.
@@ -116,18 +118,10 @@ class LogicBase extends element_descriptor_1.default {
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicIxRequest} The logic interaction request object.
      */
-    createIxRequest(routine, ixObject) {
+    createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const result = await ix.result();
-            const values = routine.returns.map(field => result[field.label]);
-            if (values.length === 0) {
-                return undefined;
-            }
-            if (values.length === 1) {
-                return values[0];
-            }
-            return values;
+            return await ix.result();
         };
         return {
             unwrap,
@@ -149,8 +143,6 @@ class LogicBase extends element_descriptor_1.default {
             routine: routine,
             arguments: args
         };
-        const DEFAULT_FUEL_PRICE = 1;
-        const DEFAULT_FUEL_LIMIT = 5000;
         ixObject.call = async () => {
             option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
@@ -169,7 +161,7 @@ class LogicBase extends element_descriptor_1.default {
         ixObject.createPayload = () => {
             return this.createPayload(ixObject);
         };
-        return this.createIxRequest(routine, ixObject);
+        return this.createIxRequest(ixObject);
     }
 }
 exports.LogicBase = LogicBase;

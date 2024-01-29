@@ -11,8 +11,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     routines = {};
     persistentState;
     ephemeralState;
-    constructor(logicId, manifest, value) {
-        super(logicId, manifest, value);
+    constructor(logicId, manifest, signer) {
+        super(logicId, manifest, signer);
         this.createState();
         this.createRoutines();
     }

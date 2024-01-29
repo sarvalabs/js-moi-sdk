@@ -29,7 +29,7 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
  * Trims the "0x" prefix from the keys of a Map and returns a new Map.
  *
  * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
- * @returns {Map<string, number | bigint>} - A new Map with trimmed keys.
+ * @returns {Record<string, string>} - A object with keys as hexadecimal strings without the "0x" prefix.
  */
 const processValues = (values: Map<string, number | bigint>): Record<string, string> => {
     return Array.from(values).reduce((entries: Record<string, string>, [key, value]) => {

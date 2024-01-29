@@ -44,8 +44,6 @@ export declare abstract class Signer {
      * performing validity checks.
      *
      * @param {InteractionObject} ixObject - The interaction object to prepare.
-     * @param {Options} options - The options for preparing the interaction object. (optional)
-     * @param {object} options.ignore - The fields to ignore validation during preparation. (optional)
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is
      * an error during preparation.

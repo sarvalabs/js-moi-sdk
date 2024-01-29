@@ -900,17 +900,16 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     }
                     clearTimers();
                     const result = this.processReceipt(receipt);
-                    const error = "error" in result
-                        ? js_moi_manifest_1.ManifestCoder.decodeException(result.error)
-                        : null;
-                    if (error) {
-                        reject(new js_moi_utils_1.CustomError(error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
-                            ...error,
-                            receipt
-                        }));
+                    const error = js_moi_manifest_1.ManifestCoder.decodeException(result.error);
+                    if (error == null) {
+                        resolve(receipt);
                         return;
                     }
-                    resolve(receipt);
+                    const err = new js_moi_utils_1.CustomError(error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
+                        ...error,
+                        receipt,
+                    });
+                    reject(err);
                 }
                 catch (err) {
                 }

@@ -13,7 +13,7 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
     readonly routines: Routines<T>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
-    constructor(logicId: string, manifest: LogicManifest.Manifest, value: Signer);
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.

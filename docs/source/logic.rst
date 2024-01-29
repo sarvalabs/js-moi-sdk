@@ -163,6 +163,7 @@ Methods
     const supply = 1000000;
     
     const ix = await factory.deploy("Seed!", symbol, supply);
+    const result = await ix.result();
 
     console.log(result.logic_id); // 0x0800007d70c34ed6e...
 
@@ -184,6 +185,7 @@ the last argument in the deploy call.
     }
     
     const ix = await factory.deploy("Seed!", symbol, supply, option);
+    const result = await ix.result();
 
     console.log(result.logic_id); // 0x010000423d3233...
 
@@ -245,7 +247,7 @@ Usage
     const logic = await getLogicDriver(logicId, wallet);
 
     // Call the logic routine
-    const balance = await logic.routines.BalanceOf(address);
+    const { balance } = await logic.routines.BalanceOf(address);
 
     console.log(balance); // 1000000
 
@@ -286,6 +288,12 @@ Usage
 
     const receipt = await ix.wait();
     console.log(receipt); // { ... }
+
+    // if you want to view the result of the logic interaction
+    // you can use the result() method
+
+    // for example
+    // const result = await ix.result(); // { ... }
 
 
 If you wish to externally pass `fuelLimit` or `fuelPrice`, pass the options as
