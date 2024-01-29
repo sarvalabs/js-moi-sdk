@@ -146,8 +146,16 @@ export abstract class LogicBase extends ElementDescriptor {
             const ix = await ixObject.call();
             const result = await ix.result();
             const values = routine.returns.map(field => result[field.label]);
-            
-            return values.length > 1 ? values : values[0];
+
+            if (values.length === 0) {
+                return undefined;
+            }
+
+            if (values.length === 1) {
+                return values[0];
+            }
+
+            return values;
         }
 
         return {
