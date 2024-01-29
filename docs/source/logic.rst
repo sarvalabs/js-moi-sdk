@@ -166,8 +166,8 @@ Methods
 
     console.log(result.logic_id); // 0x0800007d70c34ed6e...
 
-In case you want to pass externally fuelLimit or fuelPrice. Pass the deploy options
-as the last argument in deploy call.
+If you wish to externally pass `fuelLimit` or `fuelPrice`, pass the options as
+the last argument in the deploy call.
 
 .. code-block:: javascript
 
@@ -238,8 +238,8 @@ Usage
     import { getLogicDriver } from "js-moi-sdk";
     import { wallet } from "./wallet";
 
-    const logicId = "0x0800007d70c34ed6ec...";
-    const address = "0xd13dfs...";
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
 
     // Get logic driver
     const logic = await getLogicDriver(logicId, wallet);
@@ -256,8 +256,8 @@ Usage
     import { getLogicDriver } from "js-moi-sdk";
     import { wallet } from "./wallet";
 
-    const logicId = "0x0800007d70c34ed6ec...";
-    const address = "0xd13dfs...";
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
 
     // Get logic driver
     const logic = await getLogicDriver(logicId, wallet);
@@ -274,8 +274,8 @@ Usage
     import { getLogicDriver } from "js-moi-sdk";
     import { wallet } from "./wallet";
 
-    const logicId = "0x0800007d70c34ed6ec...";
-    const address = "0xd13dfs...";
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
 
     // Get logic driver
     const logic = await getLogicDriver(logicId, wallet);
@@ -287,16 +287,17 @@ Usage
     const receipt = await ix.wait();
     console.log(receipt); // { ... }
 
-Incase you want to pass externally fuelLimit or fuelPrice. Pass the options
-as the last argument in routine call.
+
+If you wish to externally pass `fuelLimit` or `fuelPrice`, pass the options as
+the last argument in the deploy call.
 
 .. code-block:: javascript
 
     import { getLogicDriver } from "js-moi-sdk";
     import { wallet } from "./wallet";
 
-    const logicId = "0x0800007d70c34ed6ec...";
-    const address = "0xd13dfs...";
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
 
     // Get logic driver
     const logic = await getLogicDriver(logicId, wallet);
