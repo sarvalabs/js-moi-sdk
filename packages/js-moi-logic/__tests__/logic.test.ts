@@ -104,17 +104,20 @@ describe("Logic", () => {
             expect(receipt).toBeDefined();
         });
 
-        it("`result` should throw error if contract routine calls throws error", async () => {
+        it("should throw error when contract execution throw error using `result()`", async () => {
             const { balance } = await logic.routines.BalanceOf(signer.getAddress());
             const amount = balance + 1
             const ix = await logic.routines.Transfer(RECEIVER, amount);
 
-            expect(async () => {
+            try {
                 await ix.result();
-            }).rejects.toThrow("insufficient balance for sender");
+            } catch (error) {
+                expect(error.message).toBe("insufficient balance for sender");
+                expect(error.params.receipt).toBeDefined();
+            }
         });
 
-        it("`wait` should throw error if contract method throw error", async () => {
+        it("should throw error when contract execution throw error using `wait()`", async () => {
             const { balance } = await logic.routines.BalanceOf(signer.getAddress());
             const amount = balance + 1
             const ix = await logic.routines.Transfer(RECEIVER, amount);
@@ -123,7 +126,7 @@ describe("Logic", () => {
                 await ix.wait();
             } catch (error) {
                 expect(error.message).toBe("insufficient balance for sender");
-                expect("receipt" in error.params).toBeTruthy();
+                expect(error.params.receipt).toBeDefined();
             }
         });
 
