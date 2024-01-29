@@ -31,8 +31,8 @@ it("should initialize the wallet", async () => {
 describe("Logic", () => {
     let logicId: string | undefined;
 
-    describe("deploy contract", () => {
-        it("should deploy contract without options", async () => {
+    describe("deploy logic", () => {
+        it("should deploy logic without options", async () => {
             const factory = new LogicFactory(manifest, signer);
 
             const symbol = SYMBOL;
@@ -50,7 +50,7 @@ describe("Logic", () => {
         });
 
 
-        it("should deploy contract with options", async () => {
+        it("should deploy logic with options", async () => {
             const factory = new LogicFactory(manifest, signer);
             const symbol = "MOI";
             const supply = 100000000;
@@ -78,9 +78,18 @@ describe("Logic", () => {
         });
 
         it("should able to retrieve balance of the account", async () => {
-            const output = await logic.routines.BalanceOf(signer.getAddress());
+            const balance = await logic.routines.BalanceOf(signer.getAddress());
             
-            expect(output.balance).toBe(INITIAL_SUPPLY);
+            expect(balance).toBe(INITIAL_SUPPLY);
+        });
+
+        it("should able to get tuple when returned values is more than one in logic", async () => {
+            const values = await logic.routines.DoubleReturnValue(signer.getAddress());
+            const [symbol, supply] = values;
+
+            expect(Array.isArray(values)).toBeTruthy();
+            expect(typeof symbol).toBe('string');
+            expect(typeof supply).toBe('number');
         });
 
         it("should able to transfer without option", async () => {
@@ -97,15 +106,15 @@ describe("Logic", () => {
             const option = { fuelPrice: 1, fuelLimit: 1000 + Math.floor(Math.random() * 1000) }
             const ix = await logic.routines.Transfer(RECEIVER, amount, option);
             const receipt = await ix.wait();
-            const output = await logic.routines.BalanceOf(RECEIVER);
+            const balance = await logic.routines.BalanceOf(RECEIVER);
 
-            expect(output.balance).toBeGreaterThanOrEqual(amount);
+            expect(balance).toBeGreaterThanOrEqual(amount);
             expect(ix.hash).toBeDefined();
             expect(receipt).toBeDefined();
         });
 
-        it("should throw error when contract execution throw error using `result()`", async () => {
-            const { balance } = await logic.routines.BalanceOf(signer.getAddress());
+        it("should throw error when logic execution throw error using `result()`", async () => {
+            const balance = await logic.routines.BalanceOf(signer.getAddress());
             const amount = balance + 1
             const ix = await logic.routines.Transfer(RECEIVER, amount);
 
@@ -117,8 +126,8 @@ describe("Logic", () => {
             }
         });
 
-        it("should throw error when contract execution throw error using `wait()`", async () => {
-            const { balance } = await logic.routines.BalanceOf(signer.getAddress());
+        it("should throw error when logic execution throw error using `wait()`", async () => {
+            const balance = await logic.routines.BalanceOf(signer.getAddress());
             const amount = balance + 1
             const ix = await logic.routines.Transfer(RECEIVER, amount);
 

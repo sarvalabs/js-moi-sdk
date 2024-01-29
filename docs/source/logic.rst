@@ -245,9 +245,9 @@ Usage
     const logic = await getLogicDriver(logicId, wallet);
 
     // Call the logic routine
-    const output = await logic.routines.GetBalance(address);
+    const balance = await logic.routines.BalanceOf(address);
 
-    console.log(output.balance); // 1000000
+    console.log(balance); // 1000000
 
 **Example 2**: Retrieving from the persistent state of a logic
 

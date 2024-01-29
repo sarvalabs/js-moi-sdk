@@ -141,10 +141,13 @@ export abstract class LogicBase extends ElementDescriptor {
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicIxRequest} The logic interaction request object.
      */
-    protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest {
+    protected createIxRequest(routine: LogicManifest.Routine, ixObject: LogicIxObject): LogicIxRequest {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            return await ix.result();
+            const result = await ix.result();
+            const values = routine.returns.map(field => result[field.label]);
+            
+            return values.length > 1 ? values : values[0];
         }
 
         return {
@@ -199,6 +202,6 @@ export abstract class LogicBase extends ElementDescriptor {
             return this.createPayload(ixObject)
         }
 
-        return this.createIxRequest(ixObject)
+        return this.createIxRequest(routine, ixObject);
     }
 }

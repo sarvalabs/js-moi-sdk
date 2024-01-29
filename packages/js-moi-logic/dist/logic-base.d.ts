@@ -56,7 +56,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicIxRequest} The logic interaction request object.
      */
-    protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest;
+    protected createIxRequest(routine: LogicManifest.Routine, ixObject: LogicIxObject): LogicIxRequest;
     /**
      * Creates a logic interaction request object with the specified routine and arguments.
      *
