@@ -62,37 +62,37 @@ class Signer {
      * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    async checkInteraction(ixObject, options) {
-        if (ixObject.type == null) {
+    async checkInteraction(ixObject) {
+        if (ixObject.type === undefined || ixObject.type === null) {
             js_moi_utils_1.ErrorUtils.throwError("Interaction type is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!options.ignore?.sender && !(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
+        if (!(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid sender address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        if (!options.ignore?.sender && ixObject.sender == null) {
+        if (ixObject.sender == null) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!options.ignore?.sender && (this.isInitialized() && ixObject.sender !== this.getAddress())) {
+        if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.type === js_moi_utils_1.IxType.VALUE_TRANSFER) {
-            if (!options.ignore?.receiver && !ixObject.receiver) {
+            if (!ixObject.receiver) {
                 js_moi_utils_1.ErrorUtils.throwError("Receiver address is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
-            if (!options.ignore?.receiver && !(0, js_moi_utils_1.isValidAddress)(ixObject.receiver)) {
+            if (!(0, js_moi_utils_1.isValidAddress)(ixObject.receiver)) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid receiver address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
         }
-        if (!options.ignore?.fuel_price && ixObject.fuel_price == null) {
+        if (ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
             js_moi_utils_1.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!options.ignore?.fuel_limit && ixObject.fuel_limit == null) {
+        if (ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
             js_moi_utils_1.ErrorUtils.throwError("Fuel limit is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        if (!options.ignore?.fuel_limit && ixObject.fuel_limit === 0) {
+        if (ixObject.fuel_limit === 0) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
         }
-        if (!options.ignore?.nonce && ixObject.nonce != null) {
+        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
             const nonce = await this.getNonce({ tesseract_number: -1 });
             if (ixObject.nonce < nonce) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid nonce", js_moi_utils_1.ErrorCode.NONCE_EXPIRED);
@@ -110,11 +110,11 @@ class Signer {
      * @throws {Error} if the interaction object is not valid or if there is
      * an error during preparation.
      */
-    async prepareInteraction(ixObject, options = {}) {
+    async prepareInteraction(ixObject) {
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
-        await this.checkInteraction(ixObject, options);
+        await this.checkInteraction(ixObject);
         if (ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }

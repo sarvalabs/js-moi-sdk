@@ -75,46 +75,46 @@ export abstract class Signer {
      * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    private async checkInteraction(ixObject: InteractionObject, options: { ignore?: Partial<Record<keyof InteractionObject, boolean>> }): Promise<void> {
-        if(ixObject.type == null) {
+    private async checkInteraction(ixObject: InteractionObject): Promise<void> {
+        if(ixObject.type === undefined || ixObject.type === null) {
             ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
         }
 
-        if(!options.ignore?.sender && !isValidAddress(ixObject.sender)) {
+        if(!isValidAddress(ixObject.sender)) {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
-        if(!options.ignore?.sender && ixObject.sender == null) {
+        if(ixObject.sender == null) {
             ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
         }
 
-        if(!options.ignore?.sender && (this.isInitialized() && ixObject.sender !== this.getAddress())) {
+        if(this.isInitialized() && ixObject.sender !== this.getAddress()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
         if(ixObject.type === IxType.VALUE_TRANSFER) {
-            if(!options.ignore?.receiver && !ixObject.receiver) {
+            if(!ixObject.receiver) {
                 ErrorUtils.throwError("Receiver address is missing", ErrorCode.MISSING_ARGUMENT);
             }
     
-            if(!options.ignore?.receiver && !isValidAddress(ixObject.receiver)) {
+            if(!isValidAddress(ixObject.receiver)) {
                 ErrorUtils.throwError("Invalid receiver address", ErrorCode.INVALID_ARGUMENT);
             }
         }
 
-        if(!options.ignore?.fuel_price && ixObject.fuel_price == null) {
+        if(ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
             ErrorUtils.throwError("Fuel price is missing", ErrorCode.MISSING_ARGUMENT);
         }
 
-        if(!options.ignore?.fuel_limit && ixObject.fuel_limit == null) {
+        if(ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
             ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
         }
 
-        if(!options.ignore?.fuel_limit && ixObject.fuel_limit === 0) {
+        if(ixObject.fuel_limit === 0) {
             ErrorUtils.throwError("Invalid fuel limit", ErrorCode.INTERACTION_UNDERPRICED);
         }
 
-        if(!options.ignore?.nonce && ixObject.nonce != null) {
+        if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
             const nonce = await this.getNonce({ tesseract_number: -1 });
             if(ixObject.nonce < nonce) {
                 ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
@@ -133,12 +133,12 @@ export abstract class Signer {
      * @throws {Error} if the interaction object is not valid or if there is 
      * an error during preparation.
      */
-    private async prepareInteraction(ixObject: InteractionObject, options: { ignore?: Partial<Record<keyof InteractionObject, boolean>> } = {}): Promise<void> {
+    private async prepareInteraction(ixObject: InteractionObject): Promise<void> {
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
         
-        await this.checkInteraction(ixObject, options);
+        await this.checkInteraction(ixObject);
         
         if (ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
