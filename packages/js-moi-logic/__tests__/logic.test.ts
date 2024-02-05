@@ -11,14 +11,14 @@ const MNEMONIC = "main story burst wonder sausage spice okay pioneer person unaw
 const INITIAL_SUPPLY = 100000000;
 const SYMBOL = "MOI";
 const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
-const deviationPath: string | undefined = "m/44'/6174'/0'/0/1";
-const provider = new JsonRpcProvider(HOST);
+const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+const PROVIDER = new JsonRpcProvider(HOST);
 
 let wallet: Wallet;
 
 beforeAll(async () => {
-    wallet = new Wallet(provider);
-    await wallet.fromMnemonic(MNEMONIC, deviationPath);
+    wallet = new Wallet(PROVIDER);
+    await wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH);
 });
 
 it("should initialize the wallet", async () => {
