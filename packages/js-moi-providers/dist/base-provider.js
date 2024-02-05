@@ -893,26 +893,22 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 clearTimeout(timeoutId);
             };
             const checkReceipt = async () => {
-                try {
-                    const receipt = await this.getInteractionReceipt(interactionHash);
-                    if (receipt == null) {
-                        return;
-                    }
-                    clearTimers();
-                    const result = this.processReceipt(receipt);
-                    const error = js_moi_manifest_1.ManifestCoder.decodeException(result.error);
-                    if (error == null) {
-                        resolve(receipt);
-                        return;
-                    }
-                    const err = new js_moi_utils_1.CustomError(error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
-                        ...error,
-                        receipt,
-                    });
-                    reject(err);
+                const receipt = await this.getInteractionReceipt(interactionHash);
+                if (receipt == null) {
+                    return;
                 }
-                catch (err) {
+                clearTimers();
+                const result = this.processReceipt(receipt);
+                const error = js_moi_manifest_1.ManifestCoder.decodeException(result.error);
+                if (error == null) {
+                    resolve(receipt);
+                    return;
                 }
+                const err = new js_moi_utils_1.CustomError(error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
+                    ...error,
+                    receipt,
+                });
+                reject(err);
             };
             await checkReceipt();
             intervalId = setInterval(checkReceipt, 5000);

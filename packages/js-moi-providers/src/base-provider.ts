@@ -1023,33 +1023,28 @@ export class BaseProvider extends AbstractProvider {
             }
 
             const checkReceipt = async() => {
-                try {
-                    const receipt = await this.getInteractionReceipt(interactionHash);
-    
-                    if(receipt == null) {
-                        return;
-                    }
+                const receipt = await this.getInteractionReceipt(interactionHash);
 
-                    clearTimers();
-
-                    const result = this.processReceipt(receipt);
-                    const error = ManifestCoder.decodeException(result.error);
-                    
-                    if (error == null) {
-                        resolve(receipt);
-                        return;
-                    }
-
-                    const err = new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
-                        ...error,
-                        receipt,
-                    });
-
-                    reject(err);
-
-                } catch(err) {
-
+                if(receipt == null) {
+                    return;
                 }
+
+                clearTimers();
+
+                const result = this.processReceipt(receipt);
+                const error = ManifestCoder.decodeException(result.error);
+                
+                if (error == null) {
+                    resolve(receipt);
+                    return;
+                }
+
+                const err = new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
+                    ...error,
+                    receipt,
+                });
+
+                reject(err);
             }
 
             await checkReceipt();
