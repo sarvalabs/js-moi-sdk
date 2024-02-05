@@ -1,7 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import {LogicId} from "./logic-id";
 import { LogicBase } from "./logic-base";
+import { LogicId } from "./logic-id";
 import { ContextStateKind } from "./state";
 
 export enum EngineKind {

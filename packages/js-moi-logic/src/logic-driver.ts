@@ -1,18 +1,17 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { LogicPayload } from "js-moi-providers";
+import { LogicManifest } from "js-moi-manifest";
+import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
-import { Options } from "js-moi-providers";
-import { Routine, Routines } from "../types/logic";
-import { EphemeralState, PersistentState } from "./state";
+import { LogicIxObject, LogicIxResponse } from "../types/interaction";
+import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { EphemeralState, PersistentState } from "./state";
 
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
-export class LogicDriver extends LogicDescriptor {
-    public readonly routines: Routines = {};
+export class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
+    public readonly routines: Routines<T> = {} as Routines<T>;
     public readonly persistentState: PersistentState;
     public readonly ephemeralState: EphemeralState;
 
@@ -27,7 +26,6 @@ export class LogicDriver extends LogicDescriptor {
      if available in logic manifest.
      */
     private createState() {
-        const provider = this.signer.getProvider();
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
 
         if(persistentStateExists) {
@@ -35,7 +33,7 @@ export class LogicDriver extends LogicDescriptor {
                 this.logicId.hex(),
                 this.elements.get(persistentStatePtr),
                 this.manifestCoder,
-                provider
+                this.signer.getProvider()
             )
 
             defineReadOnly(this, "persistentState", persistentState)
@@ -49,34 +47,54 @@ export class LogicDriver extends LogicDescriptor {
         const routines = {};
 
         this.manifest.elements.forEach((element: LogicManifest.Element) => {
-            if(element.kind === "routine") {
-                const routine = element.data as LogicManifest.Routine;
+            if (element.kind !== "routine") {
+                return;
+            }
 
-                if (routine.kind === "invokable") {
-                    const routineName = this.normalizeRoutineName(routine.name)
+            const routine = element.data as LogicManifest.Routine;
 
-                    // Create a routine execution function
-                    routines[routineName] = ((args: any[] = []) => {
-                        return this.createIxObject(routine, ...args);
-                    }) as Routine;
-    
-                    // Define routine properties
-                    routines[routineName].isMutable = (): boolean => {
-                        return this.isMutableRoutine(routine.name)
-                    }
-    
-                    routines[routineName].accepts = (): LogicManifest.TypeField[] | null => {
-                        return routine.accepts ? routine.accepts : null
-                    }
+            if (routine.kind !== "invokable") {
+                return;
+            }
 
-                    routines[routineName].returns = (): LogicManifest.TypeField[] | null => {
-                        return routine.returns ? routine.returns : null
-                    }
+            const name = this.normalizeRoutineName(routine.name);
+
+            routines[name] = async (...params: any[]) => {
+                const argsLen =
+                    params.at(-1) && typeof params.at(-1) === "object"
+                        ? params.length - 1
+                        : params.length;
+
+                if (routine.accepts && argsLen < routine.accepts.length) {
+                    ErrorUtils.throwError(
+                        "One or more required arguments are missing.",
+                        ErrorCode.INVALID_ARGUMENT
+                    );
                 }
+
+                const ixObject = this.createIxObject(routine, ...params);
+
+                if (!this.isMutableRoutine(routine.name)) {
+                    return await ixObject.unwrap();
+                }
+
+                return await ixObject.send();
+            };
+
+            routines[name].isMutable = (): boolean => {
+                return this.isMutableRoutine(routine.name)
+            }
+
+            routines[name].accepts = (): LogicManifest.TypeField[] | null => {
+                return routine.accepts ? routine.accepts : null
+            }
+
+            routines[name].returns = (): LogicManifest.TypeField[] | null => {
+                return routine.returns ? routine.returns : null
             }
         })
 
-        defineReadOnly(this, "routines", routines);
+        defineReadOnly(this, "routines", routines as Routines<T>);
     }
 
     /**
@@ -145,23 +163,12 @@ export class LogicDriver extends LogicDescriptor {
      * @returns {Promise<LogicIxResult | null>} A promise that resolves to the 
      logic interaction result or null.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null> {
+    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null> {
         try {
             const routine = this.getRoutineElement(response.routine_name)
             const result = await response.result(timeout);
-            const data = { 
-                output: this.manifestCoder.decodeOutput(
-                    result.outputs,
-                    routine.data["returns"]
-                ), 
-                error: ManifestCoder.decodeException(result.error) 
-            };
-    
-            if(data.output || data.error) {
-                return data
-            }
 
-            return null
+            return this.manifestCoder.decodeOutput(result.outputs, routine.data["returns"]);
         } catch(err) {
             throw err;
         }
@@ -172,24 +179,24 @@ export class LogicDriver extends LogicDescriptor {
  * Returns a logic driver instance based on the given logic id.
  * 
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer} signer - The signer instance for signing the interactions.
+ * @param {Signer} signer - The signer or provider instance. 
  * @param {Options} options - The custom tesseract options for retrieving 
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async (logicId: string, signer: Signer, options?: Options): Promise<LogicDriver> => {
+export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<T>> => {
     try {
-        const provider = signer.getProvider()
+        const provider = signer.getProvider();
         const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
-        if (typeof manifest === 'object') {
-            return new LogicDriver(logicId, manifest, signer);
+        if (typeof manifest === "object") {
+            return  new LogicDriver<T>(logicId, manifest, signer);
         }
 
         ErrorUtils.throwError(
             "Invalid logic manifest",
             ErrorCode.INVALID_ARGUMENT
-        )
+        );
     } catch(err) {
         throw err;
     }

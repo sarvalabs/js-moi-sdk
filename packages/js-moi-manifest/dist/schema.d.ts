@@ -344,6 +344,9 @@ export declare class Schema {
                     };
                 };
             };
+            revert: {
+                kind: string;
+            };
         };
     };
     static PISA_RESULT_SCHEMA: {

@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
-import { Tesseract, Interaction } from "js-moi-utils";
+import { Interaction, Tesseract } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, ContextInfo, InteractionRequest, InteractionReceipt, InteractionResponse, Options, RpcResponse, TDU, Content, ContentFrom, Status, Inspect, Encoding, Registry, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo, InteractionCallResponse, SyncStatus } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 /**
@@ -133,6 +133,56 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call.
      */
     getWaitTime(address: string): Promise<number | bigint>;
+    /**
+     * Initializes a filter for retrieving newly detected terreracts.
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
+     * the timeout is reset to 1 minute.
+     *
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     */
+    getNewTesseractFilter(): Promise<Filter>;
+    /**
+     * Initiates a filtering mechanism to fetch recently identified tesseracts
+     * associated with a specific account. The filter setup triggers a 1-minute
+     * timeout period, and with each subsequent request, the timeout is reset to 1 minute.
+     *
+     * @param {string} address - The address of the target account for which new tesseracts are filtered.
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    getNewTesseractsByAccountFilter(address: string): Promise<Filter>;
+    /**
+     * Initiates a filtering mechanism to fetch recently identified pending interaction.
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent request,
+     * the timeout is reset to 1 minute.
+     *
+     * @returns {Promise<Filter>} A object containing the Filter ID for PendingIxnsFilter
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    getPendingInteractionFilter(): Promise<Filter>;
+    /**
+     * Asynchronously removes the filter and returns a Promise that resolves to a
+     * object.
+     * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
+     *
+     * @returns {Promise<FilterDeletionResult>} A Promise that resolves to an object with a `status` property indicating the success of the filter removal.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    removeFilter(filter: Filter): Promise<FilterDeletionResult>;
+    /**
+     * Retrieves all filter changes since the last poll.
+     *
+     * The specific result varies depending on the type of filter used.
+     *
+     * @param {Filter} filter - The filter object for which changes are to be retrieved.
+     *
+     * @returns {Promise<T>} A promise that resolves to an object containing information about the changes made to the specified filter since the last poll. The structure of the object is determined by the type of filter provided.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     *
+     * @template T - The type of the object returned, dependent on the provided filter.
+     */
+    getFilterChanges<T extends any>(filter: Filter): Promise<T>;
     /**
      * Retrieves a Tesseract for a specific address.
      *
@@ -306,34 +356,6 @@ export declare class BaseProvider extends AbstractProvider {
      * the response.
      */
     getNodeInfo(): Promise<NodeInfo>;
-    /**
-     * Retrieves the value of a database entry with the specified key.
-     *
-     * @param {string} key - The key of the database entry.
-     * @returns {Promise<string>} A Promise that resolves to the value of the
-     * database entry as a string.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    getDBEntry(key: string): Promise<string>;
-    /**
-     * Retrieves the list of all registered accounts from a moipod.
-     *
-     * @returns {Promise<string[]>} A Promise that resolves to the list of
-     * accounts.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    getAccounts(): Promise<string[]>;
-    /**
-     * Retrieves information about active network connections.
-     *
-     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of
-     * connection response object.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    getConnections(): Promise<ConnectionsInfo>;
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.

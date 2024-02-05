@@ -1,10 +1,10 @@
 import {
     AssetCreationReceipt,
-    AssetMintOrBurnReceipt, 
-    AssetStandard, 
-    IxType, 
-    LogicDeployReceipt, 
-    LogicInvokeReceipt 
+    AssetMintOrBurnReceipt,
+    AssetStandard,
+    IxType,
+    LogicDeployReceipt,
+    LogicInvokeReceipt
 } from "js-moi-utils";
 
 export interface Options {
@@ -169,10 +169,6 @@ export interface StorageParams {
     options: Options;
 }
 
-export interface DBEntryParams {
-    key: string;
-}
-
 // Type alias for encoding type
 type Encoding = "JSON" | "POLO";
 
@@ -204,6 +200,14 @@ export interface ContentFrom {
     queued: Map<number | bigint, InteractionInfo>;
 }
 
+export interface Filter {
+    id: string;
+}
+
+export interface FilterDeletionResult {
+    status: boolean;
+}
+
 export interface Status {
     pending: number | bigint;
     queued: number | bigint;
@@ -227,18 +231,6 @@ export interface NodeInfo {
 interface Stream {
     protocol: string;
     direction: number;
-}
-
-interface Connection {
-    peer_id: string;
-    streams: Stream[];
-}
-
-export interface ConnectionsInfo {
-    connections: Connection[];
-    inbound_conn_count: number;
-    outbound_conn_count: number;
-    active_pub_sub_topics: { [topic: string]: number };
 }
 
 export interface AssetCreatePayload {
@@ -276,8 +268,8 @@ interface InteractionObject {
     transfer_values?: Map<string, number | bigint>;
     perceived_values?: Map<string, number | bigint>;
 
-    fuel_price: number | bigint;
-    fuel_limit: number | bigint;
+    fuel_price?: number | bigint;
+    fuel_limit?: number | bigint;
     
     payload?: InteractionPayload;
 }

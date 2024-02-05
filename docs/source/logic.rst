@@ -130,7 +130,8 @@ applications on the MOI network.
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
-        return await wallet.fromMnemonic(mnemonic);
+        await wallet.fromMnemonic(mnemonic);
+        return wallet;
     }
 
     const manifest = { ... }
@@ -153,84 +154,40 @@ Methods
 
 .. code-block:: javascript
 
-    // Example
-    const args = [
-        "LOG-FAC", 
-        "LOG", 
-        100000000, 
-        "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-    ]
+    import { LogicFactory } from "js-moi-sdk";
+    import { wallet } from "./wallet";
 
-    const response = await factory.deploy("Seeder!", args).send({
+    const factory = new LogicFactory(manifest, wallet);
+    
+    const symbol = "MOI";
+    const supply = 1000000;
+    
+    const ix = await factory.deploy("Seed!", symbol, supply);
+    const result = await ix.result();
+
+    console.log(result.logic_id); // 0x0800007d70c34ed6e...
+
+If you wish to externally pass `fuelLimit` or `fuelPrice`, pass the options as
+the last argument in the deploy call.
+
+.. code-block:: javascript
+
+    import { LogicFactory } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const factory = new LogicFactory(manifest, wallet);
+    
+    const symbol = "MOI";
+    const supply = 1000000;
+    const option = {
         fuelPrice: 1,
-        fuelLimit: 1000
-    });
+        fuelLimit: 6420,
+    }
+    
+    const ix = await factory.deploy("Seed!", symbol, supply, option);
+    const result = await ix.result();
 
-    // interaction response
-    console.log("--------");
-    console.log("Response");
-    console.log("--------");
-    console.log(response)
-
-    // interaction receipt
-    const receipt = await response.wait();
-    console.log("-------");
-    console.log("Receipt");
-    console.log("-------");
-    console.log(receipt);
-
-    // interaction result containes the logic id or decoded output/error
-    const result = await response.result();
-    console.log("-------");
-    console.log("Result");
-    console.log("-------");
-    console.log(result);
-
-    // Output
-    /*
-
-        --------
-        response
-        --------
-        {
-            hash: '0x778d37c13d3081742837176af9f2b8070c72c4c29e536751e8f846335744de2a',
-            wait: [Function: bound waitForInteraction] AsyncFunction,
-            result: [Function: bound processResult] AsyncFunction
-        }
-
-        -------
-        receipt
-        -------
-
-        {
-            "ix_type": "0x8",
-            "ix_hash": "0x778d37c13d3081742837176af9f2b8070c72c4c29e536751e8f846335744de2a",
-            "status": 0,
-            "fuel_used": "0x2b2",
-            "hashes": [
-                ...
-            ],
-            "extra_data": {
-                "logic_id": "0x080000e383d6d11848abf0bb741c4bcbbf6c70679442b5d5072d1578b1b6e31c564599",
-                "error": "0x"
-            },
-            "from": "0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba",
-            "to": "0xe383d6d11848abf0bb741c4bcbbf6c70679442b5d5072d1578b1b6e31c564599",
-            "ix_index": "0x0",
-            "parts": [
-                ...
-            ]
-        }
-
-        ------
-        result
-        ------
-
-        {
-            logic_id: "0x080000e383d6d11848abf0bb741c4bcbbf6c70679442b5d5072d1578b1b6e31c564599",
-            error: null
-        }
-    */
+    console.log(result.logic_id); // 0x010000423d3233...
 
 Logic Driver
 ------------
@@ -265,7 +222,8 @@ Functions
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const provider = new JsonRpcProvider("http://localhost:1600/");
         const wallet = new Wallet(provider);
-        return await wallet.fromMnemonic(mnemonic);
+        await wallet.fromMnemonic(mnemonic);
+        return wallet;
     }
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
@@ -275,82 +233,90 @@ Functions
 Usage
 ~~~~~
 
+**Example 1**: Calling a routine using the logic driver
+
 .. code-block:: javascript
 
-    const sender = "0x377a4674fca572f072a8176d61b86d9015914b9df0a57bb1d80fafecce233084";
-    const seeder = "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-    const name = await logicDriver.persistentState.get("name")
-    console.log('name - ' + name)
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
 
-    // Invoking a routine
-    const response = await logicDriver.routines.BalanceOf([seeder]).send({
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Call the logic routine
+    const { balance } = await logic.routines.BalanceOf(address);
+
+    console.log(balance); // 1000000
+
+**Example 2**: Retrieving from the persistent state of a logic
+
+.. code-block:: javascript
+
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Get the persistent state
+    const symbol = await logic.persistentState.get("symbol");
+
+    console.log(symbol); // MOI
+
+**Example 3**: Executing a mutating routine call
+
+.. code-block:: javascript
+
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Execute a mutating routine call
+    const ix = await logic.routines.Transfer(address, 1000);
+    console.log(ix.hash); //  0x010000423d3233...
+
+    const receipt = await ix.wait();
+    console.log(receipt); // { ... }
+
+    // if you want to view the result of the logic interaction
+    // you can use the result() method
+
+    // for example
+    // const result = await ix.result(); // { ... }
+
+
+If you wish to externally pass `fuelLimit` or `fuelPrice`, pass the options as
+the last argument in the deploy call.
+
+.. code-block:: javascript
+
+    import { getLogicDriver } from "js-moi-sdk";
+    import { wallet } from "./wallet";
+
+    const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+    // Get logic driver
+    const logic = await getLogicDriver(logicId, wallet);
+
+    // Execute a mutating routine call
+    const option = {
         fuelPrice: 1,
-        fuelLimit: 1000
-    });
+        fuelLimit: 6420,
+    }
+    const ix = await logic.routines.Transfer(address, 1000, option);
+    console.log(ix.hash); //  0x010000423d3233...
 
-    // interaction response
-    console.log("--------");
-    console.log("Response");
-    console.log("--------");
-    console.log(response)
-
-    // interaction receipt
-    const receipt = await response.wait();
-    console.log("-------");
-    console.log("Receipt");
-    console.log("-------");
-    console.log(receipt)
-
-    // interaction result containes the decoded output/error
-    const result = await response.result();
-    console.log("-------");
-    console.log("Result");
-    console.log("-------");
-    console.log(result);
-
-    // Output
-    /*
-        name - LOG-FAC
-
-        --------
-        response
-        --------
-        {
-            hash: '0x3492b59462fc7b8b9ec83296c6e04f314d0c93beb1cb2bfd267874b8e17c702c',
-            wait: [Function: bound waitForInteraction] AsyncFunction,
-            result: [Function: bound processResult] AsyncFunction
-        }
-
-        -------
-        receipt
-        -------
-
-        {
-            "ix_type": "0x9",
-            "ix_hash": "0x3492b59462fc7b8b9ec83296c6e04f314d0c93beb1cb2bfd267874b8e17c702c",
-            "status": 0,
-            "fuel_used": "0x46",
-            "hashes": [
-                ...
-            ],
-            "extra_data": {
-                "output": "0x0d2f067562616c616e63650305f5e100",
-                "error": "0x"
-            },
-            "from": "0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba",
-            "to": "0x9fe670db024784ec1b9b3b21cabbafa11f8c0a4fc063c376b453d20deda188de",
-            "ix_index": "0x0",
-            "parts": [
-                ...
-            ]
-        }
-
-        ------
-        result
-        ------
-
-        {
-            output: { balance: 100000000 },
-            error: null
-        }
-    */
+    const receipt = await ix.wait();
+    console.log(receipt); // { ... }

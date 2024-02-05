@@ -3,7 +3,7 @@ import { Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 
 const primitiveTypes = [
-    "null", "bool", "bytes", "address", "string", "u64", "i64", "bigint"
+    "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256","bigint"
 ]
 
 const isPrimitiveType = (type: string): boolean => {
@@ -240,6 +240,9 @@ export class Schema {
                         kind: "string"
                     }
                 }
+            },
+            revert: {
+                kind: "bool"
             }
         }
     }
@@ -347,7 +350,9 @@ export class Schema {
             case "string":
                 return "string";
             case "u64":
+            case "u256":
             case "i64":
+            case "i256":
             case "bigint":
                 return "integer";
             default:

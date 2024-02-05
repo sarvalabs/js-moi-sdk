@@ -7,6 +7,8 @@ exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
+const DEFAULT_FUEL_PRICE = 1;
+const DEFAULT_FUEL_LIMIT = 5000;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  class for logic-related operations.
@@ -17,8 +19,8 @@ class LogicBase extends element_descriptor_1.default {
     manifestCoder;
     constructor(manifest, signer) {
         super(manifest.elements);
-        this.signer = signer;
         this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
+        this.signer = signer;
     }
     /**
      * Returns the logic ID associated with the LogicBase instance.
@@ -31,7 +33,7 @@ class LogicBase extends element_descriptor_1.default {
     /**
      * Updates the signer or establishes a connection with a new signer.
      *
-     * @param {Signer} signer - The updated signer object or the new signer object to connect.
+     * @param {Signer} signer -  The updated signer object or the new signer object to connect.
      */
     connect(signer) {
         this.signer = signer;
@@ -47,44 +49,39 @@ class LogicBase extends element_descriptor_1.default {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    async executeRoutine(ixObject, ...args) {
-        const processedArgs = this.processArguments(ixObject, args);
+    async executeRoutine(ixObject, method, option) {
         if (this.getIxType() !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
-            js_moi_utils_1.ErrorUtils.throwError("This logic object doesn\'t have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+            js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
-        switch (processedArgs.type) {
-            case "call":
-                return this.signer.call(processedArgs.params)
-                    .then((response) => {
-                    return {
+        const { type, params } = this.processArguments(ixObject, method, option);
+        switch (type) {
+            case "call": {
+                const response = await this.signer.call(params);
+                return {
+                    ...response,
+                    result: this.processResult.bind(this, {
                         ...response,
-                        result: this.processResult.bind(this, {
-                            ...response,
-                            routine_name: ixObject.routine.name
-                        })
-                    };
-                }).catch((err) => {
-                    throw err;
-                });
-            case "estimate":
-                return this.signer.estimateFuel(processedArgs.params);
-            case "send":
-                return this.signer.sendInteraction(processedArgs.params)
-                    .then((response) => {
-                    return {
+                        routine_name: ixObject.routine.name,
+                    }),
+                };
+            }
+            case "estimate": {
+                return this.signer.estimateFuel(params);
+            }
+            case "send": {
+                const response = await this.signer.sendInteraction(params);
+                return {
+                    ...response,
+                    result: this.processResult.bind(this, {
                         ...response,
-                        result: this.processResult.bind(this, {
-                            ...response,
-                            routine_name: ixObject.routine.name
-                        })
-                    };
-                }).catch((err) => {
-                    throw err;
-                });
+                        routine_name: ixObject.routine.name,
+                    }),
+                };
+            }
             default:
                 break;
         }
-        js_moi_utils_1.ErrorUtils.throwError('Method "' + processedArgs.type + '" not supported.', js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+        js_moi_utils_1.ErrorUtils.throwError('Method "' + type + '" not supported.', js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
     /**
      * Processes the interaction arguments and returns the processed arguments object.
@@ -94,20 +91,26 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    processArguments(ixObject, args) {
-        if (args.length < 2) {
-            js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-        }
-        return {
-            type: args[0],
-            params: {
-                sender: this.signer.getAddress(),
-                type: this.getIxType(),
-                fuel_price: args[1].fuelPrice,
-                fuel_limit: args[1].fuelLimit,
-                payload: ixObject.createPayload()
-            }
+    processArguments(ixObject, type, option) {
+        const params = {
+            type: this.getIxType(),
+            payload: ixObject.createPayload(),
         };
+        if (option.sender != null) {
+            params.sender = option.sender;
+        }
+        else {
+            if (this.signer?.isInitialized()) {
+                params.sender = this.signer.getAddress();
+            }
+        }
+        if (option.fuelPrice != null) {
+            params.fuel_price = option.fuelPrice;
+        }
+        if (option.fuelLimit != null) {
+            params.fuel_limit = option.fuelLimit;
+        }
+        return { type, params: { ...params, ...option } };
     }
     /**
      * Creates a logic interaction request object based on the given interaction object.
@@ -116,7 +119,12 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxRequest(ixObject) {
+        const unwrap = async () => {
+            const ix = await ixObject.call();
+            return await ix.result();
+        };
         return {
+            unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
             estimateFuel: ixObject.estimateFuel.bind(ixObject)
@@ -130,19 +138,25 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
+        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
         const ixObject = {
             routine: routine,
             arguments: args
         };
-        // Define call, send, estimateFuel methods on ixObject
-        ixObject.call = (...args) => {
-            return this.executeRoutine(ixObject, "call", ...args);
+        ixObject.call = async () => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            return this.executeRoutine(ixObject, "call", option);
         };
-        ixObject.send = (...args) => {
-            return this.executeRoutine(ixObject, "send", ...args);
+        ixObject.send = async () => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            return this.executeRoutine(ixObject, "send", option);
         };
-        ixObject.estimateFuel = (...args) => {
-            return this.executeRoutine(ixObject, "estimate", ...args);
+        ixObject.estimateFuel = () => {
+            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : DEFAULT_FUEL_LIMIT;
+            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            return this.executeRoutine(ixObject, "estimate", option);
         };
         ixObject.createPayload = () => {
             return this.createPayload(ixObject);

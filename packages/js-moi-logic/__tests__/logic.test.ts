@@ -1,74 +1,162 @@
-import erc20 from "../manifests/erc20.json";
-import {JsonRpcProvider} from "js-moi-providers";
-import {LogicFactory} from "../src/logic-factory";
-import { getLogicDriver } from "../src/logic-driver";
-import { initializeWallet } from "./utils/utils";
-import { Signer } from "js-moi-signer";
+import { JsonRpcProvider } from "js-moi-providers";
 import { Wallet } from "js-moi-wallet";
 
-describe("Test Logic Deploy", () => {
-    let logicId: string;
-    let wallet: Signer;
+import { LogicDriver, getLogicDriver } from "../src/logic-driver";
+import { LogicFactory } from "../src/logic-factory";
 
-    test.concurrent("should initialize the wallet", async () => {
-        const provider = new JsonRpcProvider("http://localhost:1600/");
-        const mnemonic = "disease into limb company taxi unaware collect vehicle upper final problem proof";
-        wallet = await initializeWallet(provider, mnemonic);
-        expect(wallet).toBeInstanceOf(Wallet);
-    })
+import manifest from "../manifests/erc20.json";
 
-    test.concurrent("should deploy the erc20 logic", async() => {
-        expect(wallet).toBeDefined();
+const HOST = "http://localhost:1600/";
+const MNEMONIC = "main story burst wonder sausage spice okay pioneer person unaware force bubble";
+const INITIAL_SUPPLY = 100000000;
+const SYMBOL = "MOI";
+const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
+const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+const PROVIDER = new JsonRpcProvider(HOST);
 
-        const factory = new LogicFactory(erc20, wallet);
+let wallet: Wallet;
 
-        const args = [
-            "LOGIC-Token", 
-            "LOGIC", 
-            100000000, 
-            "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-        ]
+beforeAll(async () => {
+    wallet = new Wallet(PROVIDER);
+    await wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH);
+});
 
-        const response = await factory.deploy("Seeder!", args).send({
-            fuelPrice: 1,
-            fuelLimit: 2000
+it("should initialize the wallet", async () => {
+    expect(wallet).toBeInstanceOf(Wallet);
+    expect(wallet.getAddress()).toBeDefined();
+});
+
+describe("Logic", () => {
+    let logicId: string | undefined;
+
+    describe("deploy logic", () => {
+        it("should deploy logic without options", async () => {
+            const factory = new LogicFactory(manifest, wallet);
+
+            const symbol = SYMBOL;
+            const supply = INITIAL_SUPPLY;
+
+            const ix = await factory.deploy("Seed!", symbol, supply);
+            
+            const receipt = await ix.wait();
+            const result = await ix.result();
+            logicId = result.logic_id;
+
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+
         });
-        expect(response).toBeDefined();
 
-        const receipt = await response.wait();
-        expect(receipt).toBeDefined();
 
-        const result = await response.result();
-        expect(result).toBeDefined();
-        expect(result.error).not.toBe("0x");
+        it("should deploy logic with options", async () => {
+            const factory = new LogicFactory(manifest, wallet);
+            const symbol = "MOI";
+            const supply = 100000000;
+            const option = { fuelPrice: 1, fuelLimit: 3000 + Math.floor(Math.random() * 3000) }
+            const ix = await factory.deploy("Seed!", symbol, supply, option);
+            
+            const receipt = await ix.wait();
+            const result = await ix.result();
+            logicId = result.logic_id;
 
-        logicId = result.logic_id;
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+        });
     });
 
-    test.concurrent("should execute the erc20 routine", async() => {
-        expect(logicId).toBeDefined();
+    describe("logic driver initialized using signer", () => {
+        let logic: LogicDriver;
 
-        const seeder = "0xffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34";
-        const logicDriver = await getLogicDriver(logicId, wallet);
-        const name = await logicDriver.persistentState.get("name")
-        expect(name).toBe("LOGIC-Token")
+        beforeAll(async () => {
+            if(logicId == null) {
+                expect(logicId).toBeDefined();
+                return;
+            };
 
-        const response = await logicDriver.routines.BalanceOf([seeder]).send({
-            fuelPrice: 1,
-            fuelLimit: 2000
+            logic = await getLogicDriver(logicId, wallet);
         });
 
-        console.log(response)
+        it("should able to retrieve balance of the account", async () => {
+            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+            
+            expect(balance).toBe(INITIAL_SUPPLY);
+        });
 
-        const receipt = await response.wait();
-        expect(receipt).toBeDefined();
+        it("should return object when multiple values are returned", async () => {
+            const values = await logic.routines.DoubleReturnValue(wallet.getAddress());
+            const { symbol, supply } = values;
 
-        console.log(receipt)
+            expect(values).toBeDefined();
+            expect(typeof symbol).toBe('string');
+            expect(typeof supply).toBe('number');
+        });
 
-        const result = await response.result();
-        expect(result).toBeDefined();
-        expect(result.output.balance).toBe(100000000)
+        it("should able to transfer without option", async () => {
+            const amount = Math.floor(Math.random() * 1000);
+            const ix = await logic.routines.Transfer(RECEIVER, amount);
+            const receipt = await ix.wait();
+            const { success } = await ix.result();
 
-        console.log(result)
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+            expect(typeof success).toBe('boolean');
+        });
+
+        it("should able to transfer with option", async () => {
+            const amount = Math.floor(Math.random() * 1000);
+            const option = { fuelPrice: 1, fuelLimit: 1000 + Math.floor(Math.random() * 1000) }
+            const ix = await logic.routines.Transfer(RECEIVER, amount, option);
+            const receipt = await ix.wait();
+            const result = await ix.result();
+            const { balance } = await logic.routines.BalanceOf(RECEIVER);
+
+            console.log(result);
+            const { success } = result;
+
+            expect(balance).toBeGreaterThanOrEqual(amount);
+            expect(ix.hash).toBeDefined();
+            expect(receipt).toBeDefined();
+            expect(typeof success).toBe('boolean');
+        });
+
+        it("should throw error when logic execution throw error using `result()`", async () => {
+            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+            const amount = balance + 1
+            const ix = await logic.routines.Transfer(RECEIVER, amount);
+
+            try {
+                await ix.result();
+            } catch (error) {
+                expect(error.message).toBe("insufficient balance for sender");
+                expect(error.params.receipt).toBeDefined();
+            }
+        });
+
+        it("should throw error when logic execution throw error using `wait()`", async () => {
+            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+            const amount = balance + 1
+            const ix = await logic.routines.Transfer(RECEIVER, amount);
+
+            try {
+                await ix.wait();
+            } catch (error) {
+                expect(error.message).toBe("insufficient balance for sender");
+                expect(error.params.receipt).toBeDefined();
+            }
+        });
+
+        it("should be able to read from persistent storage", async () => {
+            const symbol = await logic.persistentState.get("symbol");
+    
+            expect(symbol).toBe(SYMBOL);
+        });
+
+        it("should throw error when reading from persistent storage with invalid key", async () => {
+            const invalidKey = "invalid-key";
+            
+            expect(async () => {
+                await logic.persistentState.get(invalidKey);
+            }).rejects.toThrow(`The provided slot "${invalidKey}" does not exist.`);
+        });
     });
 })

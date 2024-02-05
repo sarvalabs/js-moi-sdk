@@ -1,17 +1,16 @@
 import { LogicManifest } from "js-moi-manifest";
-import { LogicPayload } from "js-moi-providers";
+import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
-import { Options } from "js-moi-providers";
+import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
-import { EphemeralState, PersistentState } from "./state";
 import { LogicDescriptor } from "./logic-descriptor";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
-export declare class LogicDriver extends LogicDescriptor {
-    readonly routines: Routines;
+export declare class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
+    readonly routines: Routines<T>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
@@ -60,15 +59,15 @@ export declare class LogicDriver extends LogicDescriptor {
      * @returns {Promise<LogicIxResult | null>} A promise that resolves to the
      logic interaction result or null.
      */
-    protected processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null>;
+    protected processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
 }
 /**
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer} signer - The signer instance for signing the interactions.
+ * @param {Signer} signer - The signer or provider instance.
  * @param {Options} options - The custom tesseract options for retrieving
  * logic manifest. (optional)
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export declare const getLogicDriver: (logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver>;
+export declare const getLogicDriver: <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver<T>>;

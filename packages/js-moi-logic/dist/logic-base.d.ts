@@ -1,11 +1,10 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { IxType } from "js-moi-utils";
-import { LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { InteractionResponse, InteractionCallResponse } from "js-moi-providers";
+import { IxType } from "js-moi-utils";
+import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
+import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
-import { LogicIxRequest } from "../types/logic";
-import { LogicIxArguments, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  class for logic-related operations.
@@ -17,7 +16,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
     constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract getIxType(): IxType;
-    protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult | null>;
+    protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
     /**
      * Returns the logic ID associated with the LogicBase instance.
      *
@@ -27,7 +26,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
     /**
      * Updates the signer or establishes a connection with a new signer.
      *
-     * @param {Signer} signer - The updated signer object or the new signer object to connect.
+     * @param {Signer} signer -  The updated signer object or the new signer object to connect.
      */
     connect(signer: Signer): void;
     /**
@@ -41,7 +40,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * if the logic id is not defined, if the method type is unsupported,
      * or if the sendInteraction operation fails.
      */
-    protected executeRoutine(ixObject: LogicIxObject, ...args: any[]): Promise<InteractionCallResponse | number | bigint | InteractionResponse>;
+    protected executeRoutine(ixObject: LogicIxObject, method: string, option: RoutineOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse>;
     /**
      * Processes the interaction arguments and returns the processed arguments object.
      *
@@ -50,7 +49,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    protected processArguments(ixObject: LogicIxObject, args: any[]): LogicIxArguments;
+    protected processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): LogicIxArguments;
     /**
      * Creates a logic interaction request object based on the given interaction object.
      *

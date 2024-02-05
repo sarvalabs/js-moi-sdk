@@ -75,7 +75,7 @@ class LogicFactory extends logic_base_1.LogicBase {
      * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    deploy(builderName, args = []) {
+    deploy(builderName, ...args) {
         const builder = Object.values(this.manifest.elements)
             .find(element => {
             if (element.kind === "routine") {
@@ -87,10 +87,11 @@ class LogicFactory extends logic_base_1.LogicBase {
         });
         if (builder) {
             const builderRoutine = builder.data;
-            if (builderRoutine.accepts && Object.keys(builderRoutine.accepts).length != args.length) {
+            const argsLen = args.at(-1) && typeof args.at(-1) === "object" ? args.length - 1 : args.length;
+            if (builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
                 js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
-            return this.createIxObject(builderRoutine, ...args);
+            return this.createIxObject(builderRoutine, ...args).send();
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid builder name, builder not found!", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }

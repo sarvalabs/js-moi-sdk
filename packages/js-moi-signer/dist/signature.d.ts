@@ -1,4 +1,5 @@
-export default class Signature {
+import { ISignature } from "../types";
+export default class Signature implements ISignature {
     private prefix;
     private digest;
     private extraData;

@@ -1,18 +1,22 @@
-import { LogicManifest } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, IxType, AssetCreationReceipt, AssetMintOrBurnReceipt,
-LogicDeployReceipt, LogicInvokeReceipt, Tesseract, Interaction, bytesToHex, hexDataLength, 
-hexToBytes, unmarshal, hexToBN, toQuantity } from "js-moi-utils";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import {
+    AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
+    IxType, LogicDeployReceipt, LogicInvokeReceipt, Tesseract, bytesToHex, hexDataLength,
+    hexToBN, hexToBytes, toQuantity, unmarshal
+} from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountParamsBase, AccountState, AssetInfo, 
-AssetInfoParams, BalanceParams, ContextInfo, InteractionRequest, 
-InteractionReceipt, InteractionParams, InteractionResponse, 
-LogicManifestParams, Options, RpcResponse, StorageParams, TDU, TesseractParams, 
-Content, AccountStateParams, DBEntryParams, ContentFrom, Status, 
-Inspect, Encoding, AccountMetaInfoParams, InteractionByTesseractParams, 
-Registry, TDUResponse, CallorEstimateIxObject, ConnectionsInfo, CallorEstimateOptions, NodeInfo, InteractionCallResponse, SyncStatus, SyncStatusParams } from "../types/jsonrpc";
-import { processIxObject } from "./interaction";
+import {
+    AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
+    AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
+    Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    InteractionByTesseractParams, InteractionCallResponse, InteractionParams, InteractionReceipt,
+    InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
+    RpcResponse, Status, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
+    TesseractParams
+} from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
+import { processIxObject } from "./interaction";
 
 // Default timeout value in seconds
 const defaultTimeout: number = 120;
@@ -353,6 +357,120 @@ export class BaseProvider extends AbstractProvider {
             const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
 
             return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Initializes a filter for retrieving newly detected terreracts. 
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
+     * the timeout is reset to 1 minute.
+     * 
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     */
+    public async getNewTesseractFilter(): Promise<Filter> {
+        try {
+            const response: RpcResponse = await this.execute("moi.NewTesseractFilter", null);
+
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Initiates a filtering mechanism to fetch recently identified tesseracts
+     * associated with a specific account. The filter setup triggers a 1-minute
+     * timeout period, and with each subsequent request, the timeout is reset to 1 minute.
+     *
+     * @param {string} address - The address of the target account for which new tesseracts are filtered.
+     * @returns {Promise<Filter>} An object containing the filter id for the NewTesseractFilter.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    public async getNewTesseractsByAccountFilter(address: string): Promise<Filter> {
+        try {
+            const params = {
+                address: address
+            };
+
+            const response: RpcResponse = await this.execute("moi.NewTesseractsByAccountFilter", params);
+
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;   
+        }
+    }
+
+    /**
+     * Initiates a filtering mechanism to fetch recently identified pending interaction.
+     * The filter setup triggers a 1-minute timeout period, and with each subsequent request,
+     * the timeout is reset to 1 minute.
+     * 
+     * @returns {Promise<Filter>} A object containing the Filter ID for PendingIxnsFilter
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    public async getPendingInteractionFilter(): Promise<Filter> {
+        try {
+            const params = null;
+
+            const response: RpcResponse = await this.execute('moi.PendingIxnsFilter', params);
+            
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Asynchronously removes the filter and returns a Promise that resolves to a
+     * object.
+     * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
+     * 
+     * @returns {Promise<FilterDeletionResult>} A Promise that resolves to an object with a `status` property indicating the success of the filter removal.
+     * @throws {Error} Throws an error if there is an error executing the RPC call.
+     */
+    public async removeFilter(filter: Filter): Promise<FilterDeletionResult> {
+        try {
+            const params = {
+                id: filter.id
+            };
+
+            const response: RpcResponse = await this.execute("moi.RemoveFilter", params);
+
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
+    /**
+     * Retrieves all filter changes since the last poll.
+     *
+     * The specific result varies depending on the type of filter used.
+     * 
+     * @param {Filter} filter - The filter object for which changes are to be retrieved.
+     *
+     * @returns {Promise<T>} A promise that resolves to an object containing information about the changes made to the specified filter since the last poll. The structure of the object is determined by the type of filter provided.
+     * @throws {Error} Throws an error if there is an issue executing the RPC call.
+     * 
+     * @template T - The type of the object returned, dependent on the provided filter.
+     */
+    async getFilterChanges<T extends any>(filter: Filter): Promise<T> {
+        try {
+            const params = {
+                id: filter.id
+            };
+ 
+            const response = await this.execute("moi.GetFilterChanges", params);
+            
+            if (response.result.data == null) {
+                return null;
+            }
+
+            return this.processResponse(response);
         } catch (error) {
             throw error;
         }
@@ -823,63 +941,6 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Retrieves the value of a database entry with the specified key.
-     * 
-     * @param {string} key - The key of the database entry.
-     * @returns {Promise<string>} A Promise that resolves to the value of the 
-     * database entry as a string.
-     * @throws {Error} if there is an error executing the RPC call or processing 
-     * the response.
-     */
-    public async getDBEntry(key: string): Promise<string> {
-        try {
-            const params: DBEntryParams = {
-                key: key
-            }
-    
-            const response: RpcResponse = await this.execute("debug.DBGet", params)
-
-            return this.processResponse(response)
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
-     * Retrieves the list of all registered accounts from a moipod.
-     * 
-     * @returns {Promise<string[]>} A Promise that resolves to the list of 
-     * accounts.
-     * @throws {Error} if there is an error executing the RPC call or processing 
-     * the response.
-     */
-    public async getAccounts(): Promise<string[]> {
-        try {
-            const response: RpcResponse = await this.execute("debug.Accounts", null)
-            return this.processResponse(response)
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
-     * Retrieves information about active network connections.
-     * 
-     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of 
-     * connection response object.
-     * @throws {Error} if there is an error executing the RPC call or processing 
-     * the response.
-     */
-    public async getConnections(): Promise<ConnectionsInfo> {
-        try {
-            const response: RpcResponse = await this.execute("debug.Connections", null)
-            return this.processResponse(response)
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
      * Waits for the interaction with the specified hash to be included in a tesseract 
      * and returns the interaction receipt.
      * 
@@ -899,18 +960,34 @@ export class BaseProvider extends AbstractProvider {
             let intervalId: ReturnType<typeof setInterval>;
             let timeoutId: ReturnType<typeof setTimeout>;
 
-            const checkReceipt = async() => {
-                try {
-                    const receipt = await this.getInteractionReceipt(interactionHash);
-    
-                    if(receipt) {
-                        resolve(receipt)
-                        clearInterval(intervalId)
-                        clearTimeout(timeoutId)
-                    }
-                } catch(err) {
+            const clearTimers = () => {
+                clearInterval(intervalId);
+                clearTimeout(timeoutId);
+            }
 
+            const checkReceipt = async() => {
+                const receipt = await this.getInteractionReceipt(interactionHash);
+
+                if(receipt == null) {
+                    return;
                 }
+
+                clearTimers();
+
+                const result = this.processReceipt(receipt);
+                const error = ManifestCoder.decodeException(result.error);
+                
+                if (error == null) {
+                    resolve(receipt);
+                    return;
+                }
+
+                const err = new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
+                    ...error,
+                    receipt,
+                });
+
+                reject(err);
             }
 
             await checkReceipt();
@@ -975,15 +1052,8 @@ export class BaseProvider extends AbstractProvider {
      * response, or the timeout is reached.
      */
     protected async waitForResult(interactionHash: string, timeout?: number): Promise<any> {
-        return new Promise(async(resolve, reject) => {
-            try {
-                const receipt = await this.waitForInteraction(interactionHash, timeout);
-                const result = this.processReceipt(receipt);
-                resolve(result);
-            } catch(err) {
-                reject(new Error(`An error occurred while waiting for result: ${err.message}`));
-            }
-        })
+        const receipt = await this.waitForInteraction(interactionHash, timeout);
+        return await this.processReceipt(receipt);
     }
 
     /**
