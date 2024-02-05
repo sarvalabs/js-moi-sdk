@@ -838,7 +838,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 clearTimeout(timeoutId);
             };
             const checkReceipt = async () => {
-                const receipt = await this.getInteractionReceipt(interactionHash);
+                const receipt = await this.getInteractionReceipt(interactionHash).catch(() => null);
                 if (receipt == null) {
                     return;
                 }
