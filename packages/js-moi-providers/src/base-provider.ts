@@ -8,11 +8,11 @@ import { EventType, Listener } from "../types/event";
 import {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
-    ConnectionsInfo, Content, ContentFrom, ContextInfo, DBEntryParams, Encoding, Filter,
-    FilterDeletionResult, Inspect, InteractionByTesseractParams, InteractionCallResponse,
-    InteractionParams, InteractionReceipt, InteractionRequest, InteractionResponse,
-    LogicManifestParams, NodeInfo, Options, Registry, RpcResponse, Status, StorageParams,
-    SyncStatus, SyncStatusParams, TDU, TDUResponse, TesseractParams
+    Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    InteractionByTesseractParams, InteractionCallResponse, InteractionParams, InteractionReceipt,
+    InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
+    RpcResponse, Status, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
+    TesseractParams
 } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -930,63 +930,6 @@ export class BaseProvider extends AbstractProvider {
     public async getNodeInfo(): Promise<NodeInfo> {
         try {
             const response: RpcResponse = await this.execute("net.Info", null)
-            return this.processResponse(response)
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
-     * Retrieves the value of a database entry with the specified key.
-     * 
-     * @param {string} key - The key of the database entry.
-     * @returns {Promise<string>} A Promise that resolves to the value of the 
-     * database entry as a string.
-     * @throws {Error} if there is an error executing the RPC call or processing 
-     * the response.
-     */
-    public async getDBEntry(key: string): Promise<string> {
-        try {
-            const params: DBEntryParams = {
-                key: key
-            }
-    
-            const response: RpcResponse = await this.execute("debug.DBGet", params)
-
-            return this.processResponse(response)
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
-     * Retrieves the list of all registered accounts from a moipod.
-     * 
-     * @returns {Promise<string[]>} A Promise that resolves to the list of 
-     * accounts.
-     * @throws {Error} if there is an error executing the RPC call or processing 
-     * the response.
-     */
-    public async getAccounts(): Promise<string[]> {
-        try {
-            const response: RpcResponse = await this.execute("debug.Accounts", null)
-            return this.processResponse(response)
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
-     * Retrieves information about active network connections.
-     * 
-     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of 
-     * connection response object.
-     * @throws {Error} if there is an error executing the RPC call or processing 
-     * the response.
-     */
-    public async getConnections(): Promise<ConnectionsInfo> {
-        try {
-            const response: RpcResponse = await this.execute("debug.Connections", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;

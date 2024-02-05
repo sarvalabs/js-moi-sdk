@@ -169,10 +169,6 @@ export interface StorageParams {
     options: Options;
 }
 
-export interface DBEntryParams {
-    key: string;
-}
-
 // Type alias for encoding type
 type Encoding = "JSON" | "POLO";
 
@@ -235,18 +231,6 @@ export interface NodeInfo {
 interface Stream {
     protocol: string;
     direction: number;
-}
-
-interface Connection {
-    peer_id: string;
-    streams: Stream[];
-}
-
-export interface ConnectionsInfo {
-    connections: Connection[];
-    inbound_conn_count: number;
-    outbound_conn_count: number;
-    active_pub_sub_topics: { [topic: string]: number };
 }
 
 export interface AssetCreatePayload {

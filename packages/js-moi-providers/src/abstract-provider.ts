@@ -7,7 +7,6 @@ import {
     AssetInfo,
     CallorEstimateIxObject,
     CallorEstimateOptions,
-    ConnectionsInfo,
     Content,
     ContentFrom,
     ContextInfo,
@@ -63,14 +62,11 @@ export abstract class AbstractProvider {
     abstract getPeers(): Promise<string[]>
     abstract getVersion(): Promise<string>
     abstract getNodeInfo(): Promise<NodeInfo>
-    abstract getDBEntry(key: string): Promise<string>
-    abstract getAccounts(): Promise<string[]>
     abstract getNewTesseractFilter(): Promise<Filter>
     abstract getNewTesseractsByAccountFilter(address: string): Promise<Filter>
     abstract getPendingInteractionFilter(): Promise<Filter>
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>
-    abstract getConnections(): Promise<ConnectionsInfo>
 
     // Event Emitter (ish)
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;

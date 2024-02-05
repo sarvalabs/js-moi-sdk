@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, ConnectionsInfo, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 /**
@@ -356,34 +356,6 @@ export declare class BaseProvider extends AbstractProvider {
      * the response.
      */
     getNodeInfo(): Promise<NodeInfo>;
-    /**
-     * Retrieves the value of a database entry with the specified key.
-     *
-     * @param {string} key - The key of the database entry.
-     * @returns {Promise<string>} A Promise that resolves to the value of the
-     * database entry as a string.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    getDBEntry(key: string): Promise<string>;
-    /**
-     * Retrieves the list of all registered accounts from a moipod.
-     *
-     * @returns {Promise<string[]>} A Promise that resolves to the list of
-     * accounts.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    getAccounts(): Promise<string[]>;
-    /**
-     * Retrieves information about active network connections.
-     *
-     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of
-     * connection response object.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    getConnections(): Promise<ConnectionsInfo>;
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
