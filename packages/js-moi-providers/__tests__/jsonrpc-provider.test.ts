@@ -290,14 +290,6 @@ describe("Test JsonRpcProvider Query Calls", () => {
       });
     });
 
-    describe("getAccounts", () => {
-      it('should return the accounts', async () => {
-        const accounts = await provider.getAccounts();
-        expect(accounts).toBeDefined();
-        expect(accounts.length).toBeGreaterThanOrEqual(2)
-      });
-    });
-
     describe("getNewTesseractFilter", () => {
       it("should return the filter object containing the filter id", async () => {
         const filter = await provider.getNewTesseractFilter();
@@ -382,11 +374,4 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(Array.length).toBeGreaterThanOrEqual(1);
       })
     });
-    
-    describe("getConnections", () => {
-      it('should return the connections info', async () => {
-        const info = await provider.getConnections();
-        expect(info).toBeDefined();
-      });
-    })
 });

@@ -411,10 +411,6 @@ Query Methods
 
 .. autofunction:: getNodeInfo
 
-.. autofunction:: getDBEntry
-
-.. autofunction:: getAccounts
-
 .. autofunction:: getNewTesseractFilter
 
 .. autofunction:: getNewTesseractsByAccountFilter
@@ -424,8 +420,6 @@ Query Methods
 .. autofunction:: getFilterChanges
 
 .. autofunction:: removeFilter
-
-.. autofunction:: getConnections
 
 Event Methods
 ~~~~~~~~~~~~~

@@ -816,61 +816,6 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
-     * Retrieves the value of a database entry with the specified key.
-     *
-     * @param {string} key - The key of the database entry.
-     * @returns {Promise<string>} A Promise that resolves to the value of the
-     * database entry as a string.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    async getDBEntry(key) {
-        try {
-            const params = {
-                key: key
-            };
-            const response = await this.execute("debug.DBGet", params);
-            return this.processResponse(response);
-        }
-        catch (error) {
-            throw error;
-        }
-    }
-    /**
-     * Retrieves the list of all registered accounts from a moipod.
-     *
-     * @returns {Promise<string[]>} A Promise that resolves to the list of
-     * accounts.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    async getAccounts() {
-        try {
-            const response = await this.execute("debug.Accounts", null);
-            return this.processResponse(response);
-        }
-        catch (error) {
-            throw error;
-        }
-    }
-    /**
-     * Retrieves information about active network connections.
-     *
-     * @returns {Promise<ConnectionsInfo>} A Promise that resolves to an array of
-     * connection response object.
-     * @throws {Error} if there is an error executing the RPC call or processing
-     * the response.
-     */
-    async getConnections() {
-        try {
-            const response = await this.execute("debug.Connections", null);
-            return this.processResponse(response);
-        }
-        catch (error) {
-            throw error;
-        }
-    }
-    /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
      *
