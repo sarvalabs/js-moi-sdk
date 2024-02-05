@@ -138,7 +138,7 @@ export abstract class Signer {
         
         await this.checkInteraction(ixObject);
         
-        if (ixObject.nonce != null) {
+        if (ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }
     }
@@ -178,7 +178,7 @@ export abstract class Signer {
         // Get the provider
         const provider = this.getProvider();
 
-        await this.prepareInteraction(ixObject)
+        await this.prepareInteraction(ixObject);
 
         return await provider.estimateFuel(ixObject as CallorEstimateIxObject)
     }
@@ -201,7 +201,7 @@ export abstract class Signer {
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
 
-            await this.prepareInteraction(ixObject)
+            await this.prepareInteraction(ixObject);
 
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo)

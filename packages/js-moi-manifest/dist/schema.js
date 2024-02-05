@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const primitiveTypes = [
-    "null", "bool", "bytes", "address", "string", "u64", "i64", "bigint"
+    "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"
 ];
 const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
@@ -312,7 +312,9 @@ class Schema {
             case "string":
                 return "string";
             case "u64":
+            case "u256":
             case "i64":
+            case "i256":
             case "bigint":
                 return "integer";
             default:

@@ -7,104 +7,18 @@
     "elements": [
       {
         "ptr": 0,
-        "kind": "state",
+        "kind": "constant",
         "data": {
-          "kind": "persistent",
-          "fields": [
-            {
-              "slot": 0,
-              "label": "name",
-              "type": "string"
-            },
-            {
-              "slot": 1,
-              "label": "symbol",
-              "type": "string"
-            },
-            {
-              "slot": 2,
-              "label": "supply",
-              "type": "u64"
-            },
-            {
-              "slot": 3,
-              "label": "balances",
-              "type": "map[address]u64"
-            },
-            {
-              "slot": 4,
-              "label": "allowances",
-              "type": "map[address]map[address]u64"
-            }
-          ]
+          "type": "string",
+          "value": "0x066d6f69"
         }
       },
       {
         "ptr": 1,
-        "deps": [
-          0
-        ],
-        "kind": "routine",
+        "kind": "constant",
         "data": {
-          "name": "Seeder!",
-          "kind": "deployer",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "name",
-              "type": "string"
-            },
-            {
-              "slot": 1,
-              "label": "symbol",
-              "type": "string"
-            },
-            {
-              "slot": 2,
-              "label": "supply",
-              "type": "u64"
-            },
-            {
-              "slot": 3,
-              "label": "seeder",
-              "type": "address"
-            }
-          ],
-          "executes": {
-            "bin": [
-              4,
-              0,
-              0,
-              129,
-              0,
-              0,
-              4,
-              0,
-              1,
-              129,
-              0,
-              1,
-              4,
-              0,
-              2,
-              129,
-              0,
-              2,
-              128,
-              1,
-              3,
-              4,
-              2,
-              3,
-              84,
-              1,
-              2,
-              0,
-              129,
-              1,
-              3
-            ]
-          }
+          "type": "u64",
+          "value": "0x032710"
         }
       },
       {
@@ -112,51 +26,135 @@
         "kind": "constant",
         "data": {
           "type": "u64",
-          "value": "0x030a"
+          "value": "0x0302"
         }
       },
       {
         "ptr": 3,
-        "kind": "typedef",
-        "data": "map[address]u64"
+        "kind": "constant",
+        "data": {
+          "type": "string",
+          "value": "0x067a65726f206164647265737320666f722073656e646572"
+        }
       },
       {
         "ptr": 4,
+        "kind": "constant",
+        "data": {
+          "type": "string",
+          "value": "0x067a65726f206164647265737320666f72207265636569766572"
+        }
+      },
+      {
+        "ptr": 5,
+        "kind": "constant",
+        "data": {
+          "type": "string",
+          "value": "0x06696e73756666696369656e742062616c616e636520666f722073656e646572"
+        }
+      },
+      {
+        "ptr": 6,
+        "kind": "constant",
+        "data": {
+          "type": "string",
+          "value": "0x06696e73756666696369656e742062616c616e636520666f72206275726e"
+        }
+      },
+      {
+        "ptr": 7,
+        "kind": "typedef",
+        "data": "map[address]u256"
+      },
+      {
+        "ptr": 8,
+        "kind": "state",
+        "data": {
+          "kind": "persistent",
+          "fields": [
+            {
+              "slot": 0,
+              "label": "symbol",
+              "type": "string"
+            },
+            {
+              "slot": 1,
+              "label": "supply",
+              "type": "u256"
+            },
+            {
+              "slot": 2,
+              "label": "balances",
+              "type": "map[address]u256"
+            }
+          ]
+        }
+      },
+      {
+        "ptr": 9,
         "deps": [
-          0
+          8
         ],
         "kind": "routine",
         "data": {
-          "name": "Name",
-          "kind": "invokable",
-          "returns": [
+          "name": "Seed!",
+          "kind": "deployer",
+          "accepts": [
             {
               "slot": 0,
-              "label": "name",
+              "label": "symbol",
               "type": "string"
+            },
+            {
+              "slot": 1,
+              "label": "supply",
+              "type": "u256"
             }
           ],
+          "returns": [],
           "executes": {
             "bin": [
+              4,
+              0,
+              0,
+              129,
+              0,
+              0,
+              4,
+              0,
+              1,
+              129,
+              0,
+              1,
               128,
+              1,
+              2,
+              115,
+              2,
+              73,
+              2,
+              2,
+              84,
+              1,
+              2,
               0,
-              0,
-              5,
-              0,
-              0
+              129,
+              1,
+              2
             ]
           }
         }
       },
       {
-        "ptr": 5,
+        "ptr": 10,
         "deps": [
-          0
+          8
         ],
         "kind": "routine",
         "data": {
           "name": "Symbol",
           "kind": "invokable",
+          "accepts": [],
           "returns": [
             {
               "slot": 0,
@@ -168,7 +166,7 @@
             "bin": [
               128,
               0,
-              1,
+              0,
               5,
               0,
               0
@@ -177,14 +175,68 @@
         }
       },
       {
-        "ptr": 6,
+        "ptr": 11,
         "deps": [
-          0
+          0,
+          1
+        ],
+        "kind": "routine",
+        "data": {
+          "name": "DoubleReturnValue",
+          "kind": "invokable",
+          "accepts": [],
+          "returns": [
+            {
+              "slot": 0,
+              "label": "symbol",
+              "type": "string"
+            },
+            {
+              "slot": 1,
+              "label": "supply",
+              "type": "u64"
+            }
+          ],
+          "executes": {
+            "bin": [
+              17,
+              0,
+              0,
+              16,
+              0,
+              0,
+              5,
+              0,
+              0,
+              5,
+              0,
+              0,
+              17,
+              0,
+              1,
+              16,
+              0,
+              0,
+              5,
+              0,
+              1,
+              5,
+              0,
+              1
+            ]
+          }
+        }
+      },
+      {
+        "ptr": 12,
+        "deps": [
+          2
         ],
         "kind": "routine",
         "data": {
           "name": "Decimals",
           "kind": "invokable",
+          "accepts": [],
           "returns": [
             {
               "slot": 0,
@@ -208,26 +260,27 @@
         }
       },
       {
-        "ptr": 7,
+        "ptr": 13,
         "deps": [
-          0
+          8
         ],
         "kind": "routine",
         "data": {
           "name": "TotalSupply",
           "kind": "invokable",
+          "accepts": [],
           "returns": [
             {
               "slot": 0,
               "label": "supply",
-              "type": "u64"
+              "type": "u256"
             }
           ],
           "executes": {
             "bin": [
               128,
               0,
-              2,
+              1,
               5,
               0,
               0
@@ -236,9 +289,9 @@
         }
       },
       {
-        "ptr": 8,
+        "ptr": 14,
         "deps": [
-          0
+          8
         ],
         "kind": "routine",
         "data": {
@@ -247,7 +300,7 @@
           "accepts": [
             {
               "slot": 0,
-              "label": "addr",
+              "label": "address",
               "type": "address"
             }
           ],
@@ -255,173 +308,21 @@
             {
               "slot": 0,
               "label": "balance",
-              "type": "u64"
+              "type": "u256"
             }
           ],
           "executes": {
             "bin": [
               128,
               0,
-              3,
+              2,
               4,
               1,
               0,
               83,
-              2,
+              0,
               0,
               1,
-              5,
-              2,
-              0
-            ]
-          }
-        }
-      },
-      {
-        "ptr": 9,
-        "deps": [
-          0
-        ],
-        "kind": "routine",
-        "data": {
-          "name": "Allowance",
-          "kind": "invokable",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "owner",
-              "type": "address"
-            },
-            {
-              "slot": 1,
-              "label": "spender",
-              "type": "address"
-            }
-          ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "allowance",
-              "type": "u64"
-            }
-          ],
-          "executes": {
-            "bin": [
-              128,
-              0,
-              4,
-              4,
-              1,
-              0,
-              83,
-              2,
-              0,
-              1,
-              4,
-              3,
-              1,
-              83,
-              4,
-              2,
-              3,
-              5,
-              4,
-              0
-            ]
-          }
-        }
-      },
-      {
-        "ptr": 10,
-        "deps": [
-          0,
-          3
-        ],
-        "kind": "routine",
-        "data": {
-          "name": "Approve!",
-          "kind": "invokable",
-          "accepts": [
-            {
-              "slot": 0,
-              "label": "owner",
-              "type": "address"
-            },
-            {
-              "slot": 1,
-              "label": "spender",
-              "type": "address"
-            },
-            {
-              "slot": 2,
-              "label": "amount",
-              "type": "u64"
-            }
-          ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "ok",
-              "type": "bool"
-            }
-          ],
-          "executes": {
-            "bin": [
-              128,
-              0,
-              4,
-              4,
-              1,
-              0,
-              83,
-              2,
-              0,
-              1,
-              32,
-              3,
-              2,
-              98,
-              3,
-              3,
-              17,
-              4,
-              10,
-              3,
-              4,
-              3,
-              17,
-              4,
-              0,
-              40,
-              4,
-              4,
-              36,
-              2,
-              4,
-              1,
-              4,
-              3,
-              1,
-              4,
-              4,
-              2,
-              84,
-              2,
-              3,
-              4,
-              84,
-              0,
-              1,
-              2,
-              129,
-              0,
-              4,
-              41,
-              0,
-              1,
-              98,
-              0,
-              0,
               5,
               0,
               0
@@ -430,9 +331,12 @@
         }
       },
       {
-        "ptr": 11,
+        "ptr": 15,
         "deps": [
-          0
+          3,
+          4,
+          5,
+          8
         ],
         "kind": "routine",
         "data": {
@@ -441,86 +345,129 @@
           "accepts": [
             {
               "slot": 0,
-              "label": "from",
+              "label": "receiver",
               "type": "address"
             },
             {
               "slot": 1,
-              "label": "to",
-              "type": "address"
-            },
-            {
-              "slot": 2,
               "label": "amount",
-              "type": "u64"
+              "type": "u256"
             }
           ],
           "returns": [
             {
               "slot": 0,
-              "label": "ok",
+              "label": "success",
               "type": "bool"
             }
           ],
           "executes": {
             "bin": [
-              128,
+              115,
               0,
+              73,
+              0,
+              0,
+              98,
+              1,
+              0,
+              98,
+              1,
+              1,
+              17,
+              2,
+              9,
               3,
+              2,
+              1,
+              17,
+              1,
+              3,
+              16,
+              1,
+              1,
+              65,
+              1,
+              1,
               4,
               1,
               0,
-              83,
+              98,
               2,
-              0,
               1,
-              4,
-              3,
+              98,
               2,
-              68,
-              4,
+              2,
+              17,
+              3,
+              18,
+              3,
               3,
               2,
               17,
-              5,
-              10,
-              3,
-              5,
+              2,
               4,
-              41,
-              0,
+              16,
+              2,
+              2,
+              65,
+              2,
               1,
+              128,
+              2,
+              2,
+              83,
+              3,
+              2,
+              0,
+              4,
+              4,
+              1,
+              68,
               5,
-              0,
-              0,
-              0,
+              3,
+              4,
+              98,
+              5,
+              5,
+              17,
+              6,
+              29,
+              3,
+              6,
+              5,
+              17,
+              5,
+              5,
+              16,
+              5,
+              5,
+              65,
+              5,
               1,
               102,
+              3,
+              3,
               4,
+              84,
               2,
-              3,
-              84,
               0,
-              1,
-              4,
-              4,
-              5,
-              1,
+              3,
               83,
-              4,
               0,
-              5,
+              2,
+              1,
               101,
-              6,
+              0,
+              0,
               4,
-              3,
               84,
+              2,
+              1,
               0,
-              5,
-              6,
               129,
-              0,
-              3,
+              2,
+              2,
               41,
               0,
               1,
@@ -535,9 +482,9 @@
         }
       },
       {
-        "ptr": 12,
+        "ptr": 16,
         "deps": [
-          0
+          8
         ],
         "kind": "routine",
         "data": {
@@ -547,74 +494,60 @@
             {
               "slot": 0,
               "label": "amount",
-              "type": "u64"
-            },
-            {
-              "slot": 1,
-              "label": "addr",
-              "type": "address"
+              "type": "u256"
             }
           ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "ok",
-              "type": "bool"
-            }
-          ],
+          "returns": [],
           "executes": {
             "bin": [
-              128,
+              115,
               0,
-              2,
-              4,
+              73,
+              0,
+              0,
+              128,
               1,
+              1,
+              4,
+              2,
               0,
               101,
-              0,
-              0,
               1,
+              1,
+              2,
               129,
-              0,
-              2,
-              128,
-              0,
-              3,
-              4,
-              2,
               1,
+              1,
+              128,
+              1,
+              2,
               83,
+              2,
+              1,
+              0,
+              4,
               3,
               0,
-              2,
               101,
-              3,
-              3,
-              1,
-              84,
-              0,
+              2,
               2,
               3,
-              129,
-              0,
-              3,
-              41,
-              0,
+              84,
               1,
-              98,
               0,
-              0,
-              5,
-              0,
-              0
+              2,
+              129,
+              1,
+              2
             ]
           }
         }
       },
       {
-        "ptr": 13,
+        "ptr": 17,
         "deps": [
-          0
+          6,
+          8
         ],
         "kind": "routine",
         "data": {
@@ -624,84 +557,76 @@
             {
               "slot": 0,
               "label": "amount",
-              "type": "u64"
-            },
-            {
-              "slot": 1,
-              "label": "addr",
-              "type": "address"
+              "type": "u256"
             }
           ],
-          "returns": [
-            {
-              "slot": 0,
-              "label": "ok",
-              "type": "bool"
-            }
-          ],
+          "returns": [],
           "executes": {
             "bin": [
-              128,
+              115,
               0,
-              3,
-              4,
+              73,
+              0,
+              0,
+              128,
               1,
-              1,
+              2,
               83,
               2,
-              0,
               1,
+              0,
               4,
               3,
               0,
               68,
               4,
-              3,
               2,
+              3,
+              98,
+              4,
+              4,
               17,
               5,
-              10,
+              12,
               3,
               5,
               4,
-              41,
-              0,
-              1,
-              5,
-              0,
-              0,
-              0,
+              17,
+              4,
+              6,
+              16,
+              4,
+              4,
+              65,
+              4,
               1,
               102,
-              4,
+              2,
               2,
               3,
               84,
+              1,
+              0,
+              2,
+              129,
+              1,
+              2,
+              128,
               0,
               1,
               4,
-              129,
+              1,
               0,
-              3,
-              128,
-              0,
-              2,
               102,
-              0,
-              0,
-              3,
-              129,
-              0,
-              2,
-              41,
+              1,
               0,
               1,
-              98,
+              36,
               0,
+              1,
+              129,
               0,
-              5,
-              0,
-              0
+              1
             ]
           }
         }

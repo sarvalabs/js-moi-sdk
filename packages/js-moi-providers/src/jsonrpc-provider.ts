@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import { ErrorCode, ErrorUtils, CustomError } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
 import { BaseProvider } from "./base-provider";
 import Event from "./event";
 

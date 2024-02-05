@@ -284,8 +284,8 @@ interface InteractionObject {
     transfer_values?: Map<string, number | bigint>;
     perceived_values?: Map<string, number | bigint>;
 
-    fuel_price: number | bigint;
-    fuel_limit: number | bigint;
+    fuel_price?: number | bigint;
+    fuel_limit?: number | bigint;
     
     payload?: InteractionPayload;
 }

@@ -1,6 +1,6 @@
-import { LogicManifest } from "js-moi-manifest";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import {
-    AssetCreationReceipt, AssetMintOrBurnReceipt, ErrorCode, ErrorUtils, Interaction,
+    AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
     IxType, LogicDeployReceipt, LogicInvokeReceipt, Tesseract, bytesToHex, hexDataLength,
     hexToBN, hexToBytes, toQuantity, unmarshal
 } from "js-moi-utils";
@@ -51,7 +51,7 @@ export class BaseProvider extends AbstractProvider {
      */
     protected processResponse(response: RpcResponse): any {
         if(response.result) {
-            if(response.result.data || response.result.data === null) {
+            if(response.result.data) {
                 return response.result.data;
             }
 
@@ -463,8 +463,12 @@ export class BaseProvider extends AbstractProvider {
             const params = {
                 id: filter.id
             };
-
+ 
             const response = await this.execute("moi.GetFilterChanges", params);
+            
+            if (response.result.data == null) {
+                return null;
+            }
 
             return this.processResponse(response);
         } catch (error) {
@@ -1013,18 +1017,34 @@ export class BaseProvider extends AbstractProvider {
             let intervalId: ReturnType<typeof setInterval>;
             let timeoutId: ReturnType<typeof setTimeout>;
 
-            const checkReceipt = async() => {
-                try {
-                    const receipt = await this.getInteractionReceipt(interactionHash);
-    
-                    if(receipt) {
-                        resolve(receipt)
-                        clearInterval(intervalId)
-                        clearTimeout(timeoutId)
-                    }
-                } catch(err) {
+            const clearTimers = () => {
+                clearInterval(intervalId);
+                clearTimeout(timeoutId);
+            }
 
+            const checkReceipt = async() => {
+                const receipt = await this.getInteractionReceipt(interactionHash);
+
+                if(receipt == null) {
+                    return;
                 }
+
+                clearTimers();
+
+                const result = this.processReceipt(receipt);
+                const error = ManifestCoder.decodeException(result.error);
+                
+                if (error == null) {
+                    resolve(receipt);
+                    return;
+                }
+
+                const err = new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
+                    ...error,
+                    receipt,
+                });
+
+                reject(err);
             }
 
             await checkReceipt();
@@ -1089,15 +1109,8 @@ export class BaseProvider extends AbstractProvider {
      * response, or the timeout is reached.
      */
     protected async waitForResult(interactionHash: string, timeout?: number): Promise<any> {
-        return new Promise(async(resolve, reject) => {
-            try {
-                const receipt = await this.waitForInteraction(interactionHash, timeout);
-                const result = this.processReceipt(receipt);
-                resolve(result);
-            } catch(err) {
-                reject(new Error(`An error occurred while waiting for result: ${err.message}`));
-            }
-        })
+        const receipt = await this.waitForInteraction(interactionHash, timeout);
+        return await this.processReceipt(receipt);
     }
 
     /**
