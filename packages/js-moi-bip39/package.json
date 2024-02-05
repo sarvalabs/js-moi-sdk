@@ -1,6 +1,6 @@
 {
   "name": "js-moi-bip39",
-  "version": "0.2.0",
+  "version": "0.2.1-rc1",
   "description": "Bitcoin BIP39 package for deterministic key generation using mnemonic code",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,10 +24,10 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-hdnode": "^0.2.0",
-    "js-moi-signer": "^0.2.0",
-    "js-moi-constants": "^0.2.0",
-    "js-moi-utils": "^0.2.0",
+    "js-moi-hdnode": "^0.2.1-rc1",
+    "js-moi-signer": "^0.2.1-rc1",
+    "js-moi-constants": "^0.2.1-rc1",
+    "js-moi-utils": "^0.2.1-rc1",
     "buffer": "^6.0.3",
     "@noble/hashes": "^1.1.5"
   }

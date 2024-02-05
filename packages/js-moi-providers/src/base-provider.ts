@@ -966,7 +966,7 @@ export class BaseProvider extends AbstractProvider {
             }
 
             const checkReceipt = async() => {
-                const receipt = await this.getInteractionReceipt(interactionHash);
+                const receipt = await this.getInteractionReceipt(interactionHash).catch(() => null);
 
                 if(receipt == null) {
                     return;
