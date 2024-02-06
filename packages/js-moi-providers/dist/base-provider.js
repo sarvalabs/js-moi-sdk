@@ -844,6 +844,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 }
                 clearTimers();
                 const result = this.processReceipt(receipt);
+                if (result == null) {
+                    resolve(receipt);
+                    return;
+                }
                 const error = js_moi_manifest_1.ManifestCoder.decodeException(result.error);
                 if (error == null) {
                     resolve(receipt);

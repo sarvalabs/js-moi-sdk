@@ -110,7 +110,6 @@ describe("Logic", () => {
             const result = await ix.result();
             const { balance } = await logic.routines.BalanceOf(RECEIVER);
 
-            console.log(result);
             const { success } = result;
 
             expect(balance).toBeGreaterThanOrEqual(amount);
