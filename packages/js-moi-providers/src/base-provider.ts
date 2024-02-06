@@ -975,6 +975,12 @@ export class BaseProvider extends AbstractProvider {
                 clearTimers();
 
                 const result = this.processReceipt(receipt);
+
+                if(result == null) {
+                    resolve(receipt);
+                    return;
+                }
+
                 const error = ManifestCoder.decodeException(result.error);
                 
                 if (error == null) {
