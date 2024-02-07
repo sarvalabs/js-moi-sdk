@@ -1,9 +1,19 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
+exports.trimHexPrefix =
+  exports.isHex =
+  exports.bytesToHex =
+  exports.hexToBN =
+  exports.hexToBytes =
+  exports.encodeToString =
+  exports.toQuantity =
+  exports.numToHex =
+    void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
 const buffer_1 = require("buffer");
 /**
@@ -16,14 +26,14 @@ const buffer_1 = require("buffer");
  * @throws {Error} If the input value is a negative number.
  */
 const numToHex = (value) => {
-    if (!bn_js_1.default.isBN(value)) {
-        value = new bn_js_1.default(value);
-    }
-    if (value.lt(new bn_js_1.default(0))) {
-        throw new Error('Input must be a positive BN value');
-    }
-    const bigNum = new bn_js_1.default(value.toString()); // Convert bigint to bn.js BN instance
-    return bigNum.toString(16).toUpperCase();
+  if (!bn_js_1.default.isBN(value)) {
+    value = new bn_js_1.default(value);
+  }
+  if (value.lt(new bn_js_1.default(0))) {
+    throw new Error("Input must be a positive BN value");
+  }
+  const bigNum = new bn_js_1.default(value.toString()); // Convert bigint to bn.js BN instance
+  return bigNum.toString(16).toUpperCase();
 };
 exports.numToHex = numToHex;
 /**
@@ -35,12 +45,11 @@ exports.numToHex = numToHex;
  * @throws {Error} If an error occurs during the conversion.
  */
 const toQuantity = (value) => {
-    try {
-        return "0x" + (0, exports.numToHex)(value);
-    }
-    catch (err) {
-        throw err;
-    }
+  try {
+    return "0x" + (0, exports.numToHex)(value);
+  } catch (err) {
+    throw err;
+  }
 };
 exports.toQuantity = toQuantity;
 /**
@@ -50,7 +59,7 @@ exports.toQuantity = toQuantity;
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const encodeToString = (data) => {
-    return "0x" + buffer_1.Buffer.from(data).toString('hex');
+  return "0x" + buffer_1.Buffer.from(data).toString("hex");
 };
 exports.encodeToString = encodeToString;
 /**
@@ -61,15 +70,15 @@ exports.encodeToString = encodeToString;
  * @throws {Error} If the input string is not a valid hexadecimal string.
  */
 const hexToBytes = (str) => {
-    const hex = str.replace(/^0x/, '').trim();
-    if (hex.length % 2 !== 0) {
-        throw new Error('Invalid hex string');
-    }
-    const bytes = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < hex.length; i += 2) {
-        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
-    }
-    return bytes;
+  const hex = str.replace(/^0x/, "").trim();
+  if (hex.length % 2 !== 0) {
+    throw new Error("Invalid hex string");
+  }
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
+  return bytes;
 };
 exports.hexToBytes = hexToBytes;
 /**
@@ -81,21 +90,21 @@ exports.hexToBytes = hexToBytes;
  * @returns {bigint | number} The resulting value as a bigint or number.
  */
 const hexToBN = (hex) => {
-    let value;
-    hex = hex.trim();
-    // Check if the hex string starts with "0x"
-    if (hex.startsWith("0x")) {
-        // If it does, create a BN instance from the hex string without the "0x" prefix
-        hex = hex.slice(2);
-    }
-    value = new bn_js_1.default(hex, 16);
-    // Check if the number is too large to fit in a number
-    if (value.bitLength() > 53) {
-        // If so, return it as a BigInt
-        return BigInt(`0x${value.toString(16)}`);
-    }
-    // Otherwise, return it as a number
-    return value.toNumber();
+  let value;
+  hex = hex.trim();
+  // Check if the hex string starts with "0x"
+  if (hex.startsWith("0x")) {
+    // If it does, create a BN instance from the hex string without the "0x" prefix
+    hex = hex.slice(2);
+  }
+  value = new bn_js_1.default(hex, 16);
+  // Check if the number is too large to fit in a number
+  if (value.bitLength() > 53) {
+    // If so, return it as a BigInt
+    return BigInt(`0x${value.toString(16)}`);
+  }
+  // Otherwise, return it as a number
+  return value.toNumber();
 };
 exports.hexToBN = hexToBN;
 /**
@@ -105,7 +114,7 @@ exports.hexToBN = hexToBN;
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const bytesToHex = (data) => {
-    return buffer_1.Buffer.from(data).toString('hex');
+  return buffer_1.Buffer.from(data).toString("hex");
 };
 exports.bytesToHex = bytesToHex;
 /**
@@ -115,7 +124,7 @@ exports.bytesToHex = bytesToHex;
  * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
  */
 const isHex = (data) => {
-    return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+  return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
 };
 exports.isHex = isHex;
 /**
@@ -125,9 +134,9 @@ exports.isHex = isHex;
  * @returns {string} The trimmed hexadecimal string.
  */
 const trimHexPrefix = (data) => {
-    if ((0, exports.isHex)(data) && data.startsWith('0x')) {
-        data = data.slice(2);
-    }
-    return data;
+  if ((0, exports.isHex)(data) && data.startsWith("0x")) {
+    data = data.slice(2);
+  }
+  return data;
 };
 exports.trimHexPrefix = trimHexPrefix;

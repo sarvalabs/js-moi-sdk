@@ -1,7 +1,28 @@
+import { IxType } from "../src/interaction";
 import { TesseractPart } from "./common";
 
+export interface ContextDelta {
+    role: number;
+    behavioural_nodes: string[] | null;
+    random_nodes: string[] | null;
+    replaced_nodes: string[] | null;
+}
+
+export interface Participant {
+    address: string;
+    height: string;
+    transitive_link: string;
+    prev_context: string;
+    latest_context: string;
+    context_delta: ContextDelta;
+    state_hash: string;
+}
+
+export type Participants = Participant[];
+
+
 export interface Interaction {
-    type: number;
+    type: IxType;
     nonce: string;
     
     sender: string;
@@ -27,7 +48,8 @@ export interface Interaction {
     hash: string;
     signature: string;
 
-    parts: TesseractPart[];
+    ts_hash: string;
+    participants: Participants;
     ix_index: string;
 }
 
