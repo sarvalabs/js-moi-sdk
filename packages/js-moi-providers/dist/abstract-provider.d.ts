@@ -10,9 +10,11 @@ export declare abstract class AbstractProvider {
     abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
     abstract getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
     abstract getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
+    abstract getTesseract(with_interactions: boolean, options?: Options): Promise<Tesseract>;
     abstract getTDU(address: string, options?: Options): Promise<TDU[]>;
     abstract getInteractionByHash(ixHash: string): Promise<Interaction>;
     abstract getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>;
+    abstract getInteractionByTesseract(options: Options, ix_index?: string): Promise<Interaction>;
     abstract getInteractionCount(address: string, options?: Options): Promise<number | bigint>;
     abstract getPendingInteractionCount(address: string): Promise<number | bigint>;
     abstract getAccountState(address: string, options?: Options): Promise<AccountState>;

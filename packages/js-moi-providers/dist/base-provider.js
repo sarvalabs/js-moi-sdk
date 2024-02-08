@@ -138,27 +138,23 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw err;
         }
     }
-    /**
-     * Retrieves the interaction information for the specified address and tesseract options.
-     *
-     * @param address - The address for which to retrieve the interaction.
-     * @param options - The tesseract options. (optional)
-     * @param ix_index - The index of the interaction to retrieve.
-     * @returns A Promise that resolves to the interaction information.
-     * @throws Error if there is an error executing the RPC call.
-     */
-    async getInteractionByTesseract(address, options, ix_index = (0, js_moi_utils_1.toQuantity)(1)) {
+    async getInteractionByTesseract(arg1, arg2, ix_index) {
         try {
-            const params = {
-                address: address,
-                options: options ? options : defaultOptions,
-                ix_index: ix_index
-            };
+            const params = {};
+            if (typeof arg1 === "string") {
+                params['address'] = arg1;
+                params['options'] = arg2 ? arg2 : defaultOptions;
+                params['ix_index'] = ix_index ? ix_index : (0, js_moi_utils_1.toQuantity)(1);
+            }
+            if (typeof arg1 === "object") {
+                params['options'] = arg1 ? arg1 : defaultOptions;
+                params['ix_index'] = arg2 ? arg2 : (0, js_moi_utils_1.toQuantity)(1);
+            }
             const response = await this.execute("moi.InteractionByTesseract", params);
             return this.processResponse(response);
         }
-        catch (err) {
-            throw err;
+        catch (error) {
+            throw error;
         }
     }
     /**
@@ -402,23 +398,18 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
-    /**
-     * Retrieves a Tesseract for a specific address.
-     *
-     * @param {string} address - The address for which to retrieve the Tesseract.
-     * @param {boolean} with_interactions - A boolean value indicating whether to include
-     * interactions in the Tesseract.
-     * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
-     * @throws {Error} if there is an error executing the RPC call.
-     */
-    async getTesseract(address, with_interactions, options) {
+    async getTesseract(arg1, arg2, arg3) {
         try {
-            const params = {
-                address: address,
-                with_interactions: with_interactions,
-                options: options ? options : defaultOptions
-            };
+            const params = {};
+            if (typeof arg1 === 'string') {
+                params['address'] = arg1;
+                params['with_interactions'] = arg2;
+                params['options'] = arg3 ?? defaultOptions;
+            }
+            if (typeof arg1 === 'boolean') {
+                params['with_interactions'] = arg1;
+                params['options'] = arg2 ?? defaultOptions;
+            }
             const response = await this.execute("moi.Tesseract", params);
             return this.processResponse(response);
         }

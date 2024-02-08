@@ -4,18 +4,21 @@ import { JsonRpcProvider } from "../src/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { initializeWallet } from "./utils/utils";
 
+const HOST = "http://localhost:1600";
+const MNEMONIC = "main story burst wonder sausage spice okay pioneer person unaware force bubble";
+const ADDRESS = "0x2835c601ccd1fc6518ae17b58dc91a644d43b734001dd2cd262a51f03a3fafef";
+
 describe("Test JsonRpcProvider Query Calls", () => {
-  const address = "0x898ca25ac7a51a36894b9c9f55ec6212500dd8e0c01f6591f0eb9f5b0bc84655";
-  const mnemonic = "hockey airport rather chef nasty shrimp tragic embrace olive another own hen";
-    let provider: JsonRpcProvider;
+    const address = ADDRESS;
+    const provider = new JsonRpcProvider(HOST);
     let ixHash: string;
     let signer: Signer;
     let ixReceipt: InteractionReceipt;
     let nextNonce = 0;
+    const supply = Math.floor(Math.random() * 1000);
 
     beforeAll(async() => {
-      provider = new JsonRpcProvider('http://localhost:1600');
-      signer = await initializeWallet(provider, mnemonic)
+      signer = await initializeWallet(provider, MNEMONIC);
       const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
         type: IxType.ASSET_CREATE,
@@ -24,10 +27,10 @@ describe("Test JsonRpcProvider Query Calls", () => {
         fuel_limit: 200,
         payload: {
             standard: AssetStandard.MAS0,
-            symbol: "TESTING",
-            supply: 1248577
+            symbol: "TEST #" + Math.floor(Math.random() * 1000),
+            supply: supply
         }
-      })
+      });
 
       ixHash = ixResponse.hash;
       ixReceipt = await ixResponse.wait();
@@ -36,13 +39,14 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe('getBalance', () => {
       it('should return the asset balance', async () => {
-        ixReceipt.extra_data = ixReceipt.extra_data as AssetCreationReceipt
-        const balance = await provider.getBalance(
-          address, 
-          ixReceipt.extra_data.asset_id
-        );
-        expect(balance).toBeDefined();
-        expect(balance).toBe(1248577);
+        if (!ixReceipt.extra_data) {
+          expect(ixReceipt.extra_data).toBeDefined();
+          return;
+        }
+
+        const balance = await provider.getBalance(address, (<AssetCreationReceipt>ixReceipt.extra_data).asset_id);
+
+        expect(balance).toBe(supply);
       })
     });
 
@@ -80,11 +84,10 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(tdu).toBeDefined();
         
         const extraData = ixReceipt.extra_data as AssetCreationReceipt
-        const asset = tdu.find(asset => 
-          asset.asset_id === extraData.asset_id
-        );
+        const asset = tdu.find(asset => asset.asset_id === extraData.asset_id);
+
         expect(asset).toBeDefined();
-        expect(asset?.amount).toBe(1248577);
+        expect(asset?.amount).toBe(supply);
       })
     });
 
@@ -120,6 +123,23 @@ describe("Test JsonRpcProvider Query Calls", () => {
         })
         expect(ixCount).toBeDefined();
         expect(ixCount).toBeGreaterThanOrEqual(1);
+      });
+    });
+
+    describe("getInteractionByTesseract", () => {
+      it('should return the interaction by tesseract', async () => {
+        const interactions = await provider.getInteractionByTesseract(address, undefined, "0x0");
+
+        expect(interactions).toBeDefined();
+        expect(interactions.hash).toBe(ixReceipt.ix_hash);
+      });
+
+      it("should return the interaction by tesseract without address", async () => {
+        const tesseract = await provider.getTesseract(address, true);
+        const interaction = await provider.getInteractionByTesseract({ tesseract_hash: tesseract.hash }, "0x0");
+
+        expect(interaction).toBeDefined();
+        expect(interaction.ts_hash).toBe(tesseract.hash);
       });
     });
 
@@ -169,27 +189,51 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe('getTesseract', () => {
         it('should return the latest tesseract', async () => {
           const tesseract = await provider.getTesseract(address, false);
+          const participant = tesseract.participants.find(p => p.address === address);
+
+          if (!participant) {
+            expect(participant).toBeDefined();
+            return;
+          }
+          
           expect(tesseract).toBeDefined();
-          expect(hexToBN(tesseract.header.height)).toBeGreaterThan(0);
+          expect(hexToBN(participant.height)).toBeGreaterThan(0);
+          expect(tesseract.hash).toBe(ixReceipt.ts_hash);
         });
 
         it('should return the tesseract by height', async() => {
           const tesseract = await provider.getTesseract(address, false, {
             tesseract_number: 0
           });
+
+          const participant = tesseract.participants.find(p => p.address === address);
+
+          if (!participant) {
+            expect(participant).toBeDefined();
+            return;
+          }
+
           expect(tesseract).toBeDefined();
-          expect(hexToBN(tesseract.header.height)).toBe(0);
+          expect(hexToBN(participant.height)).toBe(0);
         });
 
         it('should return the tesseract by hash', async() => {
           const tesseract = await provider.getTesseract(address, false);
           expect(tesseract).toBeDefined();
 
-          const tesseractByHash = await provider.getTesseract(address, false, {
+          const tesseractByHash = await provider.getTesseract(false, {
             tesseract_hash: tesseract.hash
-          })
+          });
+
+          const participant = tesseractByHash.participants.find(p => p.address === address);
+
+          if (!participant) {
+            expect(participant).toBeDefined();
+            return;
+          }
+
           expect(tesseractByHash).toBeDefined();
-          expect(hexToBN(tesseractByHash.header.height)).toBeGreaterThan(0);
+          expect(hexToBN(participant.height)).toBeGreaterThan(0);
         });
     });
 

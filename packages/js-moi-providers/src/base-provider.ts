@@ -9,10 +9,9 @@ import {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
     Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
-    InteractionByTesseractParams, InteractionCallResponse, InteractionParams, InteractionReceipt,
+    InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
-    RpcResponse, Status, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
-    TesseractParams
+    RpcResponse, Status, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
 } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -171,6 +170,31 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
+    // /**
+    //  * Retrieves the interaction information for the specified address and tesseract options.
+    //  * 
+    //  * @param address - The address for which to retrieve the interaction.
+    //  * @param options - The tesseract options. (optional)
+    //  * @param ix_index - The index of the interaction to retrieve.
+    //  * @returns A Promise that resolves to the interaction information.
+    //  * @throws Error if there is an error executing the RPC call.
+    //  */
+    // public async getInteractionByTesseract(address: string, options?: Options, ix_index: string = toQuantity(1)): Promise<Interaction> {
+    //     try {
+    //         const params: InteractionByTesseractParams = {
+    //             address: address,
+    //             options: options ? options : defaultOptions,
+    //             ix_index: ix_index
+    //         }
+    
+    //         const response: RpcResponse = await this.execute("moi.InteractionByTesseract", params)
+
+    //         return this.processResponse(response)
+    //     } catch(err) {
+    //         throw err;
+    //     }
+    // }
+
     /**
      * Retrieves the interaction information for the specified address and tesseract options.
      * 
@@ -180,19 +204,35 @@ export class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    public async getInteractionByTesseract(address: string, options?: Options, ix_index: string = toQuantity(1)): Promise<Interaction> {
+    getInteractionByTesseract(address: string, options?: Pick<Options, 'tesseract_number'>, ix_index?: string): Promise<Interaction>;
+    /**
+     * Retrieves the interaction information for the specified tesseract options.
+     * 
+     * @param options - The tesseract options. (optional)
+     * @param ix_index - The index of the interaction to retrieve.
+     * @returns A Promise that resolves to the interaction information.
+     * @throws Error if there is an error executing the RPC call.
+     */
+    getInteractionByTesseract(options: Pick<Options, 'tesseract_hash'>, ix_index?: string): Promise<Interaction>;
+    async getInteractionByTesseract(arg1?: unknown, arg2?: unknown, ix_index?: unknown): Promise<Interaction> {
         try {
-            const params: InteractionByTesseractParams = {
-                address: address,
-                options: options ? options : defaultOptions,
-                ix_index: ix_index
-            }
-    
-            const response: RpcResponse = await this.execute("moi.InteractionByTesseract", params)
+            const params = {};
 
-            return this.processResponse(response)
-        } catch(err) {
-            throw err;
+            if(typeof arg1 === "string") {
+                params['address'] = arg1;
+                params['options'] = arg2 ? arg2 : defaultOptions;
+                params['ix_index'] = ix_index ? ix_index : toQuantity(1);
+            }
+
+            if (typeof arg1 === "object") {
+                params['options'] = arg1 ? arg1 : defaultOptions;
+                params['ix_index'] = arg2 ? arg2 : toQuantity(1);
+            }
+
+            const response = await this.execute("moi.InteractionByTesseract", params);
+            return this.processResponse(response);
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -486,21 +526,38 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract> {
+   getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
+   /**
+     * Retrieves a Tesseract for a tesseract hash.
+     * 
+     * @param {boolean} with_interactions - A boolean value indicating whether to include
+     * interactions in the Tesseract.
+     * @param {Pick<Options, 'tesseract_hash'>} options - The tesseract options. (optional)
+     * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+   getTesseract(with_interactions: boolean, options: Pick<Options, 'tesseract_hash'>): Promise<Tesseract>;
+   async getTesseract(arg1: unknown, arg2: unknown, arg3?: unknown): Promise<Tesseract> {
         try {
-            const params: TesseractParams = {
-                address: address,
-                with_interactions: with_interactions,
-                options: options ? options : defaultOptions
-            }
-    
-            const response: RpcResponse = await this.execute("moi.Tesseract", params)
+            const params = {};
 
-            return this.processResponse(response)
+            if (typeof arg1 === 'string') {
+                params['address'] = arg1;
+                params['with_interactions'] = arg2;
+                params['options'] = arg3 ?? defaultOptions;
+            }
+
+            if (typeof arg1 === 'boolean') {
+                params['with_interactions'] = arg1;
+                params['options'] = arg2 ?? defaultOptions;
+            }
+
+            const response = await this.execute<RpcResponse>("moi.Tesseract", params);
+            return this.processResponse(response);
         } catch (error) {
             throw error;
         }
-    }
+   }
 
     /**
      * Retrieves the logic id's associated with a specific address.
@@ -1080,7 +1137,7 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<any>} A Promise that resolves to the response of the RPC call.
      * @throws {Error} if the method is not implemented.
      */
-    protected execute(method: string, params: any): Promise<any> {
+    protected execute<T = any>(method: string, params: any): Promise<T> {
         throw new Error(method + " not implemented")
     }
 
