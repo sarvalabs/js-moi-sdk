@@ -169,32 +169,7 @@ export class BaseProvider extends AbstractProvider {
             throw err;
         }
     }
-
-    // /**
-    //  * Retrieves the interaction information for the specified address and tesseract options.
-    //  * 
-    //  * @param address - The address for which to retrieve the interaction.
-    //  * @param options - The tesseract options. (optional)
-    //  * @param ix_index - The index of the interaction to retrieve.
-    //  * @returns A Promise that resolves to the interaction information.
-    //  * @throws Error if there is an error executing the RPC call.
-    //  */
-    // public async getInteractionByTesseract(address: string, options?: Options, ix_index: string = toQuantity(1)): Promise<Interaction> {
-    //     try {
-    //         const params: InteractionByTesseractParams = {
-    //             address: address,
-    //             options: options ? options : defaultOptions,
-    //             ix_index: ix_index
-    //         }
     
-    //         const response: RpcResponse = await this.execute("moi.InteractionByTesseract", params)
-
-    //         return this.processResponse(response)
-    //     } catch(err) {
-    //         throw err;
-    //     }
-    // }
-
     /**
      * Retrieves the interaction information for the specified address and tesseract options.
      * 
