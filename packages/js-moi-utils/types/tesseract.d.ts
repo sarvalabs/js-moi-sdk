@@ -25,6 +25,5 @@ export interface Tesseract {
     consensus_info: ConsensusInfo;
     seal: string;
     hash: string;
-    address: string;
     ixns: Interactions;
 }
