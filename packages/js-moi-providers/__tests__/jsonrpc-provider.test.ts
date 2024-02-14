@@ -2,14 +2,13 @@ import { Signer } from "js-moi-signer";
 import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "js-moi-utils";
 import { JsonRpcProvider } from "../src/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
-import { initializeWallet } from "./utils/utils";
+import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
 const HOST = "http://localhost:1600";
 const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
 const ADDRESS = "0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db";
 
-const getRandomSupply = () => 100 + Math.floor(Math.random() * 900);
-const getRandomSymbol = () => "TEST #" + Math.floor(Math.random() * 1000);
+
 
 describe("Test JsonRpcProvider Query Calls", () => {
   const address = ADDRESS;
