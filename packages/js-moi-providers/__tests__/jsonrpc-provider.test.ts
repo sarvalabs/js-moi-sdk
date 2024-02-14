@@ -8,8 +8,11 @@ const HOST = "http://localhost:1600";
 const MNEMONIC = "main story burst wonder sausage spice okay pioneer person unaware force bubble";
 const ADDRESS = "0x2835c601ccd1fc6518ae17b58dc91a644d43b734001dd2cd262a51f03a3fafef";
 
+const getRandomSupply = () => 100 + Math.floor(Math.random() * 900);
+const getRandomSymbol = () => "TEST #" + Math.floor(Math.random() * 1000);
+
 describe("Test JsonRpcProvider Query Calls", () => {
-    const address = ADDRESS;
+  const address = ADDRESS;
     const provider = new JsonRpcProvider(HOST);
     let ixHash: string;
     let signer: Signer;
@@ -27,8 +30,8 @@ describe("Test JsonRpcProvider Query Calls", () => {
         fuel_limit: 200,
         payload: {
             standard: AssetStandard.MAS0,
-            symbol: "TEST #" + Math.floor(Math.random() * 1000),
-            supply: supply
+            symbol: getRandomSymbol(),
+            supply: getRandomSupply()
         }
       });
 
