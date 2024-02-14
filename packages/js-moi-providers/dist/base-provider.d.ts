@@ -76,7 +76,7 @@ export declare class BaseProvider extends AbstractProvider {
      * Retrieves the interaction information for the specified tesseract options.
      *
      * @param options - The tesseract options. (optional)
-     * @param ix_index - The index of the interaction to retrieve.
+     * @param ix_index - The index of the interaction to retrieve. (optional)
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
