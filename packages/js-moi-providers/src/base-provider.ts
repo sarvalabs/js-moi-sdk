@@ -535,8 +535,8 @@ export class BaseProvider extends AbstractProvider {
      * Retrieves a Tesseract for a specific address or tesseract hash.
      * 
      * @param {string | boolean} address - The address for which to retrieve the Tesseract or a boolean indicating whether to include interactions.
-     * @param {boolean | Options} with_interactions - A boolean value indicating whether to include interactions in the Tesseract or tesseract options.
-     * @param {Options | undefined} [options] - The tesseract options. Required when using an address and optional when using a tesseract hash.
+     * @param {boolean | Options} with_interactions - A boolean value indicating whether to include interactions in the Tesseract.
+     * @param {Options | undefined} [options] - The tesseract options. (optional)
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      *

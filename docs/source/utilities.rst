@@ -135,7 +135,7 @@ The ``Tesseract`` interface represents a tesseract object. It has the following 
 * ``epoch`` - ``string``: The hex value represents the fixed time slot.
 * ``time_stamp`` - ``string``: The hex value represents the ICS request time.
 * ``operator`` - ``string``: The Krama ID of the operator.
-* ``fuel_used`` - ``string``: The hex value representing fuel used in the interaction.
+* ``fuel_used`` - ``string``: The hex value representing fuel used to process the interaction.
 * ``fuel_limit`` - ``string``: The hex value representing fuel limit of the interaction.
 * ``consensus_info`` - ``ConsensusInfo``: The object representing the consensus information.
 * ``seal`` - ``string``: The hex value representing the The signature of node which executed the tesseract.
