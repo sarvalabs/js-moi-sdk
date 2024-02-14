@@ -144,17 +144,17 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      *
      * @param {string} address - The address for which to retrieve the interaction. Omit if using only tesseract options.
      * @param {Object} options - The tesseract options. Should be an object with either 'tesseract_number' or 'tesseract_hash'. (optional)
-     * @param {string} [ix_index] - The index of the interaction to retrieve.
+     * @param {number} [ix_index] - The index of the interaction to retrieve.
      * @returns {Promise<Interaction>} A Promise that resolves to the interaction information.
      * @throws {Error} if there is an error executing the RPC call.
      *
      * @example
      * // Retrieve interaction by address and tesseract options
-     * provider.getInteractionByTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', { tesseract_number: '0' }, '1')
+     * provider.getInteractionByTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', { tesseract_number: 0 }, 1)
     *
      * @example
      * // Retrieve interaction by tesseract options only
-     * provider.getInteractionByTesseract({ tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' }, '2')
+     * provider.getInteractionByTesseract({ tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' }, 2)
      */
     async getInteractionByTesseract(arg1, arg2, ix_index) {
         try {
@@ -162,11 +162,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             if (typeof arg1 === "string") {
                 params['address'] = arg1;
                 params['options'] = arg2 ? arg2 : defaultOptions;
-                params['ix_index'] = ix_index ? ix_index : (0, js_moi_utils_1.toQuantity)(1);
+                params['ix_index'] = ix_index != null ? (0, js_moi_utils_1.toQuantity)(ix_index) : (0, js_moi_utils_1.toQuantity)(1);
             }
             if (typeof arg1 === "object") {
                 params['options'] = arg1 ? arg1 : defaultOptions;
-                params['ix_index'] = arg2 ? arg2 : (0, js_moi_utils_1.toQuantity)(1);
+                params['ix_index'] = arg2 != null ? (0, js_moi_utils_1.toQuantity)(arg2) : (0, js_moi_utils_1.toQuantity)(1);
             }
             const response = await this.execute("moi.InteractionByTesseract", params);
             return this.processResponse(response);

@@ -40,8 +40,8 @@ export abstract class AbstractProvider {
     abstract getTDU(address: string, options?: Options): Promise<TDU[]>
     abstract getInteractionByHash(ixHash: string): Promise<Interaction>
     
-    abstract getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>
-    abstract getInteractionByTesseract(options: Options, ix_index?: string): Promise<Interaction>
+    abstract getInteractionByTesseract(address: string, options?: Options, ix_index?: number): Promise<Interaction>
+    abstract getInteractionByTesseract(options: Options, ix_index?: number): Promise<Interaction>
 
     abstract getInteractionCount(address: string, options?: Options): Promise<number | bigint>
     abstract getPendingInteractionCount(address: string): Promise<number | bigint>

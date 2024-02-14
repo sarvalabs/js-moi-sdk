@@ -71,7 +71,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(address: string, options?: Options, ix_index?: number): Promise<Interaction>;
     /**
      * Retrieves the interaction information for the specified tesseract options.
      *
@@ -80,7 +80,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(options: Options, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(options: Options, ix_index?: number): Promise<Interaction>;
     /**
      * Retrieves the total number of interactions for the specified address.
      *

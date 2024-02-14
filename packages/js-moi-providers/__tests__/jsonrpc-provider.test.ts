@@ -18,7 +18,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
     let signer: Signer;
     let ixReceipt: InteractionReceipt;
     let nextNonce = 0;
-    const supply = Math.floor(Math.random() * 1000);
+    const supply = getRandomSupply();
 
     beforeAll(async() => {
       signer = await initializeWallet(provider, MNEMONIC);
@@ -31,7 +31,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         payload: {
             standard: AssetStandard.MAS0,
             symbol: getRandomSymbol(),
-            supply: getRandomSupply()
+            supply: supply
         }
       });
 
@@ -131,7 +131,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe("getInteractionByTesseract", () => {
       it('should return the interaction by tesseract', async () => {
-        const interactions = await provider.getInteractionByTesseract(address, undefined, "0x0");
+        const interactions = await provider.getInteractionByTesseract(address, undefined, 0);
 
         expect(interactions).toBeDefined();
         expect(interactions.hash).toBe(ixReceipt.ix_hash);
@@ -139,7 +139,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
       it("should return the interaction by tesseract without address", async () => {
         const tesseract = await provider.getTesseract(address, true);
-        const interaction = await provider.getInteractionByTesseract({ tesseract_hash: tesseract.hash }, "0x0");
+        const interaction = await provider.getInteractionByTesseract({ tesseract_hash: tesseract.hash }, 0);
 
         expect(interaction).toBeDefined();
         expect(interaction.ts_hash).toBe(tesseract.hash);
