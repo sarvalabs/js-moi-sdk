@@ -21,7 +21,7 @@ Types
 
 The ``ContextDelta`` interface represents a context delta object. It has the following properties:
 
-* ``role`` - ``number``: The role of the context delta.
+* ``role`` - ``number``: The role of the participant.
 * ``behavioural_nodes`` - ``string[] | null``: An array of behavioural nodes.
 * ``random_nodes`` - ``string | null``: An array of compute nodes.
 * ``replaced_nodes`` - ``string[] | null``: An array of trust nodes.
