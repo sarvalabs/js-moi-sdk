@@ -1,6 +1,6 @@
 {
   "name": "js-moi-providers",
-  "version": "0.2.1-rc2",
+  "version": "0.3.0-rc1",
   "description": "Module to connect and interact with MOI network",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,8 +23,8 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-utils": "^0.2.1-rc2",
-    "js-moi-manifest": "^0.2.1-rc2",
+    "js-moi-utils": "^0.3.0-rc1",
+    "js-moi-manifest": "^0.3.0-rc1",
     "cross-fetch": "^4.0.0",
     "websocket": "^1.0.34"
   }
