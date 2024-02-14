@@ -1,5 +1,4 @@
 import { IxType } from "../src/interaction";
-import { TesseractPart } from "./common";
 
 export interface ContextDelta {
     role: number;

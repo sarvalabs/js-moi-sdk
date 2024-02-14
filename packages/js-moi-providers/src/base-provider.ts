@@ -179,7 +179,7 @@ export class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(address: string, options?: Pick<Options, 'tesseract_number'>, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>;
     /**
      * Retrieves the interaction information for the specified tesseract options.
      * 
@@ -188,7 +188,25 @@ export class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(options: Pick<Options, 'tesseract_hash'>, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(options: Options, ix_index?: string): Promise<Interaction>;
+    /**
+     * Retrieves the interaction information for the specified address and tesseract options.
+     * If only tesseract options are provided, the address parameter can be omitted.
+     *
+     * @param {string} address - The address for which to retrieve the interaction. Omit if using only tesseract options.
+     * @param {Object} options - The tesseract options. Should be an object with either 'tesseract_number' or 'tesseract_hash'. (optional)
+     * @param {string} [ix_index] - The index of the interaction to retrieve.
+     * @returns {Promise<Interaction>} A Promise that resolves to the interaction information.
+     * @throws {Error} if there is an error executing the RPC call.
+     *
+     * @example
+     * // Retrieve interaction by address and tesseract options
+     * provider.getInteractionByTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', { tesseract_number: '0' }, '1')
+    *
+     * @example
+     * // Retrieve interaction by tesseract options only
+     * provider.getInteractionByTesseract({ tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' }, '2')
+     */
     async getInteractionByTesseract(arg1?: unknown, arg2?: unknown, ix_index?: unknown): Promise<Interaction> {
         try {
             const params = {};
@@ -511,7 +529,26 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      */
-   getTesseract(with_interactions: boolean, options: Pick<Options, 'tesseract_hash'>): Promise<Tesseract>;
+   getTesseract(with_interactions: boolean, options: Options): Promise<Tesseract>;
+   /**
+     * Retrieves a Tesseract for a specific address or tesseract hash.
+     * If using an address, provide the address along with whether to include interactions and optional tesseract options.
+     * If using a tesseract hash, provide a boolean indicating whether to include interactions and optional tesseract options.
+     *
+     * @param {string | boolean} address - The address for which to retrieve the Tesseract or a boolean indicating whether to include interactions.
+     * @param {boolean | Options} with_interactions - A boolean value indicating whether to include interactions in the Tesseract or tesseract options.
+     * @param {Options} [options] - The tesseract options. Required when using an address and optional when using a tesseract hash.
+     * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
+     * @throws {Error} if there is an error executing the RPC call.
+     *
+     * @example
+     * // Retrieve Tesseract by address with interactions and options
+     * provider.getTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', true, { tesseract_number: '0' })
+     *
+     * @example
+     * // Retrieve Tesseract by tesseract hash with interactions and options
+     * provider.getTesseract(true, { tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' })
+     */
    async getTesseract(arg1: unknown, arg2: unknown, arg3?: unknown): Promise<Tesseract> {
         try {
             const params = {};

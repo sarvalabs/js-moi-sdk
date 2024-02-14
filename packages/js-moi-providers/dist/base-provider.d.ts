@@ -71,7 +71,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(address: string, options?: Pick<Options, 'tesseract_number'>, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>;
     /**
      * Retrieves the interaction information for the specified tesseract options.
      *
@@ -80,7 +80,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(options: Pick<Options, 'tesseract_hash'>, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(options: Options, ix_index?: string): Promise<Interaction>;
     /**
      * Retrieves the total number of interactions for the specified address.
      *
@@ -212,7 +212,7 @@ export declare class BaseProvider extends AbstractProvider {
       * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
       * @throws {Error} if there is an error executing the RPC call.
       */
-    getTesseract(with_interactions: boolean, options: Pick<Options, 'tesseract_hash'>): Promise<Tesseract>;
+    getTesseract(with_interactions: boolean, options: Options): Promise<Tesseract>;
     /**
      * Retrieves the logic id's associated with a specific address.
      *
