@@ -32,11 +32,11 @@ The ``Participant`` interface represents a participant object. It has the follow
 
 * ``address`` - ``string``: The address of the participant.
 * ``height`` - ``string``: The height of the participant.
-* ``transitive_link`` - ``string``: The transitive link for the participant.
-* ``prev_context`` - ``string``: The previous context for the participant.
-* ``latest_context`` - ``string``: The latest context for the participant.
-* ``context_delta`` - ``ContextDelta``: The object representing the context delta.
-* ``state_delta`` - ``string``: The state delta for the participant.
+* ``transitive_link`` - ``string``: The transitive link of the participant.
+* ``prev_context`` - ``string``: The previous context of the participant.
+* ``latest_context`` - ``string``: The latest context of the participant.
+* ``context_delta`` - ``ContextDelta``: The object representing the context delta of the participant.
+* ``state_delta`` - ``string``: The state delta of the participant.
 
 **Participants**
 
@@ -117,13 +117,13 @@ The ``ConsensusInfo`` interface represents the consensus information. It has the
 * ``evidence_hash`` - ``string``: The hash of the evidence.
 * ``binary_hash`` - ``string``: The hash of the binary.
 * ``identity_hash`` - ``string``: The hash of the identity.
-* ``ics_hash`` - ``string``: The hash of the ICS.
-* ``cluster_id`` - ``string``: The ID of the cluster.
-* ``ics_signature`` - ``string``: The signature of the ICS.
-* ``ics_vote_set`` - ``string``: The vote set of the ICS.
-* ``round`` - ``string``: The round value.
-* ``commit_signature`` - ``string``: The commit signature.
-* ``bft_vote_set`` - ``string``: The vote set of the BFT.
+* ``ics_hash`` - ``string``: The hash representing the ICS.
+* ``cluster_id`` - ``string``: The hash representing the cluster id.
+* ``ics_signature`` - ``string``: The hash representing the ICS signature.
+* ``ics_vote_set`` - ``string``: The hash representing the ICS vote set.
+* ``round`` - ``string``: The string representing the round.
+* ``commit_signature`` - ``string``: The hash representing the commit signature.
+* ``bft_vote_set`` - ``string``: The string representing the BFT vote set.
 
 **Tesseract**
 
@@ -135,8 +135,8 @@ The ``Tesseract`` interface represents a tesseract object. It has the following 
 * ``epoch`` - ``string``: The hex value represents the fixed time slot.
 * ``time_stamp`` - ``string``: The hex value represents the ICS request time.
 * ``operator`` - ``string``: The Krama ID of the operator.
-* ``fuel_used`` - ``string``: The hex value representing fuel used in the tesseract formation.
-* ``fuel_limit`` - ``string``: The hex value representing fuel limit of the tesseract.
+* ``fuel_used`` - ``string``: The hex value representing fuel used in the interaction.
+* ``fuel_limit`` - ``string``: The hex value representing fuel limit of the interaction.
 * ``consensus_info`` - ``ConsensusInfo``: The object representing the consensus information.
 * ``seal`` - ``string``: The hex value representing the The signature of node which executed the tesseract.
 * ``ixns`` - ``Interaction[]``: An array of interactions.
