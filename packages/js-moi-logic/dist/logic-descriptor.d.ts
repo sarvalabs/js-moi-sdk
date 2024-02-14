@@ -68,16 +68,18 @@ export declare abstract class LogicDescriptor extends LogicBase {
     isStateful(): boolean;
     /**
      * Checks if the logic has persistent state.
+     * @returns A tuple containing the pointer to the persistent state and a flag indicating if it exists.
      *
-     * @returns {[number, boolean]} A tuple containing the pointer to the
-     persistent state and a flag indicating if it exists.
+     @example
+     * const [ptr, exists] = logic.hasPersistentState();
      */
     hasPersistentState(): [number, boolean];
     /**
      * Checks if the logic has ephemeral state.
+     * @returns A tuple containing the pointer to the ephemeral state and a flag indicating if it exists.
      *
-     * @returns {[number, boolean]} A tuple containing the pointer to the
-     ephemeral state and a flag indicating if it exists.
+     * @example
+     * const [ptr, exists] = logic.hasEphemeralState();
      */
     hasEphemeralState(): [number, boolean];
 }
