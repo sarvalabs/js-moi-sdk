@@ -9,3 +9,6 @@ export const initializeWallet = async (provider: JsonRpcProvider, mnemonic: stri
 
     return wallet;
 }
+
+export const getRandomSupply = () => 100 + Math.floor(Math.random() * 900);
+export const getRandomSymbol = () => "TEST #" + Math.floor(Math.random() * 1000);

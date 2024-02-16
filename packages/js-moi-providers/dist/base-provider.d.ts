@@ -71,7 +71,16 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns A Promise that resolves to the interaction information.
      * @throws Error if there is an error executing the RPC call.
      */
-    getInteractionByTesseract(address: string, options?: Options, ix_index?: string): Promise<Interaction>;
+    getInteractionByTesseract(address: string, options?: Options, ix_index?: number): Promise<Interaction>;
+    /**
+     * Retrieves the interaction information for the specified tesseract options.
+     *
+     * @param options - The tesseract options. (optional)
+     * @param ix_index - The index of the interaction to retrieve. (optional)
+     * @returns A Promise that resolves to the interaction information.
+     * @throws Error if there is an error executing the RPC call.
+     */
+    getInteractionByTesseract(options: Options, ix_index?: number): Promise<Interaction>;
     /**
      * Retrieves the total number of interactions for the specified address.
      *
@@ -189,11 +198,21 @@ export declare class BaseProvider extends AbstractProvider {
      * @param {string} address - The address for which to retrieve the Tesseract.
      * @param {boolean} with_interactions - A boolean value indicating whether to include
      * interactions in the Tesseract.
-     * @param {Options} options - The tesseract options. (optional)
+     * @param {Options | undefined} options - The tesseract options. (optional)
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      */
     getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
+    /**
+      * Retrieves a Tesseract for a specified tesseract hash.
+      *
+      * @param {boolean} with_interactions - A boolean value indicating whether to include
+      * interactions in the Tesseract.
+      * @param {Options} options - The tesseract options. (optional)
+      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
+      * @throws {Error} if there is an error executing the RPC call.
+      */
+    getTesseract(with_interactions: boolean, options: Options): Promise<Tesseract>;
     /**
      * Retrieves the logic id's associated with a specific address.
      *
@@ -405,7 +424,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<any>} A Promise that resolves to the response of the RPC call.
      * @throws {Error} if the method is not implemented.
      */
-    protected execute(method: string, params: any): Promise<any>;
+    protected execute<T = any>(method: string, params: any): Promise<T>;
     /**
      * Starts the specified event by performing necessary actions.
      *

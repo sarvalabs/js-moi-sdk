@@ -292,7 +292,7 @@ export class Schema {
      * Extracts the key and value data types from the provided map data type string.
      *
      * @param {string} dataType - The map data type. eg:"map[u64]string".
-     * @returns {[string, string]} The extracted key and value data types as a tuple.
+     * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
     private extractMapDataType(dataType: string): [string, string] {

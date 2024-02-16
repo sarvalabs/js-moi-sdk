@@ -105,7 +105,7 @@ class ElementDescriptor {
     }
     /**
      * Retrieves the element from the logic manifest based on the given
-     routine name.
+     * routine name.
      *
      * @param {string} routineName - The name of the routine.
      * @returns {LogicManifest.Element} The routine element.
@@ -120,7 +120,7 @@ class ElementDescriptor {
     }
     /**
      * Retrieves the element from the logic manifest based on the given
-     class name.
+     * class name.
      *
      * @returns {LogicManifest.Element} The class element.
      * @throws {Error} if the class name is invalid.
@@ -134,7 +134,7 @@ class ElementDescriptor {
     }
     /**
      * Retrieves the element from the logic manifest based on the given
-     method name.
+     * method name.
      *
      * @param {string} methodName - The name of the method.
      * @returns {LogicManifest.Element} The method element.

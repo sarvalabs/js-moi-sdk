@@ -16,6 +16,32 @@ to ensure accuracy, security, and convenience throughout the development process
 
 Types
 -----
+
+**ContextDelta**
+
+The ``ContextDelta`` interface represents a context delta object. It has the following properties:
+
+* ``role`` - ``number``: The role of the participant.
+* ``behavioural_nodes`` - ``string[] | null``: An array of behavioural nodes.
+* ``random_nodes`` - ``string | null``: An array of compute nodes.
+* ``replaced_nodes`` - ``string[] | null``: An array of trust nodes.
+
+**Participant**
+
+The ``Participant`` interface represents a participant object. It has the following properties:
+
+* ``address`` - ``string``: The address of the participant.
+* ``height`` - ``string``: The height of the participant.
+* ``transitive_link`` - ``string``: The transitive link of the participant.
+* ``prev_context`` - ``string``: The previous context of the participant.
+* ``latest_context`` - ``string``: The latest context of the participant.
+* ``context_delta`` - ``ContextDelta``: The object representing the context delta of the participant.
+* ``state_delta`` - ``string``: The state delta of the participant.
+
+**Participants**
+
+The ``Participants`` type represents an array of participants.
+
 **Interaction**
 
 The ``Interaction`` interface represents an interaction object. It has the following properties:
@@ -38,7 +64,8 @@ The ``Interaction`` interface represents an interaction object. It has the follo
 * ``trust_nodes`` - ``string[]``: The trust nodes associated with the interaction.
 * ``hash`` - ``string``: The hash of the interaction.
 * ``signature`` - ``string``: The signature of the interaction.
-* ``parts`` - ``TesseractPart[]``: An array of tesseract parts associated with the interaction.
+* ``ts_hash`` - ``string``: The hash of the tesseract.
+* ``participants`` - ``Participants[]``: An array of tesseract participants associated with the interaction.
 * ``ix_index`` - ``string``: The index of the interaction.
 
 **Interactions**
@@ -83,88 +110,37 @@ The ``Receipt`` interface represents an interaction receipt. It has the followin
 * ``context_hashes`` - ``Map<string, string>``: Context hashes associated with the interaction.
 * ``extra_data`` - ``AssetCreationReceipt``, ``AssetMintOrBurnReceipt``, ``LogicDeployReceipt``, ``LogicInvokeReceipt``, or ``null``: Additional data associated with the interaction receipt.
 
-**ContextLockInfo**
+**ConsensusInfo**
 
-The ``ContextLockInfo`` interface represents information about a context lock. It has the following properties:
+The ``ConsensusInfo`` interface represents the consensus information. It has the following properties:
 
-* ``address`` - ``string``: The address associated with the context lock.
-* ``context_hash`` - ``string``: The hash of the context.
-* ``height`` - ``string``: The height of the context.
-* ``tesseract_hash`` - ``string``: The hash of the tesseract.
-
-**DeltaGroup**
-
-The ``DeltaGroup`` interface represents a group of delta nodes. It has the following properties:
-
-* ``address`` - ``string``: The address associated with the delta group.
-* ``role`` - ``number``: The role of the delta group.
-* ``behavioural_nodes`` - ``string[]``: An array of behavioural nodes.
-* ``random_nodes`` - ``string[]``: An array of random nodes.
-* ``replaced_nodes`` - ``string[]``: An array of replaced nodes.
-
-**PoXCData**
-
-The ``PoXCData`` interface represents PoXC data. It has the following properties:
-
+* ``evidence_hash`` - ``string``: The hash of the evidence.
 * ``binary_hash`` - ``string``: The hash of the binary.
 * ``identity_hash`` - ``string``: The hash of the identity.
-* ``ics_hash`` - ``string``: The hash of the ICS.
-
-**TesseractGridID**
-
-The ``TesseractGridID`` interface represents the identifier for a tesseract grid. It has the following properties:
-
-* ``hash`` - ``string``: The hash of the grid.
-* ``total`` - ``string``: The total value.
-* ``parts`` - ``TesseractPart[]``: An array of tesseract parts.
-
-**CommitData**
-
-The ``CommitData`` interface represents commit data. It has the following properties:
-
-* ``round`` - ``string``: The round value.
-* ``commit_signature`` - ``string``: The commit signature.
-* ``vote_set`` - ``string``: The vote set.
-* ``evidence_hash`` - ``string``: The hash of the evidence.
-* ``grid_id`` - ``TesseractGridID``: The grid identifier.
-
-**TesseractHeader**
-
-The ``TesseractHeader`` interface represents the header of a tesseract. It has the following properties:
-
-* ``address`` - ``string``: The address associated with the tesseract.
-* ``prev_hash`` - ``string``: The hash of the previous tesseract.
-* ``height`` - ``string``: The height of the tesseract.
-* ``fuel_used`` - ``string``: The fuel used in the tesseract.
-* ``fuel_limit`` - ``string``: The fuel limit of the tesseract.
-* ``body_hash`` - ``string``: The hash of the tesseract body.
-* ``grid_hash`` - ``string``: The hash of the tesseract grid.
-* ``operator`` - ``string``: The operator of the tesseract.
-* ``cluster_id`` - ``string``: The ID of the cluster.
-* ``timestamp`` - ``string``: The timestamp of the tesseract.
-* ``context_lock`` - ``ContextLockInfo[]``: An array of context lock information.
-* ``extra`` - ``CommitData``: Additional commit data.
-
-**TesseractBody**
-
-The ``TesseractBody`` interface represents the body of a tesseract. It has the following properties:
-
-* ``state_hash`` - ``string``: The hash of the state.
-* ``context_hash`` - ``string``: The hash of the context.
-* ``interaction_hash`` - ``string``: The hash of the interactions.
-* ``receipt_hash`` - ``string``: The hash of the receipts.
-* ``context_delta`` - ``DeltaGroup[]``: An array of delta groups for the context.
-* ``consensus_proof`` - ``PoXCData``: The PoXC data for the consensus.
+* ``ics_hash`` - ``string``: The hash representing the ICS.
+* ``cluster_id`` - ``string``: The hash representing the cluster id.
+* ``ics_signature`` - ``string``: The hash representing the ICS signature.
+* ``ics_vote_set`` - ``string``: The hash representing the ICS vote set.
+* ``round`` - ``string``: The string representing the round.
+* ``commit_signature`` - ``string``: The hash representing the commit signature.
+* ``bft_vote_set`` - ``string``: The string representing the BFT vote set.
 
 **Tesseract**
 
 The ``Tesseract`` interface represents a tesseract object. It has the following properties:
 
-* ``header`` - ``TesseractHeader``: The header of the tesseract.
-* ``body`` - ``TesseractBody``: The body of the tesseract.
-* ``ixns`` - ``Interactions``: The interactions associated with the tesseract.
-* ``seal`` - ``string``: The seal of the tesseract.
 * ``hash`` - ``string``: The hash of the tesseract.
+* ``interactions_hash`` - ``string``: The hash of the interactions.
+* ``receipts_hash`` - ``string``: The hash of the receipts.
+* ``epoch`` - ``string``: The hex value represents the fixed time slot.
+* ``time_stamp`` - ``string``: The hex value represents the ICS request time.
+* ``operator`` - ``string``: The Krama ID of the operator.
+* ``fuel_used`` - ``string``: The hex value representing fuel used to process the interaction.
+* ``fuel_limit`` - ``string``: The hex value representing fuel limit of the interaction.
+* ``consensus_info`` - ``ConsensusInfo``: The object representing the consensus information.
+* ``seal`` - ``string``: The hex value representing the The signature of node which executed the tesseract.
+* ``ixns`` - ``Interaction[]``: An array of interactions.
+* ``participants`` - ``Participant[]``: An array of participants.
 
 
 Address
