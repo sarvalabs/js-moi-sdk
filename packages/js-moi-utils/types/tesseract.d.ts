@@ -1,69 +1,29 @@
-import { TesseractPart } from "./common";
-import { Interactions } from "./interaction";
+import { Interactions, Participants } from "./interaction";
 
-export interface ContextLockInfo {
-    address: string;
-    context_hash: string;
-    height: string;
-    tesseract_hash: string;
-}
-
-export interface DeltaGroup {
-    address: string;
-    role: number;
-    behavioural_nodes: string[];
-    random_nodes: string[];
-    replaced_nodes: string[];
-}
-
-export interface PoXCData {
+export interface ConsensusInfo {
+    evidence_hash: string;
     binary_hash: string;
     identity_hash: string;
     ics_hash: string;
-}
-  
-interface TesseractGridID {
-    hash: string;
-    total: string;
-    parts: TesseractPart[];
-}
-
-interface CommitData {
+    cluster_id: string;
+    ics_signature: string;
+    ics_vote_set: string;
     round: string;
     commit_signature: string;
-    vote_set: string;
-    evidence_hash: string;
-    grid_id: TesseractGridID;
-}  
-
-export interface TesseractHeader {
-    address: string;
-    prev_hash: string;
-    height: string;
-    fuel_used: string;
-    fuel_limit: string;
-    body_hash: string;
-    grid_hash: string;
-    operator: string;
-    cluster_id: string;
-    timestamp: string;
-    context_lock: ContextLockInfo[]
-    extra: CommitData
-}
-
-export interface TesseractBody {
-    state_hash: string;
-    context_hash: string;
-    interaction_hash: string;
-    receipt_hash: string;
-    context_delta: DeltaGroup[];
-    consensus_proof: PoXCData;
+    bft_vote_set: string;
 }
 
 export interface Tesseract {
-    header: TesseractHeader;
-    body: TesseractBody;
-    ixns: Interactions;
+    participants: Participants;
+    interactions_hash: string;
+    receipts_hash: string;
+    epoch: string;
+    time_stamp: string;
+    operator: string;
+    fuel_used: string;
+    fuel_limit: string;
+    consensus_info: ConsensusInfo;
     seal: string;
     hash: string;
+    ixns: Interactions;
 }

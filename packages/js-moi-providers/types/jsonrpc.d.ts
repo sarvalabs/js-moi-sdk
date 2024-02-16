@@ -4,7 +4,8 @@ import {
     AssetStandard,
     IxType,
     LogicDeployReceipt,
-    LogicInvokeReceipt
+    LogicInvokeReceipt,
+    Participants
 } from "js-moi-utils";
 
 export interface Options {
@@ -81,13 +82,12 @@ export interface InteractionReceipt {
     ix_hash: string;
     status: number;
     fuel_used: string;
-    state_hashes: StateHash[];
-    context_hashes: ContextHash[];
+    participants: Participants;
     extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null;
     from: string;
     to: string;
     ix_index: string;
-    parts: string;
+    ts_hash: string;
 }
 
 export interface AssetInfo {

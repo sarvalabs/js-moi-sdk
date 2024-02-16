@@ -2,7 +2,7 @@
 Documentation
 =============
 
-This documentation is for js-moi-sdk v0.2.1.
+This documentation is for js-moi-sdk |version|
 
 --------------------------------------------------------------------------------
 

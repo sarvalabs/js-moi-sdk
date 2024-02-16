@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { ContextStateMatrix } from "./state";
 import { CallSite, MethodDef } from "../types/logic";
+import { ContextStateMatrix } from "./state";
 
 /**
  * This class represents a descriptor for elements in the logic manifest.
@@ -121,8 +121,8 @@ export default class ElementDescriptor {
     }
 
     /**
-     * Retrieves the element from the logic manifest based on the given 
-     routine name.
+     * Retrieves the element from the logic manifest based on the given
+     * routine name.
      * 
      * @param {string} routineName - The name of the routine.
      * @returns {LogicManifest.Element} The routine element.
@@ -143,7 +143,7 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the element from the logic manifest based on the given 
-     class name.
+     * class name.
      * 
      * @returns {LogicManifest.Element} The class element.
      * @throws {Error} if the class name is invalid.
@@ -163,7 +163,7 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the element from the logic manifest based on the given 
-     method name.
+     * method name.
      * 
      * @param {string} methodName - The name of the method.
      * @returns {LogicManifest.Element} The method element.

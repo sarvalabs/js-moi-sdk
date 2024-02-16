@@ -187,13 +187,12 @@ The ``InteractionReceipt`` interface represents a receipt for an interaction. It
 * ``ix_hash`` - ``string``: The hash of the interaction.
 * ``status`` - ``number``: The status of the interaction.
 * ``fuel_used`` - ``string``: The amount of fuel used for the interaction.
-* ``state_hashes`` - ``StateHash[]``: An array of state hash objects.
-* ``context_hashes`` - ``ContextHash[]``: An array of context hash objects.
+* ``participants`` - ``Participant[]``: The participants involved in the interaction.
 * ``extra_data`` - ``AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null``: Additional data specific to the interaction type or null.
 * ``from`` - ``string``: The sender of the interaction.
 * ``to`` - ``string``: The receiver of the interaction.
 * ``ix_index`` - ``string``: The index of the interaction.
-* ``parts`` - ``string``: The parts of the interaction.
+* ``ts_hash`` - ``string``: The hash of the tesseract.
 
 **AssetInfo**
 
