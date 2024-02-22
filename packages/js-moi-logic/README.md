@@ -34,11 +34,12 @@ npm install js-moi-wallet
     import { Wallet } from "js-moi-wallet";
     import { getLogicDriver } from "js-moi-logic";
 
-    const initWallet = async () => {
+     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
-        const provider = new JsonRpcProvider("http://localhost:1600/");
-        const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        const wallet = await Wallet.fromMnemonic(mnemonic);
+
+        wallet.connect(new JsonRpcProvider("http://localhost:1600/"));
+
         return wallet;
     }
 

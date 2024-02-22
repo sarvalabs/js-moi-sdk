@@ -34,10 +34,14 @@ npm install js-moi-wallet
     import { Wallet } from "js-moi-wallet";
 
     (async() => {
-        const wallet = new Wallet();
-        const mnemonic = "hollow appear story text start mask salt social child ...";
-        const path = "m/44'/7567'/0'/0/1";
-        await wallet.fromMnemonic(mnemonic, path);
+         const initWallet = async () => {
+        const mnemonic = "mother clarify push liquid ordinary social track ...";
+        const wallet = await Wallet.fromMnemonic(mnemonic);
+
+        wallet.connect(new JsonRpcProvider("http://localhost:1600/"));
+
+        return wallet;
+    }
     })()
 ```
 

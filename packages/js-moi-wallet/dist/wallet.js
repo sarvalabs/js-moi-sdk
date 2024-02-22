@@ -27,17 +27,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = exports.CURVE = void 0;
-const bip39 = __importStar(require("js-moi-bip39"));
-const elliptic_1 = __importDefault(require("elliptic"));
-const js_moi_hdnode_1 = require("js-moi-hdnode");
-const crypto_1 = require("crypto");
 const buffer_1 = require("buffer");
+const crypto_1 = require("crypto");
+const elliptic_1 = __importDefault(require("elliptic"));
+const bip39 = __importStar(require("js-moi-bip39"));
 const js_moi_constants_1 = require("js-moi-constants");
+const js_moi_hdnode_1 = require("js-moi-hdnode");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
-const serializer_1 = require("./serializer");
 const keystore_1 = require("./keystore");
+const serializer_1 = require("./serializer");
 var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
@@ -86,28 +86,36 @@ const privateMapSet = (receiver, privateMap, value) => {
 };
 const __vault = new WeakMap();
 /**
- * Wallet
+ * A class representing a wallet that can sign interactions.
  *
- * A class representing a wallet that can sign interactions and manage keys.
+ * The Wallet implements the Signer API and can be used anywhere a [Signer](https://js-moi-sdk.docs.moi.technology/signer)
+ * is expected and has all the required properties.
+ *
+ * @example
+ * // creating a wallet from mnemonic
+ * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
+ *
+ * @example
+ * // creating a wallet from keystore
+ * const keystore = { ... }
+ * const wallet = Wallet.fromKeystore(keystore, "password");
+ *
+ * @example
+ * // Connecting a wallet to a provider
+ * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
+ * const provider = new VoyagerProvider("babylon");
+ *
+ * wallet.connect(provider);
+ *
+ * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 class Wallet extends js_moi_signer_1.Signer {
-    constructor(provider) {
-        super(provider);
-        __vault.set(this, {
-            value: void 0
-        });
-    }
-    /**
-     * Initializes the wallet with a private key, mnemonic, and curve.
-     *
-     * @param {Buffer} key - The private key as a Buffer.
-     * @param {string} curve - The elliptic curve algorithm used for key generation.
-     * @param {string} mnemonic - The mnemonic associated with the wallet. (optional)
-     * @throws {Error} if the key is undefined or if an error occurs during the
-     * initialization process.
-     */
-    load(key, curve, mnemonic) {
+    constructor(key, curve, mnemonic) {
         try {
+            super();
+            __vault.set(this, {
+                value: void 0,
+            });
             let privKey, pubKey;
             if (!key) {
                 js_moi_utils_1.ErrorUtils.throwError("Key is required, cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
@@ -124,11 +132,11 @@ class Wallet extends js_moi_signer_1.Signer {
                 _key: privKey,
                 _mnemonic: mnemonic,
                 _public: pubKey,
-                _curve: curve
+                _curve: curve,
             });
         }
-        catch (err) {
-            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        catch (error) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
     }
     /**
@@ -143,21 +151,6 @@ class Wallet extends js_moi_signer_1.Signer {
         return false;
     }
     /**
-     * Generates a random mnemonic and initializes the wallet from it.
-     *
-     * @throws {Error} if there is an error generating the random mnemonic.
-     */
-    async createRandom() {
-        try {
-            const _random16Bytes = (0, crypto_1.randomBytes)(16);
-            var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
-            await this.fromMnemonic(mnemonic);
-        }
-        catch (err) {
-            js_moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
-        }
-    }
-    /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
      * @param {string} password Used for encrypting the keystore data.
@@ -170,7 +163,7 @@ class Wallet extends js_moi_signer_1.Signer {
             js_moi_utils_1.ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         try {
-            const data = buffer_1.Buffer.from(this.privateKey(), "hex");
+            const data = buffer_1.Buffer.from(this.privateKey, "hex");
             return (0, keystore_1.encryptKeystoreData)(data, password);
         }
         catch (err) {
@@ -178,51 +171,12 @@ class Wallet extends js_moi_signer_1.Signer {
         }
     }
     /**
-     * Intializes the wallet from a provided mnemonic.
+     * Private key associated with the wallet.
      *
-     * @param {string} mnemonic - The mnemonic associated with the wallet.
-     * @param {string} path - The derivation path for the HDNode. (optional)
-     * @param {string[]} wordlist - The wordlist for the mnemonic. (optional)
-     * @throws {Error} if there is an error loading the wallet from the mnemonic.
-     */
-    async fromMnemonic(mnemonic, path, wordlist) {
-        mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
-        try {
-            const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
-            const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
-            const childNode = masterNode.derivePath(path ? path : js_moi_constants_1.MOI_DERIVATION_PATH);
-            this.load(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
-        }
-        catch (err) {
-            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
-        }
-    }
-    /**
-     * Initializes the wallet by decrypting and loading the private key from
-     * a keystore file.
-     *
-     * @param {string} keystore The keystore object as a JSON string.
-     * @param {string} password The password used for decrypting the keystore.
-     * @throws {Error} if there is an error parsing the keystore, decrypting
-     * the keystore data, or loading the private key.
-     */
-    fromKeystore(keystore, password) {
-        try {
-            const keystoreJson = JSON.parse(keystore);
-            const privateKey = (0, keystore_1.decryptKeystoreData)(keystoreJson, password);
-            this.load(privateKey, CURVE.SECP256K1);
-        }
-        catch (err) {
-            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
-        }
-    }
-    /**
-     * Retrieves the private key associated with the wallet.
-     *
-     * @returns {string} The private key as a string.
      * @throws {Error} if the wallet is not loaded or initialized.
+     * @readonly
      */
-    privateKey() {
+    get privateKey() {
         if (this.isInitialized()) {
             return privateMapGet(this, __vault)._key;
         }
@@ -231,34 +185,33 @@ class Wallet extends js_moi_signer_1.Signer {
     /**
      * Retrieves the mnemonic associated with the wallet.
      *
-     * @returns {string} The mnemonic as a string.
      * @throws {Error} if the wallet is not loaded or initialized.
+     * @readonly
      */
-    mnemonic() {
+    get mnemonic() {
         if (this.isInitialized()) {
             return privateMapGet(this, __vault)._mnemonic;
         }
         js_moi_utils_1.ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * Retrieves the public key associated with the wallet.
+     * Public key associated with the wallet.
      *
-     * @returns {string} The public key as a string.
      * @throws {Error} if the wallet is not loaded or initialized.
+     * @readonly
      */
-    publicKey() {
+    get publicKey() {
         if (this.isInitialized()) {
             return privateMapGet(this, __vault)._public;
         }
         js_moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * Retrieves the curve used by the wallet.
+     * Curve associated with the wallet.
      *
-     * @returns {string} The curve as a string.
-     * @throws {Error} if the wallet is not loaded or initialized.
+     * @readonly
      */
-    curve() {
+    get curve() {
         if (this.isInitialized()) {
             return privateMapGet(this, __vault)._curve;
         }
@@ -270,8 +223,15 @@ class Wallet extends js_moi_signer_1.Signer {
      * @returns {string} The address as a string.
      */
     getAddress() {
-        const publicKey = this.publicKey();
-        return "0x" + publicKey.slice(2);
+        return "0x" + this.publicKey.slice(2);
+    }
+    /**
+     * Address associated with the wallet.
+     *
+     * @readonly
+     */
+    get address() {
+        return this.getAddress();
     }
     /**
      * Connects the wallet to the given provider.
@@ -292,21 +252,20 @@ class Wallet extends js_moi_signer_1.Signer {
      * there is an error during signing.
      */
     sign(message, sigAlgo) {
-        if (sigAlgo) {
-            switch (sigAlgo.sigName) {
-                case "ECDSA_S256": {
-                    const privateKey = this.privateKey();
-                    const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-                    const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), privateKey);
-                    const sigBytes = sig.serialize();
-                    return (0, js_moi_utils_1.bytesToHex)(sigBytes);
-                }
-                default: {
-                    js_moi_utils_1.ErrorUtils.throwError("Unsupported signature type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
-                }
+        if (sigAlgo == null) {
+            js_moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        switch (sigAlgo.sigName) {
+            case "ECDSA_S256": {
+                const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+                const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), this.privateKey);
+                const sigBytes = sig.serialize();
+                return (0, js_moi_utils_1.bytesToHex)(sigBytes);
+            }
+            default: {
+                js_moi_utils_1.ErrorUtils.throwError("Unsupported signature type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
             }
         }
-        js_moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefiend", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     /**
      * Signs an interaction object using the wallet's private key and the
@@ -325,11 +284,133 @@ class Wallet extends js_moi_signer_1.Signer {
             const signature = this.sign(ixData, sigAlgo);
             return {
                 ix_args: (0, js_moi_utils_1.bytesToHex)(ixData),
-                signature: signature
+                signature: signature,
             };
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
+     * Initializes the wallet from a provided mnemonic.
+     *
+     * @param {string} mnemonic - The mnemonic to initialize the wallet with.
+     * @param {string | undefined} path - The derivation path to use for key generation. (optional)
+     * @param {string[] | undefined} wordlist - The wordlist to use for mnemonic generation. (optional)
+     *
+     * @returns {Promise<Wallet>} a promise that resolves to a `Wallet` instance.
+     * @throws {Error} if there is an error during initialization.
+     *
+     * @example
+     * // Initializing a wallet from mnemonic
+     * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
+     *
+     * @example
+     * // Initializing a wallet from mnemonic with custom path
+     * const mnemonic = "hollow appear story text start mask salt social child ...";
+     * const path = "m/44'/60'/0'/0/0";
+     * const wallet = await Wallet.fromMnemonic(mnemonic, path);
+     */
+    static async fromMnemonic(mnemonic, path, wordlist) {
+        try {
+            mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
+            const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
+            const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
+            const childNode = masterNode.derivePath(path ? path : js_moi_constants_1.MOI_DERIVATION_PATH);
+            return new Wallet(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
+        }
+        catch (error) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
+                originalError: error,
+            });
+        }
+    }
+    /**
+     * Initializes the wallet from a provided mnemonic synchronously.
+     *
+     * @param {string} mnemonic - The mnemonic to initialize the wallet with.
+     * @param {string | undefined} path - The derivation path to use for key generation. (optional)
+     * @param {string[] | undefined} wordlist - The wordlist to use for mnemonic generation. (optional)
+     *
+     * @returns {Promise<Wallet>} a promise that resolves to a `Wallet` instance.
+     * @throws {Error} if there is an error during initialization.
+     *
+     * @example
+     * // Initializing a wallet from mnemonic
+     * const wallet = Wallet.fromMnemonicSync("hollow appear story text start mask salt social child ...");
+     *
+     * @example
+     * // Initializing a wallet from mnemonic with custom path
+     * const mnemonic = "hollow appear story text start mask salt social child ...";
+     * const path = "m/44'/60'/0'/0/0";
+     * const wallet = Wallet.fromMnemonicSync(mnemonic, path);
+     */
+    static fromMnemonicSync(mnemonic, path, wordlist) {
+        try {
+            mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
+            const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
+            const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
+            const childNode = masterNode.derivePath(path ? path : js_moi_constants_1.MOI_DERIVATION_PATH);
+            return new Wallet(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
+        }
+        catch (error) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
+                originalError: error,
+            });
+        }
+    }
+    /**
+     * Initializes the wallet from a provided keystore.
+     *
+     * @param {string} keystore - The keystore to initialize the wallet with.
+     * @param {string} password - The password used to decrypt the keystore.
+     *
+     * @returns {Wallet} a instance of `Wallet`.
+     * @throws {Error} if there is an error during initialization.
+     */
+    static fromKeystore(keystore, password) {
+        try {
+            const privateKey = (0, keystore_1.decryptKeystoreData)(JSON.parse(keystore), password);
+            return new Wallet(privateKey, CURVE.SECP256K1);
+        }
+        catch (err) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
+                originalError: err,
+            });
+        }
+    }
+    /**
+     * Generates a random mnemonic and initializes the wallet from it.
+     *
+     * @returns {Promise<Wallet>} a promise that resolves to a `Wallet` instance.
+     *
+     * @throws {Error} if there is an error generating the random mnemonic.
+     */
+    static async createRandom() {
+        try {
+            const _random16Bytes = (0, crypto_1.randomBytes)(16);
+            var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
+            return await Wallet.fromMnemonic(mnemonic);
+        }
+        catch (err) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
+     * Generates a random mnemonic and initializes the wallet from it.
+     *
+     * @returns {Wallet} a instance of `Wallet`.
+     *
+     * @throws {Error} if there is an error generating the random mnemonic.
+     */
+    static createRandomSync() {
+        try {
+            const _random16Bytes = (0, crypto_1.randomBytes)(16);
+            var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
+            return Wallet.fromMnemonicSync(mnemonic);
+        }
+        catch (err) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
 }
