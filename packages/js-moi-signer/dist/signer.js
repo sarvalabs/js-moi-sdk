@@ -58,19 +58,19 @@ class Signer {
     /**
      * Checks the validity of an interaction object by performing various checks.
      *
+     * @param {InteractionMethod} method - The method to be checked.
      * @param {InteractionObject} ixObject - The interaction object to be checked.
-     * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    async checkInteraction(ixObject) {
-        if (ixObject.type === undefined || ixObject.type === null) {
+    async checkInteraction(method, ixObject) {
+        if (ixObject.type == null) {
             js_moi_utils_1.ErrorUtils.throwError("Interaction type is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-        }
-        if (!(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
-            js_moi_utils_1.ErrorUtils.throwError("Invalid sender address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         if (ixObject.sender == null) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        if (!(0, js_moi_utils_1.isValidAddress)(ixObject.sender)) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid sender address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
@@ -83,14 +83,16 @@ class Signer {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid receiver address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
         }
-        if (ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
-            js_moi_utils_1.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-        }
-        if (ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
-            js_moi_utils_1.ErrorUtils.throwError("Fuel limit is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-        }
-        if (ixObject.fuel_limit === 0) {
-            js_moi_utils_1.ErrorUtils.throwError("Invalid fuel limit", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
+        if (method === "send") {
+            if (ixObject.fuel_price == null) {
+                js_moi_utils_1.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+            }
+            if (ixObject.fuel_limit == null) {
+                js_moi_utils_1.ErrorUtils.throwError("Fuel limit is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+            }
+            if (ixObject.fuel_price === 0) {
+                js_moi_utils_1.ErrorUtils.throwError("Invalid fuel price", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
+            }
         }
         if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
             const nonce = await this.getNonce({ tesseract_number: -1 });
@@ -103,16 +105,17 @@ class Signer {
      * Prepares the interaction object by populating necessary fields and
      * performing validity checks.
      *
+     * @param {InteractionMethod} method - The method to prepare the interaction for.
      * @param {InteractionObject} ixObject - The interaction object to prepare.
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is
      * an error during preparation.
      */
-    async prepareInteraction(ixObject) {
+    async prepareInteraction(method, ixObject) {
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
-        await this.checkInteraction(ixObject);
+        await this.checkInteraction(method, ixObject);
         if (ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }
@@ -130,7 +133,7 @@ class Signer {
     async call(ixObject) {
         // Get the provider
         const provider = this.getProvider();
-        await this.prepareInteraction(ixObject);
+        await this.prepareInteraction('call', ixObject);
         return await provider.call(ixObject);
     }
     /**
@@ -148,7 +151,7 @@ class Signer {
     async estimateFuel(ixObject) {
         // Get the provider
         const provider = this.getProvider();
-        await this.prepareInteraction(ixObject);
+        await this.prepareInteraction('estimateFuel', ixObject);
         return await provider.estimateFuel(ixObject);
     }
     /**
@@ -167,7 +170,7 @@ class Signer {
             const provider = this.getProvider();
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-            await this.prepareInteraction(ixObject);
+            await this.prepareInteraction('send', ixObject);
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo);
             // Send the interaction request and return the response

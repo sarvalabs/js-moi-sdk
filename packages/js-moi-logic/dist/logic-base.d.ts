@@ -1,5 +1,5 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
+import { InteractionCallResponse, InteractionResponse, LogicPayload, type AbstractProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
@@ -7,13 +7,14 @@ import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
- class for logic-related operations.
+ * class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export declare abstract class LogicBase extends ElementDescriptor {
-    protected signer: Signer;
+    protected signer?: Signer;
+    protected provider: AbstractProvider;
     protected manifestCoder: ManifestCoder;
-    constructor(manifest: LogicManifest.Manifest, signer: Signer);
+    constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract getIxType(): IxType;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
@@ -24,11 +25,11 @@ export declare abstract class LogicBase extends ElementDescriptor {
      */
     protected getLogicId(): string;
     /**
-     * Updates the signer or establishes a connection with a new signer.
+     * Updates the signer and provider instances for the LogicBase instance.
      *
-     * @param {Signer} signer -  The updated signer object or the new signer object to connect.
+     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
      */
-    connect(signer: Signer): void;
+    connect(arg: AbstractProvider | Signer): void;
     /**
      * Executes a routine with the given arguments and returns the interaction response.
      *

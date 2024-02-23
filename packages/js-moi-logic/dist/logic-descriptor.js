@@ -21,8 +21,8 @@ class LogicDescriptor extends logic_base_1.LogicBase {
     engine;
     sealed;
     assetLogic;
-    constructor(logicId, manifest, signer) {
-        super(manifest, signer);
+    constructor(logicId, manifest, arg) {
+        super(manifest, arg);
         this.logicId = new logic_id_1.LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = js_moi_manifest_1.ManifestCoder.encodeManifest(this.manifest);
