@@ -230,6 +230,10 @@ Functions
     const wallet = await initWallet();
     const logicDriver = await getLogicDriver(logicId, wallet);
 
+.. warning::
+    When the logic driver is initialized using a specific provider,
+    attempting to invoke a mutating routine will result in the SDK throwing an exception.
+
 Usage
 ~~~~~
 
