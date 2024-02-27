@@ -14,7 +14,6 @@
 [![pulls count](https://img.shields.io/github/issues-pr/sarvalabs/js-moi-sdk?style=for-the-badge&color=brightgreen)][pullslink]
 ![test status](https://img.shields.io/github/actions/workflow/status/sarvalabs/js-moi-sdk/test.yml?label=test&style=for-the-badge)
 
-
 # js-moi-wallet
 
 This is a sub-package of [js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk).
@@ -22,6 +21,7 @@ This is a sub-package of [js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk).
 The **js-moi-wallet** package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
 
 ## Installation
+
 Install the latest [release](https://github.com/sarvalabs/js-moi-sdk/releases) using the following command.
 
 ```sh
@@ -37,8 +37,9 @@ npm install js-moi-wallet
      const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const wallet = await Wallet.fromMnemonic(mnemonic);
-
-        wallet.connect(new JsonRpcProvider("http://localhost:1600/"));
+        const provider = new JsonRpcProvider("http://localhost:1600/");
+        
+        wallet.connect(provider);
 
         return wallet;
     }
@@ -58,14 +59,17 @@ npm install js-moi-wallet
 ```
 
 ## Contributing
+
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as below, without any additional terms or conditions.
 
 ## License
+
 &copy; 2023 Sarva Labs Inc. & MOI Protocol Developers.
 
 This project is licensed under either of
+
 - [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) ([`LICENSE-APACHE`](LICENSE-APACHE))
 - [MIT license](https://opensource.org/licenses/MIT) ([`LICENSE-MIT`](LICENSE-MIT))
 
