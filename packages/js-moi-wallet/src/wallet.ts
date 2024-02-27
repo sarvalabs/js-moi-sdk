@@ -106,7 +106,8 @@ export class Wallet extends Signer {
             }
 
             const ecPrivKey = new elliptic.ec(curve);
-            const keyInBytes = bufferToUint8(key instanceof Buffer ? key : Buffer.from(key, "hex"));
+            const keyBuffer = key instanceof Buffer ? key : Buffer.from(key, "hex");
+            const keyInBytes = bufferToUint8(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
             pubKey = keyPair.getPublic(true, "hex");

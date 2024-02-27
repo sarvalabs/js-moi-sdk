@@ -110,7 +110,7 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 class Wallet extends js_moi_signer_1.Signer {
-    constructor(key, curve, mnemonic) {
+    constructor(key, curve) {
         try {
             super();
             __vault.set(this, {
@@ -124,13 +124,13 @@ class Wallet extends js_moi_signer_1.Signer {
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
             }
             const ecPrivKey = new elliptic_1.default.ec(curve);
-            const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(key);
+            const keyBuffer = key instanceof buffer_1.Buffer ? key : buffer_1.Buffer.from(key, "hex");
+            const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
             pubKey = keyPair.getPublic(true, "hex");
             privateMapSet(this, __vault, {
                 _key: privKey,
-                _mnemonic: mnemonic,
                 _public: pubKey,
                 _curve: curve,
             });
@@ -317,7 +317,12 @@ class Wallet extends js_moi_signer_1.Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(path ? path : js_moi_constants_1.MOI_DERIVATION_PATH);
-            return new Wallet(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1);
+            privateMapSet(wallet, __vault, {
+                ...privateMapGet(wallet, __vault),
+                _mnemonic: mnemonic,
+            });
+            return wallet;
         }
         catch (error) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
@@ -351,7 +356,12 @@ class Wallet extends js_moi_signer_1.Signer {
             const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(path ? path : js_moi_constants_1.MOI_DERIVATION_PATH);
-            return new Wallet(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1);
+            privateMapSet(wallet, __vault, {
+                ...privateMapGet(wallet, __vault),
+                _mnemonic: mnemonic,
+            });
+            return wallet;
         }
         catch (error) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {

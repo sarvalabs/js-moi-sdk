@@ -31,7 +31,7 @@ export declare enum CURVE {
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export declare class Wallet extends Signer {
-    constructor(key: Buffer, curve: string, mnemonic?: string);
+    constructor(key: Buffer | string, curve: string);
     /**
      * Checks if the wallet is initialized.
      *
