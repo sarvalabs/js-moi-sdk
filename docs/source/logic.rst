@@ -129,8 +129,8 @@ applications on the MOI network.
     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
         const wallet = await Wallet.fromMnemonic(mnemonic);
-
-        wallet.connect(new JsonRpcProvider("http://localhost:1600/"));
+        const provider = new JsonRpcProvider("http://localhost:1600/");
+        wallet.connect(provider);
 
         return wallet;
     }

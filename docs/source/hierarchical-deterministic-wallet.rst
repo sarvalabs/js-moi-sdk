@@ -157,7 +157,7 @@ Methods
   const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
 
   const signature = wallet.sign(Buffer.from(message), algo);
-  // OUTPUT >> 0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee...
+  >> "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee..."
 
 .. autofunction:: Wallet#signInteraction
 
@@ -189,9 +189,6 @@ Methods
     */
 
 .. autofunction:: Wallet#generateKeystore
-
-Static Methods
-======================
 
 .. autofunction:: Wallet.fromMnemonic
 
