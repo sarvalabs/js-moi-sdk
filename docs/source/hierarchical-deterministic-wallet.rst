@@ -64,7 +64,7 @@ Creating Instances
 
         const privateKey = "0x...";
 
-        const wallet = new Wallet(Buffer.from(privateKey, "hex"), CURVE.SECP256K1);
+        const wallet = new Wallet(privateKey, CURVE.SECP256K1);
   
 -  Create a wallet instance from a mnemonic
 
@@ -78,7 +78,7 @@ Creating Instances
 
     .. code-block:: javascript
 
-        const keystore = {
+        const keystore = `{
             "cipher": "aes-128-ctr",
             "ciphertext": "...",
             "cipherparams": {
@@ -93,7 +93,7 @@ Creating Instances
                 "salt": "..."
             },
             "mac": "..."
-        };
+        }`;
         const password = "YOUR_PASSWORD_HERE";
 
         const wallet = await Wallet.fromKeystore(keystore, password);
@@ -112,35 +112,35 @@ Properties
 .. code-block:: javascript
 
     console.log(wallet.address);
-    // OUTPUT: "0x87925..."
+    // OUTPUT >> "0x87925..."
 
 - ``publicKey`` - ``readonly`` ``string``: The public key of the wallet.
 
 .. code-block:: javascript
 
     console.log(wallet.publicKey);
-    // OUTPUT: "038792..."
+    // OUTPUT >> "038792..."
 
 - ``privateKey`` - ``readonly`` ``string``: The private key of the wallet. 
 
 .. code-block:: javascript
 
     console.log(wallet.privateKey);
-    // OUTPUT: "0x87925..."
+    // OUTPUT >> "0x87925..."
 
 - ``mnemonic`` - ``readonly`` ``string``: The mnemonic of the wallet.
 
 .. code-block:: javascript
 
     console.log(wallet.mnemonic);
-    // OUTPUT: "hollow appear story text start mask salt social child ..."
+    // OUTPUT >> "hollow appear story text start mask salt social child ..."
 
 - ``curve`` - ``readonly`` ``string``: The curve of the wallet.
 
 .. code-block:: javascript
 
     console.log(wallet.curve);
-    // OUTPUT: "secp256k1"
+    // OUTPUT >> "secp256k1"
 
 
 Methods
@@ -160,6 +160,33 @@ Methods
   // OUTPUT >> 0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee...
 
 .. autofunction:: Wallet#signInteraction
+
+.. code-block:: javascript
+
+    const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+    const interaction = {
+        type: IxType.ASSET_CREATE,
+        nonce: 0,
+        sender: address,
+        fuel_price: 1,
+        fuel_limit: 200,
+        payload: {
+            standard: AssetStandard.MAS0,
+            symbol: "SIG",
+            supply: 1248577
+        }
+    }
+    const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+    const signedIxn = wallet.signInteraction(interaction, sigAlgo);
+    console.log(signedIxn)
+    
+    // Output
+    /*
+        {
+            ix_args:'0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f063363636161604d4f49130d41',
+            signature: '01463044022059e8e9839a02d2a0b2585e2267400826f91e575eb27cb89485d2deab697c5a34022020d71b2d3caa8c0b003849a2cb4effdbfd32028357db335549a75c82dd329f8902'
+        }
+    */
 
 .. autofunction:: Wallet#generateKeystore
 

@@ -127,7 +127,8 @@ export declare class Wallet extends Signer {
      *
      * @example
      * // Initializing a wallet from mnemonic
-     * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
+     * const mnemonic = "hollow appear story text start mask salt social child ..."
+     * const wallet = await Wallet.fromMnemonic(mnemonic);
      *
      * @example
      * // Initializing a wallet from mnemonic with custom path
@@ -148,7 +149,8 @@ export declare class Wallet extends Signer {
      *
      * @example
      * // Initializing a wallet from mnemonic
-     * const wallet = Wallet.fromMnemonicSync("hollow appear story text start mask salt social child ...");
+     * const mnemonic = "hollow appear story text start mask salt social child ..."
+     * const wallet = Wallet.fromMnemonicSync();
      *
      * @example
      * // Initializing a wallet from mnemonic with custom path
