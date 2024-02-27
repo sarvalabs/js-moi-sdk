@@ -112,35 +112,35 @@ Properties
 .. code-block:: javascript
 
     console.log(wallet.address);
-    // OUTPUT >> "0x87925..."
+    >> "0x87925..."
 
 - ``publicKey`` - ``readonly`` ``string``: The public key of the wallet.
 
 .. code-block:: javascript
 
     console.log(wallet.publicKey);
-    // OUTPUT >> "038792..."
+    >> "038792..."
 
 - ``privateKey`` - ``readonly`` ``string``: The private key of the wallet. 
 
 .. code-block:: javascript
 
     console.log(wallet.privateKey);
-    // OUTPUT >> "0x87925..."
+    >> "0x87925..."
 
 - ``mnemonic`` - ``readonly`` ``string``: The mnemonic of the wallet.
 
 .. code-block:: javascript
 
     console.log(wallet.mnemonic);
-    // OUTPUT >> "hollow appear story text start mask salt social child ..."
+    >> "hollow appear story text start mask salt social child ..."
 
 - ``curve`` - ``readonly`` ``string``: The curve of the wallet.
 
 .. code-block:: javascript
 
     console.log(wallet.curve);
-    // OUTPUT >> "secp256k1"
+    >> "secp256k1"
 
 
 Methods
