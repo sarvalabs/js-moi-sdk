@@ -78,7 +78,7 @@ export abstract class Signer {
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
     private async checkInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
-        if( ixObject.type == null) {
+        if(ixObject.type == null) {
             ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
         }
 

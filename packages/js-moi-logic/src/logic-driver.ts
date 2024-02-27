@@ -16,7 +16,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     public readonly ephemeralState: EphemeralState;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: AbstractProvider)
+    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: AbstractProvider);
     constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
         super(logicId, manifest, arg)
         this.createState();
@@ -207,7 +207,7 @@ interface GetLogicDriver {
  * Returns a logic driver instance based on the given logic id.
  * 
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signerOrProvider - The signer or provider instance.
+ * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
  * @param {Options} options - The custom tesseract options for retrieving
  * 
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
@@ -223,6 +223,7 @@ export const getLogicDriver: GetLogicDriver = async <T extends Record<string, (.
         );
     }
 
+    // below check added for type safety
     return signerOrProvider instanceof Signer 
         ? new LogicDriver<T>(logicId, manifest, signerOrProvider)
         : new LogicDriver<T>(logicId, manifest, signerOrProvider);

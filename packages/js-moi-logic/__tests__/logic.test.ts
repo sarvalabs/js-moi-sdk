@@ -179,14 +179,16 @@ describe("Logic", () => {
 
         it("should return object when multiple values are returned", async () => {
             const values = await logic.routines.DoubleReturnValue(wallet.getAddress());
+            
+            expect(values).toBeDefined();
+
             const { symbol, supply } = values;
 
-            expect(values).toBeDefined();
             expect(typeof symbol).toBe('string');
             expect(typeof supply).toBe('number');
         });
 
-        it("should thrown exception in mutating routine call", async () => {
+        it("should throw an exception in mutating routine call", async () => {
             const amount = Math.floor(Math.random() * 1000);
             
             expect(async () => {
@@ -200,7 +202,7 @@ describe("Logic", () => {
             expect(symbol).toBe(SYMBOL);
         });
 
-        it("should throw error when reading from persistent storage with invalid key", async () => {
+        it("should throw an exception when reading from persistent storage with invalid key", async () => {
             const invalidKey = "invalid-key";
             
             expect(async () => {

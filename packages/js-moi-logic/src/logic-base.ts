@@ -1,5 +1,6 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload, type AbstractProvider } from "js-moi-providers";
+import type { AbstractProvider } from "js-moi-providers";
+import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";

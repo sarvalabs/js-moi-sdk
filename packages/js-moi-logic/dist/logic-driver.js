@@ -139,7 +139,7 @@ exports.LogicDriver = LogicDriver;
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signerOrProvider - The signer or provider instance.
+ * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
  * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
@@ -150,6 +150,7 @@ const getLogicDriver = async (logicId, signerOrProvider, options) => {
     if (typeof manifest !== "object") {
         js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
+    // below check added for type safety
     return signerOrProvider instanceof js_moi_signer_1.Signer
         ? new LogicDriver(logicId, manifest, signerOrProvider)
         : new LogicDriver(logicId, manifest, signerOrProvider);

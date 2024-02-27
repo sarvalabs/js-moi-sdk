@@ -231,8 +231,13 @@ Functions
     const logicDriver = await getLogicDriver(logicId, wallet);
 
 .. warning::
-    When the logic driver is initialized using a specific provider,
-    attempting to invoke a mutating routine will result in the SDK throwing an exception.
+    When the logic driver is initialized with a provider,
+    any attempt to execute a mutating routine will trigger the SDK to
+    raise an exception. The error message associated with this exception
+    will state: **"Mutating routine calls require a signer to be initialized"**.
+    Developers should ensure they should pass signer instance while
+    doing mutating routine calls to avoid encountering this exception.
+
 
 Usage
 ~~~~~
