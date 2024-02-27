@@ -93,11 +93,11 @@ class Signer {
             if (ixObject.fuel_price === 0) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid fuel price", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
             }
-        }
-        if (ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            const nonce = await this.getNonce({ tesseract_number: -1 });
-            if (ixObject.nonce < nonce) {
-                js_moi_utils_1.ErrorUtils.throwError("Invalid nonce", js_moi_utils_1.ErrorCode.NONCE_EXPIRED);
+            if (ixObject.nonce != null) {
+                const nonce = await this.getNonce({ tesseract_number: -1 });
+                if (ixObject.nonce < nonce) {
+                    js_moi_utils_1.ErrorUtils.throwError("Invalid nonce", js_moi_utils_1.ErrorCode.NONCE_EXPIRED);
+                }
             }
         }
     }
@@ -105,7 +105,7 @@ class Signer {
      * Prepares the interaction object by populating necessary fields and
      * performing validity checks.
      *
-     * @param {InteractionMethod} method - The method to prepare the interaction for.
+     * @param {InteractionMethod} method - The method for which the interaction is being prepared.
      * @param {InteractionObject} ixObject - The interaction object to prepare.
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is

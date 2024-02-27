@@ -43,7 +43,7 @@ export declare abstract class Signer {
      * Prepares the interaction object by populating necessary fields and
      * performing validity checks.
      *
-     * @param {InteractionMethod} method - The method to prepare the interaction for.
+     * @param {InteractionMethod} method - The method for which the interaction is being prepared.
      * @param {InteractionObject} ixObject - The interaction object to prepare.
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is

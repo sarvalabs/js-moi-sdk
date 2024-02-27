@@ -207,13 +207,13 @@ interface GetLogicDriver {
  * Returns a logic driver instance based on the given logic id.
  * 
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} value - The signer or provider instance.
+ * @param {Signer | AbstractProvider} signerOrProvider - The signer or provider instance.
  * @param {Options} options - The custom tesseract options for retrieving
  * 
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver: GetLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, value: Signer | AbstractProvider, options?: Options): Promise<LogicDriver<T>> => {
-    const provider = value instanceof Signer ? value.getProvider() : value;
+export const getLogicDriver: GetLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signerOrProvider: Signer | AbstractProvider, options?: Options): Promise<LogicDriver<T>> => {
+    const provider = signerOrProvider instanceof Signer ? signerOrProvider.getProvider() : signerOrProvider;
     const manifest = await provider.getLogicManifest(logicId, "JSON", options);
 
     if (typeof manifest !== "object") {
@@ -223,7 +223,7 @@ export const getLogicDriver: GetLogicDriver = async <T extends Record<string, (.
         );
     }
 
-    return value instanceof Signer 
-        ? new LogicDriver<T>(logicId, manifest, value)
-        : new LogicDriver<T>(logicId, manifest, value);
+    return signerOrProvider instanceof Signer 
+        ? new LogicDriver<T>(logicId, manifest, signerOrProvider)
+        : new LogicDriver<T>(logicId, manifest, signerOrProvider);
 }
