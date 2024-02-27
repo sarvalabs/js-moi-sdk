@@ -11,14 +11,14 @@ const MNEMONIC = "visa security tobacco hood forget rate exhibit habit deny good
 const INITIAL_SUPPLY = 100000000;
 const SYMBOL = "MOI";
 const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
-const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+const PATH = "m/44'/6174'/0'/0/1";
 const PROVIDER = new JsonRpcProvider(HOST);
 
 let wallet: Wallet;
 
 beforeAll(async () => {
-    wallet = new Wallet(PROVIDER);
-    await wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH);
+    wallet = await Wallet.fromMnemonic(MNEMONIC, PATH);
+    wallet.connect(PROVIDER);
 });
 
 it("should initialize the wallet", async () => {

@@ -128,9 +128,10 @@ applications on the MOI network.
     // Example
     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
+        const wallet = await Wallet.fromMnemonic(mnemonic);
         const provider = new JsonRpcProvider("http://localhost:1600/");
-        const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        wallet.connect(provider);
+
         return wallet;
     }
 
@@ -220,9 +221,11 @@ Functions
     // Example
     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
+        const wallet = await Wallet.fromMnemonic(mnemonic);
         const provider = new JsonRpcProvider("http://localhost:1600/");
-        const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        
+        wallet.connect(provider);
+
         return wallet;
     }
 
