@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
+const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
 const state_1 = require("./state");
@@ -11,8 +12,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     routines = {};
     persistentState;
     ephemeralState;
-    constructor(logicId, manifest, signer) {
-        super(logicId, manifest, signer);
+    constructor(logicId, manifest, arg) {
+        super(logicId, manifest, arg);
         this.createState();
         this.createRoutines();
     }
@@ -23,7 +24,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     createState() {
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.signer.getProvider());
+            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.provider);
             (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
     }
@@ -138,22 +139,20 @@ exports.LogicDriver = LogicDriver;
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer} signer - The signer or provider instance.
+ * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
  * @param {Options} options - The custom tesseract options for retrieving
- * logic manifest. (optional)
+ *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-const getLogicDriver = async (logicId, signer, options) => {
-    try {
-        const provider = signer.getProvider();
-        const manifest = await provider.getLogicManifest(logicId, "JSON", options);
-        if (typeof manifest === "object") {
-            return new LogicDriver(logicId, manifest, signer);
-        }
+const getLogicDriver = async (logicId, signerOrProvider, options) => {
+    const provider = signerOrProvider instanceof js_moi_signer_1.Signer ? signerOrProvider.getProvider() : signerOrProvider;
+    const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+    if (typeof manifest !== "object") {
         js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
-    catch (err) {
-        throw err;
-    }
+    // below check added for type safety
+    return signerOrProvider instanceof js_moi_signer_1.Signer
+        ? new LogicDriver(logicId, manifest, signerOrProvider)
+        : new LogicDriver(logicId, manifest, signerOrProvider);
 };
 exports.getLogicDriver = getLogicDriver;

@@ -53,7 +53,7 @@ export class JsonRpcProvider extends BaseProvider {
                 jsonrpc: "2.0",
                 id: 1
             };
-            
+
             const response = await fetch(this.host, {
                 method: 'POST',
                 body: JSON.stringify(payload),
