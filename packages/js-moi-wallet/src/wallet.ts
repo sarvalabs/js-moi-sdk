@@ -87,7 +87,7 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export class Wallet extends Signer {
-    constructor(key: Buffer, curve: string, mnemonic?: string) {
+    constructor(key: Buffer | string, curve: string) {
         try {
             super();
 
@@ -106,14 +106,13 @@ export class Wallet extends Signer {
             }
 
             const ecPrivKey = new elliptic.ec(curve);
-            const keyInBytes = bufferToUint8(key);
+            const keyInBytes = bufferToUint8(key instanceof Buffer ? key : Buffer.from(key, "hex"));
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
             pubKey = keyPair.getPublic(true, "hex");
 
             privateMapSet(this, __vault, {
                 _key: privKey,
-                _mnemonic: mnemonic,
                 _public: pubKey,
                 _curve: curve,
             });
@@ -333,7 +332,14 @@ export class Wallet extends Signer {
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(path ? path : MOI_DERIVATION_PATH);
 
-            return new Wallet(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1);
+
+            privateMapSet(wallet, __vault, {
+                ...privateMapGet(wallet, __vault),
+                _mnemonic: mnemonic,
+            })
+
+            return wallet
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
                 originalError: error,
@@ -368,7 +374,14 @@ export class Wallet extends Signer {
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(path ? path : MOI_DERIVATION_PATH);
 
-            return new Wallet(childNode.privateKey(), CURVE.SECP256K1, mnemonic);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1);
+
+            privateMapSet(wallet, __vault, {
+                ...privateMapGet(wallet, __vault),
+                _mnemonic: mnemonic,
+            });
+
+            return wallet
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
                 originalError: error,

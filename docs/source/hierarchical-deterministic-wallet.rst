@@ -78,7 +78,22 @@ Creating Instances
 
     .. code-block:: javascript
 
-        const keystore = { ... };
+        const keystore = {
+            "cipher": "aes-128-ctr",
+            "ciphertext": "...",
+            "cipherparams": {
+                "IV": "..."
+            },
+            "kdf": "scrypt",
+            "kdfparams": {
+                "n": 4096,
+                "r": 8,
+                "p": 1,
+                "dklen": 32,
+                "salt": "..."
+            },
+            "mac": "..."
+        };
         const password = "YOUR_PASSWORD_HERE";
 
         const wallet = await Wallet.fromKeystore(keystore, password);
@@ -92,15 +107,40 @@ Creating Instances
 Properties
 ======================
 
-- ``address`` - ``readonly`` ``string`` : The address of the wallet. 
+- ``address`` - ``readonly`` ``string`` : The address of the wallet.
 
-- ``publicKey`` - ``readonly`` ``string``: The public key of the wallet. 
+.. code-block:: javascript
+
+    console.log(wallet.address);
+    // OUTPUT: "0x87925..."
+
+- ``publicKey`` - ``readonly`` ``string``: The public key of the wallet.
+
+.. code-block:: javascript
+
+    console.log(wallet.publicKey);
+    // OUTPUT: "038792..."
 
 - ``privateKey`` - ``readonly`` ``string``: The private key of the wallet. 
 
-- ``mnemonic`` - ``readonly`` ``string``: The mnemonic of the wallet. 
+.. code-block:: javascript
 
-- ``curve`` - ``readonly`` ``string``: The curve of the wallet. 
+    console.log(wallet.privateKey);
+    // OUTPUT: "0x87925..."
+
+- ``mnemonic`` - ``readonly`` ``string``: The mnemonic of the wallet.
+
+.. code-block:: javascript
+
+    console.log(wallet.mnemonic);
+    // OUTPUT: "hollow appear story text start mask salt social child ..."
+
+- ``curve`` - ``readonly`` ``string``: The curve of the wallet.
+
+.. code-block:: javascript
+
+    console.log(wallet.curve);
+    // OUTPUT: "secp256k1"
 
 
 Methods
@@ -117,6 +157,7 @@ Methods
   const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
 
   const signature = wallet.sign(Buffer.from(message), algo);
+  // OUTPUT >> 0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee...
 
 .. autofunction:: Wallet#signInteraction
 

@@ -9,20 +9,18 @@ const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6
 
 describe("Wallet", () => {
     describe("constructor", () => {
-        test("instance create with mnemonic", async () => {
-            const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1, MNEMONIC);
+        test("instance create with private key (Buffer) and curve", async () => {
+            const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1);
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(isValidAddress(wallet.address)).toBeTruthy();
             expect(wallet.address).toBe(ADDRESS);
-            expect(wallet.mnemonic).toBe(MNEMONIC);
-            expect(wallet.curve).toBe(CURVE.SECP256K1);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
 
-        test("instance create with mnemonic and curve", async () => {
-            const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1);
+        test("instance create with private key (string) and curve", async () => {
+            const wallet = new Wallet(PRIVATE_KEY, CURVE.SECP256K1);
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
@@ -39,6 +37,8 @@ describe("Wallet", () => {
             expect(wallet.address).toBe(ADDRESS);
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic).toBe(MNEMONIC);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
         });
 
         test(Wallet.fromMnemonicSync.name, () => {
@@ -47,6 +47,8 @@ describe("Wallet", () => {
             expect(wallet.address).toBe(ADDRESS);
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic).toBe(MNEMONIC);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
 
         test(Wallet.createRandom.name, async () => {
@@ -55,6 +57,8 @@ describe("Wallet", () => {
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic.split(" ").length).toBe(12);
+            expect(wallet.privateKey).toBeDefined();
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
 
         test(Wallet.createRandomSync.name, () => {
@@ -63,7 +67,9 @@ describe("Wallet", () => {
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet).toBeDefined();
             expect(isValidAddress(wallet.address)).toBeTruthy();
+            expect(wallet.privateKey).toBeDefined();
             expect(wallet.mnemonic.split(" ").length).toBe(12);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
 
         test(Wallet.fromKeystore.name, async () => {
@@ -89,6 +95,8 @@ describe("Wallet", () => {
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
     });
 
