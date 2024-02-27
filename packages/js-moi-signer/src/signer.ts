@@ -4,6 +4,8 @@ import { SigType, SigningAlgorithms } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
+type InteractionMethod = "call" | "send" | "estimateFuel";
+
 /**
  * An abstract class representing a signer responsible for cryptographic 
  * activities like signing and verification.
@@ -71,21 +73,21 @@ export abstract class Signer {
     /**
      * Checks the validity of an interaction object by performing various checks.
      *
+     * @param {InteractionMethod} method - The method to be checked.
      * @param {InteractionObject} ixObject - The interaction object to be checked.
-     * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
-    private async checkInteraction(ixObject: InteractionObject): Promise<void> {
-        if(ixObject.type === undefined || ixObject.type === null) {
+    private async checkInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
+        if(ixObject.type == null) {
             ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
-        }
-
-        if(!isValidAddress(ixObject.sender)) {
-            ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
         if(ixObject.sender == null) {
             ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
+        }
+
+        if(!isValidAddress(ixObject.sender)) {
+            ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
         if(this.isInitialized() && ixObject.sender !== this.getAddress()) {
@@ -102,22 +104,24 @@ export abstract class Signer {
             }
         }
 
-        if(ixObject.fuel_price === undefined || ixObject.fuel_price === null) {
-            ErrorUtils.throwError("Fuel price is missing", ErrorCode.MISSING_ARGUMENT);
-        }
+        if (method === "send") {
+            if(ixObject.fuel_price == null) {
+                ErrorUtils.throwError("Fuel price is missing", ErrorCode.MISSING_ARGUMENT);
+            }
 
-        if(ixObject.fuel_limit === undefined || ixObject.fuel_limit === null) {
-            ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
-        }
+            if(ixObject.fuel_limit == null) {
+                ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
+            }
 
-        if(ixObject.fuel_limit === 0) {
-            ErrorUtils.throwError("Invalid fuel limit", ErrorCode.INTERACTION_UNDERPRICED);
-        }
+            if(ixObject.fuel_price === 0) {
+                ErrorUtils.throwError("Invalid fuel price", ErrorCode.INTERACTION_UNDERPRICED);
+            }
 
-        if(ixObject.nonce !== undefined || ixObject.nonce !== null) {
-            const nonce = await this.getNonce({ tesseract_number: -1 });
-            if(ixObject.nonce < nonce) {
-                ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
+            if(ixObject.nonce != null) {
+                const nonce = await this.getNonce({ tesseract_number: -1 });
+                if(ixObject.nonce < nonce) {
+                    ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
+                }
             }
         }
     }
@@ -126,19 +130,20 @@ export abstract class Signer {
      * Prepares the interaction object by populating necessary fields and 
      * performing validity checks.
      *
+     * @param {InteractionMethod} method - The method for which the interaction is being prepared.
      * @param {InteractionObject} ixObject - The interaction object to prepare.
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is 
      * an error during preparation.
      */
-    private async prepareInteraction(ixObject: InteractionObject): Promise<void> {
+    private async prepareInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
         if (!ixObject.sender) {
             ixObject.sender = this.getAddress();
         }
         
-        await this.checkInteraction(ixObject);
+        await this.checkInteraction(method, ixObject);
         
-        if (ixObject.nonce == null) {
+        if (method === "send" && ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }
     }
@@ -157,7 +162,7 @@ export abstract class Signer {
         // Get the provider
         const provider = this.getProvider();
 
-        await this.prepareInteraction(ixObject);
+        await this.prepareInteraction('call', ixObject);
 
         return await provider.call(ixObject as CallorEstimateIxObject)
     }
@@ -178,7 +183,7 @@ export abstract class Signer {
         // Get the provider
         const provider = this.getProvider();
 
-        await this.prepareInteraction(ixObject);
+        await this.prepareInteraction('estimateFuel', ixObject);
 
         return await provider.estimateFuel(ixObject as CallorEstimateIxObject)
     }
@@ -201,7 +206,7 @@ export abstract class Signer {
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
 
-            await this.prepareInteraction(ixObject);
+            await this.prepareInteraction('send', ixObject);
 
             // Sign the interaction object
             const ixRequest = this.signInteraction(ixObject, sigAlgo)

@@ -1,43 +1,178 @@
-import { JsonRpcProvider } from "js-moi-providers";
-import { AssetStandard } from "js-moi-utils";
-import { Wallet } from "../src/index";
+import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
+import { AssetStandard, isValidAddress } from "js-moi-utils";
+import { CURVE, Wallet } from "../src/index";
 
-describe("Test Wallet", () => {
-    let wallet: Wallet;
+const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
+const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
 
-    beforeAll(async () => {
-        const mnemonic = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
-        const derivationPath = "m/44'/6174'/0'/0/1";
-        const provider = new JsonRpcProvider("http://localhost:1600");
-        wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic, derivationPath);
+describe("Wallet", () => {
+    describe("constructor", () => {
+        test("instance is created with a private key (Buffer type) and a specified curve", async () => {
+            const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1);
+
+            expect(wallet).toBeDefined();
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+        });
+
+        test("Instance is created with a private key (String type) and a specified curve", async () => {
+            const wallet = new Wallet(PRIVATE_KEY, CURVE.SECP256K1);
+
+            expect(wallet).toBeDefined();
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+        });
     });
 
-    test("Sign Message", async () => {
-        const message = "Hello, MOI";
-        const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
-        const signature = wallet.sign(Buffer.from(message), sigAlgo);
-        expect(signature).toBe("0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402");
+    describe("Static methods", () => {
+        test(Wallet.fromMnemonic.name, async () => {
+            const wallet = await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH);
+
+            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet.mnemonic).toBe(MNEMONIC);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+        });
+
+        test(Wallet.fromMnemonicSync.name, () => {
+            const wallet =  Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+
+            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet.mnemonic).toBe(MNEMONIC);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+        });
+
+        test(Wallet.createRandom.name, async () => {
+            const wallet = await Wallet.createRandom();
+
+            expect(wallet).toBeDefined();
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet.mnemonic.split(" ").length).toBe(12);
+            expect(wallet.privateKey).toBeDefined();
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+        });
+
+        test(Wallet.createRandomSync.name, () => {
+            const wallet = Wallet.createRandomSync();
+
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet).toBeDefined();
+            expect(isValidAddress(wallet.address)).toBeTruthy();
+            expect(wallet.privateKey).toBeDefined();
+            expect(wallet.mnemonic.split(" ").length).toBe(12);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+        });
+
+        test(Wallet.fromKeystore.name, async () => {
+            const keystore = `{
+                        "cipher": "aes-128-ctr",
+                        "ciphertext": "b241d6a71004b0f73397e4e0e1a324ca7e06b314d7694a092e76c898b48d4d6c",
+                        "cipherparams": {
+                            "IV": "c7a6284851f604b70a483bdd18c16c5a"
+                        },
+                        "kdf": "scrypt",
+                        "kdfparams": {
+                            "n": 4096,
+                            "r": 8,
+                            "p": 1,
+                            "dklen": 32,
+                            "salt": "17584125264a5817c6c46fbbb86c1009815261975168b7edc2dd57b175470880"
+                        },
+                        "mac": "f7b658893365e6f787db31888859c0531f1434a12ba4a10e548ef869c3428780"
+                    }`;
+
+            const wallet = Wallet.fromKeystore(keystore, "password");
+
+            expect(wallet).toBeDefined();
+            expect(wallet.isInitialized()).toBe(true);
+            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+            expect(wallet.curve).toBe(CURVE.SECP256K1);
+        });
     });
 
-    test("Sign Interaction", async () => {
-        const ixObject = {
-            type: 3,
-            nonce: 0,
-            sender: "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b",
-            fuel_price: 1,
-            fuel_limit: 200,
-            payload: {
-                standard: AssetStandard.MAS0,
-                symbol: "SIG",
-                supply: 1248577
-            }
-        }
-        const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"]
-        const ixArgs = wallet.signInteraction(ixObject, sigAlgo)
-        expect(ixArgs).toEqual({
-            ix_args: "0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f06336363616160534947130d41",
-            signature: "0147304502210089d5c9125fbc605eaa7c51ba1157ed774896cc02483992bb9b3180555ba20c1a02202aad27b8c6ce498a9ce6167924b6286fb13865ec9d9e3767d32b8c6a250b3e9e02"
-        })
+    describe("Instance methods", () => {
+        let wallet: Wallet;
+
+        beforeEach(() => {
+            wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+        });
+
+        test("sign", () => {
+            const message = "Hello, MOI";
+            const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+            const signature = wallet.sign(Buffer.from(message), algo);
+
+            expect(signature).toBe(
+                "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
+            );
+        });
+
+        test("signInteraction", () => {
+            const ixObject = {
+                type: 3,
+                nonce: 0,
+                sender: wallet.address,
+                fuel_price: 1,
+                fuel_limit: 200,
+                payload: {
+                    standard: AssetStandard.MAS0,
+                    symbol: "SIG",
+                    supply: 1248577,
+                },
+            };
+
+            const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+            const ixArgs = wallet.signInteraction(ixObject, algo);
+
+            expect(ixArgs).toBeDefined();
+            expect(ixArgs).toMatchObject<InteractionRequest>({
+                ix_args: expect.any(String),
+                signature: expect.any(String),
+            });
+            expect(ixArgs.ix_args).toEqual(
+                "0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f06336363616160534947130d41"
+            );
+        });
+
+        test("address", () => {
+            expect(wallet.address).toBe(ADDRESS);
+        });
+
+        test("isInitialized", () => {
+            expect(wallet.isInitialized()).toBe(true);
+        });
+
+        test("mnemonic", () => {
+            expect(wallet.mnemonic).toBe(MNEMONIC);
+        });
+
+        test("privateKey", () => {
+            expect(wallet.privateKey).toBe(PRIVATE_KEY);
+        });
+
+        test("connect", () => {
+            const provider = new VoyageProvider("babylon");
+
+            wallet.connect(provider);
+
+            expect(wallet.provider).toBe(provider);
+        });
+
+        test("generateKeystore", () => {
+            const keystore = wallet.generateKeystore("password");
+
+            expect(keystore).toBeDefined();
+            expect(keystore).not.toBeNull();
+        });
     });
-})
+});

@@ -128,9 +128,10 @@ applications on the MOI network.
     // Example
     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
+        const wallet = await Wallet.fromMnemonic(mnemonic);
         const provider = new JsonRpcProvider("http://localhost:1600/");
-        const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        wallet.connect(provider);
+
         return wallet;
     }
 
@@ -220,15 +221,26 @@ Functions
     // Example
     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";
+        const wallet = await Wallet.fromMnemonic(mnemonic);
         const provider = new JsonRpcProvider("http://localhost:1600/");
-        const wallet = new Wallet(provider);
-        await wallet.fromMnemonic(mnemonic);
+        
+        wallet.connect(provider);
+
         return wallet;
     }
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
     const wallet = await initWallet();
     const logicDriver = await getLogicDriver(logicId, wallet);
+
+.. warning::
+    When the logic driver is initialized with a provider,
+    any attempt to execute a mutating routine will trigger the SDK to
+    raise an exception. The error message associated with this exception
+    will state: **"Mutating routine calls require a signer to be initialized"**.
+    Developers should ensure they should pass signer instance while
+    doing mutating routine calls to avoid encountering this exception.
+
 
 Usage
 ~~~~~

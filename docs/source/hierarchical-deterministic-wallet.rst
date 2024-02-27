@@ -44,53 +44,41 @@ The ``Keystore`` interface represents a keystore object. It has the following pr
 
 Wallet
 ------
+
 A class representing a Hierarchical Deterministic Wallet that can sign interactions and manage accounts.
 
 .. code-block:: javascript
 
     // Example
-    const provider = new JsonRpcProvider("http://localhost:1600");
-    const wallet = new Wallet(provider);
+    const mnemonic = "hollow appear story text start mask salt social child ...";
 
-Methods
-~~~~~~~
+    const wallet = await Wallet.fromMnemonic(mnemonic);
 
-.. autofunction:: Wallet#load
 
-.. code-block:: javascript
+Creating Instances
+======================
 
-    // Example
-    const privateKey = Buffer.from("...")
-    wallet.load(privateKey, "secp256k1")
+- Create a wallet instance from private key
 
-.. autofunction:: Wallet#isInitialized
+    .. code-block:: javascript
 
-.. code-block:: javascript
+        const privateKey = "0x...";
 
-    // Example
-    const isInitialized = wallet.isInitialized();
-    console.log(isInitialized)
+        const wallet = new Wallet(privateKey, CURVE.SECP256K1);
+  
+-  Create a wallet instance from a mnemonic
 
-    >> true
+    .. code-block:: javascript
 
-.. autofunction:: Wallet#createRandom
+        const mnemonic = "hollow appear story text start mask salt social child ...";
 
-.. code-block:: javascript
+        const wallet = await Wallet.fromMnemonic(mnemonic);
 
-    // Example
-    await wallet.createRandom();
+- Create a wallet instance from JSON keystore
 
-.. autofunction:: Wallet#generateKeystore
+    .. code-block:: javascript
 
-.. code-block:: javascript
-
-    // Example
-    const keystore = await wallet.generateKeystore("CZ%90$DI");
-    console.log(keystore);
-
-    // Output
-    /*
-        {
+        const keystore = `{
             "cipher": "aes-128-ctr",
             "ciphertext": "...",
             "cipherparams": {
@@ -98,115 +86,83 @@ Methods
             },
             "kdf": "scrypt",
             "kdfparams": {
-                ...
+                "n": 4096,
+                "r": 8,
+                "p": 1,
+                "dklen": 32,
+                "salt": "..."
             },
             "mac": "..."
-        }
-    */
+        }`;
+        const password = "YOUR_PASSWORD_HERE";
 
-.. autofunction:: Wallet#fromMnemonic
+        const wallet = await Wallet.fromKeystore(keystore, password);
 
-.. code-block:: javascript
+- Create a wallet instance from a random mnemonic
 
-    // Example
-    const mnemonic = "hollow appear story text start mask salt social child ...";
-    const path = "m/44'/7567'/0'/0/1";
-    await wallet.fromMnemonic(mnemonic, path);
+    .. code-block:: javascript
 
-.. autofunction:: Wallet#fromKeystore
+        const wallet = await Wallet.createRandom();
 
-.. code-block:: javascript
+Properties
+======================
 
-    // Example
-    const keystore = {
-        "cipher": "aes-128-ctr",
-        "ciphertext": "...",
-        "cipherparams": {
-            "IV": "..."
-        },
-        "kdf": "scrypt",
-        "kdfparams": {
-            ...
-        },
-        "mac": "..."
-    }
-    wallet.fromKeystore(keystore, "CZ%90$DI");
-
-.. autofunction:: Wallet#mnemonic
+- ``address`` - ``readonly`` ``string`` : The address of the wallet.
 
 .. code-block:: javascript
 
-    // Example
-    const mnemonic = wallet.mnemonic();
-    console.log(mnemonic);
+    console.log(wallet.address);
+    >> "0x87925..."
 
-    >> hollow appear story text start mask salt social child ...
-
-.. autofunction:: Wallet#privateKey
+- ``publicKey`` - ``readonly`` ``string``: The public key of the wallet.
 
 .. code-block:: javascript
 
-    // Example
-    const privateKey = wallet.privateKey();
-    console.log(privateKey);
+    console.log(wallet.publicKey);
+    >> "038792..."
 
-    >> 084384...
-
-.. autofunction:: Wallet#publicKey
+- ``privateKey`` - ``readonly`` ``string``: The private key of the wallet. 
 
 .. code-block:: javascript
 
-    // Example
-    const publicKey = wallet.publicKey();
-    console.log(publicKey);
+    console.log(wallet.privateKey);
+    >> "0x87925..."
 
-    >> 038792...
-
-.. autofunction:: Wallet#curve
+- ``mnemonic`` - ``readonly`` ``string``: The mnemonic of the wallet.
 
 .. code-block:: javascript
 
-    // Example
-    const curve = wallet.curve();
-    console.log(curve);
+    console.log(wallet.mnemonic);
+    >> "hollow appear story text start mask salt social child ..."
 
-    >> secp256k1
-
-.. autofunction:: Wallet#getAddress
+- ``curve`` - ``readonly`` ``string``: The curve of the wallet.
 
 .. code-block:: javascript
 
-    // Example
-    const address = wallet.getAddress();
-    console.log(address);
+    console.log(wallet.curve);
+    >> "secp256k1"
 
-    >> 0x87925...
 
-.. autofunction:: Wallet#connect
-
-.. code-block:: javascript
-
-    // Example
-    const provider = new VoyageProvider("babylon");
-    wallet.connect(provider);
+Methods
+======================
 
 .. autofunction:: Wallet#sign
 
+
+**Example**
+
 .. code-block:: javascript
 
-    // Example
-    const message = "Hello, MOI";
-    const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
-    const signature = wallet.sign(Buffer.from(message), sigAlgo);
-    console.log(signature);
+  const message = "Hello, MOI";
+  const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
 
-    >> 0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402
+  const signature = wallet.sign(Buffer.from(message), algo);
+  >> "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee..."
 
 .. autofunction:: Wallet#signInteraction
 
 .. code-block:: javascript
 
-    // Example
     const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
     const interaction = {
         type: IxType.ASSET_CREATE,
@@ -224,10 +180,22 @@ Methods
     const signedIxn = wallet.signInteraction(interaction, sigAlgo);
     console.log(signedIxn)
     
-    // Ouptut
+    // Output
     /*
         {
             ix_args:'0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f063363636161604d4f49130d41',
             signature: '01463044022059e8e9839a02d2a0b2585e2267400826f91e575eb27cb89485d2deab697c5a34022020d71b2d3caa8c0b003849a2cb4effdbfd32028357db335549a75c82dd329f8902'
         }
     */
+
+.. autofunction:: Wallet#generateKeystore
+
+.. autofunction:: Wallet.fromMnemonic
+
+.. autofunction:: Wallet.fromMnemonicSync
+
+.. autofunction:: Wallet.fromKeystore
+
+.. autofunction:: Wallet.createRandom
+
+.. autofunction:: Wallet.createRandomSync

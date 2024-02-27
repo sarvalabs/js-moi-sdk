@@ -4,8 +4,9 @@ import { JsonRpcProvider } from "../../src/jsonrpc-provider";
 
 export const initializeWallet = async (provider: JsonRpcProvider, mnemonic: string): Promise<Signer> => {
     const derivationPath = "m/44'/6174'/0'/0/1";
-    const wallet = new Wallet(provider);
-    await wallet.fromMnemonic(mnemonic, derivationPath);
+    
+    const wallet =  await Wallet.fromMnemonic(mnemonic, derivationPath);
+    wallet.connect(provider);
 
     return wallet;
 }

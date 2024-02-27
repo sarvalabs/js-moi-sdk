@@ -5,22 +5,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
+const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 const DEFAULT_FUEL_PRICE = 1;
-const DEFAULT_FUEL_LIMIT = 5000;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
- class for logic-related operations.
+ * class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
  */
 class LogicBase extends element_descriptor_1.default {
     signer;
+    provider;
     manifestCoder;
-    constructor(manifest, signer) {
+    constructor(manifest, arg) {
         super(manifest.elements);
         this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
-        this.signer = signer;
+        this.connect(arg);
     }
     /**
      * Returns the logic ID associated with the LogicBase instance.
@@ -31,12 +32,17 @@ class LogicBase extends element_descriptor_1.default {
         return "";
     }
     /**
-     * Updates the signer or establishes a connection with a new signer.
+     * Updates the signer and provider instances for the LogicBase instance.
      *
-     * @param {Signer} signer -  The updated signer object or the new signer object to connect.
+     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
      */
-    connect(signer) {
-        this.signer = signer;
+    connect(arg) {
+        if (arg instanceof js_moi_signer_1.Signer) {
+            this.signer = arg;
+            this.provider = arg.getProvider();
+            return;
+        }
+        this.provider = arg;
     }
     /**
      * Executes a routine with the given arguments and returns the interaction response.
@@ -56,7 +62,7 @@ class LogicBase extends element_descriptor_1.default {
         const { type, params } = this.processArguments(ixObject, method, option);
         switch (type) {
             case "call": {
-                const response = await this.signer.call(params);
+                const response = await this.provider.call(params);
                 return {
                     ...response,
                     result: this.processResult.bind(this, {
@@ -66,9 +72,15 @@ class LogicBase extends element_descriptor_1.default {
                 };
             }
             case "estimate": {
-                return this.signer.estimateFuel(params);
+                if (!this.signer?.isInitialized()) {
+                    js_moi_utils_1.ErrorUtils.throwError("Mutating routine calls require a signer to be initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+                }
+                return this.provider.estimateFuel(params);
             }
             case "send": {
+                if (!this.signer?.isInitialized()) {
+                    js_moi_utils_1.ErrorUtils.throwError("Mutating routine calls require a signer to be initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+                }
                 const response = await this.signer.sendInteraction(params);
                 return {
                     ...response,
@@ -144,8 +156,6 @@ class LogicBase extends element_descriptor_1.default {
             arguments: args
         };
         ixObject.call = async () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
@@ -154,8 +164,6 @@ class LogicBase extends element_descriptor_1.default {
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : DEFAULT_FUEL_LIMIT;
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "estimate", option);
         };
         ixObject.createPayload = () => {

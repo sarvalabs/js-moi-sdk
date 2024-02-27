@@ -34,8 +34,8 @@ export declare abstract class Signer {
     /**
      * Checks the validity of an interaction object by performing various checks.
      *
+     * @param {InteractionMethod} method - The method to be checked.
      * @param {InteractionObject} ixObject - The interaction object to be checked.
-     * @param {number | bigint} nonce - The nonce (interaction count) for comparison.
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
     private checkInteraction;
@@ -43,6 +43,7 @@ export declare abstract class Signer {
      * Prepares the interaction object by populating necessary fields and
      * performing validity checks.
      *
+     * @param {InteractionMethod} method - The method for which the interaction is being prepared.
      * @param {InteractionObject} ixObject - The interaction object to prepare.
      * @returns {Promise<void>} A Promise that resolves once the preparation is complete.
      * @throws {Error} if the interaction object is not valid or if there is

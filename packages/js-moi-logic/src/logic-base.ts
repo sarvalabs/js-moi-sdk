@@ -1,4 +1,5 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import type { AbstractProvider } from "js-moi-providers";
 import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
@@ -7,22 +8,22 @@ import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
 
 const DEFAULT_FUEL_PRICE = 1;
-const DEFAULT_FUEL_LIMIT = 5000;
 
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base 
- class for logic-related operations.
+ * class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export abstract class LogicBase extends ElementDescriptor {
-    protected signer: Signer;
+    protected signer?: Signer;
+    protected provider: AbstractProvider;
     protected manifestCoder: ManifestCoder;
 
-    constructor(manifest: LogicManifest.Manifest, signer: Signer) {
+    constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
         super(manifest.elements)
 
         this.manifestCoder = new ManifestCoder(this.elements, this.classDefs)
-        this.signer = signer;
+        this.connect(arg)
     }
 
     // abstract methods to be implemented by subclasses
@@ -43,12 +44,17 @@ export abstract class LogicBase extends ElementDescriptor {
     }
 
     /**
-     * Updates the signer or establishes a connection with a new signer.
+     * Updates the signer and provider instances for the LogicBase instance.
      * 
-     * @param {Signer} signer -  The updated signer object or the new signer object to connect.
+     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
      */
-    public connect(signer: Signer): void {
-        this.signer = signer;
+    public connect(arg: AbstractProvider | Signer): void {
+        if (arg instanceof Signer) {
+            this.signer = arg;
+            this.provider = arg.getProvider();
+            return;
+        }
+        this.provider = arg;
     }
 
     /**
@@ -71,10 +77,10 @@ export abstract class LogicBase extends ElementDescriptor {
         }
 
         const { type, params } = this.processArguments(ixObject, method, option);
-     
+
         switch (type) {
             case "call": {
-                const response = await this.signer.call(params as CallorEstimateIxObject);
+                const response = await this.provider.call(params as CallorEstimateIxObject);
 
                 return {
                     ...response,
@@ -85,9 +91,23 @@ export abstract class LogicBase extends ElementDescriptor {
                 };
             }
             case "estimate": {
-                return this.signer.estimateFuel(params as CallorEstimateIxObject);
+                if (!this.signer?.isInitialized()) {
+                    ErrorUtils.throwError(
+                        "Mutating routine calls require a signer to be initialized.",
+                        ErrorCode.NOT_INITIALIZED
+                    );
+                }
+                
+                return this.provider.estimateFuel(params as CallorEstimateIxObject);
             }
             case "send": {
+                if (!this.signer?.isInitialized()) {
+                    ErrorUtils.throwError(
+                        "Mutating routine calls require a signer to be initialized.",
+                        ErrorCode.NOT_INITIALIZED
+                    );
+                }
+
                 const response = await this.signer.sendInteraction(params);
 
                 return {
@@ -175,9 +195,6 @@ export abstract class LogicBase extends ElementDescriptor {
         } as LogicIxObject
 
         ixObject.call = async (): Promise<InteractionCallResponse> => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
-
             return this.executeRoutine(ixObject, "call", option) as Promise<InteractionCallResponse>
         }
 
@@ -189,9 +206,6 @@ export abstract class LogicBase extends ElementDescriptor {
         }
         
         ixObject.estimateFuel = (): Promise<number|bigint> => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : DEFAULT_FUEL_LIMIT;
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
-
             return this.executeRoutine(ixObject, "estimate", option) as Promise<number | bigint>
         }
 
