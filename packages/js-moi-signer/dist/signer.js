@@ -116,7 +116,7 @@ class Signer {
             ixObject.sender = this.getAddress();
         }
         await this.checkInteraction(method, ixObject);
-        if (ixObject.nonce == null) {
+        if (method === "send" && ixObject.nonce == null) {
             ixObject.nonce = await this.getNonce();
         }
     }
