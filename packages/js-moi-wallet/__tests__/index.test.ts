@@ -9,7 +9,7 @@ const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6
 
 describe("Wallet", () => {
     describe("constructor", () => {
-        test("instance create with private key (Buffer) and curve", async () => {
+        test("instance is created with a private key (Buffer type) and a specified curve", async () => {
             const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1);
 
             expect(wallet).toBeDefined();
@@ -19,7 +19,7 @@ describe("Wallet", () => {
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
 
-        test("instance create with private key (string) and curve", async () => {
+        test("Instance is created with a private key (String type) and a specified curve", async () => {
             const wallet = new Wallet(PRIVATE_KEY, CURVE.SECP256K1);
 
             expect(wallet).toBeDefined();
@@ -77,15 +77,15 @@ describe("Wallet", () => {
                         "cipher": "aes-128-ctr",
                         "ciphertext": "b241d6a71004b0f73397e4e0e1a324ca7e06b314d7694a092e76c898b48d4d6c",
                         "cipherparams": {
-                        "IV": "c7a6284851f604b70a483bdd18c16c5a"
+                            "IV": "c7a6284851f604b70a483bdd18c16c5a"
                         },
                         "kdf": "scrypt",
                         "kdfparams": {
-                        "n": 4096,
-                        "r": 8,
-                        "p": 1,
-                        "dklen": 32,
-                        "salt": "17584125264a5817c6c46fbbb86c1009815261975168b7edc2dd57b175470880"
+                            "n": 4096,
+                            "r": 8,
+                            "p": 1,
+                            "dklen": 32,
+                            "salt": "17584125264a5817c6c46fbbb86c1009815261975168b7edc2dd57b175470880"
                         },
                         "mac": "f7b658893365e6f787db31888859c0531f1434a12ba4a10e548ef869c3428780"
                     }`;
