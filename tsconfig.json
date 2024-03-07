@@ -40,6 +40,12 @@
     },
     {
       "path": "./packages/js-moi-manifest/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/js-moi-hdnode/tsconfig.cjs.json"
+    },
+    {
+      "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
     }
   ],
   "exclude": ["node_modules", "**/__tests__/**"]
