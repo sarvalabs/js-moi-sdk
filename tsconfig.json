@@ -76,6 +76,12 @@
         },
         {
             "path": "./packages/js-moi-logic/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi/tsconfig.cjs.json"
+        }, 
+        {
+            "path": "./packages/js-moi/tsconfig.esm.json"
         }
     ],
     "exclude": ["node_modules", "**/__tests__/**"]

@@ -7,3 +7,4 @@ export * from "js-moi-signer";
 export * from "js-moi-bip39";
 export * from "js-moi-constants";
 export * from "js-moi-utils";
+//# sourceMappingURL=index.d.ts.map

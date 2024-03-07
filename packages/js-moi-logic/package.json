@@ -2,8 +2,8 @@
   "name": "js-moi-logic",
   "version": "0.3.0-rc3",
   "description": "Module to interact with MOI Logic Objects.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./lib.cjs/index.js",
+  "module": "./lib.esm/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

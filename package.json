@@ -3,8 +3,8 @@
   "version": "0.3.0-rc3",
   "description": "JavaScript library to interact with MOI Protocol via RPC API",
   "private": true,
-  "main": "packages/js-moi/dist/index.js",
-  "types": "packages/js-moi/dist/index.d.ts",
+  "main": "packages/js-moi/lib.cjs/index.js",
+  "module": "packages/js-moi/lib.esm/index.js",
   "scripts": {
     "build": "tsc -b && rm -rf dist",
     "watch": "tsc -b -w",

@@ -23,3 +23,4 @@ __exportStar(require("js-moi-signer"), exports);
 __exportStar(require("js-moi-bip39"), exports);
 __exportStar(require("js-moi-constants"), exports);
 __exportStar(require("js-moi-utils"), exports);
+//# sourceMappingURL=index.js.map
