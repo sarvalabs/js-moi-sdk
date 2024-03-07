@@ -1,18 +1,20 @@
 import BN from "bn.js";
 import { Buffer } from "buffer";
 
+export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];
+
 /**
  * Converts a number, bigint, or BN instance to a hexadecimal string representation.
  * If the input value is not already a BN instance, it is converted to one.
  * Throws an error if the input value is a negative number.
  *
- * @param {number | bigint | BN} value - The value to convert to a hexadecimal string.
+ * @param {NumberLike} value - The value to convert to a hexadecimal string.
  * @returns {string} - The hexadecimal string representation of the value.
  * @throws {Error} If the input value is a negative number.
  */
-export const numToHex = (value: number | bigint | BN): string => {
+export const numToHex = (value: NumberLike): string => {
     if (!BN.isBN(value)) {
-        value = new BN(value)   
+        value = new BN(value as Exclude<NumberLike, bigint>)   
     }
     
     if (value.lt(new BN(0))) {
@@ -28,13 +30,13 @@ export const numToHex = (value: number | bigint | BN): string => {
  * Converts a number, bigint, or BN instance to a quantity string representation.
  * The quantity string is prefixed with "0x" and is obtained by calling `numToHex` function.
  *
- * @param {number | bigint | BN} value - The value to convert to a quantity string.
+ * @param {NumberLike} value - The value to convert to a quantity string.
  * @returns {string} - The quantity string representation of the value.
  * @throws {Error} If an error occurs during the conversion.
  */
-export const toQuantity = (value: number | bigint | BN): string => {
+export const toQuantity = (value: NumberLike): string => {
   try {
-    return "0x" + numToHex(value)
+    return "0x" + numToHex(value as Exclude<NumberLike, bigint>)
   } catch(err) {
     throw err
   }
