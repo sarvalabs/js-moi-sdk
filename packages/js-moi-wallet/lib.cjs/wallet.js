@@ -427,3 +427,4 @@ class Wallet extends js_moi_signer_1.Signer {
     }
 }
 exports.Wallet = Wallet;
+//# sourceMappingURL=wallet.js.map

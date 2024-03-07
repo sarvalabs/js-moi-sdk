@@ -9,3 +9,4 @@ function ErrPrivateSet() {
     throw new TypeError("attempted to set private field on non-instance");
 }
 exports.ErrPrivateSet = ErrPrivateSet;
+//# sourceMappingURL=errors.js.map

@@ -186,3 +186,4 @@ export declare class Wallet extends Signer {
      */
     static createRandomSync(): Wallet;
 }
+//# sourceMappingURL=wallet.d.ts.map

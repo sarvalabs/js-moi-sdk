@@ -1,70 +1,76 @@
 {
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "types": ["node", "jest"],
-    "lib": ["ES6", "ESNext", "DOM"],
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "declaration": true,
-    "pretty": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "declarationMap": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false,
-    "noImplicitReturns": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "noUnusedLocals": true
-  },
-  "ts-node": {
-    "esm": true
-  },
-  "references": [
-    {
-      "path": "./packages/js-moi-providers/tsconfig.cjs.json"
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "types": ["node", "jest"],
+        "lib": ["ES6", "ESNext", "DOM"],
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "declaration": true,
+        "pretty": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "declarationMap": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": false,
+        "noImplicitReturns": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "noUnusedLocals": true
     },
-    {
-      "path": "./packages/js-moi-providers/tsconfig.esm.json"
+    "ts-node": {
+        "esm": true
     },
-    {
-      "path": "./packages/js-moi-utils/tsconfig.cjs.json"
-    },
-    {
-      "path": "./packages/js-moi-utils/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
-    },
-    {
-      "path": "./packages/js-moi-manifest/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/js-moi-hdnode/tsconfig.cjs.json"
-    },
-    {
-      "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/js-moi-constants/tsconfig.cjs.json"
-    },
-    {
-      "path": "./packages/js-moi-constants/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/js-moi-signer/tsconfig.cjs.json"
-    },
-    {
-      "path": "./packages/js-moi-signer/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/js-moi-bip39/tsconfig.cjs.json"
-    },
-    {
-      "path": "./packages/js-moi-bip39/tsconfig.esm.json"
-    }
-  ],
-  "exclude": ["node_modules", "**/__tests__/**"]
+    "references": [
+        {
+            "path": "./packages/js-moi-providers/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-providers/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-utils/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-utils/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-manifest/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-hdnode/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-constants/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-constants/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-signer/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-signer/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-bip39/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-bip39/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-wallet/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-wallet/tsconfig.esm.json"
+        }
+    ],
+    "exclude": ["node_modules", "**/__tests__/**"]
 }

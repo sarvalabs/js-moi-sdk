@@ -2,8 +2,8 @@
   "name": "js-moi-wallet",
   "version": "0.3.0-rc3",
   "description": "Module to interact with the MOI accounts.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./lib.cjs/index.js",
+  "module": "./lib.esm/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Buffer } from "buffer";
 import { Keystore } from "../types/keystore";
 /**
@@ -37,3 +38,4 @@ export declare const encryptKeystoreData: (data: Buffer, password: string) => Ke
  * @throws {Error} If the cipher is not supported or the password is incorrect.
  */
 export declare const decryptKeystoreData: (keystore: Keystore, password: string) => Buffer;
+//# sourceMappingURL=keystore.d.ts.map

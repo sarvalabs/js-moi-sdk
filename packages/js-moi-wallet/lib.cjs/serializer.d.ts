@@ -7,3 +7,4 @@ import { InteractionObject } from "js-moi-providers";
  * @throws {Error} if there is an error during encoding or if the payload is missing.
  */
 export declare const serializeIxObject: (ixObject: InteractionObject) => Uint8Array;
+//# sourceMappingURL=serializer.d.ts.map

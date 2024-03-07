@@ -135,3 +135,4 @@ const serializeIxObject = (ixObject) => {
     }
 };
 exports.serializeIxObject = serializeIxObject;
+//# sourceMappingURL=serializer.js.map
