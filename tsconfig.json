@@ -70,6 +70,12 @@
         },
         {
             "path": "./packages/js-moi-wallet/tsconfig.esm.json"
+        },
+        {
+            "path": "./packages/js-moi-logic/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-logic/tsconfig.esm.json"
         }
     ],
     "exclude": ["node_modules", "**/__tests__/**"]

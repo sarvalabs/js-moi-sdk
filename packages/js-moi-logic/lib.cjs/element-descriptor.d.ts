@@ -76,3 +76,4 @@ export default class ElementDescriptor {
      */
     getMethodElement(methodName: string): LogicManifest.Element;
 }
+//# sourceMappingURL=element-descriptor.d.ts.map

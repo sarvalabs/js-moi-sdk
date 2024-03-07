@@ -77,3 +77,4 @@ export declare class EphemeralState {
      */
     get(label: string): Promise<void>;
 }
+//# sourceMappingURL=state.d.ts.map

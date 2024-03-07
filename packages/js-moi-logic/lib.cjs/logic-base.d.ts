@@ -68,3 +68,4 @@ export declare abstract class LogicBase extends ElementDescriptor {
      */
     protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicIxRequest;
 }
+//# sourceMappingURL=logic-base.d.ts.map

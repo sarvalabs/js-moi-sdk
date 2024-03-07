@@ -173,3 +173,4 @@ class LogicBase extends element_descriptor_1.default {
     }
 }
 exports.LogicBase = LogicBase;
+//# sourceMappingURL=logic-base.js.map

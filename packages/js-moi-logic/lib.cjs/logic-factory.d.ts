@@ -49,3 +49,4 @@ export declare class LogicFactory extends LogicBase {
      */
     deploy(builderName: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse>;
 }
+//# sourceMappingURL=logic-factory.d.ts.map

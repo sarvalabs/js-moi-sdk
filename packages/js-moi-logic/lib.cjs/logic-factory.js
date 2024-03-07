@@ -97,3 +97,4 @@ class LogicFactory extends logic_base_1.LogicBase {
     }
 }
 exports.LogicFactory = LogicFactory;
+//# sourceMappingURL=logic-factory.js.map

@@ -84,3 +84,4 @@ export declare abstract class LogicDescriptor extends LogicBase {
      */
     hasEphemeralState(): [number, boolean];
 }
+//# sourceMappingURL=logic-descriptor.d.ts.map

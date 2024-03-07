@@ -53,3 +53,4 @@ export declare class LogicId {
      */
     getAddress(): string | null;
 }
+//# sourceMappingURL=logic-id.d.ts.map

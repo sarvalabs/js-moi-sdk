@@ -124,3 +124,4 @@ class LogicDescriptor extends logic_base_1.LogicBase {
     }
 }
 exports.LogicDescriptor = LogicDescriptor;
+//# sourceMappingURL=logic-descriptor.js.map
