@@ -99,3 +99,4 @@ export declare abstract class Signer {
      */
     verify(message: Uint8Array, signature: string | Uint8Array, publicKey: string | Uint8Array): boolean;
 }
+//# sourceMappingURL=signer.d.ts.map

@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const js_moi_utils_1 = require("js-moi-utils");
-class Signature {
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+export default class Signature {
     prefix;
     digest;
     extraData;
@@ -15,7 +13,7 @@ class Signature {
     unmarshall(signature) {
         let sig;
         if (typeof signature === "string") {
-            sig = (0, js_moi_utils_1.hexToBytes)(signature);
+            sig = hexToBytes(signature);
         }
         else {
             sig = signature;
@@ -39,7 +37,7 @@ class Signature {
      */
     getSigByte() {
         if (typeof this.prefix[0] !== "number") {
-            js_moi_utils_1.ErrorUtils.throwError("Invalid signature byte.", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
+            ErrorUtils.throwError("Invalid signature byte.", ErrorCode.INVALID_SIGNATURE);
         }
         return this.prefix[0];
     }
@@ -58,7 +56,7 @@ class Signature {
     }
     serialize() {
         if (this.name === "") {
-            js_moi_utils_1.ErrorUtils.throwError("Signature is not initialized", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+            ErrorUtils.throwError("Signature is not initialized", ErrorCode.NOT_INITIALIZED);
         }
         const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
         const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);
@@ -79,4 +77,4 @@ class Signature {
         }
     }
 }
-exports.default = Signature;
+//# sourceMappingURL=signature.js.map

@@ -52,6 +52,12 @@
     },
     {
       "path": "./packages/js-moi-constants/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/js-moi-signer/tsconfig.cjs.json"
+    },
+    {
+      "path": "./packages/js-moi-signer/tsconfig.esm.json"
     }
   ],
   "exclude": ["node_modules", "**/__tests__/**"]

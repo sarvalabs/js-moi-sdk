@@ -36,3 +36,4 @@ export default class ECDSA_S256 implements SigType {
      */
     verify(message: Uint8Array, signature: Signature, publicKey: Uint8Array): boolean;
 }
+//# sourceMappingURL=ecdsa.d.ts.map

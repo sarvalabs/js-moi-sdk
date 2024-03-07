@@ -36,3 +36,4 @@ export default class Signature implements ISignature {
      */
     private getSignatureName;
 }
+//# sourceMappingURL=signature.d.ts.map

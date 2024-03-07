@@ -214,3 +214,4 @@ class Signer {
     }
 }
 exports.Signer = Signer;
+//# sourceMappingURL=signer.js.map
