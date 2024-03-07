@@ -410,3 +410,4 @@ export declare class Schema {
      */
     parseFields(fields: LogicManifest.TypeField[]): PoloSchema;
 }
+//# sourceMappingURL=schema.d.ts.map

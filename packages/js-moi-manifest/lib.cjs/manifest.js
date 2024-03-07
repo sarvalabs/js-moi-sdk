@@ -222,3 +222,4 @@ class ManifestCoder {
     }
 }
 exports.ManifestCoder = ManifestCoder;
+//# sourceMappingURL=manifest.js.map

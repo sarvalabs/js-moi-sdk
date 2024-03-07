@@ -83,3 +83,4 @@ export declare class ManifestCoder {
      */
     decodeState(data: string, field: string, fields: LogicManifest.TypeField[]): unknown | null;
 }
+//# sourceMappingURL=manifest.d.ts.map
