@@ -46,6 +46,12 @@
     },
     {
       "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/js-moi-constants/tsconfig.cjs.json"
+    },
+    {
+      "path": "./packages/js-moi-constants/tsconfig.esm.json"
     }
   ],
   "exclude": ["node_modules", "**/__tests__/**"]
