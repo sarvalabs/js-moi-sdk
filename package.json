@@ -6,10 +6,11 @@
   "main": "packages/js-moi/lib.cjs/index.js",
   "module": "packages/js-moi/lib.esm/index.js",
   "scripts": {
-    "clean": "rm -rf dist **/lib.cjs **/lib.esm **/lib",
+    "build:clean": "find . -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} + && npm run build",
     "build": "tsc -b && rm -rf dist",
     "watch": "tsc -b -w",
-    "test": "jest --env=node --colors --verbose"
+    "test": "jest --env=node --colors --verbose",
+    "docs": "cd docs && make html"
   },
   "repository": {
     "type": "git",

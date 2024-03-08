@@ -8,5 +8,5 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "lib.esm/.tsbuildinfo"
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*", "./wordlists/*.json"]
 }

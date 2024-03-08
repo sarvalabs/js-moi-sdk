@@ -6,5 +6,5 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "lib.cjs/.tsbuildinfo"
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "./wordlists/*.json"]
 }
