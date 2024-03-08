@@ -35,7 +35,6 @@
     "ts-jest": "^29.0.5"
   },
   "dependencies": {
-    "@noble/ciphers": "^0.5.1",
     "@noble/hashes": "^1.1.5",
     "@noble/secp256k1": "^1.7.1",
     "@scure/bip32": "^1.3.3",
@@ -46,7 +45,6 @@
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
     "cross-fetch": "^4.0.0",
-    "crypto": "npm:crypto-browserify",
     "elliptic": "^6.5.4",
     "js-polo": "^0.1.3",
     "keccak": "^3.0.3",
