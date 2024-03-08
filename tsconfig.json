@@ -9,7 +9,7 @@
         "declaration": true,
         "pretty": true,
         "sourceMap": true,
-        "outDir": "dist",
+        "outDir": "./dist",
         "declarationMap": true,
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": true,

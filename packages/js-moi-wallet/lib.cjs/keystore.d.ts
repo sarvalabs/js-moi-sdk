@@ -9,7 +9,7 @@ import { Keystore } from "../types/keystore";
  * @param {Buffer} iv - Initialization vector.
  * @returns {Buffer} Encrypted data.
  */
-export declare const aesCTRWithXOR: (key: Buffer, input: Buffer, iv: Buffer) => Buffer;
+export declare const aesCTRWithXOR: (key: Uint8Array, input: Uint8Array, iv: Uint8Array) => Uint8Array;
 /**
  * Derives the key for a keystore based on the provided password and
  * KDF parameters.
@@ -28,7 +28,7 @@ export declare const getKDFKeyForKeystore: (keystore: Keystore, password: string
  * @param {string} password - Password for encryption.
  * @returns {Keystore} Encrypted keystore object.
  */
-export declare const encryptKeystoreData: (data: Buffer, password: string) => Keystore;
+export declare const encryptKeystoreData: (data: Buffer | Uint8Array, password: string) => Keystore;
 /**
  * Decrypts the keystore data using the provided password.
  *

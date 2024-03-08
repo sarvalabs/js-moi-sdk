@@ -4,10 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decryptKeystoreData = exports.encryptKeystoreData = exports.getKDFKeyForKeystore = exports.aesCTRWithXOR = void 0;
-const crypto_1 = __importDefault(require("crypto"));
-const keccak_1 = __importDefault(require("keccak"));
+const scrypt_1 = require("@noble/hashes/scrypt");
+const utils_1 = require("@noble/hashes/utils");
+const aes_js_1 = require("aes-js");
 const buffer_1 = require("buffer");
 const js_moi_utils_1 = require("js-moi-utils");
+const keccak_1 = __importDefault(require("keccak"));
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
  *
@@ -17,9 +19,7 @@ const js_moi_utils_1 = require("js-moi-utils");
  * @returns {Buffer} Encrypted data.
  */
 const aesCTRWithXOR = (key, input, iv) => {
-    const aesBlock = crypto_1.default.createCipheriv('aes-128-ctr', key, iv);
-    const output = aesBlock.update(input);
-    return buffer_1.Buffer.concat([output, aesBlock.final()]);
+    return new aes_js_1.CTR(key, iv).encrypt(input);
 };
 exports.aesCTRWithXOR = aesCTRWithXOR;
 /**
@@ -39,7 +39,7 @@ const getKDFKeyForKeystore = (keystore, password) => {
         const n = keystore.kdfparams.n;
         const r = keystore.kdfparams.r;
         const p = keystore.kdfparams.p;
-        return crypto_1.default.scryptSync(pwBuf, salt, dkLen, { N: n, r, p });
+        return buffer_1.Buffer.from((0, scrypt_1.scrypt)(pwBuf, salt, { N: n, r, p, dkLen }));
     }
     js_moi_utils_1.ErrorUtils.throwError(`Unsupported KDF: ${keystore.kdf}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
 };
@@ -53,23 +53,24 @@ exports.getKDFKeyForKeystore = getKDFKeyForKeystore;
  * @returns {Keystore} Encrypted keystore object.
  */
 const encryptKeystoreData = (data, password) => {
-    const salt = crypto_1.default.randomBytes(32);
-    const derivedKey = crypto_1.default.scryptSync(password, salt, 32, {
+    const salt = (0, utils_1.randomBytes)(32);
+    const derivedKey = (0, scrypt_1.scrypt)(password, salt, {
         N: 4096,
         r: 8,
         p: 1,
+        dkLen: 32,
     });
     const encryptKey = derivedKey.slice(0, 16);
-    const iv = crypto_1.default.randomBytes(16);
+    const iv = (0, utils_1.randomBytes)(16);
     const cipherText = (0, exports.aesCTRWithXOR)(encryptKey, data, iv);
-    const mac = new keccak_1.default('keccak256')
+    const mac = new keccak_1.default("keccak256")
         .update(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]))
         .digest();
     return {
         cipher: 'aes-128-ctr',
-        ciphertext: cipherText.toString('hex'),
+        ciphertext: (0, js_moi_utils_1.bytesToHex)(cipherText),
         cipherparams: {
-            IV: iv.toString('hex'),
+            IV: (0, js_moi_utils_1.bytesToHex)(iv),
         },
         kdf: 'scrypt',
         kdfparams: {
@@ -77,9 +78,9 @@ const encryptKeystoreData = (data, password) => {
             r: 8,
             p: 1,
             dklen: 32,
-            salt: salt.toString('hex'),
+            salt: (0, js_moi_utils_1.bytesToHex)(salt),
         },
-        mac: mac.toString('hex'),
+        mac: (0, js_moi_utils_1.bytesToHex)(mac),
     };
 };
 exports.encryptKeystoreData = encryptKeystoreData;
@@ -105,7 +106,7 @@ const decryptKeystoreData = (keystore, password) => {
     if (!calculatedMAC.equals(mac)) {
         js_moi_utils_1.ErrorUtils.throwError("Could not decrypt key with the given password");
     }
-    return (0, exports.aesCTRWithXOR)(derivedKey.slice(0, 16), cipherText, iv);
+    return buffer_1.Buffer.from((0, exports.aesCTRWithXOR)(derivedKey.slice(0, 16), cipherText, iv));
 };
 exports.decryptKeystoreData = decryptKeystoreData;
 //# sourceMappingURL=keystore.js.map

@@ -27,8 +27,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = exports.CURVE = void 0;
+const utils_1 = require("@noble/hashes/utils");
 const buffer_1 = require("buffer");
-const crypto_1 = require("crypto");
 const elliptic_1 = __importDefault(require("elliptic"));
 const bip39 = __importStar(require("js-moi-bip39"));
 const js_moi_constants_1 = require("js-moi-constants");
@@ -400,7 +400,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static async createRandom() {
         try {
-            const _random16Bytes = (0, crypto_1.randomBytes)(16);
+            const _random16Bytes = buffer_1.Buffer.from((0, utils_1.randomBytes)(16));
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             return await Wallet.fromMnemonic(mnemonic);
         }
@@ -417,7 +417,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static createRandomSync() {
         try {
-            const _random16Bytes = (0, crypto_1.randomBytes)(16);
+            const _random16Bytes = buffer_1.Buffer.from((0, utils_1.randomBytes)(16));
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             return Wallet.fromMnemonicSync(mnemonic);
         }

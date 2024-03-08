@@ -1,5 +1,5 @@
+import { randomBytes } from "@noble/hashes/utils";
 import { Buffer } from "buffer";
-import { randomBytes } from "crypto";
 import elliptic from "elliptic";
 import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
@@ -371,7 +371,7 @@ export class Wallet extends Signer {
      */
     static async createRandom() {
         try {
-            const _random16Bytes = randomBytes(16);
+            const _random16Bytes = Buffer.from(randomBytes(16));
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             return await Wallet.fromMnemonic(mnemonic);
         }
@@ -388,7 +388,7 @@ export class Wallet extends Signer {
      */
     static createRandomSync() {
         try {
-            const _random16Bytes = randomBytes(16);
+            const _random16Bytes = Buffer.from(randomBytes(16));
             var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
             return Wallet.fromMnemonicSync(mnemonic);
         }
