@@ -1,9 +1,9 @@
 import { scrypt } from "@noble/hashes/scrypt";
+import { keccak_256 } from "@noble/hashes/sha3";
 import { randomBytes } from "@noble/hashes/utils";
 import { CTR } from "aes-js";
 import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils, bytesToHex } from "js-moi-utils";
-import keccak from "keccak";
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
  *
@@ -55,9 +55,7 @@ export const encryptKeystoreData = (data, password) => {
     const encryptKey = derivedKey.slice(0, 16);
     const iv = randomBytes(16);
     const cipherText = aesCTRWithXOR(encryptKey, data, iv);
-    const mac = new keccak("keccak256")
-        .update(Buffer.concat([derivedKey.slice(16, 32), cipherText]))
-        .digest();
+    const mac = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     return {
         cipher: 'aes-128-ctr',
         ciphertext: bytesToHex(cipherText),
@@ -91,9 +89,8 @@ export const decryptKeystoreData = (keystore, password) => {
     const iv = Buffer.from(keystore.cipherparams.IV, 'hex');
     const cipherText = Buffer.from(keystore.ciphertext, 'hex');
     const derivedKey = getKDFKeyForKeystore(keystore, password);
-    const hash = new keccak('keccak256');
-    hash.update(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
-    const calculatedMAC = Buffer.from(hash.digest());
+    const hash = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
+    const calculatedMAC = Buffer.from(hash);
     if (!calculatedMAC.equals(mac)) {
         ErrorUtils.throwError("Could not decrypt key with the given password");
     }

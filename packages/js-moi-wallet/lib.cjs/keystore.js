@@ -1,15 +1,12 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decryptKeystoreData = exports.encryptKeystoreData = exports.getKDFKeyForKeystore = exports.aesCTRWithXOR = void 0;
 const scrypt_1 = require("@noble/hashes/scrypt");
+const sha3_1 = require("@noble/hashes/sha3");
 const utils_1 = require("@noble/hashes/utils");
 const aes_js_1 = require("aes-js");
 const buffer_1 = require("buffer");
 const js_moi_utils_1 = require("js-moi-utils");
-const keccak_1 = __importDefault(require("keccak"));
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
  *
@@ -63,9 +60,7 @@ const encryptKeystoreData = (data, password) => {
     const encryptKey = derivedKey.slice(0, 16);
     const iv = (0, utils_1.randomBytes)(16);
     const cipherText = (0, exports.aesCTRWithXOR)(encryptKey, data, iv);
-    const mac = new keccak_1.default("keccak256")
-        .update(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]))
-        .digest();
+    const mac = (0, sha3_1.keccak_256)(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     return {
         cipher: 'aes-128-ctr',
         ciphertext: (0, js_moi_utils_1.bytesToHex)(cipherText),
@@ -100,9 +95,8 @@ const decryptKeystoreData = (keystore, password) => {
     const iv = buffer_1.Buffer.from(keystore.cipherparams.IV, 'hex');
     const cipherText = buffer_1.Buffer.from(keystore.ciphertext, 'hex');
     const derivedKey = (0, exports.getKDFKeyForKeystore)(keystore, password);
-    const hash = new keccak_1.default('keccak256');
-    hash.update(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
-    const calculatedMAC = buffer_1.Buffer.from(hash.digest());
+    const hash = (0, sha3_1.keccak_256)(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
+    const calculatedMAC = buffer_1.Buffer.from(hash);
     if (!calculatedMAC.equals(mac)) {
         js_moi_utils_1.ErrorUtils.throwError("Could not decrypt key with the given password");
     }

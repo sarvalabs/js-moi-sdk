@@ -1,9 +1,9 @@
 import { scrypt } from "@noble/hashes/scrypt";
+import { keccak_256 } from "@noble/hashes/sha3";
 import { randomBytes } from "@noble/hashes/utils";
 import { CTR } from "aes-js";
 import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils, bytesToHex } from "js-moi-utils";
-import keccak from "keccak";
 import { Keystore } from "../types/keystore";
 
 /**
@@ -66,9 +66,7 @@ export const encryptKeystoreData = (data: Buffer | Uint8Array, password: string)
     const encryptKey = derivedKey.slice(0, 16);
     const iv = randomBytes(16);
     const cipherText = aesCTRWithXOR(encryptKey, data, iv);
-    const mac = new keccak("keccak256")
-        .update(Buffer.concat([derivedKey.slice(16, 32), cipherText]))
-        .digest();
+    const mac = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
 
     return {
         cipher: 'aes-128-ctr',
@@ -108,9 +106,8 @@ export const decryptKeystoreData = (keystore: Keystore, password: string): Buffe
     const iv = Buffer.from(keystore.cipherparams.IV, 'hex');
     const cipherText = Buffer.from(keystore.ciphertext, 'hex');
     const derivedKey = getKDFKeyForKeystore(keystore, password);
-    const hash = new keccak('keccak256');
-    hash.update(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
-    const calculatedMAC = Buffer.from(hash.digest());
+    const hash = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
+    const calculatedMAC = Buffer.from(hash);
     
     if (!calculatedMAC.equals(mac)) {
         ErrorUtils.throwError(
