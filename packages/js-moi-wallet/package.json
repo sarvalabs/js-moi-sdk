@@ -29,11 +29,9 @@
     "js-moi-constants": "^0.3.0-rc3",
     "js-moi-utils": "^0.3.0-rc3",
     "js-moi-bip39": "^0.3.0-rc3",
-    "@noble/ciphers": "^0.5.1",
     "@noble/hashes": "^1.1.5",
     "buffer": "^6.0.3",
     "aes-js": "^4.0.0-beta.5",
-    "crypto": "npm:crypto-browserify",
     "elliptic": "^6.5.4",
     "js-polo": "^0.1.3",
     "keccak": "^3.0.3"
