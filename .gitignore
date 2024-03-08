@@ -2,5 +2,7 @@ build
 node_modules
 package-lock.json
 .DS_Store
-**/tsconfig.tsbuildinfo
-**/*.js.map
+**/.tsbuildinfo
+**/src/**/*.js.map
+**/__tests__/**/*.js.map
+dist
