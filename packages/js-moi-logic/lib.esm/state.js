@@ -1,5 +1,5 @@
+import { blake2b } from "@noble/hashes/blake2b";
 import { ErrorCode, ErrorUtils, encodeToString } from "js-moi-utils";
-import { blake2b } from 'blakejs';
 export var ContextStateKind;
 (function (ContextStateKind) {
     ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
@@ -85,7 +85,9 @@ export class PersistentState {
      * @returns {string} The hash of the slot as a string.
      */
     slotHash(slot) {
-        const hash = blake2b(new Uint8Array([slot]), null, 32);
+        const hash = blake2b(new Uint8Array([slot]), {
+            dkLen: 32,
+        });
         return encodeToString(hash);
     }
     /**

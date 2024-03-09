@@ -1,6 +1,5 @@
-import { LogicManifest } from "js-moi-manifest";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { AbstractProvider } from "js-moi-providers";
-import { ManifestCoder } from "js-moi-manifest";
 export declare enum ContextStateKind {
     PersistentState = 0,
     EphemeralState = 1

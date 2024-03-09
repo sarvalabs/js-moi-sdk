@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EphemeralState = exports.PersistentState = exports.ContextStateMatrix = exports.ContextStateKind = void 0;
+const blake2b_1 = require("@noble/hashes/blake2b");
 const js_moi_utils_1 = require("js-moi-utils");
-const blakejs_1 = require("blakejs");
 var ContextStateKind;
 (function (ContextStateKind) {
     ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
@@ -89,7 +89,9 @@ class PersistentState {
      * @returns {string} The hash of the slot as a string.
      */
     slotHash(slot) {
-        const hash = (0, blakejs_1.blake2b)(new Uint8Array([slot]), null, 32);
+        const hash = (0, blake2b_1.blake2b)(new Uint8Array([slot]), {
+            dkLen: 32,
+        });
         return (0, js_moi_utils_1.encodeToString)(hash);
     }
     /**

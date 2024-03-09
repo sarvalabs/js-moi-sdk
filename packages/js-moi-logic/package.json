@@ -27,7 +27,7 @@
     "js-moi-utils": "^0.3.0-rc3",
     "js-moi-providers": "^0.3.0-rc3",
     "js-moi-signer": "^0.3.0-rc3",
-    "blakejs": "^1.2.1",
+    "@noble/hashes": "^1.1.5",
     "buffer": "^6.0.3"
   }
 }
