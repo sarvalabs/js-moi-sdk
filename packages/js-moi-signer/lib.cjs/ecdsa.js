@@ -26,11 +26,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const blake2b_1 = __importDefault(require("blake2b"));
-const js_moi_utils_1 = require("js-moi-utils");
+const blake2b_1 = require("@noble/hashes/blake2b");
 const hmac_1 = require("@noble/hashes/hmac");
-const nobleECC = __importStar(require("@noble/secp256k1"));
 const sha256_1 = require("@noble/hashes/sha256");
+const nobleECC = __importStar(require("@noble/secp256k1"));
+const js_moi_utils_1 = require("js-moi-utils");
 const signature_1 = __importDefault(require("./signature"));
 const utils_1 = require("./utils");
 /**
@@ -69,8 +69,9 @@ class ECDSA_S256 {
         else {
             _signingKey = signingKey;
         }
-        // Hashing raw message with blake2b to get 32 bytes digest 
-        const messageHash = (0, blake2b_1.default)(256 / 8).update(message).digest();
+        const messageHash = (0, blake2b_1.blake2b)(message, {
+            dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
+        });
         const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false });
         const digest = {
             _r: (0, utils_1.toDER)(sigParts.slice(0, 32)),
@@ -102,7 +103,9 @@ class ECDSA_S256 {
         verificationKey.set(signature.Extra());
         verificationKey.set(publicKey, signature.Extra().length);
         let derSignature = signature.Digest();
-        const messageHash = (0, blake2b_1.default)(256 / 8).update(message).digest();
+        const messageHash = (0, blake2b_1.blake2b)(message, {
+            dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
+        });
         const _digest = (0, utils_1.bip66Decode)(derSignature);
         const sigDigest = {
             _r: (0, utils_1.fromDER)(_digest._r),

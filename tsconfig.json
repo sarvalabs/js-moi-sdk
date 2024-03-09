@@ -9,7 +9,7 @@
         "declaration": true,
         "pretty": true,
         "sourceMap": true,
-        "outDir": "./dist",
+        "outDir": "dist",
         "declarationMap": true,
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": true,
@@ -17,7 +17,9 @@
         "noImplicitReturns": true,
         "resolveJsonModule": true,
         "experimentalDecorators": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "incremental": true,
+        "tsBuildInfoFile": "dist/.tsbuildinfo"
     },
     "ts-node": {
         "esm": true
@@ -84,5 +86,5 @@
             "path": "./packages/js-moi/tsconfig.esm.json"
         }
     ],
-    "exclude": ["node_modules", "**/__tests__/**"]
+    "exclude": ["node_modules", "**/__tests__/**", "dist"]
 }

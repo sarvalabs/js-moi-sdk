@@ -1,10 +1,10 @@
-import Blake2b from "blake2b";
-import { hexToBytes } from "js-moi-utils";
+import { blake2b } from "@noble/hashes/blake2b";
 import { hmac } from '@noble/hashes/hmac';
-import * as nobleECC from '@noble/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
+import * as nobleECC from '@noble/secp256k1';
+import { hexToBytes } from "js-moi-utils";
 import Signature from "./signature";
-import { toDER, bip66Encode, bip66Decode, JoinSignature, fromDER } from "./utils";
+import { JoinSignature, bip66Decode, bip66Encode, fromDER, toDER } from "./utils";
 /**
  * Setting the `hmacSha256Sync` with custom hashing logic
  * @param key
@@ -41,8 +41,9 @@ export default class ECDSA_S256 {
         else {
             _signingKey = signingKey;
         }
-        // Hashing raw message with blake2b to get 32 bytes digest 
-        const messageHash = Blake2b(256 / 8).update(message).digest();
+        const messageHash = blake2b(message, {
+            dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
+        });
         const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false });
         const digest = {
             _r: toDER(sigParts.slice(0, 32)),
@@ -74,7 +75,9 @@ export default class ECDSA_S256 {
         verificationKey.set(signature.Extra());
         verificationKey.set(publicKey, signature.Extra().length);
         let derSignature = signature.Digest();
-        const messageHash = Blake2b(256 / 8).update(message).digest();
+        const messageHash = blake2b(message, {
+            dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
+        });
         const _digest = bip66Decode(derSignature);
         const sigDigest = {
             _r: fromDER(_digest._r),
