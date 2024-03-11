@@ -6,11 +6,12 @@
   "main": "packages/js-moi/lib.cjs/index.js",
   "module": "packages/js-moi/lib.esm/index.js",
   "scripts": {
-    "build:clean": "find . -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} + && npm run build",
+    "clean": "find . -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
     "build": "tsc -b && rm -rf dist",
+    "build:clean": "npm run clean && npm run build",
     "watch": "tsc -b -w",
     "test": "jest --env=node --colors --verbose",
-    "docs": "cd docs && make html"
+    "docs": "make -C docs html"
   },
   "repository": {
     "type": "git",
@@ -50,5 +51,6 @@
     "js-polo": "^0.1.3",
     "stream": "npm:stream-browserify",
     "websocket": "^1.0.34"
-  }
+  },
+  "sideEffects": false
 }
