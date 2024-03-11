@@ -1,4 +1,6 @@
-module.exports = {
+import { Config } from "jest"
+
+const configuration: Config = {
     projects: [
         {
             displayName: 'js-moi-bip39',
@@ -45,3 +47,6 @@ module.exports = {
     testTimeout: 700000,
     maxConcurrency: 1
 }
+
+
+export default configuration

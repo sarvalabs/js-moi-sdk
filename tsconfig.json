@@ -86,5 +86,6 @@
             "path": "./packages/js-moi/tsconfig.esm.json"
         }
     ],
-    "exclude": ["node_modules", "**/__tests__/**", "dist"]
+    "include": ["packages/**/*.ts"],
+    "exclude": ["node_modules", "**/__tests__/**" ,"dist"]
 }
