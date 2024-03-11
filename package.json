@@ -11,6 +11,7 @@
     "build:clean": "npm run clean && npm run build",
     "watch": "tsc -b -w",
     "test": "jest --env=node --colors --verbose",
+    "test:coverage": "jest --coverage --env=node --colors --verbose",
     "docs": "make -C docs html"
   },
   "repository": {

@@ -6,3 +6,4 @@ package-lock.json
 **/src/**/*.js.map
 **/__tests__/**/*.js.map
 dist
+coverage
