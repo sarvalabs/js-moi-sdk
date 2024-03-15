@@ -85,18 +85,17 @@ export class HDNode {
   }
 
   /**
-   * Retrieves the extended public key associated with the HDNode.
-   * 
-   * @returns {string} The extended public key.
+   * Returns the extended private key associated with this HDNode.
+   * @returns The string representation of the extended private key.
    */
   getExtendedPrivateKey(): string {
     return this.node.privateExtendedKey;
   }
 
+  
   /**
-   * Retrieves the extended public key associated with the HDNode.
-   *
-   * @returns {string} The extended public key.
+   * Returns the extended public key for the HDNode.
+   * @returns The string representation of the extended public key.
    */
   getExtendedPublicKey(): string {
     return this.node.publicExtendedKey;

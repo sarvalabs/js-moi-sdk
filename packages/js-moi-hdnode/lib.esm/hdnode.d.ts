@@ -39,15 +39,13 @@ export declare class HDNode {
      */
     deriveChild(index: number): HDNode;
     /**
-     * Retrieves the extended public key associated with the HDNode.
-     *
-     * @returns {string} The extended public key.
+     * Returns the extended private key associated with this HDNode.
+     * @returns The string representation of the extended private key.
      */
     getExtendedPrivateKey(): string;
     /**
-     * Retrieves the extended public key associated with the HDNode.
-     *
-     * @returns {string} The extended public key.
+     * Returns the extended public key for the HDNode.
+     * @returns The string representation of the extended public key.
      */
     getExtendedPublicKey(): string;
     /**
