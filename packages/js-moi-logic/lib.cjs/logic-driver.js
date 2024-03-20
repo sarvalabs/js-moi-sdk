@@ -24,7 +24,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     createState() {
         const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
         if (persistentStateExists) {
-            const persistentState = new state_1.PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.provider);
+            const persistentState = new state_1.PersistentState(this.logicId.hex(), this, this.manifestCoder, this.provider);
             (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
     }

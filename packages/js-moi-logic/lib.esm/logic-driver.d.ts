@@ -5,7 +5,7 @@ import { IxType } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { PersistentState, type EphemeralState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */

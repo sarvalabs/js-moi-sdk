@@ -1,0 +1,1 @@
+{"version":3,"file":"ephemeral-state.js","sourceRoot":"","sources":["../../src/state/ephemeral-state.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AAErD;;;GAGG;AACH,MAAM,OAAO,cAAc;IACvB,gBAAe,CAAC;IAEhB;;;;;;OAMG;IACI,KAAK,CAAC,GAAG,CAAC,KAAa;QAC1B,UAAU,CAAC,UAAU,CACjB,2DAA2D,EAC3D,SAAS,CAAC,qBAAqB,CAClC,CAAA;IACL,CAAC;CACJ"}
