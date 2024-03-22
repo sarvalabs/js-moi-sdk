@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"
 ];
@@ -9,7 +10,7 @@ const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
 };
 const isArray = (type) => {
-    return (/^\[(\d*)\]/).test(type);
+    return (ARRAY_MATCHER_REGEX).test(type);
 };
 const isMap = (type) => {
     return type.startsWith("map");
@@ -246,19 +247,15 @@ class Schema {
      * @returns {string} The extracted array data type.
      * @throws {Error} If the array type is invalid or unsupported.
      */
-    extractArrayDataType(dataType) {
-        let endIndex = 0;
-        for (let i = 0; i < dataType.length; i++) {
-            if (dataType.charAt(i) == "]") {
-                endIndex = i + 1;
-                break;
-            }
+    static extractArrayDataType(dataType) {
+        if (!isArray(dataType)) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid array type: The provided data type is not an array.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        const type = dataType.slice(endIndex);
-        if (type) {
-            return type;
+        const type = dataType.replace(ARRAY_MATCHER_REGEX, '');
+        if (type === "") {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        js_moi_utils_1.ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        return type;
     }
     /**
      * Extracts the key and value data types from the provided map data type string.
@@ -267,7 +264,7 @@ class Schema {
      * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
-    extractMapDataType(dataType) {
+    static extractMapDataType(dataType) {
         let brackets = [];
         let startIndex = 0;
         let endIndex = 0;
@@ -300,7 +297,7 @@ class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
-    convertPrimitiveDataType(type) {
+    static convertPrimitiveDataType(type) {
         switch (type) {
             case "null":
                 return "null";
@@ -327,19 +324,19 @@ class Schema {
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
-    parseClassFields(className) {
-        const ptr = this.classDefs.get(className);
+    static parseClassFields(className, classDef, elements) {
+        const ptr = classDef.get(className);
         if (ptr === undefined) {
             js_moi_utils_1.ErrorUtils.throwError(`Invalid class name: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        const element = this.elements.get(ptr);
+        const element = elements.get(ptr);
         const schema = {
             kind: "struct",
             fields: {}
         };
         element.data = element.data;
         Object.values(element.data.fields).forEach(field => {
-            schema.fields[field.label] = this.parseDataType(field.type);
+            schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements);
         });
         return schema;
     }
@@ -352,31 +349,31 @@ class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
-    parseDataType(type) {
+    static parseDataType(type, classDef, elements) {
         switch (true) {
             case isPrimitiveType(type):
                 return {
-                    kind: this.convertPrimitiveDataType(type)
+                    kind: Schema.convertPrimitiveDataType(type)
                 };
             case isArray(type):
-                const values = this.extractArrayDataType(type);
+                const values = Schema.extractArrayDataType(type);
                 return {
                     kind: "array",
                     fields: {
-                        values: this.parseDataType(values)
+                        values: Schema.parseDataType(values, classDef, elements)
                     }
                 };
             case isMap(type):
-                const [key, value] = this.extractMapDataType(type);
+                const [key, value] = Schema.extractMapDataType(type);
                 return {
                     kind: "map",
                     fields: {
-                        keys: this.parseDataType(key),
-                        values: this.parseDataType(value)
+                        keys: Schema.parseDataType(key, classDef, elements),
+                        values: Schema.parseDataType(value, classDef, elements)
                     }
                 };
-            case isClass(type, this.classDefs):
-                return this.parseClassFields(type);
+            case isClass(type, classDef):
+                return this.parseClassFields(type, classDef, elements);
             default:
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported data type: ${type}!`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
         }
@@ -400,7 +397,7 @@ class Schema {
             if (!field || !(field.label && field.type)) {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid field: Each field must have a label and a type.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
-            schema.fields[field.label] = this.parseDataType(field.type);
+            schema.fields[field.label] = Schema.parseDataType(field.type, this.classDefs, this.elements);
         });
         return schema;
     }

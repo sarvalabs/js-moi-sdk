@@ -1,5 +1,12 @@
+/// <reference types="node" />
 import BN from "bn.js";
 export type SlotHash = BN;
+export declare class StorageKey {
+    private value;
+    constructor(value: number | string | Buffer | Uint8Array | BN);
+    hex(): string;
+    toBuffer(): Buffer;
+}
 /**
  * Represents an accessor that provides access to a slot hash.
  */
@@ -10,8 +17,29 @@ export interface Accessor {
      * @param hash - The hash of the slot.
      * @returns The slot hash associated with the given hash.
      */
-    access(hash: SlotHash): SlotHash;
+    access(hash: StorageKey): StorageKey;
 }
+/**
+ * Represents an accessor provider that provides accessors.
+ */
+export interface AccessorProvider {
+    /**
+     * Retrieves the accessors.
+     * @returns An array of accessors.
+     */
+    getAccessors(): Accessor[];
+}
+/**
+ * Represents a interface that provides the type of the value present at slot hash.
+ */
+export interface StorageTypeProvider {
+    /**
+     * Gets the type of the slot hash.
+     * @returns The type of the slot hash as a string.
+     */
+    getStorageType(): string;
+}
+export type AccessorAndStorageProvider = AccessorProvider & StorageTypeProvider;
 /**
  * AbstractAccessor class provides a base implementation of the Accessor interface.
  */
@@ -21,14 +49,14 @@ export declare abstract class AbstractAccessor implements Accessor {
      * @param hash - The input Uint8Array to be hashed.
      * @returns The calculated sum256 hash as a Uint8Array.
      */
-    sum256(hash: Uint8Array): Uint8Array;
+    protected sum256(hash: Uint8Array): Uint8Array;
     /**
      * Abstract method that needs to be implemented by subclasses.
      * It defines the logic for accessing a SlotHash.
      * @param hash - The SlotHash to be accessed.
      * @returns The accessed SlotHash.
      */
-    abstract access(hash: SlotHash): SlotHash;
+    abstract access(hash: StorageKey): StorageKey;
 }
 /**
  * Represents a LengthAccessor class that extends the AbstractAccessor class.
@@ -36,30 +64,30 @@ export declare abstract class AbstractAccessor implements Accessor {
  * It generates slot hash for accessing the length of an Array/VArray or a Map.
  */
 export declare class LengthAccessor extends AbstractAccessor {
-    access(hash: SlotHash): SlotHash;
+    access(hash: StorageKey): StorageKey;
 }
 /**
  * Generates a slot hash for accessing the key of Map.
  */
 export declare class PropertyAccessor extends AbstractAccessor {
-    private label;
+    private key;
     /**
      * Creates a new instance of PropertyAccessor.
-     * @param label The label of the property.
+     * @param key The label of the property.
      */
-    constructor(label: string);
+    constructor(key: string);
     /**
-     * Polorizes the given label and returns it as a Uint8Array.
-     * @param label The label to polorize.
-     * @returns The polorized label as a Uint8Array.
+     * Polorizes the given key.
+     * @param key The key to polorize.
+     * @returns The polorized key as a bytes.
      */
-    polorizeKey(label: string): Uint8Array;
+    private polorizeKey;
     /**
      * Accesses the property with the given hash and returns the resulting hash.
      * @param hash The hash of the property.
      * @returns The resulting hash after accessing the property.
      */
-    access(hash: SlotHash): SlotHash;
+    access(hash: StorageKey): StorageKey;
 }
 /**
  * Represents an accessor for accessing elements in an array by index.
@@ -76,14 +104,30 @@ export declare class ArrayIndexAccessor extends AbstractAccessor {
      * @param hash The input hash.
      * @returns The updated hash after accessing the element.
      */
-    access(hash: SlotHash): SlotHash;
+    access(hash: StorageKey): StorageKey;
 }
 /**
- * Represents an accessor for accessing fields in a class by index.
+ * Represents an accessor for accessing fields of a class.
  */
 export declare class ClassFieldAccessor extends AbstractAccessor {
     private index;
     constructor(index: number);
-    access(hash: SlotHash): SlotHash;
+    access(hash: StorageKey): StorageKey;
 }
+/**
+ * Generates a slot hash based on the provided base and accessors.
+ *
+ * @param base - The base value for the slot hash.
+ * @param accessors - The accessors used to generate the slot hash.
+ * @returns The generated slot hash as a Uint8Array.
+ */
+export declare function generateStorageKey(base: number | StorageKey, ...accessors: Accessor[]): StorageKey;
+/**
+ * Generates a slot hash based on the provided base value and array of accessors.
+ *
+ * @param base - The base value for generating the slot hash.
+ * @param accessorsArray - An array of accessors used in generating the slot hash.
+ * @returns The generated slot hash as a Uint8Array.
+ */
+export declare function generateStorageKey(base: number | StorageKey, accessorsArray: Accessor[]): StorageKey;
 //# sourceMappingURL=accessor.d.ts.map

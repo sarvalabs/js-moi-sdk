@@ -1,5 +1,9 @@
-import { encodeToString, ErrorCode, ErrorUtils } from "js-moi-utils";
+import { Schema } from "js-moi-manifest";
+import { ErrorUtils, hexToBytes } from "js-moi-utils";
+import { Depolorizer } from "js-polo";
+import { generateStorageKey } from "./accessor";
 import { SlotAccessorBuilder } from "./accessor-builder";
+import { EntityBuilder } from "./entity-builder";
 /**
  * Represents persistent state functionality for a logic element.
  * Manages slots, types, and retrieval of persistent state values.
@@ -7,47 +11,27 @@ import { SlotAccessorBuilder } from "./accessor-builder";
 export class PersistentState {
     logicId;
     provider;
-    manifestCoder;
-    logicDescriptor;
-    constructor(logicId, logicDescriptor, manifestCoder, provider) {
-        this.logicId = logicId;
+    driver;
+    constructor(logic, provider) {
+        this.logicId = logic.getLogicId();
         this.provider = provider;
-        this.manifestCoder = manifestCoder;
-        this.logicDescriptor = logicDescriptor;
+        this.driver = logic;
     }
-    async get(accessor) {
-        const builder = accessor(new EntityBuilder(this.logicDescriptor));
+    async get(createAccessorBuilder) {
+        const [ptr, hasPersistentState] = this.driver.hasPersistentState();
+        if (!hasPersistentState) {
+            ErrorUtils.throwError("Persistent state is not present");
+        }
+        const builder = createAccessorBuilder(new EntityBuilder(ptr, this.driver));
         if (!SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
             ErrorUtils.throwError("Invalid accessor builder");
         }
-        const slot = builder.generate().toBuffer('be', 32);
-        const result = await this.provider.getStorageAt(this.logicId, encodeToString(slot));
-        return result;
-    }
-}
-class EntityBuilder {
-    logicDescriptor;
-    constructor(logicDescriptor) {
-        this.logicDescriptor = logicDescriptor;
-    }
-    entity(label) {
-        const [ptr, isPersistance] = this.logicDescriptor.hasPersistentState();
-        if (!isPersistance) {
-            ErrorUtils.throwError("Persistent state not found");
-        }
-        const element = this.logicDescriptor.getElements().get(ptr)?.data;
-        if (element == null) {
-            ErrorUtils.throwError("Element not found", ErrorCode.PROPERTY_NOT_DEFINED, {
-                ptr
-            });
-        }
-        const field = element.fields.find((field) => field.label === label);
-        if (field == null) {
-            ErrorUtils.throwError(`Entity '${label} not found in state`, ErrorCode.PROPERTY_NOT_DEFINED, {
-                entity: label
-            });
-        }
-        return new SlotAccessorBuilder(field.slot, this.logicDescriptor);
+        const accessors = builder.getAccessors();
+        const slot = generateStorageKey(ptr, accessors);
+        const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const type = builder.getStorageType();
+        const schema = Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
+        return new Depolorizer(hexToBytes(result)).depolorize(schema);
     }
 }
 //# sourceMappingURL=persistent-state.js.map

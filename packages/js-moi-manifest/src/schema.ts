@@ -2,6 +2,8 @@ import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 
+const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/
+
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256","bigint"
 ]
@@ -11,7 +13,7 @@ const isPrimitiveType = (type: string): boolean => {
 }
 
 const isArray = (type: string): boolean => {
-    return (/^\[(\d*)\]/).test(type)
+    return (ARRAY_MATCHER_REGEX).test(type)
 }
 
 const isMap = (type: string): boolean => {
@@ -266,26 +268,24 @@ export class Schema {
      * @returns {string} The extracted array data type.
      * @throws {Error} If the array type is invalid or unsupported.
      */
-    private extractArrayDataType(dataType: string): string {
-        let endIndex: number = 0
-    
-        for(let i = 0; i < dataType.length; i++) {
-            if (dataType.charAt(i) == "]") {
-                endIndex = i + 1;
-                break;
-            }
+    public static extractArrayDataType(dataType: string): string {
+        if(!isArray(dataType)) {
+            ErrorUtils.throwError(
+                "Invalid array type: The provided data type is not an array.",
+                ErrorCode.INVALID_ARGUMENT
+            );
+        }
+
+        const type = dataType.replace(ARRAY_MATCHER_REGEX, '')
+
+        if (type === "") {
+            ErrorUtils.throwError(
+                "Failed to extract array type: The array type could not be determined.",
+                ErrorCode.INVALID_ARGUMENT
+            );
         }
     
-        const type: string = dataType.slice(endIndex,)
-        
-        if(type) {
-            return type
-        }
-    
-        ErrorUtils.throwError(
-            "Failed to extract array type: The array type could not be determined.",
-            ErrorCode.INVALID_ARGUMENT
-        );
+        return type
     }
     
     /**
@@ -295,7 +295,7 @@ export class Schema {
      * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
-    private extractMapDataType(dataType: string): [string, string] {
+    public static extractMapDataType(dataType: string): [string, string] {
         let brackets: string[] = []
         let startIndex: number = 0
         let endIndex: number = 0
@@ -338,7 +338,7 @@ export class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
-    private convertPrimitiveDataType(type: string): string {
+    public static convertPrimitiveDataType(type: string): string {
         switch(type) {
             case "null":
                 return "null";
@@ -369,8 +369,8 @@ export class Schema {
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
-    private parseClassFields(className: string): PoloSchema {
-        const ptr = this.classDefs.get(className)
+    public static parseClassFields(className: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema {
+        const ptr = classDef.get(className)
         if (ptr === undefined) {
             ErrorUtils.throwError(
                 `Invalid class name: ${className}`,
@@ -378,7 +378,7 @@ export class Schema {
             );
         }
 
-        const element = this.elements.get(ptr)
+        const element = elements.get(ptr)
 
         const schema = {
             kind: "struct",
@@ -387,7 +387,7 @@ export class Schema {
 
         element.data = element.data as LogicManifest.Class
         Object.values(element.data.fields).forEach(field => {
-            schema.fields[field.label] = this.parseDataType(field.type)
+            schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements)
         })
 
         return schema
@@ -402,31 +402,31 @@ export class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
-    private parseDataType(type: string): PoloSchema {
+    public static parseDataType(type: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema {
         switch(true) {
             case isPrimitiveType(type):
                 return {
-                    kind: this.convertPrimitiveDataType(type)
+                    kind: Schema.convertPrimitiveDataType(type)
                 }
             case isArray(type):
-                const values = this.extractArrayDataType(type)
+                const values = Schema.extractArrayDataType(type)
                 return {
                     kind: "array",
                     fields: {
-                        values: this.parseDataType(values)
+                        values: Schema.parseDataType(values, classDef, elements)
                     }
                 }
             case isMap(type):
-                const [key, value] = this.extractMapDataType(type)
+                const [key, value] = Schema.extractMapDataType(type)
                 return {
                     kind: "map",
                     fields: {
-                        keys: this.parseDataType(key),
-                        values: this.parseDataType(value)
+                        keys: Schema.parseDataType(key, classDef, elements),
+                        values: Schema.parseDataType(value, classDef, elements)
                     }
                 };
-            case isClass(type, this.classDefs):
-                return this.parseClassFields(type)
+            case isClass(type, classDef):
+                return this.parseClassFields(type, classDef, elements)
             default:
                 ErrorUtils.throwError(
                     `Unsupported data type: ${type}!`,
@@ -463,7 +463,7 @@ export class Schema {
                 )
             }
     
-            schema.fields[field.label] = this.parseDataType(field.type);
+            schema.fields[field.label] = Schema.parseDataType(field.type, this.classDefs, this.elements);
         })
     
         return schema

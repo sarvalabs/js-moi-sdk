@@ -1,18 +1,9 @@
-import { JsonRpcProvider } from "js-moi-providers";
 import { Wallet } from "js-moi-wallet";
 
+import manifest from "../manifests/erc20.json";
 import { LogicDriver, getLogicDriver } from "../src/logic-driver";
 import { LogicFactory } from "../src/logic-factory";
-
-import manifest from "../manifests/erc20.json";
-
-const HOST = "http://localhost:1600/";
-const MNEMONIC = "visa security tobacco hood forget rate exhibit habit deny good sister slender";
-const INITIAL_SUPPLY = 100000000;
-const SYMBOL = "MOI";
-const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
-const PATH = "m/44'/6174'/0'/0/1";
-const PROVIDER = new JsonRpcProvider(HOST);
+import { INITIAL_SUPPLY, MNEMONIC, PATH, PROVIDER, RECEIVER, SYMBOL } from "./utils/constants";
 
 let wallet: Wallet;
 

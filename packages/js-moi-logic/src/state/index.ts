@@ -10,6 +10,7 @@ export {
     ClassFieldAccessor,
     LengthAccessor,
     PropertyAccessor,
+    generateStorageKey as generateSlotHash,
     type Accessor,
     type SlotHash
 } from "./accessor";

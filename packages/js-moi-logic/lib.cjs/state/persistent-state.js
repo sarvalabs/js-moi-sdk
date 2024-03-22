@@ -1,8 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersistentState = void 0;
+const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
+const accessor_1 = require("./accessor");
 const accessor_builder_1 = require("./accessor-builder");
+const entity_builder_1 = require("./entity-builder");
 /**
  * Represents persistent state functionality for a logic element.
  * Manages slots, types, and retrieval of persistent state values.
@@ -10,48 +14,28 @@ const accessor_builder_1 = require("./accessor-builder");
 class PersistentState {
     logicId;
     provider;
-    manifestCoder;
-    logicDescriptor;
-    constructor(logicId, logicDescriptor, manifestCoder, provider) {
-        this.logicId = logicId;
+    driver;
+    constructor(logic, provider) {
+        this.logicId = logic.getLogicId();
         this.provider = provider;
-        this.manifestCoder = manifestCoder;
-        this.logicDescriptor = logicDescriptor;
+        this.driver = logic;
     }
-    async get(accessor) {
-        const builder = accessor(new EntityBuilder(this.logicDescriptor));
+    async get(createAccessorBuilder) {
+        const [ptr, hasPersistentState] = this.driver.hasPersistentState();
+        if (!hasPersistentState) {
+            js_moi_utils_1.ErrorUtils.throwError("Persistent state is not present");
+        }
+        const builder = createAccessorBuilder(new entity_builder_1.EntityBuilder(ptr, this.driver));
         if (!accessor_builder_1.SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid accessor builder");
         }
-        const slot = builder.generate().toBuffer('be', 32);
-        const result = await this.provider.getStorageAt(this.logicId, (0, js_moi_utils_1.encodeToString)(slot));
-        return result;
+        const accessors = builder.getAccessors();
+        const slot = (0, accessor_1.generateStorageKey)(ptr, accessors);
+        const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const type = builder.getStorageType();
+        const schema = js_moi_manifest_1.Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
+        return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result)).depolorize(schema);
     }
 }
 exports.PersistentState = PersistentState;
-class EntityBuilder {
-    logicDescriptor;
-    constructor(logicDescriptor) {
-        this.logicDescriptor = logicDescriptor;
-    }
-    entity(label) {
-        const [ptr, isPersistance] = this.logicDescriptor.hasPersistentState();
-        if (!isPersistance) {
-            js_moi_utils_1.ErrorUtils.throwError("Persistent state not found");
-        }
-        const element = this.logicDescriptor.getElements().get(ptr)?.data;
-        if (element == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Element not found", js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
-                ptr
-            });
-        }
-        const field = element.fields.find((field) => field.label === label);
-        if (field == null) {
-            js_moi_utils_1.ErrorUtils.throwError(`Entity '${label} not found in state`, js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
-                entity: label
-            });
-        }
-        return new accessor_builder_1.SlotAccessorBuilder(field.slot, this.logicDescriptor);
-    }
-}
 //# sourceMappingURL=persistent-state.js.map

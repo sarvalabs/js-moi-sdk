@@ -28,18 +28,14 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      if available in logic manifest.
      */
     private createState() {
-        const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
+        const hasPersistance = this.stateMatrix.persistent();
 
-        if(persistentStateExists) {
-            const persistentState = new PersistentState(
-                this.logicId.hex(),
-                this,
-                this.manifestCoder,
-                this.provider
-            )
-
-            defineReadOnly(this, "persistentState", persistentState)
+        if(hasPersistance === false) {
+            return; 
         }
+
+        const persistentState = new PersistentState(this, this.provider)
+        defineReadOnly(this, "persistentState", persistentState)
     }
 
     /**

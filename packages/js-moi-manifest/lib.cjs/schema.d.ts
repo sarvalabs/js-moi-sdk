@@ -367,7 +367,7 @@ export declare class Schema {
      * @returns {string} The extracted array data type.
      * @throws {Error} If the array type is invalid or unsupported.
      */
-    private extractArrayDataType;
+    static extractArrayDataType(dataType: string): string;
     /**
      * Extracts the key and value data types from the provided map data type string.
      *
@@ -375,7 +375,7 @@ export declare class Schema {
      * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
-    private extractMapDataType;
+    static extractMapDataType(dataType: string): [string, string];
     /**
      * Converts the primitive data type to a standardized representation.
      *
@@ -383,14 +383,14 @@ export declare class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
-    private convertPrimitiveDataType;
+    static convertPrimitiveDataType(type: string): string;
     /**
      * Parses the fields of a class data type and generates the schema for the class.
      *
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
-    private parseClassFields;
+    static parseClassFields(className: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema;
     /**
      * Parses a data type and generates the corresponding schema based on the
      * data type. The parsing is performed recursively to handle nested data types,
@@ -400,7 +400,7 @@ export declare class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
-    private parseDataType;
+    static parseDataType(type: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema;
     /**
      * Parses an array of fields and generates the schema based on the fields.
      *

@@ -1,32 +1,40 @@
-import { BN } from "bn.js";
-import type { LogicManifest } from "js-moi-manifest";
+import { Schema, type LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import type { LogicDescriptor } from "../logic-descriptor";
-import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, type Accessor, type SlotHash } from "./accessor";
-import { ContextStateKind } from "./context-state-matrix";
+import type ElementDescriptor from "../element-descriptor";
+import {
+    ArrayIndexAccessor,
+    ClassFieldAccessor,
+    LengthAccessor,
+    PropertyAccessor,
+    type Accessor,
+    type AccessorProvider,
+    type StorageTypeProvider,
+} from "./accessor";
+
+const VALUE_TYPE_INDEX = 1;
 
 export interface AccessorBuilder {
     /**
      * Adds a length accessor to the accessor builder.
      * This accessor can be used to retrieve the length of an array or map.
-     * 
+     *
      * @returns The accessor builder instance.
      */
     length(): AccessorBuilder;
 
     /**
      * Adds a property accessor to the accessor builder.
-     * 
+     *
      * Used to access to value of key in a map.
-     * 
-     * @param label - The label of the property.
+     *
+     * @param key - The label of the property.
      * @returns The accessor builder instance.
      */
-    property(label: string): AccessorBuilder;
+    property(key: string): AccessorBuilder;
 
     /**
      * Adds an accessor for the specified index to the AccessorBuilder.
-     * 
+     *
      * @param index - The index of the accessor.
      * @returns The AccessorBuilder instance.
      */
@@ -34,85 +42,103 @@ export interface AccessorBuilder {
 
     /**
      * Adds a field to the accessor builder.
-     * 
+     *
      * Used to access the value of a field in a class.
-     * 
-     * @param label - The label of the field.
+     *
+     * @param fieldName - The label of the field.
      * @returns The accessor builder instance.
      */
-    field(label: string): AccessorBuilder;
+    field(fieldName: string): AccessorBuilder;
 }
 
-export class SlotAccessorBuilder implements AccessorBuilder {
+export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, StorageTypeProvider {
     private accessors: Accessor[] = [];
+    public readonly elementDescriptor: ElementDescriptor;
+    private slotType: string;
 
-    public readonly baseSlot: SlotHash;
-
-    public readonly logicDescriptor: LogicDescriptor;
-
-    constructor(base: SlotHash | number, logicDescriptor: LogicDescriptor) {
-        this.logicDescriptor = logicDescriptor;
-
-        if (typeof base === "number") {
-            this.baseSlot = new BN(base);
-            return;
-        }
-
-        this.baseSlot = base;
+    public constructor(baseType: string, logicDescriptor: ElementDescriptor) {
+        this.elementDescriptor = logicDescriptor;
+        this.slotType = baseType;
     }
 
-    get slotAsNumber(): number {
-        return this.baseSlot.toNumber();
+    public getStorageType(): string {
+        return this.slotType;
     }
 
-    
-    length(): SlotAccessorBuilder {
+    public getAccessors(): Accessor[] {
+        return this.accessors;
+    }
+
+    public length(): SlotAccessorBuilder {
+        this.slotType = "u64";
         this.accessors.push(new LengthAccessor());
+
         return this;
     }
 
-   
-    property(label: string): SlotAccessorBuilder {
-        this.accessors.push(new PropertyAccessor(label));
+    public property(key: string): SlotAccessorBuilder {
+        this.slotType = Schema.extractMapDataType(this.slotType)[VALUE_TYPE_INDEX];
+        this.accessors.push(new PropertyAccessor(key));
+
         return this;
     }
 
-    generate(): SlotHash {
-        return this.accessors.reduce((slotHash, accessor) => accessor.access(slotHash), this.baseSlot)
-    }
-
-    
-    at(index: number): SlotAccessorBuilder {
+    public at(index: number): SlotAccessorBuilder {
+        this.slotType = Schema.extractArrayDataType(this.slotType);
         this.accessors.push(new ArrayIndexAccessor(index));
+
         return this;
     }
 
-    field(label: string): SlotAccessorBuilder {
-        const value = this.logicDescriptor.getStateMatrix().get(ContextStateKind.PersistentState);
-        const element = this.logicDescriptor.getElements().get(value);
-
-        if (element == null) {
-            ErrorUtils.throwError("Element not found");
+    public field(fieldName: string): SlotAccessorBuilder {
+        if (!this.elementDescriptor.getClassDefs().has(this.slotType)) {
+            ErrorUtils.throwError(
+                `Attempting to access a field '${fieldName}' in ${this.slotType}, which is not a recognized class.`,
+                ErrorCode.UNEXPECTED_ARGUMENT
+            );
         }
 
-        element.data = element.data as LogicManifest.State;
-        let field = element.data.fields[this.slotAsNumber];
-        const classDef = this.logicDescriptor.getClassElement(field.type);
+        const element = this.elementDescriptor.getClassElement(this.slotType);
 
-        classDef.data = classDef.data as LogicManifest.State;
-        field = classDef.data.fields.find((field) => field.label === label);
+        element.data = element.data as LogicManifest.Class;
+
+        const field = element.data.fields.find((field) => field.label === fieldName);
 
         if (field == null) {
-            ErrorUtils.throwError(`Class field '${label}' not found`, ErrorCode.PROPERTY_NOT_DEFINED, {
-                field: label
-            });
+            ErrorUtils.throwError(
+                `The field '${fieldName}' is not a recognized member of the class '${this.slotType}'. Please ensure that the field name is correct and that it is defined within the class context.`,
+                ErrorCode.PROPERTY_NOT_DEFINED,
+                {
+                    field: fieldName,
+                }
+            );
         }
 
-        this.accessors.push(new ClassFieldAccessor(field.slot));
+        this.slotType = field.type;
+
+        const accessor = new ClassFieldAccessor(field.slot);
+        this.accessors.push(accessor);
+
         return this;
     }
 
-    static isSlotAccessorBuilder(builder: AccessorBuilder): builder is SlotAccessorBuilder {
+    /**
+     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
+     * @param field - The TypeField object.
+     * @param logicDescriptor - The LogicDescriptor object.
+     * @returns A new SlotAccessorBuilder instance.
+     */
+    public static fromTypeField(field: LogicManifest.TypeField, logicDescriptor: ElementDescriptor): SlotAccessorBuilder {
+        return new SlotAccessorBuilder(field.type, logicDescriptor);
+    }
+
+    /**
+     * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.
+     *
+     * @param builder - The accessor builder to check.
+     * @returns `true` if the `builder` is an instance of `SlotAccessorBuilder`, `false` otherwise.
+     */
+    public static isSlotAccessorBuilder(builder: AccessorBuilder): builder is SlotAccessorBuilder {
         return builder instanceof SlotAccessorBuilder;
     }
 }

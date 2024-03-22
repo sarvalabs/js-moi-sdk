@@ -1,59 +1,71 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SlotAccessorBuilder = void 0;
-const bn_js_1 = require("bn.js");
+const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const accessor_1 = require("./accessor");
-const context_state_matrix_1 = require("./context-state-matrix");
+const VALUE_TYPE_INDEX = 1;
 class SlotAccessorBuilder {
     accessors = [];
-    baseSlot;
-    logicDescriptor;
-    constructor(base, logicDescriptor) {
-        this.logicDescriptor = logicDescriptor;
-        if (typeof base === "number") {
-            this.baseSlot = new bn_js_1.BN(base);
-            return;
-        }
-        this.baseSlot = base;
+    elementDescriptor;
+    slotType;
+    constructor(baseType, logicDescriptor) {
+        this.elementDescriptor = logicDescriptor;
+        this.slotType = baseType;
     }
-    get slotAsNumber() {
-        return this.baseSlot.toNumber();
+    getStorageType() {
+        return this.slotType;
+    }
+    getAccessors() {
+        return this.accessors;
     }
     length() {
+        this.slotType = "u64";
         this.accessors.push(new accessor_1.LengthAccessor());
         return this;
     }
-    property(label) {
-        this.accessors.push(new accessor_1.PropertyAccessor(label));
+    property(key) {
+        this.slotType = js_moi_manifest_1.Schema.extractMapDataType(this.slotType)[VALUE_TYPE_INDEX];
+        this.accessors.push(new accessor_1.PropertyAccessor(key));
         return this;
     }
-    generate() {
-        return this.accessors.reduce((slotHash, accessor) => accessor.access(slotHash), this.baseSlot);
-    }
     at(index) {
+        this.slotType = js_moi_manifest_1.Schema.extractArrayDataType(this.slotType);
         this.accessors.push(new accessor_1.ArrayIndexAccessor(index));
         return this;
     }
-    field(label) {
-        const value = this.logicDescriptor.getStateMatrix().get(context_state_matrix_1.ContextStateKind.PersistentState);
-        const element = this.logicDescriptor.getElements().get(value);
-        if (element == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Element not found");
+    field(fieldName) {
+        if (!this.elementDescriptor.getClassDefs().has(this.slotType)) {
+            js_moi_utils_1.ErrorUtils.throwError(`Attempting to access a field '${fieldName}' in ${this.slotType}, which is not a recognized class.`, js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
+        const element = this.elementDescriptor.getClassElement(this.slotType);
         element.data = element.data;
-        let field = element.data.fields[this.slotAsNumber];
-        const classDef = this.logicDescriptor.getClassElement(field.type);
-        classDef.data = classDef.data;
-        field = classDef.data.fields.find((field) => field.label === label);
+        const field = element.data.fields.find((field) => field.label === fieldName);
         if (field == null) {
-            js_moi_utils_1.ErrorUtils.throwError(`Class field '${label}' not found`, js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
-                field: label
+            js_moi_utils_1.ErrorUtils.throwError(`The field '${fieldName}' is not a recognized member of the class '${this.slotType}'. Please ensure that the field name is correct and that it is defined within the class context.`, js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
+                field: fieldName,
             });
         }
-        this.accessors.push(new accessor_1.ClassFieldAccessor(field.slot));
+        this.slotType = field.type;
+        const accessor = new accessor_1.ClassFieldAccessor(field.slot);
+        this.accessors.push(accessor);
         return this;
     }
+    /**
+     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
+     * @param field - The TypeField object.
+     * @param logicDescriptor - The LogicDescriptor object.
+     * @returns A new SlotAccessorBuilder instance.
+     */
+    static fromTypeField(field, logicDescriptor) {
+        return new SlotAccessorBuilder(field.type, logicDescriptor);
+    }
+    /**
+     * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.
+     *
+     * @param builder - The accessor builder to check.
+     * @returns `true` if the `builder` is an instance of `SlotAccessorBuilder`, `false` otherwise.
+     */
     static isSlotAccessorBuilder(builder) {
         return builder instanceof SlotAccessorBuilder;
     }

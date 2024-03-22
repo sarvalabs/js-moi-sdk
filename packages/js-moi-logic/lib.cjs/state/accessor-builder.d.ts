@@ -1,5 +1,6 @@
-import type { LogicDescriptor } from "../logic-descriptor";
-import { type SlotHash } from "./accessor";
+import { type LogicManifest } from "js-moi-manifest";
+import type ElementDescriptor from "../element-descriptor";
+import { type Accessor, type AccessorProvider, type StorageTypeProvider } from "./accessor";
 export interface AccessorBuilder {
     /**
      * Adds a length accessor to the accessor builder.
@@ -13,10 +14,10 @@ export interface AccessorBuilder {
      *
      * Used to access to value of key in a map.
      *
-     * @param label - The label of the property.
+     * @param key - The label of the property.
      * @returns The accessor builder instance.
      */
-    property(label: string): AccessorBuilder;
+    property(key: string): AccessorBuilder;
     /**
      * Adds an accessor for the specified index to the AccessorBuilder.
      *
@@ -29,22 +30,35 @@ export interface AccessorBuilder {
      *
      * Used to access the value of a field in a class.
      *
-     * @param label - The label of the field.
+     * @param fieldName - The label of the field.
      * @returns The accessor builder instance.
      */
-    field(label: string): AccessorBuilder;
+    field(fieldName: string): AccessorBuilder;
 }
-export declare class SlotAccessorBuilder implements AccessorBuilder {
+export declare class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, StorageTypeProvider {
     private accessors;
-    readonly baseSlot: SlotHash;
-    readonly logicDescriptor: LogicDescriptor;
-    constructor(base: SlotHash | number, logicDescriptor: LogicDescriptor);
-    get slotAsNumber(): number;
+    readonly elementDescriptor: ElementDescriptor;
+    private slotType;
+    constructor(baseType: string, logicDescriptor: ElementDescriptor);
+    getStorageType(): string;
+    getAccessors(): Accessor[];
     length(): SlotAccessorBuilder;
-    property(label: string): SlotAccessorBuilder;
-    generate(): SlotHash;
+    property(key: string): SlotAccessorBuilder;
     at(index: number): SlotAccessorBuilder;
-    field(label: string): SlotAccessorBuilder;
+    field(fieldName: string): SlotAccessorBuilder;
+    /**
+     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
+     * @param field - The TypeField object.
+     * @param logicDescriptor - The LogicDescriptor object.
+     * @returns A new SlotAccessorBuilder instance.
+     */
+    static fromTypeField(field: LogicManifest.TypeField, logicDescriptor: ElementDescriptor): SlotAccessorBuilder;
+    /**
+     * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.
+     *
+     * @param builder - The accessor builder to check.
+     * @returns `true` if the `builder` is an instance of `SlotAccessorBuilder`, `false` otherwise.
+     */
     static isSlotAccessorBuilder(builder: AccessorBuilder): builder is SlotAccessorBuilder;
 }
 //# sourceMappingURL=accessor-builder.d.ts.map

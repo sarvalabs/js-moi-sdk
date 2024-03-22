@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SlotAccessorBuilder = exports.PropertyAccessor = exports.LengthAccessor = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.AbstractAccessor = exports.EphemeralState = exports.PersistentState = exports.ContextStateMatrix = exports.ContextStateKind = void 0;
+exports.SlotAccessorBuilder = exports.generateSlotHash = exports.PropertyAccessor = exports.LengthAccessor = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.AbstractAccessor = exports.EphemeralState = exports.PersistentState = exports.ContextStateMatrix = exports.ContextStateKind = void 0;
 var context_state_matrix_1 = require("./context-state-matrix");
 Object.defineProperty(exports, "ContextStateKind", { enumerable: true, get: function () { return context_state_matrix_1.ContextStateKind; } });
 Object.defineProperty(exports, "ContextStateMatrix", { enumerable: true, get: function () { return context_state_matrix_1.ContextStateMatrix; } });
@@ -14,6 +14,7 @@ Object.defineProperty(exports, "ArrayIndexAccessor", { enumerable: true, get: fu
 Object.defineProperty(exports, "ClassFieldAccessor", { enumerable: true, get: function () { return accessor_1.ClassFieldAccessor; } });
 Object.defineProperty(exports, "LengthAccessor", { enumerable: true, get: function () { return accessor_1.LengthAccessor; } });
 Object.defineProperty(exports, "PropertyAccessor", { enumerable: true, get: function () { return accessor_1.PropertyAccessor; } });
+Object.defineProperty(exports, "generateSlotHash", { enumerable: true, get: function () { return accessor_1.generateStorageKey; } });
 var accessor_builder_1 = require("./accessor-builder");
 Object.defineProperty(exports, "SlotAccessorBuilder", { enumerable: true, get: function () { return accessor_builder_1.SlotAccessorBuilder; } });
 //# sourceMappingURL=index.js.map

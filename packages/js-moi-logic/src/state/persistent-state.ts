@@ -1,8 +1,18 @@
-import type { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { Schema } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
-import { encodeToString, ErrorCode, ErrorUtils } from "js-moi-utils";
-import type { LogicDescriptor } from "../logic-descriptor";
+import { ErrorUtils, hexToBytes } from "js-moi-utils";
+import { Depolorizer } from "js-polo";
+import type { LogicDriver } from "../logic-driver";
+import { generateStorageKey } from "./accessor";
 import { SlotAccessorBuilder, type AccessorBuilder } from "./accessor-builder";
+import { EntityBuilder } from "./entity-builder";
+
+/**
+ * Represents a function that builds an accessor.
+ * @param builder - The entity builder.
+ * @returns The accessor builder.
+ */
+type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder;
 
 /**
  * Represents persistent state functionality for a logic element.
@@ -11,64 +21,35 @@ import { SlotAccessorBuilder, type AccessorBuilder } from "./accessor-builder";
 export class PersistentState {
     private logicId: string;
     private provider: AbstractProvider;
-    private manifestCoder: ManifestCoder;
-    private logicDescriptor: LogicDescriptor;
+    private driver: LogicDriver;
 
-    constructor(
-        logicId: string, 
-        logicDescriptor: LogicDescriptor, 
-        manifestCoder: ManifestCoder, 
-        provider: AbstractProvider
-    ) {
-        this.logicId = logicId;
+    constructor(logic: LogicDriver, provider: AbstractProvider) {
+        this.logicId = logic.getLogicId();
         this.provider = provider;
-        this.manifestCoder = manifestCoder;
-        this.logicDescriptor = logicDescriptor;
+        this.driver = logic;
     }
 
-    async get(accessor?: (builder: EntityBuilder) => AccessorBuilder) {
-        const builder = accessor(new EntityBuilder(this.logicDescriptor))
-        
-        if(!SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
+    public async get<T = any>(createAccessorBuilder: AccessorBuilderFunction): Promise<T> {
+        const [ptr, hasPersistentState] = this.driver.hasPersistentState();
+
+        if (!hasPersistentState) {
+            ErrorUtils.throwError("Persistent state is not present");
+        }
+
+        const builder = createAccessorBuilder(new EntityBuilder(ptr, this.driver));
+
+        if (!SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
             ErrorUtils.throwError("Invalid accessor builder");
         }
 
-        const slot = builder.generate().toBuffer('be', 32);
-        const result = await this.provider.getStorageAt(this.logicId, encodeToString(slot));
-        return result;
-    }
-}
+        const accessors = builder.getAccessors();
+        const slot = generateStorageKey(ptr, accessors);
+        const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        
+        const type = builder.getStorageType();
+        const schema = Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
+        
+        return new Depolorizer(hexToBytes(result)).depolorize(schema) as T;
 
-class EntityBuilder {
-    private readonly logicDescriptor: LogicDescriptor;
-
-    constructor(logicDescriptor: LogicDescriptor) {
-        this.logicDescriptor = logicDescriptor;
-    }
-
-    entity(label: string): AccessorBuilder {
-        const [ptr, isPersistance] = this.logicDescriptor.hasPersistentState();
-
-        if (!isPersistance) {
-            ErrorUtils.throwError("Persistent state not found");
-        }
-
-        const element = this.logicDescriptor.getElements().get(ptr)?.data as (LogicManifest.State | undefined);
-
-        if(element == null) {
-            ErrorUtils.throwError("Element not found", ErrorCode.PROPERTY_NOT_DEFINED, {
-                ptr
-            });
-        }
-
-        const field = element.fields.find((field) => field.label === label);
-
-        if(field == null) {
-            ErrorUtils.throwError(`Entity '${label} not found in state`, ErrorCode.PROPERTY_NOT_DEFINED, {
-                entity: label
-            });
-        }
-
-        return new SlotAccessorBuilder(field.slot, this.logicDescriptor);
     }
 }

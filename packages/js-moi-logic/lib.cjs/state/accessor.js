@@ -3,10 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = void 0;
+exports.generateStorageKey = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
+const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
+class StorageKey {
+    value;
+    constructor(value) {
+        this.value = new bn_js_1.default(value);
+    }
+    hex() {
+        return (0, js_moi_utils_1.encodeToString)(this.toBuffer());
+    }
+    toBuffer() {
+        return this.value.toBuffer("be", 32);
+    }
+}
+exports.StorageKey = StorageKey;
 /**
  * AbstractAccessor class provides a base implementation of the Accessor interface.
  */
@@ -36,23 +50,23 @@ exports.LengthAccessor = LengthAccessor;
  * Generates a slot hash for accessing the key of Map.
  */
 class PropertyAccessor extends AbstractAccessor {
-    label;
+    key;
     /**
      * Creates a new instance of PropertyAccessor.
-     * @param label The label of the property.
+     * @param key The label of the property.
      */
-    constructor(label) {
+    constructor(key) {
         super();
-        this.label = label;
+        this.key = key;
     }
     /**
-     * Polorizes the given label and returns it as a Uint8Array.
-     * @param label The label to polorize.
-     * @returns The polorized label as a Uint8Array.
+     * Polorizes the given key.
+     * @param key The key to polorize.
+     * @returns The polorized key as a bytes.
      */
-    polorizeKey(label) {
+    polorizeKey(key) {
         const polorizer = new js_polo_1.Polorizer();
-        polorizer.polorizeString(label);
+        polorizer.polorizeString(key);
         return polorizer.bytes();
     }
     /**
@@ -61,10 +75,10 @@ class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const key = this.polorizeKey(this.label);
+        const key = this.polorizeKey(this.key);
         const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer('le', 32), separator, key]);
-        return new bn_js_1.default(this.sum256(buffer));
+        const buffer = Buffer.concat([hash.toBuffer(), separator, key]);
+        return new StorageKey(this.sum256(buffer));
     }
 }
 exports.PropertyAccessor = PropertyAccessor;
@@ -87,13 +101,16 @@ class ArrayIndexAccessor extends AbstractAccessor {
      * @returns The updated hash after accessing the element.
      */
     access(hash) {
-        const bytes = this.sum256(hash.toBuffer('be', 32));
-        return new bn_js_1.default(bytes).add(new bn_js_1.default(this.index));
+        const bytes = this.sum256(hash.toBuffer());
+        const slot = new bn_js_1.default(bytes).add(new bn_js_1.default(this.index));
+        const b = new StorageKey(slot);
+        console.log("ArrayIndexAccessor", b.hex());
+        return b;
     }
 }
 exports.ArrayIndexAccessor = ArrayIndexAccessor;
 /**
- * Represents an accessor for accessing fields in a class by index.
+ * Represents an accessor for accessing fields of a class.
  */
 class ClassFieldAccessor extends AbstractAccessor {
     index;
@@ -102,14 +119,23 @@ class ClassFieldAccessor extends AbstractAccessor {
         this.index = index;
     }
     access(hash) {
-        this.index;
-        // console.log("Base Hash", hash.toBuffer('be', 32));
-        const bytes = this.sum256(hash.toBuffer('be', 32));
-        // console.log("Blake Js", bytes);
-        const bn = new bn_js_1.default(bytes).add(new bn_js_1.default(0));
-        // console.log(bn);
-        return bn;
+        const polorizer = new js_polo_1.Polorizer();
+        polorizer.polorizeString("a");
+        const bytes = this.sum256(hash.toBuffer());
+        console.log(polorizer.bytes());
+        console.log(new bn_js_1.default(polorizer.bytes()));
+        console.log(new bn_js_1.default(bytes).add(new bn_js_1.default(polorizer.bytes())));
+        return new StorageKey(new bn_js_1.default(bytes).add(new bn_js_1.default(this.index)));
     }
 }
 exports.ClassFieldAccessor = ClassFieldAccessor;
+function generateStorageKey(base, ...args) {
+    let slot = typeof base === "number" ? new StorageKey(base) : base;
+    const accessors = Array.isArray(args[0]) ? args[0] : args;
+    for (const accessor of accessors) {
+        slot = accessor.access(slot);
+    }
+    return slot;
+}
+exports.generateStorageKey = generateStorageKey;
 //# sourceMappingURL=accessor.js.map
