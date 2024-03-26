@@ -3,16 +3,16 @@ const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"
 ];
-const isPrimitiveType = (type) => {
+export const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
 };
-const isArray = (type) => {
+export const isArray = (type) => {
     return (ARRAY_MATCHER_REGEX).test(type);
 };
-const isMap = (type) => {
+export const isMap = (type) => {
     return type.startsWith("map");
 };
-const isClass = (type, classDefs) => {
+export const isClass = (type, classDefs) => {
     return classDefs.has(type);
 };
 /**

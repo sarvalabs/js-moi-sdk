@@ -1,5 +1,6 @@
-import { Schema, type LogicManifest } from "js-moi-manifest";
+import { isArray, isMap, Schema, type LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
+
 import type ElementDescriptor from "../element-descriptor";
 import {
     ArrayIndexAccessor,
@@ -70,6 +71,13 @@ export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, S
     }
 
     public length(): SlotAccessorBuilder {
+        if (!isArray(this.slotType) && !isMap(this.slotType)) {
+            ErrorUtils.throwError(
+                `Attempting to access the length of a non-array or non-map type '${this.slotType}'.`,
+                ErrorCode.UNSUPPORTED_OPERATION
+            );
+        }
+
         this.slotType = "u64";
         this.accessors.push(new LengthAccessor());
 

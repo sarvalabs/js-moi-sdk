@@ -136,7 +136,7 @@ describe("Logic", () => {
         });
 
         it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get("symbol");
+            const symbol = await logic.persistentState.get(b => b.entity("symbol"));
     
             expect(symbol).toBe(SYMBOL);
         });
@@ -145,7 +145,7 @@ describe("Logic", () => {
             const invalidKey = "invalid-key";
             
             expect(async () => {
-                await logic.persistentState.get(invalidKey);
+                await logic.persistentState.get(b => b.entity(invalidKey));
             }).rejects.toThrow(`The provided slot "${invalidKey}" does not exist.`);
         });
     });

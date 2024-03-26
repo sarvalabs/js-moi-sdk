@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Schema = void 0;
+exports.Schema = exports.isClass = exports.isMap = exports.isArray = exports.isPrimitiveType = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = [
@@ -9,15 +9,19 @@ const primitiveTypes = [
 const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
 };
+exports.isPrimitiveType = isPrimitiveType;
 const isArray = (type) => {
     return (ARRAY_MATCHER_REGEX).test(type);
 };
+exports.isArray = isArray;
 const isMap = (type) => {
     return type.startsWith("map");
 };
+exports.isMap = isMap;
 const isClass = (type, classDefs) => {
     return classDefs.has(type);
 };
+exports.isClass = isClass;
 /**
  * Schema is a class that provides schema parsing functionality for encoding and
  * decoding manifest, arguments, logic states and other data based on
@@ -248,7 +252,7 @@ class Schema {
      * @throws {Error} If the array type is invalid or unsupported.
      */
     static extractArrayDataType(dataType) {
-        if (!isArray(dataType)) {
+        if (!(0, exports.isArray)(dataType)) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid array type: The provided data type is not an array.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         const type = dataType.replace(ARRAY_MATCHER_REGEX, '');
@@ -351,11 +355,11 @@ class Schema {
      */
     static parseDataType(type, classDef, elements) {
         switch (true) {
-            case isPrimitiveType(type):
+            case (0, exports.isPrimitiveType)(type):
                 return {
                     kind: Schema.convertPrimitiveDataType(type)
                 };
-            case isArray(type):
+            case (0, exports.isArray)(type):
                 const values = Schema.extractArrayDataType(type);
                 return {
                     kind: "array",
@@ -363,7 +367,7 @@ class Schema {
                         values: Schema.parseDataType(values, classDef, elements)
                     }
                 };
-            case isMap(type):
+            case (0, exports.isMap)(type):
                 const [key, value] = Schema.extractMapDataType(type);
                 return {
                     kind: "map",
@@ -372,7 +376,7 @@ class Schema {
                         values: Schema.parseDataType(value, classDef, elements)
                     }
                 };
-            case isClass(type, classDef):
+            case (0, exports.isClass)(type, classDef):
                 return this.parseClassFields(type, classDef, elements);
             default:
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported data type: ${type}!`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

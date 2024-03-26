@@ -17,8 +17,7 @@ export const initializeWallet = async (provider: JsonRpcProvider, mnemonic: stri
 
 export const loadManifestFromFile = async (filepath: string): Promise<LogicManifest.Manifest> => {
     filepath = path.resolve(__dirname, filepath);
-
-    console.log(filepath);
+    
     const blob = await fs.readFile(filepath, "utf-8");
     return JSON.parse(blob);
 }

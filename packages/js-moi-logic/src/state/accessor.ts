@@ -1,8 +1,8 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import BN from "bn.js";
 import { encodeToString } from "js-moi-utils";
-
 import { Polorizer } from "js-polo";
+
 
 export type SlotHash = BN;
 
@@ -149,9 +149,7 @@ export class ArrayIndexAccessor extends AbstractAccessor {
     public access(hash: StorageKey): StorageKey {
         const bytes = this.sum256(hash.toBuffer());
         const slot = new BN(bytes).add(new BN(this.index));
-        const b =  new StorageKey(slot)
-        console.log("ArrayIndexAccessor", b.hex());
-        return b;
+        return new StorageKey(slot)
     }
 }
 
@@ -167,9 +165,6 @@ export class ClassFieldAccessor extends AbstractAccessor {
         const polorizer = new Polorizer();
         polorizer.polorizeString("a");
         const bytes = this.sum256(hash.toBuffer());
-        console.log(polorizer.bytes());
-        console.log(new BN(polorizer.bytes()))
-        console.log(new BN(bytes).add(new BN(polorizer.bytes())));
         return new StorageKey(new BN(bytes).add(new BN(this.index)));
     }
 }

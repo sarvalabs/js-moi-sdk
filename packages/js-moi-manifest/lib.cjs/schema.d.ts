@@ -1,5 +1,9 @@
 import { Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
+export declare const isPrimitiveType: (type: string) => boolean;
+export declare const isArray: (type: string) => boolean;
+export declare const isMap: (type: string) => boolean;
+export declare const isClass: (type: string, classDefs: Map<string, number>) => boolean;
 /**
  * Schema is a class that provides schema parsing functionality for encoding and
  * decoding manifest, arguments, logic states and other data based on

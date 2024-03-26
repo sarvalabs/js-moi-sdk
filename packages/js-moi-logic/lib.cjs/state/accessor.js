@@ -103,9 +103,7 @@ class ArrayIndexAccessor extends AbstractAccessor {
     access(hash) {
         const bytes = this.sum256(hash.toBuffer());
         const slot = new bn_js_1.default(bytes).add(new bn_js_1.default(this.index));
-        const b = new StorageKey(slot);
-        console.log("ArrayIndexAccessor", b.hex());
-        return b;
+        return new StorageKey(slot);
     }
 }
 exports.ArrayIndexAccessor = ArrayIndexAccessor;
@@ -122,9 +120,6 @@ class ClassFieldAccessor extends AbstractAccessor {
         const polorizer = new js_polo_1.Polorizer();
         polorizer.polorizeString("a");
         const bytes = this.sum256(hash.toBuffer());
-        console.log(polorizer.bytes());
-        console.log(new bn_js_1.default(polorizer.bytes()));
-        console.log(new bn_js_1.default(bytes).add(new bn_js_1.default(polorizer.bytes())));
         return new StorageKey(new bn_js_1.default(bytes).add(new bn_js_1.default(this.index)));
     }
 }

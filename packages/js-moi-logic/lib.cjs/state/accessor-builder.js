@@ -20,6 +20,9 @@ class SlotAccessorBuilder {
         return this.accessors;
     }
     length() {
+        if (!(0, js_moi_manifest_1.isArray)(this.slotType) && !(0, js_moi_manifest_1.isMap)(this.slotType)) {
+            js_moi_utils_1.ErrorUtils.throwError(`Attempting to access the length of a non-array or non-map type '${this.slotType}'.`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+        }
         this.slotType = "u64";
         this.accessors.push(new accessor_1.LengthAccessor());
         return this;

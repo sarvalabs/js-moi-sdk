@@ -1,7 +1,8 @@
-import { Schema } from "js-moi-manifest";
+import { isPrimitiveType, Schema } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { ErrorUtils, hexToBytes } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
+
 import type { LogicDriver } from "../logic-driver";
 import { generateStorageKey } from "./accessor";
 import { SlotAccessorBuilder, type AccessorBuilder } from "./accessor-builder";
@@ -43,13 +44,17 @@ export class PersistentState {
         }
 
         const accessors = builder.getAccessors();
+        let type = builder.getStorageType();
+
+        if(!isPrimitiveType(type)) {
+                ErrorUtils.throwError("Cannot retrieve complex types from persistent state");
+        }
+
         const slot = generateStorageKey(ptr, accessors);
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
         
-        const type = builder.getStorageType();
         const schema = Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
         
         return new Depolorizer(hexToBytes(result)).depolorize(schema) as T;
-
     }
 }

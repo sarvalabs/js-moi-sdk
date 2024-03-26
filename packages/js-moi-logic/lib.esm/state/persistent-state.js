@@ -1,4 +1,4 @@
-import { Schema } from "js-moi-manifest";
+import { isArray, isMap, isPrimitiveType, Schema } from "js-moi-manifest";
 import { ErrorUtils, hexToBytes } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { generateStorageKey } from "./accessor";
@@ -27,9 +27,18 @@ export class PersistentState {
             ErrorUtils.throwError("Invalid accessor builder");
         }
         const accessors = builder.getAccessors();
+        let type = builder.getStorageType();
+        if (!isPrimitiveType(type)) {
+            switch (true) {
+                case isMap(type) || isArray(type):
+                    type = "integer";
+                    break;
+                default:
+                    throw ErrorUtils.throwError("Invalid type for persistent state");
+            }
+        }
         const slot = generateStorageKey(ptr, accessors);
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
-        const type = builder.getStorageType();
         const schema = Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
         return new Depolorizer(hexToBytes(result)).depolorize(schema);
     }

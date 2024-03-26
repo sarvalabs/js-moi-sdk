@@ -30,9 +30,18 @@ class PersistentState {
             js_moi_utils_1.ErrorUtils.throwError("Invalid accessor builder");
         }
         const accessors = builder.getAccessors();
+        let type = builder.getStorageType();
+        if (!(0, js_moi_manifest_1.isPrimitiveType)(type)) {
+            switch (true) {
+                case (0, js_moi_manifest_1.isMap)(type) || (0, js_moi_manifest_1.isArray)(type):
+                    type = "integer";
+                    break;
+                default:
+                    throw js_moi_utils_1.ErrorUtils.throwError("Invalid type for persistent state");
+            }
+        }
         const slot = (0, accessor_1.generateStorageKey)(ptr, accessors);
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
-        const type = builder.getStorageType();
         const schema = js_moi_manifest_1.Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
         return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result)).depolorize(schema);
     }

@@ -8,19 +8,19 @@ const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256","bigint"
 ]
 
-const isPrimitiveType = (type: string): boolean => {
+export const isPrimitiveType = (type: string): boolean => {
     return primitiveTypes.includes(type);
 }
 
-const isArray = (type: string): boolean => {
+export const isArray = (type: string): boolean => {
     return (ARRAY_MATCHER_REGEX).test(type)
 }
 
-const isMap = (type: string): boolean => {
+export const isMap = (type: string): boolean => {
     return type.startsWith("map")
 }
 
-const isClass = (type: string, classDefs: Map<string, number>): boolean => {
+export const isClass = (type: string, classDefs: Map<string, number>): boolean => {
     return classDefs.has(type)
 }
 

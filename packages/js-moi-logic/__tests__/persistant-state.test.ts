@@ -2,7 +2,7 @@ import { encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { LogicDriver } from "../src/logic-driver";
 import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor } from "../src/state";
-import { generateStorageKey, StorageKey } from "../src/state/accessor";
+import { generateStorageKey } from "../src/state/accessor";
 import { PROVIDER } from "./utils/constants";
 import { loadManifestFromFile } from "./utils/utils";
 
@@ -34,7 +34,6 @@ describe("Slot Key Generation", () => {
     test(`X["foo"][0]`, () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("foo"), new ArrayIndexAccessor(0));
-        console.log(slot instanceof StorageKey)
         expect(slot.hex()).toBe("0xfb70ce47ff2e72a9d69bde31f25e2754335e694164bf9971725742bcdc73bf60");
     });
 
@@ -102,41 +101,59 @@ describe("Slot Key Generation", () => {
     });
 });
 
-describe('Accessing Persistance Storage', () => {
+describe("Accessing Persistance Storage", () => {
     let logic: LogicDriver;
-    
+
     beforeAll(async () => {
         const manifest = await loadManifestFromFile("../../manifests/atomic_storage.json");
         const logicID = "0x080000eaf5d3321459454f868d4603afa9015cdba0b4a0c2130a11f36b3272f8616cd2";
 
         logic = new LogicDriver(logicID, manifest, PROVIDER);
-    })
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("it should throw an error if persistent state is not present", async () => {
+        jest.spyOn(logic, "hasPersistentState").mockImplementation(() => [0, false]);
+
+        await expect(async () => {
+            await logic.persistentState.get<string>((accessor) => accessor.entity("value1").field("name"));
+        }).rejects.toThrow(/Persistent state is not present/);
+    });
 
     test("it should return the length of the array", async () => {
         const expectedLength = Math.floor(Math.random() * 100);
-        
-        jest.spyOn(PROVIDER, 'getStorageAt').mockImplementation(() => {
+
+        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
             const polorizer = new Polorizer();
             polorizer.polorizeInteger(expectedLength);
             return Promise.resolve(encodeToString(polorizer.bytes()));
         });
 
-        const length = await logic.persistentState.get<number>(accessor => accessor.entity("value1").length());
+        const length = await logic.persistentState.get<number>((accessor) => accessor.entity("value1").length());
 
         expect(typeof length).toBe("number");
         expect(length).toBe(expectedLength);
     });
 
-    test("it should return the length of the array", async () => {
+    test("it should throw an error when accessing length of non array/map type", async () => {
+        expect(async () => {
+            await logic.persistentState.get<number>((accessor) => accessor.entity("value2").length());
+        }).rejects.toThrow(/Attempting to access the length of a non-array or non-map type '(\w+)'/);
+    });
+
+    test("it should return the field value of class", async () => {
         const expectedName = "Harsh";
-        
-        jest.spyOn(PROVIDER, 'getStorageAt').mockImplementation(() => {
+
+        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
             const polorizer = new Polorizer();
             polorizer.polorizeString(expectedName);
             return Promise.resolve(encodeToString(polorizer.bytes()));
         });
 
-        const name = await logic.persistentState.get<string>(accessor => accessor.entity("value2").field("name"));
+        const name = await logic.persistentState.get<string>((accessor) => accessor.entity("value2").field("name"));
 
         expect(typeof name).toBe("string");
         expect(name).toBe(expectedName);
@@ -144,32 +161,59 @@ describe('Accessing Persistance Storage', () => {
 
     test("it should be able to access map value", async () => {
         const expectedValue = "Harsh";
-        
-        jest.spyOn(PROVIDER, 'getStorageAt').mockImplementation(() => {
+
+        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
             const polorizer = new Polorizer();
             polorizer.polorizeString(expectedValue);
             return Promise.resolve(encodeToString(polorizer.bytes()));
         });
 
-        const value = await logic.persistentState.get<string>(accessor => accessor.entity("value3").property("foo").field("name"));
+        const value = await logic.persistentState.get<string>((accessor) =>
+            accessor.entity("value3").property("foo").field("name")
+        );
 
         expect(typeof value).toBe("string");
         expect(value).toBe(expectedValue);
     });
 
-
-    test("it should throw an error when accessing invalid class field", async () => {
-        const expectedValue = "Harsh";
-        
-        jest.spyOn(PROVIDER, 'getStorageAt').mockImplementation(() => {
+    test("it should be access index of array", async () => {
+        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
             const polorizer = new Polorizer();
-            polorizer.polorizeString(expectedValue);
+            polorizer.polorizeBool(true);
             return Promise.resolve(encodeToString(polorizer.bytes()));
         });
 
-        expect(async () => {
-            await logic.persistentState.get<string>(accessor => accessor.entity("value3").property("foo").field("invalid"));
-        }).rejects.toThrow();
+        const value = await logic.persistentState.get<boolean>((b) => b.entity("value1").property("foo").at(0));
 
+        expect(typeof value).toBe("boolean");
+        expect(value).toBe(true);
     });
-})
+
+    test("it should throw an error when accessing invalid class field", async () => {
+        expect(async () => {
+            await logic.persistentState.get<string>((accessor) =>
+                accessor.entity("value3").property("foo").field("invalid")
+            );
+        }).rejects.toThrow();
+    });
+
+    test("it should throw an error when accessing non primitive type value", async () => {
+        expect(async () => {
+            await logic.persistentState.get<string>((accessor) => accessor.entity("value2"));
+        }).rejects.toThrow(/Cannot retrieve complex types from persistent state/);
+    });
+
+    test("it should throw an error when attempting to access field of class, which is not recognized", async () => {
+        expect(async () => {
+            await logic.persistentState.get<string>((accessor) => accessor.entity("value1").field("invalid"));
+        }).rejects.toThrow(/Attempting to access a field '(\w+)' in (\S+), which is not a recognized class./);
+    });
+
+    test("it should throw an error when attempting to access property of entity, which is not recognized", async () => {
+        const label = "invalid" + Math.floor(Math.random() * 100);
+
+        expect(async () => {
+            await logic.persistentState.get<string>((accessor) => accessor.entity(label));
+        }).rejects.toThrow(/'(\w+)' is not member of persistent state/);
+    });
+});

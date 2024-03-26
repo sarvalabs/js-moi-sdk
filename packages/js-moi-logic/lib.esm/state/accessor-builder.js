@@ -1,4 +1,4 @@
-import { Schema } from "js-moi-manifest";
+import { isArray, isMap, Schema } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, } from "./accessor";
 const VALUE_TYPE_INDEX = 1;
@@ -17,6 +17,9 @@ export class SlotAccessorBuilder {
         return this.accessors;
     }
     length() {
+        if (!isArray(this.slotType) && !isMap(this.slotType)) {
+            ErrorUtils.throwError(`Attempting to access the length of a non-array or non-map type '${this.slotType}'.`, ErrorCode.UNSUPPORTED_OPERATION);
+        }
         this.slotType = "u64";
         this.accessors.push(new LengthAccessor());
         return this;
