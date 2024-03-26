@@ -2,7 +2,8 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import {
     AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
     IxType, LogicDeployReceipt, LogicInvokeReceipt, Tesseract, bytesToHex, hexDataLength,
-    hexToBN, hexToBytes, toQuantity, unmarshal
+    hexToBN, hexToBytes, toQuantity, unmarshal,
+    type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
@@ -208,7 +209,7 @@ export class BaseProvider extends AbstractProvider {
      * // Retrieve interaction by tesseract options only
      * provider.getInteractionByTesseract({ tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' }, 2)
      */
-    async getInteractionByTesseract(arg1?: unknown, arg2?: unknown, ix_index?: unknown): Promise<Interaction> {
+    async getInteractionByTesseract(arg1?: unknown, arg2?: unknown, ix_index?: NumberLike): Promise<Interaction> {
         try {
             const params = {};
 
@@ -220,7 +221,7 @@ export class BaseProvider extends AbstractProvider {
 
             if (typeof arg1 === "object") {
                 params['options'] = arg1 ? arg1 : defaultOptions;
-                params['ix_index'] = arg2 != null ? toQuantity(arg2) : toQuantity(1);
+                params['ix_index'] = arg2 != null ? toQuantity(arg2 as number) : toQuantity(1);
             }
 
             const response = await this.execute("moi.InteractionByTesseract", params);

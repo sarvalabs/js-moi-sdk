@@ -2,4 +2,5 @@ src/
 manifests/
 __tests__/
 tsconfig.json
+tsconfig.*.json
 dist/tsconfig.tsbuild*

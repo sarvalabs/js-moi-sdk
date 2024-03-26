@@ -1,0 +1,199 @@
+import { blake2b } from "@noble/hashes/blake2b";
+import BN from "bn.js";
+import { encodeToString } from "js-moi-utils";
+import { Polorizer } from "js-polo";
+
+
+export type SlotHash = BN;
+
+export class StorageKey {
+    private value: BN;
+
+    constructor(value: number | string | Buffer | Uint8Array | BN) {
+        this.value = new BN(value);
+    }
+
+    hex(): string {
+        return encodeToString(this.toBuffer());
+    }
+    
+    toBuffer(): Buffer {
+        return this.value.toBuffer("be", 32);
+    }
+}
+
+/**
+ * Represents an accessor that provides access to a slot hash.
+ */
+export interface Accessor {
+    /**
+     * Retrieves the slot hash associated with the given hash.
+     *
+     * @param hash - The hash of the slot.
+     * @returns The slot hash associated with the given hash.
+     */
+    access(hash: StorageKey): StorageKey;
+}
+
+/**
+ * Represents an accessor provider that provides accessors.
+ */
+export interface AccessorProvider {
+    /**
+     * Retrieves the accessors.
+     * @returns An array of accessors.
+     */
+    getAccessors(): Accessor[];
+}
+
+/**
+ * Represents a interface that provides the type of the value present at slot hash.
+ */
+export interface StorageTypeProvider {
+    /**
+     * Gets the type of the slot hash.
+     * @returns The type of the slot hash as a string.
+     */
+    getStorageType(): string;
+}
+
+export type AccessorAndStorageProvider = AccessorProvider & StorageTypeProvider;
+
+/**
+ * AbstractAccessor class provides a base implementation of the Accessor interface.
+ */
+export abstract class AbstractAccessor implements Accessor {
+    /**
+     * Calculates the sum256 hash of a Uint8Array using the blake2b algorithm.
+     * @param hash - The input Uint8Array to be hashed.
+     * @returns The calculated sum256 hash as a Uint8Array.
+     */
+    protected sum256(hash: Uint8Array): Uint8Array {
+        return blake2b(hash, { dkLen: 32 });
+    }
+
+    /**
+     * Abstract method that needs to be implemented by subclasses.
+     * It defines the logic for accessing a SlotHash.
+     * @param hash - The SlotHash to be accessed.
+     * @returns The accessed SlotHash.
+     */
+    public abstract access(hash: StorageKey): StorageKey;
+}
+
+/**
+ * Represents a LengthAccessor class that extends the AbstractAccessor class.
+ *
+ * It generates slot hash for accessing the length of an Array/VArray or a Map.
+ */
+export class LengthAccessor extends AbstractAccessor {
+    public access(hash: StorageKey): StorageKey {
+        return hash;
+    }
+}
+
+/**
+ * Generates a slot hash for accessing the key of Map.
+ */
+export class PropertyAccessor extends AbstractAccessor {
+    /**
+     * Creates a new instance of PropertyAccessor.
+     * @param key The label of the property.
+     */
+    public constructor(private key: string) {
+        super();
+    }
+
+    /**
+     * Polorizes the given key.
+     * @param key The key to polorize.
+     * @returns The polorized key as a bytes.
+     */
+    private polorizeKey(key: string): Uint8Array {
+        const polorizer = new Polorizer();
+        polorizer.polorizeString(key);
+        return polorizer.bytes();
+    }
+
+    /**
+     * Accesses the property with the given hash and returns the resulting hash.
+     * @param hash The hash of the property.
+     * @returns The resulting hash after accessing the property.
+     */
+    public access(hash: StorageKey): StorageKey {
+        const key = this.polorizeKey(this.key);
+        const separator = Buffer.from(".");
+        const buffer = Buffer.concat([hash.toBuffer(), separator, key]);
+
+        return new StorageKey(this.sum256(buffer));
+    }
+}
+
+/**
+ * Represents an accessor for accessing elements in an array by index.
+ */
+export class ArrayIndexAccessor extends AbstractAccessor {
+    /**
+     * Creates a new instance of ArrayIndexAccessor.
+     * @param index The index of the element to access.
+     */
+    public constructor(private index: number) {
+        super();
+    }
+
+    /**
+     * Generates a slot hash for accessing the element at the given index.
+     * @param hash The input hash.
+     * @returns The updated hash after accessing the element.
+     */
+    public access(hash: StorageKey): StorageKey {
+        const bytes = this.sum256(hash.toBuffer());
+        const slot = new BN(bytes).add(new BN(this.index));
+        return new StorageKey(slot)
+    }
+}
+
+/**
+ * Represents an accessor for accessing fields of a class.
+ */
+export class ClassFieldAccessor extends AbstractAccessor {
+    constructor(private index: number) {
+        super();
+    }
+
+    public access(hash: StorageKey): StorageKey {
+        const polorizer = new Polorizer();
+        polorizer.polorizeString("a");
+        const bytes = this.sum256(hash.toBuffer());
+        return new StorageKey(new BN(bytes).add(new BN(this.index)));
+    }
+}
+
+
+/**
+ * Generates a slot hash based on the provided base and accessors.
+ * 
+ * @param base - The base value for the slot hash.
+ * @param accessors - The accessors used to generate the slot hash.
+ * @returns The generated slot hash as a Uint8Array.
+ */
+export function generateStorageKey(base: number | StorageKey, ...accessors: Accessor[]): StorageKey;
+/**
+ * Generates a slot hash based on the provided base value and array of accessors.
+ * 
+ * @param base - The base value for generating the slot hash.
+ * @param accessorsArray - An array of accessors used in generating the slot hash.
+ * @returns The generated slot hash as a Uint8Array.
+ */
+export function generateStorageKey(base: number | StorageKey, accessorsArray: Accessor[]): StorageKey;
+export function generateStorageKey(base: number | StorageKey, ...args: any[]): StorageKey {
+    let slot = typeof base === "number" ? new StorageKey(base) : base;
+
+    const accessors: Accessor[] = Array.isArray(args[0]) ? args[0] : args;
+
+    for (const accessor of accessors) {
+        slot = accessor.access(slot);
+    }
+
+    return slot;
+}

@@ -1,10 +1,10 @@
-import HDKey from "hdkey";
+import { HDKey } from "@scure/bip32";
 import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 
 /**
  * This class represents a Hierarchical Deterministic (HD) Node used in 
- cryptographic key generation and derivation.
+ * cryptographic key generation and derivation.
  */
 export class HDNode {
   private node: HDKey;
@@ -85,6 +85,23 @@ export class HDNode {
   }
 
   /**
+   * Returns the extended private key associated with this HDNode.
+   * @returns The string representation of the extended private key.
+   */
+  getExtendedPrivateKey(): string {
+    return this.node.privateExtendedKey;
+  }
+
+  
+  /**
+   * Returns the extended public key for the HDNode.
+   * @returns The string representation of the extended public key.
+   */
+  getExtendedPublicKey(): string {
+    return this.node.publicExtendedKey;
+  }
+
+  /**
    * Retrieves the public key associated with the HDNode.
    *
    * @returns {Buffer} The public key.
@@ -94,7 +111,7 @@ export class HDNode {
     if (!this.node) {
       ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
     }
-    return this.node._publicKey;
+    return Buffer.from(this.node.publicKey);
   }
 
   /**
@@ -114,6 +131,6 @@ export class HDNode {
         ErrorCode.PROPERTY_NOT_DEFINED
       );
     }
-    return this.node._privateKey;
+    return Buffer.from(this.node.privateKey);
   }
 }

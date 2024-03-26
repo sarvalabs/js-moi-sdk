@@ -1,0 +1,136 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateStorageKey = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
+const blake2b_1 = require("@noble/hashes/blake2b");
+const bn_js_1 = __importDefault(require("bn.js"));
+const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
+class StorageKey {
+    value;
+    constructor(value) {
+        this.value = new bn_js_1.default(value);
+    }
+    hex() {
+        return (0, js_moi_utils_1.encodeToString)(this.toBuffer());
+    }
+    toBuffer() {
+        return this.value.toBuffer("be", 32);
+    }
+}
+exports.StorageKey = StorageKey;
+/**
+ * AbstractAccessor class provides a base implementation of the Accessor interface.
+ */
+class AbstractAccessor {
+    /**
+     * Calculates the sum256 hash of a Uint8Array using the blake2b algorithm.
+     * @param hash - The input Uint8Array to be hashed.
+     * @returns The calculated sum256 hash as a Uint8Array.
+     */
+    sum256(hash) {
+        return (0, blake2b_1.blake2b)(hash, { dkLen: 32 });
+    }
+}
+exports.AbstractAccessor = AbstractAccessor;
+/**
+ * Represents a LengthAccessor class that extends the AbstractAccessor class.
+ *
+ * It generates slot hash for accessing the length of an Array/VArray or a Map.
+ */
+class LengthAccessor extends AbstractAccessor {
+    access(hash) {
+        return hash;
+    }
+}
+exports.LengthAccessor = LengthAccessor;
+/**
+ * Generates a slot hash for accessing the key of Map.
+ */
+class PropertyAccessor extends AbstractAccessor {
+    key;
+    /**
+     * Creates a new instance of PropertyAccessor.
+     * @param key The label of the property.
+     */
+    constructor(key) {
+        super();
+        this.key = key;
+    }
+    /**
+     * Polorizes the given key.
+     * @param key The key to polorize.
+     * @returns The polorized key as a bytes.
+     */
+    polorizeKey(key) {
+        const polorizer = new js_polo_1.Polorizer();
+        polorizer.polorizeString(key);
+        return polorizer.bytes();
+    }
+    /**
+     * Accesses the property with the given hash and returns the resulting hash.
+     * @param hash The hash of the property.
+     * @returns The resulting hash after accessing the property.
+     */
+    access(hash) {
+        const key = this.polorizeKey(this.key);
+        const separator = Buffer.from(".");
+        const buffer = Buffer.concat([hash.toBuffer(), separator, key]);
+        return new StorageKey(this.sum256(buffer));
+    }
+}
+exports.PropertyAccessor = PropertyAccessor;
+/**
+ * Represents an accessor for accessing elements in an array by index.
+ */
+class ArrayIndexAccessor extends AbstractAccessor {
+    index;
+    /**
+     * Creates a new instance of ArrayIndexAccessor.
+     * @param index The index of the element to access.
+     */
+    constructor(index) {
+        super();
+        this.index = index;
+    }
+    /**
+     * Generates a slot hash for accessing the element at the given index.
+     * @param hash The input hash.
+     * @returns The updated hash after accessing the element.
+     */
+    access(hash) {
+        const bytes = this.sum256(hash.toBuffer());
+        const slot = new bn_js_1.default(bytes).add(new bn_js_1.default(this.index));
+        return new StorageKey(slot);
+    }
+}
+exports.ArrayIndexAccessor = ArrayIndexAccessor;
+/**
+ * Represents an accessor for accessing fields of a class.
+ */
+class ClassFieldAccessor extends AbstractAccessor {
+    index;
+    constructor(index) {
+        super();
+        this.index = index;
+    }
+    access(hash) {
+        const polorizer = new js_polo_1.Polorizer();
+        polorizer.polorizeString("a");
+        const bytes = this.sum256(hash.toBuffer());
+        return new StorageKey(new bn_js_1.default(bytes).add(new bn_js_1.default(this.index)));
+    }
+}
+exports.ClassFieldAccessor = ClassFieldAccessor;
+function generateStorageKey(base, ...args) {
+    let slot = typeof base === "number" ? new StorageKey(base) : base;
+    const accessors = Array.isArray(args[0]) ? args[0] : args;
+    for (const accessor of accessors) {
+        slot = accessor.access(slot);
+    }
+    return slot;
+}
+exports.generateStorageKey = generateStorageKey;
+//# sourceMappingURL=accessor.js.map

@@ -204,12 +204,34 @@ Variables
 logic manifest. Developers can easily invoke and execute these routines, which 
 encapsulate specific functionalities and operations provided by the logic.
 
+``ephemeralState`` - The ephemeral state, accessible via this variable, 
+represents the short-term or temporary state of the logic.
+
 ``persistentState`` - The persistent state is accessible via this variable. It 
 allows developers to retrieve state of the logic, which persists across 
 different invocations and interactions.
 
-``ephemeralState`` - The ephemeral state, accessible via this variable, 
-represents the short-term or temporary state of the logic.
+ It contains the following method:
+
+* ``get`` 
+    This method retrieves the value from persistent state using the storage key.
+    As the storage key hash generation is complex, we have exposed the a builder 
+    object to generate the storage key hash. The builder object has the following methods:
+
+    * ``entity`` - This method used to select the member of the state persistent.
+    * ``length`` - This method used to access length/size of `Array`, `Varray` and, `Map`.
+    * ``property`` - This method used to access the property of map using the passed key.
+    * ``at`` - This method used to access the element of `Array` and `Varray` using the passed index.
+    * ``field`` - This method used to access the field of `Class` using the passed field name.
+
+.. code-block:: javascript
+
+    // Example
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const symbol = await logic.persistentState.get(access => access.entity("symbol"));
+    console.log(symbol); // MOI
+
 
 Functions
 ~~~~~~~~~
@@ -277,7 +299,7 @@ Usage
     const logic = await getLogicDriver(logicId, wallet);
 
     // Get the persistent state
-    const symbol = await logic.persistentState.get("symbol");
+    const symbol = await logic.persistentState.get(access => access.entity("symbol"));
 
     console.log(symbol); // MOI
 
