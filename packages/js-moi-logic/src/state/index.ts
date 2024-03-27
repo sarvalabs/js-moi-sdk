@@ -11,8 +11,7 @@ export {
     LengthAccessor,
     PropertyAccessor,
     generateStorageKey as generateSlotHash,
-    type Accessor,
-    type SlotHash
+    type Accessor
 } from "./accessor";
 
 export { SlotAccessorBuilder } from "./accessor-builder";

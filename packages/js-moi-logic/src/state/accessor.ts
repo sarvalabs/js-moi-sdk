@@ -3,9 +3,6 @@ import BN from "bn.js";
 import { encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 
-
-export type SlotHash = BN;
-
 export class StorageKey {
     private value: BN;
 
@@ -96,12 +93,16 @@ export class LengthAccessor extends AbstractAccessor {
  * Generates a slot hash for accessing the key of Map.
  */
 export class PropertyAccessor extends AbstractAccessor {
+    key: Uint8Array;
+
     /**
      * Creates a new instance of PropertyAccessor.
      * @param key The label of the property.
      */
-    public constructor(private key: string) {
+    public constructor(key: string) {
         super();
+
+        this.key = this.sum256(this.polorize(key));
     }
 
     /**
@@ -109,7 +110,7 @@ export class PropertyAccessor extends AbstractAccessor {
      * @param key The key to polorize.
      * @returns The polorized key as a bytes.
      */
-    private polorizeKey(key: string): Uint8Array {
+    private polorize(key: string): Uint8Array {
         const polorizer = new Polorizer();
         polorizer.polorizeString(key);
         return polorizer.bytes();
@@ -121,9 +122,8 @@ export class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     public access(hash: StorageKey): StorageKey {
-        const key = this.polorizeKey(this.key);
         const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, key]);
+        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
 
         return new StorageKey(this.sum256(buffer));
     }

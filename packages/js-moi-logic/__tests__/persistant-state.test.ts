@@ -21,7 +21,7 @@ describe("Slot Key Generation", () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("foo"), new LengthAccessor());
 
-        expect(slot.hex()).toBe("0xddda8583818ad60e3fb343dead4d2b68e180ab61c90214b29c9f1f8bcbcb8e48");
+        expect(slot.hex()).toBe("0x4e599175a4aa8d5f5d36b2f2795b30e910fd43bce5c2bfb423fa941690ab188d");
     });
 
     test(`len(X["boo"])`, () => {
@@ -33,7 +33,7 @@ describe("Slot Key Generation", () => {
 
     test(`X["foo"][0]`, () => {
         const base = generateStorageKey(0);
-        const slot = generateStorageKey(base, new PropertyAccessor("foo"), new ArrayIndexAccessor(0));
+        const slot = generateStorageKey(base, new PropertyAccessor("foo"), new ArrayIndexAccessor(8));
         expect(slot.hex()).toBe("0xfb70ce47ff2e72a9d69bde31f25e2754335e694164bf9971725742bcdc73bf60");
     });
 
@@ -48,16 +48,19 @@ describe("Slot Key Generation", () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("boo"), new ArrayIndexAccessor(1));
 
-        expect(slot.hex()).toBe("0xe86598cc5f684a7929ab01bef95109589e3ed0951420336de597876cae07d346");
+        expect(slot.hex()).toBe("0x6641e86771daecc0b8da74d7e9a376067a35c96bc1177764f1c22f7a363b2a0c");
     });
 
     test(`Y.a`, () => {
-        const storageKey = new StorageKey("23615463689709273622549015552744609029845592521730629701095228557717941624602")
+        const storageKey = new StorageKey(
+            "23615463689709273622549015552744609029845592521730629701095228557717941624602"
+        );
         const base = generateStorageKey(storageKey);
         const slot = generateStorageKey(base, new ClassFieldAccessor(0));
 
         expect(slot.hex()).toBe("0xaa5d421bf085129f130aa77b9de3fce691fa3354f6ffca86b34226f0cbbd2e81");
     });
+
     test(`len(Y.b)`, () => {
         const base = generateStorageKey(1);
         const slot = generateStorageKey(base, new ClassFieldAccessor(1), new LengthAccessor());
