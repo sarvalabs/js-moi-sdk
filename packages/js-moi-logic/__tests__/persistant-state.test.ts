@@ -2,7 +2,7 @@ import { encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { LogicDriver } from "../src/logic-driver";
 import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor } from "../src/state";
-import { generateStorageKey } from "../src/state/accessor";
+import { generateStorageKey, StorageKey } from "../src/state/accessor";
 import { PROVIDER } from "./utils/constants";
 import { loadManifestFromFile } from "./utils/utils";
 
@@ -52,10 +52,11 @@ describe("Slot Key Generation", () => {
     });
 
     test(`Y.a`, () => {
-        const base = generateStorageKey(1);
-        const slot = generateStorageKey(base, new ClassFieldAccessor(1));
+        const storageKey = new StorageKey("23615463689709273622549015552744609029845592521730629701095228557717941624602")
+        const base = generateStorageKey(storageKey);
+        const slot = generateStorageKey(base, new ClassFieldAccessor(0));
 
-        expect(slot.hex()).toBe("0x44a2711e9357cdc7c7c8832ad510d1232da569ec2feab44495d2e9ef01ff2bf2");
+        expect(slot.hex()).toBe("0xaa5d421bf085129f130aa77b9de3fce691fa3354f6ffca86b34226f0cbbd2e81");
     });
     test(`len(Y.b)`, () => {
         const base = generateStorageKey(1);

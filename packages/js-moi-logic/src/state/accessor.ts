@@ -162,10 +162,11 @@ export class ClassFieldAccessor extends AbstractAccessor {
     }
 
     public access(hash: StorageKey): StorageKey {
-        const polorizer = new Polorizer();
-        polorizer.polorizeString("a");
-        const bytes = this.sum256(hash.toBuffer());
-        return new StorageKey(new BN(bytes).add(new BN(this.index)));
+        let blob : Uint8Array = hash.toBuffer();
+        blob = this.sum256(blob);
+        const bn = new BN(blob).add(new BN(this.index));
+        
+        return new StorageKey(bn);
     }
 }
 
