@@ -1,8 +1,7 @@
-import { LogicManifest } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, encodeToString } from "js-moi-utils";
-import { blake2b } from 'blakejs';
+import { blake2b } from "@noble/hashes/blake2b";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { AbstractProvider } from "js-moi-providers";
-import { ManifestCoder } from "js-moi-manifest";
+import { ErrorCode, ErrorUtils, encodeToString } from "js-moi-utils";
 
 export enum ContextStateKind {
     PersistentState,
@@ -112,7 +111,9 @@ export class PersistentState {
      * @returns {string} The hash of the slot as a string.
      */
     private slotHash(slot: number): string {
-        const hash = blake2b(new Uint8Array([slot]), null, 32);
+        const hash = blake2b(new Uint8Array([slot]), {
+            dkLen: 32,
+        });
       
         return encodeToString(hash)
     }
