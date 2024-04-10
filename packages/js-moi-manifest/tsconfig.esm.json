@@ -8,5 +8,5 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "lib.esm/.tsbuildinfo"
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "../js-moi-logic/src/element-descriptor.ts"]
 }

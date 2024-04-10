@@ -1,9 +1,9 @@
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { ContextStateMatrix } from "./state";
+import { ContextStateMatrix } from "./context-state-matrix";
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-export default class ElementDescriptor {
+export class ElementDescriptor {
     stateMatrix;
     elements = new Map();
     callSites = new Map();

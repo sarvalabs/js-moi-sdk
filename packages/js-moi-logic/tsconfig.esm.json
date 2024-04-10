@@ -8,5 +8,5 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "lib.esm/.tsbuildinfo"
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "src/element-descriptor.ts"]
 }

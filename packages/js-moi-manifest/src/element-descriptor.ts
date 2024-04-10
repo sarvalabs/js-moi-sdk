@@ -1,39 +1,42 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const js_moi_utils_1 = require("js-moi-utils");
-const state_1 = require("./state");
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import type { LogicManifest } from "../types/manifest";
+import { ContextStateMatrix } from "./context-state-matrix";
+
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-class ElementDescriptor {
-    stateMatrix;
-    elements = new Map();
-    callSites = new Map();
-    classDefs = new Map();
-    methodDefs = new Map();
-    constructor(elements) {
-        this.stateMatrix = new state_1.ContextStateMatrix(elements);
+export class ElementDescriptor {
+    protected stateMatrix: ContextStateMatrix;
+    protected elements: Map<number, LogicManifest.Element> = new Map();
+    protected callSites: Map<string, LogicManifest.CallSite> = new Map();
+    protected classDefs: Map<string, number> = new Map();
+    protected methodDefs: Map<string, LogicManifest.MethodDef> = new Map();
+
+    constructor(elements: LogicManifest.Element[]) {
+        this.stateMatrix = new ContextStateMatrix(elements);
+
         // Populate the maps for elements, call sites, class and method definitions.
         elements.forEach(element => {
             this.elements.set(element.ptr, element);
-            switch (element.kind) {
+            
+            switch(element.kind){
                 case "class":
-                    const classData = element.data;
+                    const classData = element.data as LogicManifest.Class;
                     this.classDefs.set(classData.name, element.ptr);
                     break;
                 case "method":
-                    const methodData = element.data;
-                    const methodDef = {
+                    const methodData = element.data as LogicManifest.Method;
+                    const methodDef: LogicManifest.MethodDef = {
                         ptr: element.ptr,
                         class: methodData.class
                     };
                     this.methodDefs.set(methodData.name, methodDef);
                     break;
                 case "routine":
-                    const routineData = element.data;
-                    const callsite = {
-                        ptr: element.ptr,
-                        kind: routineData.kind
+                    const routineData = element.data as LogicManifest.Routine;
+                    const callsite: LogicManifest.CallSite = { 
+                        ptr: element.ptr, 
+                        kind: routineData.kind 
                     };
                     this.callSites.set(routineData.name, callsite);
                     break;
@@ -42,111 +45,139 @@ class ElementDescriptor {
             }
         });
     }
+
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
-     *
+     * 
      * @returns {ContextStateMatrix} The state matrix.
      */
-    getStateMatrix() {
+    public getStateMatrix(): ContextStateMatrix {
         return this.stateMatrix;
     }
+
     /**
      * Retrieves the map of elements associated with the ElementDescriptor.
-     *
+     * 
      * @returns {Map<number, LogicManifest.Element>} The elements map.
      */
-    getElements() {
+    public getElements(): Map<number, LogicManifest.Element> {
         return this.elements;
     }
+
     /**
      * Retrieves the map of call sites associated with the ElementDescriptor.
-     *
+     * 
      * @returns {Map<string, CallSite>} The call sites map.
      */
-    getCallsites() {
+    public getCallsites(): Map<string, LogicManifest.CallSite> {
         return this.callSites;
-    }
+    } 
+
     /**
      * Retrieves the map of class definitions associated with the ElementDescriptor.
-     *
+     * 
      * @returns {Map<string, number>} The class definitions map.
      */
-    getClassDefs() {
+    public getClassDefs(): Map<string, number> {
         return this.classDefs;
     }
+
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
-     *
+     * 
      * @returns {Map<string, MethodDef>} The method definitions map.
      */
-    getMethodDefs() {
+    public getMethodDefs(): Map<string, LogicManifest.MethodDef> {
         return this.methodDefs;
     }
+
     /**
      * Retrieves the methods of a class based on the given class name.
-     *
+     * 
      * @param {string} className - The name of the class.
      * @returns {Map<string, LogicManifest.Method>} The methods of the class.
      * @throws {Error} if the class name is invalid.
      */
-    getClassMethods(className) {
+    public getClassMethods(className: string): Map<string, LogicManifest.Method> {
         const classPtr = this.classDefs.get(className);
+        
         if (classPtr === undefined) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid class name: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(
+                `Invalid class name: ${className}`,
+                ErrorCode.INVALID_ARGUMENT
+            );
         }
-        const classMethods = new Map();
+    
+        const classMethods: Map<string, LogicManifest.Method> = new Map();
         this.methodDefs.forEach((method, methodName) => {
             if (method.class === className) {
                 const element = this.elements.get(method.ptr);
-                classMethods.set(methodName, element.data);
+                classMethods.set(methodName, element.data as LogicManifest.Method);
             }
         });
+    
         return classMethods;
     }
+
     /**
      * Retrieves the element from the logic manifest based on the given
      * routine name.
-     *
+     * 
      * @param {string} routineName - The name of the routine.
      * @returns {LogicManifest.Element} The routine element.
      * @throws {Error} if the routine name is invalid.
      */
-    getRoutineElement(routineName) {
+    public getRoutineElement(routineName: string): LogicManifest.Element {
         const callsite = this.callSites.get(routineName);
+
         if (!callsite) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${routineName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(
+                `Invalid routine name: ${routineName}`,
+                ErrorCode.INVALID_ARGUMENT
+            )
         }
+
         return this.elements.get(callsite.ptr);
     }
+
     /**
-     * Retrieves the element from the logic manifest based on the given
+     * Retrieves the element from the logic manifest based on the given 
      * class name.
-     *
+     * 
      * @returns {LogicManifest.Element} The class element.
      * @throws {Error} if the class name is invalid.
      */
-    getClassElement(className) {
+    public getClassElement(className: string): LogicManifest.Element {
         const ptr = this.classDefs.get(className);
+
         if (ptr === undefined) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(
+                `Invalid routine name: ${className}`,
+                ErrorCode.INVALID_ARGUMENT
+            )
         }
+
         return this.elements.get(ptr);
     }
+
     /**
-     * Retrieves the element from the logic manifest based on the given
+     * Retrieves the element from the logic manifest based on the given 
      * method name.
-     *
+     * 
      * @param {string} methodName - The name of the method.
      * @returns {LogicManifest.Element} The method element.
      * @throws {Error} if the method name is invalid.
      */
-    getMethodElement(methodName) {
+    public getMethodElement(methodName: string): LogicManifest.Element {
         const methodDef = this.methodDefs.get(methodName);
+
         if (!methodDef) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${methodName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(
+                `Invalid routine name: ${methodName}`,
+                ErrorCode.INVALID_ARGUMENT
+            )
         }
+
         return this.elements.get(methodDef.ptr);
     }
 }
-exports.default = ElementDescriptor;
-//# sourceMappingURL=element-descriptor.js.map

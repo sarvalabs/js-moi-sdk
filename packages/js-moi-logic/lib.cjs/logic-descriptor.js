@@ -4,7 +4,6 @@ exports.LogicDescriptor = exports.EngineKind = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const logic_base_1 = require("./logic-base");
 const logic_id_1 = require("./logic-id");
-const state_1 = require("./state");
 var EngineKind;
 (function (EngineKind) {
     EngineKind["PISA"] = "PISA";
@@ -102,7 +101,7 @@ class LogicDescriptor extends logic_base_1.LogicBase {
      * const [ptr, exists] = logic.hasPersistentState();
      */
     hasPersistentState() {
-        const ptr = this.stateMatrix.get(state_1.ContextStateKind.PersistentState);
+        const ptr = this.stateMatrix.get(js_moi_manifest_1.ContextStateKind.PersistentState);
         if (ptr !== undefined) {
             return [ptr, true];
         }
@@ -116,7 +115,7 @@ class LogicDescriptor extends logic_base_1.LogicBase {
      * const [ptr, exists] = logic.hasEphemeralState();
      */
     hasEphemeralState() {
-        const ptr = this.stateMatrix.get(state_1.ContextStateKind.EphemeralState);
+        const ptr = this.stateMatrix.get(js_moi_manifest_1.ContextStateKind.EphemeralState);
         if (ptr !== undefined) {
             return [ptr, true];
         }

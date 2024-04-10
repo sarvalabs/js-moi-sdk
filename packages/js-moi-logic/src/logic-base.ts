@@ -1,11 +1,10 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
-import ElementDescriptor from "./element-descriptor";
 
 const DEFAULT_FUEL_PRICE = 1;
 

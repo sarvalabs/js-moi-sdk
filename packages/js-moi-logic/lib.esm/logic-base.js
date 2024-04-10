@@ -1,7 +1,6 @@
-import { ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import ElementDescriptor from "./element-descriptor";
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
