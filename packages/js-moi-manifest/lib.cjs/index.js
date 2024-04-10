@@ -18,6 +18,6 @@ exports.ElementDescriptor = void 0;
 __exportStar(require("./context-state-matrix"), exports);
 var element_descriptor_1 = require("./element-descriptor");
 Object.defineProperty(exports, "ElementDescriptor", { enumerable: true, get: function () { return element_descriptor_1.ElementDescriptor; } });
-__exportStar(require("./manifest"), exports);
+__exportStar(require("./manifest-coder"), exports);
 __exportStar(require("./schema"), exports);
 //# sourceMappingURL=index.js.map

@@ -218,4 +218,4 @@ export class ManifestCoder {
         return null;
     }
 }
-//# sourceMappingURL=manifest.js.map
+//# sourceMappingURL=manifest-coder.js.map
