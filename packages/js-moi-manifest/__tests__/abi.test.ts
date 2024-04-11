@@ -33,7 +33,7 @@ describe("Test ManifestCoder", () => {
             expect(calldata).toBe(output);
         });
 
-        test("it should encode arguments when field is of type string", () => {
+        test("it should encode arguments when field is routine name", () => {
             const result = manifestCoder.encodeArguments(routineName, args);
 
             expect(result).toBe(output);
@@ -46,21 +46,30 @@ describe("Test ManifestCoder", () => {
         });
     });
 
-    test("Decode polo encoded output", () => {
-        const output = "0x0e1f0305f5e100";
+    describe("Decode POLO encoded ouput", () => {
+        type Output = { balance: number };
+        const encodedOutput = "0x0e1f0305f5e100";
+        const decodedOutput: Output = { balance: 100000000 };
+        const routineName = "BalanceOf";
 
-        const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-            element.data = element.data as LogicManifest.Routine;
-            return element.data.name === "BalanceOf";
+        test("it should be able to decode when field is provided as type of arguments", () => {
+            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
+                element.data = element.data as LogicManifest.Routine;
+                return element.data.name === routineName;
+            });
+
+            const routine = routineElement?.data as LogicManifest.Routine;
+            const fields = routine.returns ? routine.returns : [];
+            const output = manifestCoder.decodeOutput<Output>(encodedOutput, fields);
+
+            expect(output).toEqual(decodedOutput);
         });
 
-        const routine = routineElement?.data as LogicManifest.Routine;
+        test("it should be able to decode when field is routine name", () => {
+            const output = manifestCoder.decodeOutput<Output>(encodedOutput, routineName);
 
-        const fields = routine.returns ? routine.returns : [];
-
-        const decodedOutput = manifestCoder.decodeOutput(output, fields);
-
-        expect(decodedOutput).toEqual({ balance: 100000000 });
+            expect(output).toEqual(decodedOutput);
+        });
     });
 
     test("Decode polo encoded exception", () => {
