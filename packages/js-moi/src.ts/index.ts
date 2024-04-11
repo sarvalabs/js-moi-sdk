@@ -7,4 +7,4 @@ export * from "js-moi-providers";
 export * from "js-moi-signer";
 export * from "js-moi-utils";
 export * from "js-moi-wallet";
-//# sourceMappingURL=index.d.ts.map
+

@@ -5,8 +5,8 @@
     "module": "ES2022",
     "composite": true,
     "moduleResolution": "Bundler",
-    "rootDir": "./src",
+    "rootDir": "./src.ts",
     "tsBuildInfoFile": "lib.esm/.tsbuildinfo"
   },
-  "include": ["./src/**/*"]
+  "include": ["./src.ts/**/*"]
 }
