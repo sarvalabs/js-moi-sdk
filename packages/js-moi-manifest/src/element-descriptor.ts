@@ -12,7 +12,20 @@ export class ElementDescriptor {
     protected classDefs: Map<string, number> = new Map();
     protected methodDefs: Map<string, LogicManifest.MethodDef> = new Map();
 
-    constructor(elements: LogicManifest.Element[]) {
+    /**
+     * Creates an instance of ElementDescriptor.
+     * 
+     * @param {LogicManifest.Element[]} manifest - The JSON representation of the logic manifest.
+     */
+    constructor(manifest: LogicManifest.Manifest);
+    /**
+     * Creates an instance of ElementDescriptor.
+     *
+     * @param {LogicManifest.Manifest} elements - The JSON representation of the logic manifest.
+     */
+    constructor(elements: LogicManifest.Element[]);
+    constructor(argument: LogicManifest.Element[] | LogicManifest.Manifest) {
+        const elements = Array.isArray(argument) ? argument : argument.elements;
         this.stateMatrix = new ContextStateMatrix(elements);
 
         // Populate the maps for elements, call sites, class and method definitions.

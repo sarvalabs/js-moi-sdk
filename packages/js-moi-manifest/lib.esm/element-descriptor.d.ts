@@ -9,6 +9,17 @@ export declare class ElementDescriptor {
     protected callSites: Map<string, LogicManifest.CallSite>;
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, LogicManifest.MethodDef>;
+    /**
+     * Creates an instance of ElementDescriptor.
+     *
+     * @param {LogicManifest.Element[]} manifest - The JSON representation of the logic manifest.
+     */
+    constructor(manifest: LogicManifest.Manifest);
+    /**
+     * Creates an instance of ElementDescriptor.
+     *
+     * @param {LogicManifest.Manifest} elements - The JSON representation of the logic manifest.
+     */
     constructor(elements: LogicManifest.Element[]);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.

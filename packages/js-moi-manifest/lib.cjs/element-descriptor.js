@@ -12,7 +12,8 @@ class ElementDescriptor {
     callSites = new Map();
     classDefs = new Map();
     methodDefs = new Map();
-    constructor(elements) {
+    constructor(argument) {
+        const elements = Array.isArray(argument) ? argument : argument.elements;
         this.stateMatrix = new context_state_matrix_1.ContextStateMatrix(elements);
         // Populate the maps for elements, call sites, class and method definitions.
         elements.forEach(element => {

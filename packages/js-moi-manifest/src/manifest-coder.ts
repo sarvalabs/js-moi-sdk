@@ -1,26 +1,42 @@
+import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
-import { Schema } from "./schema";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { bytesToHex, hexToBytes, ErrorUtils, ErrorCode, trimHexPrefix, deepCopy } from "js-moi-utils";
+import { ElementDescriptor } from "./element-descriptor";
+import { Schema } from "./schema";
 
 /**
- * ManifestCoder is a class that provides encoding and decoding functionality 
- * for Logic Interface.It allows encoding manifests and arguments, as well as 
- * decoding output, exceptions and logic states based on both a predefined and 
+ * ManifestCoder is a class that provides encoding and decoding functionality
+ * for Logic Interface.It allows encoding manifests and arguments, as well as
+ * decoding output, exceptions and logic states based on both a predefined and
  * runtime schema.
  *
  * @class
  */
 export class ManifestCoder {
-    private schema: Schema
+    private readonly elementDescriptor: ElementDescriptor;
 
-    constructor(elements: Map<number, LogicManifest.Element>, classDefs: Map<string, number>) {
-        this.schema = new Schema(elements, classDefs)
+    /**
+     * Creates an instance of ManifestCoder.
+     *
+     * @param {LogicManifest.Manifest} manifest - The logic manifest.
+     */
+    constructor(manifest: LogicManifest.Manifest);
+    /**
+     * Create an instance of ManifestCoder.
+     * @param elementDescriptor a element descriptor of the logic manifest
+     */
+    constructor(elementDescriptor: ElementDescriptor);
+    constructor(argument: LogicManifest.Manifest | ElementDescriptor) {
+        this.elementDescriptor = argument instanceof ElementDescriptor ? argument : new ElementDescriptor(argument);
     }
 
-    /** 
-     * Encodes a logic manifest into POLO format. The manifest is processed and 
+    get schema(): Schema {
+        return new Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());
+    }
+
+    /**
+     * Encodes a logic manifest into POLO format. The manifest is processed and
      * serialized according to the predefined schema.
      * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
      *
@@ -32,18 +48,18 @@ export class ManifestCoder {
         const polorizer = new Polorizer();
         polorizer.polorizeString(manifest.syntax);
         polorizer.polorize(manifest.engine, Schema.PISA_ENGINE_SCHEMA);
-    
-        if(manifest.elements) {
+
+        if (manifest.elements) {
             const elements = new Polorizer();
-        
+
             manifest.elements.forEach((value) => {
                 const element = new Polorizer();
-        
+
                 element.polorizeInteger(value.ptr);
                 element.polorize(value.deps, Schema.PISA_DEPS_SCHEMA);
                 element.polorizeString(value.kind);
-        
-                switch(value.kind) {    
+
+                switch (value.kind) {
                     case "constant":
                         element.polorize(value.data, Schema.PISA_CONSTANT_SCHEMA);
                         break;
@@ -63,20 +79,17 @@ export class ManifestCoder {
                         element.polorize(value.data, Schema.PISA_STATE_SCHEMA);
                         break;
                     default:
-                        ErrorUtils.throwError(
-                            `Unsupported kind: ${value.kind}`, 
-                            ErrorCode.UNSUPPORTED_OPERATION,
-                        );
+                        ErrorUtils.throwError(`Unsupported kind: ${value.kind}`, ErrorCode.UNSUPPORTED_OPERATION);
                 }
-        
+
                 elements.polorizePacked(element);
-            })
-        
+            });
+
             polorizer.polorizePacked(elements);
         }
 
         const bytes = polorizer.bytes();
-    
+
         return "0x" + bytesToHex(bytes);
     }
 
@@ -94,62 +107,52 @@ export class ManifestCoder {
         const parsableKinds = ["bytes", "array", "map", "struct"];
 
         const reconstructSchema = (schema: PoloSchema): PoloSchema => {
-            Object.keys(schema.fields).forEach(key => {
-                if(schema.fields[key].kind === "struct") {
+            Object.keys(schema.fields).forEach((key) => {
+                if (schema.fields[key].kind === "struct") {
                     schema.fields[key].kind = "document";
                 }
             });
-        
+
             return schema;
-        }
+        };
 
         const parseArray = (schema: PoloSchema, arg: any[]) => {
-            return arg.map((value: any, index: number) => 
-                this.parseCalldata(schema, value, arg.length - 1 === index)
-            );
-        }
+            return arg.map((value: any, index: number) => this.parseCalldata(schema, value, arg.length - 1 === index));
+        };
 
         const parseMap = (schema: PoloSchema, arg: Map<any, any>) => {
-            const map = new Map()
+            const map = new Map();
             const entries = Array.from(arg.entries());
 
             // Loop through the entries of the Map
-            entries.forEach((entry:[any, any], index: number) => {
+            entries.forEach((entry: [any, any], index: number) => {
                 const [key, value] = entry;
 
                 map.set(
-                    this.parseCalldata(
-                        schema.fields.keys, 
-                        key, 
-                        entries.length - 1 === index
-                    ), 
-                    this.parseCalldata(
-                        schema.fields.values, 
-                        value, 
-                        entries.length - 1 === index
-                    )
+                    this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index),
+                    this.parseCalldata(schema.fields.values, value, entries.length - 1 === index)
                 );
             });
 
             return map;
-        }
+        };
 
         const parseStruct = (schema: PoloSchema, arg: any, updateType: boolean) => {
-            Object.keys(arg).forEach(key => {
-                arg[key] = this.parseCalldata(schema.fields[key], arg[key], false)
+            Object.keys(arg).forEach((key) => {
+                arg[key] = this.parseCalldata(schema.fields[key], arg[key], false);
             });
 
-            const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)))
+            const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)));
 
-            if(updateType) {
+            if (updateType) {
                 schema.kind = "document";
                 delete schema.fields;
             }
 
             return doc.getData();
-        }
+        };
 
-        switch(schema.kind) {
+        switch (schema.kind) {
             case "string":
                 return trimHexPrefix(arg);
 
@@ -166,8 +169,7 @@ export class ManifestCoder {
                 break;
 
             case "map":
-                if((parsableKinds.includes(schema.fields.keys.kind) || 
-                parsableKinds.includes(schema.fields.values.kind))) {
+                if (parsableKinds.includes(schema.fields.keys.kind) || parsableKinds.includes(schema.fields.values.kind)) {
                     return parseMap(schema, arg);
                 }
                 break;
@@ -182,6 +184,22 @@ export class ManifestCoder {
         return arg;
     }
 
+    private getRoutine(routineName: string): LogicManifest.Routine {
+        const callsite = this.elementDescriptor.getCallsites().get(routineName);
+
+        if (callsite == null) {
+            ErrorUtils.throwArgumentError("Callsite not found", "routineName", routineName);
+        }
+
+        const element = this.elementDescriptor.getElements().get(callsite.ptr);
+        if (element.kind !== "routine" && element.kind !== "deployer") {
+            ErrorUtils.throwError("Invalid routine kind", ErrorCode.INVALID_ARGUMENT);
+        }
+
+        const routine = element.data as LogicManifest.Routine;
+        return routine;
+    }
+
     /**
      * Encodes the provided arguments based on the given manifest routine 
      * parmeters and its types (the accepts property in routine).
@@ -190,27 +208,27 @@ export class ManifestCoder {
      * is generated by parsing and encoding the arguments based on the dynamically 
      * created schema from fields.
      *
-     * @param {LogicManifest.TypeField[]} fields - The fields associated with the 
+     * @param {LogicManifest.TypeField[] | string} fields - The fields associated with the 
      routine parameters (arguments).
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string 
      prefixed with "0x".
      */
-    public encodeArguments(fields: LogicManifest.TypeField[], args: any[]): string {
+    public encodeArguments(fields: LogicManifest.TypeField[] | string, args: any[]): string {
+        if (typeof fields === "string") {
+            fields = this.getRoutine(fields).accepts;
+        }
+
         const schema = this.schema.parseFields(fields);
         const calldata = {};
-        Object.values(fields).forEach((field:LogicManifest.TypeField) => {
-            calldata[field.label] = this.parseCalldata(
-                schema.fields[field.label], 
-                args[field.slot]
-            );
+        
+        Object.values(fields).forEach((field: LogicManifest.TypeField) => {
+            calldata[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
         });
 
         const document = documentEncode(calldata, schema);
         const bytes = document.bytes();
-        const data = "0x" + bytesToHex(new Uint8Array(bytes));
-
-        return data;
+        return "0x" + bytesToHex(new Uint8Array(bytes));
     }
 
     /**
@@ -223,15 +241,16 @@ export class ManifestCoder {
      * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput(output: string, fields: LogicManifest.TypeField[]): unknown | null {
-        if(output && output != "0x" && fields && fields.length) {
-            const decodedOutput = hexToBytes(output)
-            const depolorizer = new Depolorizer(decodedOutput)
+    public decodeOutput(output: string, fields: LogicManifest.TypeField[] | string): unknown | null {
+        if (output && output != "0x" && fields && fields.length) {
+            fields = typeof fields === "string" ? this.getRoutine(fields).returns : fields;
+            const decodedOutput = hexToBytes(output);
+            const depolorizer = new Depolorizer(decodedOutput);
             const schema = this.schema.parseFields(fields);
-            return depolorizer.depolorize(schema)
+            return depolorizer.depolorize(schema);
         }
 
-        return null
+        return null;
     }
 
     /**
@@ -245,15 +264,15 @@ export class ManifestCoder {
      the error is empty.
      */
     public static decodeException(error: string): Exception | null {
-        if(error && error !== "0x") {
-            const decodedError = hexToBytes(error)
-            const depolorizer = new Depolorizer(decodedError)
-            const exception = depolorizer.depolorize(Schema.PISA_EXCEPTION_SCHEMA)
+        if (error && error !== "0x") {
+            const decodedError = hexToBytes(error);
+            const depolorizer = new Depolorizer(decodedError);
+            const exception = depolorizer.depolorize(Schema.PISA_EXCEPTION_SCHEMA);
 
-            return exception as Exception
+            return exception as Exception;
         }
 
-        return null
+        return null;
     }
 
     /**
@@ -270,10 +289,10 @@ export class ManifestCoder {
      */
     public decodeState(data: string, field: string, fields: LogicManifest.TypeField[]): unknown | null {
         if (data && data != "0x") {
-            const decodedData = hexToBytes(data)
-            const depolorizer = new Depolorizer(decodedData)
+            const decodedData = hexToBytes(data);
+            const depolorizer = new Depolorizer(decodedData);
             const schema = this.schema.parseFields(fields);
-            return depolorizer.depolorize(schema.fields[field])
+            return depolorizer.depolorize(schema.fields[field]);
         }
 
         return null;

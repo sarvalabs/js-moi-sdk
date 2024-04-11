@@ -1,5 +1,5 @@
 export * from "./context-state-matrix";
-export { ElementDescriptor } from "./element-descriptor";
+export * from "./element-descriptor";
 export * from "./manifest-coder";
 export * from "./schema";
 //# sourceMappingURL=index.js.map

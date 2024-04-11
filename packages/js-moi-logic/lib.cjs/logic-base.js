@@ -15,8 +15,8 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
+        super(manifest);
+        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this);
         this.connect(arg);
     }
     /**
