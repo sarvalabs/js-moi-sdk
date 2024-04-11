@@ -56,7 +56,6 @@ export declare class ManifestCoder {
      * Encodes the provided arguments based on the given manifest routine
      * parameters or routine name. The arguments are encoded into POLO format.
      *
-     * @example
      * ```javascript
      * const manifestCoder = new ManifestCoder(manifest);
      * const address = "0x89c28b823b5f71388e0d6dd2c56b44dd965bb64dae4b6c69abace47cf68f6948"
@@ -73,7 +72,6 @@ export declare class ManifestCoder {
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields or routine name.
      *
-     * @example
      * ```javascript
      * const manifestCoder = new ManifestCoder(manifest);
      * const output = "0x0e1f0305f5e100";

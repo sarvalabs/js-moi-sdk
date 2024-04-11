@@ -70,6 +70,18 @@ describe("Test ManifestCoder", () => {
 
             expect(output).toEqual(decodedOutput);
         });
+
+        test("it should throw an error when routine is not found", () => {
+            const routineName = randomBytes(16).toString("utf-8");
+
+            expect(() => manifestCoder.decodeOutput(routineName, encodedOutput)).toThrow();
+        });
+
+        test("it should return null when output is '0x'", () => {
+            const output = manifestCoder.decodeOutput("0x", routineName);
+
+            expect(output).toBeNull();
+        });
     });
 
     test("Decode polo encoded exception", () => {

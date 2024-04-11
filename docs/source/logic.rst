@@ -43,43 +43,6 @@ The ``Routine`` interface represents a routine function. It has the following pr
 
 The ``Routines`` interface represents a collection of routines. It is an object with named properties where the property name is the routine name and the property value is a ``Routine``.
 
-**CallSite**
-
-The ``CallSite`` interface represents a callsite. It has the following properties:
-
-* ``ptr`` - ``number``: The pointer to the callsite.
-* ``kind`` - ``string``: The kind of the callsite.
-
-**MethodDef**
-
-The ``MethodDef`` interface represents a method definition. It has the following properties:
-
-* ``ptr`` - ``number``: The pointer to the method.
-* ``class`` - ``string``: The name of the class.
-
-Element Descriptor
-------------------
-The ElementDescriptor class represents a descriptor for elements in the 
-logic manifest.
-
-.. autofunction:: getStateMatrix
-
-.. autofunction:: getElements
-
-.. autofunction:: getCallsites
-
-.. autofunction:: getClassDefs
-
-.. autofunction:: getMethodDefs
-
-.. autofunction:: getClassMethods
-
-.. autofunction:: getRoutineElement
-
-.. autofunction:: getClassElement
-
-.. autofunction:: getMethodElement
-
 Logic Base
 ----------
 The LogicBase is a abstract class extends the ElementDescriptor class and 

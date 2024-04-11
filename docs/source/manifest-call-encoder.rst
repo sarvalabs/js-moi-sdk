@@ -123,6 +123,21 @@ The ``LogicManifest`` module defines the schema for a logic manifest.
     * ``engine`` - ``EngineConfig``: The configuration of the logic engine.
     * ``elements`` - ``Element[]``: An array of elements within the manifest.
 
+    **CallSite**
+
+    The ``CallSite`` interface represents a callsite. It has the following properties:
+
+    * ``ptr`` - ``number``: The pointer to the callsite.
+    * ``kind`` - ``string``: The kind of the callsite.
+
+    **MethodDef**
+
+    The ``MethodDef`` interface represents a method definition. It has the following properties:
+
+    * ``ptr`` - ``number``: The pointer to the method.
+    * ``class`` - ``string``: The name of the class.
+
+
 **Exception**
 
 The `Exception` interface defines an exception. It has three properties:
@@ -179,7 +194,16 @@ Methods
 
     >> 0x0e4f065 ... 50000
 
-.. autofunction:: encodeArguments
+.. function:: encodeArguments
+
+    Encodes the provided arguments based on the given manifest routine 
+    parameters or routine name. The arguments are encoded into POLO format.
+
+    :param field: The fields associated with the routine parameters (arguments) or the routine name.
+    :type field: LogicManifest.TypeField[] | string
+    :param args: The arguments to encode.
+    :type args: any[]
+    :return: **string** - The encoded manifest.
 
 .. code-block:: javascript
 
@@ -204,7 +228,33 @@ Methods
 
     >> 0x0def01 ... d4f49
 
-.. autofunction:: decodeOutput
+.. code-block:: javascript
+
+    // Example
+    const args = [
+        "MOI-Token", 
+        "MOI", 
+        100000000, 
+        "ffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
+    ];
+
+    const calldata = manifestCoder.encodeArguments("Seeder!", args);
+
+    console.log(calldata)
+
+    >> 0x0def01 ... d4f49
+
+.. function:: decodeOutput
+
+    Decodes the output data returned from a logic routine call.
+    The output data is decoded using the provided fields or routine name.
+
+    :param output: The POLO encoded output data to decode, represented as a hexadecimal string prefixed with "0x".
+    :type output: string
+    :param fields: The fields associated with the output data or the routine name.
+    :type fields: LogicManifest.TypeField[] | string
+
+    :return: **unknown | null** - The decoded output data, or null if the output is empty.
 
 .. code-block:: javascript
 
@@ -219,6 +269,16 @@ Methods
     const fields = routine.data.returns ? routine.data.returns : [];
 
     const decodedOutput = manifestCoder.decodeOutput(output, fields);
+
+    console.log(decodedOutput);
+
+    >> { balance: 100000000 }
+
+.. code-block:: javascript
+
+    // Example
+    const output = "0x0e1f0305f5e100";
+    const decodedOutput = manifestCoder.decodeOutput(output, "BalanceOf");
 
     console.log(decodedOutput);
 
@@ -296,3 +356,26 @@ Methods
     console.log(routineSchema)
 
     >> { kind: "struct", fields: { addr: { kind: "bytes" } } }
+
+Element Descriptor
+------------------
+The ElementDescriptor class represents a descriptor for elements in the 
+logic manifest.
+
+.. autofunction:: getStateMatrix
+
+.. autofunction:: getElements
+
+.. autofunction:: getCallsites
+
+.. autofunction:: getClassDefs
+
+.. autofunction:: getMethodDefs
+
+.. autofunction:: getClassMethods
+
+.. autofunction:: getRoutineElement
+
+.. autofunction:: getClassElement
+
+.. autofunction:: getMethodElement
