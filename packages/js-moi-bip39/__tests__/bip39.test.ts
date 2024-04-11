@@ -1,12 +1,12 @@
 import {
-    mnemonicToSeedSync,
-    mnemonicToSeed,
-    mnemonicToEntropy,
-    entropyToMnemonic,
-    generateMnemonic,
-    validateMnemonic,
-    getDefaultWordlist,
-  } from '../src/bip39';
+  entropyToMnemonic,
+  generateMnemonic,
+  getDefaultWordlist,
+  mnemonicToEntropy,
+  mnemonicToSeed,
+  mnemonicToSeedSync,
+  validateMnemonic,
+} from '../src.ts/bip39';
   
   describe('Mnemonic Utils', () => {
     describe('mnemonicToSeedSync', () => {
