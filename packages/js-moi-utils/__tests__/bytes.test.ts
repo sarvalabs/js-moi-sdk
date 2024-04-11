@@ -1,4 +1,4 @@
-import { isInteger, isBytes, hexDataLength, isHexString, bufferToUint8 } from '../src/bytes';
+import { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger } from '../src.ts/bytes';
 
 describe('isInteger', () => {
   it('should return true for integers', () => {
