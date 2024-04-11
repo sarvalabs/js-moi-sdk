@@ -31,13 +31,3 @@ export interface Routine<T extends (...args: any[]) => any> {
 export type Routines<T extends Record<string, (...args: any[]) => any>> = {
     [K in keyof T]: T[K] extends (...args: any[]) => any ? Routine<T[K]> : never;
 }
-
-export interface CallSite {
-    ptr: number,
-    kind: string
-}
-
-export interface MethodDef {
-    ptr: number;
-    class: string;
-}

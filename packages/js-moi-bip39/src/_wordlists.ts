@@ -10,16 +10,16 @@
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
  * 
  **/
-import czech from './wordlists/czech.json';
-import chinese_simplified from './wordlists/chinese_simplified.json';
-import chinese_traditional from './wordlists/chinese_traditional.json';
-import korean from './wordlists/korean.json';
-import french from './wordlists/french.json';
-import italian from './wordlists/italian.json';
-import spanish from './wordlists/spanish.json';
-import japanese from './wordlists/japanese.json';
-import portuguese from './wordlists/portuguese.json';
-import english from './wordlists/english.json';
+import czech from '../wordlists/czech.json';
+import chinese_simplified from '../wordlists/chinese_simplified.json';
+import chinese_traditional from '../wordlists/chinese_traditional.json';
+import korean from '../wordlists/korean.json';
+import french from '../wordlists/french.json';
+import italian from '../wordlists/italian.json';
+import spanish from '../wordlists/spanish.json';
+import japanese from '../wordlists/japanese.json';
+import portuguese from '../wordlists/portuguese.json';
+import english from '../wordlists/english.json';
 
 export const wordlists: { [key: string]: string[] } = {
     czech: czech,

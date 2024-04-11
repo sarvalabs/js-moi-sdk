@@ -3,7 +3,7 @@ export declare module LogicManifest {
         kind: string;
         flags: string[];
     }
-    
+
     export interface TypeField {
         slot: number;
         label: string;
@@ -16,27 +16,27 @@ export declare module LogicManifest {
     }
 
     export interface Class {
-        name: string,
-        fields?: TypeField[] | null,
-        methods?: MethodField[] | null
+        name: string;
+        fields?: TypeField[] | null;
+        methods?: MethodField[] | null;
     }
-    
+
     export interface State {
         kind: string;
         fields: TypeField[];
     }
-    
+
     export interface Constant {
         type: string;
         value: string;
     }
-    
+
     export interface Instructions {
         bin?: number[] | null;
         hex?: string;
         asm?: string[] | null;
     }
-    
+
     export interface Routine {
         name: string;
         kind: string;
@@ -54,19 +54,29 @@ export declare module LogicManifest {
         executes: Instructions;
         catches?: string[] | null;
     }
-    
+
     export type TypeDef = string;
-    
+
     export interface Element {
         ptr: number;
         kind: string;
         deps?: number[] | null;
         data: State | Constant | TypeDef | Routine | Class | Method;
     }
-    
+
     export interface Manifest {
         syntax: string;
         engine: EngineConfig;
         elements: Element[];
+    }
+
+    export interface CallSite {
+        ptr: number;
+        kind: string;
+    }
+
+    export interface MethodDef {
+        ptr: number;
+        class: string;
     }
 }
