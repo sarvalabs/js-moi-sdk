@@ -1,6 +1,6 @@
 {
   "name": "js-moi-manifest",
-  "version": "0.3.0-rc3",
+  "version": "0.3.0-rc4",
   "description": "Module to encode and decode MOI Logic Engine input and output.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -23,7 +23,7 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-utils": "^0.3.0-rc3",
+    "js-moi-utils": "^0.3.0-rc4",
     "js-polo": "^0.1.3"
   }
 }
