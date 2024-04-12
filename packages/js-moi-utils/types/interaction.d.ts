@@ -1,4 +1,4 @@
-import { IxType } from "../src/interaction";
+import { IxType } from "../src.ts/interaction";
 
 export interface ContextDelta {
     role: number;

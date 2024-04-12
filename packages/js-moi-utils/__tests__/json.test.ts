@@ -1,4 +1,4 @@
-import { marshal, unmarshal } from "../src/json";
+import { marshal, unmarshal } from "../src.ts/json";
 
 describe("marshal", () => {
   test("should marshal a JSON object to Uint8Array", () => {

@@ -2,8 +2,8 @@
   "name": "js-moi-signer",
   "version": "0.3.0-rc3",
   "description": "This package enables users to sign and verify messages in their applications.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./lib.cjs/index.js",
+  "module": "./lib.esm/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,7 +25,6 @@
   "dependencies": {
     "js-moi-providers": "^0.3.0-rc3",
     "js-moi-utils": "^0.3.0-rc3",
-    "blake2b": "^2.1.4",
     "buffer": "^6.0.3",
     "@noble/hashes": "^1.1.5",
     "@noble/secp256k1": "^1.7.1"

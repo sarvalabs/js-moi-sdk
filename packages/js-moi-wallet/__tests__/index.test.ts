@@ -1,6 +1,6 @@
 import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
 import { AssetStandard, isValidAddress } from "js-moi-utils";
-import { CURVE, Wallet } from "../src/index";
+import { CURVE, Wallet } from "../src.ts/index";
 
 const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
 const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";

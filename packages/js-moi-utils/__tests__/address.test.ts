@@ -1,4 +1,4 @@
-import { isValidAddress } from '../src/address';
+import { isValidAddress } from '../src.ts/address';
 
 describe('isValidAddress', () => {
   it('should return true for a valid address', () => {

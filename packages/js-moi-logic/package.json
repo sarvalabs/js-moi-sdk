@@ -2,8 +2,8 @@
   "name": "js-moi-logic",
   "version": "0.3.0-rc3",
   "description": "Module to interact with MOI Logic Objects.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./lib.cjs/index.js",
+  "module": "./lib.esm/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -27,7 +27,7 @@
     "js-moi-utils": "^0.3.0-rc3",
     "js-moi-providers": "^0.3.0-rc3",
     "js-moi-signer": "^0.3.0-rc3",
-    "blakejs": "^1.2.1",
+    "@noble/hashes": "^1.1.5",
     "buffer": "^6.0.3"
   }
 }
