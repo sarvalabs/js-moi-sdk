@@ -1,5 +1,5 @@
-import { ManifestCoder } from "../src/manifest";
 import manifest from "../manifests/erc20.json";
+import { ManifestCoder } from "../src.ts/manifest";
 import { LogicManifest } from "../types/manifest";
 
 describe("Test ManifestCoder", () => {

@@ -1,8 +1,8 @@
 import { JsonRpcProvider } from "js-moi-providers";
 import { Wallet } from "js-moi-wallet";
 
-import { LogicDriver, getLogicDriver } from "../src/logic-driver";
-import { LogicFactory } from "../src/logic-factory";
+import { LogicDriver, getLogicDriver } from "../src.ts/logic-driver";
+import { LogicFactory } from "../src.ts/logic-factory";
 
 import manifest from "../manifests/erc20.json";
 

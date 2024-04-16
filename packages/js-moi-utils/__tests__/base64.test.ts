@@ -1,4 +1,4 @@
-import { encodeBase64, decodeBase64 } from '../src/base64';
+import { decodeBase64, encodeBase64 } from '../src.ts/base64';
 
 describe('Base64 Encoding and Decoding', () => {
   const testData = [72, 101, 108, 108, 111]; // [72, 101, 108, 108, 111] represents the ASCII values for 'Hello'

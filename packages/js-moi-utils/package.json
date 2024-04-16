@@ -1,9 +1,9 @@
 {
   "name": "js-moi-utils",
-  "version": "0.3.0-rc3",
+  "version": "0.3.0-rc4",
   "description": "Collection of utility functions used in js-moi-sdk.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./lib.cjs/index.js",
+  "module": "./lib.esm/index.js",
   "scripts": {
     "compile": "tsc -b tsconfig.json"
   },
@@ -25,5 +25,8 @@
   "dependencies": {
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5"
   }
 }

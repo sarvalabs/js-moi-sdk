@@ -15,9 +15,9 @@ author = 'Sarva Labs Inc'
 # built documents.
 #
 # The short X.Y version.
-version = u'v0.3.0-rc3'
+version = u'v0.3.0-rc4'
 # The full version, including alpha/beta/rc tags.
-release = u'v0.3.0-rc3'
+release = u'v0.3.0-rc4'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -25,14 +25,14 @@ release = u'v0.3.0-rc3'
 extensions = ['sphinx_js']
 root_for_relative_js_paths = '~/'
 js_source_path = [
-    '../../packages/js-moi-manifest/dist', 
-    '../../packages/js-moi-providers/dist',
-    '../../packages/js-moi-signer/dist',
-    '../../packages/js-moi-logic/dist',
-    '../../packages/js-moi-bip39/dist',
-    '../../packages/js-moi-hdnode/dist',
-    '../../packages/js-moi-wallet/dist',
-    '../../packages/js-moi-utils/dist'
+    '../../packages/js-moi-manifest/lib.cjs', 
+    '../../packages/js-moi-providers/lib.cjs',
+    '../../packages/js-moi-signer/lib.cjs',
+    '../../packages/js-moi-logic/lib.cjs',
+    '../../packages/js-moi-bip39/lib.cjs',
+    '../../packages/js-moi-hdnode/lib.cjs',
+    '../../packages/js-moi-wallet/lib.cjs',
+    '../../packages/js-moi-utils/lib.cjs'
 ]
 primary_domain = 'js'
 
