@@ -17,7 +17,7 @@ export * from "./object";
 export * from "./properties";
 export * from "./schema";
 
-export { Interaction, Participant as Participants } from "../types/interaction";
+export { Interaction, Participant, Participants } from "../types/interaction";
 export { Receipt } from "../types/receipt";
 export { Tesseract } from "../types/tesseract";
 
