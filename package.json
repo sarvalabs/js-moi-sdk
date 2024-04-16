@@ -1,6 +1,6 @@
 {
   "name": "moi",
-  "version": "0.3.0-rc3",
+  "version": "0.3.0-rc4",
   "description": "JavaScript library to interact with MOI Protocol via RPC API",
   "private": true,
   "main": "packages/js-moi/lib.cjs/index.js",
