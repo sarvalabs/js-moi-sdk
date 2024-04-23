@@ -1,4 +1,4 @@
-import { isArray, isMap, isPrimitiveType, Schema } from "js-moi-manifest";
+import { isPrimitiveType, Schema } from "js-moi-manifest";
 import { ErrorUtils, hexToBytes } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { generateStorageKey } from "./accessor";
@@ -29,13 +29,7 @@ export class PersistentState {
         const accessors = builder.getAccessors();
         let type = builder.getStorageType();
         if (!isPrimitiveType(type)) {
-            switch (true) {
-                case isMap(type) || isArray(type):
-                    type = "integer";
-                    break;
-                default:
-                    throw ErrorUtils.throwError("Invalid type for persistent state");
-            }
+            ErrorUtils.throwError("Cannot retrieve complex types from persistent state");
         }
         const slot = generateStorageKey(ptr, accessors);
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());

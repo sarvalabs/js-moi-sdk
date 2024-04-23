@@ -57,14 +57,14 @@ class PropertyAccessor extends AbstractAccessor {
      */
     constructor(key) {
         super();
-        this.key = key;
+        this.key = this.sum256(this.polorize(key));
     }
     /**
      * Polorizes the given key.
      * @param key The key to polorize.
      * @returns The polorized key as a bytes.
      */
-    polorizeKey(key) {
+    polorize(key) {
         const polorizer = new js_polo_1.Polorizer();
         polorizer.polorizeString(key);
         return polorizer.bytes();
@@ -75,9 +75,8 @@ class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const key = this.polorizeKey(this.key);
         const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, key]);
+        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
         return new StorageKey(this.sum256(buffer));
     }
 }
@@ -117,10 +116,10 @@ class ClassFieldAccessor extends AbstractAccessor {
         this.index = index;
     }
     access(hash) {
-        const polorizer = new js_polo_1.Polorizer();
-        polorizer.polorizeString("a");
-        const bytes = this.sum256(hash.toBuffer());
-        return new StorageKey(new bn_js_1.default(bytes).add(new bn_js_1.default(this.index)));
+        let blob = hash.toBuffer();
+        blob = this.sum256(blob);
+        const bn = new bn_js_1.default(blob).add(new bn_js_1.default(this.index));
+        return new StorageKey(bn);
     }
 }
 exports.ClassFieldAccessor = ClassFieldAccessor;

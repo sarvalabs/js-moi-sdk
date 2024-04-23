@@ -1,5 +1,4 @@
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-<<<<<<< HEAD
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = [
     "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"
@@ -14,21 +13,6 @@ export const isMap = (type) => {
     return type.startsWith("map");
 };
 export const isClass = (type, classDefs) => {
-=======
-const primitiveTypes = [
-    "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"
-];
-const isPrimitiveType = (type) => {
-    return primitiveTypes.includes(type);
-};
-const isArray = (type) => {
-    return (/^\[(\d*)\]/).test(type);
-};
-const isMap = (type) => {
-    return type.startsWith("map");
-};
-const isClass = (type, classDefs) => {
->>>>>>> develop
     return classDefs.has(type);
 };
 /**
@@ -260,7 +244,6 @@ export class Schema {
      * @returns {string} The extracted array data type.
      * @throws {Error} If the array type is invalid or unsupported.
      */
-<<<<<<< HEAD
     static extractArrayDataType(dataType) {
         if (!isArray(dataType)) {
             ErrorUtils.throwError("Invalid array type: The provided data type is not an array.", ErrorCode.INVALID_ARGUMENT);
@@ -270,21 +253,6 @@ export class Schema {
             ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", ErrorCode.INVALID_ARGUMENT);
         }
         return type;
-=======
-    extractArrayDataType(dataType) {
-        let endIndex = 0;
-        for (let i = 0; i < dataType.length; i++) {
-            if (dataType.charAt(i) == "]") {
-                endIndex = i + 1;
-                break;
-            }
-        }
-        const type = dataType.slice(endIndex);
-        if (type) {
-            return type;
-        }
-        ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", ErrorCode.INVALID_ARGUMENT);
->>>>>>> develop
     }
     /**
      * Extracts the key and value data types from the provided map data type string.
@@ -293,11 +261,7 @@ export class Schema {
      * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
-<<<<<<< HEAD
     static extractMapDataType(dataType) {
-=======
-    extractMapDataType(dataType) {
->>>>>>> develop
         let brackets = [];
         let startIndex = 0;
         let endIndex = 0;
@@ -330,11 +294,7 @@ export class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
-<<<<<<< HEAD
     static convertPrimitiveDataType(type) {
-=======
-    convertPrimitiveDataType(type) {
->>>>>>> develop
         switch (type) {
             case "null":
                 return "null";
@@ -361,32 +321,19 @@ export class Schema {
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
-<<<<<<< HEAD
     static parseClassFields(className, classDef, elements) {
         const ptr = classDef.get(className);
         if (ptr === undefined) {
             ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
         const element = elements.get(ptr);
-=======
-    parseClassFields(className) {
-        const ptr = this.classDefs.get(className);
-        if (ptr === undefined) {
-            ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
-        }
-        const element = this.elements.get(ptr);
->>>>>>> develop
         const schema = {
             kind: "struct",
             fields: {}
         };
         element.data = element.data;
         Object.values(element.data.fields).forEach(field => {
-<<<<<<< HEAD
             schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements);
-=======
-            schema.fields[field.label] = this.parseDataType(field.type);
->>>>>>> develop
         });
         return schema;
     }
@@ -399,7 +346,6 @@ export class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
-<<<<<<< HEAD
     static parseDataType(type, classDef, elements) {
         switch (true) {
             case isPrimitiveType(type):
@@ -425,33 +371,6 @@ export class Schema {
                 };
             case isClass(type, classDef):
                 return this.parseClassFields(type, classDef, elements);
-=======
-    parseDataType(type) {
-        switch (true) {
-            case isPrimitiveType(type):
-                return {
-                    kind: this.convertPrimitiveDataType(type)
-                };
-            case isArray(type):
-                const values = this.extractArrayDataType(type);
-                return {
-                    kind: "array",
-                    fields: {
-                        values: this.parseDataType(values)
-                    }
-                };
-            case isMap(type):
-                const [key, value] = this.extractMapDataType(type);
-                return {
-                    kind: "map",
-                    fields: {
-                        keys: this.parseDataType(key),
-                        values: this.parseDataType(value)
-                    }
-                };
-            case isClass(type, this.classDefs):
-                return this.parseClassFields(type);
->>>>>>> develop
             default:
                 ErrorUtils.throwError(`Unsupported data type: ${type}!`, ErrorCode.UNSUPPORTED_OPERATION);
         }
@@ -475,11 +394,7 @@ export class Schema {
             if (!field || !(field.label && field.type)) {
                 ErrorUtils.throwError("Invalid field: Each field must have a label and a type.", ErrorCode.INVALID_ARGUMENT);
             }
-<<<<<<< HEAD
             schema.fields[field.label] = Schema.parseDataType(field.type, this.classDefs, this.elements);
-=======
-            schema.fields[field.label] = this.parseDataType(field.type);
->>>>>>> develop
         });
         return schema;
     }

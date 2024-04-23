@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"version":3,"file":"version.js","sourceRoot":"","sources":["../src/version.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,OAAO,GAAG,WAAW,CAAC"}
-=======
 {"version":3,"file":"version.js","sourceRoot":"","sources":["../src.ts/version.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,OAAO,GAAG,WAAW,CAAC"}
->>>>>>> develop

@@ -21,11 +21,7 @@ export declare abstract class AbstractProvider {
     abstract getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo>;
     abstract getLogicIds(address: string, options?: Options): Promise<string[]>;
     abstract getRegistry(address: string, options?: Options): Promise<Registry>;
-<<<<<<< HEAD
-    abstract getSyncStatus(address: string): Promise<SyncStatus>;
-=======
     abstract getSyncStatus(address?: string): Promise<SyncStatus>;
->>>>>>> develop
     abstract getContentFrom(address: string): Promise<ContentFrom>;
     abstract getWaitTime(address: string): Promise<number | bigint>;
     abstract call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;

@@ -48,14 +48,14 @@ export class PropertyAccessor extends AbstractAccessor {
      */
     constructor(key) {
         super();
-        this.key = key;
+        this.key = this.sum256(this.polorize(key));
     }
     /**
      * Polorizes the given key.
      * @param key The key to polorize.
      * @returns The polorized key as a bytes.
      */
-    polorizeKey(key) {
+    polorize(key) {
         const polorizer = new Polorizer();
         polorizer.polorizeString(key);
         return polorizer.bytes();
@@ -66,9 +66,8 @@ export class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const key = this.polorizeKey(this.key);
         const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, key]);
+        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
         return new StorageKey(this.sum256(buffer));
     }
 }
@@ -106,10 +105,10 @@ export class ClassFieldAccessor extends AbstractAccessor {
         this.index = index;
     }
     access(hash) {
-        const polorizer = new Polorizer();
-        polorizer.polorizeString("a");
-        const bytes = this.sum256(hash.toBuffer());
-        return new StorageKey(new BN(bytes).add(new BN(this.index)));
+        let blob = hash.toBuffer();
+        blob = this.sum256(blob);
+        const bn = new BN(blob).add(new BN(this.index));
+        return new StorageKey(bn);
     }
 }
 export function generateStorageKey(base, ...args) {

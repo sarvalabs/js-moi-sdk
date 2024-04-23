@@ -32,13 +32,7 @@ class PersistentState {
         const accessors = builder.getAccessors();
         let type = builder.getStorageType();
         if (!(0, js_moi_manifest_1.isPrimitiveType)(type)) {
-            switch (true) {
-                case (0, js_moi_manifest_1.isMap)(type) || (0, js_moi_manifest_1.isArray)(type):
-                    type = "integer";
-                    break;
-                default:
-                    throw js_moi_utils_1.ErrorUtils.throwError("Invalid type for persistent state");
-            }
+            js_moi_utils_1.ErrorUtils.throwError("Cannot retrieve complex types from persistent state");
         }
         const slot = (0, accessor_1.generateStorageKey)(ptr, accessors);
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());

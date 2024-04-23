@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"version":3,"file":"errors.js","sourceRoot":"","sources":["../src/errors.ts"],"names":[],"mappings":";;;AAAA,SAAgB,aAAa;IACzB,MAAM,IAAI,SAAS,CAAC,gDAAgD,CAAC,CAAC;AAC1E,CAAC;AAFD,sCAEC;AAED,SAAgB,aAAa;IACzB,MAAM,IAAI,SAAS,CAAC,gDAAgD,CAAC,CAAC;AAC1E,CAAC;AAFD,sCAEC"}
-=======
 {"version":3,"file":"errors.js","sourceRoot":"","sources":["../src.ts/errors.ts"],"names":[],"mappings":";;;AAAA,SAAgB,aAAa;IACzB,MAAM,IAAI,SAAS,CAAC,gDAAgD,CAAC,CAAC;AAC1E,CAAC;AAFD,sCAEC;AAED,SAAgB,aAAa;IACzB,MAAM,IAAI,SAAS,CAAC,gDAAgD,CAAC,CAAC;AAC1E,CAAC;AAFD,sCAEC"}
->>>>>>> develop

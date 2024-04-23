@@ -1,6 +1,5 @@
 /// <reference types="node" />
 import BN from "bn.js";
-export type SlotHash = BN;
 export declare class StorageKey {
     private value;
     constructor(value: number | string | Buffer | Uint8Array | BN);
@@ -70,7 +69,7 @@ export declare class LengthAccessor extends AbstractAccessor {
  * Generates a slot hash for accessing the key of Map.
  */
 export declare class PropertyAccessor extends AbstractAccessor {
-    private key;
+    key: Uint8Array;
     /**
      * Creates a new instance of PropertyAccessor.
      * @param key The label of the property.
@@ -81,7 +80,7 @@ export declare class PropertyAccessor extends AbstractAccessor {
      * @param key The key to polorize.
      * @returns The polorized key as a bytes.
      */
-    private polorizeKey;
+    private polorize;
     /**
      * Accesses the property with the given hash and returns the resulting hash.
      * @param hash The hash of the property.

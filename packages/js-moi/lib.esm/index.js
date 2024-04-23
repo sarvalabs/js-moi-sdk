@@ -6,14 +6,5 @@ export * from "js-moi-manifest";
 export * from "js-moi-providers";
 export * from "js-moi-signer";
 export * from "js-moi-utils";
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/js-moi/lib.esm/index.js
-//# sourceMappingURL=index.js.map
-========
-export * from "js-moi-wallet";
-
->>>>>>>> develop:packages/js-moi/src.ts/index.ts
-=======
 export * from "js-moi-wallet";
 //# sourceMappingURL=index.js.map
->>>>>>> develop

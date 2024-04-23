@@ -19,7 +19,7 @@ class EntityBuilder {
         }
         const field = element.fields.find((field) => field.label === label);
         if (field == null) {
-            js_moi_utils_1.ErrorUtils.throwError(`'${label} is not member of persistance state`, js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
+            js_moi_utils_1.ErrorUtils.throwError(`'${label}' is not member of persistent state`, js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
                 entity: label,
             });
         }
