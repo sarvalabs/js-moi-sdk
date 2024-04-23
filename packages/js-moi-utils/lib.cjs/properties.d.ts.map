@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"properties.d.ts","sourceRoot":"","sources":["../src/properties.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,eAAO,MAAM,cAAc,6DAA4D,IAMtF,CAAA"}
+=======
+{"version":3,"file":"properties.d.ts","sourceRoot":"","sources":["../src.ts/properties.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,eAAO,MAAM,cAAc,6DAA4D,IAMtF,CAAA"}
+>>>>>>> develop

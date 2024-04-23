@@ -498,7 +498,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     /**
      * Retrieves the synchronization status for a specific account.
      *
-     * @param {string} address - The address for which to retrieve the synchronization status.
+     * @param {string | undefined} address - The address for which to retrieve the synchronization status.
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */

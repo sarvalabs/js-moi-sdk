@@ -1,5 +1,5 @@
 import { mnemonicToSeed } from "js-moi-bip39";
-import { HDNode } from "../src/hdnode";
+import { HDNode } from "../src.ts/hdnode";
 
 describe("Test HDNode",() => {
     let hdNode: HDNode

@@ -3,8 +3,8 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "lib.cjs",
-    "rootDir": "./src",
+    "rootDir": "./src.ts",
     "tsBuildInfoFile": "lib.cjs/.tsbuildinfo"
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src.ts/**/*.ts"]
 }

@@ -40,6 +40,7 @@ export interface AccountState {
     storage_root: string;
     logic_root: string;
     file_root: string
+    asset_registry: string;
 }
 
 export interface AccountMetaInfo {
@@ -160,7 +161,7 @@ export interface InteractionByTesseractParams extends AccountParamsBase {
 }
 
 export interface SyncStatusParams {
-    address: string
+    address?: string
 }
 
 export interface StorageParams {

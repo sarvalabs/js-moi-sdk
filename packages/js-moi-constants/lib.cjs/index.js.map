@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;AAAA,yCAAuB;AACvB,4CAA0B;AAC1B,4CAA0B"}
+=======
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../src.ts/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;AAAA,yCAAuB;AACvB,4CAA0B;AAC1B,4CAA0B"}
+>>>>>>> develop

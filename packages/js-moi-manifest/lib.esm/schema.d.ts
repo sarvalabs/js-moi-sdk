@@ -1,9 +1,12 @@
 import { Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
+<<<<<<< HEAD
 export declare const isPrimitiveType: (type: string) => boolean;
 export declare const isArray: (type: string) => boolean;
 export declare const isMap: (type: string) => boolean;
 export declare const isClass: (type: string, classDefs: Map<string, number>) => boolean;
+=======
+>>>>>>> develop
 /**
  * Schema is a class that provides schema parsing functionality for encoding and
  * decoding manifest, arguments, logic states and other data based on
@@ -371,7 +374,11 @@ export declare class Schema {
      * @returns {string} The extracted array data type.
      * @throws {Error} If the array type is invalid or unsupported.
      */
+<<<<<<< HEAD
     static extractArrayDataType(dataType: string): string;
+=======
+    private extractArrayDataType;
+>>>>>>> develop
     /**
      * Extracts the key and value data types from the provided map data type string.
      *
@@ -379,7 +386,11 @@ export declare class Schema {
      * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
+<<<<<<< HEAD
     static extractMapDataType(dataType: string): [string, string];
+=======
+    private extractMapDataType;
+>>>>>>> develop
     /**
      * Converts the primitive data type to a standardized representation.
      *
@@ -387,14 +398,22 @@ export declare class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
+<<<<<<< HEAD
     static convertPrimitiveDataType(type: string): string;
+=======
+    private convertPrimitiveDataType;
+>>>>>>> develop
     /**
      * Parses the fields of a class data type and generates the schema for the class.
      *
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
+<<<<<<< HEAD
     static parseClassFields(className: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema;
+=======
+    private parseClassFields;
+>>>>>>> develop
     /**
      * Parses a data type and generates the corresponding schema based on the
      * data type. The parsing is performed recursively to handle nested data types,
@@ -404,7 +423,11 @@ export declare class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
+<<<<<<< HEAD
     static parseDataType(type: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema;
+=======
+    private parseDataType;
+>>>>>>> develop
     /**
      * Parses an array of fields and generates the schema based on the fields.
      *

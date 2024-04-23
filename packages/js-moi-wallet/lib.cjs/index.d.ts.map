@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,cAAc,UAAU,CAAC;AACzB,mBAAmB,mBAAmB,CAAC"}
+=======
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../src.ts/index.ts"],"names":[],"mappings":"AAAA,cAAc,UAAU,CAAC;AACzB,mBAAmB,mBAAmB,CAAC"}
+>>>>>>> develop

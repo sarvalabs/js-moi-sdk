@@ -1,7 +1,7 @@
-import { AssetStandard, hexToBN, IxType } from "js-moi-utils";
 import { Signer } from "js-moi-signer";
-import { JsonRpcProvider } from "../src/jsonrpc-provider"
-import { WebSocketProvider, WebSocketEvents } from "../src/websocket-provider"
+import { AssetStandard, hexToBN, IxType } from "js-moi-utils";
+import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
+import { WebSocketEvents, WebSocketProvider } from "../src.ts/websocket-provider";
 import { initializeWallet } from "./utils/utils";
 
 describe("Test Websocket Provider", () => {

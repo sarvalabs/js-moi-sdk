@@ -1,5 +1,5 @@
-import { Schema } from "../src/schema";
 import manifest from "../manifests/erc20.json";
+import { Schema } from "../src.ts/schema";
 import { LogicManifest } from "../types/manifest";
 
 describe("Test Schema", () => {

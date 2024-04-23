@@ -19,12 +19,20 @@ export class LogicDriver extends LogicDescriptor {
      if available in logic manifest.
      */
     createState() {
+<<<<<<< HEAD
         const hasPersistance = this.stateMatrix.persistent();
         if (hasPersistance === false) {
             return;
         }
         const persistentState = new PersistentState(this, this.provider);
         defineReadOnly(this, "persistentState", persistentState);
+=======
+        const [persistentStatePtr, persistentStateExists] = this.hasPersistentState();
+        if (persistentStateExists) {
+            const persistentState = new PersistentState(this.logicId.hex(), this.elements.get(persistentStatePtr), this.manifestCoder, this.provider);
+            defineReadOnly(this, "persistentState", persistentState);
+        }
+>>>>>>> develop
     }
     /**
      * Creates an interface for executing routines defined in the logic manifest.

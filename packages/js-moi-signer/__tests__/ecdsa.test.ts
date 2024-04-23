@@ -1,5 +1,5 @@
 // import { Wallet } from "js-moi-wallet";
-import { Signer } from "../src";
+import { Signer } from "../src.ts";
 // import { JsonRpcProvider } from "js-moi-providers";
 // import { bytesToHex } from "js-moi-utils";
 // import { serializeIxObject } from "../src/serializer";

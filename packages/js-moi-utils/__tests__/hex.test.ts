@@ -1,4 +1,4 @@
-import { numToHex, toQuantity, encodeToString, hexToBytes, hexToBN, bytesToHex, isHex, trimHexPrefix } from "../src/hex";
+import { bytesToHex, encodeToString, hexToBN, hexToBytes, isHex, numToHex, toQuantity, trimHexPrefix } from "../src.ts/hex";
 
 describe("numToHex", () => {
   test("should convert a positive number to a hexadecimal string", () => {
