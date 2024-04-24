@@ -3,6 +3,7 @@ import { Wallet } from "js-moi-wallet";
 import { LogicDriver, getLogicDriver } from "../src.ts/logic-driver";
 import { LogicFactory } from "../src.ts/logic-factory";
 
+import { JsonRpcProvider } from "js-moi-providers";
 import manifest from "../manifests/erc20.json";
 
 const HOST = "http://localhost:1600/";
