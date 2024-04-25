@@ -64,6 +64,7 @@ describe("Logic", () => {
         });
     });
 
+    
     describe("logic driver initialized using signer", () => {
         let logic: LogicDriver;
 
@@ -210,4 +211,21 @@ describe("Logic", () => {
             }).rejects.toThrow(`The provided slot "${invalidKey}" does not exist.`);
         });
     });
+
+    let logic: LogicDriver;
+    
+    beforeAll(async () => {
+        logic = new LogicDriver("0x", manifest, wallet)
+    });
+
+    it("should be able return is routine mutable or not", () => {
+        const routine = [{ name: "Transfer", mutable: false }, { name: "BalanceOf", mutable: false }];
+        
+        for(const { name, mutable } of routine) {
+            if (name in logic.routines) {
+                const isMutable = logic.routines[name].isMutable();
+                expect(isMutable).toBe(mutable);
+            }
+        }
+    })
 })

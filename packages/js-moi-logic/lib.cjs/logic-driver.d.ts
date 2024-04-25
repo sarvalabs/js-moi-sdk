@@ -32,13 +32,6 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
      */
     private isMutableRoutine;
     /**
-     * Normalizes a routine name by removing the exclamation mark if present.
-     *
-     * @param {string} routineName - The routine name
-     * @returns {string} The normalized routine name.
-     */
-    private normalizeRoutineName;
-    /**
      * Returns the interaction type for the logic driver.
      *
      * @returns {IxType} The interaction type.

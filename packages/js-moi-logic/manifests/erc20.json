@@ -341,6 +341,7 @@
         "kind": "routine",
         "data": {
           "name": "Transfer!",
+          "mode": "persistent",
           "kind": "invokable",
           "accepts": [
             {

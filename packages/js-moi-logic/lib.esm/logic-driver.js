@@ -39,8 +39,7 @@ export class LogicDriver extends LogicDescriptor {
             if (routine.kind !== "invokable") {
                 return;
             }
-            const name = this.normalizeRoutineName(routine.name);
-            routines[name] = async (...params) => {
+            routines[routine.name] = async (...params) => {
                 const argsLen = params.at(-1) && typeof params.at(-1) === "object"
                     ? params.length - 1
                     : params.length;
@@ -48,18 +47,18 @@ export class LogicDriver extends LogicDescriptor {
                     ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.INVALID_ARGUMENT);
                 }
                 const ixObject = this.createIxObject(routine, ...params);
-                if (!this.isMutableRoutine(routine.name)) {
+                if (!this.isMutableRoutine(routine)) {
                     return await ixObject.unwrap();
                 }
                 return await ixObject.send();
             };
-            routines[name].isMutable = () => {
-                return this.isMutableRoutine(routine.name);
+            routines[routine.name].isMutable = () => {
+                return this.isMutableRoutine(routine);
             };
-            routines[name].accepts = () => {
+            routines[routine.name].accepts = () => {
                 return routine.accepts ? routine.accepts : null;
             };
-            routines[name].returns = () => {
+            routines[routine.name].returns = () => {
                 return routine.returns ? routine.returns : null;
             };
         });
@@ -71,20 +70,8 @@ export class LogicDriver extends LogicDescriptor {
      * @param {string} routineName - The name of the routine.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
-    isMutableRoutine(routineName) {
-        return routineName.endsWith("!");
-    }
-    /**
-     * Normalizes a routine name by removing the exclamation mark if present.
-     *
-     * @param {string} routineName - The routine name
-     * @returns {string} The normalized routine name.
-     */
-    normalizeRoutineName(routineName) {
-        if (this.isMutableRoutine(routineName)) {
-            return routineName.slice(0, -1); // Remove the last character (exclamation mark)
-        }
-        return routineName; // If no exclamation mark, return the original string
+    isMutableRoutine(routine) {
+        return routine.mode === "persistent";
     }
     /**
      * Returns the interaction type for the logic driver.
