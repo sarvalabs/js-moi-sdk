@@ -97,7 +97,7 @@ export declare class Schema {
     static PISA_STATE_SCHEMA: {
         kind: string;
         fields: {
-            kind: {
+            mode: {
                 kind: string;
             };
             fields: {
@@ -186,6 +186,9 @@ export declare class Schema {
                 kind: string;
             };
             kind: {
+                kind: string;
+            };
+            mode: {
                 kind: string;
             };
             accepts: {

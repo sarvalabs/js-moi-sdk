@@ -1,6 +1,6 @@
+import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode, Polorizer } from "js-polo";
 import { Schema } from "./schema";
-import { bytesToHex, hexToBytes, ErrorUtils, ErrorCode, trimHexPrefix, deepCopy } from "js-moi-utils";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -25,7 +25,7 @@ export class ManifestCoder {
      */
     static encodeManifest(manifest) {
         const polorizer = new Polorizer();
-        polorizer.polorizeString(manifest.syntax);
+        polorizer.polorizeInteger(manifest.syntax);
         polorizer.polorize(manifest.engine, Schema.PISA_ENGINE_SCHEMA);
         if (manifest.elements) {
             const elements = new Polorizer();

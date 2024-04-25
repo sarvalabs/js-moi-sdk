@@ -127,7 +127,7 @@ export class Schema {
     public static PISA_STATE_SCHEMA = {
         kind: "struct",
         fields: {
-            kind: {
+            mode: {
                 kind: "string"
             },
             fields: {
@@ -175,6 +175,9 @@ export class Schema {
                 kind: "string"
             },
             kind: {
+                kind: "string"
+            },
+            mode: {
                 kind: "string"
             },
             accepts: {

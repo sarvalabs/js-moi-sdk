@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManifestCoder = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const schema_1 = require("./schema");
-const js_moi_utils_1 = require("js-moi-utils");
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -28,7 +28,7 @@ class ManifestCoder {
      */
     static encodeManifest(manifest) {
         const polorizer = new js_polo_1.Polorizer();
-        polorizer.polorizeString(manifest.syntax);
+        polorizer.polorizeInteger(manifest.syntax);
         polorizer.polorize(manifest.engine, schema_1.Schema.PISA_ENGINE_SCHEMA);
         if (manifest.elements) {
             const elements = new js_polo_1.Polorizer();

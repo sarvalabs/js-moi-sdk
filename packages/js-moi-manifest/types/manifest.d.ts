@@ -66,7 +66,7 @@ export declare module LogicManifest {
     }
     
     export interface Manifest {
-        syntax: string;
+        syntax: number;
         engine: EngineConfig;
         elements: Element[];
     }
