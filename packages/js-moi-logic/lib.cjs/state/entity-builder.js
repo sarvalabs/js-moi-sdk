@@ -6,6 +6,7 @@ const accessor_builder_1 = require("./accessor-builder");
 class EntityBuilder {
     slot;
     elementDescriptor;
+    slotAccessorBuilder;
     constructor(slot, elementDescriptor) {
         this.slot = slot;
         this.elementDescriptor = elementDescriptor;
@@ -23,7 +24,14 @@ class EntityBuilder {
                 entity: label,
             });
         }
-        return accessor_builder_1.SlotAccessorBuilder.fromTypeField(field, this.elementDescriptor);
+        this.slotAccessorBuilder = new accessor_builder_1.SlotAccessorBuilder(field, this.elementDescriptor);
+        return this.slotAccessorBuilder;
+    }
+    getSlotAccessorBuilder() {
+        if (this.slotAccessorBuilder == null) {
+            js_moi_utils_1.ErrorUtils.throwError("Slot accessor builder not initialized");
+        }
+        return this.slotAccessorBuilder;
     }
 }
 exports.EntityBuilder = EntityBuilder;

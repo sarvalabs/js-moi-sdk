@@ -8,7 +8,7 @@ export interface AccessorBuilder {
      *
      * @returns The accessor builder instance.
      */
-    length(): AccessorBuilder;
+    length(): void;
     /**
      * Adds a property accessor to the accessor builder.
      *
@@ -39,26 +39,33 @@ export declare class SlotAccessorBuilder implements AccessorBuilder, AccessorPro
     private accessors;
     readonly elementDescriptor: ElementDescriptor;
     private slotType;
-    constructor(baseType: string, logicDescriptor: ElementDescriptor);
+    private readonly typeField;
+    constructor(field: LogicManifest.TypeField, logicDescriptor: ElementDescriptor);
+    /**
+     * Retrieves the storage type of the accessor builder.
+     * @returns The storage type.
+     */
     getStorageType(): string;
+    /**
+     * Retrieves the base slot of the accessor builder.
+     * @returns The base slot.
+     */
+    getBaseSlot(): number;
+    /**
+     * Retrieves the accessors of the accessor builder.
+     * @returns The accessors.
+     */
     getAccessors(): Accessor[];
-    length(): SlotAccessorBuilder;
+    length(): void;
     property(key: string): SlotAccessorBuilder;
     at(index: number): SlotAccessorBuilder;
     field(fieldName: string): SlotAccessorBuilder;
-    /**
-     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
-     * @param field - The TypeField object.
-     * @param logicDescriptor - The LogicDescriptor object.
-     * @returns A new SlotAccessorBuilder instance.
-     */
-    static fromTypeField(field: LogicManifest.TypeField, logicDescriptor: ElementDescriptor): SlotAccessorBuilder;
     /**
      * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.
      *
      * @param builder - The accessor builder to check.
      * @returns `true` if the `builder` is an instance of `SlotAccessorBuilder`, `false` otherwise.
      */
-    static isSlotAccessorBuilder(builder: AccessorBuilder): builder is SlotAccessorBuilder;
+    static isSlotAccessorBuilder(builder: unknown): builder is SlotAccessorBuilder;
 }
 //# sourceMappingURL=accessor-builder.d.ts.map

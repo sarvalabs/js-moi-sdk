@@ -3,6 +3,7 @@ import { SlotAccessorBuilder } from "./accessor-builder";
 export class EntityBuilder {
     slot;
     elementDescriptor;
+    slotAccessorBuilder;
     constructor(slot, elementDescriptor) {
         this.slot = slot;
         this.elementDescriptor = elementDescriptor;
@@ -20,7 +21,14 @@ export class EntityBuilder {
                 entity: label,
             });
         }
-        return SlotAccessorBuilder.fromTypeField(field, this.elementDescriptor);
+        this.slotAccessorBuilder = new SlotAccessorBuilder(field, this.elementDescriptor);
+        return this.slotAccessorBuilder;
+    }
+    getSlotAccessorBuilder() {
+        if (this.slotAccessorBuilder == null) {
+            ErrorUtils.throwError("Slot accessor builder not initialized");
+        }
+        return this.slotAccessorBuilder;
     }
 }
 //# sourceMappingURL=entity-builder.js.map

@@ -77,7 +77,13 @@ export class ErrorUtils {
      * @throws {CustomError} - Throws a CustomError.
      */
     public static throwError(message: string, code: ErrorCode = ErrorCode.UNKNOWN_ERROR, params: ErrorParams = {}): never {
-        throw new CustomError(message, code, params);
+        const error = new CustomError(message, code, params);
+        
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(error, ErrorUtils.throwError);
+        }
+
+        throw error;
     }
 
     /**

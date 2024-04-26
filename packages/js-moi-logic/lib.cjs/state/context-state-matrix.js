@@ -15,11 +15,11 @@ class ContextStateMatrix {
     matrix;
     constructor(elements) {
         this.matrix = new Map();
-        const stateElements = elements.filter(element => element.kind === "state");
+        const stateElements = elements.filter((element) => element.kind === "state");
         for (let i = 0; i < stateElements.length; i++) {
             const stateElement = stateElements[i];
             stateElement.data = stateElement.data;
-            switch (stateElement.data.kind) {
+            switch (stateElement.data.mode) {
                 case "persistent":
                     this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
                     break;

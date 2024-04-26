@@ -9,23 +9,36 @@ class SlotAccessorBuilder {
     accessors = [];
     elementDescriptor;
     slotType;
-    constructor(baseType, logicDescriptor) {
+    typeField;
+    constructor(field, logicDescriptor) {
         this.elementDescriptor = logicDescriptor;
-        this.slotType = baseType;
+        this.typeField = field;
+        this.slotType = field.type;
     }
+    /**
+     * Retrieves the storage type of the accessor builder.
+     * @returns The storage type.
+     */
     getStorageType() {
         return this.slotType;
     }
+    /**
+     * Retrieves the base slot of the accessor builder.
+     * @returns The base slot.
+     */
+    getBaseSlot() {
+        return this.typeField.slot;
+    }
+    /**
+     * Retrieves the accessors of the accessor builder.
+     * @returns The accessors.
+     */
     getAccessors() {
         return this.accessors;
     }
     length() {
-        if (!(0, js_moi_manifest_1.isArray)(this.slotType) && !(0, js_moi_manifest_1.isMap)(this.slotType)) {
-            js_moi_utils_1.ErrorUtils.throwError(`Attempting to access the length of a non-array or non-map type '${this.slotType}'.`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
-        }
         this.slotType = "u64";
         this.accessors.push(new accessor_1.LengthAccessor());
-        return this;
     }
     property(key) {
         this.slotType = js_moi_manifest_1.Schema.extractMapDataType(this.slotType)[VALUE_TYPE_INDEX];
@@ -53,15 +66,6 @@ class SlotAccessorBuilder {
         const accessor = new accessor_1.ClassFieldAccessor(field.slot);
         this.accessors.push(accessor);
         return this;
-    }
-    /**
-     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
-     * @param field - The TypeField object.
-     * @param logicDescriptor - The LogicDescriptor object.
-     * @returns A new SlotAccessorBuilder instance.
-     */
-    static fromTypeField(field, logicDescriptor) {
-        return new SlotAccessorBuilder(field.type, logicDescriptor);
     }
     /**
      * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.

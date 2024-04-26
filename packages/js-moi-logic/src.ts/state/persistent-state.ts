@@ -1,6 +1,6 @@
 import { isPrimitiveType, Schema } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
-import { ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 
 import type { LogicDriver } from "../logic-driver";
@@ -13,7 +13,7 @@ import { EntityBuilder } from "./entity-builder";
  * @param builder - The entity builder.
  * @returns The accessor builder.
  */
-type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder;
+type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder | void;
 
 /**
  * Represents persistent state functionality for a logic element.
@@ -30,6 +30,12 @@ export class PersistentState {
         this.driver = logic;
     }
 
+    private getBuilder(slot: number, createAccessorBuilder: AccessorBuilderFunction): AccessorBuilder {
+        const entityBuilder = new EntityBuilder(slot, this.driver);
+        createAccessorBuilder(entityBuilder);
+        return entityBuilder.getSlotAccessorBuilder();
+    }
+
     public async get<T = any>(createAccessorBuilder: AccessorBuilderFunction): Promise<T> {
         const [ptr, hasPersistentState] = this.driver.hasPersistentState();
 
@@ -37,24 +43,25 @@ export class PersistentState {
             ErrorUtils.throwError("Persistent state is not present");
         }
 
-        const builder = createAccessorBuilder(new EntityBuilder(ptr, this.driver));
+        const builder = this.getBuilder(ptr, createAccessorBuilder)
 
         if (!SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
-            ErrorUtils.throwError("Invalid accessor builder");
+            ErrorUtils.throwError("Invalid accessor builder", ErrorCode.ACTION_REJECTED, {
+                expected: SlotAccessorBuilder.name,
+                got: typeof builder,
+            });
         }
 
-        const accessors = builder.getAccessors();
-        let type = builder.getStorageType();
-
-        if(!isPrimitiveType(type)) {
-                ErrorUtils.throwError("Cannot retrieve complex types from persistent state");
+        if (!isPrimitiveType(builder.getStorageType())) {
+            ErrorUtils.throwError("Cannot retrieve complex types from persistent state", ErrorCode.ACTION_REJECTED, {
+                type: builder.getStorageType(),
+            });
         }
 
-        const slot = generateStorageKey(ptr, accessors);
+        const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
-        
-        const schema = Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
-        
+        const schema = Schema.parseDataType(builder.getStorageType(), this.driver.getClassDefs(), this.driver.getElements());
+
         return new Depolorizer(hexToBytes(result)).depolorize(schema) as T;
     }
 }

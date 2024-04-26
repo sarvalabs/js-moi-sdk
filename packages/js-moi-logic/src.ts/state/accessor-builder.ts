@@ -1,4 +1,4 @@
-import { isArray, isMap, Schema, type LogicManifest } from "js-moi-manifest";
+import { Schema, type LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 
 import type ElementDescriptor from "../element-descriptor";
@@ -21,7 +21,7 @@ export interface AccessorBuilder {
      *
      * @returns The accessor builder instance.
      */
-    length(): AccessorBuilder;
+    length(): void;
 
     /**
      * Adds a property accessor to the accessor builder.
@@ -54,34 +54,46 @@ export interface AccessorBuilder {
 
 export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, StorageTypeProvider {
     private accessors: Accessor[] = [];
+
     public readonly elementDescriptor: ElementDescriptor;
+
     private slotType: string;
 
-    public constructor(baseType: string, logicDescriptor: ElementDescriptor) {
+    private readonly typeField: LogicManifest.TypeField;
+
+    public constructor(field: LogicManifest.TypeField, logicDescriptor: ElementDescriptor) {
         this.elementDescriptor = logicDescriptor;
-        this.slotType = baseType;
+        this.typeField = field;
+        this.slotType = field.type;
     }
 
+    /**
+     * Retrieves the storage type of the accessor builder.
+     * @returns The storage type.
+     */
     public getStorageType(): string {
         return this.slotType;
     }
 
+    /**
+     * Retrieves the base slot of the accessor builder.
+     * @returns The base slot.
+     */
+    public getBaseSlot(): number {
+        return this.typeField.slot;
+    }
+
+    /**
+     * Retrieves the accessors of the accessor builder.
+     * @returns The accessors.
+     */
     public getAccessors(): Accessor[] {
         return this.accessors;
     }
 
-    public length(): SlotAccessorBuilder {
-        if (!isArray(this.slotType) && !isMap(this.slotType)) {
-            ErrorUtils.throwError(
-                `Attempting to access the length of a non-array or non-map type '${this.slotType}'.`,
-                ErrorCode.UNSUPPORTED_OPERATION
-            );
-        }
-
+    public length(): void {
         this.slotType = "u64";
         this.accessors.push(new LengthAccessor());
-
-        return this;
     }
 
     public property(key: string): SlotAccessorBuilder {
@@ -107,9 +119,7 @@ export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, S
         }
 
         const element = this.elementDescriptor.getClassElement(this.slotType);
-
         element.data = element.data as LogicManifest.Class;
-
         const field = element.data.fields.find((field) => field.label === fieldName);
 
         if (field == null) {
@@ -131,22 +141,12 @@ export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, S
     }
 
     /**
-     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
-     * @param field - The TypeField object.
-     * @param logicDescriptor - The LogicDescriptor object.
-     * @returns A new SlotAccessorBuilder instance.
-     */
-    public static fromTypeField(field: LogicManifest.TypeField, logicDescriptor: ElementDescriptor): SlotAccessorBuilder {
-        return new SlotAccessorBuilder(field.type, logicDescriptor);
-    }
-
-    /**
      * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.
      *
      * @param builder - The accessor builder to check.
      * @returns `true` if the `builder` is an instance of `SlotAccessorBuilder`, `false` otherwise.
      */
-    public static isSlotAccessorBuilder(builder: AccessorBuilder): builder is SlotAccessorBuilder {
+    public static isSlotAccessorBuilder(builder: unknown): builder is SlotAccessorBuilder {
         return builder instanceof SlotAccessorBuilder;
     }
 }

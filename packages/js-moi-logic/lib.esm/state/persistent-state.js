@@ -1,5 +1,5 @@
 import { isPrimitiveType, Schema } from "js-moi-manifest";
-import { ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { generateStorageKey } from "./accessor";
 import { SlotAccessorBuilder } from "./accessor-builder";
@@ -17,23 +17,31 @@ export class PersistentState {
         this.provider = provider;
         this.driver = logic;
     }
+    getBuilder(slot, createAccessorBuilder) {
+        const entityBuilder = new EntityBuilder(slot, this.driver);
+        createAccessorBuilder(entityBuilder);
+        return entityBuilder.getSlotAccessorBuilder();
+    }
     async get(createAccessorBuilder) {
         const [ptr, hasPersistentState] = this.driver.hasPersistentState();
         if (!hasPersistentState) {
             ErrorUtils.throwError("Persistent state is not present");
         }
-        const builder = createAccessorBuilder(new EntityBuilder(ptr, this.driver));
+        const builder = this.getBuilder(ptr, createAccessorBuilder);
         if (!SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
-            ErrorUtils.throwError("Invalid accessor builder");
+            ErrorUtils.throwError("Invalid accessor builder", ErrorCode.ACTION_REJECTED, {
+                expected: SlotAccessorBuilder.name,
+                got: typeof builder,
+            });
         }
-        const accessors = builder.getAccessors();
-        let type = builder.getStorageType();
-        if (!isPrimitiveType(type)) {
-            ErrorUtils.throwError("Cannot retrieve complex types from persistent state");
+        if (!isPrimitiveType(builder.getStorageType())) {
+            ErrorUtils.throwError("Cannot retrieve complex types from persistent state", ErrorCode.ACTION_REJECTED, {
+                type: builder.getStorageType(),
+            });
         }
-        const slot = generateStorageKey(ptr, accessors);
+        const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
-        const schema = Schema.parseDataType(type, this.driver.getClassDefs(), this.driver.getElements());
+        const schema = Schema.parseDataType(builder.getStorageType(), this.driver.getClassDefs(), this.driver.getElements());
         return new Depolorizer(hexToBytes(result)).depolorize(schema);
     }
 }

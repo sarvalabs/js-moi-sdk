@@ -1,4 +1,4 @@
-import { isArray, isMap, Schema } from "js-moi-manifest";
+import { Schema } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, } from "./accessor";
 const VALUE_TYPE_INDEX = 1;
@@ -6,23 +6,36 @@ export class SlotAccessorBuilder {
     accessors = [];
     elementDescriptor;
     slotType;
-    constructor(baseType, logicDescriptor) {
+    typeField;
+    constructor(field, logicDescriptor) {
         this.elementDescriptor = logicDescriptor;
-        this.slotType = baseType;
+        this.typeField = field;
+        this.slotType = field.type;
     }
+    /**
+     * Retrieves the storage type of the accessor builder.
+     * @returns The storage type.
+     */
     getStorageType() {
         return this.slotType;
     }
+    /**
+     * Retrieves the base slot of the accessor builder.
+     * @returns The base slot.
+     */
+    getBaseSlot() {
+        return this.typeField.slot;
+    }
+    /**
+     * Retrieves the accessors of the accessor builder.
+     * @returns The accessors.
+     */
     getAccessors() {
         return this.accessors;
     }
     length() {
-        if (!isArray(this.slotType) && !isMap(this.slotType)) {
-            ErrorUtils.throwError(`Attempting to access the length of a non-array or non-map type '${this.slotType}'.`, ErrorCode.UNSUPPORTED_OPERATION);
-        }
         this.slotType = "u64";
         this.accessors.push(new LengthAccessor());
-        return this;
     }
     property(key) {
         this.slotType = Schema.extractMapDataType(this.slotType)[VALUE_TYPE_INDEX];
@@ -50,15 +63,6 @@ export class SlotAccessorBuilder {
         const accessor = new ClassFieldAccessor(field.slot);
         this.accessors.push(accessor);
         return this;
-    }
-    /**
-     * Creates a SlotAccessorBuilder instance from a given {@linkcode LogicManifest.TypeField} and {@linkcode ElementDescriptor}.
-     * @param field - The TypeField object.
-     * @param logicDescriptor - The LogicDescriptor object.
-     * @returns A new SlotAccessorBuilder instance.
-     */
-    static fromTypeField(field, logicDescriptor) {
-        return new SlotAccessorBuilder(field.type, logicDescriptor);
     }
     /**
      * Checks if the given `builder` is an instance of `SlotAccessorBuilder`.

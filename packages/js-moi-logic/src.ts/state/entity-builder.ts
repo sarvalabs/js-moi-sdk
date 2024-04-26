@@ -7,6 +7,8 @@ export class EntityBuilder {
     private readonly slot: number;
     private readonly elementDescriptor: ElementDescriptor;
 
+    private slotAccessorBuilder?: AccessorBuilder;
+
     constructor(slot: number, elementDescriptor: ElementDescriptor) {
         this.slot = slot;
         this.elementDescriptor = elementDescriptor;
@@ -29,6 +31,15 @@ export class EntityBuilder {
             });
         }
 
-        return SlotAccessorBuilder.fromTypeField(field, this.elementDescriptor);
+        this.slotAccessorBuilder = new SlotAccessorBuilder(field, this.elementDescriptor);
+        return this.slotAccessorBuilder;
+    }
+
+    getSlotAccessorBuilder(): AccessorBuilder {
+        if (this.slotAccessorBuilder == null) {
+            ErrorUtils.throwError("Slot accessor builder not initialized");
+        }
+
+        return this.slotAccessorBuilder;
     }
 }

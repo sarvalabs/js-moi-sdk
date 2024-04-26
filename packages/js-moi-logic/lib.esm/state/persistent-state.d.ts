@@ -7,7 +7,7 @@ import { EntityBuilder } from "./entity-builder";
  * @param builder - The entity builder.
  * @returns The accessor builder.
  */
-type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder;
+type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder | void;
 /**
  * Represents persistent state functionality for a logic element.
  * Manages slots, types, and retrieval of persistent state values.
@@ -17,6 +17,7 @@ export declare class PersistentState {
     private provider;
     private driver;
     constructor(logic: LogicDriver, provider: AbstractProvider);
+    private getBuilder;
     get<T = any>(createAccessorBuilder: AccessorBuilderFunction): Promise<T>;
 }
 export {};

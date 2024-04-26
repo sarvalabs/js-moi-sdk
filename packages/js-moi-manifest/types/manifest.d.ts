@@ -22,7 +22,8 @@ export declare module LogicManifest {
     }
     
     export interface State {
-        kind: string;
+        kind?: string;
+        mode?: string;
         fields: TypeField[];
     }
     

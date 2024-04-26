@@ -34,7 +34,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             return; 
         }
 
-        const persistentState = new PersistentState(this, this.provider)
+        const persistentState = new PersistentState(this, this.provider);
         defineReadOnly(this, "persistentState", persistentState)
     }
 
