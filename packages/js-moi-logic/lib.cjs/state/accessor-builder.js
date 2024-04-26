@@ -37,6 +37,9 @@ class SlotAccessorBuilder {
         return this.accessors;
     }
     length() {
+        if ((0, js_moi_manifest_1.isPrimitiveType)(this.slotType)) {
+            js_moi_utils_1.ErrorUtils.throwError(`Attempting to access the length of primitive on type "${this.slotType}"`, js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
+        }
         this.slotType = "u64";
         this.accessors.push(new accessor_1.LengthAccessor());
     }
@@ -63,8 +66,7 @@ class SlotAccessorBuilder {
             });
         }
         this.slotType = field.type;
-        const accessor = new accessor_1.ClassFieldAccessor(field.slot);
-        this.accessors.push(accessor);
+        this.accessors.push(new accessor_1.ClassFieldAccessor(field.slot));
         return this;
     }
     /**

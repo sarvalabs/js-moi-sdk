@@ -41,7 +41,7 @@ export declare module LogicManifest {
     export interface Routine {
         name: string;
         kind: string;
-        mode: 'persistent';
+        mode: string;
         accepts?: TypeField[] | null;
         returns?: TypeField[] | null;
         executes: Instructions;

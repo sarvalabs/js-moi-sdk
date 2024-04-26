@@ -34,13 +34,12 @@ export class PersistentState {
                 got: typeof builder,
             });
         }
-        if (!isPrimitiveType(builder.getStorageType())) {
-            ErrorUtils.throwError("Cannot retrieve complex types from persistent state", ErrorCode.ACTION_REJECTED, {
-                type: builder.getStorageType(),
-            });
-        }
         const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const depolorizer = new Depolorizer(hexToBytes(result));
+        if (!isPrimitiveType(builder.getStorageType())) {
+            return depolorizer.depolorizeInteger();
+        }
         const schema = Schema.parseDataType(builder.getStorageType(), this.driver.getClassDefs(), this.driver.getElements());
         return new Depolorizer(hexToBytes(result)).depolorize(schema);
     }

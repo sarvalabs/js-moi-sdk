@@ -74,7 +74,7 @@ export declare class PropertyAccessor extends AbstractAccessor {
      * Creates a new instance of PropertyAccessor.
      * @param key The label of the property.
      */
-    constructor(key: string);
+    constructor(key: string | number);
     /**
      * Polorizes the given key.
      * @param key The key to polorize.

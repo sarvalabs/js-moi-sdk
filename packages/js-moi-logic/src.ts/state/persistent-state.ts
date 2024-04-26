@@ -52,16 +52,15 @@ export class PersistentState {
             });
         }
 
-        if (!isPrimitiveType(builder.getStorageType())) {
-            ErrorUtils.throwError("Cannot retrieve complex types from persistent state", ErrorCode.ACTION_REJECTED, {
-                type: builder.getStorageType(),
-            });
-        }
-
         const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
-        const schema = Schema.parseDataType(builder.getStorageType(), this.driver.getClassDefs(), this.driver.getElements());
+        const depolorizer = new Depolorizer(hexToBytes(result));
 
+        if (!isPrimitiveType(builder.getStorageType())) {
+            return depolorizer.depolorizeInteger() as T;
+        }
+
+        const schema = Schema.parseDataType(builder.getStorageType(), this.driver.getClassDefs(), this.driver.getElements());
         return new Depolorizer(hexToBytes(result)).depolorize(schema) as T;
     }
 }

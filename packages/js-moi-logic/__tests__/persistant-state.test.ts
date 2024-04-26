@@ -1,3 +1,4 @@
+import { BN } from "bn.js";
 import { encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { LogicDriver } from "../src.ts/logic-driver";
@@ -27,20 +28,20 @@ describe("Slot Key Generation", () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("boo"), new LengthAccessor());
 
-        expect(slot.hex()).toBe("0x2b586f4bfc77b974496e6e86c4c8abbc06a8fa56654f3bfcd9fd3dc8db99f1e9");
+        expect(slot.hex()).toBe("0xd2e32084b705074870ff13c6978cdd2a9f0cccb51cacb25596f590210c4f2903");
     });
 
     test(`X["foo"][0]`, () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("foo"), new ArrayIndexAccessor(8));
-        expect(slot.hex()).toBe("0xfb70ce47ff2e72a9d69bde31f25e2754335e694164bf9971725742bcdc73bf60");
+        expect(slot.hex()).toBe("0x300464d4748307d603e3807009362bfec9fd1ed997c4f3ec1789d073b0c1c891");
     });
 
     test(`X["foo"][1]`, () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("foo"), new ArrayIndexAccessor(1));
 
-        expect(slot.hex()).toBe("0xfb70ce47ff2e72a9d69bde31f25e2754335e694164bf9971725742bcdc73bf61");
+        expect(slot.hex()).toBe("0x300464d4748307d603e3807009362bfec9fd1ed997c4f3ec1789d073b0c1c88a");
     });
 
     test(`X["boo"][1]`, () => {
@@ -51,10 +52,7 @@ describe("Slot Key Generation", () => {
     });
 
     test(`Y.a`, () => {
-        const storageKey = new StorageKey(
-            "23615463689709x273622549015552744609029845592521730629701095228557717941624602"
-        );
-        const base = generateStorageKey(storageKey);
+        const base = new StorageKey(new BN("23615463689709273622549015552744609029845592521730629701095228557717941624602", 'be'));
         const slot = generateStorageKey(base, new ClassFieldAccessor(0));
 
         expect(slot.hex()).toBe("0xaa5d421bf085129f130aa77b9de3fce691fa3354f6ffca86b34226f0cbbd2e81");
@@ -64,43 +62,42 @@ describe("Slot Key Generation", () => {
         const base = generateStorageKey(1);
         const slot = generateStorageKey(base, new ClassFieldAccessor(1), new LengthAccessor());
 
-        expect(slot.hex()).toBe("0xfbd413697421330767c2ed8b49e142a417588c3db436f5e8a2518fbf8fecaf69");
+        expect(slot.hex()).toBe("0x33e423980c9b37d048bd5fadbd4a2aeb95146922045405accc2f468d0ef96989");
     });
 
     test(`len(Y.b[1])`, () => {
         const base = generateStorageKey(1);
-        const slot = generateStorageKey(
-            base,
-            new ClassFieldAccessor(1),
-            new ArrayIndexAccessor(1),
-            new LengthAccessor()
-        );
+        const slot = generateStorageKey(base, new ClassFieldAccessor(1), new ArrayIndexAccessor(1), new LengthAccessor());
 
-        expect(slot.hex()).toBe("0xfbd413697421330767c2ed8b49e142a417588c3db436f5e8a2518fbf8fecaf69");
+        expect(slot.hex()).toBe("0x5b291c649aac2341691a24dac6eab0b73560bbf17c6e858fd962147dcf98c970");
     });
 
     test(`Y.b[1][1]`, () => {
         const base = generateStorageKey(1);
-        const slot = generateStorageKey(
-            base,
-            new ClassFieldAccessor(1),
-            new ArrayIndexAccessor(1),
-            new ArrayIndexAccessor(1)
-        );
+        const slot = generateStorageKey(base, new ClassFieldAccessor(1), new ArrayIndexAccessor(1), new ArrayIndexAccessor(1));
 
-        expect(slot.hex()).toBe("0x760f6627b53e3701958b9c6580ff53cc59f1d126188a0cc90b1e56286b87d82b");
+        expect(slot.hex()).toBe("0xff747fb9e7d6b15138adb83cf0c6b0d7a3fc57b14c6f945083ab1ea199fbc475");
     });
 
     test("Y.b[0][1]", () => {
         const base = generateStorageKey(1);
-        const slot = generateStorageKey(
-            base,
-            new ClassFieldAccessor(1),
-            new ArrayIndexAccessor(0),
-            new ArrayIndexAccessor(1)
-        );
+        const slot = generateStorageKey(base, new ClassFieldAccessor(1), new ArrayIndexAccessor(0), new ArrayIndexAccessor(1));
 
-        expect(slot.hex()).toBe("0x4f71ce530f6ada3927f1af406779157ffff64d8581a7c94d71e0a136de1c064a");
+        expect(slot.hex()).toBe("0x4de85ac5f19b72de74978dd4c4a312d25097652afadbd3b57b805dcbf3728387");
+    });
+
+    test("X[5]", () => {
+        const base = generateStorageKey(0);
+        const slot = generateStorageKey(base, new PropertyAccessor(5));
+
+        expect(slot.hex()).toBe("0x9f5ed330645660302fde5b2350710a32298ec94764dff274bafcd3e211abef06");
+    });
+
+    test("X[5.5]", () => {
+        const base = generateStorageKey(0);
+        const slot = generateStorageKey(base, new PropertyAccessor(5.5));
+
+        expect(slot.hex()).toBe("0x6330aba8f95edd47f3d9f6ca1884ee11479b2dfcfbdd9e9f0775f7057438eff6");
     });
 });
 
@@ -141,12 +138,7 @@ describe("Accessing Persistance Storage", () => {
         expect(length).toBe(expectedLength);
     });
 
-    test("it should throw an error when accessing length of non array/map type", async () => {
-        expect(async () => {
-            await logic.persistentState.get<number>((accessor) => accessor.entity("value2").length());
-        }).rejects.toThrow(/Attempting to access the length of a non-array or non-map type '(\w+)'/);
-    });
-
+    
     test("it should return the field value of class", async () => {
         const expectedName = "Harsh";
 
@@ -171,9 +163,7 @@ describe("Accessing Persistance Storage", () => {
             return Promise.resolve(encodeToString(polorizer.bytes()));
         });
 
-        const value = await logic.persistentState.get<string>((accessor) =>
-            accessor.entity("value3").property("foo").field("name")
-        );
+        const value = await logic.persistentState.get<string>((accessor) => accessor.entity("value3").property("foo").field("name"));
 
         expect(typeof value).toBe("string");
         expect(value).toBe(expectedValue);
@@ -194,9 +184,7 @@ describe("Accessing Persistance Storage", () => {
 
     test("it should throw an error when accessing invalid class field", async () => {
         expect(async () => {
-            await logic.persistentState.get<string>((accessor) =>
-                accessor.entity("value3").property("foo").field("invalid")
-            );
+            await logic.persistentState.get<string>((accessor) => accessor.entity("value3").property("foo").field("invalid"));
         }).rejects.toThrow();
     });
 

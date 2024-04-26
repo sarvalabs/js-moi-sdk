@@ -37,13 +37,12 @@ class PersistentState {
                 got: typeof builder,
             });
         }
-        if (!(0, js_moi_manifest_1.isPrimitiveType)(builder.getStorageType())) {
-            js_moi_utils_1.ErrorUtils.throwError("Cannot retrieve complex types from persistent state", js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
-                type: builder.getStorageType(),
-            });
-        }
         const slot = (0, accessor_1.generateStorageKey)(builder.getBaseSlot(), builder.getAccessors());
         const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const depolorizer = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result));
+        if (!(0, js_moi_manifest_1.isPrimitiveType)(builder.getStorageType())) {
+            return depolorizer.depolorizeInteger();
+        }
         const schema = js_moi_manifest_1.Schema.parseDataType(builder.getStorageType(), this.driver.getClassDefs(), this.driver.getElements());
         return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result)).depolorize(schema);
     }

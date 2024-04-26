@@ -1,4 +1,4 @@
-import { Schema } from "js-moi-manifest";
+import { isPrimitiveType, Schema } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, } from "./accessor";
 const VALUE_TYPE_INDEX = 1;
@@ -34,6 +34,9 @@ export class SlotAccessorBuilder {
         return this.accessors;
     }
     length() {
+        if (isPrimitiveType(this.slotType)) {
+            ErrorUtils.throwError(`Attempting to access the length of primitive on type "${this.slotType}"`, ErrorCode.UNEXPECTED_ARGUMENT);
+        }
         this.slotType = "u64";
         this.accessors.push(new LengthAccessor());
     }
@@ -60,8 +63,7 @@ export class SlotAccessorBuilder {
             });
         }
         this.slotType = field.type;
-        const accessor = new ClassFieldAccessor(field.slot);
-        this.accessors.push(accessor);
+        this.accessors.push(new ClassFieldAccessor(field.slot));
         return this;
     }
     /**

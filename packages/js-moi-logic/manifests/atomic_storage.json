@@ -1,5 +1,5 @@
 {
-    "syntax": "0.1.0",
+    "syntax": 1,
     "engine": {
         "kind": "PISA",
         "flags": []
@@ -132,7 +132,7 @@
             ],
             "kind": "state",
             "data": {
-                "kind": "persistent",
+                "mode": "persistent",
                 "fields": [
                     {
                         "slot": 0,

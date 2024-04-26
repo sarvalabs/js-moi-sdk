@@ -57,7 +57,28 @@ export class PropertyAccessor extends AbstractAccessor {
      */
     polorize(key) {
         const polorizer = new Polorizer();
-        polorizer.polorizeString(key);
+        switch (true) {
+            case typeof key === "string":
+                polorizer.polorizeString(key);
+                break;
+            case typeof key === "number":
+                if (Number.isInteger(key)) {
+                    polorizer.polorizeInteger(key);
+                }
+                if (!Number.isInteger(key)) {
+                    polorizer.polorizeFloat(key);
+                }
+                break;
+            case typeof key === "boolean":
+                polorizer.polorizeBool(key);
+                break;
+            case (key instanceof Uint8Array):
+            case (key instanceof Buffer):
+                polorizer.polorizeBytes(key);
+                break;
+            default:
+                throw new Error(`Unsupported type: ${typeof key}`);
+        }
         return polorizer.bytes();
     }
     /**
