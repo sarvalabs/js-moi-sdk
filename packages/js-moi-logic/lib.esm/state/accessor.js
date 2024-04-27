@@ -72,8 +72,8 @@ export class PropertyAccessor extends AbstractAccessor {
             case typeof key === "boolean":
                 polorizer.polorizeBool(key);
                 break;
-            case (key instanceof Uint8Array):
-            case (key instanceof Buffer):
+            case key instanceof Uint8Array:
+            case key instanceof Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
