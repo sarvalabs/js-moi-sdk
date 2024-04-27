@@ -1057,7 +1057,7 @@ export class BaseProvider extends AbstractProvider {
                     return;
                 }
 
-                const err = new CustomError(error.data, ErrorCode.ACTION_REJECTED, {
+                const err = new CustomError(error.Error, ErrorCode.ACTION_REJECTED, {
                     ...error,
                     receipt,
                 });

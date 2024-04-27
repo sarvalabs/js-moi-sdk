@@ -185,10 +185,10 @@ export declare class Schema {
             name: {
                 kind: string;
             };
-            kind: {
+            mode: {
                 kind: string;
             };
-            mode: {
+            kind: {
                 kind: string;
             };
             accepts: {
@@ -337,22 +337,22 @@ export declare class Schema {
     static PISA_EXCEPTION_SCHEMA: {
         kind: string;
         fields: {
-            class: {
+            Class: {
                 kind: string;
             };
-            data: {
+            Error: {
                 kind: string;
             };
-            trace: {
+            Revert: {
+                kind: string;
+            };
+            Trace: {
                 kind: string;
                 fields: {
                     values: {
                         kind: string;
                     };
                 };
-            };
-            revert: {
-                kind: string;
             };
         };
     };

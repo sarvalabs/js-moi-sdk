@@ -1,5 +1,6 @@
 export interface Exception {
-    class: string;
-    data: string;
-    trace: string[];
+    Class: string;
+    Error: string;
+    Revert: boolean;
+    Trace: string[];
 }

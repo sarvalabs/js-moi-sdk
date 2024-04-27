@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { type LogicManifest } from "js-moi-manifest";
 import type ElementDescriptor from "../element-descriptor";
 import { type Accessor, type AccessorProvider, type StorageTypeProvider } from "./accessor";
@@ -17,7 +18,7 @@ export interface AccessorBuilder {
      * @param key - The label of the property.
      * @returns The accessor builder instance.
      */
-    property(key: string): AccessorBuilder;
+    property(key: string | number | boolean | Uint8Array | Buffer): AccessorBuilder;
     /**
      * Adds an accessor for the specified index to the AccessorBuilder.
      *

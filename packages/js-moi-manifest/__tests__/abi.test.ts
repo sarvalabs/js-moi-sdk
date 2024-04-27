@@ -23,8 +23,8 @@ describe("Test ManifestCoder", () => {
     const manifestCoder = new ManifestCoder(elements, classDefs);
 
     test("Encode ABI/Manifest into polo format", async () => {
-        const encodedABI = ManifestCoder.encodeManifest(await loadManifestFromFile("../../manifests/guardian-registry.json"));
-        expect(encodedABI).toBe(await loadFile("../../manifests/guardian-registry-polo.txt"));
+        const encodedABI = ManifestCoder.encodeManifest(await loadManifestFromFile("../../manifests/tokenledger.json"));
+        expect(encodedABI).toBe(await loadFile("../../manifests/tokenledger-polo.txt"));
     });
 
     test("Encode arguments into polo format", () => {
@@ -34,13 +34,11 @@ describe("Test ManifestCoder", () => {
         });
         const routine = routineElement?.data as LogicManifest.Routine;
         const fields = routine.accepts ? routine.accepts : [];
-        const args = ["MOI-Token", "MOI", 100000000, "ffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"];
+        const args = ["MOI", 100000000];
         const calldata = manifestCoder.encodeArguments(fields, args);
 
         expect(routine).toBeDefined();
-        expect(calldata).toBe(
-            "0x0def010645e601c502d606b5078608e5086e616d65064d4f492d546f6b656e73656564657206ffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34737570706c790305f5e10073796d626f6c064d4f49"
-        );
+        expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
     });
 
     test("Decode polo encoded output", () => {
@@ -61,13 +59,16 @@ describe("Test ManifestCoder", () => {
     });
 
     test("Decode polo encoded exception", () => {
-        const error = "0x0e4f0666ae03737472696e67536f6d657468696e672077656e742077726f6e673f06b60166756e6374696f6e31282966756e6374696f6e322829";
+        const error =
+            "0x0e6f0666d104de04737472696e67696e73756666696369656e742062616c616e636520666f722073656e6465723f06e60172756e74696d652e726f6f742829726f7574696e652e5472616e736665722829205b3078635d202e2e2e205b307831623a205448524f57203078355d";
         const exception = ManifestCoder.decodeException(error);
 
+        expect(exception).toBeDefined();
         expect(exception).toEqual({
-            class: "string",
-            data: "Something went wrong",
-            trace: ["function1()", "function2()"],
+            Class: "string",
+            Error: "insufficient balance for sender",
+            Revert: false,
+            Trace: ["runtime.root()", "routine.Transfer() [0xc] ... [0x1b: THROW 0x5]"],
         });
     });
 

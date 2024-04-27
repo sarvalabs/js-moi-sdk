@@ -13,7 +13,7 @@ export class StorageKey {
     hex(): string {
         return encodeToString(this.toBuffer());
     }
-    
+
     toBuffer(): Buffer {
         return this.value.toBuffer("be", 32);
     }
@@ -112,12 +112,12 @@ export class PropertyAccessor extends AbstractAccessor {
     private polorize(key: string | number | boolean | Uint8Array | Buffer): Uint8Array {
         const polorizer = new Polorizer();
 
-        switch(true) {
+        switch (true) {
             case typeof key === "string":
                 polorizer.polorizeString(key);
                 break;
             case typeof key === "number":
-                if(Number.isInteger(key)) {
+                if (Number.isInteger(key)) {
                     polorizer.polorizeInteger(key);
                 }
 
@@ -128,8 +128,8 @@ export class PropertyAccessor extends AbstractAccessor {
             case typeof key === "boolean":
                 polorizer.polorizeBool(key);
                 break;
-            case (key instanceof Uint8Array):
-            case (key instanceof Buffer):
+            case key instanceof Uint8Array:
+            case key instanceof Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
@@ -172,7 +172,7 @@ export class ArrayIndexAccessor extends AbstractAccessor {
     public access(hash: StorageKey): StorageKey {
         const bytes = this.sum256(hash.toBuffer());
         const slot = new BN(bytes).add(new BN(this.index));
-        return new StorageKey(slot)
+        return new StorageKey(slot);
     }
 }
 
@@ -185,18 +185,17 @@ export class ClassFieldAccessor extends AbstractAccessor {
     }
 
     public access(hash: StorageKey): StorageKey {
-        let blob : Uint8Array = hash.toBuffer();
+        let blob: Uint8Array = hash.toBuffer();
         blob = this.sum256(blob);
         const bn = new BN(blob).add(new BN(this.index));
-        
+
         return new StorageKey(bn);
     }
 }
 
-
 /**
  * Generates a slot hash based on the provided base and accessors.
- * 
+ *
  * @param base - The base value for the slot hash.
  * @param accessors - The accessors used to generate the slot hash.
  * @returns The generated slot hash as a Uint8Array.
@@ -204,7 +203,7 @@ export class ClassFieldAccessor extends AbstractAccessor {
 export function generateStorageKey(base: number | StorageKey, ...accessors: Accessor[]): StorageKey;
 /**
  * Generates a slot hash based on the provided base value and array of accessors.
- * 
+ *
  * @param base - The base value for generating the slot hash.
  * @param accessorsArray - An array of accessors used in generating the slot hash.
  * @returns The generated slot hash as a Uint8Array.

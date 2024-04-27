@@ -17,10 +17,10 @@ export default class ElementDescriptor {
         this.stateMatrix = new ContextStateMatrix(elements);
 
         // Populate the maps for elements, call sites, class and method definitions.
-        elements.forEach(element => {
+        elements.forEach((element) => {
             this.elements.set(element.ptr, element);
-            
-            switch(element.kind){
+
+            switch (element.kind) {
                 case "class":
                     const classData = element.data as LogicManifest.Class;
                     this.classDefs.set(classData.name, element.ptr);
@@ -29,15 +29,15 @@ export default class ElementDescriptor {
                     const methodData = element.data as LogicManifest.Method;
                     const methodDef: MethodDef = {
                         ptr: element.ptr,
-                        class: methodData.class
+                        class: methodData.class,
                     };
                     this.methodDefs.set(methodData.name, methodDef);
                     break;
                 case "routine":
                     const routineData = element.data as LogicManifest.Routine;
-                    const callsite: CallSite = { 
-                        ptr: element.ptr, 
-                        kind: routineData.kind 
+                    const callsite: CallSite = {
+                        ptr: element.ptr,
+                        kind: routineData.kind,
                     };
                     this.callSites.set(routineData.name, callsite);
                     break;
@@ -49,7 +49,7 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
-     * 
+     *
      * @returns {ContextStateMatrix} The state matrix.
      */
     public getStateMatrix(): ContextStateMatrix {
@@ -58,7 +58,7 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the map of elements associated with the ElementDescriptor.
-     * 
+     *
      * @returns {Map<number, LogicManifest.Element>} The elements map.
      */
     public getElements(): Map<number, LogicManifest.Element> {
@@ -67,16 +67,16 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the map of call sites associated with the ElementDescriptor.
-     * 
+     *
      * @returns {Map<string, CallSite>} The call sites map.
      */
     public getCallsites(): Map<string, CallSite> {
         return this.callSites;
-    } 
+    }
 
     /**
      * Retrieves the map of class definitions associated with the ElementDescriptor.
-     * 
+     *
      * @returns {Map<string, number>} The class definitions map.
      */
     public getClassDefs(): Map<string, number> {
@@ -85,7 +85,7 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
-     * 
+     *
      * @returns {Map<string, MethodDef>} The method definitions map.
      */
     public getMethodDefs(): Map<string, MethodDef> {
@@ -94,21 +94,18 @@ export default class ElementDescriptor {
 
     /**
      * Retrieves the methods of a class based on the given class name.
-     * 
+     *
      * @param {string} className - The name of the class.
      * @returns {Map<string, LogicManifest.Method>} The methods of the class.
      * @throws {Error} if the class name is invalid.
      */
     public getClassMethods(className: string): Map<string, LogicManifest.Method> {
         const classPtr = this.classDefs.get(className);
-        
+
         if (classPtr === undefined) {
-            return ErrorUtils.throwError(
-                `Invalid class name: ${className}`,
-                ErrorCode.INVALID_ARGUMENT
-            );
+            return ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
-    
+
         const classMethods: Map<string, LogicManifest.Method> = new Map();
         this.methodDefs.forEach((method, methodName) => {
             if (method.class === className) {
@@ -116,14 +113,14 @@ export default class ElementDescriptor {
                 classMethods.set(methodName, element.data as LogicManifest.Method);
             }
         });
-    
+
         return classMethods;
     }
 
     /**
      * Retrieves the element from the logic manifest based on the given
      * routine name.
-     * 
+     *
      * @param {string} routineName - The name of the routine.
      * @returns {LogicManifest.Element} The routine element.
      * @throws {Error} if the routine name is invalid.
@@ -132,19 +129,16 @@ export default class ElementDescriptor {
         const callsite = this.callSites.get(routineName);
 
         if (!callsite) {
-            return ErrorUtils.throwError(
-                `Invalid routine name: ${routineName}`,
-                ErrorCode.INVALID_ARGUMENT
-            )
+            return ErrorUtils.throwError(`Invalid routine name: ${routineName}`, ErrorCode.INVALID_ARGUMENT);
         }
 
         return this.elements.get(callsite.ptr);
     }
 
     /**
-     * Retrieves the element from the logic manifest based on the given 
+     * Retrieves the element from the logic manifest based on the given
      * class name.
-     * 
+     *
      * @returns {LogicManifest.Element} The class element.
      * @throws {Error} if the class name is invalid.
      */
@@ -152,19 +146,16 @@ export default class ElementDescriptor {
         const ptr = this.classDefs.get(className);
 
         if (ptr === undefined) {
-            return ErrorUtils.throwError(
-                `Invalid routine name: ${className}`,
-                ErrorCode.INVALID_ARGUMENT
-            )
+            return ErrorUtils.throwError(`Invalid routine name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
 
         return this.elements.get(ptr);
     }
 
     /**
-     * Retrieves the element from the logic manifest based on the given 
+     * Retrieves the element from the logic manifest based on the given
      * method name.
-     * 
+     *
      * @param {string} methodName - The name of the method.
      * @returns {LogicManifest.Element} The method element.
      * @throws {Error} if the method name is invalid.
@@ -173,10 +164,7 @@ export default class ElementDescriptor {
         const methodDef = this.methodDefs.get(methodName);
 
         if (!methodDef) {
-            return ErrorUtils.throwError(
-                `Invalid routine name: ${methodName}`,
-                ErrorCode.INVALID_ARGUMENT
-            )
+            return ErrorUtils.throwError(`Invalid routine name: ${methodName}`, ErrorCode.INVALID_ARGUMENT);
         }
 
         return this.elements.get(methodDef.ptr);

@@ -43,7 +43,7 @@ export class PersistentState {
             ErrorUtils.throwError("Persistent state is not present");
         }
 
-        const builder = this.getBuilder(ptr, createAccessorBuilder)
+        const builder = this.getBuilder(ptr, createAccessorBuilder);
 
         if (!SlotAccessorBuilder.isSlotAccessorBuilder(builder)) {
             ErrorUtils.throwError("Invalid accessor builder", ErrorCode.ACTION_REJECTED, {

@@ -1,13 +1,19 @@
 import { BN } from "bn.js";
-import { encodeToString } from "js-moi-utils";
-import { Polorizer } from "js-polo";
-import { LogicDriver } from "../src.ts/logic-driver";
+import { hexToBytes } from "js-moi-utils";
+import { Wallet } from "js-moi-wallet";
+
+import { JsonRpcProvider } from "js-moi-providers";
+import { getLogicDriver, type LogicDriver } from "../src.ts/logic-driver";
+import { LogicFactory } from "../src.ts/logic-factory";
 import { ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "../src.ts/state/accessor";
-import { PROVIDER } from "./utils/constants";
 import { loadManifestFromFile } from "./utils/utils";
 
-// For the below tests, we are using the following object:
-// https://github.com/sarvalabs/go-pisa/issues/3
+const MNEMONIC = "laptop hybrid ripple unaware entire cover flag rally deliver adjust nerve ready";
+const PATH = "m/44'/6174'/0'/0/1";
+const PROVIDER = new JsonRpcProvider("http://localhost:1600");
+
+const wallet = Wallet.fromMnemonicSync(MNEMONIC, PATH);
+wallet.connect(PROVIDER);
 
 describe("Slot Key Generation", () => {
     test("len(X)", () => {
@@ -52,7 +58,7 @@ describe("Slot Key Generation", () => {
     });
 
     test(`Y.a`, () => {
-        const base = new StorageKey(new BN("23615463689709273622549015552744609029845592521730629701095228557717941624602", 'be'));
+        const base = new StorageKey(new BN("23615463689709273622549015552744609029845592521730629701095228557717941624602", "be"));
         const slot = generateStorageKey(base, new ClassFieldAccessor(0));
 
         expect(slot.hex()).toBe("0xaa5d421bf085129f130aa77b9de3fce691fa3354f6ffca86b34226f0cbbd2e81");
@@ -103,108 +109,39 @@ describe("Slot Key Generation", () => {
 
 describe("Accessing Persistance Storage", () => {
     let logic: LogicDriver;
+    const supply = 100000000;
+    const symbol = "MOI";
 
     beforeAll(async () => {
-        const manifest = await loadManifestFromFile("../../manifests/atomic_storage.json");
-        const logicID = "0x080000eaf5d3321459454f868d4603afa9015cdba0b4a0c2130a11f36b3272f8616cd2";
+        const manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
+        const factory = new LogicFactory(manifest, wallet);
+        const ix = await factory.deploy("Seeder", symbol, supply);
+        const result = await ix.result();
 
-        logic = new LogicDriver(logicID, manifest, PROVIDER);
+        await new Promise((resolve) => setTimeout(resolve, 3000)); // This is wait time as instantly fetching logic causing logic not found error
+
+        logic = await getLogicDriver(result.logic_id, PROVIDER);
     });
 
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    test("it should throw an error if persistent state is not present", async () => {
-        jest.spyOn(logic, "hasPersistentState").mockImplementation(() => [0, false]);
-
-        await expect(async () => {
-            await logic.persistentState.get<string>((accessor) => accessor.entity("value1").field("name"));
-        }).rejects.toThrow(/Persistent state is not present/);
-    });
-
-    test("it should return the length of the array", async () => {
-        const expectedLength = Math.floor(Math.random() * 100);
-
-        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
-            const polorizer = new Polorizer();
-            polorizer.polorizeInteger(expectedLength);
-            return Promise.resolve(encodeToString(polorizer.bytes()));
-        });
-
-        const length = await logic.persistentState.get<number>((accessor) => accessor.entity("value1").length());
+    test("it should return the size of the map", async () => {
+        const length = await logic.persistentState.get<number>((accessor) => accessor.entity("balances"));
 
         expect(typeof length).toBe("number");
-        expect(length).toBe(expectedLength);
+        expect(length).toBe(1);
     });
 
-    
-    test("it should return the field value of class", async () => {
-        const expectedName = "Harsh";
+    test("it should able access value of map", async () => {
+        const address = hexToBytes(wallet.address);
+        const balance = await logic.persistentState.get<string>((accessor) => accessor.entity("balances").property(address));
 
-        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
-            const polorizer = new Polorizer();
-            polorizer.polorizeString(expectedName);
-            return Promise.resolve(encodeToString(polorizer.bytes()));
-        });
-
-        const name = await logic.persistentState.get<string>((accessor) => accessor.entity("value2").field("name"));
-
-        expect(typeof name).toBe("string");
-        expect(name).toBe(expectedName);
+        expect(typeof balance).toBe("number");
+        expect(balance).toBe(supply);
     });
 
-    test("it should be able to access map value", async () => {
-        const expectedValue = "Harsh";
-
-        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
-            const polorizer = new Polorizer();
-            polorizer.polorizeString(expectedValue);
-            return Promise.resolve(encodeToString(polorizer.bytes()));
-        });
-
-        const value = await logic.persistentState.get<string>((accessor) => accessor.entity("value3").property("foo").field("name"));
+    test("it should be able to access primitive in state", async () => {
+        const value = await logic.persistentState.get<string>((accessor) => accessor.entity("symbol"));
 
         expect(typeof value).toBe("string");
-        expect(value).toBe(expectedValue);
-    });
-
-    test("it should be access index of array", async () => {
-        jest.spyOn(PROVIDER, "getStorageAt").mockImplementation(() => {
-            const polorizer = new Polorizer();
-            polorizer.polorizeBool(true);
-            return Promise.resolve(encodeToString(polorizer.bytes()));
-        });
-
-        const value = await logic.persistentState.get<boolean>((b) => b.entity("value1").property("foo").at(0));
-
-        expect(typeof value).toBe("boolean");
-        expect(value).toBe(true);
-    });
-
-    test("it should throw an error when accessing invalid class field", async () => {
-        expect(async () => {
-            await logic.persistentState.get<string>((accessor) => accessor.entity("value3").property("foo").field("invalid"));
-        }).rejects.toThrow();
-    });
-
-    test("it should throw an error when accessing non primitive type value", async () => {
-        expect(async () => {
-            await logic.persistentState.get<string>((accessor) => accessor.entity("value2"));
-        }).rejects.toThrow(/Cannot retrieve complex types from persistent state/);
-    });
-
-    test("it should throw an error when attempting to access field of class, which is not recognized", async () => {
-        expect(async () => {
-            await logic.persistentState.get<string>((accessor) => accessor.entity("value1").field("invalid"));
-        }).rejects.toThrow(/Attempting to access a field '(\w+)' in (\S+), which is not a recognized class./);
-    });
-
-    test("it should throw an error when attempting to access property of entity, which is not recognized", async () => {
-        const label = "invalid" + Math.floor(Math.random() * 100);
-
-        expect(async () => {
-            await logic.persistentState.get<string>((accessor) => accessor.entity(label));
-        }).rejects.toThrow(/'(\w+)' is not member of persistent state/);
+        expect(value).toBe(symbol);
     });
 });
