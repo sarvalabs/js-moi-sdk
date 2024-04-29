@@ -5,7 +5,7 @@ import { LogicFactory } from "../src.ts/logic-factory";
 
 import type { LogicManifest } from "js-moi-manifest";
 import { loadManifestFromFile } from "js-moi-manifest/__tests__/utils/helper";
-import { JsonRpcProvider } from "js-moi-providers";
+import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "js-moi-providers";
 
 const HOST = "http://localhost:1600/";
 const MNEMONIC = "laptop hybrid ripple unaware entire cover flag rally deliver adjust nerve ready";
@@ -31,20 +31,22 @@ describe("Logic", () => {
     let logicId: string | undefined;
     let manifest: LogicManifest.Manifest;
 
+    let ix: InteractionResponse;
+    let receipt: InteractionReceipt;
+
     beforeAll(async () => {
         manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
+
+        const factory = new LogicFactory(manifest, wallet);
+        ix = await factory.deploy("Seeder", SYMBOL, INITIAL_SUPPLY);
+        receipt = await ix.wait();
+        const result = await ix.result();
+
+        logicId = result.logic_id;
     });
 
     describe("deploy logic", () => {
         it("should deploy logic without options", async () => {
-            const factory = new LogicFactory(manifest, wallet);
-
-            const ix = await factory.deploy("Seeder", SYMBOL, INITIAL_SUPPLY);
-
-            const receipt = await ix.wait();
-            const result = await ix.result();
-            logicId = result.logic_id;
-
             expect(ix.hash).toBeDefined();
             expect(receipt).toBeDefined();
         });
@@ -70,11 +72,7 @@ describe("Logic", () => {
 
         beforeAll(async () => {
             if (logicId == null) {
-                const factory = new LogicFactory(manifest, wallet);
-                const ix = await factory.deploy("Seeder", SYMBOL, INITIAL_SUPPLY);
-                await ix.wait();
-                const result = await ix.result();
-                logicId = result.logic_id;
+                expect(logicId).toBeDefined();
             }
 
             logic = await getLogicDriver(logicId!, wallet);
@@ -153,11 +151,7 @@ describe("Logic", () => {
 
         beforeAll(async () => {
             if (logicId == null) {
-                const factory = new LogicFactory(manifest, wallet);
-                const ix = await factory.deploy("Seeder", SYMBOL, INITIAL_SUPPLY);
-                await ix.wait();
-                const result = await ix.result();
-                logicId = result.logic_id;
+                expect(logicId).toBeDefined();
             }
 
             logic = await getLogicDriver(logicId!, PROVIDER);
@@ -198,7 +192,7 @@ describe("Logic", () => {
         logic = new LogicDriver("0x", manifest, wallet);
     });
 
-    it("should be able return is routine mutable or not", () => {
+    it("should be able return routine is mutable or not", () => {
         const routine = [
             { name: "Transfer", mutable: true },
             { name: "BalanceOf", mutable: false },

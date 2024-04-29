@@ -30,12 +30,26 @@ export class PersistentState {
         this.driver = logic;
     }
 
+    /**
+     * Returns an accessor builder for the specified slot.
+     * 
+     * @param slot - The slot number.
+     * @param createAccessorBuilder - The function to create the accessor builder.
+     * @returns The accessor builder for the specified slot.
+     */
     private getBuilder(slot: number, createAccessorBuilder: AccessorBuilderFunction): AccessorBuilder {
         const entityBuilder = new EntityBuilder(slot, this.driver);
         createAccessorBuilder(entityBuilder);
         return entityBuilder.getSlotAccessorBuilder();
     }
 
+    /**
+     * Retrieves the value from the persistent state.
+     * 
+     * @param createAccessorBuilder - The function that creates the accessor builder.
+     * @returns A promise that resolves to the retrieved value.
+     * @throws An error if the persistent state is not present or if the accessor builder is invalid.
+     */
     public async get<T = any>(createAccessorBuilder: AccessorBuilderFunction): Promise<T> {
         const [ptr, hasPersistentState] = this.driver.hasPersistentState();
 

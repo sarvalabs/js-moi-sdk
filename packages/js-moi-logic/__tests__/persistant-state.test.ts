@@ -50,6 +50,11 @@ describe("Slot Key Generation", () => {
         expect(slot.hex()).toBe("0x300464d4748307d603e3807009362bfec9fd1ed997c4f3ec1789d073b0c1c88a");
     });
 
+    test('accessing index of array', () => {
+        const slot = generateStorageKey(1, new ArrayIndexAccessor(10));
+        expect(slot.hex()).toBe("0x33e423980c9b37d048bd5fadbd4a2aeb95146922045405accc2f468d0ef96992")
+    })
+
     test(`X["boo"][1]`, () => {
         const base = generateStorageKey(0);
         const slot = generateStorageKey(base, new PropertyAccessor("boo"), new ArrayIndexAccessor(1));

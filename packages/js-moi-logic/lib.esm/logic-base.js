@@ -75,7 +75,6 @@ export class LogicBase extends ElementDescriptor {
                 if (!this.signer?.isInitialized()) {
                     ErrorUtils.throwError("Mutating routine calls require a signer to be initialized.", ErrorCode.NOT_INITIALIZED);
                 }
-                // @ts-ignore
                 const response = await this.signer.sendInteraction(params);
                 return {
                     ...response,
