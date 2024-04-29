@@ -15,9 +15,9 @@ author = 'Sarva Labs Inc'
 # built documents.
 #
 # The short X.Y version.
-version = u'v0.3.0-rc4'
+version = u'v0.4.0'
 # The full version, including alpha/beta/rc tags.
-release = u'v0.3.0-rc4'
+release = u'v0.4.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
