@@ -880,7 +880,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     resolve(receipt);
                     return;
                 }
-                const err = new js_moi_utils_1.CustomError(error.data, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
+                const err = new js_moi_utils_1.CustomError(error.error, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
                     ...error,
                     receipt,
                 });

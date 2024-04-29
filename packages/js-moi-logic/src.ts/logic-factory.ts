@@ -96,9 +96,8 @@ export class LogicFactory extends LogicBase {
                 return routine.kind === "deployer" && 
                 builderName === routine.name;
             }
-
             return false;
-        })
+        });
 
         if(builder) {
             const builderRoutine = builder.data as LogicManifest.Routine;
@@ -112,7 +111,7 @@ export class LogicFactory extends LogicBase {
                     ErrorCode.MISSING_ARGUMENT
                 );
             }
-    
+            
             return this.createIxObject(builderRoutine, ...args).send();
         }
 

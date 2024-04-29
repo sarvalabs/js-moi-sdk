@@ -1,6 +1,6 @@
 {
   "name": "js-moi-hdnode",
-  "version": "0.3.0-rc4",
+  "version": "0.4.0",
   "description": "BIP32 HD Node for cryptocurrency key management.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -28,7 +28,7 @@
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
     "hdkey": "^2.1.0",
-    "js-moi-utils": "^0.3.0-rc4",
+    "js-moi-utils": "^0.4.0",
     "process": "^0.11.10",
     "secp256k1": "^5.0.0",
     "stream": "npm:stream-browserify"

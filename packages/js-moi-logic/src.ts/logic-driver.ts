@@ -5,7 +5,7 @@ import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-mo
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { PersistentState, type EphemeralState } from "./state";
 
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -28,18 +28,14 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      if available in logic manifest.
      */
     private createState() {
-        const [persistentStatePtr, persistentStateExists] = this.hasPersistentState()
+        const hasPersistance = this.stateMatrix.persistent();
 
-        if(persistentStateExists) {
-            const persistentState = new PersistentState(
-                this.logicId.hex(),
-                this.elements.get(persistentStatePtr),
-                this.manifestCoder,
-                this.provider
-            )
-
-            defineReadOnly(this, "persistentState", persistentState)
+        if(hasPersistance === false) {
+            return; 
         }
+
+        const persistentState = new PersistentState(this, this.provider);
+        defineReadOnly(this, "persistentState", persistentState)
     }
 
     /**
@@ -59,9 +55,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 return;
             }
 
-            const name = this.normalizeRoutineName(routine.name);
-
-            routines[name] = async (...params: any[]) => {
+            routines[routine.name] = async (...params: any[]) => {
                 const argsLen =
                     params.at(-1) && typeof params.at(-1) === "object"
                         ? params.length - 1
@@ -76,22 +70,22 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
 
                 const ixObject = this.createIxObject(routine, ...params);
 
-                if (!this.isMutableRoutine(routine.name)) {
+                if (!this.isMutableRoutine(routine)) {
                     return await ixObject.unwrap();
                 }
 
                 return await ixObject.send();
             };
 
-            routines[name].isMutable = (): boolean => {
-                return this.isMutableRoutine(routine.name)
+            routines[routine.name].isMutable = (): boolean => {
+                return this.isMutableRoutine(routine)
             }
 
-            routines[name].accepts = (): LogicManifest.TypeField[] | null => {
+            routines[routine.name].accepts = (): LogicManifest.TypeField[] | null => {
                 return routine.accepts ? routine.accepts : null
             }
 
-            routines[name].returns = (): LogicManifest.TypeField[] | null => {
+            routines[routine.name].returns = (): LogicManifest.TypeField[] | null => {
                 return routine.returns ? routine.returns : null
             }
         })
@@ -105,22 +99,8 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @param {string} routineName - The name of the routine.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
-    private isMutableRoutine(routineName: string): boolean {
-        return routineName.endsWith("!");
-    }
-
-    /**
-     * Normalizes a routine name by removing the exclamation mark if present.
-     * 
-     * @param {string} routineName - The routine name
-     * @returns {string} The normalized routine name.
-     */
-    private normalizeRoutineName(routineName: string): string {
-        if (this.isMutableRoutine(routineName)) {
-            return routineName.slice(0, -1); // Remove the last character (exclamation mark)
-        }
-
-        return routineName; // If no exclamation mark, return the original string
+    private isMutableRoutine(routine: LogicManifest.Routine): boolean {
+        return routine.mode === "persistent";
     }
 
     /**
