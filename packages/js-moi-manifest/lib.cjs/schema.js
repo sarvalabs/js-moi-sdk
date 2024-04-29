@@ -215,16 +215,16 @@ class Schema {
     static PISA_EXCEPTION_SCHEMA = {
         kind: "struct",
         fields: {
-            Class: {
+            class: {
                 kind: "string",
             },
-            Error: {
+            error: {
                 kind: "string",
             },
-            Revert: {
+            revert: {
                 kind: "bool",
             },
-            Trace: {
+            trace: {
                 kind: "array",
                 fields: {
                     values: {

@@ -337,16 +337,16 @@ export declare class Schema {
     static PISA_EXCEPTION_SCHEMA: {
         kind: string;
         fields: {
-            Class: {
+            class: {
                 kind: string;
             };
-            Error: {
+            error: {
                 kind: string;
             };
-            Revert: {
+            revert: {
                 kind: string;
             };
-            Trace: {
+            trace: {
                 kind: string;
                 fields: {
                     values: {

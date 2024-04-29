@@ -65,10 +65,10 @@ describe("Test ManifestCoder", () => {
 
         expect(exception).toBeDefined();
         expect(exception).toEqual({
-            Class: "string",
-            Error: "insufficient balance for sender",
-            Revert: false,
-            Trace: ["runtime.root()", "routine.Transfer() [0xc] ... [0x1b: THROW 0x5]"],
+            class: "string",
+            error: "insufficient balance for sender",
+            revert: false,
+            trace: ["runtime.root()", "routine.Transfer() [0xc] ... [0x1b: THROW 0x5]"],
         });
     });
 

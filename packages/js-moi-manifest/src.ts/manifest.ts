@@ -248,9 +248,7 @@ export class ManifestCoder {
         if(error && error !== "0x") {
             const decodedError = hexToBytes(error)
             const depolorizer = new Depolorizer(decodedError)
-            const exception = depolorizer.depolorize(Schema.PISA_EXCEPTION_SCHEMA)
-
-            return exception as Exception
+            return depolorizer.depolorize(Schema.PISA_EXCEPTION_SCHEMA) as Exception
         }
 
         return null

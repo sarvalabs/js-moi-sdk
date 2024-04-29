@@ -194,8 +194,7 @@ class ManifestCoder {
         if (error && error !== "0x") {
             const decodedError = (0, js_moi_utils_1.hexToBytes)(error);
             const depolorizer = new js_polo_1.Depolorizer(decodedError);
-            const exception = depolorizer.depolorize(schema_1.Schema.PISA_EXCEPTION_SCHEMA);
-            return exception;
+            return depolorizer.depolorize(schema_1.Schema.PISA_EXCEPTION_SCHEMA);
         }
         return null;
     }
