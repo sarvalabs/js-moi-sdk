@@ -22,7 +22,7 @@ export declare module LogicManifest {
     }
     
     export interface State {
-        kind: string;
+        mode: string;
         fields: TypeField[];
     }
     
@@ -40,6 +40,7 @@ export declare module LogicManifest {
     export interface Routine {
         name: string;
         kind: string;
+        mode: string;
         accepts?: TypeField[] | null;
         returns?: TypeField[] | null;
         executes: Instructions;
@@ -65,7 +66,7 @@ export declare module LogicManifest {
     }
     
     export interface Manifest {
-        syntax: string;
+        syntax: number;
         engine: EngineConfig;
         elements: Element[];
     }

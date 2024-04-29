@@ -5,7 +5,7 @@ import { IxType } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { PersistentState, type EphemeralState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
@@ -31,13 +31,6 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine;
-    /**
-     * Normalizes a routine name by removing the exclamation mark if present.
-     *
-     * @param {string} routineName - The routine name
-     * @returns {string} The normalized routine name.
-     */
-    private normalizeRoutineName;
     /**
      * Returns the interaction type for the logic driver.
      *

@@ -12,7 +12,7 @@ export default class ElementDescriptor {
     constructor(elements) {
         this.stateMatrix = new ContextStateMatrix(elements);
         // Populate the maps for elements, call sites, class and method definitions.
-        elements.forEach(element => {
+        elements.forEach((element) => {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
                 case "class":
@@ -23,7 +23,7 @@ export default class ElementDescriptor {
                     const methodData = element.data;
                     const methodDef = {
                         ptr: element.ptr,
-                        class: methodData.class
+                        class: methodData.class,
                     };
                     this.methodDefs.set(methodData.name, methodDef);
                     break;
@@ -31,7 +31,7 @@ export default class ElementDescriptor {
                     const routineData = element.data;
                     const callsite = {
                         ptr: element.ptr,
-                        kind: routineData.kind
+                        kind: routineData.kind,
                     };
                     this.callSites.set(routineData.name, callsite);
                     break;

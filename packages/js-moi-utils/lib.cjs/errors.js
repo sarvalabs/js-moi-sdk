@@ -69,7 +69,11 @@ class ErrorUtils {
      * @throws {CustomError} - Throws a CustomError.
      */
     static throwError(message, code = ErrorCode.UNKNOWN_ERROR, params = {}) {
-        throw new CustomError(message, code, params);
+        const error = new CustomError(message, code, params);
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(error, ErrorUtils.throwError);
+        }
+        throw error;
     }
     /**
      * Throws a CustomError with the specified argument-related error message,

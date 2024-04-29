@@ -204,12 +204,76 @@ Variables
 logic manifest. Developers can easily invoke and execute these routines, which 
 encapsulate specific functionalities and operations provided by the logic.
 
+``ephemeralState`` - The ephemeral state, accessible via this variable, 
+represents the short-term or temporary state of the logic.
+
 ``persistentState`` - The persistent state is accessible via this variable. It 
 allows developers to retrieve state of the logic, which persists across 
 different invocations and interactions.
 
-``ephemeralState`` - The ephemeral state, accessible via this variable, 
-represents the short-term or temporary state of the logic.
+ It contains the following method:
+
+* ``get`` 
+    This method retrieves the value from persistent state using the storage key.
+    As the storage key hash generation is complex, a builder 
+    object is passed to callback to generate storage key. The builder object has the following methods:
+
+    * ``entity`` - This method used to select the member of the state persistent.
+    * ``length`` - This method used to access length/size of `Array`, `Varray` and, `Map`.
+    * ``property`` - This method used to access the property of map using the passed key.
+    * ``at`` - This method used to access the element of `Array` and `Varray` using the passed index.
+    * ``field`` - This method used to access the field of `Class` using the passed field name.
+
+.. code-block:: javascript
+
+    // Example
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const symbol = await logic.persistentState.get(access => access.entity("symbol"));
+    console.log(symbol);
+
+    >> MOI
+
+.. code-block:: javascript
+
+    // Example: if you want to access size of the array/map
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const length = await logic.persistentState.get(access => access.entity("persons").length());
+    console.log(length);
+
+    >> 10
+
+.. code-block:: javascript
+
+    // Example: if you want to access the balance of the address from the map
+    const logic = await getLogicDriver(logicId, wallet);
+    const address = "0x035dcdaa46f9b8984803b1105d8f327aef97de58481a5d3fea447735cee28fdc";
+
+    const balance = await logic.persistentState.get(access => access.entity("Balances").property(hexToBytes(address)));
+    console.log(balance);
+
+    >> 10000
+
+.. code-block:: javascript
+
+    // Example: if you want to field of the class
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const name = await logic.persistentState.get(access => access.entity("persons").field("name"));
+    console.log(name);
+
+    >> Alice
+
+.. code-block:: javascript
+
+    // Example: if you want to access the element of the array
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const product = await logic.persistentState.get(access => access.entity("Products").at(0));
+    console.log(name);
+
+    >> Chocolate
 
 Functions
 ~~~~~~~~~
@@ -277,7 +341,7 @@ Usage
     const logic = await getLogicDriver(logicId, wallet);
 
     // Get the persistent state
-    const symbol = await logic.persistentState.get("symbol");
+    const symbol = await logic.persistentState.get(access => access.entity("symbol"));
 
     console.log(symbol); // MOI
 

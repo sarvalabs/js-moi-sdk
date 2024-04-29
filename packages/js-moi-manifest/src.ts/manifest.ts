@@ -1,8 +1,8 @@
+import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
-import { Schema } from "./schema";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { bytesToHex, hexToBytes, ErrorUtils, ErrorCode, trimHexPrefix, deepCopy } from "js-moi-utils";
+import { Schema } from "./schema";
 
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality 
@@ -30,7 +30,7 @@ export class ManifestCoder {
      */
     public static encodeManifest(manifest: LogicManifest.Manifest): string {
         const polorizer = new Polorizer();
-        polorizer.polorizeString(manifest.syntax);
+        polorizer.polorizeInteger(manifest.syntax);
         polorizer.polorize(manifest.engine, Schema.PISA_ENGINE_SCHEMA);
     
         if(manifest.elements) {
@@ -248,9 +248,7 @@ export class ManifestCoder {
         if(error && error !== "0x") {
             const decodedError = hexToBytes(error)
             const depolorizer = new Depolorizer(decodedError)
-            const exception = depolorizer.depolorize(Schema.PISA_EXCEPTION_SCHEMA)
-
-            return exception as Exception
+            return depolorizer.depolorize(Schema.PISA_EXCEPTION_SCHEMA) as Exception
         }
 
         return null

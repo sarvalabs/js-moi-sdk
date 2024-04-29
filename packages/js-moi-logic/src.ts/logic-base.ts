@@ -201,7 +201,7 @@ export abstract class LogicBase extends ElementDescriptor {
         ixObject.send = async (): Promise<InteractionResponse> => {
             option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
-            
+
             return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }
         

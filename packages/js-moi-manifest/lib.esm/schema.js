@@ -1,17 +1,16 @@
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-const primitiveTypes = [
-    "null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"
-];
-const isPrimitiveType = (type) => {
+const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
+const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
+export const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
 };
-const isArray = (type) => {
-    return (/^\[(\d*)\]/).test(type);
+export const isArray = (type) => {
+    return ARRAY_MATCHER_REGEX.test(type);
 };
-const isMap = (type) => {
+export const isMap = (type) => {
     return type.startsWith("map");
 };
-const isClass = (type, classDefs) => {
+export const isClass = (type, classDefs) => {
     return classDefs.has(type);
 };
 /**
@@ -33,25 +32,25 @@ export class Schema {
         kind: "struct",
         fields: {
             kind: {
-                kind: "string"
+                kind: "string",
             },
             flags: {
                 kind: "array",
                 fields: {
                     values: {
-                        kind: "string"
-                    }
-                }
-            }
-        }
+                        kind: "string",
+                    },
+                },
+            },
+        },
     };
     static PISA_DEPS_SCHEMA = {
         kind: "array",
         fields: {
             values: {
-                kind: "integer"
-            }
-        }
+                kind: "integer",
+            },
+        },
     };
     static PISA_TYPE_FIELD_SCHEMA = {
         kind: "array",
@@ -60,17 +59,17 @@ export class Schema {
                 kind: "struct",
                 fields: {
                     slot: {
-                        kind: "integer"
+                        kind: "integer",
                     },
                     label: {
-                        kind: "string"
+                        kind: "string",
                     },
                     type: {
-                        kind: "string"
-                    }
-                }
-            }
-        }
+                        kind: "string",
+                    },
+                },
+            },
+        },
     };
     static PISA_METHOD_FIELD_SCHEMA = {
         kind: "array",
@@ -79,162 +78,165 @@ export class Schema {
                 kind: "struct",
                 fields: {
                     ptr: {
-                        kind: "integer"
+                        kind: "integer",
                     },
                     code: {
-                        kind: "integer"
-                    }
-                }
-            }
-        }
+                        kind: "integer",
+                    },
+                },
+            },
+        },
     };
     static PISA_INSTRUCTIONS_SCHEMA = {
         kind: "struct",
         fields: {
             bin: {
-                kind: "bytes"
+                kind: "bytes",
             },
             hex: {
-                kind: "string"
+                kind: "string",
             },
             asm: {
                 kind: "array",
                 fields: {
                     values: {
-                        kind: "string"
-                    }
-                }
-            }
-        }
+                        kind: "string",
+                    },
+                },
+            },
+        },
     };
     static PISA_STATE_SCHEMA = {
         kind: "struct",
         fields: {
-            kind: {
-                kind: "string"
+            mode: {
+                kind: "string",
             },
             fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA
-            }
-        }
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
+            },
+        },
     };
     static PISA_CONSTANT_SCHEMA = {
         kind: "struct",
         fields: {
             type: {
-                kind: "string"
+                kind: "string",
             },
             value: {
-                kind: "string"
-            }
-        }
+                kind: "string",
+            },
+        },
     };
     static PISA_TYPEDEF_SCHEMA = {
         kind: "string",
-        fields: {}
+        fields: {},
     };
     static PISA_CLASS_SCHEMA = {
         kind: "struct",
         fields: {
             name: {
-                kind: "string"
+                kind: "string",
             },
             fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
             },
             methods: {
-                ...Schema.PISA_METHOD_FIELD_SCHEMA
-            }
-        }
+                ...Schema.PISA_METHOD_FIELD_SCHEMA,
+            },
+        },
     };
     static PISA_ROUTINE_SCHEMA = {
         kind: "struct",
         fields: {
             name: {
-                kind: "string"
+                kind: "string",
+            },
+            mode: {
+                kind: "string",
             },
             kind: {
-                kind: "string"
+                kind: "string",
             },
             accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
             },
             returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
             },
             executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA
+                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
             },
             catches: {
                 kind: "array",
                 fields: {
                     values: {
-                        kind: "string"
-                    }
-                }
-            }
-        }
+                        kind: "string",
+                    },
+                },
+            },
+        },
     };
     static PISA_METHOD_SCHEMA = {
         kind: "struct",
         fields: {
             name: {
-                kind: "string"
+                kind: "string",
             },
             class: {
-                kind: "string"
+                kind: "string",
             },
             accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
             },
             returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
             },
             executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA
+                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
             },
             catches: {
                 kind: "array",
                 fields: {
                     values: {
-                        kind: "string"
-                    }
-                }
-            }
-        }
+                        kind: "string",
+                    },
+                },
+            },
+        },
     };
     static PISA_EXCEPTION_SCHEMA = {
         kind: "struct",
         fields: {
             class: {
-                kind: "string"
+                kind: "string",
             },
-            data: {
-                kind: "string"
+            error: {
+                kind: "string",
+            },
+            revert: {
+                kind: "bool",
             },
             trace: {
                 kind: "array",
                 fields: {
                     values: {
-                        kind: "string"
-                    }
-                }
+                        kind: "string",
+                    },
+                },
             },
-            revert: {
-                kind: "bool"
-            }
-        }
+        },
     };
     static PISA_RESULT_SCHEMA = {
         kind: "struct",
         fields: {
             outputs: {
-                kind: "bytes"
+                kind: "bytes",
             },
             error: {
-                kind: "bytes"
-            }
-        }
+                kind: "bytes",
+            },
+        },
     };
     /**
      * Extracts the array data type from the provided data type string.
@@ -243,19 +245,15 @@ export class Schema {
      * @returns {string} The extracted array data type.
      * @throws {Error} If the array type is invalid or unsupported.
      */
-    extractArrayDataType(dataType) {
-        let endIndex = 0;
-        for (let i = 0; i < dataType.length; i++) {
-            if (dataType.charAt(i) == "]") {
-                endIndex = i + 1;
-                break;
-            }
+    static extractArrayDataType(dataType) {
+        if (!isArray(dataType)) {
+            ErrorUtils.throwError("Invalid array type: The provided data type is not an array.", ErrorCode.INVALID_ARGUMENT);
         }
-        const type = dataType.slice(endIndex);
-        if (type) {
-            return type;
+        const type = dataType.replace(ARRAY_MATCHER_REGEX, "");
+        if (type === "") {
+            ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", ErrorCode.INVALID_ARGUMENT);
         }
-        ErrorUtils.throwError("Failed to extract array type: The array type could not be determined.", ErrorCode.INVALID_ARGUMENT);
+        return type;
     }
     /**
      * Extracts the key and value data types from the provided map data type string.
@@ -264,7 +262,7 @@ export class Schema {
      * @returns The extracted key and value data types as a tuple.
      * @throws {Error} If the map data type is invalid or unsupported.
      */
-    extractMapDataType(dataType) {
+    static extractMapDataType(dataType) {
         let brackets = [];
         let startIndex = 0;
         let endIndex = 0;
@@ -297,7 +295,7 @@ export class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
-    convertPrimitiveDataType(type) {
+    static convertPrimitiveDataType(type) {
         switch (type) {
             case "null":
                 return "null";
@@ -315,7 +313,7 @@ export class Schema {
             case "bigint":
                 return "integer";
             default:
-                ErrorUtils.throwError('Unsupported data type!', ErrorCode.UNSUPPORTED_OPERATION);
+                ErrorUtils.throwError("Unsupported data type!", ErrorCode.UNSUPPORTED_OPERATION);
         }
     }
     /**
@@ -324,19 +322,19 @@ export class Schema {
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
-    parseClassFields(className) {
-        const ptr = this.classDefs.get(className);
+    static parseClassFields(className, classDef, elements) {
+        const ptr = classDef.get(className);
         if (ptr === undefined) {
             ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
-        const element = this.elements.get(ptr);
+        const element = elements.get(ptr);
         const schema = {
             kind: "struct",
-            fields: {}
+            fields: {},
         };
         element.data = element.data;
-        Object.values(element.data.fields).forEach(field => {
-            schema.fields[field.label] = this.parseDataType(field.type);
+        Object.values(element.data.fields).forEach((field) => {
+            schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements);
         });
         return schema;
     }
@@ -349,31 +347,31 @@ export class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
-    parseDataType(type) {
+    static parseDataType(type, classDef, elements) {
         switch (true) {
             case isPrimitiveType(type):
                 return {
-                    kind: this.convertPrimitiveDataType(type)
+                    kind: Schema.convertPrimitiveDataType(type),
                 };
             case isArray(type):
-                const values = this.extractArrayDataType(type);
+                const values = Schema.extractArrayDataType(type);
                 return {
                     kind: "array",
                     fields: {
-                        values: this.parseDataType(values)
-                    }
+                        values: Schema.parseDataType(values, classDef, elements),
+                    },
                 };
             case isMap(type):
-                const [key, value] = this.extractMapDataType(type);
+                const [key, value] = Schema.extractMapDataType(type);
                 return {
                     kind: "map",
                     fields: {
-                        keys: this.parseDataType(key),
-                        values: this.parseDataType(value)
-                    }
+                        keys: Schema.parseDataType(key, classDef, elements),
+                        values: Schema.parseDataType(value, classDef, elements),
+                    },
                 };
-            case isClass(type, this.classDefs):
-                return this.parseClassFields(type);
+            case isClass(type, classDef):
+                return this.parseClassFields(type, classDef, elements);
             default:
                 ErrorUtils.throwError(`Unsupported data type: ${type}!`, ErrorCode.UNSUPPORTED_OPERATION);
         }
@@ -387,17 +385,17 @@ export class Schema {
      */
     parseFields(fields) {
         const schema = {
-            kind: 'struct',
-            fields: {}
+            kind: "struct",
+            fields: {},
         };
         if (!Array.isArray(fields)) {
             ErrorUtils.throwError("Invalid fields: Fields must be an array.", ErrorCode.INVALID_ARGUMENT);
         }
-        fields.forEach(field => {
+        fields.forEach((field) => {
             if (!field || !(field.label && field.type)) {
                 ErrorUtils.throwError("Invalid field: Each field must have a label and a type.", ErrorCode.INVALID_ARGUMENT);
             }
-            schema.fields[field.label] = this.parseDataType(field.type);
+            schema.fields[field.label] = Schema.parseDataType(field.type, this.classDefs, this.elements);
         });
         return schema;
     }
