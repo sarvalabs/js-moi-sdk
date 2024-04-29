@@ -215,8 +215,8 @@ different invocations and interactions.
 
 * ``get`` 
     This method retrieves the value from persistent state using the storage key.
-    As the storage key hash generation is complex, we have exposed the a builder 
-    object to generate the storage key hash. The builder object has the following methods:
+    As the storage key hash generation is complex, a builder 
+    object is passed to callback to generate storage key. The builder object has the following methods:
 
     * ``entity`` - This method used to select the member of the state persistent.
     * ``length`` - This method used to access length/size of `Array`, `Varray` and, `Map`.
@@ -230,8 +230,50 @@ different invocations and interactions.
     const logic = await getLogicDriver(logicId, wallet);
 
     const symbol = await logic.persistentState.get(access => access.entity("symbol"));
-    console.log(symbol); // MOI
+    console.log(symbol);
 
+    >> MOI
+
+.. code-block:: javascript
+
+    // Example: if you want to access size of the array/map
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const length = await logic.persistentState.get(access => access.entity("persons").length());
+    console.log(length);
+
+    >> 10
+
+.. code-block:: javascript
+
+    // Example: if you want to access the balance of the address from the map
+    const logic = await getLogicDriver(logicId, wallet);
+    const address = "0x035dcdaa46f9b8984803b1105d8f327aef97de58481a5d3fea447735cee28fdc";
+
+    const balance = await logic.persistentState.get(access => access.entity("Balances").property(hexToBytes(address)));
+    console.log(balance);
+
+    >> 10000
+
+.. code-block:: javascript
+
+    // Example: if you want to field of the class
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const name = await logic.persistentState.get(access => access.entity("persons").field("name"));
+    console.log(name);
+
+    >> Alice
+
+.. code-block:: javascript
+
+    // Example: if you want to access the element of the array
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const product = await logic.persistentState.get(access => access.entity("Products").at(0));
+    console.log(name);
+
+    >> Chocolate
 
 Functions
 ~~~~~~~~~
