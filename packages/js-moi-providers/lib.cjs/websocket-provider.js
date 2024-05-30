@@ -228,7 +228,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             const request = this.responseQueue.get(id);
             this.responseQueue.delete(id);
             if (response.result != undefined) {
-                request.callback(null, response.result);
+                request.callback(null, response);
                 this.emit(WebSocketEvents.DEBUG, {
                     action: "response",
                     request: JSON.parse(request.payload),

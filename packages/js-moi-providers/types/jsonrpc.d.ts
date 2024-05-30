@@ -287,11 +287,6 @@ export interface RpcErrorResponse {
     message: string;
 }
 
-export interface RpcResult {
-    data?: any
-    error?: RpcErrorResponse
-}
-
 export interface RpcError {
     code: number,
     message: string,
@@ -300,7 +295,7 @@ export interface RpcError {
 
 export interface RpcResponse {
     jsonrpc: string;
-    result: RpcResult;
+    result?: any;
     error?: RpcError,
     id: 1;
 }

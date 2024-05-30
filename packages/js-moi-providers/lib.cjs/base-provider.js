@@ -37,11 +37,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * does not have data.
      */
     processResponse(response) {
-        if (response.result) {
-            if (response.result.data) {
-                return response.result.data;
-            }
-            js_moi_utils_1.ErrorUtils.throwError(response.result.error.message, js_moi_utils_1.ErrorCode.SERVER_ERROR);
+        if (response.result != null) {
+            return response.result;
         }
         js_moi_utils_1.ErrorUtils.throwError(response.error.message, js_moi_utils_1.ErrorCode.SERVER_ERROR);
     }
@@ -408,7 +405,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 id: filter.id
             };
             const response = await this.execute("moi.GetFilterChanges", params);
-            if (response.result.data == null) {
+            if (response.result == null) {
                 return null;
             }
             return this.processResponse(response);
@@ -580,15 +577,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async sendInteraction(ixObject) {
         const response = await this.execute("moi.SendInteractions", ixObject);
         try {
-            if (response.result) {
-                if (response.result.data) {
-                    return {
-                        hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this, response.result.data),
-                        result: this.waitForResult.bind(this, response.result.data)
-                    };
-                }
-                js_moi_utils_1.ErrorUtils.throwError(response.result.error.message, js_moi_utils_1.ErrorCode.SERVER_ERROR);
+            if (response.result != null) {
+                return {
+                    hash: response.result,
+                    wait: this.waitForInteraction.bind(this, response.result),
+                    result: this.waitForResult.bind(this, response.result)
+                };
             }
             js_moi_utils_1.ErrorUtils.throwError(response.error.message, js_moi_utils_1.ErrorCode.SERVER_ERROR);
         }
