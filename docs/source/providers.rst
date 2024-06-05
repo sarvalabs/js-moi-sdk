@@ -534,9 +534,8 @@ operates over WebSocket instead of HTTP or HTTPS. It allows for subscribing to
 specific events or filters, receiving instant notifications when relevant data 
 changes on the blockchain.
 
-The current version of the MOI protocol does not include support for invoking 
-JSON-RPC methods over a WebSocket connection. However, it is expected to be 
-added in upcoming releases of the protocol.
+The MOI protocol has incorporated support for invoking JSON-RPC methods over a 
+WebSocket connection, facilitating real-time interaction with the blockchain.
 
 .. code-block:: javascript
 
