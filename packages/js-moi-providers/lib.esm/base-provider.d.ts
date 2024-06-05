@@ -22,7 +22,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if the response does not have a result or if the result
      * does not have data.
      */
-    protected processResponse(response: RpcResponse): any;
+    protected processResponse<T>(response: RpcResponse<T>): T;
     /**
      * Retrieves the balance of the specified address for the given asset id.
      *
@@ -424,7 +424,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<any>} A Promise that resolves to the response of the RPC call.
      * @throws {Error} if the method is not implemented.
      */
-    protected execute<T = any>(method: string, params: any): Promise<T>;
+    protected execute<T = any>(method: string, params: any): Promise<RpcResponse<T>>;
     /**
      * Starts the specified event by performing necessary actions.
      *

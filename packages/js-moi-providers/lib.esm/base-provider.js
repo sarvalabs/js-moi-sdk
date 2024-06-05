@@ -272,14 +272,14 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             };
             const response = await this.execute("ixpool.ContentFrom", params);
-            const content = this.processResponse(response);
-            const contentResponse = {
+            const contentResponse = this.processResponse(response);
+            const content = {
                 pending: new Map(),
                 queued: new Map(),
             };
-            Object.keys(content.pending).forEach(nonce => contentResponse.pending.set(hexToBN(nonce), content.pending[nonce]));
-            Object.keys(content.queued).forEach(nonce => contentResponse.queued.set(hexToBN(nonce), content.queued[nonce]));
-            return contentResponse;
+            Object.keys(contentResponse.pending).forEach(nonce => content.pending.set(hexToBN(nonce), contentResponse.pending[nonce]));
+            Object.keys(contentResponse.queued).forEach(nonce => content.queued.set(hexToBN(nonce), contentResponse.queued[nonce]));
+            return content;
         }
         catch (error) {
             throw error;
@@ -700,20 +700,20 @@ export class BaseProvider extends AbstractProvider {
     async getContent() {
         try {
             const response = await this.execute("ixpool.Content", null);
-            const content = this.processResponse(response);
-            const contentResponse = {
+            const contentResponse = this.processResponse(response);
+            const content = {
                 pending: new Map(),
                 queued: new Map(),
             };
-            Object.keys(content.pending).forEach(key => {
-                contentResponse.pending.set(key, new Map());
-                Object.keys(content.pending[key]).forEach(nonce => contentResponse.pending.get(key).set(hexToBN(nonce), content.pending[key][nonce]));
+            Object.keys(contentResponse.pending).forEach(key => {
+                content.pending.set(key, new Map());
+                Object.keys(contentResponse.pending[key]).forEach(nonce => content.pending.get(key).set(hexToBN(nonce), contentResponse.pending[key][nonce]));
             });
-            Object.keys(content.queued).forEach(key => {
-                contentResponse.queued.set(key, new Map());
-                Object.keys(content.queued[key]).forEach(nonce => contentResponse.queued.get(key).set(hexToBN(nonce), content.queued[key][nonce]));
+            Object.keys(contentResponse.queued).forEach(key => {
+                content.queued.set(key, new Map());
+                Object.keys(contentResponse.queued[key]).forEach(nonce => content.queued.get(key).set(hexToBN(nonce), contentResponse.queued[key][nonce]));
             });
-            return contentResponse;
+            return content;
         }
         catch (error) {
             throw error;
@@ -756,25 +756,25 @@ export class BaseProvider extends AbstractProvider {
     async getInspect() {
         try {
             const response = await this.execute("ixpool.Inspect", null);
-            const inspect = this.processResponse(response);
-            const inspectResponse = {
+            const inspectResponse = this.processResponse(response);
+            const inspect = {
                 pending: new Map(),
                 queued: new Map(),
                 wait_time: new Map()
             };
-            Object.keys(inspect.pending).forEach(key => {
-                inspectResponse.pending.set(key, new Map(Object.entries(inspect.pending[key])));
+            Object.keys(inspectResponse.pending).forEach(key => {
+                inspect.pending.set(key, new Map(Object.entries(inspectResponse.pending[key])));
             });
-            Object.keys(inspect.queued).forEach(key => {
-                inspectResponse.queued.set(key, new Map(Object.entries(inspect.queued[key])));
+            Object.keys(inspectResponse.queued).forEach(key => {
+                inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])));
             });
-            Object.keys(inspectResponse.wait_time).forEach(key => {
-                inspectResponse.wait_time.set(key, {
-                    ...inspectResponse.wait_time[key],
-                    time: hexToBN(inspectResponse.wait_time[key]["time"])
+            Object.keys(inspect.wait_time).forEach(key => {
+                inspect.wait_time.set(key, {
+                    ...inspect.wait_time[key],
+                    time: hexToBN(inspect.wait_time[key]["time"])
                 });
             });
-            return inspectResponse;
+            return inspect;
         }
         catch (error) {
             throw error;

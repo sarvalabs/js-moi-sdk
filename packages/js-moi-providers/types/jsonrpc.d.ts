@@ -191,9 +191,19 @@ export interface InteractionInfo {
     hash: string;
 }
 
+interface ContentResponse {
+    pending: Record<string, Map<number | bigint, InteractionInfo>>
+    queued: Record<string, Map<number | bigint, InteractionInfo>>
+}
+
 export interface Content {
     pending: Map<string, Map<number | bigint, InteractionInfo>>;
     queued: Map<string, Map<number | bigint, InteractionInfo>>;
+}
+
+interface ContentFromResponse {
+    pending: Record<string, InteractionInfo>;
+    queued: Record<string, InteractionInfo>;
 }
 
 export interface ContentFrom {
@@ -209,6 +219,11 @@ export interface FilterDeletionResult {
     status: boolean;
 }
 
+interface StatusResponse {
+    pending: string;
+    queued: string;
+}
+
 export interface Status {
     pending: number | bigint;
     queued: number | bigint;
@@ -217,6 +232,12 @@ export interface Status {
 export interface WaitTime {
     expired: boolean,
     time: number | bigint
+}
+
+interface InspectResponse {
+    pending: Record<string, Map<string, string>>;
+    queued: Record<string, Map<string, string>>;
+    wait_time: Record<string, WaitTime>;
 }
 
 export interface Inspect {
@@ -293,9 +314,9 @@ export interface RpcError {
     data: any
 }
 
-export interface RpcResponse {
+export interface RpcResponse<T> {
     jsonrpc: string;
-    result?: any;
-    error?: RpcError,
+    result?: T;
+    error?: RpcError;
     id: 1;
 }

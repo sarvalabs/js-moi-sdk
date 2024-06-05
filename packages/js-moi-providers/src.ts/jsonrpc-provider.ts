@@ -2,6 +2,7 @@ import fetch from "cross-fetch";
 import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
 import { BaseProvider } from "./base-provider";
 import Event from "./event";
+import { RpcResponse } from "../types/jsonrpc";
 
 /**
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
@@ -29,7 +30,7 @@ export class JsonRpcProvider extends BaseProvider {
      * @returns A Promise that resolves to the result of the RPC call.
      * @throws Error if there is an error executing the RPC call.
      */
-    protected async execute(method: string, params: any): Promise<any> {
+    protected async execute<T>(method: string, params: any): Promise<RpcResponse<T>> {
         try {
             return await this.send(method, [params])
         } catch (error) {
@@ -45,7 +46,7 @@ export class JsonRpcProvider extends BaseProvider {
      * @returns A Promise that resolves to the result of the RPC call.
      * @throws Error if there is an error sending the RPC request.
      */
-    protected async send(method: string, params: any[]): Promise<any> {
+    protected async send<T>(method: string, params: any[]): Promise<RpcResponse<T>> {
         try {
             const payload = {
                 method: method,
