@@ -667,6 +667,27 @@ Subscribing to account specific tesseracts
         provider.off(adddress, handleTesseracts);
     });
 
+Websocket enabled JSON-RPC communication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const address = "0x102e973bc33200fdb3383b4c8e490433743211edb33e53b8915d5a4b2668cf5e";
+    const contextInfo = await provider.getContextInfo(address)
+    console.log(contextInfo)
+
+    // Output
+    /*
+        {
+            "behaviour_nodes": [
+                "3WwLTp3WztxoLKKdPSLn9PRDPyB5mvVfGCpahP9kYaiqjrE8LwH1.16Uiu2HAm6wumV4gJkAAqTkfowUcbF1i1yQmLFcAhjbbJuDu2hURC"
+            ],
+            "random_nodes": [],
+            "storage_nodes": []
+        }
+    */
+
 Voyage Provider
 ---------------
 The **VoyageProvider** is a subclass of ``BaseProvider`` it allows users to 
