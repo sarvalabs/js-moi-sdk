@@ -1,4 +1,5 @@
 import { BaseProvider } from './base-provider';
+import { RpcResponse } from '../types/jsonrpc';
 /**
  * A provider for making RPC calls to voyage nodes.
  */
@@ -13,7 +14,7 @@ export declare class VoyageProvider extends BaseProvider {
      * @returns {Promise<any>} A promise that resolves to the result of the RPC call.
      * @throws {Error} Throws any error encountered during the RPC call.
      */
-    protected execute(method: string, params: any): Promise<any>;
+    protected execute<T>(method: string, params: any): Promise<RpcResponse<T>>;
     /**
      * Sends an RPC request to the Voyage endpoint.
      *

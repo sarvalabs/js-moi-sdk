@@ -367,8 +367,9 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
     async _subscribe(tag, param, processFunc) {
         let subIdPromise = this.subsIds[tag];
         if (subIdPromise == null) {
-            subIdPromise = Promise.all(param).then((param) => {
-                return this.send("moi.subscribe", param);
+            subIdPromise = Promise.all(param).then(async (param) => {
+                const response = await this.send("moi.subscribe", param);
+                return response.result;
             });
             this.subsIds[tag] = subIdPromise;
         }
