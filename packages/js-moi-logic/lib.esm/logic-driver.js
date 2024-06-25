@@ -1,5 +1,5 @@
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { PersistentState } from "./state";
 /**
@@ -72,14 +72,6 @@ export class LogicDriver extends LogicDescriptor {
      */
     isMutableRoutine(routine) {
         return routine.mode === "persistent";
-    }
-    /**
-     * Returns the interaction type for the logic driver.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    getIxType() {
-        return IxType.LOGIC_INVOKE;
     }
     /**
      * Creates the logic payload from the given interaction object.

@@ -16,14 +16,6 @@ class LogicFactory extends logic_base_1.LogicBase {
         this.encodedManifest = js_moi_manifest_1.ManifestCoder.encodeManifest(manifest);
     }
     /**
-     * Retrieves the interaction type associated with the LogicFactory.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    getIxType() {
-        return js_moi_utils_1.IxType.LOGIC_DEPLOY;
-    }
-    /**
      * Creates the payload for the logic interaction object.
      *
      * @param {LogicIxObject} ixObject - The logic interaction object.

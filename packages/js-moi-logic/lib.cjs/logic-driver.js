@@ -77,14 +77,6 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         return routine.mode === "persistent";
     }
     /**
-     * Returns the interaction type for the logic driver.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    getIxType() {
-        return js_moi_utils_1.IxType.LOGIC_INVOKE;
-    }
-    /**
      * Creates the logic payload from the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.

@@ -26,6 +26,23 @@ export class LogicBase extends ElementDescriptor {
         return "";
     }
     /**
+     * Returns the interaction type based on the routine kind.
+     *
+     * @returns {IxType} The interaction type.
+     */
+    getIxType(kind) {
+        switch (kind) {
+            case "deploy":
+                return IxType.LOGIC_DEPLOY;
+            case "invoke":
+                return IxType.LOGIC_INVOKE;
+            case "enlist":
+                return IxType.LOGIC_ENLIST;
+            default:
+                throw new Error("Unsupported routine kind!");
+        }
+    }
+    /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
      * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
@@ -50,7 +67,7 @@ export class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
@@ -99,7 +116,7 @@ export class LogicBase extends ElementDescriptor {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            type: this.getIxType(),
+            type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
         };
         if (option.sender != null) {

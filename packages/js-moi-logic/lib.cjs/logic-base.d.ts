@@ -17,7 +17,6 @@ export declare abstract class LogicBase extends ElementDescriptor {
     protected manifestCoder: ManifestCoder;
     constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
-    protected abstract getIxType(): IxType;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
     /**
      * Returns the logic ID associated with the LogicBase instance.
@@ -25,6 +24,12 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * @returns {string} The logic ID.
      */
     protected getLogicId(): string;
+    /**
+     * Returns the interaction type based on the routine kind.
+     *
+     * @returns {IxType} The interaction type.
+     */
+    protected getIxType(kind: string): IxType;
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *

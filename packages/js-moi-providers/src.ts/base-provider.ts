@@ -1,9 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import {
     AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
-    IxType, LogicDeployReceipt, LogicInvokeReceipt, Tesseract, bytesToHex, hexDataLength,
-    hexToBN, hexToBytes, toQuantity, unmarshal,
-    type NumberLike
+    IxType, LogicDeployReceipt, LogicInvokeReceipt, LogicEnlistReceipt, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
@@ -1134,6 +1132,11 @@ export class BaseProvider extends AbstractProvider {
                     return receipt.extra_data as LogicInvokeReceipt;
                 }
                 throw new Error("Failed to retrieve logic invoke response");
+            case IxType.LOGIC_ENLIST:
+                if (receipt.extra_data) {
+                    return receipt.extra_data as LogicEnlistReceipt;
+                }
+                throw new Error("Failed to retrieve logic enlist response");
             default:
                 throw new Error("Unsupported interaction type encountered");
         }

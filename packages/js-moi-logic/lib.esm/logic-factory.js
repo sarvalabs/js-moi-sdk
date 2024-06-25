@@ -1,5 +1,5 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, IxType, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
 /**
  * This class represents a factory for deploying logic.
@@ -11,14 +11,6 @@ export class LogicFactory extends LogicBase {
         super(manifest, signer);
         this.manifest = manifest;
         this.encodedManifest = ManifestCoder.encodeManifest(manifest);
-    }
-    /**
-     * Retrieves the interaction type associated with the LogicFactory.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    getIxType() {
-        return IxType.LOGIC_DEPLOY;
     }
     /**
      * Creates the payload for the logic interaction object.

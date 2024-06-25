@@ -935,6 +935,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     return receipt.extra_data;
                 }
                 throw new Error("Failed to retrieve logic invoke response");
+            case js_moi_utils_1.IxType.LOGIC_ENLIST:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve logic enlist response");
             default:
                 throw new Error("Unsupported interaction type encountered");
         }
