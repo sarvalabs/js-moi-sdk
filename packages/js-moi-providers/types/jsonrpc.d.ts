@@ -165,6 +165,7 @@ export interface SyncStatusParams {
 }
 
 export interface StorageParams {
+    address?: string;
     logic_id: string;
     storage_key: string;
     options: Options;
