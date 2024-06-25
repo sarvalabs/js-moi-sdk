@@ -9,10 +9,11 @@ import { EventType, Listener } from "../types/event";
 import {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
-    Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
-    RpcResponse, Status, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
+    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
+    InspectResponse
 } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -49,16 +50,9 @@ export class BaseProvider extends AbstractProvider {
      * @throws {Error} if the response does not have a result or if the result 
      * does not have data.
      */
-    protected processResponse(response: RpcResponse): any {
-        if(response.result) {
-            if(response.result.data) {
-                return response.result.data;
-            }
-
-            ErrorUtils.throwError(
-                response.result.error.message, 
-                ErrorCode.SERVER_ERROR,
-            );
+    protected processResponse<T>(response: RpcResponse<T>): T {
+        if(response.result != null) {
+            return response.result
         }
 
         ErrorUtils.throwError(
@@ -87,9 +81,9 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.Balance", params);
+            const response = await this.execute("moi.Balance", params);
 
-            const balance = this.processResponse(response);
+            const balance: string = this.processResponse(response);
 
             return hexToBN(balance);
         } catch (error) {
@@ -114,7 +108,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.ContextInfo", params);
+            const response = await this.execute("moi.ContextInfo", params);
 
             return this.processResponse(response);
         } catch (error) {
@@ -137,9 +131,9 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.TDU", params);
+            const response = await this.execute("moi.TDU", params);
 
-            const tdu = this.processResponse(response);
+            const tdu: Array<TDUResponse> = this.processResponse(response);
 
             return tdu.map((asset: TDUResponse) => ({
                 asset_id: asset.asset_id,
@@ -163,7 +157,7 @@ export class BaseProvider extends AbstractProvider {
                 hash: ixHash
             }
     
-            const response: RpcResponse = await this.execute("moi.InteractionByHash", params)
+            const response = await this.execute("moi.InteractionByHash", params)
 
             return this.processResponse(response)
         } catch(err) {
@@ -247,9 +241,9 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.InteractionCount", params);
+            const response = await this.execute("moi.InteractionCount", params);
 
-            const ixCount = this.processResponse(response);
+            const ixCount: string = this.processResponse(response);
 
             return hexToBN(ixCount);
         } catch (error) {
@@ -274,9 +268,9 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             }
     
-            const response: RpcResponse = await this.execute("moi.PendingInteractionCount", params);
+            const response = await this.execute("moi.PendingInteractionCount", params);
 
-            const ixCount = this.processResponse(response);
+            const ixCount: string = this.processResponse(response);
 
             return hexToBN(ixCount);
         } catch (error) {
@@ -301,7 +295,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.AccountState", params)
+            const response = await this.execute("moi.AccountState", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -324,7 +318,7 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             }
     
-            const response: RpcResponse = await this.execute("moi.AccountMetaInfo", params)
+            const response = await this.execute("moi.AccountMetaInfo", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -346,30 +340,30 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             }
     
-            const response: RpcResponse = await this.execute("ixpool.ContentFrom", params)
+            const response = await this.execute("ixpool.ContentFrom", params)
 
-            const content = this.processResponse(response)
+            const contentResponse: ContentFromResponse = this.processResponse(response)
 
-            const contentResponse = {
+            const content = {
                 pending: new Map(),
                 queued: new Map(),
             }
 
-            Object.keys(content.pending).forEach(nonce => 
-                contentResponse.pending.set(
+            Object.keys(contentResponse.pending).forEach(nonce => 
+                content.pending.set(
                     hexToBN(nonce),
-                    content.pending[nonce]
+                    contentResponse.pending[nonce]
                 )
             )
 
-            Object.keys(content.queued).forEach(nonce => 
-                contentResponse.queued.set(
+            Object.keys(contentResponse.queued).forEach(nonce => 
+                content.queued.set(
                     hexToBN(nonce),
-                    content.queued[nonce]
+                    contentResponse.queued[nonce]
                 )
             )
 
-            return contentResponse
+            return content
         } catch (error) {
             throw error;
         }
@@ -389,7 +383,7 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             }
     
-            const response: RpcResponse = await this.execute("ixpool.WaitTime", params)
+            const response = await this.execute("ixpool.WaitTime", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -407,7 +401,7 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getNewTesseractFilter(): Promise<Filter> {
         try {
-            const response: RpcResponse = await this.execute("moi.NewTesseractFilter", null);
+            const response = await this.execute("moi.NewTesseractFilter", null);
 
             return this.processResponse(response);
         } catch (error) {
@@ -430,7 +424,7 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             };
 
-            const response: RpcResponse = await this.execute("moi.NewTesseractsByAccountFilter", params);
+            const response = await this.execute("moi.NewTesseractsByAccountFilter", params);
 
             return this.processResponse(response);
         } catch (error) {
@@ -450,7 +444,7 @@ export class BaseProvider extends AbstractProvider {
         try {
             const params = null;
 
-            const response: RpcResponse = await this.execute('moi.PendingIxnsFilter', params);
+            const response = await this.execute('moi.PendingIxnsFilter', params);
             
             return this.processResponse(response);
         } catch (error) {
@@ -472,7 +466,7 @@ export class BaseProvider extends AbstractProvider {
                 id: filter.id
             };
 
-            const response: RpcResponse = await this.execute("moi.RemoveFilter", params);
+            const response = await this.execute("moi.RemoveFilter", params);
 
             return this.processResponse(response);
         } catch (error) {
@@ -501,7 +495,7 @@ export class BaseProvider extends AbstractProvider {
  
             const response = await this.execute("moi.GetFilterChanges", params);
             
-            if (response.result.data == null) {
+            if (response.result == null) {
                 return null;
             }
 
@@ -564,7 +558,7 @@ export class BaseProvider extends AbstractProvider {
                 params['options'] = arg2 ?? defaultOptions;
             }
 
-            const response = await this.execute<RpcResponse>("moi.Tesseract", params);
+            const response = await this.execute<Tesseract>("moi.Tesseract", params);
             return this.processResponse(response);
         } catch (error) {
             throw error;
@@ -586,7 +580,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.LogicIDs", params)
+            const response = await this.execute("moi.LogicIDs", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -609,7 +603,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.Registry", params)
+            const response = await this.execute("moi.Registry", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -630,7 +624,7 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             }
     
-            const response: RpcResponse = await this.execute("moi.Syncing", params)
+            const response = await this.execute("moi.Syncing", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -657,7 +651,7 @@ export class BaseProvider extends AbstractProvider {
                 options : options
             }
 
-            const response: RpcResponse = await this.execute("moi.Call", params)
+            const response = await this.execute("moi.Call", params)
 
             const receipt: InteractionReceipt = this.processResponse(response)
 
@@ -689,9 +683,9 @@ export class BaseProvider extends AbstractProvider {
                 options : options
             }
 
-            const response: RpcResponse = await this.execute("moi.FuelEstimate", params)
+            const response = await this.execute("moi.FuelEstimate", params)
 
-            const fuelPrice = this.processResponse(response)
+            const fuelPrice: string = this.processResponse(response)
 
             return  hexToBN(fuelPrice)
         } catch (error) {
@@ -709,22 +703,15 @@ export class BaseProvider extends AbstractProvider {
      * processing the response.
      */
     public async sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse> {
-        const response: RpcResponse = await this.execute("moi.SendInteractions", ixObject)
+        const response = await this.execute("moi.SendInteractions", ixObject)
 
         try {
-            if(response.result) {
-                if(response.result.data) {
-                    return {
-                        hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this, response.result.data),
-                        result: this.waitForResult.bind(this, response.result.data)
-                    }
+            if(response.result != null) {
+                return {
+                    hash: response.result,
+                    wait: this.waitForInteraction.bind(this, response.result),
+                    result: this.waitForResult.bind(this, response.result)
                 }
-    
-                ErrorUtils.throwError(
-                    response.result.error.message, 
-                    ErrorCode.SERVER_ERROR,
-                );
             }
     
             ErrorUtils.throwError(
@@ -755,7 +742,7 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions,
             }
     
-            const response: RpcResponse = await this.execute("moi.AssetInfoByAssetID", params)
+            const response = await this.execute("moi.AssetInfoByAssetID", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -778,7 +765,7 @@ export class BaseProvider extends AbstractProvider {
                 hash: ixHash
             }
     
-            const response: RpcResponse = await this.execute("moi.InteractionReceipt", params)
+            const response = await this.execute("moi.InteractionReceipt", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -832,8 +819,8 @@ export class BaseProvider extends AbstractProvider {
                 options: options ? options : defaultOptions
             }
     
-            const response: RpcResponse = await this.execute("moi.LogicManifest", params)
-            const data = this.processResponse(response);
+            const response = await this.execute("moi.LogicManifest", params)
+            const data: string = this.processResponse(response);
             const decodedManifest = hexToBytes(data)
 
             switch(encoding) {
@@ -860,34 +847,34 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getContent(): Promise<Content> {
         try {
-            const response: RpcResponse = await this.execute("ixpool.Content", null)
-            const content = this.processResponse(response)
-            const contentResponse = {
+            const response = await this.execute("ixpool.Content", null)
+            const contentResponse: ContentResponse = this.processResponse(response)
+            const content = {
                 pending: new Map(),
                 queued: new Map(),
             }
 
-            Object.keys(content.pending).forEach(key => {
-                contentResponse.pending.set(key, new Map())
-                Object.keys(content.pending[key]).forEach(nonce => 
-                    contentResponse.pending.get(key).set(
+            Object.keys(contentResponse.pending).forEach(key => {
+                content.pending.set(key, new Map())
+                Object.keys(contentResponse.pending[key]).forEach(nonce => 
+                    content.pending.get(key).set(
                         hexToBN(nonce), 
-                        content.pending[key][nonce]
+                        contentResponse.pending[key][nonce]
                     )
                 )
             })
 
-            Object.keys(content.queued).forEach(key => {
-                contentResponse.queued.set(key, new Map())
-                Object.keys(content.queued[key]).forEach(nonce => 
-                    contentResponse.queued.get(key).set(
+            Object.keys(contentResponse.queued).forEach(key => {
+                content.queued.set(key, new Map())
+                Object.keys(contentResponse.queued[key]).forEach(nonce => 
+                    content.queued.get(key).set(
                         hexToBN(nonce), 
-                        content.queued[key][nonce]
+                        contentResponse.queued[key][nonce]
                     )
                 )
             })
 
-            return contentResponse;
+            return content;
         } catch (error) {
             throw error;
         }
@@ -904,8 +891,8 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getStatus(): Promise<Status> {
         try {
-            const response: RpcResponse = await this.execute("ixpool.Status", null)
-            const status = this.processResponse(response)
+            const response = await this.execute("ixpool.Status", null)
+            const status: StatusResponse = this.processResponse(response)
 
             return {
                 pending: hexToBN(status.pending),
@@ -930,30 +917,30 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getInspect(): Promise<Inspect> {
         try {
-            const response: RpcResponse = await this.execute("ixpool.Inspect", null)
-            const inspect = this.processResponse(response)
-            const inspectResponse = {
+            const response = await this.execute("ixpool.Inspect", null)
+            const inspectResponse: InspectResponse = this.processResponse(response)
+            const inspect = {
                 pending: new Map(),
                 queued: new Map(),
                 wait_time: new Map()
             }
 
-            Object.keys(inspect.pending).forEach(key => {
-                inspectResponse.pending.set(key, new Map(Object.entries(inspect.pending[key])))
+            Object.keys(inspectResponse.pending).forEach(key => {
+                inspect.pending.set(key, new Map(Object.entries(inspectResponse.pending[key])))
             })
 
-            Object.keys(inspect.queued).forEach(key => {
-                inspectResponse.queued.set(key, new Map(Object.entries(inspect.queued[key])))
+            Object.keys(inspectResponse.queued).forEach(key => {
+                inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])))
             })
 
-            Object.keys(inspectResponse.wait_time).forEach(key => {
-                inspectResponse.wait_time.set(key, {
-                    ...inspectResponse.wait_time[key],
-                    time: hexToBN(inspectResponse.wait_time[key]["time"])
+            Object.keys(inspect.wait_time).forEach(key => {
+                inspect.wait_time.set(key, {
+                    ...inspect.wait_time[key],
+                    time: hexToBN(inspect.wait_time[key]["time"])
                 })
             })
 
-            return inspectResponse
+            return inspect
         } catch (error) {
             throw error;
         }
@@ -968,7 +955,7 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getPeers(): Promise<string[]> {
         try {
-            const response: RpcResponse = await this.execute("net.Peers", null)
+            const response = await this.execute("net.Peers", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -985,7 +972,7 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getVersion(): Promise<string> {
         try {
-            const response: RpcResponse = await this.execute("net.Version", null)
+            const response = await this.execute("net.Version", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -1002,7 +989,7 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getNodeInfo(): Promise<NodeInfo> {
         try {
-            const response: RpcResponse = await this.execute("net.Info", null)
+            const response = await this.execute("net.Info", null)
             return this.processResponse(response)
         } catch (error) {
             throw error;
@@ -1149,7 +1136,7 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<any>} A Promise that resolves to the response of the RPC call.
      * @throws {Error} if the method is not implemented.
      */
-    protected execute<T = any>(method: string, params: any): Promise<T> {
+    protected execute<T = any>(method: string, params: any): Promise<RpcResponse<T>> {
         throw new Error(method + " not implemented")
     }
 

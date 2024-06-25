@@ -202,7 +202,7 @@ export class WebSocketProvider extends JsonRpcProvider {
             const request = this.responseQueue.get(id);
             this.responseQueue.delete(id);
             if (response.result != undefined) {
-                request.callback(null, response.result);
+                request.callback(null, response);
                 this.emit(WebSocketEvents.DEBUG, {
                     action: "response",
                     request: JSON.parse(request.payload),
@@ -341,8 +341,9 @@ export class WebSocketProvider extends JsonRpcProvider {
     async _subscribe(tag, param, processFunc) {
         let subIdPromise = this.subsIds[tag];
         if (subIdPromise == null) {
-            subIdPromise = Promise.all(param).then((param) => {
-                return this.send("moi.subscribe", param);
+            subIdPromise = Promise.all(param).then(async (param) => {
+                const response = await this.send("moi.subscribe", param);
+                return response.result;
             });
             this.subsIds[tag] = subIdPromise;
         }
