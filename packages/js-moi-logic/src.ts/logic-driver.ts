@@ -5,7 +5,7 @@ import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils"
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { PersistentState, type EphemeralState } from "./state";
+import { EphemeralState, PersistentState } from "./state";
 
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -29,13 +29,17 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     private createState() {
         const hasPersistance = this.stateMatrix.persistent();
+        const hasEphemeral = this.stateMatrix.ephemeral();
 
-        if(hasPersistance === false) {
-            return; 
+        if(hasPersistance) {
+            const persistentState = new PersistentState(this, this.provider);
+            defineReadOnly(this, "persistentState", persistentState)
         }
 
-        const persistentState = new PersistentState(this, this.provider);
-        defineReadOnly(this, "persistentState", persistentState)
+        if(hasEphemeral) {
+            const ephemeralState = new EphemeralState(this, this.provider);
+            defineReadOnly(this, "ephemeralState", ephemeralState)
+        }
     }
 
     /**
