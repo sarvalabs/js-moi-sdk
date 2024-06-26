@@ -1,16 +1,38 @@
+import { EntityBuilder } from "./entity-builder";
+import { AccessorBuilder } from "./accessor-builder";
+import { AbstractProvider } from "js-moi-providers";
+import { LogicDriver } from "../logic-driver";
+/**
+ * Represents a function that builds an accessor.
+ * @param builder - The entity builder.
+ * @returns The accessor builder.
+ */
+type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder | void;
 /**
  * Represents ephemeral state functionality for a logic element.
  * Does not support retrieval of ephemeral state elements.
  */
 export declare class EphemeralState {
-    constructor();
+    private logicId;
+    private provider;
+    private driver;
+    constructor(logic: LogicDriver, provider: AbstractProvider);
     /**
-     * Throws an error as ephemeral state operations are temporarily not supported.
+     * Returns an accessor builder for the specified slot.
      *
-     * @param {string} label - The label of the state field.
-     * @throws {Error} Always throws an error indicating ephemeral state operations
-     are temporarily not supported.
+     * @param slot - The slot number.
+     * @param createAccessorBuilder - The function to create the accessor builder.
+     * @returns The accessor builder for the specified slot.
      */
-    get(label: string): Promise<void>;
+    private getBuilder;
+    /**
+     * Retrieves the value from the ephemeral state.
+     *
+     * @param createAccessorBuilder - The function that creates the accessor builder.
+     * @returns A promise that resolves to the retrieved value.
+     * @throws An error if the ephemeral state is not present or if the accessor builder is invalid.
+     */
+    get<T = any>(address: string, createAccessorBuilder: AccessorBuilderFunction): Promise<T>;
 }
+export {};
 //# sourceMappingURL=ephemeral-state.d.ts.map
