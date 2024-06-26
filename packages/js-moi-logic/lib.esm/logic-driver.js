@@ -75,7 +75,7 @@ export class LogicDriver extends LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return routine.mode === "persistent";
+        return routine.mode === "persistent" || routine.mode === "ephemeral";
     }
     /**
      * Creates the logic payload from the given interaction object.

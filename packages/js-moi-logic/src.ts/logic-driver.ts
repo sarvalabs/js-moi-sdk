@@ -104,7 +104,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: LogicManifest.Routine): boolean {
-        return routine.mode === "persistent";
+        return routine.mode === "persistent" || routine.mode === "ephemeral";
     }
 
     /**
