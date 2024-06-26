@@ -55,7 +55,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
 
             const routine = element.data as LogicManifest.Routine;
 
-            if (routine.kind !== "invokable") {
+            if (!["invoke", "enlist"].includes(routine.kind)) {
                 return;
             }
 

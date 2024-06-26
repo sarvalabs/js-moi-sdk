@@ -84,7 +84,7 @@ export class LogicFactory extends LogicBase {
         .find(element => {
             if(element.kind === "routine"){
                 const routine = element.data as LogicManifest.Routine;
-                return routine.kind === "deployer" && 
+                return routine.kind === "deploy" && 
                 builderName === routine.name;
             }
             return false;

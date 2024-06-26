@@ -72,7 +72,7 @@ class LogicFactory extends logic_base_1.LogicBase {
             .find(element => {
             if (element.kind === "routine") {
                 const routine = element.data;
-                return routine.kind === "deployer" &&
+                return routine.kind === "deploy" &&
                     builderName === routine.name;
             }
             return false;

@@ -40,7 +40,7 @@ export class LogicDriver extends LogicDescriptor {
                 return;
             }
             const routine = element.data;
-            if (routine.kind !== "invokable") {
+            if (!["invoke", "enlist"].includes(routine.kind)) {
                 return;
             }
             routines[routine.name] = async (...params) => {
