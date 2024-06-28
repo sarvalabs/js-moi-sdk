@@ -17,7 +17,7 @@ export default class ElementDescriptor {
             switch (element.kind) {
                 case "class":
                     const classData = element.data;
-                    this.classDefs.set(classData.name, element.ptr);
+                    this.classDefs.set("class." + classData.name, element.ptr);
                     break;
                 case "method":
                     const methodData = element.data;

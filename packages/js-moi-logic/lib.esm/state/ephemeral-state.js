@@ -1,9 +1,9 @@
+import { isPrimitiveType, Schema } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
-import { EntityBuilder } from "./entity-builder";
-import { SlotAccessorBuilder } from "./accessor-builder";
-import { Schema, isPrimitiveType } from "js-moi-manifest";
 import { Depolorizer } from "js-polo";
 import { generateStorageKey } from "./accessor";
+import { SlotAccessorBuilder } from "./accessor-builder";
+import { EntityBuilder } from "./entity-builder";
 /**
  * Represents ephemeral state functionality for a logic element.
  * Does not support retrieval of ephemeral state elements.
@@ -13,7 +13,7 @@ export class EphemeralState {
     provider;
     driver;
     constructor(logic, provider) {
-        this.logicId = logic.getLogicId();
+        this.logicId = logic.getLogicId().hex();
         this.provider = provider;
         this.driver = logic;
     }

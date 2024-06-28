@@ -78,7 +78,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return routine.mode === "persistent" || routine.mode === "ephemeral";
+        return ["persistent", "ephemeral"].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.
@@ -88,7 +88,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            logic_id: this.getLogicId(),
+            logic_id: this.getLogicId().string(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

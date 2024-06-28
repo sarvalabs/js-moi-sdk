@@ -298,10 +298,10 @@ export declare class BaseProvider extends AbstractProvider {
      * @param {string} logicId - The logic id for which to retrieve the storage value.
      * @param {string} storageKey - The storage key for which to retrieve the value.
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<any>} A Promise that resolves to the storage value.
+     * @returns {Promise<string>} A Promise that resolves to the storage value.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any>;
+    getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>;
     /**
      * Retrieves the storage entry corresponding to a specific storage key, address and logic id.
      *
@@ -309,10 +309,10 @@ export declare class BaseProvider extends AbstractProvider {
      * @param {string} storageKey - The storage key for which to retrieve the value.
      * @param {string} address - The address related to the storage key (optional).
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<any>} A Promise that resolves to the storage value.
+     * @returns {Promise<string>} A Promise that resolves to the storage value.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getStorageAt(logicId: string, storageKey: string, address: string, options?: Options): Promise<any>;
+    getStorageAt(logicId: string, storageKey: string, address: string, options?: Options): Promise<string>;
     /**
      * Retrieves the logic manifest for a specific logic id.
      *

@@ -8,6 +8,7 @@ const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
+const logic_id_1 = require("./logic-id");
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -29,7 +30,7 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {string} The logic ID.
      */
     getLogicId() {
-        return "";
+        return new logic_id_1.LogicId("");
     }
     /**
      * Returns the interaction type based on the routine kind.

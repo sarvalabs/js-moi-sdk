@@ -1,7 +1,7 @@
+import type { AbstractProvider } from "js-moi-providers";
+import type { LogicDriver } from "../logic-driver";
+import { type AccessorBuilder } from "./accessor-builder";
 import { EntityBuilder } from "./entity-builder";
-import { AccessorBuilder } from "./accessor-builder";
-import { AbstractProvider } from "js-moi-providers";
-import { LogicDriver } from "../logic-driver";
 /**
  * Represents a function that builds an accessor.
  * @param builder - The entity builder.

@@ -2,6 +2,7 @@ import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import ElementDescriptor from "./element-descriptor";
+import { LogicId } from "./logic-id";
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -23,7 +24,7 @@ export class LogicBase extends ElementDescriptor {
      * @returns {string} The logic ID.
      */
     getLogicId() {
-        return "";
+        return new LogicId("");
     }
     /**
      * Returns the interaction type based on the routine kind.

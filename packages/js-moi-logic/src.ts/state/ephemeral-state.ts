@@ -1,11 +1,12 @@
+import { isPrimitiveType, Schema } from "js-moi-manifest";
+import type { AbstractProvider } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
-import { EntityBuilder } from "./entity-builder";
-import { AccessorBuilder, SlotAccessorBuilder } from "./accessor-builder";
-import { AbstractProvider } from "js-moi-providers";
-import { LogicDriver } from "../logic-driver";
-import { Schema, isPrimitiveType } from "js-moi-manifest";
 import { Depolorizer } from "js-polo";
+
+import type { LogicDriver } from "../logic-driver";
 import { generateStorageKey } from "./accessor";
+import { SlotAccessorBuilder, type AccessorBuilder } from "./accessor-builder";
+import { EntityBuilder } from "./entity-builder";
 
 /**
  * Represents a function that builds an accessor.
@@ -24,7 +25,7 @@ export class EphemeralState {
     private driver: LogicDriver;
 
     constructor(logic: LogicDriver, provider: AbstractProvider) {
-        this.logicId = logic.getLogicId();
+        this.logicId = logic.getLogicId().hex();
         this.provider = provider;
         this.driver = logic;
     }

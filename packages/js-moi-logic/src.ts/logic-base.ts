@@ -6,6 +6,7 @@ import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
+import { LogicId } from "./logic-id";
 
 const DEFAULT_FUEL_PRICE = 1;
 
@@ -38,8 +39,8 @@ export abstract class LogicBase extends ElementDescriptor {
      * 
      * @returns {string} The logic ID.
      */
-    protected getLogicId(): string {
-        return ""
+    protected getLogicId(): LogicId {
+        return new LogicId("")
     }
 
     /**

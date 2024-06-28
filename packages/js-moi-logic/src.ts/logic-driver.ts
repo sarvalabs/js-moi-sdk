@@ -104,7 +104,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: LogicManifest.Routine): boolean {
-        return routine.mode === "persistent" || routine.mode === "ephemeral";
+        return ["persistent", "ephemeral"].includes(routine.mode);
     }
 
     /**
@@ -115,7 +115,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     protected createPayload(ixObject: LogicIxObject): LogicPayload {
         const payload = {
-            logic_id: this.getLogicId(),
+            logic_id: this.getLogicId().string(),
             callsite: ixObject.routine.name,
         } as LogicPayload
 

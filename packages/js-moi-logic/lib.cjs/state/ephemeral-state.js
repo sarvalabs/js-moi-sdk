@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EphemeralState = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
-const entity_builder_1 = require("./entity-builder");
-const accessor_builder_1 = require("./accessor-builder");
 const js_moi_manifest_1 = require("js-moi-manifest");
+const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const accessor_1 = require("./accessor");
+const accessor_builder_1 = require("./accessor-builder");
+const entity_builder_1 = require("./entity-builder");
 /**
  * Represents ephemeral state functionality for a logic element.
  * Does not support retrieval of ephemeral state elements.
@@ -16,7 +16,7 @@ class EphemeralState {
     provider;
     driver;
     constructor(logic, provider) {
-        this.logicId = logic.getLogicId();
+        this.logicId = logic.getLogicId().hex();
         this.provider = provider;
         this.driver = logic;
     }

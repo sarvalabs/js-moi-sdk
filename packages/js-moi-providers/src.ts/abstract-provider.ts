@@ -61,8 +61,8 @@ export abstract class AbstractProvider {
     // Query Methods
     abstract getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>
-    abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<any>
-    abstract getStorageAt(logicId: string, storageKey: string, address: string, options?: Options): Promise<any>
+    abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>
+    abstract getStorageAt(logicId: string, storageKey: string, address: string, options?: Options): Promise<string>
     abstract getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>
     abstract getContent(): Promise<Content>
     abstract getStatus(): Promise<Status>
