@@ -282,7 +282,7 @@ a participant and can change frequently as interactions occur.
     This method retrieves a value from ephemeral state using the storage key 
     and participant address.
 
-    **Usage*: Similar to persistent state, the get method takes a callback function.
+    **Usage**: Similar to persistent state, the get method takes a callback function.
     In addition to that, it also requires a participant address. The builder 
     object within the callback defines how to access the state, similar to 
     persistent state.
