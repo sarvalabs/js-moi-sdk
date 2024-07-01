@@ -6,7 +6,7 @@
   "main": "packages/js-moi/lib.cjs/index.js",
   "module": "packages/js-moi/lib.esm/index.js",
   "scripts": {
-    "clean": "find . -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
+    "clean": "find . -path ./node_modules -prune -o -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
     "build": "npm run clean && tsc -b && rm -rf dist",
     "watch": "tsc -b -w",
     "test": "jest --env=node --colors --verbose",
