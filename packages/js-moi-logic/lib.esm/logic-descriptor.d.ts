@@ -24,7 +24,7 @@ export declare abstract class LogicDescriptor extends LogicBase {
      *
      * @returns {string} The logic id.
      */
-    getLogicId(): string;
+    getLogicId(): LogicId;
     /**
      * Returns the logic execution engine type.
      *

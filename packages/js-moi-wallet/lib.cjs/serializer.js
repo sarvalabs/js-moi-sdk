@@ -24,6 +24,7 @@ const processPayload = (ixType, payload) => {
         case js_moi_utils_1.IxType.LOGIC_DEPLOY:
             return payload;
         case js_moi_utils_1.IxType.LOGIC_INVOKE:
+        case js_moi_utils_1.IxType.LOGIC_ENLIST:
             payload = payload;
             return {
                 ...payload,
@@ -73,6 +74,7 @@ const processIxObject = (ixObject) => {
             case js_moi_utils_1.IxType.ASSET_BURN:
             case js_moi_utils_1.IxType.LOGIC_DEPLOY:
             case js_moi_utils_1.IxType.LOGIC_INVOKE:
+            case js_moi_utils_1.IxType.LOGIC_ENLIST:
                 if (!ixObject.payload) {
                     js_moi_utils_1.ErrorUtils.throwError("Payload is missing!", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
                 }
@@ -119,7 +121,8 @@ const serializeIxObject = (ixObject) => {
                 return polorizer.bytes();
             }
             case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-            case js_moi_utils_1.IxType.LOGIC_INVOKE: {
+            case js_moi_utils_1.IxType.LOGIC_INVOKE:
+            case js_moi_utils_1.IxType.LOGIC_ENLIST: {
                 polorizer.polorize(processedIxObject.payload, js_moi_utils_1.logicSchema);
                 const payload = polorizer.bytes();
                 polorizer = new js_polo_1.Polorizer();

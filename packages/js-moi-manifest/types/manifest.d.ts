@@ -50,10 +50,17 @@ export declare module LogicManifest {
     export interface Method {
         name: string;
         class: string;
+        mutable: boolean;
         accepts?: TypeField[] | null;
         returns?: TypeField[] | null;
         executes: Instructions;
         catches?: string[] | null;
+    }
+
+    export interface Event {
+        name: string;
+        topics: number;
+        fields: TypeField[];
     }
     
     export type TypeDef = string;

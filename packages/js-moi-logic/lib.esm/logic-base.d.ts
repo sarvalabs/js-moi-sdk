@@ -6,6 +6,7 @@ import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
+import { LogicId } from "./logic-id";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
@@ -17,14 +18,19 @@ export declare abstract class LogicBase extends ElementDescriptor {
     protected manifestCoder: ManifestCoder;
     constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
-    protected abstract getIxType(): IxType;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
     /**
      * Returns the logic ID associated with the LogicBase instance.
      *
      * @returns {string} The logic ID.
      */
-    protected getLogicId(): string;
+    protected getLogicId(): LogicId;
+    /**
+     * Returns the interaction type based on the routine kind.
+     *
+     * @returns {IxType} The interaction type.
+     */
+    protected getIxType(kind: string): IxType;
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *

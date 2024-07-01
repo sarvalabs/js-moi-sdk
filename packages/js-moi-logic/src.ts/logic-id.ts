@@ -21,6 +21,15 @@ export class LogicId {
     }
 
     /**
+     * Returns the LogicID as a hex encoded string without 0x prefix.
+     * 
+     * @returns {string} The LogicID as a hex encoded string.
+     */
+    public string(): string {
+        return Buffer.from(this.logic).toString('hex');
+    }
+
+    /**
      * Checks if the LogicID is valid.
      * 
      * @returns {boolean} True if the LogicID is valid, false otherwise.

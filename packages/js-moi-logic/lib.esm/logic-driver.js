@@ -1,7 +1,7 @@
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType, defineReadOnly, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import { PersistentState } from "./state";
+import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
@@ -20,11 +20,15 @@ export class LogicDriver extends LogicDescriptor {
      */
     createState() {
         const hasPersistance = this.stateMatrix.persistent();
-        if (hasPersistance === false) {
-            return;
+        const hasEphemeral = this.stateMatrix.ephemeral();
+        if (hasPersistance) {
+            const persistentState = new PersistentState(this, this.provider);
+            defineReadOnly(this, "persistentState", persistentState);
         }
-        const persistentState = new PersistentState(this, this.provider);
-        defineReadOnly(this, "persistentState", persistentState);
+        if (hasEphemeral) {
+            const ephemeralState = new EphemeralState(this, this.provider);
+            defineReadOnly(this, "ephemeralState", ephemeralState);
+        }
     }
     /**
      * Creates an interface for executing routines defined in the logic manifest.
@@ -36,7 +40,7 @@ export class LogicDriver extends LogicDescriptor {
                 return;
             }
             const routine = element.data;
-            if (routine.kind !== "invokable") {
+            if (!["invoke", "enlist"].includes(routine.kind)) {
                 return;
             }
             routines[routine.name] = async (...params) => {
@@ -71,15 +75,7 @@ export class LogicDriver extends LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return routine.mode === "persistent";
-    }
-    /**
-     * Returns the interaction type for the logic driver.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    getIxType() {
-        return IxType.LOGIC_INVOKE;
+        return ["persistent", "ephemeral"].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.
@@ -89,7 +85,7 @@ export class LogicDriver extends LogicDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            logic_id: this.getLogicId(),
+            logic_id: this.getLogicId().string(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

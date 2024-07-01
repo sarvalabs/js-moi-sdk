@@ -5,6 +5,7 @@ import {
     IxType,
     LogicDeployReceipt,
     LogicInvokeReceipt,
+    LogicEnlistReceipt,
     Participants
 } from "js-moi-utils";
 
@@ -84,7 +85,7 @@ export interface InteractionReceipt {
     status: number;
     fuel_used: string;
     participants: Participants;
-    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
     from: string;
     to: string;
     ix_index: string;
@@ -165,6 +166,7 @@ export interface SyncStatusParams {
 }
 
 export interface StorageParams {
+    address?: string;
     logic_id: string;
     storage_key: string;
     options: Options;

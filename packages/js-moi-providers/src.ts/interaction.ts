@@ -15,6 +15,7 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
             return polorizer.bytes()
         case IxType.LOGIC_DEPLOY:
         case IxType.LOGIC_INVOKE:
+        case IxType.LOGIC_ENLIST:
             polorizer.polorize(payload, logicSchema);
             return polorizer.bytes()
         default:

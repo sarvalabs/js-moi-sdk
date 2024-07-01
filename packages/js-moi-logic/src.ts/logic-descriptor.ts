@@ -37,8 +37,8 @@ export abstract class LogicDescriptor extends LogicBase {
      * 
      * @returns {string} The logic id.
      */
-    public getLogicId(): string {
-        return this.logicId.hex();
+    public getLogicId(): LogicId {
+        return this.logicId;
     }
 
     /**

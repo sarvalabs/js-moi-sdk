@@ -99,6 +99,13 @@ The ``LogicInvokeReceipt`` interface represents a receipt for logic execution. I
 * ``outputs`` - ``string``: The outputs of the logic execution.
 * ``error`` - ``string``: The error message associated with the execution.
 
+**LogicEnlistReceipt**
+
+The ``LogicEnlistReceipt`` interface represents a receipt for logic enlist. It has the following properties:
+
+* ``outputs`` - ``string``: The outputs of the logic enlist.
+* ``error`` - ``string``: The error message associated with the enlist.
+
 **Receipt**
 
 The ``Receipt`` interface represents an interaction receipt. It has the following properties:

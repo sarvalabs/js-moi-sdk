@@ -1,7 +1,6 @@
 import { LogicManifest } from "js-moi-manifest";
 import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { IxType } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { RoutineOption } from "../types/logic";
 import { LogicBase } from "./logic-base";
@@ -12,12 +11,6 @@ export declare class LogicFactory extends LogicBase {
     private manifest;
     private encodedManifest;
     constructor(manifest: LogicManifest.Manifest, signer: Signer);
-    /**
-     * Retrieves the interaction type associated with the LogicFactory.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    protected getIxType(): IxType;
     /**
      * Creates the payload for the logic interaction object.
      *

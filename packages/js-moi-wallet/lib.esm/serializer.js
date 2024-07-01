@@ -21,6 +21,7 @@ const processPayload = (ixType, payload) => {
         case IxType.LOGIC_DEPLOY:
             return payload;
         case IxType.LOGIC_INVOKE:
+        case IxType.LOGIC_ENLIST:
             payload = payload;
             return {
                 ...payload,
@@ -70,6 +71,7 @@ const processIxObject = (ixObject) => {
             case IxType.ASSET_BURN:
             case IxType.LOGIC_DEPLOY:
             case IxType.LOGIC_INVOKE:
+            case IxType.LOGIC_ENLIST:
                 if (!ixObject.payload) {
                     ErrorUtils.throwError("Payload is missing!", ErrorCode.MISSING_ARGUMENT);
                 }
@@ -116,7 +118,8 @@ export const serializeIxObject = (ixObject) => {
                 return polorizer.bytes();
             }
             case IxType.LOGIC_DEPLOY:
-            case IxType.LOGIC_INVOKE: {
+            case IxType.LOGIC_INVOKE:
+            case IxType.LOGIC_ENLIST: {
                 polorizer.polorize(processedIxObject.payload, logicSchema);
                 const payload = polorizer.bytes();
                 polorizer = new Polorizer();

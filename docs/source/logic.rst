@@ -204,19 +204,16 @@ Variables
 logic manifest. Developers can easily invoke and execute these routines, which 
 encapsulate specific functionalities and operations provided by the logic.
 
-``ephemeralState`` - The ephemeral state, accessible via this variable, 
-represents the short-term or temporary state of the logic.
-
-``persistentState`` - The persistent state is accessible via this variable. It 
-allows developers to retrieve state of the logic, which persists across 
-different invocations and interactions.
+``persistentState`` - The persistent state variable provides access to enduring 
+state associated with the logic. This state persists across different 
+invocations and interactions, defining core attributes and long-term data.
 
  It contains the following method:
 
 * ``get`` 
-    This method retrieves the value from persistent state using the storage key.
-    As the storage key hash generation is complex, a builder 
-    object is passed to callback to generate storage key. The builder object has the following methods:
+    This method retrieves a value from persistent state using the storage key. 
+    A builder object is passed to a callback to generate the storage key. The 
+    builder object offers the following methods:
 
     * ``entity`` - This method used to select the member of the state persistent.
     * ``length`` - This method used to access length/size of `Array`, `Varray` and, `Map`.
@@ -274,6 +271,34 @@ different invocations and interactions.
     console.log(name);
 
     >> Chocolate
+
+``ephemeralState`` - The ephemeral state variable provides access to transient 
+state associated directly with a participant. This state reflects the state of 
+a participant and can change frequently as interactions occur.
+
+ It contains the following method:
+
+* ``get`` 
+    This method retrieves a value from ephemeral state using the storage key 
+    and participant address.
+
+    **Usage**: Similar to persistent state, the get method takes a callback function.
+    In addition to that, it also requires a participant address. The builder 
+    object within the callback defines how to access the state, similar to 
+    persistent state.
+
+.. code-block:: javascript
+
+    // Example
+    const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df"
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const spendable = await logic.ephemeralState.get(address, (access) => 
+        access.entity("Spendable")
+    );
+    console.log(spendable);
+
+    >> 10000
 
 Functions
 ~~~~~~~~~

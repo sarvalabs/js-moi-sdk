@@ -8,6 +8,7 @@ const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
+const logic_id_1 = require("./logic-id");
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -29,7 +30,24 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {string} The logic ID.
      */
     getLogicId() {
-        return "";
+        return new logic_id_1.LogicId("");
+    }
+    /**
+     * Returns the interaction type based on the routine kind.
+     *
+     * @returns {IxType} The interaction type.
+     */
+    getIxType(kind) {
+        switch (kind) {
+            case "deploy":
+                return js_moi_utils_1.IxType.LOGIC_DEPLOY;
+            case "invoke":
+                return js_moi_utils_1.IxType.LOGIC_INVOKE;
+            case "enlist":
+                return js_moi_utils_1.IxType.LOGIC_ENLIST;
+            default:
+                throw new Error("Unsupported routine kind!");
+        }
     }
     /**
      * Updates the signer and provider instances for the LogicBase instance.
@@ -56,7 +74,7 @@ class LogicBase extends element_descriptor_1.default {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType() !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
@@ -105,7 +123,7 @@ class LogicBase extends element_descriptor_1.default {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            type: this.getIxType(),
+            type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
         };
         if (option.sender != null) {

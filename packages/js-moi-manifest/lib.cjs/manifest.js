@@ -53,6 +53,9 @@ class ManifestCoder {
                     case "routine":
                         element.polorize(value.data, schema_1.Schema.PISA_ROUTINE_SCHEMA);
                         break;
+                    case "event":
+                        element.polorize(value.data, schema_1.Schema.PISA_EVENT_SCHEMA);
+                        break;
                     case "state":
                         element.polorize(value.data, schema_1.Schema.PISA_STATE_SCHEMA);
                         break;

@@ -10,15 +10,18 @@ export interface AssetMintOrBurnReceipt {
 
 export interface LogicDeployReceipt {
     logic_id?: string;
-    error: string
+    error: string;
 }
 
 export interface LogicInvokeReceipt {
     outputs: string;
-    error: string
+    error: string;
 }
 
-export type IxReceiptData = string | LogicDeployReceipt | LogicInvokeReceipt
+export interface LogicEnlistReceipt {
+    outputs: string;
+    error: string;
+}
 
 export interface Receipt {
     ix_type: number;
@@ -26,5 +29,5 @@ export interface Receipt {
     fuel_used: bigint;
     state_hashes: Map<string, string>;
     context_hashes: Map<string, string>;
-    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null;
+    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
 }

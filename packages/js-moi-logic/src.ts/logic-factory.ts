@@ -1,7 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { RoutineOption } from "../types/logic";
 import { LogicBase } from "./logic-base";
@@ -17,15 +17,6 @@ export class LogicFactory extends LogicBase {
         super(manifest, signer);
         this.manifest = manifest;
         this.encodedManifest = ManifestCoder.encodeManifest(manifest);
-    }
-
-    /**
-     * Retrieves the interaction type associated with the LogicFactory.
-     * 
-     * @returns {IxType} The interaction type.
-     */
-    protected getIxType(): IxType {
-        return IxType.LOGIC_DEPLOY;
     }
 
     /**
@@ -93,7 +84,7 @@ export class LogicFactory extends LogicBase {
         .find(element => {
             if(element.kind === "routine"){
                 const routine = element.data as LogicManifest.Routine;
-                return routine.kind === "deployer" && 
+                return routine.kind === "deploy" && 
                 builderName === routine.name;
             }
             return false;

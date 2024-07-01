@@ -25,7 +25,7 @@ export class PersistentState {
     private driver: LogicDriver;
 
     constructor(logic: LogicDriver, provider: AbstractProvider) {
-        this.logicId = logic.getLogicId();
+        this.logicId = logic.getLogicId().hex();
         this.provider = provider;
         this.driver = logic;
     }

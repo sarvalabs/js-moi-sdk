@@ -207,6 +207,9 @@ export class Schema {
             class: {
                 kind: "string",
             },
+            mutable: {
+                kind: "bool",
+            },
             accepts: {
                 ...Schema.PISA_TYPE_FIELD_SCHEMA,
             },
@@ -226,6 +229,21 @@ export class Schema {
             },
         },
     };
+
+    public static PISA_EVENT_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string",
+            },
+            topics: {
+                kind: "integer",
+            },
+            fields: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA, 
+            }
+        }
+    }
 
     public static PISA_EXCEPTION_SCHEMA = {
         kind: "struct",

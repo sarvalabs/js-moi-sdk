@@ -267,6 +267,9 @@ export declare class Schema {
             class: {
                 kind: string;
             };
+            mutable: {
+                kind: string;
+            };
             accepts: {
                 kind: string;
                 fields: {
@@ -329,6 +332,36 @@ export declare class Schema {
                 fields: {
                     values: {
                         kind: string;
+                    };
+                };
+            };
+        };
+    };
+    static PISA_EVENT_SCHEMA: {
+        kind: string;
+        fields: {
+            name: {
+                kind: string;
+            };
+            topics: {
+                kind: string;
+            };
+            fields: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            slot: {
+                                kind: string;
+                            };
+                            label: {
+                                kind: string;
+                            };
+                            type: {
+                                kind: string;
+                            };
+                        };
                     };
                 };
             };

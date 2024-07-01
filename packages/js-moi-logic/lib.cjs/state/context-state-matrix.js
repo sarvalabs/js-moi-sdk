@@ -24,6 +24,8 @@ class ContextStateMatrix {
                     this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
                     break;
                 case "ephemeral":
+                    this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
+                    break;
                 default:
                     break;
             }

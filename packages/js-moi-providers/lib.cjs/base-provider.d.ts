@@ -293,18 +293,26 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
     /**
-     * Retrieves the storage value at a specific storage key for a logic id.
+     * Retrieves the storage entry corresponding to a specific storage key and logic id.
      *
-     * @param {string} logicId - The logic id for which to retrieve the
-     * storage value.
-     * @param {string} storageKey - The storage key for which to retrieve
-     * the value.
+     * @param {string} logicId - The logic id for which to retrieve the storage value.
+     * @param {string} storageKey - The storage key for which to retrieve the value.
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<string>} A Promise that resolves to the storage value
-     * as a string.
+     * @returns {Promise<string>} A Promise that resolves to the storage value.
      * @throws {Error} if there is an error executing the RPC call.
      */
     getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>;
+    /**
+     * Retrieves the storage entry corresponding to a specific storage key, address and logic id.
+     *
+     * @param {string} logicId - The logic id for which to retrieve the storage value.
+     * @param {string} storageKey - The storage key for which to retrieve the value.
+     * @param {string} address - The address related to the storage key (optional).
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<string>} A Promise that resolves to the storage value.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getStorageAt(logicId: string, storageKey: string, address: string, options?: Options): Promise<string>;
     /**
      * Retrieves the logic manifest for a specific logic id.
      *
