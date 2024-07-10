@@ -1,11 +1,10 @@
 import { LogicManifest } from "js-moi-manifest";
 import { LogicPayload, Options, type AbstractProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { IxType } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { PersistentState, type EphemeralState } from "./state";
+import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
@@ -31,12 +30,6 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine;
-    /**
-     * Returns the interaction type for the logic driver.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    protected getIxType(): IxType;
     /**
      * Creates the logic payload from the given interaction object.
      *

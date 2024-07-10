@@ -630,20 +630,33 @@ export class BaseProvider extends AbstractProvider {
         }
     }
     /**
-     * Retrieves the storage value at a specific storage key for a logic id.
+     * Retrieves the storage entry corresponding to a specific storage key and logic id.
      *
-     * @param {string} logicId - The logic id for which to retrieve the
-     * storage value.
-     * @param {string} storageKey - The storage key for which to retrieve
-     * the value.
+     * @param {string} logicId - The logic id for which to retrieve the storage value.
+     * @param {string} storageKey - The storage key for which to retrieve the value.
+     * @param {string} address - The address related to the storage key (optional).
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<string>} A Promise that resolves to the storage value
-     * as a string.
+     * @returns {Promise<string>} A Promise that resolves to the storage value as a string.
      * @throws {Error} if there is an error executing the RPC call.
+     *
+     * @example
+     * // Retrieve storage value by logic id, storage key and address
+     * provider.getStorageAt('logicId123', '0x7890..', '0xb456..')
+     *
+     * @example
+     * // Retrieve storage value by logic id, storage key, address and options
+     * provider.getStorageAt('logicId123', '0x7890..', '0xb456..', { from: '0xb456..' })
+     *
+     * @example
+     * // Retrieve storage value by logic id, storage key, and options
+     * provider.getStorageAt('logicId123', '0x7890..', { from: '0xb456..' })
      */
-    async getStorageAt(logicId, storageKey, options) {
+    async getStorageAt(logicId, storageKey, arg3, arg4) {
         try {
+            const address = typeof arg3 === 'string' ? arg3 : undefined;
+            const options = typeof arg3 === 'object' ? arg3 : arg4;
             const params = {
+                address: address,
                 logic_id: logicId,
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
@@ -916,6 +929,11 @@ export class BaseProvider extends AbstractProvider {
                     return receipt.extra_data;
                 }
                 throw new Error("Failed to retrieve logic invoke response");
+            case IxType.LOGIC_ENLIST:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve logic enlist response");
             default:
                 throw new Error("Unsupported interaction type encountered");
         }

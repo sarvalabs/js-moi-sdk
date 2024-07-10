@@ -15,6 +15,7 @@ const serializePayload = (ixType, payload) => {
             return polorizer.bytes();
         case js_moi_utils_1.IxType.LOGIC_DEPLOY:
         case js_moi_utils_1.IxType.LOGIC_INVOKE:
+        case js_moi_utils_1.IxType.LOGIC_ENLIST:
             polorizer.polorize(payload, js_moi_utils_1.logicSchema);
             return polorizer.bytes();
         default:

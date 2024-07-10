@@ -13,7 +13,7 @@ export class PersistentState {
     provider;
     driver;
     constructor(logic, provider) {
-        this.logicId = logic.getLogicId();
+        this.logicId = logic.getLogicId().hex();
         this.provider = provider;
         this.driver = logic;
     }
