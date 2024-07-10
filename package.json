@@ -7,11 +7,12 @@
   "module": "packages/js-moi/lib.esm/index.js",
   "scripts": {
     "clean": "find . -path ./node_modules -prune -o -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
-    "build": "npm run clean && tsc -b && rm -rf dist",
+    "build": "tsc -b && rm -rf dist",
     "watch": "tsc -b -w",
     "test": "jest --env=node --colors --verbose",
     "test:coverage": "jest --coverage --env=node --colors --verbose",
-    "docs": "make -C docs html"
+    "docs": "make -C docs html",
+    "prebuild": "npm run clean"
   },
   "repository": {
     "type": "git",
