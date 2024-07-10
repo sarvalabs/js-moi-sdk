@@ -23,11 +23,15 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     createState() {
         const hasPersistance = this.stateMatrix.persistent();
-        if (hasPersistance === false) {
-            return;
+        const hasEphemeral = this.stateMatrix.ephemeral();
+        if (hasPersistance) {
+            const persistentState = new state_1.PersistentState(this, this.provider);
+            (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
         }
-        const persistentState = new state_1.PersistentState(this, this.provider);
-        (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
+        if (hasEphemeral) {
+            const ephemeralState = new state_1.EphemeralState(this, this.provider);
+            (0, js_moi_utils_1.defineReadOnly)(this, "ephemeralState", ephemeralState);
+        }
     }
     /**
      * Creates an interface for executing routines defined in the logic manifest.
@@ -39,7 +43,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 return;
             }
             const routine = element.data;
-            if (routine.kind !== "invokable") {
+            if (!["invoke", "enlist"].includes(routine.kind)) {
                 return;
             }
             routines[routine.name] = async (...params) => {
@@ -74,15 +78,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return routine.mode === "persistent";
-    }
-    /**
-     * Returns the interaction type for the logic driver.
-     *
-     * @returns {IxType} The interaction type.
-     */
-    getIxType() {
-        return js_moi_utils_1.IxType.LOGIC_INVOKE;
+        return ["persistent", "ephemeral"].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.
@@ -92,7 +88,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            logic_id: this.getLogicId(),
+            logic_id: this.getLogicId().string(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

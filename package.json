@@ -1,18 +1,18 @@
 {
   "name": "moi",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "JavaScript library to interact with MOI Protocol via RPC API",
   "private": true,
   "main": "packages/js-moi/lib.cjs/index.js",
   "module": "packages/js-moi/lib.esm/index.js",
   "scripts": {
-    "clean": "find . -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
+    "clean": "find . -path ./node_modules -prune -o -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
     "build": "tsc -b && rm -rf dist",
-    "build:clean": "npm run clean && npm run build",
     "watch": "tsc -b -w",
     "test": "jest --env=node --colors --verbose",
     "test:coverage": "jest --coverage --env=node --colors --verbose",
-    "docs": "make -C docs html"
+    "docs": "make -C docs html",
+    "prebuild": "npm run clean"
   },
   "repository": {
     "type": "git",

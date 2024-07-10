@@ -1,6 +1,7 @@
 import fetch from 'cross-fetch';
 import { BaseProvider } from './base-provider';
 import { ErrorCode, ErrorUtils, CustomError } from "js-moi-utils";
+import { RpcResponse } from '../types/jsonrpc';
 
 /**
  * A provider for making RPC calls to voyage nodes.
@@ -28,7 +29,7 @@ export class VoyageProvider extends BaseProvider {
    * @returns {Promise<any>} A promise that resolves to the result of the RPC call.
    * @throws {Error} Throws any error encountered during the RPC call.
    */
-  protected async execute(method: string, params: any): Promise<any> {
+  protected async execute<T>(method: string, params: any): Promise<RpcResponse<T>> {
     try {
       return await this.send(method, [params]);
     } catch (error) {

@@ -11,6 +11,12 @@ export declare class LogicId {
      */
     hex(): string;
     /**
+     * Returns the LogicID as a hex encoded string without 0x prefix.
+     *
+     * @returns {string} The LogicID as a hex encoded string.
+     */
+    string(): string;
+    /**
      * Checks if the LogicID is valid.
      *
      * @returns {boolean} True if the LogicID is valid, false otherwise.

@@ -3,7 +3,8 @@ export {
     AssetCreationReceipt,
     AssetMintOrBurnReceipt,
     LogicDeployReceipt,
-    LogicInvokeReceipt
+    LogicInvokeReceipt,
+    LogicEnlistReceipt
 } from "../types/receipt";
 export * from "./address";
 export * from "./asset";

@@ -36,7 +36,7 @@ class LogicDescriptor extends logic_base_1.LogicBase {
      * @returns {string} The logic id.
      */
     getLogicId() {
-        return this.logicId.hex();
+        return this.logicId;
     }
     /**
      * Returns the logic execution engine type.

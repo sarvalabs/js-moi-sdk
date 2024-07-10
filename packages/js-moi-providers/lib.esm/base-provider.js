@@ -31,11 +31,8 @@ export class BaseProvider extends AbstractProvider {
      * does not have data.
      */
     processResponse(response) {
-        if (response.result) {
-            if (response.result.data) {
-                return response.result.data;
-            }
-            ErrorUtils.throwError(response.result.error.message, ErrorCode.SERVER_ERROR);
+        if (response.result != null) {
+            return response.result;
         }
         ErrorUtils.throwError(response.error.message, ErrorCode.SERVER_ERROR);
     }
@@ -275,14 +272,14 @@ export class BaseProvider extends AbstractProvider {
                 address: address
             };
             const response = await this.execute("ixpool.ContentFrom", params);
-            const content = this.processResponse(response);
-            const contentResponse = {
+            const contentResponse = this.processResponse(response);
+            const content = {
                 pending: new Map(),
                 queued: new Map(),
             };
-            Object.keys(content.pending).forEach(nonce => contentResponse.pending.set(hexToBN(nonce), content.pending[nonce]));
-            Object.keys(content.queued).forEach(nonce => contentResponse.queued.set(hexToBN(nonce), content.queued[nonce]));
-            return contentResponse;
+            Object.keys(contentResponse.pending).forEach(nonce => content.pending.set(hexToBN(nonce), contentResponse.pending[nonce]));
+            Object.keys(contentResponse.queued).forEach(nonce => content.queued.set(hexToBN(nonce), contentResponse.queued[nonce]));
+            return content;
         }
         catch (error) {
             throw error;
@@ -402,7 +399,7 @@ export class BaseProvider extends AbstractProvider {
                 id: filter.id
             };
             const response = await this.execute("moi.GetFilterChanges", params);
-            if (response.result.data == null) {
+            if (response.result == null) {
                 return null;
             }
             return this.processResponse(response);
@@ -574,15 +571,12 @@ export class BaseProvider extends AbstractProvider {
     async sendInteraction(ixObject) {
         const response = await this.execute("moi.SendInteractions", ixObject);
         try {
-            if (response.result) {
-                if (response.result.data) {
-                    return {
-                        hash: response.result.data,
-                        wait: this.waitForInteraction.bind(this, response.result.data),
-                        result: this.waitForResult.bind(this, response.result.data)
-                    };
-                }
-                ErrorUtils.throwError(response.result.error.message, ErrorCode.SERVER_ERROR);
+            if (response.result != null) {
+                return {
+                    hash: response.result,
+                    wait: this.waitForInteraction.bind(this, response.result),
+                    result: this.waitForResult.bind(this, response.result)
+                };
             }
             ErrorUtils.throwError(response.error.message, ErrorCode.SERVER_ERROR);
         }
@@ -636,20 +630,33 @@ export class BaseProvider extends AbstractProvider {
         }
     }
     /**
-     * Retrieves the storage value at a specific storage key for a logic id.
+     * Retrieves the storage entry corresponding to a specific storage key and logic id.
      *
-     * @param {string} logicId - The logic id for which to retrieve the
-     * storage value.
-     * @param {string} storageKey - The storage key for which to retrieve
-     * the value.
+     * @param {string} logicId - The logic id for which to retrieve the storage value.
+     * @param {string} storageKey - The storage key for which to retrieve the value.
+     * @param {string} address - The address related to the storage key (optional).
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<string>} A Promise that resolves to the storage value
-     * as a string.
+     * @returns {Promise<string>} A Promise that resolves to the storage value as a string.
      * @throws {Error} if there is an error executing the RPC call.
+     *
+     * @example
+     * // Retrieve storage value by logic id, storage key and address
+     * provider.getStorageAt('logicId123', '0x7890..', '0xb456..')
+     *
+     * @example
+     * // Retrieve storage value by logic id, storage key, address and options
+     * provider.getStorageAt('logicId123', '0x7890..', '0xb456..', { from: '0xb456..' })
+     *
+     * @example
+     * // Retrieve storage value by logic id, storage key, and options
+     * provider.getStorageAt('logicId123', '0x7890..', { from: '0xb456..' })
      */
-    async getStorageAt(logicId, storageKey, options) {
+    async getStorageAt(logicId, storageKey, arg3, arg4) {
         try {
+            const address = typeof arg3 === 'string' ? arg3 : undefined;
+            const options = typeof arg3 === 'object' ? arg3 : arg4;
             const params = {
+                address: address,
                 logic_id: logicId,
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
@@ -706,20 +713,20 @@ export class BaseProvider extends AbstractProvider {
     async getContent() {
         try {
             const response = await this.execute("ixpool.Content", null);
-            const content = this.processResponse(response);
-            const contentResponse = {
+            const contentResponse = this.processResponse(response);
+            const content = {
                 pending: new Map(),
                 queued: new Map(),
             };
-            Object.keys(content.pending).forEach(key => {
-                contentResponse.pending.set(key, new Map());
-                Object.keys(content.pending[key]).forEach(nonce => contentResponse.pending.get(key).set(hexToBN(nonce), content.pending[key][nonce]));
+            Object.keys(contentResponse.pending).forEach(key => {
+                content.pending.set(key, new Map());
+                Object.keys(contentResponse.pending[key]).forEach(nonce => content.pending.get(key).set(hexToBN(nonce), contentResponse.pending[key][nonce]));
             });
-            Object.keys(content.queued).forEach(key => {
-                contentResponse.queued.set(key, new Map());
-                Object.keys(content.queued[key]).forEach(nonce => contentResponse.queued.get(key).set(hexToBN(nonce), content.queued[key][nonce]));
+            Object.keys(contentResponse.queued).forEach(key => {
+                content.queued.set(key, new Map());
+                Object.keys(contentResponse.queued[key]).forEach(nonce => content.queued.get(key).set(hexToBN(nonce), contentResponse.queued[key][nonce]));
             });
-            return contentResponse;
+            return content;
         }
         catch (error) {
             throw error;
@@ -762,25 +769,25 @@ export class BaseProvider extends AbstractProvider {
     async getInspect() {
         try {
             const response = await this.execute("ixpool.Inspect", null);
-            const inspect = this.processResponse(response);
-            const inspectResponse = {
+            const inspectResponse = this.processResponse(response);
+            const inspect = {
                 pending: new Map(),
                 queued: new Map(),
                 wait_time: new Map()
             };
-            Object.keys(inspect.pending).forEach(key => {
-                inspectResponse.pending.set(key, new Map(Object.entries(inspect.pending[key])));
+            Object.keys(inspectResponse.pending).forEach(key => {
+                inspect.pending.set(key, new Map(Object.entries(inspectResponse.pending[key])));
             });
-            Object.keys(inspect.queued).forEach(key => {
-                inspectResponse.queued.set(key, new Map(Object.entries(inspect.queued[key])));
+            Object.keys(inspectResponse.queued).forEach(key => {
+                inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])));
             });
-            Object.keys(inspectResponse.wait_time).forEach(key => {
-                inspectResponse.wait_time.set(key, {
-                    ...inspectResponse.wait_time[key],
-                    time: hexToBN(inspectResponse.wait_time[key]["time"])
+            Object.keys(inspect.wait_time).forEach(key => {
+                inspect.wait_time.set(key, {
+                    ...inspect.wait_time[key],
+                    time: hexToBN(inspect.wait_time[key]["time"])
                 });
             });
-            return inspectResponse;
+            return inspect;
         }
         catch (error) {
             throw error;
@@ -922,6 +929,11 @@ export class BaseProvider extends AbstractProvider {
                     return receipt.extra_data;
                 }
                 throw new Error("Failed to retrieve logic invoke response");
+            case IxType.LOGIC_ENLIST:
+                if (receipt.extra_data) {
+                    return receipt.extra_data;
+                }
+                throw new Error("Failed to retrieve logic enlist response");
             default:
                 throw new Error("Unsupported interaction type encountered");
         }

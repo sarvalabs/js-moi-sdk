@@ -2,6 +2,7 @@ import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import ElementDescriptor from "./element-descriptor";
+import { LogicId } from "./logic-id";
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -23,7 +24,24 @@ export class LogicBase extends ElementDescriptor {
      * @returns {string} The logic ID.
      */
     getLogicId() {
-        return "";
+        return new LogicId("");
+    }
+    /**
+     * Returns the interaction type based on the routine kind.
+     *
+     * @returns {IxType} The interaction type.
+     */
+    getIxType(kind) {
+        switch (kind) {
+            case "deploy":
+                return IxType.LOGIC_DEPLOY;
+            case "invoke":
+                return IxType.LOGIC_INVOKE;
+            case "enlist":
+                return IxType.LOGIC_ENLIST;
+            default:
+                throw new Error("Unsupported routine kind!");
+        }
     }
     /**
      * Updates the signer and provider instances for the LogicBase instance.
@@ -50,7 +68,7 @@ export class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType() !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
@@ -99,7 +117,7 @@ export class LogicBase extends ElementDescriptor {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            type: this.getIxType(),
+            type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
         };
         if (option.sender != null) {
