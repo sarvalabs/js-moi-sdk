@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ixObjectSchema = exports.assetMintOrBurnSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
+exports.ixObjectSchema = exports.assetMintOrBurnSchema = exports.assetApproveOrTransferSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
 exports.logicSchema = {
     kind: "struct",
     fields: {
@@ -42,6 +42,20 @@ exports.assetCreateSchema = {
         logic_payload: exports.logicSchema
     }
 };
+exports.assetApproveOrTransferSchema = {
+    kind: "struct",
+    fields: {
+        beneficiary: {
+            kind: "bytes"
+        },
+        asset_id: {
+            kind: "string"
+        },
+        amount: {
+            kind: "integer"
+        }
+    }
+};
 exports.assetMintOrBurnSchema = {
     kind: "struct",
     fields: {
@@ -56,42 +70,14 @@ exports.assetMintOrBurnSchema = {
 exports.ixObjectSchema = {
     kind: "struct",
     fields: {
-        type: {
-            kind: "integer"
-        },
-        nonce: {
-            kind: "integer"
-        },
         sender: {
-            kind: "bytes"
-        },
-        receiver: {
             kind: "bytes"
         },
         payer: {
             kind: "bytes"
         },
-        transfer_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
-        },
-        perceived_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
+        nonce: {
+            kind: "integer"
         },
         fuel_price: {
             kind: "integer"
@@ -99,8 +85,67 @@ exports.ixObjectSchema = {
         fuel_limit: {
             kind: "integer"
         },
-        payload: {
+        asset_funds: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        asset_id: {
+                            kind: "string"
+                        },
+                        amount: {
+                            kind: "integer"
+                        }
+                    }
+                }
+            }
+        },
+        steps: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        type: {
+                            kind: "integer"
+                        },
+                        payload: {
+                            kind: "bytes"
+                        }
+                    }
+                }
+            }
+        },
+        participants: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        address: {
+                            kind: "bytes"
+                        },
+                        lock_type: {
+                            kind: "number"
+                        }
+                    }
+                }
+            }
+        },
+        perception: {
             kind: "bytes"
+        },
+        preferences: {
+            kind: "struct",
+            fields: {
+                compute: {
+                    kind: "bytes"
+                },
+                consensus: {
+                    kind: "bytes"
+                }
+            }
         }
     }
 };

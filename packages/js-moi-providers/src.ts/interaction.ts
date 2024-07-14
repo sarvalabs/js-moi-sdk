@@ -27,19 +27,6 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
 }
 
 /**
- * Trims the "0x" prefix from the keys of a Map and returns a new Map.
- *
- * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
- * @returns {Record<string, string>} - A object with keys as hexadecimal strings without the "0x" prefix.
- */
-const processValues = (values: Map<string, number | bigint>): Record<string, string> => {
-    return Array.from(values).reduce((entries: Record<string, string>, [key, value]) => {
-        entries[key] = toQuantity(value);
-        return entries;
-    }, {});
-};
-
-/**
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
@@ -49,19 +36,16 @@ const processValues = (values: Map<string, number | bigint>): Record<string, str
 export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxObject => {
     try {
         const processedIxObject: ProcessedIxObject = { 
-            type: ixObject.type,
             nonce: toQuantity(ixObject.nonce),
             sender: ixObject.sender,
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
+            asset_funds: ixObject.asset_funds,
+            steps: [],
+            participants: ixObject.participants,
         };
 
-        if(ixObject.type === IxType.VALUE_TRANSFER) {
-            processedIxObject.receiver = ixObject.receiver;
-            processedIxObject.transfer_values = processValues(ixObject.transfer_values);
-        } else {
-            processedIxObject.payload = "0x" + bytesToHex(serializePayload(ixObject.type, ixObject.payload))
-        }
+        processedIxObject.steps = ixObject.steps.map(step => ({...step, payload: "0x" + bytesToHex(serializePayload(step.type, step.payload))}))
 
         return processedIxObject;
     } catch(err) {

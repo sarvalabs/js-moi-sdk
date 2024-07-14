@@ -153,8 +153,12 @@ export abstract class LogicBase extends ElementDescriptor {
      */
     protected processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): LogicIxArguments {
         const params: InteractionObject = {
-            type: this.getIxType(ixObject.routine.kind),
-            payload: ixObject.createPayload(),
+            steps: [
+                {
+                    type: this.getIxType(ixObject.routine.kind),
+                    payload: ixObject.createPayload(),
+                }
+            ]
         }
 
         if(option.sender != null) {

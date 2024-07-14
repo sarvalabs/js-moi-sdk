@@ -123,8 +123,12 @@ class LogicBase extends element_descriptor_1.default {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            type: this.getIxType(ixObject.routine.kind),
-            payload: ixObject.createPayload(),
+            steps: [
+                {
+                    type: this.getIxType(ixObject.routine.kind),
+                    payload: ixObject.createPayload(),
+                }
+            ]
         };
         if (option.sender != null) {
             params.sender = option.sender;
