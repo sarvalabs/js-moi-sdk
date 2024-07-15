@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, logicSchema} from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, logicSchema, assetApproveOrTransferSchema} from "js-moi-utils";
 import { AssetMintOrBurnPayload, InteractionPayload, LogicPayload, InteractionObject, AssetApproveOrTransferPayload } from "js-moi-providers";
 import { ProcessedIxObject } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
@@ -79,7 +79,7 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
 
             switch(step.type) {
                 case IxType.VALUE_TRANSFER:
-                    polorizer.polorize(payload, assetMintOrBurnSchema)
+                    polorizer.polorize(payload, assetApproveOrTransferSchema)
                     return {...step, payload: polorizer.bytes()}
                 case IxType.ASSET_CREATE:
                     polorizer.polorize(payload, assetCreateSchema)
