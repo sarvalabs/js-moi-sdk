@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type { Buffer } from "buffer";
 /**
  * Array-like type representing bytes.

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * This code is based on the bitcoinjs/bip39 by Wei Lu and Danieal Cousens
  * Modifications have been made to adapt it to the needs of js-moi-bip39

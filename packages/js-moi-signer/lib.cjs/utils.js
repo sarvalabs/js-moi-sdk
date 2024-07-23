@@ -1,10 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toDER = toDER;
-exports.fromDER = fromDER;
-exports.bip66Encode = bip66Encode;
-exports.bip66Decode = bip66Decode;
-exports.JoinSignature = JoinSignature;
+exports.JoinSignature = exports.bip66Decode = exports.bip66Encode = exports.fromDER = exports.toDER = void 0;
 const ZERO = new Uint8Array([0]);
 const ErrRIsZero = "digest._r length cannot be zero";
 const ErrSIsZero = "digest._s length cannot be zero";
@@ -30,6 +26,7 @@ function toDER(x) {
     }
     return x;
 }
+exports.toDER = toDER;
 function fromDER(x) {
     if (x[0] === 0x00)
         x = x.subarray(1);
@@ -38,6 +35,7 @@ function fromDER(x) {
     uint8Array.set(x, bstart);
     return uint8Array;
 }
+exports.fromDER = fromDER;
 // Reference https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki
 // Format: 0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S]
 function bip66Encode(rAndS) {
@@ -72,6 +70,7 @@ function bip66Encode(rAndS) {
     signature.set(s, 6 + lenR);
     return signature;
 }
+exports.bip66Encode = bip66Encode;
 function bip66Decode(buffer) {
     if (buffer.length < 8)
         throw new Error('DER sequence length is too short');
@@ -109,10 +108,12 @@ function bip66Decode(buffer) {
     };
     return digest;
 }
+exports.bip66Decode = bip66Decode;
 function JoinSignature(digest) {
     const joinedArray = new Uint8Array(64);
     joinedArray.set(digest._r, 0);
     joinedArray.set(digest._s, 32);
     return joinedArray;
 }
+exports.JoinSignature = JoinSignature;
 //# sourceMappingURL=utils.js.map

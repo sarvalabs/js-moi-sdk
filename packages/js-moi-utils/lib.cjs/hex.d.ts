@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import BN from "bn.js";
 import { Buffer } from "buffer";
 export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];

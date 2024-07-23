@@ -3,8 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
-exports.generateStorageKey = generateStorageKey;
+exports.generateStorageKey = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
 const js_moi_utils_1 = require("js-moi-utils");
@@ -153,4 +152,5 @@ function generateStorageKey(base, ...args) {
     }
     return slot;
 }
+exports.generateStorageKey = generateStorageKey;
 //# sourceMappingURL=accessor.js.map

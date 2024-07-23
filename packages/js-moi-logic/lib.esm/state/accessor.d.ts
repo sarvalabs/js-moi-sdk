@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import BN from "bn.js";
 export declare class StorageKey {
     private value;

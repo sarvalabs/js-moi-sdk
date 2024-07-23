@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { HDKey } from "@scure/bip32";
 import { Buffer } from "buffer";
 /**
