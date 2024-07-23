@@ -4,6 +4,7 @@ exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
+const routine_options_1 = require("./routine-options");
 const state_1 = require("./state");
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -47,7 +48,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 return;
             }
             routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && typeof params.at(-1) === "object"
+                const argsLen = params.at(-1) && params.at(-1) instanceof routine_options_1.RoutineOption
                     ? params.length - 1
                     : params.length;
                 if (routine.accepts && argsLen < routine.accepts.length) {
