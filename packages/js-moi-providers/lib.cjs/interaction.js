@@ -14,9 +14,11 @@ const serializePayload = (ixType, payload) => {
             polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
             return polorizer.bytes();
         case js_moi_utils_1.IxType.LOGIC_DEPLOY:
+            polorizer.polorize(payload, js_moi_utils_1.logicDeploySchema);
+            return polorizer.bytes();
         case js_moi_utils_1.IxType.LOGIC_INVOKE:
         case js_moi_utils_1.IxType.LOGIC_ENLIST:
-            polorizer.polorize(payload, js_moi_utils_1.logicSchema);
+            polorizer.polorize(payload, js_moi_utils_1.logicInteractSchema);
             return polorizer.bytes();
         default:
             js_moi_utils_1.ErrorUtils.throwError("Failed to serialize payload", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);

@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicDeploySchema, logicInteractSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 const serializePayload = (ixType, payload) => {
     let polorizer = new Polorizer();
@@ -11,9 +11,11 @@ const serializePayload = (ixType, payload) => {
             polorizer.polorize(payload, assetMintOrBurnSchema);
             return polorizer.bytes();
         case IxType.LOGIC_DEPLOY:
+            polorizer.polorize(payload, logicDeploySchema);
+            return polorizer.bytes();
         case IxType.LOGIC_INVOKE:
         case IxType.LOGIC_ENLIST:
-            polorizer.polorize(payload, logicSchema);
+            polorizer.polorize(payload, logicInteractSchema);
             return polorizer.bytes();
         default:
             ErrorUtils.throwError("Failed to serialize payload", ErrorCode.UNKNOWN_ERROR);

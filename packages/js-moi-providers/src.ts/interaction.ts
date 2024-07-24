@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicDeploySchema, logicInteractSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ProcessedIxObject } from "../types/interaction";
 import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";
@@ -14,9 +14,11 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
             polorizer.polorize(payload, assetMintOrBurnSchema);
             return polorizer.bytes()
         case IxType.LOGIC_DEPLOY:
+            polorizer.polorize(payload, logicDeploySchema);
+            return polorizer.bytes()
         case IxType.LOGIC_INVOKE:
         case IxType.LOGIC_ENLIST:
-            polorizer.polorize(payload, logicSchema);
+            polorizer.polorize(payload, logicInteractSchema);
             return polorizer.bytes()
         default:
             ErrorUtils.throwError(

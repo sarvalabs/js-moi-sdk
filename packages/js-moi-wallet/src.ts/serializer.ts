@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, logicSchema, assetApproveOrTransferSchema} from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicDeploySchema, logicInteractSchema} from "js-moi-utils";
 import { AssetMintOrBurnPayload, InteractionPayload, LogicPayload, InteractionObject, AssetApproveOrTransferPayload } from "js-moi-providers";
 import { ProcessedIxObject } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
@@ -60,10 +60,14 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
             sender: hexToBytes(ixObject.sender),
             payer: hexToBytes(ZERO_ADDRESS),
             nonce: ixObject.nonce,
+            fuel_price: ixObject.fuel_price,
+            fuel_limit: ixObject.fuel_limit,
 
             asset_funds: ixObject.asset_funds,
             steps: [],
-            participants: ixObject.participants.map(paticipant => ({...paticipant, address: hexToBytes(paticipant.address)})),
+            participants: ixObject.participants?.map(paticipant => 
+                ({...paticipant, address: hexToBytes(paticipant.address)})
+            ),
         };
 
         processedIxObject.steps = ixObject.steps.map(step => {
@@ -89,9 +93,11 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
                     polorizer.polorize(payload, assetMintOrBurnSchema)
                     return {...step, payload: polorizer.bytes()}
                 case IxType.LOGIC_DEPLOY:
+                    polorizer.polorize(payload, logicDeploySchema)
+                    return {...step, payload: polorizer.bytes()}
                 case IxType.LOGIC_INVOKE:
                 case IxType.LOGIC_ENLIST:
-                    polorizer.polorize(payload, logicSchema)
+                    polorizer.polorize(payload, logicInteractSchema)
                     return {...step, payload: polorizer.bytes()}
                 default:
                     ErrorUtils.throwError(

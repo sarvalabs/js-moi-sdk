@@ -56,9 +56,11 @@ const processIxObject = (ixObject) => {
             sender: (0, js_moi_utils_1.hexToBytes)(ixObject.sender),
             payer: (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
             nonce: ixObject.nonce,
+            fuel_price: ixObject.fuel_price,
+            fuel_limit: ixObject.fuel_limit,
             asset_funds: ixObject.asset_funds,
             steps: [],
-            participants: ixObject.participants.map(paticipant => ({ ...paticipant, address: (0, js_moi_utils_1.hexToBytes)(paticipant.address) })),
+            participants: ixObject.participants?.map(paticipant => ({ ...paticipant, address: (0, js_moi_utils_1.hexToBytes)(paticipant.address) })),
         };
         processedIxObject.steps = ixObject.steps.map(step => {
             if (!step.payload) {
@@ -78,9 +80,11 @@ const processIxObject = (ixObject) => {
                     polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
                     return { ...step, payload: polorizer.bytes() };
                 case js_moi_utils_1.IxType.LOGIC_DEPLOY:
+                    polorizer.polorize(payload, js_moi_utils_1.logicDeploySchema);
+                    return { ...step, payload: polorizer.bytes() };
                 case js_moi_utils_1.IxType.LOGIC_INVOKE:
                 case js_moi_utils_1.IxType.LOGIC_ENLIST:
-                    polorizer.polorize(payload, js_moi_utils_1.logicSchema);
+                    polorizer.polorize(payload, js_moi_utils_1.logicInteractSchema);
                     return { ...step, payload: polorizer.bytes() };
                 default:
                     js_moi_utils_1.ErrorUtils.throwError("Unsupported interaction type!", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

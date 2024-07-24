@@ -1,7 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ixObjectSchema = exports.assetMintOrBurnSchema = exports.assetApproveOrTransferSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
-exports.logicSchema = {
+exports.ixObjectSchema = exports.assetMintOrBurnSchema = exports.assetApproveOrTransferSchema = exports.assetCreateSchema = exports.logicInteractSchema = exports.logicDeploySchema = void 0;
+exports.logicDeploySchema = {
+    kind: "struct",
+    fields: {
+        manifest: {
+            kind: "bytes"
+        },
+        callsite: {
+            kind: "string"
+        },
+        calldata: {
+            kind: "bytes"
+        },
+    }
+};
+exports.logicInteractSchema = {
     kind: "struct",
     fields: {
         logic_id: {
@@ -11,9 +25,6 @@ exports.logicSchema = {
             kind: "string"
         },
         calldata: {
-            kind: "bytes"
-        },
-        manifest: {
             kind: "bytes"
         }
     }
@@ -39,7 +50,7 @@ exports.assetCreateSchema = {
         is_logical: {
             kind: "bool"
         },
-        logic_payload: exports.logicSchema
+        logic_payload: exports.logicInteractSchema
     }
 };
 exports.assetApproveOrTransferSchema = {

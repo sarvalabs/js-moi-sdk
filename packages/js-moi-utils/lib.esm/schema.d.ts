@@ -1,4 +1,18 @@
-export declare const logicSchema: {
+export declare const logicDeploySchema: {
+    kind: string;
+    fields: {
+        manifest: {
+            kind: string;
+        };
+        callsite: {
+            kind: string;
+        };
+        calldata: {
+            kind: string;
+        };
+    };
+};
+export declare const logicInteractSchema: {
     kind: string;
     fields: {
         logic_id: {
@@ -8,9 +22,6 @@ export declare const logicSchema: {
             kind: string;
         };
         calldata: {
-            kind: string;
-        };
-        manifest: {
             kind: string;
         };
     };
@@ -46,9 +57,6 @@ export declare const assetCreateSchema: {
                     kind: string;
                 };
                 calldata: {
-                    kind: string;
-                };
-                manifest: {
                     kind: string;
                 };
             };
