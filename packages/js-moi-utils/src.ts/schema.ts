@@ -114,7 +114,7 @@ export const ixObjectSchema =  {
                 } 
             }
         },
-        steps: {
+        transactions: {
             kind: "array",
             fields: {
                 values: {
@@ -140,7 +140,7 @@ export const ixObjectSchema =  {
                             kind: "bytes"
                         },
                         lock_type: {
-                            kind: "number"
+                            kind: "integer"
                         }
                     }
                 } 

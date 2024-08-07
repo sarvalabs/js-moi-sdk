@@ -122,7 +122,7 @@ export declare const ixObjectSchema: {
                 };
             };
         };
-        steps: {
+        transactions: {
             kind: string;
             fields: {
                 values: {

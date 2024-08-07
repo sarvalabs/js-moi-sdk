@@ -1,6 +1,9 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicDeploySchema, logicInteractSchema} from "js-moi-utils";
-import { AssetMintOrBurnPayload, InteractionPayload, LogicPayload, InteractionObject, AssetApproveOrTransferPayload } from "js-moi-providers";
-import { ProcessedIxObject } from "js-moi-signer";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
+    assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, 
+    logicDeploySchema, logicInteractSchema,
+    LockType} from "js-moi-utils";
+import { InteractionPayload, LogicPayload, InteractionObject, AssetActionPayload, AssetSupplyPayload, IxStep } from "js-moi-providers";
+import { IxxParticipant, ProcessedIxObject } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 
@@ -18,13 +21,13 @@ const processPayload = (ixType: IxType, payload: InteractionPayload): Interactio
             return { ...payload }
         case IxType.ASSET_MINT:
         case IxType.ASSET_BURN:
-            payload = payload as AssetMintOrBurnPayload;
+            payload = payload as AssetSupplyPayload;
             return {
                 ...payload,
                 asset_id: trimHexPrefix(payload.asset_id)
             }
         case IxType.VALUE_TRANSFER:
-            payload = payload as AssetApproveOrTransferPayload;
+            payload = payload as AssetActionPayload;
             return {
                 ...payload,
                 // TODO: beneficiary address should be converted from string to uint8array
@@ -47,6 +50,41 @@ const processPayload = (ixType: IxType, payload: InteractionPayload): Interactio
     }
 }
 
+const createParticipants = (steps: IxStep[]): IxxParticipant[] => {
+    return steps.reduce((participants, step) => {
+        let address: Uint8Array | null = null;
+        let lockType: number | null = null;
+
+        switch (step.type) {
+            case IxType.ASSET_CREATE:
+                break
+            case IxType.ASSET_MINT:
+            case IxType.ASSET_BURN:
+                address = hexToBytes((step.payload as AssetSupplyPayload).asset_id.slice(10,));
+                lockType = LockType.MUTATE_LOCK
+                break;
+            case IxType.VALUE_TRANSFER:
+                address = hexToBytes((step.payload as AssetActionPayload).beneficiary);
+                lockType = LockType.MUTATE_LOCK
+                break;
+            case IxType.LOGIC_DEPLOY:
+            case IxType.LOGIC_ENLIST:
+            case IxType.LOGIC_INVOKE:
+                address = hexToBytes((step.payload as LogicPayload).logic_id.slice(10,));
+                lockType = LockType.MUTATE_LOCK
+                break;
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
+
+        if (address !== null && lockType !== null) {
+            participants.push({ address, lock_type: lockType });
+        }
+
+        return participants;
+    }, [] as IxxParticipant[]);
+};
+
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
@@ -64,13 +102,17 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
             fuel_limit: ixObject.fuel_limit,
 
             asset_funds: ixObject.asset_funds,
-            steps: [],
-            participants: ixObject.participants?.map(paticipant => 
-                ({...paticipant, address: hexToBytes(paticipant.address)})
-            ),
+            transactions: [],
+            participants: [
+                {
+                    address: hexToBytes(ixObject.sender),
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
 
-        processedIxObject.steps = ixObject.steps.map(step => {
+        processedIxObject.transactions = ixObject.transactions.map(step => {
             if(!step.payload) {
                 ErrorUtils.throwError(
                     "Payload is missing!",

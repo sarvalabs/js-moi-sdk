@@ -58,7 +58,7 @@ export interface ProcessedIxObject {
     fuel_limit?: number | bigint;
     
     asset_funds: IxxAssetFund[]
-    steps: IxxStep[]
+    transactions: IxxStep[]
     participants: IxxParticipant[]
 
     perception?: Uint8Array

@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicDeploySchema, logicInteractSchema } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicDeploySchema, logicInteractSchema, LockType } from "js-moi-utils";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 /**
@@ -40,6 +40,37 @@ const processPayload = (ixType, payload) => {
             ErrorUtils.throwError("Failed to process payload, unexpected interaction type", ErrorCode.UNEXPECTED_ARGUMENT);
     }
 };
+const createParticipants = (steps) => {
+    return steps.reduce((participants, step) => {
+        let address = null;
+        let lockType = null;
+        switch (step.type) {
+            case IxType.ASSET_CREATE:
+                break;
+            case IxType.ASSET_MINT:
+            case IxType.ASSET_BURN:
+                address = hexToBytes(step.payload.asset_id.slice(10));
+                lockType = LockType.MUTATE_LOCK;
+                break;
+            case IxType.VALUE_TRANSFER:
+                address = hexToBytes(step.payload.beneficiary);
+                lockType = LockType.MUTATE_LOCK;
+                break;
+            case IxType.LOGIC_DEPLOY:
+            case IxType.LOGIC_ENLIST:
+            case IxType.LOGIC_INVOKE:
+                address = hexToBytes(step.payload.logic_id.slice(10));
+                lockType = LockType.MUTATE_LOCK;
+                break;
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
+        if (address !== null && lockType !== null) {
+            participants.push({ address, lock_type: lockType });
+        }
+        return participants;
+    }, []);
+};
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
@@ -56,10 +87,16 @@ const processIxObject = (ixObject) => {
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
             asset_funds: ixObject.asset_funds,
-            steps: [],
-            participants: ixObject.participants?.map(paticipant => ({ ...paticipant, address: hexToBytes(paticipant.address) })),
+            transactions: [],
+            participants: [
+                {
+                    address: hexToBytes(ixObject.sender),
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
-        processedIxObject.steps = ixObject.steps.map(step => {
+        processedIxObject.transactions = ixObject.transactions.map(step => {
             if (!step.payload) {
                 ErrorUtils.throwError("Payload is missing!", ErrorCode.MISSING_ARGUMENT);
             }

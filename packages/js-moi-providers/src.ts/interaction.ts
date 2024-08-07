@@ -1,7 +1,7 @@
 import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicDeploySchema, logicInteractSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ProcessedIxObject } from "../types/interaction";
-import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";
+import { AssetActionPayload, AssetSupplyPayload, CallorEstimateIxObject, InteractionPayload, IxStep, IxParticipant, LogicPayload } from "../types/jsonrpc";
 
 const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Array => {
     let polorizer = new Polorizer()
@@ -28,6 +28,35 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
     }
 }
 
+const createParticipants = (steps: IxStep[]): IxParticipant[] => {
+    return steps.map(step => {
+        switch(step.type) {
+            case IxType.ASSET_CREATE:
+                return null
+            case IxType.ASSET_MINT:
+            case IxType.ASSET_BURN:
+                return {
+                    address: (step.payload as AssetSupplyPayload).asset_id.slice(10,),
+                    lock_type: 1,
+                }
+            case IxType.VALUE_TRANSFER:
+                return {
+                    address: (step.payload as AssetActionPayload).beneficiary,
+                    lock_type: 1,
+                }
+            case IxType.LOGIC_DEPLOY:
+            case IxType.LOGIC_ENLIST:
+            case IxType.LOGIC_INVOKE:
+                return {
+                    address: (step.payload as LogicPayload).logic_id.slice(10,),
+                    lock_type: 1
+                }
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
+    }).filter(step => step !=  null)
+}
+
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
@@ -43,11 +72,20 @@ export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxOb
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
             asset_funds: ixObject.asset_funds,
-            steps: [],
-            participants: ixObject.participants,
+            transactions: [],
+            participants: [
+                {
+                    address: ixObject.sender,
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
 
-        processedIxObject.steps = ixObject.steps.map(step => ({...step, payload: "0x" + bytesToHex(serializePayload(step.type, step.payload))}))
+        processedIxObject.transactions = ixObject.transactions.map(step => ({
+            ...step, 
+            payload: "0x" + bytesToHex(serializePayload(step.type, step.payload)),
+        }))
 
         return processedIxObject;
     } catch(err) {

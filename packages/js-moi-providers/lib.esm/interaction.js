@@ -21,6 +21,34 @@ const serializePayload = (ixType, payload) => {
             ErrorUtils.throwError("Failed to serialize payload", ErrorCode.UNKNOWN_ERROR);
     }
 };
+const createParticipants = (steps) => {
+    return steps.map(step => {
+        switch (step.type) {
+            case IxType.ASSET_CREATE:
+                return null;
+            case IxType.ASSET_MINT:
+            case IxType.ASSET_BURN:
+                return {
+                    address: step.payload.asset_id.slice(10),
+                    lock_type: 1,
+                };
+            case IxType.VALUE_TRANSFER:
+                return {
+                    address: step.payload.beneficiary,
+                    lock_type: 1,
+                };
+            case IxType.LOGIC_DEPLOY:
+            case IxType.LOGIC_ENLIST:
+            case IxType.LOGIC_INVOKE:
+                return {
+                    address: step.payload.logic_id.slice(10),
+                    lock_type: 1
+                };
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
+    }).filter(step => step != null);
+};
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
@@ -36,10 +64,19 @@ export const processIxObject = (ixObject) => {
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
             asset_funds: ixObject.asset_funds,
-            steps: [],
-            participants: ixObject.participants,
+            transactions: [],
+            participants: [
+                {
+                    address: ixObject.sender,
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
-        processedIxObject.steps = ixObject.steps.map(step => ({ ...step, payload: "0x" + bytesToHex(serializePayload(step.type, step.payload)) }));
+        processedIxObject.transactions = ixObject.transactions.map(step => ({
+            ...step,
+            payload: "0x" + bytesToHex(serializePayload(step.type, step.payload)),
+        }));
         return processedIxObject;
     }
     catch (err) {

@@ -16,7 +16,7 @@ export interface ProcessedIxObject {
     payer?: string;
 
     asset_funds: IxAssetFund[]
-    steps: IxStep[]
+    transactions: IxStep[]
     participants: IxParticipant[]
 
     fuel_price: string;

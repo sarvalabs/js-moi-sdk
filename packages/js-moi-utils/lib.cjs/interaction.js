@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IxType = void 0;
+exports.LockType = exports.IxType = void 0;
 /**
  * Enumerates the types of Interactions in the system.
  */
@@ -28,4 +28,13 @@ var IxType;
     IxType[IxType["STAKE_UNBOND"] = 19] = "STAKE_UNBOND";
     IxType[IxType["STAKE_TRANSFER"] = 20] = "STAKE_TRANSFER";
 })(IxType || (exports.IxType = IxType = {}));
+/**
+ * Enumerates the types of particpant locks in the system.
+ */
+var LockType;
+(function (LockType) {
+    LockType[LockType["READ_ONLY_LOCK"] = 0] = "READ_ONLY_LOCK";
+    LockType[LockType["MUTATE_LOCK"] = 1] = "MUTATE_LOCK";
+    LockType[LockType["OBSERVER_LOCK"] = 2] = "OBSERVER_LOCK";
+})(LockType || (exports.LockType = LockType = {}));
 //# sourceMappingURL=interaction.js.map

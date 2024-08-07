@@ -43,6 +43,37 @@ const processPayload = (ixType, payload) => {
             js_moi_utils_1.ErrorUtils.throwError("Failed to process payload, unexpected interaction type", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
     }
 };
+const createParticipants = (steps) => {
+    return steps.reduce((participants, step) => {
+        let address = null;
+        let lockType = null;
+        switch (step.type) {
+            case js_moi_utils_1.IxType.ASSET_CREATE:
+                break;
+            case js_moi_utils_1.IxType.ASSET_MINT:
+            case js_moi_utils_1.IxType.ASSET_BURN:
+                address = (0, js_moi_utils_1.hexToBytes)(step.payload.asset_id.slice(10));
+                lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
+                break;
+            case js_moi_utils_1.IxType.VALUE_TRANSFER:
+                address = (0, js_moi_utils_1.hexToBytes)(step.payload.beneficiary);
+                lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
+                break;
+            case js_moi_utils_1.IxType.LOGIC_DEPLOY:
+            case js_moi_utils_1.IxType.LOGIC_ENLIST:
+            case js_moi_utils_1.IxType.LOGIC_INVOKE:
+                address = (0, js_moi_utils_1.hexToBytes)(step.payload.logic_id.slice(10));
+                lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
+                break;
+            default:
+                js_moi_utils_1.ErrorUtils.throwError("Unsupported Ix type", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        if (address !== null && lockType !== null) {
+            participants.push({ address, lock_type: lockType });
+        }
+        return participants;
+    }, []);
+};
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
@@ -59,10 +90,16 @@ const processIxObject = (ixObject) => {
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
             asset_funds: ixObject.asset_funds,
-            steps: [],
-            participants: ixObject.participants?.map(paticipant => ({ ...paticipant, address: (0, js_moi_utils_1.hexToBytes)(paticipant.address) })),
+            transactions: [],
+            participants: [
+                {
+                    address: (0, js_moi_utils_1.hexToBytes)(ixObject.sender),
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
-        processedIxObject.steps = ixObject.steps.map(step => {
+        processedIxObject.transactions = ixObject.transactions.map(step => {
             if (!step.payload) {
                 js_moi_utils_1.ErrorUtils.throwError("Payload is missing!", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }

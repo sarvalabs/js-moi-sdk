@@ -112,7 +112,7 @@ exports.ixObjectSchema = {
                 }
             }
         },
-        steps: {
+        transactions: {
             kind: "array",
             fields: {
                 values: {
@@ -138,7 +138,7 @@ exports.ixObjectSchema = {
                             kind: "bytes"
                         },
                         lock_type: {
-                            kind: "number"
+                            kind: "integer"
                         }
                     }
                 }

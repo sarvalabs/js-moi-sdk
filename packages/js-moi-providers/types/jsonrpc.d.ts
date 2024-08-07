@@ -267,13 +267,13 @@ export interface AssetCreatePayload {
     logic_payload?: LogicPayload;
 }
 
-export interface AssetMintOrBurnPayload {
+export interface AssetSupplyPayload {
     asset_id: string;
     amount: number | bigint;
 }
 
-export interface AssetApproveOrTransferPayload {
-    beneficiary: Uint8Array;
+export interface AssetActionPayload {
+    beneficiary: string;
     asset_id: string;
     amount: number | bigint;
 }
@@ -285,7 +285,7 @@ export interface LogicPayload {
     manifest?: Uint8Array;
 }
 
-export type InteractionPayload = AssetCreatePayload | AssetMintOrBurnPayload | AssetApproveOrTransferPayload| LogicPayload;
+export type InteractionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload| LogicPayload;
 
 interface IxAssetFund {
     asset_id: string;
@@ -317,7 +317,7 @@ interface InteractionObject {
     fuel_limit?: number | bigint;
     
     asset_funds?: IxAssetFund[]
-    steps?: IxStep[]
+    transactions?: IxStep[]
     participants?: IxParticipant[]
 
     perception?: Uint8Array
