@@ -657,7 +657,7 @@ export class BaseProvider extends AbstractProvider {
             // call receipt bug is resolved in the protocol.
             return {
                 receipt: receipt,
-                result: this.processReceipt.bind(this, {...receipt, ix_type: toQuantity(ixObject.type)})
+                result: this.processReceipt.bind(this, receipt)
             }
         } catch (error) {
             throw error

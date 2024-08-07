@@ -1,6 +1,9 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, logicSchema} from "js-moi-utils";
-import { AssetMintOrBurnPayload, InteractionPayload, LogicPayload, InteractionObject } from "js-moi-providers";
-import { ProcessedIxObject } from "js-moi-signer";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
+    assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, 
+    logicDeploySchema, logicInteractSchema,
+    LockType} from "js-moi-utils";
+import { InteractionPayload, LogicPayload, InteractionObject, AssetActionPayload, AssetSupplyPayload, IxStep } from "js-moi-providers";
+import { IxxParticipant, ProcessedIxObject } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 
@@ -14,11 +17,20 @@ import { Polorizer } from "js-polo";
  */
 const processPayload = (ixType: IxType, payload: InteractionPayload): InteractionPayload => {
     switch(ixType) {
+        case IxType.ASSET_CREATE:
+            return { ...payload }
         case IxType.ASSET_MINT:
         case IxType.ASSET_BURN:
-            payload = payload as AssetMintOrBurnPayload;
+            payload = payload as AssetSupplyPayload;
             return {
                 ...payload,
+                asset_id: trimHexPrefix(payload.asset_id)
+            }
+        case IxType.VALUE_TRANSFER:
+            payload = payload as AssetActionPayload;
+            return {
+                ...payload,
+                // TODO: beneficiary address should be converted from string to uint8array
                 asset_id: trimHexPrefix(payload.asset_id)
             }
         case IxType.LOGIC_DEPLOY:
@@ -38,18 +50,39 @@ const processPayload = (ixType: IxType, payload: InteractionPayload): Interactio
     }
 }
 
-/**
- * Trims the "0x" prefix from the keys of a Map and returns a new Map.
- *
- * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
- * @returns {Map<string, number | bigint>} - A new Map with trimmed keys.
- */
-const processValues = (values: Map<string, number | bigint>): Map<string, number | bigint> => {
-    const entries = new Map();
+const createParticipants = (steps: IxStep[]): IxxParticipant[] => {
+    return steps.reduce((participants, step) => {
+        let address: Uint8Array | null = null;
+        let lockType: number | null = null;
 
-    values.forEach((value, key) => entries.set(trimHexPrefix(key), value))
+        switch (step.type) {
+            case IxType.ASSET_CREATE:
+                break
+            case IxType.ASSET_MINT:
+            case IxType.ASSET_BURN:
+                address = hexToBytes((step.payload as AssetSupplyPayload).asset_id.slice(10,));
+                lockType = LockType.MUTATE_LOCK
+                break;
+            case IxType.VALUE_TRANSFER:
+                address = hexToBytes((step.payload as AssetActionPayload).beneficiary);
+                lockType = LockType.MUTATE_LOCK
+                break;
+            case IxType.LOGIC_DEPLOY:
+            case IxType.LOGIC_ENLIST:
+            case IxType.LOGIC_INVOKE:
+                address = hexToBytes((step.payload as LogicPayload).logic_id.slice(10,));
+                lockType = LockType.MUTATE_LOCK
+                break;
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
 
-    return entries
+        if (address !== null && lockType !== null) {
+            participants.push({ address, lock_type: lockType });
+        }
+
+        return participants;
+    }, [] as IxxParticipant[]);
 };
 
 /**
@@ -61,49 +94,62 @@ const processValues = (values: Map<string, number | bigint>): Map<string, number
  */
 const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
     try {
-        const processedIxObject = { 
-            ...ixObject,
+        const processedIxObject: ProcessedIxObject = { 
             sender: hexToBytes(ixObject.sender),
-            receiver: hexToBytes(ZERO_ADDRESS),
-            payer: hexToBytes(ZERO_ADDRESS)
+            payer: hexToBytes(ZERO_ADDRESS),
+            nonce: ixObject.nonce,
+            fuel_price: ixObject.fuel_price,
+            fuel_limit: ixObject.fuel_limit,
+
+            asset_funds: ixObject.asset_funds,
+            transactions: [],
+            participants: [
+                {
+                    address: hexToBytes(ixObject.sender),
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
 
-        switch(ixObject.type) {
-            case IxType.VALUE_TRANSFER:
-                if(!ixObject.transfer_values) {
-                    ErrorUtils.throwError(
-                        "Transfer values is missing!",
-                        ErrorCode.MISSING_ARGUMENT
-                    )
-                }
-
-                processedIxObject.receiver = hexToBytes(ixObject.receiver);
-                processedIxObject.transfer_values = processValues(ixObject.transfer_values);
-                break;
-            case IxType.ASSET_CREATE:
-                break;
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN:
-            case IxType.LOGIC_DEPLOY:
-            case IxType.LOGIC_INVOKE:
-            case IxType.LOGIC_ENLIST:
-                if(!ixObject.payload) {
-                    ErrorUtils.throwError(
-                        "Payload is missing!",
-                        ErrorCode.MISSING_ARGUMENT
-                    )
-                }
-
-                processedIxObject.payload = processPayload(ixObject.type, ixObject.payload);
-                break;
-            default:
+        processedIxObject.transactions = ixObject.transactions.map(step => {
+            if(!step.payload) {
                 ErrorUtils.throwError(
-                    "Unsupported interaction type!", 
-                    ErrorCode.UNSUPPORTED_OPERATION
-                );
-        }
+                    "Payload is missing!",
+                    ErrorCode.MISSING_ARGUMENT
+                )
+            }
 
-        return processedIxObject as unknown as ProcessedIxObject;
+            const payload = processPayload(step.type, step.payload);
+            const polorizer = new Polorizer();
+
+            switch(step.type) {
+                case IxType.VALUE_TRANSFER:
+                    polorizer.polorize(payload, assetApproveOrTransferSchema)
+                    return {...step, payload: polorizer.bytes()}
+                case IxType.ASSET_CREATE:
+                    polorizer.polorize(payload, assetCreateSchema)
+                    return {...step, payload: polorizer.bytes()}
+                case IxType.ASSET_MINT:
+                case IxType.ASSET_BURN:
+                    polorizer.polorize(payload, assetMintOrBurnSchema)
+                    return {...step, payload: polorizer.bytes()}
+                case IxType.LOGIC_DEPLOY:
+                    polorizer.polorize(payload, logicDeploySchema)
+                    return {...step, payload: polorizer.bytes()}
+                case IxType.LOGIC_INVOKE:
+                case IxType.LOGIC_ENLIST:
+                    polorizer.polorize(payload, logicInteractSchema)
+                    return {...step, payload: polorizer.bytes()}
+                default:
+                    ErrorUtils.throwError(
+                        "Unsupported interaction type!", 
+                        ErrorCode.UNSUPPORTED_OPERATION
+                    );
+            }
+        })
+
+        return processedIxObject;
     } catch(err) {
         ErrorUtils.throwError(
             "Failed to process interaction object",
@@ -122,44 +168,10 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
  */
 export const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
     try {
-        let polorizer = new Polorizer();
         const processedIxObject = processIxObject(ixObject);
-
-        switch(processedIxObject.type) {
-            case IxType.VALUE_TRANSFER: {
-                polorizer.polorize(processedIxObject, ixObjectSchema);
-                return polorizer.bytes();
-            }
-            case IxType.ASSET_CREATE: {
-                polorizer.polorize(processedIxObject.payload, assetCreateSchema);
-                const payload = polorizer.bytes();
-                polorizer = new Polorizer();
-                polorizer.polorize({ ...processedIxObject, payload }, ixObjectSchema);
-                return polorizer.bytes();
-            }
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN: {
-                polorizer.polorize(processedIxObject.payload, assetMintOrBurnSchema);
-                const payload = polorizer.bytes();
-                polorizer = new Polorizer();
-                polorizer.polorize({ ...processedIxObject, payload }, ixObjectSchema);    
-                return polorizer.bytes();
-            }
-            case IxType.LOGIC_DEPLOY:
-            case IxType.LOGIC_INVOKE:
-            case IxType.LOGIC_ENLIST: {    
-                polorizer.polorize(processedIxObject.payload, logicSchema);
-                const payload = polorizer.bytes();
-                polorizer = new Polorizer();
-                polorizer.polorize({ ...processedIxObject, payload }, ixObjectSchema);    
-                return polorizer.bytes();
-            }
-            default:
-                ErrorUtils.throwError(
-                    "Unsupported interaction type!",
-                    ErrorCode.UNSUPPORTED_OPERATION
-                );
-        }
+        const polorizer = new Polorizer();
+        polorizer.polorize(processedIxObject, ixObjectSchema);
+        return polorizer.bytes();
     } catch(err) {
         ErrorUtils.throwError(
             "Failed to serialize interaction object",

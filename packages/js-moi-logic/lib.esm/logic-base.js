@@ -117,8 +117,12 @@ export class LogicBase extends ElementDescriptor {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            type: this.getIxType(ixObject.routine.kind),
-            payload: ixObject.createPayload(),
+            transactions: [
+                {
+                    type: this.getIxType(ixObject.routine.kind),
+                    payload: ixObject.createPayload(),
+                }
+            ]
         };
         if (option.sender != null) {
             params.sender = option.sender;

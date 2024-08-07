@@ -14,25 +14,43 @@ const serializePayload = (ixType, payload) => {
             polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
             return polorizer.bytes();
         case js_moi_utils_1.IxType.LOGIC_DEPLOY:
+            polorizer.polorize(payload, js_moi_utils_1.logicDeploySchema);
+            return polorizer.bytes();
         case js_moi_utils_1.IxType.LOGIC_INVOKE:
         case js_moi_utils_1.IxType.LOGIC_ENLIST:
-            polorizer.polorize(payload, js_moi_utils_1.logicSchema);
+            polorizer.polorize(payload, js_moi_utils_1.logicInteractSchema);
             return polorizer.bytes();
         default:
             js_moi_utils_1.ErrorUtils.throwError("Failed to serialize payload", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
     }
 };
-/**
- * Trims the "0x" prefix from the keys of a Map and returns a new Map.
- *
- * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
- * @returns {Record<string, string>} - A object with keys as hexadecimal strings without the "0x" prefix.
- */
-const processValues = (values) => {
-    return Array.from(values).reduce((entries, [key, value]) => {
-        entries[key] = (0, js_moi_utils_1.toQuantity)(value);
-        return entries;
-    }, {});
+const createParticipants = (steps) => {
+    return steps.map(step => {
+        switch (step.type) {
+            case js_moi_utils_1.IxType.ASSET_CREATE:
+                return null;
+            case js_moi_utils_1.IxType.ASSET_MINT:
+            case js_moi_utils_1.IxType.ASSET_BURN:
+                return {
+                    address: step.payload.asset_id.slice(10),
+                    lock_type: 1,
+                };
+            case js_moi_utils_1.IxType.VALUE_TRANSFER:
+                return {
+                    address: step.payload.beneficiary,
+                    lock_type: 1,
+                };
+            case js_moi_utils_1.IxType.LOGIC_DEPLOY:
+            case js_moi_utils_1.IxType.LOGIC_ENLIST:
+            case js_moi_utils_1.IxType.LOGIC_INVOKE:
+                return {
+                    address: step.payload.logic_id.slice(10),
+                    lock_type: 1
+                };
+            default:
+                js_moi_utils_1.ErrorUtils.throwError("Unsupported Ix type", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+    }).filter(step => step != null);
 };
 /**
  * Processes the interaction object based on its type and returns the processed object.
@@ -44,19 +62,24 @@ const processValues = (values) => {
 const processIxObject = (ixObject) => {
     try {
         const processedIxObject = {
-            type: ixObject.type,
             nonce: (0, js_moi_utils_1.toQuantity)(ixObject.nonce),
             sender: ixObject.sender,
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
+            asset_funds: ixObject.asset_funds,
+            transactions: [],
+            participants: [
+                {
+                    address: ixObject.sender,
+                    lock_type: 1,
+                },
+                ...createParticipants(ixObject.transactions)
+            ],
         };
-        if (ixObject.type === js_moi_utils_1.IxType.VALUE_TRANSFER) {
-            processedIxObject.receiver = ixObject.receiver;
-            processedIxObject.transfer_values = processValues(ixObject.transfer_values);
-        }
-        else {
-            processedIxObject.payload = "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(ixObject.type, ixObject.payload));
-        }
+        processedIxObject.transactions = ixObject.transactions.map(step => ({
+            ...step,
+            payload: "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(step.type, step.payload)),
+        }));
         return processedIxObject;
     }
     catch (err) {

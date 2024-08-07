@@ -29,3 +29,12 @@ export enum IxType {
     STAKE_UNBOND,
     STAKE_TRANSFER
 }
+
+/**
+ * Enumerates the types of particpant locks in the system.
+ */
+export enum LockType {
+    READ_ONLY_LOCK,
+    MUTATE_LOCK,
+    OBSERVER_LOCK
+}

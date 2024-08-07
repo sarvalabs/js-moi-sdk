@@ -1,4 +1,18 @@
-export declare const logicSchema: {
+export declare const logicDeploySchema: {
+    kind: string;
+    fields: {
+        manifest: {
+            kind: string;
+        };
+        callsite: {
+            kind: string;
+        };
+        calldata: {
+            kind: string;
+        };
+    };
+};
+export declare const logicInteractSchema: {
     kind: string;
     fields: {
         logic_id: {
@@ -8,9 +22,6 @@ export declare const logicSchema: {
             kind: string;
         };
         calldata: {
-            kind: string;
-        };
-        manifest: {
             kind: string;
         };
     };
@@ -48,10 +59,21 @@ export declare const assetCreateSchema: {
                 calldata: {
                     kind: string;
                 };
-                manifest: {
-                    kind: string;
-                };
             };
+        };
+    };
+};
+export declare const assetApproveOrTransferSchema: {
+    kind: string;
+    fields: {
+        beneficiary: {
+            kind: string;
+        };
+        asset_id: {
+            kind: string;
+        };
+        amount: {
+            kind: string;
         };
     };
 };
@@ -69,42 +91,14 @@ export declare const assetMintOrBurnSchema: {
 export declare const ixObjectSchema: {
     kind: string;
     fields: {
-        type: {
-            kind: string;
-        };
-        nonce: {
-            kind: string;
-        };
         sender: {
-            kind: string;
-        };
-        receiver: {
             kind: string;
         };
         payer: {
             kind: string;
         };
-        transfer_values: {
+        nonce: {
             kind: string;
-            fields: {
-                keys: {
-                    kind: string;
-                };
-                values: {
-                    kind: string;
-                };
-            };
-        };
-        perceived_values: {
-            kind: string;
-            fields: {
-                keys: {
-                    kind: string;
-                };
-                values: {
-                    kind: string;
-                };
-            };
         };
         fuel_price: {
             kind: string;
@@ -112,8 +106,67 @@ export declare const ixObjectSchema: {
         fuel_limit: {
             kind: string;
         };
-        payload: {
+        asset_funds: {
             kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        asset_id: {
+                            kind: string;
+                        };
+                        amount: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        transactions: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        type: {
+                            kind: string;
+                        };
+                        payload: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        participants: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        address: {
+                            kind: string;
+                        };
+                        lock_type: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        perception: {
+            kind: string;
+        };
+        preferences: {
+            kind: string;
+            fields: {
+                compute: {
+                    kind: string;
+                };
+                consensus: {
+                    kind: string;
+                };
+            };
         };
     };
 };

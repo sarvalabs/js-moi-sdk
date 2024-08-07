@@ -1,4 +1,18 @@
-export const logicSchema = {
+export const logicDeploySchema = {
+    kind: "struct",
+    fields: {
+        manifest: {
+            kind: "bytes"
+        },
+        callsite: {
+            kind: "string"
+        },
+        calldata: {
+            kind: "bytes"
+        },
+    }
+};
+export const logicInteractSchema = {
     kind: "struct",
     fields: {
         logic_id: {
@@ -8,9 +22,6 @@ export const logicSchema = {
             kind: "string"
         },
         calldata: {
-            kind: "bytes"
-        },
-        manifest: {
             kind: "bytes"
         }
     }
@@ -36,7 +47,21 @@ export const assetCreateSchema = {
         is_logical: {
             kind: "bool"
         },
-        logic_payload: logicSchema
+        logic_payload: logicInteractSchema
+    }
+};
+export const assetApproveOrTransferSchema = {
+    kind: "struct",
+    fields: {
+        beneficiary: {
+            kind: "bytes"
+        },
+        asset_id: {
+            kind: "string"
+        },
+        amount: {
+            kind: "integer"
+        }
     }
 };
 export const assetMintOrBurnSchema = {
@@ -53,42 +78,14 @@ export const assetMintOrBurnSchema = {
 export const ixObjectSchema = {
     kind: "struct",
     fields: {
-        type: {
-            kind: "integer"
-        },
-        nonce: {
-            kind: "integer"
-        },
         sender: {
-            kind: "bytes"
-        },
-        receiver: {
             kind: "bytes"
         },
         payer: {
             kind: "bytes"
         },
-        transfer_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
-        },
-        perceived_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
+        nonce: {
+            kind: "integer"
         },
         fuel_price: {
             kind: "integer"
@@ -96,8 +93,67 @@ export const ixObjectSchema = {
         fuel_limit: {
             kind: "integer"
         },
-        payload: {
+        asset_funds: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        asset_id: {
+                            kind: "string"
+                        },
+                        amount: {
+                            kind: "integer"
+                        }
+                    }
+                }
+            }
+        },
+        transactions: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        type: {
+                            kind: "integer"
+                        },
+                        payload: {
+                            kind: "bytes"
+                        }
+                    }
+                }
+            }
+        },
+        participants: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        address: {
+                            kind: "bytes"
+                        },
+                        lock_type: {
+                            kind: "integer"
+                        }
+                    }
+                }
+            }
+        },
+        perception: {
             kind: "bytes"
+        },
+        preferences: {
+            kind: "struct",
+            fields: {
+                compute: {
+                    kind: "bytes"
+                },
+                consensus: {
+                    kind: "bytes"
+                }
+            }
         }
     }
 };

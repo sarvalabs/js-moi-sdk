@@ -267,7 +267,13 @@ export interface AssetCreatePayload {
     logic_payload?: LogicPayload;
 }
 
-export interface AssetMintOrBurnPayload {
+export interface AssetSupplyPayload {
+    asset_id: string;
+    amount: number | bigint;
+}
+
+export interface AssetActionPayload {
+    beneficiary: string;
     asset_id: string;
     amount: number | bigint;
 }
@@ -279,23 +285,44 @@ export interface LogicPayload {
     manifest?: Uint8Array;
 }
 
-export type InteractionPayload = AssetCreatePayload | AssetMintOrBurnPayload | LogicPayload;
+export type InteractionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload| LogicPayload;
+
+interface IxAssetFund {
+    asset_id: string;
+    amount: number;
+}
+
+interface IxStep {
+    type: IxType;
+    payload?: InteractionPayload;
+}
+
+interface IxParticipant {
+    address: string;
+    lock_type: number;
+}
+
+interface IxPreferences {
+    compute: Uint8Array;
+    consensus: Uint8Array;
+}
 
 interface InteractionObject {
-    type: IxType;
     nonce?: number | bigint;
 
     sender?: string;
-    receiver?: string;
     payer?: string;
-
-    transfer_values?: Map<string, number | bigint>;
-    perceived_values?: Map<string, number | bigint>;
 
     fuel_price?: number | bigint;
     fuel_limit?: number | bigint;
     
-    payload?: InteractionPayload;
+    asset_funds?: IxAssetFund[]
+    transactions?: IxStep[]
+    participants?: IxParticipant[]
+
+    perception?: Uint8Array
+
+    preferences?: IxPreferences
 }
 
 export interface CallorEstimateIxObject extends InteractionObject {

@@ -1,7 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ixObjectSchema = exports.assetMintOrBurnSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
-exports.logicSchema = {
+exports.ixObjectSchema = exports.assetMintOrBurnSchema = exports.assetApproveOrTransferSchema = exports.assetCreateSchema = exports.logicInteractSchema = exports.logicDeploySchema = void 0;
+exports.logicDeploySchema = {
+    kind: "struct",
+    fields: {
+        manifest: {
+            kind: "bytes"
+        },
+        callsite: {
+            kind: "string"
+        },
+        calldata: {
+            kind: "bytes"
+        },
+    }
+};
+exports.logicInteractSchema = {
     kind: "struct",
     fields: {
         logic_id: {
@@ -11,9 +25,6 @@ exports.logicSchema = {
             kind: "string"
         },
         calldata: {
-            kind: "bytes"
-        },
-        manifest: {
             kind: "bytes"
         }
     }
@@ -39,7 +50,21 @@ exports.assetCreateSchema = {
         is_logical: {
             kind: "bool"
         },
-        logic_payload: exports.logicSchema
+        logic_payload: exports.logicInteractSchema
+    }
+};
+exports.assetApproveOrTransferSchema = {
+    kind: "struct",
+    fields: {
+        beneficiary: {
+            kind: "bytes"
+        },
+        asset_id: {
+            kind: "string"
+        },
+        amount: {
+            kind: "integer"
+        }
     }
 };
 exports.assetMintOrBurnSchema = {
@@ -56,42 +81,14 @@ exports.assetMintOrBurnSchema = {
 exports.ixObjectSchema = {
     kind: "struct",
     fields: {
-        type: {
-            kind: "integer"
-        },
-        nonce: {
-            kind: "integer"
-        },
         sender: {
-            kind: "bytes"
-        },
-        receiver: {
             kind: "bytes"
         },
         payer: {
             kind: "bytes"
         },
-        transfer_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
-        },
-        perceived_values: {
-            kind: "map",
-            fields: {
-                keys: {
-                    kind: "string"
-                },
-                values: {
-                    kind: "integer"
-                }
-            }
+        nonce: {
+            kind: "integer"
         },
         fuel_price: {
             kind: "integer"
@@ -99,8 +96,67 @@ exports.ixObjectSchema = {
         fuel_limit: {
             kind: "integer"
         },
-        payload: {
+        asset_funds: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        asset_id: {
+                            kind: "string"
+                        },
+                        amount: {
+                            kind: "integer"
+                        }
+                    }
+                }
+            }
+        },
+        transactions: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        type: {
+                            kind: "integer"
+                        },
+                        payload: {
+                            kind: "bytes"
+                        }
+                    }
+                }
+            }
+        },
+        participants: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "struct",
+                    fields: {
+                        address: {
+                            kind: "bytes"
+                        },
+                        lock_type: {
+                            kind: "integer"
+                        }
+                    }
+                }
+            }
+        },
+        perception: {
             kind: "bytes"
+        },
+        preferences: {
+            kind: "struct",
+            fields: {
+                compute: {
+                    kind: "bytes"
+                },
+                consensus: {
+                    kind: "bytes"
+                }
+            }
         }
     }
 };

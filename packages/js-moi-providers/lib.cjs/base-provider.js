@@ -534,7 +534,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             // call receipt bug is resolved in the protocol.
             return {
                 receipt: receipt,
-                result: this.processReceipt.bind(this, { ...receipt, ix_type: (0, js_moi_utils_1.toQuantity)(ixObject.type) })
+                result: this.processReceipt.bind(this, receipt)
             };
         }
         catch (error) {
