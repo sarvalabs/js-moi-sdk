@@ -23,15 +23,19 @@ describe("Test JsonRpcProvider Query Calls", () => {
       signer = await initializeWallet(provider, MNEMONIC);
       const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
-        type: TxType.ASSET_CREATE,
         nonce: nonce,
         fuel_price: 1,
         fuel_limit: 200,
-        payload: {
-            standard: AssetStandard.MAS0,
-            symbol: getRandomSymbol(),
-            supply: supply
-        }
+        transactions: [
+          {
+            type: TxType.ASSET_CREATE,
+            payload: {
+              standard: AssetStandard.MAS0,
+              symbol: getRandomSymbol(),
+              supply: supply
+            }
+          }
+        ]
       });
 
       ixHash = ixResponse.hash;
@@ -41,12 +45,12 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe('getBalance', () => {
       it('should return the asset balance', async () => {
-        if (!ixReceipt.extra_data) {
-          expect(ixReceipt.extra_data).toBeDefined();
+        if (!ixReceipt.transactions[0].data) {
+          expect(ixReceipt.transactions[0].data).toBeDefined();
           return;
         }
 
-        const balance = await provider.getBalance(address, (<AssetCreationReceipt>ixReceipt.extra_data).asset_id);
+        const balance = await provider.getBalance(address, (<AssetCreationReceipt>ixReceipt.transactions[0].data).asset_id);
 
         expect(balance).toBe(supply);
       })
@@ -85,7 +89,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const tdu = await provider.getTDU(address);
         expect(tdu).toBeDefined();
         
-        const extraData = ixReceipt.extra_data as AssetCreationReceipt
+        const extraData = ixReceipt.transactions[0].data as AssetCreationReceipt
         const asset = tdu.find(asset => asset.asset_id === extraData.asset_id);
 
         expect(asset).toBeDefined();
@@ -239,16 +243,20 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe("call", () => {
       it('should return the receipt by executing the interaction', async () => {
         const receipt = await provider.call({
-          type: TxType.ASSET_CREATE,
           nonce: nextNonce,
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
-          payload: {
-              standard: AssetStandard.MAS0,
-              symbol: "CALL",
-              supply: 1248577
-          }
+          transactions: [
+            {
+              type: TxType.ASSET_CREATE,
+              payload: {
+                standard: AssetStandard.MAS0,
+                symbol: "CALL",
+                supply: 1248577
+              }
+            }
+          ]
         })
 
         expect(receipt).toBeDefined()
@@ -258,16 +266,20 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe("estimateFuel", () => {
       it('should return the estimated fuel by executing the interaction', async () => {
         const fuelPrice = await provider.estimateFuel({
-          type: TxType.ASSET_CREATE,
           nonce: nextNonce,
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
-          payload: {
-              standard: AssetStandard.MAS0,
-              symbol: "ESTIMATE",
-              supply: 1248577
-          }
+          transactions: [
+            {
+              type: TxType.ASSET_CREATE,
+              payload: {
+                standard: AssetStandard.MAS0,
+                symbol: "ESTIMATE",
+                supply: 1248577
+              }
+            }
+          ]
         })
 
         expect(fuelPrice).toBeDefined()
@@ -399,15 +411,19 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const nonce = await signer.getNonce();
         const filter = await provider.getNewTesseractFilter();
         const ixResponse = await signer.sendInteraction({
-          type: TxType.ASSET_CREATE,
           nonce: nonce,
           fuel_price: 1,
           fuel_limit: 200,
-          payload: {
-              standard: AssetStandard.MAS0,
-              symbol: "TESTING",
-              supply: 1248577
-          }
+          transactions: [
+            {
+              type: TxType.ASSET_CREATE,
+              payload: {
+                standard: AssetStandard.MAS0,
+                symbol: "TESTING",
+                supply: 1248577
+              }
+            }
+          ]
         });
 
         await ixResponse.wait()
