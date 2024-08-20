@@ -24,7 +24,7 @@ const processPayload = (ixType, payload) => {
             const pay = payload;
             return {
                 ...pay,
-                benefactor: hexToBytes(pay.benefactor),
+                benefactor: hexToBytes(pay.benefactor ? pay.benefactor : ZERO_ADDRESS),
                 beneficiary: hexToBytes(pay.beneficiary),
                 asset_id: trimHexPrefix(pay.asset_id)
             };

@@ -1109,34 +1109,34 @@ export class BaseProvider extends AbstractProvider {
      * data is missing.
      */
     protected processReceipt(receipt: InteractionReceipt): TransactionResultData[] {
-        return receipt.transactions.map(step => {
-            switch (hexToBN(step.tx_type)) {
+        return receipt.transactions.map(transaction => {
+            switch (hexToBN(transaction.tx_type)) {
                 case TxType.VALUE_TRANSFER:
                     return null;
                 case TxType.ASSET_CREATE:
-                    if (step.data) {
-                        return step.data as AssetCreationReceipt;
+                    if (transaction.data) {
+                        return transaction.data as AssetCreationReceipt;
                     }
                     throw new Error("Failed to retrieve asset creation response");
                 case TxType.ASSET_MINT:
                 case TxType.ASSET_BURN:
-                    if (step.data) {
-                        return step.data as AssetMintOrBurnReceipt;
+                    if (transaction.data) {
+                        return transaction.data as AssetMintOrBurnReceipt;
                     }
                     throw new Error("Failed to retrieve asset mint/burn response");
                 case TxType.LOGIC_DEPLOY:
-                    if (step.data) {
-                        return step.data as LogicDeployReceipt;
+                    if (transaction.data) {
+                        return transaction.data as LogicDeployReceipt;
                     }
                     throw new Error("Failed to retrieve logic deploy response");
                 case TxType.LOGIC_INVOKE:
-                    if (step.data) {
-                        return step.data as LogicInvokeReceipt;
+                    if (transaction.data) {
+                        return transaction.data as LogicInvokeReceipt;
                     }
                     throw new Error("Failed to retrieve logic invoke response");
                 case TxType.LOGIC_ENLIST:
-                    if (step.data) {
-                        return step.data as LogicEnlistReceipt;
+                    if (transaction.data) {
+                        return transaction.data as LogicEnlistReceipt;
                     }
                     throw new Error("Failed to retrieve logic enlist response");
                 default:

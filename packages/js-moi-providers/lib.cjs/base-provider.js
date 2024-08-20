@@ -911,34 +911,34 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * data is missing.
      */
     processReceipt(receipt) {
-        return receipt.transactions.map(step => {
-            switch ((0, js_moi_utils_1.hexToBN)(step.tx_type)) {
+        return receipt.transactions.map(transaction => {
+            switch ((0, js_moi_utils_1.hexToBN)(transaction.tx_type)) {
                 case js_moi_utils_1.TxType.VALUE_TRANSFER:
                     return null;
                 case js_moi_utils_1.TxType.ASSET_CREATE:
-                    if (step.data) {
-                        return step.data;
+                    if (transaction.data) {
+                        return transaction.data;
                     }
                     throw new Error("Failed to retrieve asset creation response");
                 case js_moi_utils_1.TxType.ASSET_MINT:
                 case js_moi_utils_1.TxType.ASSET_BURN:
-                    if (step.data) {
-                        return step.data;
+                    if (transaction.data) {
+                        return transaction.data;
                     }
                     throw new Error("Failed to retrieve asset mint/burn response");
                 case js_moi_utils_1.TxType.LOGIC_DEPLOY:
-                    if (step.data) {
-                        return step.data;
+                    if (transaction.data) {
+                        return transaction.data;
                     }
                     throw new Error("Failed to retrieve logic deploy response");
                 case js_moi_utils_1.TxType.LOGIC_INVOKE:
-                    if (step.data) {
-                        return step.data;
+                    if (transaction.data) {
+                        return transaction.data;
                     }
                     throw new Error("Failed to retrieve logic invoke response");
                 case js_moi_utils_1.TxType.LOGIC_ENLIST:
-                    if (step.data) {
-                        return step.data;
+                    if (transaction.data) {
+                        return transaction.data;
                     }
                     throw new Error("Failed to retrieve logic enlist response");
                 default:

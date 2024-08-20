@@ -29,7 +29,7 @@ const processPayload = (ixType: TxType, payload: InteractionPayload): Interactio
             const pay = payload as AssetActionPayload;
             return {
                 ...pay,
-                benefactor: hexToBytes(pay.benefactor),
+                benefactor: hexToBytes(pay.benefactor ? pay.benefactor : ZERO_ADDRESS),
                 beneficiary: hexToBytes(pay.beneficiary),
                 asset_id: trimHexPrefix(pay.asset_id)
             } as unknown
