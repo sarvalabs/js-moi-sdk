@@ -1,14 +1,14 @@
-import { ErrorCode, ErrorUtils, TxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, assetCreateSchema, assetSupplySchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
-const serializePayload = (ixType, payload) => {
+const serializePayload = (txType, payload) => {
     let polorizer = new Polorizer();
-    switch (ixType) {
+    switch (txType) {
         case TxType.ASSET_CREATE:
             polorizer.polorize(payload, assetCreateSchema);
             return polorizer.bytes();
         case TxType.ASSET_MINT:
         case TxType.ASSET_BURN:
-            polorizer.polorize(payload, assetMintOrBurnSchema);
+            polorizer.polorize(payload, assetSupplySchema);
             return polorizer.bytes();
         case TxType.LOGIC_DEPLOY:
         case TxType.LOGIC_INVOKE:
@@ -19,35 +19,6 @@ const serializePayload = (ixType, payload) => {
             ErrorUtils.throwError("Failed to serialize payload", ErrorCode.UNKNOWN_ERROR);
     }
 };
-const createParticipants = (transactions) => {
-    return transactions.map(transaction => {
-        switch (transaction.type) {
-            case TxType.ASSET_CREATE:
-                return null;
-            case TxType.ASSET_MINT:
-            case TxType.ASSET_BURN:
-                return {
-                    address: transaction.payload.asset_id.slice(6),
-                    lock_type: 1,
-                };
-            case TxType.VALUE_TRANSFER:
-                return {
-                    address: transaction.payload.beneficiary,
-                    lock_type: 1,
-                };
-            case TxType.LOGIC_DEPLOY:
-                return null;
-            case TxType.LOGIC_ENLIST:
-            case TxType.LOGIC_INVOKE:
-                return {
-                    address: transaction.payload.logic_id.slice(6),
-                    lock_type: 1
-                };
-            default:
-                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
-        }
-    }).filter(step => step != null);
-};
 /**
  * Processes the interaction object based on its type and returns the processed object.
  *
@@ -57,26 +28,18 @@ const createParticipants = (transactions) => {
  */
 export const processIxObject = (ixObject) => {
     try {
-        const processedIxObject = {
+        return {
             nonce: toQuantity(ixObject.nonce),
             sender: ixObject.sender,
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
-            asset_funds: ixObject.asset_funds,
-            transactions: [],
-            participants: [
-                {
-                    address: ixObject.sender,
-                    lock_type: 1,
-                },
-                ...createParticipants(ixObject.transactions)
-            ],
+            asset_funds: [],
+            transactions: ixObject.transactions.map(step => ({
+                ...step,
+                payload: "0x" + bytesToHex(serializePayload(step.type, step.payload)),
+            })),
+            participants: []
         };
-        processedIxObject.transactions = ixObject.transactions.map(step => ({
-            ...step,
-            payload: "0x" + bytesToHex(serializePayload(step.type, step.payload)),
-        }));
-        return processedIxObject;
     }
     catch (err) {
         ErrorUtils.throwError("Failed to process interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });

@@ -77,7 +77,7 @@ export declare const assetCreateSchema: {
         };
     };
 };
-export declare const assetApproveOrTransferSchema: {
+export declare const assetActionSchema: {
     kind: string;
     fields: {
         benefactor: {
@@ -94,7 +94,7 @@ export declare const assetApproveOrTransferSchema: {
         };
     };
 };
-export declare const assetMintOrBurnSchema: {
+export declare const assetSupplySchema: {
     kind: string;
     fields: {
         asset_id: {

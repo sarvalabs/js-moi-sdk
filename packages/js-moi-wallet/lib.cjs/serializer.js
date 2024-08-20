@@ -109,14 +109,14 @@ const processIxObject = (ixObject) => {
             const polorizer = new js_polo_1.Polorizer();
             switch (step.type) {
                 case js_moi_utils_1.TxType.VALUE_TRANSFER:
-                    polorizer.polorize(payload, js_moi_utils_1.assetApproveOrTransferSchema);
+                    polorizer.polorize(payload, js_moi_utils_1.assetActionSchema);
                     return { ...step, payload: polorizer.bytes() };
                 case js_moi_utils_1.TxType.ASSET_CREATE:
                     polorizer.polorize(payload, js_moi_utils_1.assetCreateSchema);
                     return { ...step, payload: polorizer.bytes() };
                 case js_moi_utils_1.TxType.ASSET_MINT:
                 case js_moi_utils_1.TxType.ASSET_BURN:
-                    polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
+                    polorizer.polorize(payload, js_moi_utils_1.assetSupplySchema);
                     return { ...step, payload: polorizer.bytes() };
                 case js_moi_utils_1.TxType.LOGIC_DEPLOY:
                 case js_moi_utils_1.TxType.LOGIC_INVOKE:

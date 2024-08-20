@@ -1,4 +1,3 @@
-// import { TxType } from "js-moi-utils";
 import { TxType } from "js-moi-utils";
 import { IxAssetFund, IxParticipant, IxPreferences } from "./jsonrpc";
 
@@ -12,7 +11,6 @@ export interface ProcessedIxObject {
     nonce: string;
 
     sender: string;
-    receiver?: string;
     payer?: string;
 
     asset_funds: IxAssetFund[]

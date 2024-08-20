@@ -1,4 +1,4 @@
-import { CustomError, ErrorCode, ErrorUtils, TxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -870,22 +870,7 @@ export class BaseProvider extends AbstractProvider {
                     return;
                 }
                 clearTimers();
-                const result = this.processReceipt(receipt);
-                if (result == null) {
-                    resolve(receipt);
-                    return;
-                }
-                // const error = ManifestCoder.decodeException(result.error);
-                const error = null;
-                if (error == null) {
-                    resolve(receipt);
-                    return;
-                }
-                const err = new CustomError(error.error, ErrorCode.ACTION_REJECTED, {
-                    ...error,
-                    receipt,
-                });
-                reject(err);
+                resolve(receipt);
             };
             await checkReceipt();
             intervalId = setInterval(checkReceipt, 5000);
@@ -897,11 +882,11 @@ export class BaseProvider extends AbstractProvider {
     }
     /**
      * Process the interaction receipt to determine the appropriate result based on the
-     * interaction type.
+     * transaction type.
      *
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {any} The processed result based on the interaction type.
-     * @throws {Error} If the interaction type is unsupported or the expected response
+     * @returns {any} The processed result based on the transaction type.
+     * @throws {Error} If the transaction type is unsupported or the expected response
      * data is missing.
      */
     processReceipt(receipt) {

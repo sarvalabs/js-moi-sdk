@@ -78,10 +78,6 @@ export abstract class Signer {
      * @throws {Error} if any of the checks fail, indicating an invalid interaction.
      */
     private async checkInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
-        // if(ixObject.type == null) {
-        //     ErrorUtils.throwError("Interaction type is missing", ErrorCode.MISSING_ARGUMENT)
-        // }
-
         if(ixObject.sender == null) {
             ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
         }
@@ -94,15 +90,9 @@ export abstract class Signer {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
-        // if(ixObject.type === IxType.VALUE_TRANSFER) {
-        //     if(!ixObject.receiver) {
-        //         ErrorUtils.throwError("Receiver address is missing", ErrorCode.MISSING_ARGUMENT);
-        //     }
-    
-        //     if(!isValidAddress(ixObject.receiver)) {
-        //         ErrorUtils.throwError("Invalid receiver address", ErrorCode.INVALID_ARGUMENT);
-        //     }
-        // }
+        if(ixObject.transactions == null || ixObject.transactions.length == 0) {
+            ErrorUtils.throwError("Transactions list is missing", ErrorCode.MISSING_ARGUMENT);
+        }
 
         if (method === "send") {
             if(ixObject.fuel_price == null) {

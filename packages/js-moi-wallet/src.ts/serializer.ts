@@ -1,8 +1,8 @@
 import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
-    assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, 
+    assetCreateSchema, assetSupplySchema, assetActionSchema, 
     logicSchema, LockType} from "js-moi-utils";
 import { InteractionPayload, LogicPayload, InteractionObject, AssetActionPayload, AssetSupplyPayload, IxTransaction } from "js-moi-providers";
-import { IxxParticipant, ProcessedIxObject } from "js-moi-signer";
+import { ProcessedIxParticipant, ProcessedIxObject } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 
@@ -50,7 +50,7 @@ const processPayload = (ixType: TxType, payload: InteractionPayload): Interactio
     }
 }
 
-const createParticipants = (steps: IxTransaction[]): IxxParticipant[] => {
+const createParticipants = (steps: IxTransaction[]): ProcessedIxParticipant[] => {
     return steps.reduce((participants, step) => {
         let address: Uint8Array | null = null;
         let lockType: number | null = null;
@@ -83,7 +83,7 @@ const createParticipants = (steps: IxTransaction[]): IxxParticipant[] => {
         }
 
         return participants;
-    }, [] as IxxParticipant[]);
+    }, [] as ProcessedIxParticipant[]);
 };
 
 /**
@@ -126,14 +126,14 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
 
             switch(step.type) {
                 case TxType.VALUE_TRANSFER:
-                    polorizer.polorize(payload, assetApproveOrTransferSchema)
+                    polorizer.polorize(payload, assetActionSchema)
                     return {...step, payload: polorizer.bytes()}
                 case TxType.ASSET_CREATE:
                     polorizer.polorize(payload, assetCreateSchema)
                     return {...step, payload: polorizer.bytes()}
                 case TxType.ASSET_MINT:
                 case TxType.ASSET_BURN:
-                    polorizer.polorize(payload, assetMintOrBurnSchema)
+                    polorizer.polorize(payload, assetSupplySchema)
                     return {...step, payload: polorizer.bytes()}
                 case TxType.LOGIC_DEPLOY:
                 case TxType.LOGIC_INVOKE:

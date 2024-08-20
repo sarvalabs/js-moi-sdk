@@ -28,27 +28,27 @@ export interface SigningAlgorithms {
     ecdsa_secp256k1: ECDSA_S256
 }
 
-interface IxxAssetFund {
+interface ProcessedIxAssetFund {
     asset_id: string;
     amount: number;
 }
 
-interface IxxPreferences {
+interface ProcessedIxPreferences {
     compute: Uint8Array;
     consensus: Uint8Array;
 }
 
-interface IxxStep {
+interface ProcessedIxStep {
     type: TxType
     payload: Uint8Array
 }
 
-interface IxxParticipant {
+interface ProcessedIxParticipant {
     address: Uint8Array;
     lock_type: number;
 }
 
-export interface ProcessedIxObject {
+interface ProcessedIxObject {
     nonce?: number | bigint;
 
     sender?: Uint8Array;
@@ -57,11 +57,11 @@ export interface ProcessedIxObject {
     fuel_price?: number | bigint;
     fuel_limit?: number | bigint;
     
-    asset_funds: IxxAssetFund[]
-    transactions: IxxStep[]
-    participants: IxxParticipant[]
+    asset_funds: ProcessedIxAssetFund[]
+    transactions: ProcessedIxStep[]
+    participants: ProcessedIxParticipant[]
 
     perception?: Uint8Array
 
-    preferences?: IxxPreferences
+    preferences?: ProcessedIxPreferences
 }

@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicSchema, LockType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetSupplySchema, assetActionSchema, logicSchema, LockType } from "js-moi-utils";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 /**
@@ -106,14 +106,14 @@ const processIxObject = (ixObject) => {
             const polorizer = new Polorizer();
             switch (step.type) {
                 case TxType.VALUE_TRANSFER:
-                    polorizer.polorize(payload, assetApproveOrTransferSchema);
+                    polorizer.polorize(payload, assetActionSchema);
                     return { ...step, payload: polorizer.bytes() };
                 case TxType.ASSET_CREATE:
                     polorizer.polorize(payload, assetCreateSchema);
                     return { ...step, payload: polorizer.bytes() };
                 case TxType.ASSET_MINT:
                 case TxType.ASSET_BURN:
-                    polorizer.polorize(payload, assetMintOrBurnSchema);
+                    polorizer.polorize(payload, assetSupplySchema);
                     return { ...step, payload: polorizer.bytes() };
                 case TxType.LOGIC_DEPLOY:
                 case TxType.LOGIC_INVOKE:

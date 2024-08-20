@@ -50,7 +50,7 @@ export const assetCreateSchema = {
         logic_payload: logicSchema
     }
 };
-export const assetApproveOrTransferSchema = {
+export const assetActionSchema = {
     kind: "struct",
     fields: {
         benefactor: {
@@ -67,7 +67,7 @@ export const assetApproveOrTransferSchema = {
         }
     }
 };
-export const assetMintOrBurnSchema = {
+export const assetSupplySchema = {
     kind: "struct",
     fields: {
         asset_id: {

@@ -876,22 +876,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     return;
                 }
                 clearTimers();
-                const result = this.processReceipt(receipt);
-                if (result == null) {
-                    resolve(receipt);
-                    return;
-                }
-                // const error = ManifestCoder.decodeException(result.error);
-                const error = null;
-                if (error == null) {
-                    resolve(receipt);
-                    return;
-                }
-                const err = new js_moi_utils_1.CustomError(error.error, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
-                    ...error,
-                    receipt,
-                });
-                reject(err);
+                resolve(receipt);
             };
             await checkReceipt();
             intervalId = setInterval(checkReceipt, 5000);
@@ -903,11 +888,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     }
     /**
      * Process the interaction receipt to determine the appropriate result based on the
-     * interaction type.
+     * transaction type.
      *
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {any} The processed result based on the interaction type.
-     * @throws {Error} If the interaction type is unsupported or the expected response
+     * @returns {any} The processed result based on the transaction type.
+     * @throws {Error} If the transaction type is unsupported or the expected response
      * data is missing.
      */
     processReceipt(receipt) {

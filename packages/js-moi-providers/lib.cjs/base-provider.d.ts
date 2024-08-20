@@ -397,11 +397,11 @@ export declare class BaseProvider extends AbstractProvider {
     protected waitForInteraction(interactionHash: string, timeout?: number): Promise<InteractionReceipt>;
     /**
      * Process the interaction receipt to determine the appropriate result based on the
-     * interaction type.
+     * transaction type.
      *
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {any} The processed result based on the interaction type.
-     * @throws {Error} If the interaction type is unsupported or the expected response
+     * @returns {any} The processed result based on the transaction type.
+     * @throws {Error} If the transaction type is unsupported or the expected response
      * data is missing.
      */
     protected processReceipt(receipt: InteractionReceipt): TransactionResultData[];
