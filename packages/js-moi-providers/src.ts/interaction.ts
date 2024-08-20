@@ -34,7 +34,7 @@ const createParticipants = (transactions: IxTransaction[]): IxParticipant[] => {
             case TxType.ASSET_MINT:
             case TxType.ASSET_BURN:
                 return {
-                    address: (transaction.payload as AssetSupplyPayload).asset_id.slice(10,),
+                    address: (transaction.payload as AssetSupplyPayload).asset_id.slice(6,),
                     lock_type: 1,
                 }
             case TxType.VALUE_TRANSFER:
@@ -47,7 +47,7 @@ const createParticipants = (transactions: IxTransaction[]): IxParticipant[] => {
             case TxType.LOGIC_ENLIST:
             case TxType.LOGIC_INVOKE:
                 return {
-                    address: (transaction.payload as LogicPayload).logic_id.slice(10,),
+                    address: (transaction.payload as LogicPayload).logic_id.slice(6,),
                     lock_type: 1
                 }
             default:

@@ -27,7 +27,7 @@ const createParticipants = (transactions) => {
             case TxType.ASSET_MINT:
             case TxType.ASSET_BURN:
                 return {
-                    address: transaction.payload.asset_id.slice(10),
+                    address: transaction.payload.asset_id.slice(6),
                     lock_type: 1,
                 };
             case TxType.VALUE_TRANSFER:
@@ -40,7 +40,7 @@ const createParticipants = (transactions) => {
             case TxType.LOGIC_ENLIST:
             case TxType.LOGIC_INVOKE:
                 return {
-                    address: transaction.payload.logic_id.slice(10),
+                    address: transaction.payload.logic_id.slice(6),
                     lock_type: 1
                 };
             default:

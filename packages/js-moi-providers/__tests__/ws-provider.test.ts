@@ -5,8 +5,8 @@ import { WebSocketEvents, WebSocketProvider } from "../src.ts/websocket-provider
 import { initializeWallet } from "./utils/utils";
 
 describe("Test Websocket Provider", () => {
-    const address = "0x2c1fe83b9d6a5c81c5e6d4da20d2d0509ac3c1eb154e5f5b1fc7d5fd4a03b9cc";
-    const mnemonic = "cushion tissue toss meadow glare math custom because inform describe vacant combine";
+    const address = "0xa2b800066048596c9b207585e1f342823a50c91260cef3e33afccbdde8cd0495";
+    const mnemonic = "barely pioneer dawn hair prize enhance twist guard review goddess educate retreat";
     let signer: Signer;
     let nonce: number | bigint;
     let wsProvider: WebSocketProvider;
@@ -27,21 +27,25 @@ describe("Test Websocket Provider", () => {
         // subscribe to new tesseracts
         wsProvider.on(WebSocketEvents.ALL_TESSERACTS, (tesseract) => {
             // check if the tesseract height has increased
-            expect(hexToBN(tesseract.header.height)).toBeGreaterThan(0);
+            expect(tesseract).toBeDefined();
             done();
         });
 
         // create a new tesseract
         signer.sendInteraction({
-            type: TxType.ASSET_CREATE,
             nonce: nonce,
             fuel_price: 1,
             fuel_limit: 200,
-            payload: {
-                standard: AssetStandard.MAS0,
-                symbol: "FOO",
-                supply: 1248577
-            }
+            transactions: [
+                {
+                    type: TxType.ASSET_CREATE,
+                    payload: {
+                        standard: AssetStandard.MAS0,
+                        symbol: "FOO",
+                        supply: 1248577
+                    }
+                }
+            ]
         });
     });
 
@@ -50,21 +54,31 @@ describe("Test Websocket Provider", () => {
         // subscribe to new tesseracts
         wsProvider.on(address, (tesseract) => {
             // check if the tesseract height has increased
-            expect(hexToBN(tesseract.header.height)).toBeGreaterThan(1);
+            expect(tesseract).toBeDefined();
+            const participant = tesseract.participants.find(p => 
+                p.address === address
+            );
+
+            expect(participant).toBeDefined()
+            expect(hexToBN(participant.height)).toBeGreaterThan(1)
             done();
         });
 
         // create a new tesseract
         signer.sendInteraction({
-            type: TxType.ASSET_CREATE,
             nonce: Number(nonce) + 1,
             fuel_price: 1,
             fuel_limit: 200,
-            payload: {
-                standard: AssetStandard.MAS0,
-                symbol: "BOO",
-                supply: 1248577
-            }
+            transactions: [
+                {
+                    type: TxType.ASSET_CREATE,
+                    payload: {
+                        standard: AssetStandard.MAS0,
+                        symbol: "BOO",
+                        supply: 1248577
+                    }
+                }
+            ]
         });
     });
 
@@ -77,15 +91,19 @@ describe("Test Websocket Provider", () => {
 
         // will create a new interaction
         signer.sendInteraction({
-            type: TxType.ASSET_CREATE,
-            nonce: Number(nonce) + 1,
+            nonce: Number(nonce) + 2,
             fuel_price: 1,
             fuel_limit: 200,
-            payload: {
-                standard: AssetStandard.MAS0,
-                symbol: "BAZ",
-                supply: 1248577
-            }
+            transactions: [
+                {
+                    type: TxType.ASSET_CREATE,
+                    payload: {
+                        standard: AssetStandard.MAS0,
+                        symbol: "BAZ",
+                        supply: 1248577
+                    }
+                }
+            ]
         });
     });
 });

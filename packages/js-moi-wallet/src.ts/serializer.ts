@@ -71,7 +71,7 @@ const createParticipants = (steps: IxTransaction[]): IxxParticipant[] => {
                 break;
             case TxType.LOGIC_ENLIST:
             case TxType.LOGIC_INVOKE:
-                address = hexToBytes((step.payload as LogicPayload).logic_id.slice(10,));
+                address = hexToBytes((step.payload as LogicPayload).logic_id.slice(6,));
                 lockType = LockType.MUTATE_LOCK
                 break;
             default:

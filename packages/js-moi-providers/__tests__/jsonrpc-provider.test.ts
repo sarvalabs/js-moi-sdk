@@ -5,8 +5,8 @@ import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
 const HOST = "http://localhost:1600";
-const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
-const ADDRESS = "0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db";
+const MNEMONIC = "hire collect attack purse horn toward penalty broom chat online mistake emerge";
+const ADDRESS = "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08";
 
 
 

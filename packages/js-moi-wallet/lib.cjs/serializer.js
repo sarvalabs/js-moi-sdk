@@ -64,7 +64,7 @@ const createParticipants = (steps) => {
                 break;
             case js_moi_utils_1.TxType.LOGIC_ENLIST:
             case js_moi_utils_1.TxType.LOGIC_INVOKE:
-                address = (0, js_moi_utils_1.hexToBytes)(step.payload.logic_id.slice(10));
+                address = (0, js_moi_utils_1.hexToBytes)(step.payload.logic_id.slice(6));
                 lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
                 break;
             default:
