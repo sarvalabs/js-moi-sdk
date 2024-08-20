@@ -1,47 +1,46 @@
-import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicDeploySchema, logicInteractSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 const serializePayload = (ixType, payload) => {
     let polorizer = new Polorizer();
     switch (ixType) {
-        case IxType.ASSET_CREATE:
+        case TxType.ASSET_CREATE:
             polorizer.polorize(payload, assetCreateSchema);
             return polorizer.bytes();
-        case IxType.ASSET_MINT:
-        case IxType.ASSET_BURN:
+        case TxType.ASSET_MINT:
+        case TxType.ASSET_BURN:
             polorizer.polorize(payload, assetMintOrBurnSchema);
             return polorizer.bytes();
-        case IxType.LOGIC_DEPLOY:
-            polorizer.polorize(payload, logicDeploySchema);
-            return polorizer.bytes();
-        case IxType.LOGIC_INVOKE:
-        case IxType.LOGIC_ENLIST:
-            polorizer.polorize(payload, logicInteractSchema);
+        case TxType.LOGIC_DEPLOY:
+        case TxType.LOGIC_INVOKE:
+        case TxType.LOGIC_ENLIST:
+            polorizer.polorize(payload, logicSchema);
             return polorizer.bytes();
         default:
             ErrorUtils.throwError("Failed to serialize payload", ErrorCode.UNKNOWN_ERROR);
     }
 };
-const createParticipants = (steps) => {
-    return steps.map(step => {
-        switch (step.type) {
-            case IxType.ASSET_CREATE:
+const createParticipants = (transactions) => {
+    return transactions.map(transaction => {
+        switch (transaction.type) {
+            case TxType.ASSET_CREATE:
                 return null;
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN:
+            case TxType.ASSET_MINT:
+            case TxType.ASSET_BURN:
                 return {
-                    address: step.payload.asset_id.slice(10),
+                    address: transaction.payload.asset_id.slice(10),
                     lock_type: 1,
                 };
-            case IxType.VALUE_TRANSFER:
+            case TxType.VALUE_TRANSFER:
                 return {
-                    address: step.payload.beneficiary,
+                    address: transaction.payload.beneficiary,
                     lock_type: 1,
                 };
-            case IxType.LOGIC_DEPLOY:
-            case IxType.LOGIC_ENLIST:
-            case IxType.LOGIC_INVOKE:
+            case TxType.LOGIC_DEPLOY:
+                return null;
+            case TxType.LOGIC_ENLIST:
+            case TxType.LOGIC_INVOKE:
                 return {
-                    address: step.payload.logic_id.slice(10),
+                    address: transaction.payload.logic_id.slice(10),
                     lock_type: 1
                 };
             default:

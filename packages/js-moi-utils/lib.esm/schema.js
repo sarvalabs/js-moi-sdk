@@ -1,20 +1,9 @@
-export const logicDeploySchema = {
+export const logicSchema = {
     kind: "struct",
     fields: {
         manifest: {
             kind: "bytes"
         },
-        callsite: {
-            kind: "string"
-        },
-        calldata: {
-            kind: "bytes"
-        },
-    }
-};
-export const logicInteractSchema = {
-    kind: "struct",
-    fields: {
         logic_id: {
             kind: "string"
         },
@@ -23,6 +12,17 @@ export const logicInteractSchema = {
         },
         calldata: {
             kind: "bytes"
+        },
+        interface: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "string"
+                }
+            }
         }
     }
 };
@@ -47,12 +47,15 @@ export const assetCreateSchema = {
         is_logical: {
             kind: "bool"
         },
-        logic_payload: logicInteractSchema
+        logic_payload: logicSchema
     }
 };
 export const assetApproveOrTransferSchema = {
     kind: "struct",
     fields: {
+        benefactor: {
+            kind: "bytes"
+        },
         beneficiary: {
             kind: "bytes"
         },

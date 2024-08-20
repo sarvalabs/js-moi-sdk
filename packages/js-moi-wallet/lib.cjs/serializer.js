@@ -7,33 +7,34 @@ const js_polo_1 = require("js-polo");
 /**
  * Processes the payload based on the interaction type.
  *
- * @param {IxType} ixType - The interaction type.
+ * @param {TxType} ixType - The interaction type.
  * @param {InteractionPayload} payload - The interaction payload.
  * @returns {InteractionPayload} - The processed interaction payload.
  * @throws {Error} - Throws an error if the interaction type is unsupported.
  */
 const processPayload = (ixType, payload) => {
     switch (ixType) {
-        case js_moi_utils_1.IxType.ASSET_CREATE:
+        case js_moi_utils_1.TxType.ASSET_CREATE:
             return { ...payload };
-        case js_moi_utils_1.IxType.ASSET_MINT:
-        case js_moi_utils_1.IxType.ASSET_BURN:
+        case js_moi_utils_1.TxType.ASSET_MINT:
+        case js_moi_utils_1.TxType.ASSET_BURN:
             payload = payload;
             return {
                 ...payload,
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(payload.asset_id)
             };
-        case js_moi_utils_1.IxType.VALUE_TRANSFER:
-            payload = payload;
+        case js_moi_utils_1.TxType.VALUE_TRANSFER:
+            const pay = payload;
             return {
-                ...payload,
-                // TODO: beneficiary address should be converted from string to uint8array
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(payload.asset_id)
+                ...pay,
+                benefactor: (0, js_moi_utils_1.hexToBytes)(pay.benefactor),
+                beneficiary: (0, js_moi_utils_1.hexToBytes)(pay.beneficiary),
+                asset_id: (0, js_moi_utils_1.trimHexPrefix)(pay.asset_id)
             };
-        case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-            return payload;
-        case js_moi_utils_1.IxType.LOGIC_INVOKE:
-        case js_moi_utils_1.IxType.LOGIC_ENLIST:
+        case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+            return { ...payload };
+        case js_moi_utils_1.TxType.LOGIC_INVOKE:
+        case js_moi_utils_1.TxType.LOGIC_ENLIST:
             payload = payload;
             return {
                 ...payload,
@@ -48,20 +49,21 @@ const createParticipants = (steps) => {
         let address = null;
         let lockType = null;
         switch (step.type) {
-            case js_moi_utils_1.IxType.ASSET_CREATE:
+            case js_moi_utils_1.TxType.ASSET_CREATE:
                 break;
-            case js_moi_utils_1.IxType.ASSET_MINT:
-            case js_moi_utils_1.IxType.ASSET_BURN:
+            case js_moi_utils_1.TxType.ASSET_MINT:
+            case js_moi_utils_1.TxType.ASSET_BURN:
                 address = (0, js_moi_utils_1.hexToBytes)(step.payload.asset_id.slice(10));
                 lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
                 break;
-            case js_moi_utils_1.IxType.VALUE_TRANSFER:
+            case js_moi_utils_1.TxType.VALUE_TRANSFER:
                 address = (0, js_moi_utils_1.hexToBytes)(step.payload.beneficiary);
                 lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
                 break;
-            case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-            case js_moi_utils_1.IxType.LOGIC_ENLIST:
-            case js_moi_utils_1.IxType.LOGIC_INVOKE:
+            case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+                break;
+            case js_moi_utils_1.TxType.LOGIC_ENLIST:
+            case js_moi_utils_1.TxType.LOGIC_INVOKE:
                 address = (0, js_moi_utils_1.hexToBytes)(step.payload.logic_id.slice(10));
                 lockType = js_moi_utils_1.LockType.MUTATE_LOCK;
                 break;
@@ -106,22 +108,20 @@ const processIxObject = (ixObject) => {
             const payload = processPayload(step.type, step.payload);
             const polorizer = new js_polo_1.Polorizer();
             switch (step.type) {
-                case js_moi_utils_1.IxType.VALUE_TRANSFER:
+                case js_moi_utils_1.TxType.VALUE_TRANSFER:
                     polorizer.polorize(payload, js_moi_utils_1.assetApproveOrTransferSchema);
                     return { ...step, payload: polorizer.bytes() };
-                case js_moi_utils_1.IxType.ASSET_CREATE:
+                case js_moi_utils_1.TxType.ASSET_CREATE:
                     polorizer.polorize(payload, js_moi_utils_1.assetCreateSchema);
                     return { ...step, payload: polorizer.bytes() };
-                case js_moi_utils_1.IxType.ASSET_MINT:
-                case js_moi_utils_1.IxType.ASSET_BURN:
+                case js_moi_utils_1.TxType.ASSET_MINT:
+                case js_moi_utils_1.TxType.ASSET_BURN:
                     polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
                     return { ...step, payload: polorizer.bytes() };
-                case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-                    polorizer.polorize(payload, js_moi_utils_1.logicDeploySchema);
-                    return { ...step, payload: polorizer.bytes() };
-                case js_moi_utils_1.IxType.LOGIC_INVOKE:
-                case js_moi_utils_1.IxType.LOGIC_ENLIST:
-                    polorizer.polorize(payload, js_moi_utils_1.logicInteractSchema);
+                case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+                case js_moi_utils_1.TxType.LOGIC_INVOKE:
+                case js_moi_utils_1.TxType.LOGIC_ENLIST:
+                    polorizer.polorize(payload, js_moi_utils_1.logicSchema);
                     return { ...step, payload: polorizer.bytes() };
                 default:
                     js_moi_utils_1.ErrorUtils.throwError("Unsupported interaction type!", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

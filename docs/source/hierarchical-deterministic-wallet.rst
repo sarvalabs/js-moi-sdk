@@ -165,7 +165,7 @@ Methods
 
     const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
     const interaction = {
-        type: IxType.ASSET_CREATE,
+        type: TxType.ASSET_CREATE,
         nonce: 0,
         sender: address,
         fuel_price: 1,

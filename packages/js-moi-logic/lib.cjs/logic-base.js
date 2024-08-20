@@ -35,16 +35,16 @@ class LogicBase extends element_descriptor_1.default {
     /**
      * Returns the interaction type based on the routine kind.
      *
-     * @returns {IxType} The interaction type.
+     * @returns {TxType} The interaction type.
      */
     getIxType(kind) {
         switch (kind) {
             case "deploy":
-                return js_moi_utils_1.IxType.LOGIC_DEPLOY;
+                return js_moi_utils_1.TxType.LOGIC_DEPLOY;
             case "invoke":
-                return js_moi_utils_1.IxType.LOGIC_INVOKE;
+                return js_moi_utils_1.TxType.LOGIC_INVOKE;
             case "enlist":
-                return js_moi_utils_1.IxType.LOGIC_ENLIST;
+                return js_moi_utils_1.TxType.LOGIC_ENLIST;
             default:
                 throw new Error("Unsupported routine kind!");
         }
@@ -74,7 +74,7 @@ class LogicBase extends element_descriptor_1.default {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType(ixObject.routine.kind) !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== js_moi_utils_1.TxType.LOGIC_DEPLOY && !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);

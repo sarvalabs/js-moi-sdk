@@ -1,5 +1,5 @@
 import { Signer } from "js-moi-signer";
-import { AssetStandard, hexToBN, IxType } from "js-moi-utils";
+import { AssetStandard, hexToBN, TxType } from "js-moi-utils";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { WebSocketEvents, WebSocketProvider } from "../src.ts/websocket-provider";
 import { initializeWallet } from "./utils/utils";
@@ -33,7 +33,7 @@ describe("Test Websocket Provider", () => {
 
         // create a new tesseract
         signer.sendInteraction({
-            type: IxType.ASSET_CREATE,
+            type: TxType.ASSET_CREATE,
             nonce: nonce,
             fuel_price: 1,
             fuel_limit: 200,
@@ -56,7 +56,7 @@ describe("Test Websocket Provider", () => {
 
         // create a new tesseract
         signer.sendInteraction({
-            type: IxType.ASSET_CREATE,
+            type: TxType.ASSET_CREATE,
             nonce: Number(nonce) + 1,
             fuel_price: 1,
             fuel_limit: 200,
@@ -77,7 +77,7 @@ describe("Test Websocket Provider", () => {
 
         // will create a new interaction
         signer.sendInteraction({
-            type: IxType.ASSET_CREATE,
+            type: TxType.ASSET_CREATE,
             nonce: Number(nonce) + 1,
             fuel_price: 1,
             fuel_limit: 200,

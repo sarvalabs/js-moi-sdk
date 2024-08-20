@@ -82,7 +82,7 @@ Regular Methods
 
     // Example
     const response = await signer.sendInteraction({
-        type: IxType.ASSET_CREATE,
+        type: TxType.ASSET_CREATE,
         fuel_price: 1,
         fuel_limit: 200,
         payload: {

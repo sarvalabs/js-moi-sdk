@@ -1,4 +1,4 @@
-import { IxType } from "../src.ts/interaction";
+import { TxType } from "../src.ts/interaction";
 
 export interface ContextDelta {
     role: number;
@@ -21,7 +21,7 @@ export type Participants = Participant[];
 
 
 export interface Interaction {
-    type: IxType;
+    type: TxType;
     nonce: string;
     
     sender: string;

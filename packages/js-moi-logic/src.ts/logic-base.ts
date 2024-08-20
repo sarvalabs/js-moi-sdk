@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
@@ -46,16 +46,16 @@ export abstract class LogicBase extends ElementDescriptor {
     /**
      * Returns the interaction type based on the routine kind.
      * 
-     * @returns {IxType} The interaction type.
+     * @returns {TxType} The interaction type.
      */
-    protected getIxType(kind: string): IxType {
+    protected getIxType(kind: string): TxType {
         switch(kind){
             case "deploy":
-                return IxType.LOGIC_DEPLOY;
+                return TxType.LOGIC_DEPLOY;
             case "invoke":
-                return IxType.LOGIC_INVOKE;
+                return TxType.LOGIC_INVOKE;
             case "enlist":
-                return IxType.LOGIC_ENLIST;
+                return TxType.LOGIC_ENLIST;
             default:
                 throw new Error("Unsupported routine kind!");
         }
@@ -87,7 +87,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     protected async executeRoutine(ixObject: LogicIxObject, method: string, option: RoutineOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
-        if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== TxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
                 "This logic object doesn't have address set yet, please set an address first.",
                 ErrorCode.NOT_INITIALIZED

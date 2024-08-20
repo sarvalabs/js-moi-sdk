@@ -1,8 +1,7 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
+import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
     assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, 
-    logicDeploySchema, logicInteractSchema,
-    LockType} from "js-moi-utils";
-import { InteractionPayload, LogicPayload, InteractionObject, AssetActionPayload, AssetSupplyPayload, IxStep } from "js-moi-providers";
+    logicSchema, LockType} from "js-moi-utils";
+import { InteractionPayload, LogicPayload, InteractionObject, AssetActionPayload, AssetSupplyPayload, IxTransaction } from "js-moi-providers";
 import { IxxParticipant, ProcessedIxObject } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
@@ -10,33 +9,34 @@ import { Polorizer } from "js-polo";
 /**
  * Processes the payload based on the interaction type.
  *
- * @param {IxType} ixType - The interaction type.
+ * @param {TxType} ixType - The interaction type.
  * @param {InteractionPayload} payload - The interaction payload.
  * @returns {InteractionPayload} - The processed interaction payload.
  * @throws {Error} - Throws an error if the interaction type is unsupported.
  */
-const processPayload = (ixType: IxType, payload: InteractionPayload): InteractionPayload => {
+const processPayload = (ixType: TxType, payload: InteractionPayload): InteractionPayload => {
     switch(ixType) {
-        case IxType.ASSET_CREATE:
+        case TxType.ASSET_CREATE:
             return { ...payload }
-        case IxType.ASSET_MINT:
-        case IxType.ASSET_BURN:
+        case TxType.ASSET_MINT:
+        case TxType.ASSET_BURN:
             payload = payload as AssetSupplyPayload;
             return {
                 ...payload,
                 asset_id: trimHexPrefix(payload.asset_id)
             }
-        case IxType.VALUE_TRANSFER:
-            payload = payload as AssetActionPayload;
+        case TxType.VALUE_TRANSFER:
+            const pay = payload as AssetActionPayload;
             return {
-                ...payload,
-                // TODO: beneficiary address should be converted from string to uint8array
-                asset_id: trimHexPrefix(payload.asset_id)
-            }
-        case IxType.LOGIC_DEPLOY:
-            return payload;
-        case IxType.LOGIC_INVOKE:
-        case IxType.LOGIC_ENLIST:
+                ...pay,
+                benefactor: hexToBytes(pay.benefactor),
+                beneficiary: hexToBytes(pay.beneficiary),
+                asset_id: trimHexPrefix(pay.asset_id)
+            } as unknown
+        case TxType.LOGIC_DEPLOY:
+            return { ...payload };
+        case TxType.LOGIC_INVOKE:
+        case TxType.LOGIC_ENLIST:
             payload = payload as LogicPayload;
             return {
                 ...payload,
@@ -50,26 +50,27 @@ const processPayload = (ixType: IxType, payload: InteractionPayload): Interactio
     }
 }
 
-const createParticipants = (steps: IxStep[]): IxxParticipant[] => {
+const createParticipants = (steps: IxTransaction[]): IxxParticipant[] => {
     return steps.reduce((participants, step) => {
         let address: Uint8Array | null = null;
         let lockType: number | null = null;
 
         switch (step.type) {
-            case IxType.ASSET_CREATE:
+            case TxType.ASSET_CREATE:
                 break
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN:
+            case TxType.ASSET_MINT:
+            case TxType.ASSET_BURN:
                 address = hexToBytes((step.payload as AssetSupplyPayload).asset_id.slice(10,));
                 lockType = LockType.MUTATE_LOCK
                 break;
-            case IxType.VALUE_TRANSFER:
+            case TxType.VALUE_TRANSFER:
                 address = hexToBytes((step.payload as AssetActionPayload).beneficiary);
                 lockType = LockType.MUTATE_LOCK
                 break;
-            case IxType.LOGIC_DEPLOY:
-            case IxType.LOGIC_ENLIST:
-            case IxType.LOGIC_INVOKE:
+            case TxType.LOGIC_DEPLOY:
+                break;
+            case TxType.LOGIC_ENLIST:
+            case TxType.LOGIC_INVOKE:
                 address = hexToBytes((step.payload as LogicPayload).logic_id.slice(10,));
                 lockType = LockType.MUTATE_LOCK
                 break;
@@ -124,22 +125,20 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
             const polorizer = new Polorizer();
 
             switch(step.type) {
-                case IxType.VALUE_TRANSFER:
+                case TxType.VALUE_TRANSFER:
                     polorizer.polorize(payload, assetApproveOrTransferSchema)
                     return {...step, payload: polorizer.bytes()}
-                case IxType.ASSET_CREATE:
+                case TxType.ASSET_CREATE:
                     polorizer.polorize(payload, assetCreateSchema)
                     return {...step, payload: polorizer.bytes()}
-                case IxType.ASSET_MINT:
-                case IxType.ASSET_BURN:
+                case TxType.ASSET_MINT:
+                case TxType.ASSET_BURN:
                     polorizer.polorize(payload, assetMintOrBurnSchema)
                     return {...step, payload: polorizer.bytes()}
-                case IxType.LOGIC_DEPLOY:
-                    polorizer.polorize(payload, logicDeploySchema)
-                    return {...step, payload: polorizer.bytes()}
-                case IxType.LOGIC_INVOKE:
-                case IxType.LOGIC_ENLIST:
-                    polorizer.polorize(payload, logicInteractSchema)
+                case TxType.LOGIC_DEPLOY:
+                case TxType.LOGIC_INVOKE:
+                case TxType.LOGIC_ENLIST:
+                    polorizer.polorize(payload, logicSchema)
                     return {...step, payload: polorizer.bytes()}
                 default:
                     ErrorUtils.throwError(

@@ -1,36 +1,37 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicDeploySchema, logicInteractSchema, LockType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, assetApproveOrTransferSchema, logicSchema, LockType } from "js-moi-utils";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 /**
  * Processes the payload based on the interaction type.
  *
- * @param {IxType} ixType - The interaction type.
+ * @param {TxType} ixType - The interaction type.
  * @param {InteractionPayload} payload - The interaction payload.
  * @returns {InteractionPayload} - The processed interaction payload.
  * @throws {Error} - Throws an error if the interaction type is unsupported.
  */
 const processPayload = (ixType, payload) => {
     switch (ixType) {
-        case IxType.ASSET_CREATE:
+        case TxType.ASSET_CREATE:
             return { ...payload };
-        case IxType.ASSET_MINT:
-        case IxType.ASSET_BURN:
+        case TxType.ASSET_MINT:
+        case TxType.ASSET_BURN:
             payload = payload;
             return {
                 ...payload,
                 asset_id: trimHexPrefix(payload.asset_id)
             };
-        case IxType.VALUE_TRANSFER:
-            payload = payload;
+        case TxType.VALUE_TRANSFER:
+            const pay = payload;
             return {
-                ...payload,
-                // TODO: beneficiary address should be converted from string to uint8array
-                asset_id: trimHexPrefix(payload.asset_id)
+                ...pay,
+                benefactor: hexToBytes(pay.benefactor),
+                beneficiary: hexToBytes(pay.beneficiary),
+                asset_id: trimHexPrefix(pay.asset_id)
             };
-        case IxType.LOGIC_DEPLOY:
-            return payload;
-        case IxType.LOGIC_INVOKE:
-        case IxType.LOGIC_ENLIST:
+        case TxType.LOGIC_DEPLOY:
+            return { ...payload };
+        case TxType.LOGIC_INVOKE:
+        case TxType.LOGIC_ENLIST:
             payload = payload;
             return {
                 ...payload,
@@ -45,20 +46,21 @@ const createParticipants = (steps) => {
         let address = null;
         let lockType = null;
         switch (step.type) {
-            case IxType.ASSET_CREATE:
+            case TxType.ASSET_CREATE:
                 break;
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN:
+            case TxType.ASSET_MINT:
+            case TxType.ASSET_BURN:
                 address = hexToBytes(step.payload.asset_id.slice(10));
                 lockType = LockType.MUTATE_LOCK;
                 break;
-            case IxType.VALUE_TRANSFER:
+            case TxType.VALUE_TRANSFER:
                 address = hexToBytes(step.payload.beneficiary);
                 lockType = LockType.MUTATE_LOCK;
                 break;
-            case IxType.LOGIC_DEPLOY:
-            case IxType.LOGIC_ENLIST:
-            case IxType.LOGIC_INVOKE:
+            case TxType.LOGIC_DEPLOY:
+                break;
+            case TxType.LOGIC_ENLIST:
+            case TxType.LOGIC_INVOKE:
                 address = hexToBytes(step.payload.logic_id.slice(10));
                 lockType = LockType.MUTATE_LOCK;
                 break;
@@ -103,22 +105,20 @@ const processIxObject = (ixObject) => {
             const payload = processPayload(step.type, step.payload);
             const polorizer = new Polorizer();
             switch (step.type) {
-                case IxType.VALUE_TRANSFER:
+                case TxType.VALUE_TRANSFER:
                     polorizer.polorize(payload, assetApproveOrTransferSchema);
                     return { ...step, payload: polorizer.bytes() };
-                case IxType.ASSET_CREATE:
+                case TxType.ASSET_CREATE:
                     polorizer.polorize(payload, assetCreateSchema);
                     return { ...step, payload: polorizer.bytes() };
-                case IxType.ASSET_MINT:
-                case IxType.ASSET_BURN:
+                case TxType.ASSET_MINT:
+                case TxType.ASSET_BURN:
                     polorizer.polorize(payload, assetMintOrBurnSchema);
                     return { ...step, payload: polorizer.bytes() };
-                case IxType.LOGIC_DEPLOY:
-                    polorizer.polorize(payload, logicDeploySchema);
-                    return { ...step, payload: polorizer.bytes() };
-                case IxType.LOGIC_INVOKE:
-                case IxType.LOGIC_ENLIST:
-                    polorizer.polorize(payload, logicInteractSchema);
+                case TxType.LOGIC_DEPLOY:
+                case TxType.LOGIC_INVOKE:
+                case TxType.LOGIC_ENLIST:
+                    polorizer.polorize(payload, logicSchema);
                     return { ...step, payload: polorizer.bytes() };
                 default:
                     ErrorUtils.throwError("Unsupported interaction type!", ErrorCode.UNSUPPORTED_OPERATION);

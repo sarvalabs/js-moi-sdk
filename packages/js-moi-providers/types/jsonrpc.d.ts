@@ -2,7 +2,7 @@ import {
     AssetCreationReceipt,
     AssetMintOrBurnReceipt,
     AssetStandard,
-    IxType,
+    TxType,
     LogicDeployReceipt,
     LogicInvokeReceipt,
     LogicEnlistReceipt,
@@ -79,17 +79,24 @@ export interface ContextHash {
     hash: string;
 }
 
+export type TransactionResultData = AssetCreationReceipt | AssetMintOrBurnReceipt | 
+LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
+
+export interface TransactionResult {
+    tx_type: string;
+    status: number;
+    data: TransactionResultData
+}
+
 export interface InteractionReceipt {
-    ix_type: string;
     ix_hash: string;
     status: number;
     fuel_used: string;
-    participants: Participants;
-    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
+    transactions: TransactionResult[];
     from: string;
-    to: string;
     ix_index: string;
     ts_hash: string;
+    participants: Participants;
 }
 
 export interface AssetInfo {
@@ -273,11 +280,11 @@ export interface AssetSupplyPayload {
 }
 
 export interface AssetActionPayload {
+    benefactor: string;
     beneficiary: string;
     asset_id: string;
     amount: number | bigint;
 }
-
 export interface LogicPayload {
     logic_id?: string;
     callsite: string;
@@ -285,15 +292,15 @@ export interface LogicPayload {
     manifest?: Uint8Array;
 }
 
-export type InteractionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload| LogicPayload;
+export type InteractionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload | any;
 
 interface IxAssetFund {
     asset_id: string;
     amount: number;
 }
 
-interface IxStep {
-    type: IxType;
+interface IxTransaction {
+    type: TxType;
     payload?: InteractionPayload;
 }
 
@@ -317,7 +324,7 @@ interface InteractionObject {
     fuel_limit?: number | bigint;
     
     asset_funds?: IxAssetFund[]
-    transactions?: IxStep[]
+    transactions?: IxTransaction[]
     participants?: IxParticipant[]
 
     perception?: Uint8Array

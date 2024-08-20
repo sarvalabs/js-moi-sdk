@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseProvider = void 0;
-const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const abstract_provider_1 = require("./abstract-provider");
 const event_1 = __importDefault(require("./event"));
@@ -882,7 +881,8 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                     resolve(receipt);
                     return;
                 }
-                const error = js_moi_manifest_1.ManifestCoder.decodeException(result.error);
+                // const error = ManifestCoder.decodeException(result.error);
+                const error = null;
                 if (error == null) {
                     resolve(receipt);
                     return;
@@ -911,38 +911,40 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * data is missing.
      */
     processReceipt(receipt) {
-        switch ((0, js_moi_utils_1.hexToBN)(receipt.ix_type)) {
-            case js_moi_utils_1.IxType.VALUE_TRANSFER:
-                return null;
-            case js_moi_utils_1.IxType.ASSET_CREATE:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve asset creation response");
-            case js_moi_utils_1.IxType.ASSET_MINT:
-            case js_moi_utils_1.IxType.ASSET_BURN:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve asset mint/burn response");
-            case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve logic deploy response");
-            case js_moi_utils_1.IxType.LOGIC_INVOKE:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve logic invoke response");
-            case js_moi_utils_1.IxType.LOGIC_ENLIST:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve logic enlist response");
-            default:
-                throw new Error("Unsupported interaction type encountered");
-        }
+        return receipt.transactions.map(step => {
+            switch ((0, js_moi_utils_1.hexToBN)(step.tx_type)) {
+                case js_moi_utils_1.TxType.VALUE_TRANSFER:
+                    return null;
+                case js_moi_utils_1.TxType.ASSET_CREATE:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve asset creation response");
+                case js_moi_utils_1.TxType.ASSET_MINT:
+                case js_moi_utils_1.TxType.ASSET_BURN:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve asset mint/burn response");
+                case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve logic deploy response");
+                case js_moi_utils_1.TxType.LOGIC_INVOKE:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve logic invoke response");
+                case js_moi_utils_1.TxType.LOGIC_ENLIST:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve logic enlist response");
+                default:
+                    throw new Error("Unsupported interaction type encountered");
+            }
+        });
     }
     /**
      * Waits for the interaction with the specified hash to be included in a

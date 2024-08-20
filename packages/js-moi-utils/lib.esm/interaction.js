@@ -1,30 +1,30 @@
 /**
- * Enumerates the types of Interactions in the system.
+ * Enumerates the types of Transactions in the system.
  */
-export var IxType;
-(function (IxType) {
-    IxType[IxType["INVALID_IX"] = 0] = "INVALID_IX";
-    IxType[IxType["VALUE_TRANSFER"] = 1] = "VALUE_TRANSFER";
-    IxType[IxType["FUEL_SUPPLY"] = 2] = "FUEL_SUPPLY";
-    IxType[IxType["ASSET_CREATE"] = 3] = "ASSET_CREATE";
-    IxType[IxType["ASSET_APPROVE"] = 4] = "ASSET_APPROVE";
-    IxType[IxType["ASSET_REVOKE"] = 5] = "ASSET_REVOKE";
-    IxType[IxType["ASSET_MINT"] = 6] = "ASSET_MINT";
-    IxType[IxType["ASSET_BURN"] = 7] = "ASSET_BURN";
-    IxType[IxType["LOGIC_DEPLOY"] = 8] = "LOGIC_DEPLOY";
-    IxType[IxType["LOGIC_INVOKE"] = 9] = "LOGIC_INVOKE";
-    IxType[IxType["LOGIC_ENLIST"] = 10] = "LOGIC_ENLIST";
-    IxType[IxType["LOGIC_INTERACT"] = 11] = "LOGIC_INTERACT";
-    IxType[IxType["LOGIC_UPGRADE"] = 12] = "LOGIC_UPGRADE";
-    IxType[IxType["FILE_CREATE"] = 13] = "FILE_CREATE";
-    IxType[IxType["FILE_UPDATE"] = 14] = "FILE_UPDATE";
-    IxType[IxType["PARTICIPANT_REGISTER"] = 15] = "PARTICIPANT_REGISTER";
-    IxType[IxType["VALIDATOR_REGISTER"] = 16] = "VALIDATOR_REGISTER";
-    IxType[IxType["VALIDATOR_UNREGISTER"] = 17] = "VALIDATOR_UNREGISTER";
-    IxType[IxType["STAKE_BOND"] = 18] = "STAKE_BOND";
-    IxType[IxType["STAKE_UNBOND"] = 19] = "STAKE_UNBOND";
-    IxType[IxType["STAKE_TRANSFER"] = 20] = "STAKE_TRANSFER";
-})(IxType || (IxType = {}));
+export var TxType;
+(function (TxType) {
+    TxType[TxType["INVALID_IX"] = 0] = "INVALID_IX";
+    TxType[TxType["VALUE_TRANSFER"] = 1] = "VALUE_TRANSFER";
+    TxType[TxType["FUEL_SUPPLY"] = 2] = "FUEL_SUPPLY";
+    TxType[TxType["ASSET_CREATE"] = 3] = "ASSET_CREATE";
+    TxType[TxType["ASSET_APPROVE"] = 4] = "ASSET_APPROVE";
+    TxType[TxType["ASSET_REVOKE"] = 5] = "ASSET_REVOKE";
+    TxType[TxType["ASSET_MINT"] = 6] = "ASSET_MINT";
+    TxType[TxType["ASSET_BURN"] = 7] = "ASSET_BURN";
+    TxType[TxType["LOGIC_DEPLOY"] = 8] = "LOGIC_DEPLOY";
+    TxType[TxType["LOGIC_INVOKE"] = 9] = "LOGIC_INVOKE";
+    TxType[TxType["LOGIC_ENLIST"] = 10] = "LOGIC_ENLIST";
+    TxType[TxType["LOGIC_INTERACT"] = 11] = "LOGIC_INTERACT";
+    TxType[TxType["LOGIC_UPGRADE"] = 12] = "LOGIC_UPGRADE";
+    TxType[TxType["FILE_CREATE"] = 13] = "FILE_CREATE";
+    TxType[TxType["FILE_UPDATE"] = 14] = "FILE_UPDATE";
+    TxType[TxType["PARTICIPANT_REGISTER"] = 15] = "PARTICIPANT_REGISTER";
+    TxType[TxType["VALIDATOR_REGISTER"] = 16] = "VALIDATOR_REGISTER";
+    TxType[TxType["VALIDATOR_UNREGISTER"] = 17] = "VALIDATOR_UNREGISTER";
+    TxType[TxType["STAKE_BOND"] = 18] = "STAKE_BOND";
+    TxType[TxType["STAKE_UNBOND"] = 19] = "STAKE_UNBOND";
+    TxType[TxType["STAKE_TRANSFER"] = 20] = "STAKE_TRANSFER";
+})(TxType || (TxType = {}));
 /**
  * Enumerates the types of particpant locks in the system.
  */

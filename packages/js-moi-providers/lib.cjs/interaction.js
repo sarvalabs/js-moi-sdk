@@ -6,45 +6,44 @@ const js_polo_1 = require("js-polo");
 const serializePayload = (ixType, payload) => {
     let polorizer = new js_polo_1.Polorizer();
     switch (ixType) {
-        case js_moi_utils_1.IxType.ASSET_CREATE:
+        case js_moi_utils_1.TxType.ASSET_CREATE:
             polorizer.polorize(payload, js_moi_utils_1.assetCreateSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.IxType.ASSET_MINT:
-        case js_moi_utils_1.IxType.ASSET_BURN:
+        case js_moi_utils_1.TxType.ASSET_MINT:
+        case js_moi_utils_1.TxType.ASSET_BURN:
             polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-            polorizer.polorize(payload, js_moi_utils_1.logicDeploySchema);
-            return polorizer.bytes();
-        case js_moi_utils_1.IxType.LOGIC_INVOKE:
-        case js_moi_utils_1.IxType.LOGIC_ENLIST:
-            polorizer.polorize(payload, js_moi_utils_1.logicInteractSchema);
+        case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+        case js_moi_utils_1.TxType.LOGIC_INVOKE:
+        case js_moi_utils_1.TxType.LOGIC_ENLIST:
+            polorizer.polorize(payload, js_moi_utils_1.logicSchema);
             return polorizer.bytes();
         default:
             js_moi_utils_1.ErrorUtils.throwError("Failed to serialize payload", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
     }
 };
-const createParticipants = (steps) => {
-    return steps.map(step => {
-        switch (step.type) {
-            case js_moi_utils_1.IxType.ASSET_CREATE:
+const createParticipants = (transactions) => {
+    return transactions.map(transaction => {
+        switch (transaction.type) {
+            case js_moi_utils_1.TxType.ASSET_CREATE:
                 return null;
-            case js_moi_utils_1.IxType.ASSET_MINT:
-            case js_moi_utils_1.IxType.ASSET_BURN:
+            case js_moi_utils_1.TxType.ASSET_MINT:
+            case js_moi_utils_1.TxType.ASSET_BURN:
                 return {
-                    address: step.payload.asset_id.slice(10),
+                    address: transaction.payload.asset_id.slice(10),
                     lock_type: 1,
                 };
-            case js_moi_utils_1.IxType.VALUE_TRANSFER:
+            case js_moi_utils_1.TxType.VALUE_TRANSFER:
                 return {
-                    address: step.payload.beneficiary,
+                    address: transaction.payload.beneficiary,
                     lock_type: 1,
                 };
-            case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-            case js_moi_utils_1.IxType.LOGIC_ENLIST:
-            case js_moi_utils_1.IxType.LOGIC_INVOKE:
+            case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+                return null;
+            case js_moi_utils_1.TxType.LOGIC_ENLIST:
+            case js_moi_utils_1.TxType.LOGIC_INVOKE:
                 return {
-                    address: step.payload.logic_id.slice(10),
+                    address: transaction.payload.logic_id.slice(10),
                     lock_type: 1
                 };
             default:

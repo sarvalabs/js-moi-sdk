@@ -1,7 +1,7 @@
 /**
- * Enumerates the types of Interactions in the system.
+ * Enumerates the types of Transactions in the system.
  */
-export enum IxType {
+export enum TxType {
     INVALID_IX,
     VALUE_TRANSFER,
     FUEL_SUPPLY,

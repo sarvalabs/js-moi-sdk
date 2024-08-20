@@ -1,5 +1,4 @@
-import { ManifestCoder } from "js-moi-manifest";
-import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, TxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -876,7 +875,8 @@ export class BaseProvider extends AbstractProvider {
                     resolve(receipt);
                     return;
                 }
-                const error = ManifestCoder.decodeException(result.error);
+                // const error = ManifestCoder.decodeException(result.error);
+                const error = null;
                 if (error == null) {
                     resolve(receipt);
                     return;
@@ -905,38 +905,40 @@ export class BaseProvider extends AbstractProvider {
      * data is missing.
      */
     processReceipt(receipt) {
-        switch (hexToBN(receipt.ix_type)) {
-            case IxType.VALUE_TRANSFER:
-                return null;
-            case IxType.ASSET_CREATE:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve asset creation response");
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve asset mint/burn response");
-            case IxType.LOGIC_DEPLOY:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve logic deploy response");
-            case IxType.LOGIC_INVOKE:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve logic invoke response");
-            case IxType.LOGIC_ENLIST:
-                if (receipt.extra_data) {
-                    return receipt.extra_data;
-                }
-                throw new Error("Failed to retrieve logic enlist response");
-            default:
-                throw new Error("Unsupported interaction type encountered");
-        }
+        return receipt.transactions.map(step => {
+            switch (hexToBN(step.tx_type)) {
+                case TxType.VALUE_TRANSFER:
+                    return null;
+                case TxType.ASSET_CREATE:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve asset creation response");
+                case TxType.ASSET_MINT:
+                case TxType.ASSET_BURN:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve asset mint/burn response");
+                case TxType.LOGIC_DEPLOY:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve logic deploy response");
+                case TxType.LOGIC_INVOKE:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve logic invoke response");
+                case TxType.LOGIC_ENLIST:
+                    if (step.data) {
+                        return step.data;
+                    }
+                    throw new Error("Failed to retrieve logic enlist response");
+                default:
+                    throw new Error("Unsupported interaction type encountered");
+            }
+        });
     }
     /**
      * Waits for the interaction with the specified hash to be included in a

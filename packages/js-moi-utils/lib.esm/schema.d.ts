@@ -1,20 +1,9 @@
-export declare const logicDeploySchema: {
+export declare const logicSchema: {
     kind: string;
     fields: {
         manifest: {
             kind: string;
         };
-        callsite: {
-            kind: string;
-        };
-        calldata: {
-            kind: string;
-        };
-    };
-};
-export declare const logicInteractSchema: {
-    kind: string;
-    fields: {
         logic_id: {
             kind: string;
         };
@@ -23,6 +12,17 @@ export declare const logicInteractSchema: {
         };
         calldata: {
             kind: string;
+        };
+        interface: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
         };
     };
 };
@@ -50,6 +50,9 @@ export declare const assetCreateSchema: {
         logic_payload: {
             kind: string;
             fields: {
+                manifest: {
+                    kind: string;
+                };
                 logic_id: {
                     kind: string;
                 };
@@ -59,6 +62,17 @@ export declare const assetCreateSchema: {
                 calldata: {
                     kind: string;
                 };
+                interface: {
+                    kind: string;
+                    fields: {
+                        keys: {
+                            kind: string;
+                        };
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
             };
         };
     };
@@ -66,6 +80,9 @@ export declare const assetCreateSchema: {
 export declare const assetApproveOrTransferSchema: {
     kind: string;
     fields: {
+        benefactor: {
+            kind: string;
+        };
         beneficiary: {
             kind: string;
         };

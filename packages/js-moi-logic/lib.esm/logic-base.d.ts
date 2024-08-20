@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { IxType } from "js-moi-utils";
+import { TxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
@@ -28,9 +28,9 @@ export declare abstract class LogicBase extends ElementDescriptor {
     /**
      * Returns the interaction type based on the routine kind.
      *
-     * @returns {IxType} The interaction type.
+     * @returns {TxType} The interaction type.
      */
-    protected getIxType(kind: string): IxType;
+    protected getIxType(kind: string): TxType;
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
