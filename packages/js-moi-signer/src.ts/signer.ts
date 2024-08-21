@@ -114,9 +114,9 @@ export abstract class Signer {
                 ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
             }
 
-            // if(ixObject.fuel_price === 0) {
-            //     ErrorUtils.throwError("Invalid fuel price", ErrorCode.INTERACTION_UNDERPRICED);
-            // }
+            if(ixObject.fuel_price < 0) {
+                ErrorUtils.throwError("Invalid fuel price", ErrorCode.INTERACTION_UNDERPRICED);
+            }
 
             if(ixObject.nonce != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
