@@ -64,7 +64,7 @@ const processPayload = (txType: TxType, payload: TransactionPayload): Transactio
  * @param {InteractionObject} ixObject - The interaction object containing transactions and asset funds.
  * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
  */
-const processAssetFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
+const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
     const assetFunds = new Map<string, number | bigint>();
 
     ixObject.transactions.forEach(transaction => {
@@ -160,9 +160,9 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
             case TxType.LOGIC_ENLIST:
             case TxType.LOGIC_INVOKE: {
                 const logicPayload = transaction.payload as LogicPayload;
-                const address = trimHexPrefix(logicPayload.logic_id).slice(8);
+                const address = trimHexPrefix(logicPayload.logic_id).slice(6);
 
-                participants.set(logicPayload.logic_id.slice(6), {
+                participants.set(address, {
                     address: hexToBytes(address),
                     lock_type: LockType.MUTATE_LOCK
                 });
@@ -244,18 +244,16 @@ const processTransactions = (transactions: IxTransaction[]): ProcessedIxTransact
  */
 const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
     try {
-        const processedIxObject: ProcessedIxObject = { 
+        return { 
             sender: hexToBytes(ixObject.sender),
             payer: hexToBytes(ZERO_ADDRESS),
             nonce: ixObject.nonce,
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
-            funds: processAssetFunds(ixObject),
+            funds: processFunds(ixObject),
             transactions: processTransactions(ixObject.transactions),
             participants: processParticipants(ixObject),
-        };
-
-        return processedIxObject;
+        } as ProcessedIxObject;
     } catch(err) {
         ErrorUtils.throwError(
             "Failed to process interaction object",

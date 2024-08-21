@@ -51,7 +51,7 @@ const processPayload = (txType, payload) => {
  * @param {InteractionObject} ixObject - The interaction object containing transactions and asset funds.
  * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
  */
-const processAssetFunds = (ixObject) => {
+const processFunds = (ixObject) => {
     const assetFunds = new Map();
     ixObject.transactions.forEach(transaction => {
         switch (transaction.type) {
@@ -128,8 +128,8 @@ const processParticipants = (ixObject) => {
             case TxType.LOGIC_ENLIST:
             case TxType.LOGIC_INVOKE: {
                 const logicPayload = transaction.payload;
-                const address = trimHexPrefix(logicPayload.logic_id).slice(8);
-                participants.set(logicPayload.logic_id.slice(6), {
+                const address = trimHexPrefix(logicPayload.logic_id).slice(6);
+                participants.set(address, {
                     address: hexToBytes(address),
                     lock_type: LockType.MUTATE_LOCK
                 });
@@ -198,17 +198,16 @@ const processTransactions = (transactions) => {
  */
 const processIxObject = (ixObject) => {
     try {
-        const processedIxObject = {
+        return {
             sender: hexToBytes(ixObject.sender),
             payer: hexToBytes(ZERO_ADDRESS),
             nonce: ixObject.nonce,
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
-            funds: processAssetFunds(ixObject),
+            funds: processFunds(ixObject),
             transactions: processTransactions(ixObject.transactions),
             participants: processParticipants(ixObject),
         };
-        return processedIxObject;
     }
     catch (err) {
         ErrorUtils.throwError("Failed to process interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });

@@ -54,7 +54,7 @@ const processPayload = (txType, payload) => {
  * @param {InteractionObject} ixObject - The interaction object containing transactions and asset funds.
  * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
  */
-const processAssetFunds = (ixObject) => {
+const processFunds = (ixObject) => {
     const assetFunds = new Map();
     ixObject.transactions.forEach(transaction => {
         switch (transaction.type) {
@@ -131,8 +131,8 @@ const processParticipants = (ixObject) => {
             case js_moi_utils_1.TxType.LOGIC_ENLIST:
             case js_moi_utils_1.TxType.LOGIC_INVOKE: {
                 const logicPayload = transaction.payload;
-                const address = (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id).slice(8);
-                participants.set(logicPayload.logic_id.slice(6), {
+                const address = (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id).slice(6);
+                participants.set(address, {
                     address: (0, js_moi_utils_1.hexToBytes)(address),
                     lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
                 });
@@ -201,17 +201,16 @@ const processTransactions = (transactions) => {
  */
 const processIxObject = (ixObject) => {
     try {
-        const processedIxObject = {
+        return {
             sender: (0, js_moi_utils_1.hexToBytes)(ixObject.sender),
             payer: (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
             nonce: ixObject.nonce,
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
-            funds: processAssetFunds(ixObject),
+            funds: processFunds(ixObject),
             transactions: processTransactions(ixObject.transactions),
             participants: processParticipants(ixObject),
         };
-        return processedIxObject;
     }
     catch (err) {
         js_moi_utils_1.ErrorUtils.throwError("Failed to process interaction object", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
