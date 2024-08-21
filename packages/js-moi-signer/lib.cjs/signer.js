@@ -84,7 +84,6 @@ class Signer {
             }
         }
         if (method === "send") {
-            console.log(ixObject);
             if (ixObject.fuel_price == null) {
                 js_moi_utils_1.ErrorUtils.throwError("Fuel price is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }

@@ -105,7 +105,6 @@ export abstract class Signer {
         }
 
         if (method === "send") {
-            console.log(ixObject)
             if(ixObject.fuel_price == null) {
                 ErrorUtils.throwError("Fuel price is missing", ErrorCode.MISSING_ARGUMENT);
             }
