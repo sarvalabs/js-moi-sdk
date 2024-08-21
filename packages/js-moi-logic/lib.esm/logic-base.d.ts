@@ -30,7 +30,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      *
      * @returns {TxType} The interaction type.
      */
-    protected getIxType(kind: string): TxType;
+    protected getTxType(kind: string): TxType;
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *

@@ -26,7 +26,7 @@ describe("Test Websocket Provider", () => {
     it('should receive new tesseracts', (done) => {
         // subscribe to new tesseracts
         wsProvider.on(WebSocketEvents.ALL_TESSERACTS, (tesseract) => {
-            // check if the tesseract height has increased
+            // check if the tesseract is defined
             expect(tesseract).toBeDefined();
             done();
         });

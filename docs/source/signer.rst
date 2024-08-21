@@ -82,14 +82,18 @@ Regular Methods
 
     // Example
     const response = await signer.sendInteraction({
-        type: TxType.ASSET_CREATE,
         fuel_price: 1,
         fuel_limit: 200,
-        payload: {
-            standard: AssetStandard.MAS0,
-            symbol: "TOKYO",
-            supply: 1248577
-        }
+        transactions: [
+            {
+                type: TxType.ASSET_CREATE,
+                payload: {
+                    standard: AssetStandard.MAS0,
+                    symbol: "TOKYO",
+                    supply: 1248577
+                }
+            }
+        ]
     })
 
     console.log(response)

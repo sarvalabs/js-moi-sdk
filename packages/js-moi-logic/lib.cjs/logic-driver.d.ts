@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { LogicPayload, Options, type AbstractProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { LogicIxObject, LogicIxResponse } from "../types/interaction";
+import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
@@ -46,7 +46,7 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
      * @returns {Promise<LogicIxResult | null>} A promise that resolves to the
      logic interaction result or null.
      */
-    protected processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
+    protected processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
 }
 type LogicRoutines = Record<string, (...args: any) => any>;
 interface GetLogicDriver {

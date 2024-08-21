@@ -1,3 +1,4 @@
+import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -108,7 +109,10 @@ export class LogicDriver extends LogicDescriptor {
         try {
             const routine = this.getRoutineElement(response.routine_name);
             const result = await response.result(timeout);
-            return this.manifestCoder.decodeOutput(result[0].outputs, routine.data["returns"]);
+            return {
+                output: this.manifestCoder.decodeOutput(result[0].outputs, routine.data["returns"]),
+                error: ManifestCoder.decodeException(result[0].error)
+            };
         }
         catch (err) {
             throw err;

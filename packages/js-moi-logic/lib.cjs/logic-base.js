@@ -37,7 +37,7 @@ class LogicBase extends element_descriptor_1.default {
      *
      * @returns {TxType} The interaction type.
      */
-    getIxType(kind) {
+    getTxType(kind) {
         switch (kind) {
             case "deploy":
                 return js_moi_utils_1.TxType.LOGIC_DEPLOY;
@@ -74,7 +74,7 @@ class LogicBase extends element_descriptor_1.default {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType(ixObject.routine.kind) !== js_moi_utils_1.TxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getTxType(ixObject.routine.kind) !== js_moi_utils_1.TxType.LOGIC_DEPLOY && !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
@@ -125,7 +125,7 @@ class LogicBase extends element_descriptor_1.default {
         const params = {
             transactions: [
                 {
-                    type: this.getIxType(ixObject.routine.kind),
+                    type: this.getTxType(ixObject.routine.kind),
                     payload: ixObject.createPayload(),
                 }
             ]
