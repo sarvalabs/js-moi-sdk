@@ -12,7 +12,7 @@ export declare class RoutineOption implements IRoutineOption {
     constructor(options?: IRoutineOption);
 }
 /**
- * Creates a new RoutineOption instance.
+ * Creates a new RoutineOption instance with the given option object.
  *
  * @param option - The option object used to create the RoutineOption.
  * @returns A new RoutineOption instance.
