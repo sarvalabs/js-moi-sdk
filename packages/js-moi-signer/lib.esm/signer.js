@@ -78,15 +78,16 @@ export class Signer {
             }
         }
         if (method === "send") {
+            console.log(ixObject);
             if (ixObject.fuel_price == null) {
                 ErrorUtils.throwError("Fuel price is missing", ErrorCode.MISSING_ARGUMENT);
             }
             if (ixObject.fuel_limit == null) {
                 ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
             }
-            if (ixObject.fuel_price === 0) {
-                ErrorUtils.throwError("Invalid fuel price", ErrorCode.INTERACTION_UNDERPRICED);
-            }
+            // if(ixObject.fuel_price === 0) {
+            //     ErrorUtils.throwError("Invalid fuel price", ErrorCode.INTERACTION_UNDERPRICED);
+            // }
             if (ixObject.nonce != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
                 if (ixObject.nonce < nonce) {
