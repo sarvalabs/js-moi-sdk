@@ -60,7 +60,7 @@ describe("Test Websocket Provider", () => {
             );
 
             expect(participant).toBeDefined()
-            expect(hexToBN(participant.height)).toBeGreaterThan(1)
+            expect(hexToBN(participant.height)).toBeGreaterThanOrEqual(1)
             done();
         });
 

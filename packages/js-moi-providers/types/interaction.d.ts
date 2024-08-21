@@ -13,7 +13,7 @@ export interface ProcessedIxObject {
     sender: string;
     payer?: string;
 
-    asset_funds: IxAssetFund[]
+    funds: IxAssetFund[]
     transactions: IxTransaction[]
     participants: IxParticipant[]
 

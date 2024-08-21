@@ -39,7 +39,7 @@ const processIxObject = (ixObject) => {
             sender: ixObject.sender,
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
-            asset_funds: [],
+            funds: [],
             transactions: ixObject.transactions.map(step => ({
                 ...step,
                 payload: "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(step.type, step.payload)),

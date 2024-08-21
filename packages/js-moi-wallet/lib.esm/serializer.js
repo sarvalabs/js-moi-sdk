@@ -55,25 +55,27 @@ const processAssetFunds = (ixObject) => {
     const assetFunds = new Map();
     ixObject.transactions.forEach(transaction => {
         switch (transaction.type) {
-            case TxType.ASSET_TRANSFER: {
-                const actionPayload = transaction.payload;
-                assetFunds.set(actionPayload.asset_id, actionPayload.amount);
-                break;
-            }
+            case TxType.ASSET_TRANSFER:
             case TxType.ASSET_MINT:
             case TxType.ASSET_BURN: {
-                const supplyPayload = transaction.payload;
-                assetFunds.set(supplyPayload.asset_id, supplyPayload.amount);
-                break;
+                const payload = transaction.payload;
+                const amount = assetFunds.get(payload.asset_id) ?? 0;
+                if (typeof payload.amount === "bigint" || typeof amount === "bigint") {
+                    assetFunds.set(trimHexPrefix(payload.asset_id), BigInt(payload.amount) + BigInt(amount));
+                    return;
+                }
+                assetFunds.set(trimHexPrefix(payload.asset_id), Number(payload.amount) + Number(amount));
             }
         }
     });
-    // Add additional asset funds to the list if not present
-    ixObject.asset_funds.forEach(assetFund => {
-        if (!assetFunds.has(assetFund.asset_id)) {
-            assetFunds.set(assetFund.asset_id, assetFund.amount);
-        }
-    });
+    if (ixObject.funds != null) {
+        // Add additional asset funds to the list if not present
+        ixObject.funds.forEach(assetFund => {
+            if (!assetFunds.has(trimHexPrefix(assetFund.asset_id))) {
+                assetFunds.set(trimHexPrefix(assetFund.asset_id), assetFund.amount);
+            }
+        });
+    }
     return Array.from(assetFunds, ([asset_id, amount]) => ({ asset_id, amount }));
 };
 /**
@@ -86,7 +88,7 @@ const processAssetFunds = (ixObject) => {
  */
 const processParticipants = (ixObject) => {
     const participants = new Map();
-    // Add sender to participants map
+    // Add sender to participants
     participants.set(trimHexPrefix(ixObject.sender), {
         address: hexToBytes(ixObject.sender),
         lock_type: LockType.MUTATE_LOCK
@@ -106,8 +108,9 @@ const processParticipants = (ixObject) => {
             case TxType.ASSET_MINT:
             case TxType.ASSET_BURN: {
                 const assetSupplyPayload = transaction.payload;
-                participants.set(assetSupplyPayload.asset_id.slice(6), {
-                    address: hexToBytes(assetSupplyPayload.asset_id.slice(6)),
+                const address = trimHexPrefix(assetSupplyPayload.asset_id).slice(8);
+                participants.set(address, {
+                    address: hexToBytes(address),
                     lock_type: LockType.MUTATE_LOCK
                 });
                 break;
@@ -125,8 +128,9 @@ const processParticipants = (ixObject) => {
             case TxType.LOGIC_ENLIST:
             case TxType.LOGIC_INVOKE: {
                 const logicPayload = transaction.payload;
+                const address = trimHexPrefix(logicPayload.logic_id).slice(8);
                 participants.set(logicPayload.logic_id.slice(6), {
-                    address: hexToBytes(logicPayload.logic_id.slice(6)),
+                    address: hexToBytes(address),
                     lock_type: LockType.MUTATE_LOCK
                 });
                 break;
@@ -138,9 +142,9 @@ const processParticipants = (ixObject) => {
     // Add additional participants if they exist
     if (ixObject.participants != null) {
         ixObject.participants.forEach((participant) => {
-            const hexAddress = trimHexPrefix(participant.address);
-            if (!participants.has(hexAddress)) {
-                participants.set(hexAddress, {
+            const address = trimHexPrefix(participant.address);
+            if (!participants.has(address)) {
+                participants.set(address, {
                     address: hexToBytes(participant.address),
                     lock_type: participant.lock_type
                 });
@@ -200,7 +204,7 @@ const processIxObject = (ixObject) => {
             nonce: ixObject.nonce,
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
-            asset_funds: processAssetFunds(ixObject),
+            funds: processAssetFunds(ixObject),
             transactions: processTransactions(ixObject.transactions),
             participants: processParticipants(ixObject),
         };

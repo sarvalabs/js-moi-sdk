@@ -179,18 +179,30 @@ The ``ContextHash`` interface represents context hash information. It has the fo
 * ``address`` - ``string``: The address associated with the context hash.
 * ``hash`` - ``string``: The context hash value.
 
+**ExecutionResult**
+
+The ``ExecutionResult`` type represents the detailed outcome of a transaction execution. It can 
+vary based on the specific type of transaction.
+
+**TransactionResult**
+
+The ``TransactionResult`` interface represents the outcome of a processed transaction, 
+including its type, execution status, and resulting data.
+
+* ``tx_type`` - ``string``: The type of transaction.
+* ``status`` - ``number``: The status code indicating the result of the transaction.
+* ``data`` - ``ExecutionResult``: The detailed transaction execution result specific to the transaction type or null
+
 **InteractionReceipt**
 
 The ``InteractionReceipt`` interface represents a receipt for an interaction. It has the following properties:
 
-* ``ix_type`` - ``string``: The type of the interaction.
 * ``ix_hash`` - ``string``: The hash of the interaction.
 * ``status`` - ``number``: The status of the interaction.
 * ``fuel_used`` - ``string``: The amount of fuel used for the interaction.
 * ``participants`` - ``Participant[]``: The participants involved in the interaction.
-* ``extra_data`` - ``AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | null``: Additional data specific to the interaction type or null.
+* ``transactions`` - ``TransactionResult[]``: A list of transaction results.
 * ``from`` - ``string``: The sender of the interaction.
-* ``to`` - ``string``: The receiver of the interaction.
 * ``ix_index`` - ``string``: The index of the interaction.
 * ``ts_hash`` - ``string``: The hash of the tesseract.
 
@@ -245,6 +257,15 @@ The ``ConnectionsInfo`` interface provides information about connections and act
 * ``outbound_conn_count`` - ``number``: The count of outbound connections.
 * ``active_pub_sub_topics`` - A dictionary where the keys are topic strings and the values are numbers representing the count of active connections for each topic.
 
+**AssetActionPayload**
+
+The ``AssetActionPayload`` interface represents a payload for transferring/approving/revoking an asset. It has the following properties:
+
+* ``benefactor`` - ``string``: The address that authorized access to his asset funds.
+* ``beneficiary`` - ``string``: The recipient address for the transfer/approve/revoke operation.
+* ``asset_id`` - ``string``: The ID of the asset for which to transfer/approve/revoke.
+* ``amount`` - ``number | bigint``: The amount for transfer/approve/revoke.
+
 **AssetCreatePayload**
 
 The ``AssetCreatePayload`` interface represents a payload for creating an asset. It has the following properties:
@@ -257,9 +278,9 @@ The ``AssetCreatePayload`` interface represents a payload for creating an asset.
 * ``is_logical`` - ``boolean``: Indicates whether the asset is logical (optional).
 * ``logic_payload`` - ``LogicPayload``: The payload for the associated logic (optional).
 
-**AssetMintOrBurnPayload**
+**AssetSupplyPayload**
 
-The ``AssetMintOrBurnPayload`` interface represents a payload for minting or burning an asset. It has the following properties:
+The ``AssetSupplyPayload`` interface represents a payload for minting or burning an asset. It has the following properties:
 
 * ``asset_id`` - ``string``: The ID of the asset.
 * ``amount`` - ``number | bigint``: The amount to mint or burn.
@@ -275,22 +296,43 @@ The ``LogicPayload`` interface represents a payload for logic deployment or invo
 
 **TransactionPayload**
 
-The ``TransactionPayload`` type represents a payload for an interaction. It can be one of the following types: ``AssetCreatePayload``, ``AssetMintOrBurnPayload``, or ``LogicPayload``.
+The ``TransactionPayload`` type represents a payload for an transaction. It can be one of the following types: ``AssetActionPayload``, 
+``AssetCreatePayload``, ``AssetSupplyPayload``, or ``LogicPayload``.
+
+**IxFund**
+
+The ``IxFund`` type represents the asset and the amount required for validating the interaction before processing.
+
+* ``asset_id`` - ``string``: The unique identifier of the asset.
+* ``amount`` - ``number | bigint``: The total required amount for the interaction, 
+specified as either a ``number`` or a ``bigint``.
+
+**IxTransaction**
+
+The ``IxTransaction`` type  represents an individual transaction that is part of a larger interaction.
+
+* ``type`` - ``string``: The type of the transaction.
+* ``payload`` - ``TransactionPayload``: The specific payload corresponding to the transaction.
+
+**IxParticipant**
+
+The ``IxParticipant`` type represents a participant involved in the interaction and their corresponding lock type.
+
+* ``address`` - ``string``: The address of the participant involved in the interaction.
+* ``lock_type`` - ``number``: The type of lock to acquire while processing the interaction.
 
 **InteractionObject**
 
 The ``InteractionObject`` interface represents an interaction object. It has the following properties:
 
-* ``type`` - ``IxType``: The type of the interaction.
-* ``nonce`` - ``number | bigint``: The nonce value (optional).
-* ``sender`` - ``string``: The sender of the interaction (optional).
-* ``receiver`` - ``string``: The receiver of the interaction (optional).
-* ``payer`` - ``string``: The payer of the interaction (optional).
-* ``transfer_values`` - ``Map<string, number | bigint>``: Transfer values associated with the interaction (optional).
-* ``perceived_values`` - ``Map<string, number | bigint>``: Perceived values associated with the interaction (optional).
-* ``fuel_price`` - ``number | bigint``: The fuel price for the interaction.
-* ``fuel_limit`` - ``number | bigint``: The fuel limit for the interaction.
-* ``payload`` - ``InteractionPayload``: The payload of the interaction (optional).
+* ``sender`` - ``string``: The address of the participant initiating the interaction (optional).
+* ``payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs. (optional).
+* ``nonce`` - ``number | bigint``: A unique value used to ensure the interaction's uniqueness (optional).
+* ``funds`` - ``IxFund``: The list of asset funds required for the interaction (optional).
+* ``transactions`` - ``IxTransaction``: The list of transactions that are part of the interaction and are to be executed.
+* ``pariticipants`` - ``IxParticipant``: The list of participants involved in the interaction, along with their respective lock types (optional).
+* ``fuel_price`` - ``number | bigint``: The price per unit of fuel for executing the interaction.
+* ``fuel_limit`` - ``number | bigint``: The maximum amount of fuel that can be consumed during the processing of the interaction.
 
 **CallorEstimateIxObject**
 

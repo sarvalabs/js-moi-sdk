@@ -49,10 +49,20 @@ and so on.
 
 **Interaction**
 
-An interaction can be created, signed, and send to the MOI network. This library 
+An Interaction can be created, signed, and send to the MOI network. This library 
 provides a convenient interface for constructing interactions by specifying 
 essential details such as the recipient address, interaction type, fule price,
 fuel limit, and so on.
+
+**Transaction**
+
+A Transaction is an individual operation encapsulated within an interaction on 
+the MOI network. It is responsible for executing specific actions, such as asset 
+creation, transfer, minting, burning, logic deployment, invocation, or enlist. 
+Each transaction includes key details like the type of action being performed, 
+the associated payload. Transactions are processed as part of an interaction, and 
+their execution directly impacts the state of participants and contributes to 
+changes in the overall network state.
 
 **Asset**
 

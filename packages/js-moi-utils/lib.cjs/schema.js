@@ -99,7 +99,7 @@ exports.ixObjectSchema = {
         fuel_limit: {
             kind: "integer"
         },
-        asset_funds: {
+        funds: {
             kind: "array",
             fields: {
                 values: {

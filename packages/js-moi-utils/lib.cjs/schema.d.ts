@@ -123,7 +123,7 @@ export declare const ixObjectSchema: {
         fuel_limit: {
             kind: string;
         };
-        asset_funds: {
+        funds: {
             kind: string;
             fields: {
                 values: {

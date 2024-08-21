@@ -323,7 +323,7 @@ interface InteractionObject {
     fuel_price?: number | bigint;
     fuel_limit?: number | bigint;
     
-    asset_funds?: IxAssetFund[]
+    funds?: IxAssetFund[]
     transactions?: IxTransaction[]
     participants?: IxParticipant[]
 

@@ -38,35 +38,31 @@ The ``Participant`` interface represents a participant object. It has the follow
 * ``context_delta`` - ``ContextDelta``: The object representing the context delta of the participant.
 * ``state_delta`` - ``string``: The state delta of the participant.
 
-**Participants**
+**Transaction**
 
-The ``Participants`` type represents an array of participants.
+The ``Transaction`` interface represents an individual transaction within an interaction. 
+It contains the following properties:
+
+* ``type`` - ``number``: The type of the transaction.
+* ``payload`` - ``Uint8Array``: The serialized payload containing the transaction data.
 
 **Interaction**
 
-The ``Interaction`` interface represents an interaction object. It has the following properties:
+The ``Interaction`` interface represents a complete interaction, which bundles 
+multiple transactions and metadata to be processed on the MOI network. 
+It includes the following properties:
 
-* ``type`` - ``number``: The type of the interaction.
+* ``sender`` - ``string``: The address of the participant initiating the interaction.
+* ``payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs.
 * ``nonce`` - ``string``: The nonce value.
-* ``sender`` - ``string``: The sender of the interaction.
-* ``receiver`` - ``string``: The receiver of the interaction.
-* ``payer`` - ``string``: The payer of the interaction.
-* ``transfer_values`` - ``Map<string, string>``: Transfer values associated with the interaction.
-* ``perceived_values`` - ``Map<string, string>``: Perceived values associated with the interaction.
-* ``perceived_proofs`` - ``string``: The perceived proofs for the interaction.
-* ``fuel_price`` - ``string``: The fuel price for the interaction.
-* ``fuel_limit`` - ``string``: The fuel limit for the interaction.
-* ``payload`` - ``unknown``: The payload of the interaction.
-* ``mode`` - ``string``: The mode of the interaction.
-* ``compute_hash`` - ``string``: The hash of the compute.
-* ``compute_nodes`` - ``string[]``: The compute nodes involved in the interaction.
-* ``mtq`` - ``string``: The MTQ value for the interaction.
-* ``trust_nodes`` - ``string[]``: The trust nodes associated with the interaction.
-* ``hash`` - ``string``: The hash of the interaction.
-* ``signature`` - ``string``: The signature of the interaction.
-* ``ts_hash`` - ``string``: The hash of the tesseract.
-* ``participants`` - ``Participants[]``: An array of tesseract participants associated with the interaction.
-* ``ix_index`` - ``string``: The index of the interaction.
+* ``fuel_price`` - ``string``: The price per unit of fuel for processing the interaction.
+* ``fuel_limit`` - ``string``: The maximum amount of fuel allocated for the interaction execution.
+* ``transactions`` - ``string``: The serialized representation of the transactions included in the interaction.
+* ``hash`` - ``string``: The unique cryptographic hash of the interaction, used for identification and verification.
+* ``signature`` - ``string``: The cryptographic signature of the interaction, ensuring its authenticity.
+* ``ts_hash`` - ``string``: The hash of the associated tesseract, representing the outcome of the interaction.
+* ``participants`` - ``Participants[]``: An array of participants involved in the interaction.
+* ``ix_index`` - ``string``: The index indicating the order or position of the interaction in the sequence of interactions.
 
 **Interactions**
 

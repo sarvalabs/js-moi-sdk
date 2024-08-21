@@ -17,38 +17,29 @@ export interface Participant {
     state_hash: string;
 }
 
+export interface Transaction {
+    type: TxType;
+    payload: Uint8Array;
+}
+
 export type Participants = Participant[];
 
-
 export interface Interaction {
-    type: TxType;
     nonce: string;
     
     sender: string;
-    receiver: string;
     payer: string;
-
-    transfer_values: Map<string, string>;
-    perceived_values: Map<string, string>;
-    perceived_proofs: string;
 
     fuel_price: string;
     fuel_limit: string;
 
-    payload: unknown;
-
-    mode: string;
-    compute_hash: string;
-    compute_nodes: string[];
-
-    mtq: string;
-    trust_nodes: string[];
+    transactions: Transaction[]
     
     hash: string;
     signature: string;
 
     ts_hash: string;
-    participants: Participants;
+    participants: Participant[];
     ix_index: string;
 }
 

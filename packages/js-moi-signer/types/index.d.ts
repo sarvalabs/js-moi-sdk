@@ -57,7 +57,7 @@ interface ProcessedIxObject {
     fuel_price?: number | bigint;
     fuel_limit?: number | bigint;
     
-    asset_funds: ProcessedIxAssetFund[]
+    funds: ProcessedIxAssetFund[]
     transactions: ProcessedIxTransaction[]
     participants: ProcessedIxParticipant[]
 
