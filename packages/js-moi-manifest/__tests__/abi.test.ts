@@ -6,9 +6,10 @@ describe("Test ManifestCoder", () => {
     const elements = new Map();
     const classDefs = new Map();
     let manifest: LogicManifest.Manifest;
+    let manifestCoder: ManifestCoder;
 
     beforeAll(async () => {
-        manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
+        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest;
 
         manifest.elements.forEach((element: LogicManifest.Element) => {
             elements.set(element.ptr, element);
@@ -18,9 +19,10 @@ describe("Test ManifestCoder", () => {
                 classDefs.set(element.data.name, element.ptr);
             }
         });
+
+        manifestCoder = new ManifestCoder(manifest);
     });
 
-    const manifestCoder = new ManifestCoder(elements, classDefs);
 
     test("Encode ABI/Manifest into polo format", async () => {
         const encodedABI = ManifestCoder.encodeManifest(await loadManifestFromFile("../../manifests/tokenledger.json"));

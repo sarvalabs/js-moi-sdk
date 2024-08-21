@@ -1,5 +1,6 @@
 import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode, Polorizer } from "js-polo";
+import ElementDescriptor from "./element-descriptor";
 import { Schema } from "./schema";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
@@ -11,8 +12,10 @@ import { Schema } from "./schema";
  */
 export class ManifestCoder {
     schema;
-    constructor(elements, classDefs) {
-        this.schema = new Schema(elements, classDefs);
+    elementDescriptor;
+    constructor(manifest) {
+        this.elementDescriptor = new ElementDescriptor(manifest.elements);
+        this.schema = new Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());
     }
     /**
      * Encodes a logic manifest into POLO format. The manifest is processed and

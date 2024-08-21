@@ -2,6 +2,7 @@ import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix 
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
+import ElementDescriptor from "./element-descriptor";
 import { Schema } from "./schema";
 
 /**
@@ -13,10 +14,13 @@ import { Schema } from "./schema";
  * @class
  */
 export class ManifestCoder {
-    private schema: Schema
+    private schema: Schema;
 
-    constructor(elements: Map<number, LogicManifest.Element>, classDefs: Map<string, number>) {
-        this.schema = new Schema(elements, classDefs)
+    private readonly elementDescriptor: ElementDescriptor;
+
+    constructor(manifest: LogicManifest.Manifest) {
+        this.elementDescriptor = new ElementDescriptor(manifest.elements);
+        this.schema = new Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());
     }
 
     /** 

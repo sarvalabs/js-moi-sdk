@@ -15,7 +15,7 @@ export class LogicBase extends ElementDescriptor {
     manifestCoder;
     constructor(manifest, arg) {
         super(manifest.elements);
-        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs);
+        this.manifestCoder = new ManifestCoder(manifest);
         this.connect(arg);
     }
     /**

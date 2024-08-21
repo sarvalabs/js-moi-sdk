@@ -21,7 +21,7 @@ class LogicBase extends element_descriptor_1.default {
     manifestCoder;
     constructor(manifest, arg) {
         super(manifest.elements);
-        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
+        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(manifest);
         this.connect(arg);
     }
     /**

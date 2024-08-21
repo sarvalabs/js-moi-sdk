@@ -10,7 +10,8 @@ import { Exception } from "../types/response";
  */
 export declare class ManifestCoder {
     private schema;
-    constructor(elements: Map<number, LogicManifest.Element>, classDefs: Map<string, number>);
+    private readonly elementDescriptor;
+    constructor(manifest: LogicManifest.Manifest);
     /**
      * Encodes a logic manifest into POLO format. The manifest is processed and
      * serialized according to the predefined schema.
