@@ -9,6 +9,7 @@ const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 const logic_id_1 = require("./logic-id");
+const routine_options_1 = require("./routine-options");
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -168,7 +169,7 @@ class LogicBase extends element_descriptor_1.default {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
-        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
+        const option = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
             arguments: args

@@ -120,7 +120,7 @@ describe("Accessing Persistance Storage", () => {
     beforeAll(async () => {
         const manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
         const factory = new LogicFactory(manifest, wallet);
-        const ix = await factory.deploy("Seeder", symbol, supply);
+        const ix = await factory.deploy("Seed", symbol, supply);
         const result = await ix.result();
 
         await new Promise((resolve) => setTimeout(resolve, 3000)); // This is wait time as instantly fetching logic causing logic not found error

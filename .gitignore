@@ -7,3 +7,4 @@ package-lock.json
 **/__tests__/**/*.js.map
 dist
 coverage
+.vscode

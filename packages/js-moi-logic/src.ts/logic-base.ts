@@ -4,9 +4,10 @@ import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, Int
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
-import { LogicIxRequest, RoutineOption } from "../types/logic";
+import { LogicIxRequest } from "../types/logic";
 import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
+import { RoutineOption } from "./routine-options";
 
 const DEFAULT_FUEL_PRICE = 1;
 
@@ -204,8 +205,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicIxRequest {
-
-        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
+        const option = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.pop() : {};
 
         const ixObject: LogicIxObject = {
             routine: routine,

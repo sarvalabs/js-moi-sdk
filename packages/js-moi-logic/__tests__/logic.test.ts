@@ -6,13 +6,14 @@ import { LogicFactory } from "../src.ts/logic-factory";
 import type { LogicManifest } from "js-moi-manifest";
 import { loadManifestFromFile } from "js-moi-manifest/__tests__/utils/helper";
 import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "js-moi-providers";
+import { createRoutineOption } from "../src.ts/routine-options";
 
-const HOST = "http://localhost:1600/";
-const MNEMONIC = "laptop hybrid ripple unaware entire cover flag rally deliver adjust nerve ready";
+const HOST = "http://91.107.196.216";
+const MNEMONIC = "only possible mechanic sun senior afford ready smart exist refuse abuse denial";
 const INITIAL_SUPPLY = 100000000;
 const SYMBOL = "MOI";
 const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
-const PATH = "m/44'/6174'/0'/0/1";
+const PATH = "m/44'/6174'/7020'/0/1";
 const PROVIDER = new JsonRpcProvider(HOST);
 
 let wallet: Wallet;
@@ -38,7 +39,7 @@ describe("Logic", () => {
         manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
 
         const factory = new LogicFactory(manifest, wallet);
-        ix = await factory.deploy("Seeder", SYMBOL, INITIAL_SUPPLY);
+        ix = await factory.deploy("Seed", SYMBOL, INITIAL_SUPPLY);
         receipt = await ix.wait();
         const result = await ix.result();
 
@@ -55,8 +56,8 @@ describe("Logic", () => {
             const factory = new LogicFactory(manifest, wallet);
             const symbol = "MOI";
             const supply = 100000000;
-            const option = { fuelPrice: 1, fuelLimit: 3000 + Math.floor(Math.random() * 3000) };
-            const ix = await factory.deploy("Seeder", symbol, supply, option);
+            const option = createRoutineOption({ fuelPrice: 1, fuelLimit: 3000 + Math.floor(Math.random() * 3000) });
+            const ix = await factory.deploy("Seed", symbol, supply, option);
 
             const receipt = await ix.wait();
             const result = await ix.result();
@@ -86,7 +87,7 @@ describe("Logic", () => {
 
         it("should able to transfer without option", async () => {
             const amount = Math.floor(Math.random() * 1000);
-            const ix = await logic.routines.Transfer(RECEIVER, amount);
+            const ix = await logic.routines.Transfer(amount, RECEIVER);
             const receipt = await ix.wait();
 
             expect(ix.hash).toBeDefined();
@@ -95,8 +96,8 @@ describe("Logic", () => {
 
         it("should able to transfer with option", async () => {
             const amount = Math.floor(Math.random() * 1000);
-            const option = { fuelPrice: 1, fuelLimit: 1000 + Math.floor(Math.random() * 1000) };
-            const ix = await logic.routines.Transfer(RECEIVER, amount, option);
+            const option = createRoutineOption({ fuelPrice: 1, fuelLimit: 2000 });
+            const ix = await logic.routines.Transfer(amount, RECEIVER, option);
             const receipt = await ix.wait();
             const { balance } = await logic.routines.BalanceOf(RECEIVER);
 
@@ -108,12 +109,12 @@ describe("Logic", () => {
         it("should throw error when logic execution throw error using `result()`", async () => {
             const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
             const amount = balance + 1;
-            const ix = await logic.routines.Transfer(RECEIVER, amount);
+            const ix = await logic.routines.Transfer(amount, RECEIVER);
 
             try {
                 await ix.result();
             } catch (error) {
-                expect(error.message).toBe("insufficient balance for sender");
+                expect(error.message).toBe("sender has insufficient balance");
                 expect(error.params.receipt).toBeDefined();
             }
         });
@@ -121,18 +122,18 @@ describe("Logic", () => {
         it("should throw error when logic execution throw error using `wait()`", async () => {
             const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
             const amount = balance + 1;
-            const ix = await logic.routines.Transfer(RECEIVER, amount);
+            const ix = await logic.routines.Transfer(amount, RECEIVER);
 
             try {
                 await ix.wait();
             } catch (error) {
-                expect(error.message).toBe("insufficient balance for sender");
+                expect(error.message).toBe("sender has insufficient balance");
                 expect(error.params.receipt).toBeDefined();
             }
         });
 
         it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get((b) => b.entity("symbol"));
+            const symbol = await logic.persistentState.get((b) => b.entity("Symbol"));
 
             expect(symbol).toBe(SYMBOL);
         });
@@ -167,7 +168,7 @@ describe("Logic", () => {
             const amount = Math.floor(Math.random() * 1000);
 
             expect(async () => {
-                await logic.routines.Transfer(RECEIVER, amount);
+                await logic.routines.Transfer(amount, RECEIVER);
             }).rejects.toThrow("Mutating routine calls require a signer to be initialized.");
         });
 

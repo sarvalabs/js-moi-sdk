@@ -28,9 +28,10 @@ describe("Test ManifestCoder", () => {
     });
 
     test("Encode arguments into polo format", () => {
+        const DEPLOYER_ROUTINE = "Seed"
         const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
             element.data = element.data as LogicManifest.Routine;
-            return element.data.name === "Seeder";
+            return element.data.name === DEPLOYER_ROUTINE;
         });
         const routine = routineElement?.data as LogicManifest.Routine;
         const fields = routine.accepts ? routine.accepts : [];
@@ -75,7 +76,7 @@ describe("Test ManifestCoder", () => {
     test("Decode polo encoded property of a state", () => {
         const data = "0x0652494f";
         const state: any = manifest.elements.find((element) => element.kind === "state");
-        const output = manifestCoder.decodeState(data, "symbol", state?.data.fields);
+        const output = manifestCoder.decodeState(data, "Symbol", state?.data.fields);
 
         expect(output).toBe("RIO");
     });
