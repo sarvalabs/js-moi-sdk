@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
-const state_1 = require("./state");
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
@@ -12,7 +12,7 @@ class ElementDescriptor {
     classDefs = new Map();
     methodDefs = new Map();
     constructor(elements) {
-        this.stateMatrix = new state_1.ContextStateMatrix(elements);
+        this.stateMatrix = new js_moi_manifest_1.ContextStateMatrix(elements);
         // Populate the maps for elements, call sites, class and method definitions.
         elements.forEach((element) => {
             this.elements.set(element.ptr, element);

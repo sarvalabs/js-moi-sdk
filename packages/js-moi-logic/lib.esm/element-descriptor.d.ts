@@ -1,6 +1,4 @@
-import { LogicManifest } from "js-moi-manifest";
-import { CallSite, MethodDef } from "../types/logic";
-import { ContextStateMatrix } from "./state";
+import { ContextStateMatrix, LogicManifest, type CallSite, type MethodDef } from "js-moi-manifest";
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */

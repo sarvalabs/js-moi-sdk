@@ -1,5 +1,5 @@
+import { ContextStateMatrix } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { ContextStateMatrix } from "./state";
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
