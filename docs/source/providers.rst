@@ -273,9 +273,9 @@ The ``LogicPayload`` interface represents a payload for logic deployment or invo
 * ``calldata`` - ``Uint8Array``: The calldata for the logic execution.
 * ``manifest`` - ``Uint8Array``: The encoded manifest to deploy (optional).
 
-**InteractionPayload**
+**TransactionPayload**
 
-The ``InteractionPayload`` type represents a payload for an interaction. It can be one of the following types: ``AssetCreatePayload``, ``AssetMintOrBurnPayload``, or ``LogicPayload``.
+The ``TransactionPayload`` type represents a payload for an interaction. It can be one of the following types: ``AssetCreatePayload``, ``AssetMintOrBurnPayload``, or ``LogicPayload``.
 
 **InteractionObject**
 

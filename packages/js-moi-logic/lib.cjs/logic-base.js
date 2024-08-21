@@ -75,7 +75,7 @@ class LogicBase extends element_descriptor_1.default {
      */
     async executeRoutine(ixObject, method, option) {
         if (this.getTxType(ixObject.routine.kind) !== js_moi_utils_1.TxType.LOGIC_DEPLOY && !this.getLogicId()) {
-            js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+            js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
         switch (type) {

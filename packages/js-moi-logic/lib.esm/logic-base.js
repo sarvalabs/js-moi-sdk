@@ -69,7 +69,7 @@ export class LogicBase extends ElementDescriptor {
      */
     async executeRoutine(ixObject, method, option) {
         if (this.getTxType(ixObject.routine.kind) !== TxType.LOGIC_DEPLOY && !this.getLogicId()) {
-            ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", ErrorCode.NOT_INITIALIZED);
+            ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
         switch (type) {

@@ -1,8 +1,11 @@
-import { ErrorCode, ErrorUtils, TxType, assetCreateSchema, assetSupplySchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 const serializePayload = (txType, payload) => {
     let polorizer = new Polorizer();
     switch (txType) {
+        case TxType.ASSET_TRANSFER:
+            polorizer.polorize(payload, assetActionSchema);
+            return polorizer.bytes();
         case TxType.ASSET_CREATE:
             polorizer.polorize(payload, assetCreateSchema);
             return polorizer.bytes();

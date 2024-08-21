@@ -1,11 +1,14 @@
-import { ErrorCode, ErrorUtils, TxType, assetCreateSchema, assetSupplySchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ProcessedIxObject } from "../types/interaction";
-import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";
+import { CallorEstimateIxObject, TransactionPayload } from "../types/jsonrpc";
 
-const serializePayload = (txType: TxType, payload: InteractionPayload): Uint8Array => {
+const serializePayload = (txType: TxType, payload: TransactionPayload): Uint8Array => {
     let polorizer = new Polorizer()
     switch(txType) {
+        case TxType.ASSET_TRANSFER:
+            polorizer.polorize(payload, assetActionSchema);
+            return polorizer.bytes()
         case TxType.ASSET_CREATE:
             polorizer.polorize(payload, assetCreateSchema);
             return polorizer.bytes()

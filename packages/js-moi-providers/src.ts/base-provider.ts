@@ -10,7 +10,7 @@ import {
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
     InteractionCallResponse, InteractionParams, InteractionReceipt, InteractionRequest, InteractionResponse, 
     LogicManifestParams, NodeInfo, Options, Registry, RpcResponse, Status, StatusResponse, StorageParams, 
-    SyncStatus, SyncStatusParams, TDU, TDUResponse, InspectResponse, TransactionResultData
+    SyncStatus, SyncStatusParams, TDU, TDUResponse, InspectResponse, ExecutionResult
 } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -1079,18 +1079,18 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Process the interaction receipt to determine the appropriate result based on the
-     * transaction type.
+     * Process the interaction receipt to determine the appropriate execution result 
+     * based on the transaction type.
      * 
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {any} The processed result based on the transaction type.
+     * @returns {ExecutionResult[]} The processed execution results based on the transaction type.
      * @throws {Error} If the transaction type is unsupported or the expected response
      * data is missing.
      */
-    protected processReceipt(receipt: InteractionReceipt): TransactionResultData[] {
+    protected processReceipt(receipt: InteractionReceipt): ExecutionResult[] {
         return receipt.transactions.map(transaction => {
             switch (hexToBN(transaction.tx_type)) {
-                case TxType.VALUE_TRANSFER:
+                case TxType.ASSET_TRANSFER:
                     return null;
                 case TxType.ASSET_CREATE:
                     if (transaction.data) {

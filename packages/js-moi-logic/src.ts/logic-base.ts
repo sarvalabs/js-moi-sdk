@@ -89,7 +89,7 @@ export abstract class LogicBase extends ElementDescriptor {
     protected async executeRoutine(ixObject: LogicIxObject, method: string, option: RoutineOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
         if (this.getTxType(ixObject.routine.kind) !== TxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
-                "This logic object doesn't have address set yet, please set an address first.",
+                "This logic object doesn't have logic id assigned yet, please assign an logic id.",
                 ErrorCode.NOT_INITIALIZED
             );
         }

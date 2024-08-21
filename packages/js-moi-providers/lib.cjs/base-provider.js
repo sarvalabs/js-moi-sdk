@@ -887,18 +887,18 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         });
     }
     /**
-     * Process the interaction receipt to determine the appropriate result based on the
-     * transaction type.
+     * Process the interaction receipt to determine the appropriate execution result
+     * based on the transaction type.
      *
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {any} The processed result based on the transaction type.
+     * @returns {ExecutionResult[]} The processed execution results based on the transaction type.
      * @throws {Error} If the transaction type is unsupported or the expected response
      * data is missing.
      */
     processReceipt(receipt) {
         return receipt.transactions.map(transaction => {
             switch ((0, js_moi_utils_1.hexToBN)(transaction.tx_type)) {
-                case js_moi_utils_1.TxType.VALUE_TRANSFER:
+                case js_moi_utils_1.TxType.ASSET_TRANSFER:
                     return null;
                 case js_moi_utils_1.TxType.ASSET_CREATE:
                     if (transaction.data) {

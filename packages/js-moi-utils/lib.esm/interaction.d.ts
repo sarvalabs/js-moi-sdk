@@ -3,7 +3,7 @@
  */
 export declare enum TxType {
     INVALID_IX = 0,
-    VALUE_TRANSFER = 1,
+    ASSET_TRANSFER = 1,
     FUEL_SUPPLY = 2,
     ASSET_CREATE = 3,
     ASSET_APPROVE = 4,

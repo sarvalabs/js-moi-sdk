@@ -7,7 +7,7 @@ exports.LockType = exports.TxType = void 0;
 var TxType;
 (function (TxType) {
     TxType[TxType["INVALID_IX"] = 0] = "INVALID_IX";
-    TxType[TxType["VALUE_TRANSFER"] = 1] = "VALUE_TRANSFER";
+    TxType[TxType["ASSET_TRANSFER"] = 1] = "ASSET_TRANSFER";
     TxType[TxType["FUEL_SUPPLY"] = 2] = "FUEL_SUPPLY";
     TxType[TxType["ASSET_CREATE"] = 3] = "ASSET_CREATE";
     TxType[TxType["ASSET_APPROVE"] = 4] = "ASSET_APPROVE";

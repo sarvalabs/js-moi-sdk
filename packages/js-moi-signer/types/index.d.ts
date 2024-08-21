@@ -38,7 +38,7 @@ interface ProcessedIxPreferences {
     consensus: Uint8Array;
 }
 
-interface ProcessedIxStep {
+interface ProcessedIxTransaction {
     type: TxType
     payload: Uint8Array
 }
@@ -58,7 +58,7 @@ interface ProcessedIxObject {
     fuel_limit?: number | bigint;
     
     asset_funds: ProcessedIxAssetFund[]
-    transactions: ProcessedIxStep[]
+    transactions: ProcessedIxTransaction[]
     participants: ProcessedIxParticipant[]
 
     perception?: Uint8Array

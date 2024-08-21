@@ -79,13 +79,13 @@ export interface ContextHash {
     hash: string;
 }
 
-export type TransactionResultData = AssetCreationReceipt | AssetMintOrBurnReceipt | 
+export type ExecutionResult = AssetCreationReceipt | AssetMintOrBurnReceipt | 
 LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
 
 export interface TransactionResult {
     tx_type: string;
     status: number;
-    data: TransactionResultData
+    data: ExecutionResult
 }
 
 export interface InteractionReceipt {
@@ -292,16 +292,16 @@ export interface LogicPayload {
     manifest?: Uint8Array;
 }
 
-export type InteractionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload | any;
+export type TransactionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload | any;
 
 interface IxAssetFund {
     asset_id: string;
-    amount: number;
+    amount: number | bigint;
 }
 
 interface IxTransaction {
     type: TxType;
-    payload?: InteractionPayload;
+    payload?: TransactionPayload;
 }
 
 interface IxParticipant {

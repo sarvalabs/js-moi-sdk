@@ -6,6 +6,9 @@ const js_polo_1 = require("js-polo");
 const serializePayload = (txType, payload) => {
     let polorizer = new js_polo_1.Polorizer();
     switch (txType) {
+        case js_moi_utils_1.TxType.ASSET_TRANSFER:
+            polorizer.polorize(payload, js_moi_utils_1.assetActionSchema);
+            return polorizer.bytes();
         case js_moi_utils_1.TxType.ASSET_CREATE:
             polorizer.polorize(payload, js_moi_utils_1.assetCreateSchema);
             return polorizer.bytes();

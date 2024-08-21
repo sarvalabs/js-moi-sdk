@@ -1,1 +1,1 @@
-{"version":3,"file":"serializer.d.ts","sourceRoot":"","sources":["../src.ts/serializer.ts"],"names":[],"mappings":"AAGA,OAAO,EAAoC,iBAAiB,EAAyD,MAAM,kBAAkB,CAAC;AA6J9I;;;;;;GAMG;AACH,eAAO,MAAM,iBAAiB,aAAc,iBAAiB,KAAG,UAa/D,CAAA"}
+{"version":3,"file":"serializer.d.ts","sourceRoot":"","sources":["../src.ts/serializer.ts"],"names":[],"mappings":"AAGA,OAAO,EAAoC,iBAAiB,EACD,MAAM,kBAAkB,CAAC;AA0PpF;;;;;;GAMG;AACH,eAAO,MAAM,iBAAiB,aAAc,iBAAiB,KAAG,UAa/D,CAAA"}
