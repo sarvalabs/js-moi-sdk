@@ -1,5 +1,6 @@
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
+import { ElementDescriptor } from "./element-descriptor";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -9,9 +10,10 @@ import { Exception } from "../types/response";
  * @class
  */
 export declare class ManifestCoder {
-    private schema;
     private readonly elementDescriptor;
     constructor(manifest: LogicManifest.Manifest);
+    constructor(elementDescriptor: ElementDescriptor);
+    private get schema();
     /**
      * Encodes a logic manifest into POLO format. The manifest is processed and
      * serialized according to the predefined schema.

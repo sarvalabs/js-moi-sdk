@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManifestCoder = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
-const element_descriptor_1 = __importDefault(require("./element-descriptor"));
+const element_descriptor_1 = require("./element-descriptor");
 const schema_1 = require("./schema");
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
@@ -17,11 +14,12 @@ const schema_1 = require("./schema");
  * @class
  */
 class ManifestCoder {
-    schema;
     elementDescriptor;
     constructor(manifest) {
-        this.elementDescriptor = new element_descriptor_1.default(manifest.elements);
-        this.schema = new schema_1.Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());
+        this.elementDescriptor = manifest instanceof element_descriptor_1.ElementDescriptor ? manifest : new element_descriptor_1.ElementDescriptor(manifest.elements);
+    }
+    get schema() {
+        return new schema_1.Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());
     }
     /**
      * Encodes a logic manifest into POLO format. The manifest is processed and

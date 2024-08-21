@@ -11,7 +11,7 @@ export interface CallSite {
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-export default class ElementDescriptor {
+export declare class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element>;
     protected callSites: Map<string, CallSite>;

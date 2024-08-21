@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ElementDescriptor = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const context_state_matrix_1 = require("./context-state-matrix");
 /**
@@ -148,5 +149,5 @@ class ElementDescriptor {
         return this.elements.get(methodDef.ptr);
     }
 }
-exports.default = ElementDescriptor;
+exports.ElementDescriptor = ElementDescriptor;
 //# sourceMappingURL=element-descriptor.js.map
