@@ -1,17 +1,16 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { LogicManifest } from "js-moi-manifest";
 import {
-    AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
-    IxType, LogicDeployReceipt, LogicInvokeReceipt, LogicEnlistReceipt, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
+    AssetCreationResult, AssetSupplyResult, ErrorCode, ErrorUtils, Interaction,
+    TxType, LogicDeployResult, LogicInvokeResult, LogicEnlistResult, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
-    InteractionCallResponse, InteractionParams, InteractionReceipt,
-    InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
-    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
-    InspectResponse
+    InteractionCallResponse, InteractionParams, InteractionReceipt, InteractionRequest, InteractionResponse, 
+    LogicManifestParams, NodeInfo, Options, Registry, RpcResponse, Status, StatusResponse, StorageParams, 
+    SyncStatus, SyncStatusParams, TDU, TDUResponse, InspectResponse, ExecutionResult
 } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
@@ -657,7 +656,7 @@ export class BaseProvider extends AbstractProvider {
             // call receipt bug is resolved in the protocol.
             return {
                 receipt: receipt,
-                result: this.processReceipt.bind(this, {...receipt, ix_type: toQuantity(ixObject.type)})
+                result: this.processReceipt.bind(this, receipt)
             }
         } catch (error) {
             throw error
@@ -1065,26 +1064,7 @@ export class BaseProvider extends AbstractProvider {
 
                 clearTimers();
 
-                const result = this.processReceipt(receipt);
-
-                if(result == null) {
-                    resolve(receipt);
-                    return;
-                }
-
-                const error = ManifestCoder.decodeException(result.error);
-                
-                if (error == null) {
-                    resolve(receipt);
-                    return;
-                }
-
-                const err = new CustomError(error.error, ErrorCode.ACTION_REJECTED, {
-                    ...error,
-                    receipt,
-                });
-
-                reject(err);
+                resolve(receipt);
             }
 
             await checkReceipt();
@@ -1099,47 +1079,49 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Process the interaction receipt to determine the appropriate result based on the
-     * interaction type.
+     * Process the interaction receipt to determine the appropriate execution result 
+     * based on the transaction type.
      * 
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {any} The processed result based on the interaction type.
-     * @throws {Error} If the interaction type is unsupported or the expected response
+     * @returns {ExecutionResult[]} The processed execution results based on the transaction type.
+     * @throws {Error} If the transaction type is unsupported or the expected response
      * data is missing.
      */
-    protected processReceipt(receipt: InteractionReceipt): any {
-        switch (hexToBN(receipt.ix_type)) {
-            case IxType.VALUE_TRANSFER:
-                return null;
-            case IxType.ASSET_CREATE:
-                if (receipt.extra_data) {
-                    return receipt.extra_data as AssetCreationReceipt;
-                }
-                throw new Error("Failed to retrieve asset creation response");
-            case IxType.ASSET_MINT:
-            case IxType.ASSET_BURN:
-                if (receipt.extra_data) {
-                    return receipt.extra_data as AssetMintOrBurnReceipt;
-                }
-                throw new Error("Failed to retrieve asset mint/burn response");
-            case IxType.LOGIC_DEPLOY:
-                if (receipt.extra_data) {
-                    return receipt.extra_data as LogicDeployReceipt;
-                }
-                throw new Error("Failed to retrieve logic deploy response");
-            case IxType.LOGIC_INVOKE:
-                if (receipt.extra_data) {
-                    return receipt.extra_data as LogicInvokeReceipt;
-                }
-                throw new Error("Failed to retrieve logic invoke response");
-            case IxType.LOGIC_ENLIST:
-                if (receipt.extra_data) {
-                    return receipt.extra_data as LogicEnlistReceipt;
-                }
-                throw new Error("Failed to retrieve logic enlist response");
-            default:
-                throw new Error("Unsupported interaction type encountered");
-        }
+    protected processReceipt(receipt: InteractionReceipt): ExecutionResult[] {
+        return receipt.transactions.map(transaction => {
+            switch (hexToBN(transaction.tx_type)) {
+                case TxType.ASSET_TRANSFER:
+                    return null;
+                case TxType.ASSET_CREATE:
+                    if (transaction.data) {
+                        return transaction.data as AssetCreationResult;
+                    }
+                    throw new Error("Failed to retrieve asset creation response");
+                case TxType.ASSET_MINT:
+                case TxType.ASSET_BURN:
+                    if (transaction.data) {
+                        return transaction.data as AssetSupplyResult;
+                    }
+                    throw new Error("Failed to retrieve asset mint/burn response");
+                case TxType.LOGIC_DEPLOY:
+                    if (transaction.data) {
+                        return transaction.data as LogicDeployResult;
+                    }
+                    throw new Error("Failed to retrieve logic deploy response");
+                case TxType.LOGIC_INVOKE:
+                    if (transaction.data) {
+                        return transaction.data as LogicInvokeResult;
+                    }
+                    throw new Error("Failed to retrieve logic invoke response");
+                case TxType.LOGIC_ENLIST:
+                    if (transaction.data) {
+                        return transaction.data as LogicEnlistResult;
+                    }
+                    throw new Error("Failed to retrieve logic enlist response");
+                default:
+                    throw new Error("Unsupported interaction type encountered");
+            }
+        })
     }
 
     /**

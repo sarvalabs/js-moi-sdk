@@ -1,9 +1,9 @@
 /**
- * Enumerates the types of Interactions in the system.
+ * Enumerates the types of Transactions in the system.
  */
-export enum IxType {
+export enum TxType {
     INVALID_IX,
-    VALUE_TRANSFER,
+    ASSET_TRANSFER,
     FUEL_SUPPLY,
 
     ASSET_CREATE,
@@ -28,4 +28,13 @@ export enum IxType {
     STAKE_BOND,
     STAKE_UNBOND,
     STAKE_TRANSFER
+}
+
+/**
+ * Enumerates the types of particpant locks in the system.
+ */
+export enum LockType {
+    READ_ONLY_LOCK,
+    MUTATE_LOCK,
+    OBSERVER_LOCK
 }

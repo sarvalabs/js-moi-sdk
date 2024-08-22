@@ -1,11 +1,11 @@
 import {
-    AssetCreationReceipt,
-    AssetMintOrBurnReceipt,
+    AssetCreationResult,
+    AssetSupplyResult,
     AssetStandard,
-    IxType,
-    LogicDeployReceipt,
-    LogicInvokeReceipt,
-    LogicEnlistReceipt,
+    TxType,
+    LogicDeployResult,
+    LogicInvokeResult,
+    LogicEnlistResult,
     Participants
 } from "js-moi-utils";
 
@@ -79,17 +79,24 @@ export interface ContextHash {
     hash: string;
 }
 
+export type ExecutionResult = AssetCreationResult | AssetSupplyResult | 
+LogicDeployResult | LogicInvokeResult | LogicEnlistResult | null;
+
+export interface TransactionResult {
+    tx_type: string;
+    status: number;
+    data: ExecutionResult
+}
+
 export interface InteractionReceipt {
-    ix_type: string;
     ix_hash: string;
     status: number;
     fuel_used: string;
-    participants: Participants;
-    extra_data: AssetCreationReceipt | AssetMintOrBurnReceipt | LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
+    transactions: TransactionResult[];
     from: string;
-    to: string;
     ix_index: string;
     ts_hash: string;
+    participants: Participants;
 }
 
 export interface AssetInfo {
@@ -267,11 +274,17 @@ export interface AssetCreatePayload {
     logic_payload?: LogicPayload;
 }
 
-export interface AssetMintOrBurnPayload {
+export interface AssetSupplyPayload {
     asset_id: string;
     amount: number | bigint;
 }
 
+export interface AssetActionPayload {
+    benefactor: string;
+    beneficiary: string;
+    asset_id: string;
+    amount: number | bigint;
+}
 export interface LogicPayload {
     logic_id?: string;
     callsite: string;
@@ -279,23 +292,44 @@ export interface LogicPayload {
     manifest?: Uint8Array;
 }
 
-export type InteractionPayload = AssetCreatePayload | AssetMintOrBurnPayload | LogicPayload;
+export type TransactionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload | any;
+
+interface IxAssetFund {
+    asset_id: string;
+    amount: number | bigint;
+}
+
+interface IxTransaction {
+    type: TxType;
+    payload?: TransactionPayload;
+}
+
+interface IxParticipant {
+    address: string;
+    lock_type: number;
+}
+
+interface IxPreferences {
+    compute: Uint8Array;
+    consensus: Uint8Array;
+}
 
 interface InteractionObject {
-    type: IxType;
     nonce?: number | bigint;
 
     sender?: string;
-    receiver?: string;
     payer?: string;
-
-    transfer_values?: Map<string, number | bigint>;
-    perceived_values?: Map<string, number | bigint>;
 
     fuel_price?: number | bigint;
     fuel_limit?: number | bigint;
     
-    payload?: InteractionPayload;
+    funds?: IxAssetFund[]
+    transactions?: IxTransaction[]
+    participants?: IxParticipant[]
+
+    perception?: Uint8Array
+
+    preferences?: IxPreferences
 }
 
 export interface CallorEstimateIxObject extends InteractionObject {

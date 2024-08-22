@@ -1,9 +1,9 @@
 /**
- * Enumerates the types of Interactions in the system.
+ * Enumerates the types of Transactions in the system.
  */
-export declare enum IxType {
+export declare enum TxType {
     INVALID_IX = 0,
-    VALUE_TRANSFER = 1,
+    ASSET_TRANSFER = 1,
     FUEL_SUPPLY = 2,
     ASSET_CREATE = 3,
     ASSET_APPROVE = 4,
@@ -23,5 +23,13 @@ export declare enum IxType {
     STAKE_BOND = 18,
     STAKE_UNBOND = 19,
     STAKE_TRANSFER = 20
+}
+/**
+ * Enumerates the types of particpant locks in the system.
+ */
+export declare enum LockType {
+    READ_ONLY_LOCK = 0,
+    MUTATE_LOCK = 1,
+    OBSERVER_LOCK = 2
 }
 //# sourceMappingURL=interaction.d.ts.map

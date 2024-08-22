@@ -1,12 +1,12 @@
 import { Signer } from "js-moi-signer";
-import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "js-moi-utils";
+import { AssetCreationResult, AssetStandard, hexToBN, TxType, toQuantity } from "js-moi-utils";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
 const HOST = "http://localhost:1600";
-const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
-const ADDRESS = "0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db";
+const MNEMONIC = "hire collect attack purse horn toward penalty broom chat online mistake emerge";
+const ADDRESS = "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08";
 
 
 
@@ -23,15 +23,19 @@ describe("Test JsonRpcProvider Query Calls", () => {
       signer = await initializeWallet(provider, MNEMONIC);
       const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
-        type: IxType.ASSET_CREATE,
         nonce: nonce,
         fuel_price: 1,
         fuel_limit: 200,
-        payload: {
-            standard: AssetStandard.MAS0,
-            symbol: getRandomSymbol(),
-            supply: supply
-        }
+        transactions: [
+          {
+            type: TxType.ASSET_CREATE,
+            payload: {
+              standard: AssetStandard.MAS0,
+              symbol: getRandomSymbol(),
+              supply: supply
+            }
+          }
+        ]
       });
 
       ixHash = ixResponse.hash;
@@ -41,12 +45,12 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe('getBalance', () => {
       it('should return the asset balance', async () => {
-        if (!ixReceipt.extra_data) {
-          expect(ixReceipt.extra_data).toBeDefined();
+        if (!ixReceipt.transactions[0].data) {
+          expect(ixReceipt.transactions[0].data).toBeDefined();
           return;
         }
 
-        const balance = await provider.getBalance(address, (<AssetCreationReceipt>ixReceipt.extra_data).asset_id);
+        const balance = await provider.getBalance(address, (<AssetCreationResult>ixReceipt.transactions[0].data).asset_id);
 
         expect(balance).toBe(supply);
       })
@@ -85,7 +89,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const tdu = await provider.getTDU(address);
         expect(tdu).toBeDefined();
         
-        const extraData = ixReceipt.extra_data as AssetCreationReceipt
+        const extraData = ixReceipt.transactions[0].data as AssetCreationResult
         const asset = tdu.find(asset => asset.asset_id === extraData.asset_id);
 
         expect(asset).toBeDefined();
@@ -239,16 +243,20 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe("call", () => {
       it('should return the receipt by executing the interaction', async () => {
         const receipt = await provider.call({
-          type: IxType.ASSET_CREATE,
           nonce: nextNonce,
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
-          payload: {
-              standard: AssetStandard.MAS0,
-              symbol: "CALL",
-              supply: 1248577
-          }
+          transactions: [
+            {
+              type: TxType.ASSET_CREATE,
+              payload: {
+                standard: AssetStandard.MAS0,
+                symbol: "CALL",
+                supply: 1248577
+              }
+            }
+          ]
         })
 
         expect(receipt).toBeDefined()
@@ -258,16 +266,20 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe("estimateFuel", () => {
       it('should return the estimated fuel by executing the interaction', async () => {
         const fuelPrice = await provider.estimateFuel({
-          type: IxType.ASSET_CREATE,
           nonce: nextNonce,
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
-          payload: {
-              standard: AssetStandard.MAS0,
-              symbol: "ESTIMATE",
-              supply: 1248577
-          }
+          transactions: [
+            {
+              type: TxType.ASSET_CREATE,
+              payload: {
+                standard: AssetStandard.MAS0,
+                symbol: "ESTIMATE",
+                supply: 1248577
+              }
+            }
+          ]
         })
 
         expect(fuelPrice).toBeDefined()
@@ -399,15 +411,19 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const nonce = await signer.getNonce();
         const filter = await provider.getNewTesseractFilter();
         const ixResponse = await signer.sendInteraction({
-          type: IxType.ASSET_CREATE,
           nonce: nonce,
           fuel_price: 1,
           fuel_limit: 200,
-          payload: {
-              standard: AssetStandard.MAS0,
-              symbol: "TESTING",
-              supply: 1248577
-          }
+          transactions: [
+            {
+              type: TxType.ASSET_CREATE,
+              payload: {
+                standard: AssetStandard.MAS0,
+                symbol: "TESTING",
+                supply: 1248577
+              }
+            }
+          ]
         });
 
         await ixResponse.wait()

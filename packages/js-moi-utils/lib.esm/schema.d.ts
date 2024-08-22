@@ -1,6 +1,9 @@
 export declare const logicSchema: {
     kind: string;
     fields: {
+        manifest: {
+            kind: string;
+        };
         logic_id: {
             kind: string;
         };
@@ -10,8 +13,16 @@ export declare const logicSchema: {
         calldata: {
             kind: string;
         };
-        manifest: {
+        interface: {
             kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
         };
     };
 };
@@ -39,6 +50,9 @@ export declare const assetCreateSchema: {
         logic_payload: {
             kind: string;
             fields: {
+                manifest: {
+                    kind: string;
+                };
                 logic_id: {
                     kind: string;
                 };
@@ -48,14 +62,39 @@ export declare const assetCreateSchema: {
                 calldata: {
                     kind: string;
                 };
-                manifest: {
+                interface: {
                     kind: string;
+                    fields: {
+                        keys: {
+                            kind: string;
+                        };
+                        values: {
+                            kind: string;
+                        };
+                    };
                 };
             };
         };
     };
 };
-export declare const assetMintOrBurnSchema: {
+export declare const assetActionSchema: {
+    kind: string;
+    fields: {
+        benefactor: {
+            kind: string;
+        };
+        beneficiary: {
+            kind: string;
+        };
+        asset_id: {
+            kind: string;
+        };
+        amount: {
+            kind: string;
+        };
+    };
+};
+export declare const assetSupplySchema: {
     kind: string;
     fields: {
         asset_id: {
@@ -69,42 +108,14 @@ export declare const assetMintOrBurnSchema: {
 export declare const ixObjectSchema: {
     kind: string;
     fields: {
-        type: {
-            kind: string;
-        };
-        nonce: {
-            kind: string;
-        };
         sender: {
-            kind: string;
-        };
-        receiver: {
             kind: string;
         };
         payer: {
             kind: string;
         };
-        transfer_values: {
+        nonce: {
             kind: string;
-            fields: {
-                keys: {
-                    kind: string;
-                };
-                values: {
-                    kind: string;
-                };
-            };
-        };
-        perceived_values: {
-            kind: string;
-            fields: {
-                keys: {
-                    kind: string;
-                };
-                values: {
-                    kind: string;
-                };
-            };
         };
         fuel_price: {
             kind: string;
@@ -112,8 +123,67 @@ export declare const ixObjectSchema: {
         fuel_limit: {
             kind: string;
         };
-        payload: {
+        funds: {
             kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        asset_id: {
+                            kind: string;
+                        };
+                        amount: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        transactions: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        type: {
+                            kind: string;
+                        };
+                        payload: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        participants: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        address: {
+                            kind: string;
+                        };
+                        lock_type: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        perception: {
+            kind: string;
+        };
+        preferences: {
+            kind: string;
+            fields: {
+                compute: {
+                    kind: string;
+                };
+                consensus: {
+                    kind: string;
+                };
+            };
         };
     };
 };

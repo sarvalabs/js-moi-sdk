@@ -3,36 +3,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.processIxObject = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
-const serializePayload = (ixType, payload) => {
+const serializePayload = (txType, payload) => {
     let polorizer = new js_polo_1.Polorizer();
-    switch (ixType) {
-        case js_moi_utils_1.IxType.ASSET_CREATE:
+    switch (txType) {
+        case js_moi_utils_1.TxType.ASSET_TRANSFER:
+            polorizer.polorize(payload, js_moi_utils_1.assetActionSchema);
+            return polorizer.bytes();
+        case js_moi_utils_1.TxType.ASSET_CREATE:
             polorizer.polorize(payload, js_moi_utils_1.assetCreateSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.IxType.ASSET_MINT:
-        case js_moi_utils_1.IxType.ASSET_BURN:
-            polorizer.polorize(payload, js_moi_utils_1.assetMintOrBurnSchema);
+        case js_moi_utils_1.TxType.ASSET_MINT:
+        case js_moi_utils_1.TxType.ASSET_BURN:
+            polorizer.polorize(payload, js_moi_utils_1.assetSupplySchema);
             return polorizer.bytes();
-        case js_moi_utils_1.IxType.LOGIC_DEPLOY:
-        case js_moi_utils_1.IxType.LOGIC_INVOKE:
-        case js_moi_utils_1.IxType.LOGIC_ENLIST:
+        case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+        case js_moi_utils_1.TxType.LOGIC_INVOKE:
+        case js_moi_utils_1.TxType.LOGIC_ENLIST:
             polorizer.polorize(payload, js_moi_utils_1.logicSchema);
             return polorizer.bytes();
         default:
             js_moi_utils_1.ErrorUtils.throwError("Failed to serialize payload", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
     }
-};
-/**
- * Trims the "0x" prefix from the keys of a Map and returns a new Map.
- *
- * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
- * @returns {Record<string, string>} - A object with keys as hexadecimal strings without the "0x" prefix.
- */
-const processValues = (values) => {
-    return Array.from(values).reduce((entries, [key, value]) => {
-        entries[key] = (0, js_moi_utils_1.toQuantity)(value);
-        return entries;
-    }, {});
 };
 /**
  * Processes the interaction object based on its type and returns the processed object.
@@ -43,21 +34,18 @@ const processValues = (values) => {
  */
 const processIxObject = (ixObject) => {
     try {
-        const processedIxObject = {
-            type: ixObject.type,
+        return {
             nonce: (0, js_moi_utils_1.toQuantity)(ixObject.nonce),
             sender: ixObject.sender,
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
+            funds: [],
+            transactions: ixObject.transactions.map(transaction => ({
+                ...transaction,
+                payload: "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(transaction.type, transaction.payload)),
+            })),
+            participants: []
         };
-        if (ixObject.type === js_moi_utils_1.IxType.VALUE_TRANSFER) {
-            processedIxObject.receiver = ixObject.receiver;
-            processedIxObject.transfer_values = processValues(ixObject.transfer_values);
-        }
-        else {
-            processedIxObject.payload = "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(ixObject.type, ixObject.payload));
-        }
-        return processedIxObject;
     }
     catch (err) {
         js_moi_utils_1.ErrorUtils.throwError("Failed to process interaction object", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });

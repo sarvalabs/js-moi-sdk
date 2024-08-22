@@ -1,18 +1,26 @@
-import { IxType } from "js-moi-utils";
+import { TxType } from "js-moi-utils";
+import { IxAssetFund, IxParticipant, IxPreferences } from "./jsonrpc";
+
+
+interface IxTransaction {
+    type: TxType;
+    payload?: string;
+}
 
 export interface ProcessedIxObject {
-    type: IxType;
     nonce: string;
 
     sender: string;
-    receiver?: string;
     payer?: string;
 
-    transfer_values?: Record<string, string>;
-    perceived_values?: Map<string, string>;
+    funds: IxAssetFund[]
+    transactions: IxTransaction[]
+    participants: IxParticipant[]
 
     fuel_price: string;
     fuel_limit: string;
-    
-    payload?: string;
+
+    perception?: Uint8Array
+
+    preferences?: IxPreferences
 }

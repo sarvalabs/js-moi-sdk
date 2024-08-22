@@ -1,6 +1,6 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType } from "js-moi-utils";
 import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 const DEFAULT_FUEL_PRICE = 1;
@@ -29,16 +29,16 @@ export class LogicBase extends ElementDescriptor {
     /**
      * Returns the interaction type based on the routine kind.
      *
-     * @returns {IxType} The interaction type.
+     * @returns {TxType} The interaction type.
      */
-    getIxType(kind) {
+    getTxType(kind) {
         switch (kind) {
             case "deploy":
-                return IxType.LOGIC_DEPLOY;
+                return TxType.LOGIC_DEPLOY;
             case "invoke":
-                return IxType.LOGIC_INVOKE;
+                return TxType.LOGIC_INVOKE;
             case "enlist":
-                return IxType.LOGIC_ENLIST;
+                return TxType.LOGIC_ENLIST;
             default:
                 throw new Error("Unsupported routine kind!");
         }
@@ -68,8 +68,8 @@ export class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
-            ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", ErrorCode.NOT_INITIALIZED);
+        if (this.getTxType(ixObject.routine.kind) !== TxType.LOGIC_DEPLOY && !this.getLogicId()) {
+            ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
         switch (type) {
@@ -117,8 +117,12 @@ export class LogicBase extends ElementDescriptor {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            type: this.getIxType(ixObject.routine.kind),
-            payload: ixObject.createPayload(),
+            transactions: [
+                {
+                    type: this.getTxType(ixObject.routine.kind),
+                    payload: ixObject.createPayload(),
+                }
+            ]
         };
         if (option.sender != null) {
             params.sender = option.sender;

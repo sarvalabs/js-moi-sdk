@@ -1,21 +1,24 @@
-import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ProcessedIxObject } from "../types/interaction";
-import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";
+import { CallorEstimateIxObject, TransactionPayload } from "../types/jsonrpc";
 
-const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Array => {
+const serializePayload = (txType: TxType, payload: TransactionPayload): Uint8Array => {
     let polorizer = new Polorizer()
-    switch(ixType) {
-        case IxType.ASSET_CREATE:
+    switch(txType) {
+        case TxType.ASSET_TRANSFER:
+            polorizer.polorize(payload, assetActionSchema);
+            return polorizer.bytes()
+        case TxType.ASSET_CREATE:
             polorizer.polorize(payload, assetCreateSchema);
             return polorizer.bytes()
-        case IxType.ASSET_MINT:
-        case IxType.ASSET_BURN:
-            polorizer.polorize(payload, assetMintOrBurnSchema);
+        case TxType.ASSET_MINT:
+        case TxType.ASSET_BURN:
+            polorizer.polorize(payload, assetSupplySchema);
             return polorizer.bytes()
-        case IxType.LOGIC_DEPLOY:
-        case IxType.LOGIC_INVOKE:
-        case IxType.LOGIC_ENLIST:
+        case TxType.LOGIC_DEPLOY:
+        case TxType.LOGIC_INVOKE:
+        case TxType.LOGIC_ENLIST:
             polorizer.polorize(payload, logicSchema);
             return polorizer.bytes()
         default:
@@ -27,19 +30,6 @@ const serializePayload = (ixType: IxType, payload: InteractionPayload): Uint8Arr
 }
 
 /**
- * Trims the "0x" prefix from the keys of a Map and returns a new Map.
- *
- * @param {Map<string, number | bigint>} values - The input Map with keys as hexadecimal strings.
- * @returns {Record<string, string>} - A object with keys as hexadecimal strings without the "0x" prefix.
- */
-const processValues = (values: Map<string, number | bigint>): Record<string, string> => {
-    return Array.from(values).reduce((entries: Record<string, string>, [key, value]) => {
-        entries[key] = toQuantity(value);
-        return entries;
-    }, {});
-};
-
-/**
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
@@ -48,22 +38,18 @@ const processValues = (values: Map<string, number | bigint>): Record<string, str
  */
 export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxObject => {
     try {
-        const processedIxObject: ProcessedIxObject = { 
-            type: ixObject.type,
+        return { 
             nonce: toQuantity(ixObject.nonce),
             sender: ixObject.sender,
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
+            funds: [],
+            transactions: ixObject.transactions.map(transaction => ({
+                ...transaction, 
+                payload: "0x" + bytesToHex(serializePayload(transaction.type, transaction.payload)),
+            })),
+            participants: []
         };
-
-        if(ixObject.type === IxType.VALUE_TRANSFER) {
-            processedIxObject.receiver = ixObject.receiver;
-            processedIxObject.transfer_values = processValues(ixObject.transfer_values);
-        } else {
-            processedIxObject.payload = "0x" + bytesToHex(serializePayload(ixObject.type, ixObject.payload))
-        }
-
-        return processedIxObject;
     } catch(err) {
         ErrorUtils.throwError(
             "Failed to process interaction object",

@@ -1,6 +1,5 @@
 import { Buffer } from "buffer";
-import { InteractionPayload } from "js-moi-providers";
-import { IxType } from "js-moi-utils";
+import { TxType } from "js-moi-utils";
 
 export interface ISignature {
     Digest(): Uint8Array;
@@ -29,19 +28,40 @@ export interface SigningAlgorithms {
     ecdsa_secp256k1: ECDSA_S256
 }
 
-export interface ProcessedIxObject {
-    type: IxType;
+interface ProcessedIxAssetFund {
+    asset_id: string;
+    amount: number;
+}
+
+interface ProcessedIxPreferences {
+    compute: Uint8Array;
+    consensus: Uint8Array;
+}
+
+interface ProcessedIxTransaction {
+    type: TxType
+    payload: Uint8Array
+}
+
+interface ProcessedIxParticipant {
+    address: Uint8Array;
+    lock_type: number;
+}
+
+interface ProcessedIxObject {
     nonce?: number | bigint;
 
-    sender: Uint8Array;
-    receiver: Uint8Array;
-    payer: Uint8Array;
+    sender?: Uint8Array;
+    payer?: Uint8Array;
 
-    transfer_values?: Map<string, number | bigint>;
-    perceived_values?: Map<string, number | bigint>;
-
-    fuel_price: number | bigint;
-    fuel_limit: number | bigint;
+    fuel_price?: number | bigint;
+    fuel_limit?: number | bigint;
     
-    payload?: InteractionPayload;
+    funds: ProcessedIxAssetFund[]
+    transactions: ProcessedIxTransaction[]
+    participants: ProcessedIxParticipant[]
+
+    perception?: Uint8Array
+
+    preferences?: ProcessedIxPreferences
 }
