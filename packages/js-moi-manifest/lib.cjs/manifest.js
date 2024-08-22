@@ -18,9 +18,8 @@ class ManifestCoder {
     /**
      * Creates an instance of ManifestCoder.
      */
-    constructor(manifestOrElements) {
-        const elements = Array.isArray(manifestOrElements) ? manifestOrElements : manifestOrElements.elements;
-        this.elementDescriptor = new element_descriptor_1.ElementDescriptor(elements);
+    constructor(descriptorOrManifest) {
+        this.elementDescriptor = descriptorOrManifest instanceof element_descriptor_1.ElementDescriptor ? descriptorOrManifest : new element_descriptor_1.ElementDescriptor(descriptorOrManifest);
     }
     get schema() {
         return new schema_1.Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());

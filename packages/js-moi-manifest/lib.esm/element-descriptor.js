@@ -10,9 +10,10 @@ export class ElementDescriptor {
     classDefs = new Map();
     methodDefs = new Map();
     constructor(elements) {
-        this.stateMatrix = new ContextStateMatrix(elements);
+        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
+        this.stateMatrix = new ContextStateMatrix(elementsArr);
         // Populate the maps for elements, call sites, class and method definitions.
-        elements.forEach((element) => {
+        elementsArr.forEach((element) => {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
                 case "class":

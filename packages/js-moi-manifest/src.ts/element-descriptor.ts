@@ -22,11 +22,12 @@ export class ElementDescriptor {
     protected classDefs: Map<string, number> = new Map();
     protected methodDefs: Map<string, MethodDef> = new Map();
 
-    constructor(elements: LogicManifest.Element[]) {
-        this.stateMatrix = new ContextStateMatrix(elements);
+    constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest) {
+        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
+        this.stateMatrix = new ContextStateMatrix(elementsArr);
 
         // Populate the maps for elements, call sites, class and method definitions.
-        elements.forEach((element) => {
+        elementsArr.forEach((element) => {
             this.elements.set(element.ptr, element);
 
             switch (element.kind) {

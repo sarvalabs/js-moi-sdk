@@ -13,8 +13,8 @@ export class LogicBase extends ElementDescriptor {
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new ManifestCoder(manifest.elements);
+        super(manifest);
+        this.manifestCoder = new ManifestCoder(manifest);
         this.connect(arg);
     }
     /**

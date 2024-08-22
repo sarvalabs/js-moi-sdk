@@ -19,10 +19,10 @@ export class ManifestCoder {
     /**
      * Creates an instance of ManifestCoder.
      * 
-     * @param {LogicManifest.Manifest} element - The elements of the logic manifest.
+     * @param {LogicManifest.Manifest} elementDescriptor - The element descriptor.
      * @constructor
      */
-    constructor(elements: LogicManifest.Element[]);
+    constructor(elementDescriptor: ElementDescriptor);
     /**
      * Creates an instance of ManifestCoder.
      * 
@@ -33,9 +33,8 @@ export class ManifestCoder {
     /**
      * Creates an instance of ManifestCoder.
      */
-    constructor(manifestOrElements: LogicManifest.Manifest | LogicManifest.Element[]) {
-        const elements = Array.isArray(manifestOrElements) ? manifestOrElements : manifestOrElements.elements;
-        this.elementDescriptor = new ElementDescriptor(elements);
+    constructor(descriptorOrManifest: LogicManifest.Manifest | ElementDescriptor) {
+        this.elementDescriptor = descriptorOrManifest instanceof ElementDescriptor ? descriptorOrManifest : new ElementDescriptor(descriptorOrManifest);
     }
 
     private get schema(): Schema {
