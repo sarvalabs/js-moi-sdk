@@ -49,7 +49,7 @@ export declare class ManifestCoder {
      * @returns {string} The POLO-encoded calldata as a hexadecimal string
      prefixed with "0x".
      */
-    encodeArguments(fields: LogicManifest.TypeField[], args: any[]): string;
+    encodeArguments(fields: LogicManifest.TypeField[] | string, args: any[]): string;
     /**
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
@@ -60,7 +60,7 @@ export declare class ManifestCoder {
      * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    decodeOutput(output: string, fields: LogicManifest.TypeField[]): unknown | null;
+    decodeOutput<T>(output: string, fields: LogicManifest.TypeField[] | string): T | null;
     /**
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.

@@ -206,21 +206,19 @@ export class ManifestCoder {
      * @returns {string} The POLO-encoded calldata as a hexadecimal string 
      prefixed with "0x".
      */
-    public encodeArguments(fields: LogicManifest.TypeField[], args: any[]): string {
+    public encodeArguments(fields: LogicManifest.TypeField[] | string, args: any[]): string {
+        if (typeof fields === "string") {
+            const element  = this.elementDescriptor.getRoutineElement(fields).data as LogicManifest.Routine
+            fields = element.accepts
+        }
+        
         const schema = this.schema.parseFields(fields);
-        const calldata = {};
-        Object.values(fields).forEach((field:LogicManifest.TypeField) => {
-            calldata[field.label] = this.parseCalldata(
-                schema.fields[field.label], 
-                args[field.slot]
-            );
-        });
+        const calldata = Object.values(fields).reduce((acc, field: LogicManifest.TypeField) => {
+            acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+            return acc;
+        }, {});
 
-        const document = documentEncode(calldata, schema);
-        const bytes = document.bytes();
-        const data = "0x" + bytesToHex(new Uint8Array(bytes));
-
-        return data;
+        return "0x" + bytesToHex((documentEncode(calldata, schema).bytes()))
     }
 
     /**
@@ -233,12 +231,17 @@ export class ManifestCoder {
      * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput(output: string, fields: LogicManifest.TypeField[]): unknown | null {
+    public decodeOutput<T>(output: string, fields: LogicManifest.TypeField[] | string): T | null {
+        if (typeof fields === "string") {
+            const element  = this.elementDescriptor.getRoutineElement(fields).data as LogicManifest.Routine
+            fields = element.returns
+        }
+
         if(output && output != "0x" && fields && fields.length) {
             const decodedOutput = hexToBytes(output)
             const depolorizer = new Depolorizer(decodedOutput)
             const schema = this.schema.parseFields(fields);
-            return depolorizer.depolorize(schema)
+            return depolorizer.depolorize(schema) as T
         }
 
         return null

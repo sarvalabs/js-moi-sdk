@@ -155,15 +155,16 @@ export class ManifestCoder {
      prefixed with "0x".
      */
     encodeArguments(fields, args) {
+        if (typeof fields === "string") {
+            const element = this.elementDescriptor.getRoutineElement(fields).data;
+            fields = element.accepts;
+        }
         const schema = this.schema.parseFields(fields);
-        const calldata = {};
-        Object.values(fields).forEach((field) => {
-            calldata[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
-        });
-        const document = documentEncode(calldata, schema);
-        const bytes = document.bytes();
-        const data = "0x" + bytesToHex(new Uint8Array(bytes));
-        return data;
+        const calldata = Object.values(fields).reduce((acc, field) => {
+            acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+            return acc;
+        }, {});
+        return "0x" + bytesToHex((documentEncode(calldata, schema).bytes()));
     }
     /**
      * Decodes the output data returned from a logic routine call.
@@ -176,6 +177,10 @@ export class ManifestCoder {
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
     decodeOutput(output, fields) {
+        if (typeof fields === "string") {
+            const element = this.elementDescriptor.getRoutineElement(fields).data;
+            fields = element.returns;
+        }
         if (output && output != "0x" && fields && fields.length) {
             const decodedOutput = hexToBytes(output);
             const depolorizer = new Depolorizer(decodedOutput);
