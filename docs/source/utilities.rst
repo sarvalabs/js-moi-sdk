@@ -68,50 +68,39 @@ It includes the following properties:
 
 The ``Interactions`` type represents an array of interactions.
 
-**AssetCreationReceipt**
+**AssetCreationResult**
 
-The ``AssetCreationReceipt`` interface represents a receipt for asset creation. It has the following properties:
+The ``AssetCreationResult`` interface represents a receipt for asset creation. It has the following properties:
 
 * ``asset_id`` - ``string``: The ID of the created asset.
 * ``address`` - ``string``: The address associated with the asset.
 
-**AssetMintOrBurnReceipt**
+**AssetSupplyResult**
 
-The ``AssetMintOrBurnReceipt`` interface represents a receipt for asset minting or burning. It has the following properties:
+The ``AssetSupplyResult`` interface represents a receipt for asset minting or burning. It has the following properties:
 
 * ``total_supply`` - ``string``: The total supply of the asset.
 
-**LogicDeployReceipt**
+**LogicDeployResult**
 
-The ``LogicDeployReceipt`` interface represents a receipt for logic deployment. It has the following properties:
+The ``LogicDeployResult`` interface represents a receipt for logic deployment. It has the following properties:
 
 * ``logic_id`` - ``string`` (optional): The ID of the deployed logic.
 * ``error`` - ``string``: The error message associated with the deployment.
 
-**LogicInvokeReceipt**
+**LogicInvokeResult**
 
-The ``LogicInvokeReceipt`` interface represents a receipt for logic execution. It has the following properties:
+The ``LogicInvokeResult`` interface represents a receipt for logic execution. It has the following properties:
 
 * ``outputs`` - ``string``: The outputs of the logic execution.
 * ``error`` - ``string``: The error message associated with the execution.
 
-**LogicEnlistReceipt**
+**LogicEnlistResult**
 
-The ``LogicEnlistReceipt`` interface represents a receipt for logic enlist. It has the following properties:
+The ``LogicEnlistResult`` interface represents a receipt for logic enlist. It has the following properties:
 
 * ``outputs`` - ``string``: The outputs of the logic enlist.
 * ``error`` - ``string``: The error message associated with the enlist.
-
-**Receipt**
-
-The ``Receipt`` interface represents an interaction receipt. It has the following properties:
-
-* ``ix_type`` - ``number``: The type of the interaction.
-* ``ix_hash`` - ``string``: The hash of the interaction.
-* ``fuel_used`` - ``bigint``: The fuel used for the interaction.
-* ``state_hashes`` - ``Map<string, string>``: State hashes associated with the interaction.
-* ``context_hashes`` - ``Map<string, string>``: Context hashes associated with the interaction.
-* ``extra_data`` - ``AssetCreationReceipt``, ``AssetMintOrBurnReceipt``, ``LogicDeployReceipt``, ``LogicInvokeReceipt``, or ``null``: Additional data associated with the interaction receipt.
 
 **ConsensusInfo**
 

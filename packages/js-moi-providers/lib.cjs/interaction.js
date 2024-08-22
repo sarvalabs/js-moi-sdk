@@ -40,9 +40,9 @@ const processIxObject = (ixObject) => {
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
             funds: [],
-            transactions: ixObject.transactions.map(step => ({
-                ...step,
-                payload: "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(step.type, step.payload)),
+            transactions: ixObject.transactions.map(transaction => ({
+                ...transaction,
+                payload: "0x" + (0, js_moi_utils_1.bytesToHex)(serializePayload(transaction.type, transaction.payload)),
             })),
             participants: []
         };

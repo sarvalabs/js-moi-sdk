@@ -1,5 +1,5 @@
 import { Signer } from "js-moi-signer";
-import { AssetCreationReceipt, AssetStandard, hexToBN, TxType, toQuantity } from "js-moi-utils";
+import { AssetCreationResult, AssetStandard, hexToBN, TxType, toQuantity } from "js-moi-utils";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
@@ -50,7 +50,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           return;
         }
 
-        const balance = await provider.getBalance(address, (<AssetCreationReceipt>ixReceipt.transactions[0].data).asset_id);
+        const balance = await provider.getBalance(address, (<AssetCreationResult>ixReceipt.transactions[0].data).asset_id);
 
         expect(balance).toBe(supply);
       })
@@ -89,7 +89,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const tdu = await provider.getTDU(address);
         expect(tdu).toBeDefined();
         
-        const extraData = ixReceipt.transactions[0].data as AssetCreationReceipt
+        const extraData = ixReceipt.transactions[0].data as AssetCreationResult
         const asset = tdu.find(asset => asset.asset_id === extraData.asset_id);
 
         expect(asset).toBeDefined();

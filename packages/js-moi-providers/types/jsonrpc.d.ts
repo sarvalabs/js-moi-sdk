@@ -1,11 +1,11 @@
 import {
-    AssetCreationReceipt,
-    AssetMintOrBurnReceipt,
+    AssetCreationResult,
+    AssetSupplyResult,
     AssetStandard,
     TxType,
-    LogicDeployReceipt,
-    LogicInvokeReceipt,
-    LogicEnlistReceipt,
+    LogicDeployResult,
+    LogicInvokeResult,
+    LogicEnlistResult,
     Participants
 } from "js-moi-utils";
 
@@ -79,8 +79,8 @@ export interface ContextHash {
     hash: string;
 }
 
-export type ExecutionResult = AssetCreationReceipt | AssetMintOrBurnReceipt | 
-LogicDeployReceipt | LogicInvokeReceipt | LogicEnlistReceipt | null;
+export type ExecutionResult = AssetCreationResult | AssetSupplyResult | 
+LogicDeployResult | LogicInvokeResult | LogicEnlistResult | null;
 
 export interface TransactionResult {
     tx_type: string;

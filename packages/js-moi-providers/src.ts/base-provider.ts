@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import {
-    AssetCreationReceipt, AssetMintOrBurnReceipt, ErrorCode, ErrorUtils, Interaction,
-    TxType, LogicDeployReceipt, LogicInvokeReceipt, LogicEnlistReceipt, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
+    AssetCreationResult, AssetSupplyResult, ErrorCode, ErrorUtils, Interaction,
+    TxType, LogicDeployResult, LogicInvokeResult, LogicEnlistResult, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
@@ -1094,28 +1094,28 @@ export class BaseProvider extends AbstractProvider {
                     return null;
                 case TxType.ASSET_CREATE:
                     if (transaction.data) {
-                        return transaction.data as AssetCreationReceipt;
+                        return transaction.data as AssetCreationResult;
                     }
                     throw new Error("Failed to retrieve asset creation response");
                 case TxType.ASSET_MINT:
                 case TxType.ASSET_BURN:
                     if (transaction.data) {
-                        return transaction.data as AssetMintOrBurnReceipt;
+                        return transaction.data as AssetSupplyResult;
                     }
                     throw new Error("Failed to retrieve asset mint/burn response");
                 case TxType.LOGIC_DEPLOY:
                     if (transaction.data) {
-                        return transaction.data as LogicDeployReceipt;
+                        return transaction.data as LogicDeployResult;
                     }
                     throw new Error("Failed to retrieve logic deploy response");
                 case TxType.LOGIC_INVOKE:
                     if (transaction.data) {
-                        return transaction.data as LogicInvokeReceipt;
+                        return transaction.data as LogicInvokeResult;
                     }
                     throw new Error("Failed to retrieve logic invoke response");
                 case TxType.LOGIC_ENLIST:
                     if (transaction.data) {
-                        return transaction.data as LogicEnlistReceipt;
+                        return transaction.data as LogicEnlistResult;
                     }
                     throw new Error("Failed to retrieve logic enlist response");
                 default:

@@ -37,9 +37,9 @@ export const processIxObject = (ixObject) => {
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
             funds: [],
-            transactions: ixObject.transactions.map(step => ({
-                ...step,
-                payload: "0x" + bytesToHex(serializePayload(step.type, step.payload)),
+            transactions: ixObject.transactions.map(transaction => ({
+                ...transaction,
+                payload: "0x" + bytesToHex(serializePayload(transaction.type, transaction.payload)),
             })),
             participants: []
         };
