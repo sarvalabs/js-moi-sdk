@@ -31,7 +31,7 @@ describe("Test ManifestCoder", () => {
 
     describe("Encode arguments into polo format", () => {
         test("When the field is passed as a routine name", () => {
-            const args = ["MOI", 100000000];
+            const args = ["MOI", 100_000_000];
             const calldata = manifestCoder.encodeArguments("Seeder", args);
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
