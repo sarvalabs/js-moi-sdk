@@ -56,10 +56,10 @@ fuel limit, and so on.
 
 **Transaction**
 
-A Transaction is an individual operation encapsulated within an interaction on 
-the MOI network. It is responsible for executing specific actions, such as asset 
-creation, transfer, minting, burning, logic deployment, invocation, or enlist. 
-Each transaction includes key details like the type of action being performed, 
+A Transaction is an individual operation encapsulated within an interaction. 
+It is responsible for executing specific actions, such as asset creation, 
+transfer, minting, burning, logic deployment, invocation, or enlist. 
+Each transaction includes key details like the type of action being performed and 
 the associated payload. Transactions are processed as part of an interaction, and 
 their execution directly impacts the state of participants and contributes to 
 changes in the overall network state.
