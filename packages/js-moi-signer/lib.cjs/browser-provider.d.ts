@@ -12,7 +12,7 @@ export declare class BrowserProvider extends BaseProvider {
 export declare class BrowserSigner extends Signer {
     constructor();
     sign(message: Uint8Array): string;
-    getAddress(): string;
+    getAddress(): Promise<string>;
     connect(provider: AbstractProvider): void;
     isInitialized(): boolean;
     signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;

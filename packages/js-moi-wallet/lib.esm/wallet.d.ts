@@ -79,13 +79,7 @@ export declare class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    getAddress(): string;
-    /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    get address(): string;
+    getAddress(): Promise<string>;
     /**
      * Connects the wallet to the given provider.
      *

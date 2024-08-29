@@ -39,7 +39,7 @@ export class Signer {
     async getNonce(options) {
         try {
             const provider = this.getProvider();
-            const address = this.getAddress();
+            const address = await this.getAddress();
             if (!options) {
                 return await provider.getPendingInteractionCount(address);
             }
@@ -66,7 +66,7 @@ export class Signer {
         if (!isValidAddress(ixObject.sender)) {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
-        if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
+        if (this.isInitialized() && ixObject.sender !== await this.getAddress()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.type === IxType.VALUE_TRANSFER) {
@@ -107,7 +107,7 @@ export class Signer {
      */
     async prepareInteraction(method, ixObject) {
         if (!ixObject.sender) {
-            ixObject.sender = this.getAddress();
+            ixObject.sender = await this.getAddress();
         }
         await this.checkInteraction(method, ixObject);
         if (method === "send" && ixObject.nonce == null) {

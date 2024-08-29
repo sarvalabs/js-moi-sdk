@@ -231,17 +231,8 @@ export class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    public getAddress(): string {
+    public async getAddress(): Promise<string> {
         return "0x" + this.publicKey.slice(2);
-    }
-
-    /**
-     * Address associated with the wallet.
-     * 
-     * @readonly
-     */
-    public get address(): string {
-        return this.getAddress();
     }
 
     /**

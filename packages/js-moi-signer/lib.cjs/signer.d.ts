@@ -8,7 +8,7 @@ export declare abstract class Signer {
     provider?: AbstractProvider;
     signingAlgorithms: SigningAlgorithms;
     constructor(provider?: AbstractProvider);
-    abstract getAddress(): string;
+    abstract getAddress(): Promise<string>;
     abstract connect(provider: AbstractProvider): void;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract isInitialized(): boolean;

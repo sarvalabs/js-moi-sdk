@@ -193,16 +193,8 @@ export class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    getAddress() {
+    async getAddress() {
         return "0x" + this.publicKey.slice(2);
-    }
-    /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    get address() {
-        return this.getAddress();
     }
     /**
      * Connects the wallet to the given provider.

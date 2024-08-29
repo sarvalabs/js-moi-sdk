@@ -21,7 +21,7 @@ export abstract class Signer {
         };
     }
 
-    abstract getAddress(): string;
+    abstract getAddress(): Promise<string>;
     abstract connect(provider: AbstractProvider): void;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract isInitialized(): boolean;
@@ -58,7 +58,7 @@ export abstract class Signer {
     public async getNonce(options?: Options): Promise<number | bigint> {
         try {
             const provider = this.getProvider();
-            const address = this.getAddress();
+            const address = await this.getAddress();
 
             if(!options) {
                 return await provider.getPendingInteractionCount(address)
@@ -90,7 +90,7 @@ export abstract class Signer {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
-        if(this.isInitialized() && ixObject.sender !== this.getAddress()) {
+        if(this.isInitialized() && ixObject.sender !== await this.getAddress()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
@@ -138,7 +138,7 @@ export abstract class Signer {
      */
     private async prepareInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
         if (!ixObject.sender) {
-            ixObject.sender = this.getAddress();
+            ixObject.sender = await this.getAddress();
         }
         
         await this.checkInteraction(method, ixObject);

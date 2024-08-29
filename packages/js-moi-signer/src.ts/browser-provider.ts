@@ -33,7 +33,7 @@ export class BrowserSigner extends Signer {
         throw new Error("Not implemented");
     }
 
-    getAddress(): string {
+    getAddress(): Promise<string> {
         throw new Error("Method not implemented.");
     }
     
