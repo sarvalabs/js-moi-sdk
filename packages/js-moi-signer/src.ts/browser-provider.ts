@@ -1,11 +1,15 @@
 
-import { BaseProvider, type AbstractProvider, type InteractionObject, type InteractionRequest } from "js-moi-providers";
+import { BaseProvider, type InteractionObject, type InteractionRequest } from "js-moi-providers";
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import type { SigType } from "../types";
 import { Signer } from "./signer";
 
 interface BrowserRequest {
     request<T>(method: string, params: any[]): Promise<T>;
     sign(message: Uint8Array): string;
+    getAddress(): Promise<string>;
+    isInitialized(): boolean;
+    signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
 }
 
 export class BrowserProvider extends BaseProvider {
@@ -16,6 +20,10 @@ export class BrowserProvider extends BaseProvider {
             const data = await browser.request<T>(method, params)
             return { id: 1, jsonrpc: "2.0", result: data }
         };
+
+        this.getSigner = async () => {
+            return new BrowserSigner(browser);
+        }
     }
 
     async getSigner(): Promise<Signer> {
@@ -24,28 +32,17 @@ export class BrowserProvider extends BaseProvider {
     }
 }
 
+// @ts-ignore
 export class BrowserSigner extends Signer {
-    constructor() {
-        super();
-    }
-
-    sign(message: Uint8Array): string {
-        throw new Error("Not implemented");
-    }
-
-    getAddress(): Promise<string> {
-        throw new Error("Method not implemented.");
-    }
-    
-    connect(provider: AbstractProvider): void {
-        throw new Error("Method not implemented.");
-    }
-
-    isInitialized(): boolean {
-        throw new Error("Method not implemented.");
-    }
-    
-    signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
-        throw new Error("Method not implemented.");
+    constructor(browser: BrowserRequest) {
+        super(new BrowserProvider(browser));
+        
+        this.sign = browser.sign;
+        this.getAddress = browser.getAddress;
+        this.connect = () => {
+            ErrorUtils.throwError("Browser signer does not support connecting to a provider",  ErrorCode.UNSUPPORTED_OPERATION);
+        };
+        this.isInitialized = browser.isInitialized;
+        this.signInteraction = browser.signInteraction;
     }
 }
