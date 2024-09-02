@@ -57,7 +57,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    protected processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): LogicIxArguments;
+    protected processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): Promise<LogicIxArguments>;
     /**
      * Creates a logic interaction request object based on the given interaction object.
      *
