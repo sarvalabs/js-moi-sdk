@@ -239,6 +239,10 @@ export abstract class Signer {
             verificationKey = publicKey as Uint8Array
         }
 
+        if (verificationKey.length === 33) {
+            verificationKey = verificationKey.slice(1);
+        }
+
         const sig = new Signature();
         sig.unmarshall(signature);
 
