@@ -194,6 +194,9 @@ export class Signer {
         else {
             verificationKey = publicKey;
         }
+        if (verificationKey.length === 33) {
+            verificationKey = verificationKey.slice(1);
+        }
         const sig = new Signature();
         sig.unmarshall(signature);
         switch (sig.getSigByte()) {
