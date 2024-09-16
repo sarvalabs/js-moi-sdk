@@ -152,6 +152,13 @@ class LogicBase extends element_descriptor_1.default {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
+            const error = "error" in ix.receipt.extra_data &&
+                ix.receipt.extra_data.error != "0x"
+                ? js_moi_manifest_1.ManifestCoder.decodeException(ix.receipt.extra_data.error)
+                : null;
+            if (error != null) {
+                js_moi_utils_1.ErrorUtils.throwError(error.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
             return await ix.result();
         };
         return {
