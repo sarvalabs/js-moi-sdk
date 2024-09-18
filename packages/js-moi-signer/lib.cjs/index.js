@@ -14,5 +14,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BrowserProvider = void 0;
+var browser_provider_1 = require("./browser-provider");
+Object.defineProperty(exports, "BrowserProvider", { enumerable: true, get: function () { return browser_provider_1.BrowserProvider; } });
 __exportStar(require("./signer"), exports);
 //# sourceMappingURL=index.js.map

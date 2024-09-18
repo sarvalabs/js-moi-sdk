@@ -1,3 +1,4 @@
-export * from "./signer";
 export type * from "../types/index";
+export { BrowserProvider } from "./browser-provider";
+export * from "./signer";
 //# sourceMappingURL=index.d.ts.map
