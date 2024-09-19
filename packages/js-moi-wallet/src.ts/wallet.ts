@@ -254,7 +254,7 @@ export class Wallet extends Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    public sign(message: Uint8Array, sigAlgo: SigType): string {
+    public async sign(message: Uint8Array, sigAlgo: SigType): Promise<string> {
         if (sigAlgo == null) {
             ErrorUtils.throwError("Signature type cannot be undefined", ErrorCode.INVALID_ARGUMENT);
         }
@@ -284,10 +284,10 @@ export class Wallet extends Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
+    public async signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest> {
         try {
             const ixData = serializeIxObject(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
+            const signature = await this.sign(ixData, sigAlgo);
             return {
                 ix_args: bytesToHex(ixData),
                 signature: signature,

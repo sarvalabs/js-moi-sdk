@@ -166,7 +166,7 @@ export class Signer {
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             await this.prepareInteraction('send', ixObject);
             // Sign the interaction object
-            const ixRequest = this.signInteraction(ixObject, sigAlgo);
+            const ixRequest = await this.signInteraction(ixObject, sigAlgo);
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }

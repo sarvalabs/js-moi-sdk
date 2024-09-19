@@ -243,7 +243,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message, sigAlgo) {
+    async sign(message, sigAlgo) {
         if (sigAlgo == null) {
             js_moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
@@ -270,10 +270,10 @@ class Wallet extends js_moi_signer_1.Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject, sigAlgo) {
+    async signInteraction(ixObject, sigAlgo) {
         try {
             const ixData = (0, serializer_1.serializeIxObject)(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
+            const signature = await this.sign(ixData, sigAlgo);
             return {
                 ix_args: (0, js_moi_utils_1.bytesToHex)(ixData),
                 signature: signature,

@@ -10,9 +10,9 @@ export declare abstract class Signer {
     constructor(provider?: AbstractProvider);
     abstract getAddress(): Promise<string>;
     abstract connect(provider: AbstractProvider): void;
-    abstract sign(message: Uint8Array, sigAlgo: SigType): string;
+    abstract sign(message: Uint8Array, sigAlgo: SigType): Promise<string>;
     abstract isInitialized(): boolean;
-    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
+    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
     /**
      * Retrieves the connected provider instance.
      *
