@@ -152,19 +152,10 @@ and runtime schema.
 .. code-block:: javascript
 
     // Example
+    import { ManifestCoder } from "js-moi-sdk";
+
     const manifest = { ... }
-    const elements = new Map();
-    const classDefs = new Map();
-
-    manifest.elements.forEach(element => {
-        elements.set(element.ptr, element);
-
-        if(element.kind === "class") {
-            classDefs.set(element.data.name, element.ptr);
-        }
-    })
-
-    const manifestCoder = new ManifestCoder(elements, classDefs);
+    const manifestCoder = new ManifestCoder(manifest);
 
 Methods
 ~~~~~~~
@@ -177,48 +168,28 @@ Methods
     const encodedManifest = ManifestCoder.encodeManifest(manifest)
     console.log(encodedManifest)
 
-    >> 0x0e4f065 ... 50000
+    >> "0x0e4f065...50000"
 
 .. autofunction:: encodeArguments
 
 .. code-block:: javascript
 
     // Example
-    const routine = manifest.elements.find(element => 
-        // Seeder! is the name of a routine which is available in the manifest
-        element.data.name === "Seeder!"
-    )
-
-    const fields = routine.data.accepts ? routine.data.accepts : [];
-
-    const args = [
-        "MOI-Token", 
-        "MOI", 
-        100000000, 
-        "ffcd8ee6a29ec442dbbf9c6124dd3aeb833ef58052237d521654740857716b34"
-    ];
-
-    const calldata = manifestCoder.encodeArguments(fields, args);
+    const args = ["MOI", 100_000_000];
+    const calldata = manifestCoder.encodeArguments("Seeder", args);
 
     console.log(calldata)
 
-    >> 0x0def01 ... d4f49
+    >> "0x0d6f0665...d4f49"
 
 .. autofunction:: decodeOutput
 
 .. code-block:: javascript
 
     // Example
-    const routine = manifest.elements.find(element => 
-        // BalanceOf is the name of a routine which is available in the manifest
-        element.data.name === "BalanceOf"
-    )
-
+    const callsite = "BalanceOf";
     const output = "0x0e1f0305f5e100";
-
-    const fields = routine.data.returns ? routine.data.returns : [];
-
-    const decodedOutput = manifestCoder.decodeOutput(output, fields);
+    const args = manifestCoder.decodeOutput(output, callsite);
 
     console.log(decodedOutput);
 

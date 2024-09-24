@@ -1,7 +1,6 @@
-import { ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 const DEFAULT_FUEL_PRICE = 1;
 /**
@@ -14,8 +13,8 @@ export class LogicBase extends ElementDescriptor {
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs);
+        super(manifest);
+        this.manifestCoder = new ManifestCoder(manifest);
         this.connect(arg);
     }
     /**

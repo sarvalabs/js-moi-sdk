@@ -1,11 +1,10 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest, RoutineOption } from "../types/logic";
-import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 
 const DEFAULT_FUEL_PRICE = 1;
@@ -21,9 +20,8 @@ export abstract class LogicBase extends ElementDescriptor {
     protected manifestCoder: ManifestCoder;
 
     constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
-        super(manifest.elements)
-
-        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs)
+        super(manifest)
+        this.manifestCoder = new ManifestCoder(manifest);
         this.connect(arg)
     }
 
