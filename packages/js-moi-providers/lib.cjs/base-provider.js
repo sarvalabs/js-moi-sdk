@@ -737,13 +737,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             end_height: end
         };
         const response = await this.execute("moi.GetLogs", payload);
-        const logs = this.processResponse(response);
-        return logs.map(log => {
-            return {
-                ...log,
-                data: (0, js_moi_utils_1.decodeBase64)(log.data)
-            };
-        });
+        return this.processResponse(response);
     }
     /**
      * Retrieves all the interactions that are pending for inclusion in the next

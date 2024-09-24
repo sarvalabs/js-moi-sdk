@@ -4,7 +4,8 @@ import {
     IxType, LogicDeployReceipt,
     LogicEnlistReceipt,
     LogicInvokeReceipt,
-    Tesseract, bytesToHex, decodeBase64, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal, type NumberLike
+    Tesseract, bytesToHex,
+    hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
@@ -910,15 +911,8 @@ export class BaseProvider extends AbstractProvider {
             end_height: end
         }
 
-        const response = await this.execute<(Omit<Log, 'data'> & { data: string })[]>("moi.GetLogs", payload);
-        const logs = this.processResponse(response);
-
-        return logs.map(log => {
-            return {
-                ...log, 
-                data: decodeBase64(log.data)
-            }
-        });
+        const response = await this.execute<Log[]>("moi.GetLogs", payload);
+        return this.processResponse(response);
     }
 
     /**

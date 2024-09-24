@@ -1,5 +1,5 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, decodeBase64, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -731,13 +731,7 @@ export class BaseProvider extends AbstractProvider {
             end_height: end
         };
         const response = await this.execute("moi.GetLogs", payload);
-        const logs = this.processResponse(response);
-        return logs.map(log => {
-            return {
-                ...log,
-                data: decodeBase64(log.data)
-            };
-        });
+        return this.processResponse(response);
     }
     /**
      * Retrieves all the interactions that are pending for inclusion in the next

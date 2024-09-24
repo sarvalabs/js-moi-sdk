@@ -12,6 +12,7 @@ class ElementDescriptor {
     callSites = new Map();
     classDefs = new Map();
     methodDefs = new Map();
+    eventsDef = new Map();
     constructor(elements) {
         const elementsArr = Array.isArray(elements) ? elements : elements.elements;
         this.stateMatrix = new context_state_matrix_1.ContextStateMatrix(elementsArr);
@@ -38,6 +39,10 @@ class ElementDescriptor {
                         kind: routineData.kind,
                     };
                     this.callSites.set(routineData.name, callsite);
+                    break;
+                case "event":
+                    const eventData = element.data;
+                    this.eventsDef.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
                     break;
                 default:
                     break;
@@ -148,6 +153,22 @@ class ElementDescriptor {
             return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${methodName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         return this.elements.get(methodDef.ptr);
+    }
+    /**
+     * Retrieves the element from the logic manifest based on the given
+     * event name.
+     *
+     * @param {string} eventName - The name of the event.
+     * @returns {LogicManifest.Element} The event element.
+     *
+     * @throws {Error} if the event name is invalid.
+     */
+    getEventElement(eventName) {
+        const eventDef = this.eventsDef.get(eventName);
+        if (!eventDef) {
+            return js_moi_utils_1.ErrorUtils.throwError(`Invalid event name: ${eventName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        return this.elements.get(eventDef.ptr);
     }
 }
 exports.ElementDescriptor = ElementDescriptor;
