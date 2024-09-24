@@ -83,7 +83,7 @@ export declare class ManifestCoder {
      *
      * @returns {T | null} The decoded output data, or null if the output is empty.
      */
-    decodeOutput<T>(output: string, callsite: string): T | null;
+    decodeOutput<T>(callsite: string, output: string): T | null;
     /**
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
@@ -94,7 +94,7 @@ export declare class ManifestCoder {
      * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    decodeOutput<T>(output: string, field: LogicManifest.TypeField[]): T | null;
+    decodeOutput<T>(field: LogicManifest.TypeField[], output: string): T | null;
     /**
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.
