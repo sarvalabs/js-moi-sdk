@@ -3,23 +3,11 @@ import { ManifestCoder } from "../src.ts/manifest";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
 describe("Test ManifestCoder", () => {
-    const elements = new Map();
-    const classDefs = new Map();
     let manifest: LogicManifest.Manifest;
     let manifestCoder: ManifestCoder;
 
     beforeAll(async () => {
-        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest;
-
-        manifest.elements.forEach((element: LogicManifest.Element) => {
-            elements.set(element.ptr, element);
-
-            if (element.kind === "class") {
-                element.data = element.data as LogicManifest.Routine;
-                classDefs.set(element.data.name, element.ptr);
-            }
-        });
-
+        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest
         manifestCoder = new ManifestCoder(manifest);
     });
 
