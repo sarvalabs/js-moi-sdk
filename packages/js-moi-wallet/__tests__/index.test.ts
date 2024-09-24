@@ -161,7 +161,7 @@ describe("Wallet", () => {
             };
 
             const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
-            const ixArgs = wallet.signInteraction(ixObject, algo);
+            const ixArgs = await wallet.signInteraction(ixObject, algo);
 
             expect(ixArgs).toBeDefined();
             expect(ixArgs).toMatchObject<InteractionRequest>({
