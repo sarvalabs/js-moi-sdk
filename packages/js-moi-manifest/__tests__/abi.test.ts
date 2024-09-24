@@ -3,23 +3,11 @@ import { ManifestCoder } from "../src.ts/manifest";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
 describe("Test ManifestCoder", () => {
-    const elements = new Map();
-    const classDefs = new Map();
     let manifest: LogicManifest.Manifest;
     let manifestCoder: ManifestCoder;
 
     beforeAll(async () => {
-        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest;
-
-        manifest.elements.forEach((element: LogicManifest.Element) => {
-            elements.set(element.ptr, element);
-
-            if (element.kind === "class") {
-                element.data = element.data as LogicManifest.Routine;
-                classDefs.set(element.data.name, element.ptr);
-            }
-        });
-
+        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest
         manifestCoder = new ManifestCoder(manifest);
     });
 
@@ -56,7 +44,7 @@ describe("Test ManifestCoder", () => {
         const callsite = "BalanceOf";
 
         test("When the field is passed as a routine name", () => {
-            const args = manifestCoder.decodeOutput<{ balance: number }>(calldata, callsite);
+            const args = manifestCoder.decodeOutput<{ balance: number }>(callsite, calldata);
 
             expect(args).toEqual({ balance: expect.any(Number) });
         });
@@ -69,7 +57,7 @@ describe("Test ManifestCoder", () => {
             });
             const routine = routineElement?.data as LogicManifest.Routine;
             const fields = routine.returns ? routine.returns : [];
-            const decodedOutput = manifestCoder.decodeOutput(output, fields);
+            const decodedOutput = manifestCoder.decodeOutput(fields, output);
 
             expect(decodedOutput).toEqual({ balance: expect.any(Number) });
         });

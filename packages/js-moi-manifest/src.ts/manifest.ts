@@ -270,7 +270,7 @@ export class ManifestCoder {
      * 
      * @returns {T | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput<T>(output: string, callsite: string): T | null;
+    public decodeOutput<T>(callsite: string, output: string): T | null;
     /**
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
@@ -281,7 +281,7 @@ export class ManifestCoder {
      * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput<T>(output: string, field: LogicManifest.TypeField[]): T | null;
+    public decodeOutput<T>(field: LogicManifest.TypeField[], output: string): T | null;
     /**
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
@@ -291,7 +291,7 @@ export class ManifestCoder {
      * @param {string} fields - The name of the routine associated with the output data.
      * @returns {T | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput<T>(output: string, fields: LogicManifest.TypeField[] | string): T | null {
+    public decodeOutput<T>(fields: LogicManifest.TypeField[] | string, output: string): T | null {
         if (typeof fields === "string") {
             const element  = this.elementDescriptor.getRoutineElement(fields).data as LogicManifest.Routine
             fields = element.returns
