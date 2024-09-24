@@ -1,7 +1,8 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU, type Log } from "../types/jsonrpc";
+import { type NestedArray } from "../types/util";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 /**
@@ -324,6 +325,19 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call or processing the response.
      */
     getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>;
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     *
+     * @param address - The address for which to retrieve the tesseract logs.
+     * @param height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param topics - The topics to filter the logs. (optional)
+     *
+     * @returns A Promise that resolves to an array of logs.
+     *
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    getLogs(address: string, height: [start: number, end: number], topics?: NestedArray<string>): Promise<Log[]>;
     /**
      * Retrieves all the interactions that are pending for inclusion in the next
      * Tesseract(s) or are scheduled for future execution.

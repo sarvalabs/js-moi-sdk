@@ -1,18 +1,23 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import {
     AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
-    IxType, LogicDeployReceipt, LogicInvokeReceipt, LogicEnlistReceipt, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
+    IxType, LogicDeployReceipt,
+    LogicEnlistReceipt,
+    LogicInvokeReceipt,
+    Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    InspectResponse,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
     RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
-    InspectResponse
+    type Log
 } from "../types/jsonrpc";
+import { type NestedArray } from "../types/util";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -869,6 +874,44 @@ export class BaseProvider extends AbstractProvider {
         } catch (error) {
             throw error;
         }
+    }
+    
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     * 
+     * @param address - The address for which to retrieve the tesseract logs.
+     * @param height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive. 
+     * @param topics - The topics to filter the logs. (optional)
+     * 
+     * @returns A Promise that resolves to an array of logs.
+     * 
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    public async getLogs(address: string, height: [start: number, end: number], topics: NestedArray<string> = []) {
+        if(!isValidAddress(address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+
+        const [start, end] = height;
+
+        if (start >= end) {
+            ErrorUtils.throwArgumentError("Start height should be less than end height", "height", height);
+        }
+
+        if (!Array.isArray(topics)) {
+            ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+
+        const payload = {
+            address,
+            topics,
+            start_height: start,
+            end_height: end
+        }
+
+        const response = await this.execute<Log[]>("moi.GetLogs", payload);
+        return this.processResponse(response);
     }
 
     /**

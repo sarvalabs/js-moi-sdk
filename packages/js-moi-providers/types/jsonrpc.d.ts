@@ -4,8 +4,8 @@ import {
     AssetStandard,
     IxType,
     LogicDeployReceipt,
-    LogicInvokeReceipt,
     LogicEnlistReceipt,
+    LogicInvokeReceipt,
     Participants
 } from "js-moi-utils";
 
@@ -321,4 +321,13 @@ export interface RpcResponse<T> {
     result?: T;
     error?: RpcError;
     id: 1;
+}
+
+export interface Log {
+    address: string;
+    topics: string[];
+    data: string;
+    ix_hash: string;
+    ts_hash: string;
+    participants: Participants;
 }

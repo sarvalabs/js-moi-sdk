@@ -1,5 +1,5 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -700,6 +700,38 @@ export class BaseProvider extends AbstractProvider {
         catch (error) {
             throw error;
         }
+    }
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     *
+     * @param address - The address for which to retrieve the tesseract logs.
+     * @param height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param topics - The topics to filter the logs. (optional)
+     *
+     * @returns A Promise that resolves to an array of logs.
+     *
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    async getLogs(address, height, topics = []) {
+        if (!isValidAddress(address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+        const [start, end] = height;
+        if (start >= end) {
+            ErrorUtils.throwArgumentError("Start height should be less than end height", "height", height);
+        }
+        if (!Array.isArray(topics)) {
+            ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+        const payload = {
+            address,
+            topics,
+            start_height: start,
+            end_height: end
+        };
+        const response = await this.execute("moi.GetLogs", payload);
+        return this.processResponse(response);
     }
     /**
      * Retrieves all the interactions that are pending for inclusion in the next

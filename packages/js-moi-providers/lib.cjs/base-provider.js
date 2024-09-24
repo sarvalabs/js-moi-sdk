@@ -708,6 +708,38 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     *
+     * @param address - The address for which to retrieve the tesseract logs.
+     * @param height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param topics - The topics to filter the logs. (optional)
+     *
+     * @returns A Promise that resolves to an array of logs.
+     *
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    async getLogs(address, height, topics = []) {
+        if (!(0, js_moi_utils_1.isValidAddress)(address)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+        const [start, end] = height;
+        if (start >= end) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Start height should be less than end height", "height", height);
+        }
+        if (!Array.isArray(topics)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+        const payload = {
+            address,
+            topics,
+            start_height: start,
+            end_height: end
+        };
+        const response = await this.execute("moi.GetLogs", payload);
+        return this.processResponse(response);
+    }
+    /**
      * Retrieves all the interactions that are pending for inclusion in the next
      * Tesseract(s) or are scheduled for future execution.
      *
