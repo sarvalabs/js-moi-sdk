@@ -216,6 +216,8 @@ Methods
             ],
         }
 
+.. autofunction:: decodeEventOutput
+
 .. autofunction:: decodeState
 
 .. code-block:: javascript
@@ -230,7 +232,7 @@ Methods
     const output = manifestCoder.decodeState(data, "name", state.data.fields)
     console.log(output)
 
-    >> RIO
+    >> "RIO"
 
 Schema
 ------
