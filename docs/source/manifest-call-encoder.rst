@@ -189,7 +189,7 @@ Methods
     // Example
     const callsite = "BalanceOf";
     const output = "0x0e1f0305f5e100";
-    const args = manifestCoder.decodeOutput(output, callsite);
+    const args = manifestCoder.decodeOutput(callsite, output);
 
     console.log(decodedOutput);
 

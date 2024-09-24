@@ -56,7 +56,7 @@ describe("Test ManifestCoder", () => {
         const callsite = "BalanceOf";
 
         test("When the field is passed as a routine name", () => {
-            const args = manifestCoder.decodeOutput<{ balance: number }>(calldata, callsite);
+            const args = manifestCoder.decodeOutput<{ balance: number }>(callsite, calldata);
 
             expect(args).toEqual({ balance: expect.any(Number) });
         });
@@ -69,7 +69,7 @@ describe("Test ManifestCoder", () => {
             });
             const routine = routineElement?.data as LogicManifest.Routine;
             const fields = routine.returns ? routine.returns : [];
-            const decodedOutput = manifestCoder.decodeOutput(output, fields);
+            const decodedOutput = manifestCoder.decodeOutput(fields, output);
 
             expect(decodedOutput).toEqual({ balance: expect.any(Number) });
         });
