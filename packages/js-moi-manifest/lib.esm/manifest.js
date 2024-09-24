@@ -176,7 +176,7 @@ export class ManifestCoder {
      * @param {string} fields - The name of the routine associated with the output data.
      * @returns {T | null} The decoded output data, or null if the output is empty.
      */
-    decodeOutput(output, fields) {
+    decodeOutput(fields, output) {
         if (typeof fields === "string") {
             const element = this.elementDescriptor.getRoutineElement(fields).data;
             fields = element.returns;
