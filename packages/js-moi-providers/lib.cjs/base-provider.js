@@ -711,9 +711,9 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
      * If the topics are not provided, all logs are returned.
      *
-     * @param address - The address for which to retrieve the tesseract logs.
-     * @param height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
-     * @param topics - The topics to filter the logs. (optional)
+     * @param {string} address - The address for which to retrieve the tesseract logs.
+     * @param {Tuple<number>} height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param {NestedArray<string>}topics - The topics to filter the logs. (optional)
      *
      * @returns A Promise that resolves to an array of logs.
      *
