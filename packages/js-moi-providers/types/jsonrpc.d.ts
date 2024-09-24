@@ -326,7 +326,7 @@ export interface RpcResponse<T> {
 export interface Log {
     address: string;
     topics: string[];
-    data: string;
+    data: Uint8Array;
     ix_hash: string;
     ts_hash: string;
     participants: Participants;
