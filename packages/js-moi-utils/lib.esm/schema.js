@@ -39,6 +39,14 @@ export const assetCreateSchema = {
         logic_payload: logicSchema
     }
 };
+export const DEFAULT_EVENT_SCHEMA = {
+    kind: "struct",
+    fields: {
+        value: {
+            kind: "string"
+        }
+    }
+};
 export const assetMintOrBurnSchema = {
     kind: "struct",
     fields: {

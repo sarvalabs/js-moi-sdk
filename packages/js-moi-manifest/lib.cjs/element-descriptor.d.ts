@@ -47,6 +47,7 @@ export declare class ElementDescriptor {
      * @returns {Map<string, number>} The class definitions map.
      */
     getClassDefs(): Map<string, number>;
+    getEvents(): Map<string, EventDef>;
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
@@ -92,10 +93,10 @@ export declare class ElementDescriptor {
      * event name.
      *
      * @param {string} eventName - The name of the event.
-     * @returns {LogicManifest.Element} The event element.
+     * @returns {LogicManifest.Element<LogicManifest.Event>} The event element.
      *
      * @throws {Error} if the event name is invalid.
      */
-    getEventElement(eventName: string): LogicManifest.Element;
+    getEventElement(eventName: string): LogicManifest.Element<LogicManifest.Event>;
 }
 //# sourceMappingURL=element-descriptor.d.ts.map

@@ -5,6 +5,7 @@ import {
     LogicEnlistReceipt,
     LogicInvokeReceipt,
     Tesseract, bytesToHex,
+    decodeBase64,
     hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
@@ -912,7 +913,10 @@ export class BaseProvider extends AbstractProvider {
         }
 
         const response = await this.execute<Log[]>("moi.GetLogs", payload);
-        return this.processResponse(response);
+        return this.processResponse(response).map((log) => ({
+          ...log,
+          data: "0x" + bytesToHex(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+        }));
     }
 
     /**

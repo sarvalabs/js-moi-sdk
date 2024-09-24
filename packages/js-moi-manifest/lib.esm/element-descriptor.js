@@ -78,6 +78,9 @@ export class ElementDescriptor {
     getClassDefs() {
         return this.classDefs;
     }
+    getEvents() {
+        return this.eventsDef;
+    }
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
@@ -156,7 +159,7 @@ export class ElementDescriptor {
      * event name.
      *
      * @param {string} eventName - The name of the event.
-     * @returns {LogicManifest.Element} The event element.
+     * @returns {LogicManifest.Element<LogicManifest.Event>} The event element.
      *
      * @throws {Error} if the event name is invalid.
      */

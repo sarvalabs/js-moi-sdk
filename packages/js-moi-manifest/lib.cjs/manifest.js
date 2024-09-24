@@ -185,10 +185,36 @@ class ManifestCoder {
             fields = element.returns;
         }
         if (output && output != "0x" && fields && fields.length) {
-            const decodedOutput = (0, js_moi_utils_1.hexToBytes)(output);
-            const depolorizer = new js_polo_1.Depolorizer(decodedOutput);
             const schema = this.schema.parseFields(fields);
-            return depolorizer.depolorize(schema);
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(output)).depolorize(schema);
+        }
+        return null;
+    }
+    /**
+     * Decodes a log data from an event emitted in a logic.
+     *
+     * @param {string} eventOrLogData - The name of the event or the log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    decodeEventOutput(eventOrLogData, logData) {
+        if (logData == null) {
+            if (!(0, js_moi_utils_1.isHex)(eventOrLogData)) {
+                js_moi_utils_1.ErrorUtils.throwArgumentError("Expected a POLO encoded event log data", "eventOrLogData", eventOrLogData);
+            }
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(eventOrLogData)).depolorize(js_moi_utils_1.DEFAULT_EVENT_SCHEMA);
+        }
+        if (!(0, js_moi_utils_1.isHex)(logData)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Expected a POLO encoded event log data", "logData", logData);
+        }
+        const element = this.elementDescriptor.getEventElement(eventOrLogData);
+        if (element == null) {
+            throw new Error(`Event ${eventOrLogData} not found in manifest`);
+        }
+        if (logData && logData !== "0x") {
+            const element = this.elementDescriptor.getEventElement(eventOrLogData);
+            const schema = this.schema.parseFields(element.data.fields);
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(schema);
         }
         return null;
     }

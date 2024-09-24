@@ -103,6 +103,10 @@ export class ElementDescriptor {
         return this.classDefs;
     }
 
+    public getEvents(): Map<string, EventDef> {
+        return this.eventsDef;
+    }
+
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
@@ -195,17 +199,17 @@ export class ElementDescriptor {
      * event name.
      * 
      * @param {string} eventName - The name of the event.
-     * @returns {LogicManifest.Element} The event element.
+     * @returns {LogicManifest.Element<LogicManifest.Event>} The event element.
      * 
      * @throws {Error} if the event name is invalid.
      */
-    public getEventElement(eventName: string): LogicManifest.Element {
+    public getEventElement(eventName: string) {
         const eventDef = this.eventsDef.get(eventName);
 
         if (!eventDef) {
             return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);
         }
 
-        return this.elements.get(eventDef.ptr);
+        return this.elements.get(eventDef.ptr) as LogicManifest.Element<LogicManifest.Event>;
     }
 }

@@ -96,4 +96,6 @@ describe("Test ManifestCoder", () => {
 
         expect(output).toBe("RIO");
     });
+
+    
 });

@@ -55,6 +55,14 @@ export declare const assetCreateSchema: {
         };
     };
 };
+export declare const DEFAULT_EVENT_SCHEMA: {
+    kind: string;
+    fields: {
+        value: {
+            kind: string;
+        };
+    };
+};
 export declare const assetMintOrBurnSchema: {
     kind: string;
     fields: {
