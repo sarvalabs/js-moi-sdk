@@ -388,7 +388,7 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                 const params = {
                     address: event.address
                 };
-                this._subscribe(event.tag, ["newAccountTesseracts", params], (result) => {
+                this._subscribe(event.tag, ["newTesseractsByAccount", params], (result) => {
                     this.emit(event.address, result);
                 });
                 break;
