@@ -1,11 +1,10 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest } from "../types/logic";
-import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**

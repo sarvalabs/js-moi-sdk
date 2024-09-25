@@ -392,6 +392,8 @@ Query Methods
 
 .. autofunction:: getAssetInfoByAssetID
 
+.. autofunction:: getLogs
+
 .. autofunction:: getInteractionReceipt
 
 .. autofunction:: getStorageAt

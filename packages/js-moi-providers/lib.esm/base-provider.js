@@ -1,5 +1,5 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, decodeBase64, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -700,6 +700,50 @@ export class BaseProvider extends AbstractProvider {
         catch (error) {
             throw error;
         }
+    }
+    hashTopics(topics) {
+        const result = topics.slice();
+        for (let i = 0; i < topics.length; i++) {
+            const element = topics[i];
+            if (Array.isArray(element)) {
+                topics[i] = this.hashTopics(element);
+                continue;
+            }
+            topics[i] = topicHash(element);
+        }
+        return result;
+    }
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     *
+     * @param {string} address - The address for which to retrieve the tesseract logs.
+     * @param {Tuple<number>} height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param {NestedArray<string>}topics - The topics to filter the logs. (optional)
+     *
+     * @returns A Promise that resolves to an array of logs.
+     *
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    async getLogs(address, height, topics = []) {
+        if (!isValidAddress(address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+        if (!Array.isArray(topics)) {
+            ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+        const [start, end] = height;
+        const payload = {
+            address,
+            topics: this.hashTopics(topics),
+            start_height: start,
+            end_height: end
+        };
+        const response = await this.execute("moi.GetLogs", payload);
+        return this.processResponse(response).map((log) => ({
+            ...log,
+            data: "0x" + bytesToHex(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+        }));
     }
     /**
      * Retrieves all the interactions that are pending for inclusion in the next

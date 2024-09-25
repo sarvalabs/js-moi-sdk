@@ -1,13 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
-const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 const logic_id_1 = require("./logic-id");
 const routine_options_1 = require("./routine-options");
 const DEFAULT_FUEL_PRICE = 1;
@@ -16,13 +12,13 @@ const DEFAULT_FUEL_PRICE = 1;
  * class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
  */
-class LogicBase extends element_descriptor_1.default {
+class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     signer;
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
+        super(manifest);
+        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(manifest);
         this.connect(arg);
     }
     /**
@@ -75,7 +71,8 @@ class LogicBase extends element_descriptor_1.default {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType(ixObject.routine.kind) !== js_moi_utils_1.IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== js_moi_utils_1.IxType.LOGIC_DEPLOY &&
+            !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
@@ -152,12 +149,13 @@ class LogicBase extends element_descriptor_1.default {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const error = "error" in ix.receipt.extra_data &&
-                ix.receipt.extra_data.error != "0x"
+            const error = "error" in ix.receipt.extra_data && ix.receipt.extra_data.error != "0x"
                 ? js_moi_manifest_1.ManifestCoder.decodeException(ix.receipt.extra_data.error)
                 : null;
             if (error != null) {
-                js_moi_utils_1.ErrorUtils.throwError(error.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, { cause: error });
+                js_moi_utils_1.ErrorUtils.throwError(error.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, {
+                    cause: error,
+                });
             }
             return await ix.result();
         };
@@ -165,7 +163,7 @@ class LogicBase extends element_descriptor_1.default {
             unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateFuel: ixObject.estimateFuel.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject),
         };
     }
     /**
@@ -179,14 +177,18 @@ class LogicBase extends element_descriptor_1.default {
         const option = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
-            arguments: args
+            arguments: args,
         };
         ixObject.call = async () => {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            option.fuelLimit =
+                option.fuelLimit != null
+                    ? option.fuelLimit
+                    : await ixObject.estimateFuel();
+            option.fuelPrice =
+                option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

@@ -1,7 +1,6 @@
-import { ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder, } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 const DEFAULT_FUEL_PRICE = 1;
@@ -15,8 +14,8 @@ export class LogicBase extends ElementDescriptor {
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs);
+        super(manifest);
+        this.manifestCoder = new ManifestCoder(manifest);
         this.connect(arg);
     }
     /**
@@ -69,7 +68,8 @@ export class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY &&
+            !this.getLogicId()) {
             ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);
@@ -146,12 +146,13 @@ export class LogicBase extends ElementDescriptor {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const error = "error" in ix.receipt.extra_data &&
-                ix.receipt.extra_data.error != "0x"
+            const error = "error" in ix.receipt.extra_data && ix.receipt.extra_data.error != "0x"
                 ? ManifestCoder.decodeException(ix.receipt.extra_data.error)
                 : null;
             if (error != null) {
-                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, {
+                    cause: error,
+                });
             }
             return await ix.result();
         };
@@ -159,7 +160,7 @@ export class LogicBase extends ElementDescriptor {
             unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateFuel: ixObject.estimateFuel.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject),
         };
     }
     /**
@@ -173,14 +174,18 @@ export class LogicBase extends ElementDescriptor {
         const option = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
-            arguments: args
+            arguments: args,
         };
         ixObject.call = async () => {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            option.fuelLimit =
+                option.fuelLimit != null
+                    ? option.fuelLimit
+                    : await ixObject.estimateFuel();
+            option.fuelPrice =
+                option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

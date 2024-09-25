@@ -1,23 +1,39 @@
-import { LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { CallSite, MethodDef } from "../types/logic";
-import { ContextStateMatrix } from "./state";
+import type { LogicManifest } from "../types/manifest";
+import { ContextStateMatrix } from "./context-state-matrix";
+
+export interface EventDef {
+    ptr: number;
+    topics: number;
+}
+
+export interface MethodDef {
+    ptr: number;
+    class: string;
+}
+
+export interface CallSite {
+    ptr: number,
+    kind: string
+}
 
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-export default class ElementDescriptor {
+export class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element> = new Map();
     protected callSites: Map<string, CallSite> = new Map();
     protected classDefs: Map<string, number> = new Map();
     protected methodDefs: Map<string, MethodDef> = new Map();
+    protected eventsDef = new Map<string, EventDef>();
 
-    constructor(elements: LogicManifest.Element[]) {
-        this.stateMatrix = new ContextStateMatrix(elements);
+    constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest) {
+        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
+        this.stateMatrix = new ContextStateMatrix(elementsArr);
 
         // Populate the maps for elements, call sites, class and method definitions.
-        elements.forEach((element) => {
+        elementsArr.forEach((element) => {
             this.elements.set(element.ptr, element);
 
             switch (element.kind) {
@@ -40,6 +56,10 @@ export default class ElementDescriptor {
                         kind: routineData.kind,
                     };
                     this.callSites.set(routineData.name, callsite);
+                    break;
+                case "event":
+                    const eventData = element.data as LogicManifest.Event;
+                    this.eventsDef.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
                     break;
                 default:
                     break;
@@ -81,6 +101,10 @@ export default class ElementDescriptor {
      */
     public getClassDefs(): Map<string, number> {
         return this.classDefs;
+    }
+
+    public getEvents(): Map<string, EventDef> {
+        return this.eventsDef;
     }
 
     /**
@@ -168,5 +192,24 @@ export default class ElementDescriptor {
         }
 
         return this.elements.get(methodDef.ptr);
+    }
+
+    /**
+     * Retrieves the element from the logic manifest based on the given
+     * event name.
+     * 
+     * @param {string} eventName - The name of the event.
+     * @returns {LogicManifest.Element<LogicManifest.Event>} The event element.
+     * 
+     * @throws {Error} if the event name is invalid.
+     */
+    public getEventElement(eventName: string) {
+        const eventDef = this.eventsDef.get(eventName);
+
+        if (!eventDef) {
+            return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);
+        }
+
+        return this.elements.get(eventDef.ptr) as LogicManifest.Element<LogicManifest.Event>;
     }
 }

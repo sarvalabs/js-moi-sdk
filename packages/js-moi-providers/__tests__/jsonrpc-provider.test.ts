@@ -1,8 +1,9 @@
 import { Signer } from "js-moi-signer";
 import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "js-moi-utils";
+import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
-import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
+import { getRandomSupply } from "./utils/utils";
 
 const HOST = "http://localhost:1600";
 const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
@@ -18,26 +19,27 @@ describe("Test JsonRpcProvider Query Calls", () => {
     let ixReceipt: InteractionReceipt;
     let nextNonce = 0;
     const supply = getRandomSupply();
+    MNEMONIC;
 
-    beforeAll(async() => {
-      signer = await initializeWallet(provider, MNEMONIC);
-      const nonce = await signer.getNonce();
-      const ixResponse = await signer.sendInteraction({
-        type: IxType.ASSET_CREATE,
-        nonce: nonce,
-        fuel_price: 1,
-        fuel_limit: 200,
-        payload: {
-            standard: AssetStandard.MAS0,
-            symbol: getRandomSymbol(),
-            supply: supply
-        }
-      });
+    // beforeAll(async() => {
+    //   signer = await initializeWallet(provider, MNEMONIC);
+    //   const nonce = await signer.getNonce();
+    //   const ixResponse = await signer.sendInteraction({
+    //     type: IxType.ASSET_CREATE,
+    //     nonce: nonce,
+    //     fuel_price: 1,
+    //     fuel_limit: 200,
+    //     payload: {
+    //         standard: AssetStandard.MAS0,
+    //         symbol: getRandomSymbol(),
+    //         supply: supply
+    //     }
+    //   });
 
-      ixHash = ixResponse.hash;
-      ixReceipt = await ixResponse.wait();
-      nextNonce = Number(nonce) + 1
-    });
+    //   ixHash = ixResponse.hash;
+    //   ixReceipt = await ixResponse.wait();
+    //   nextNonce = Number(nonce) + 1
+    // });
 
     describe('getBalance', () => {
       it('should return the asset balance', async () => {
@@ -416,5 +418,28 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(Array.isArray(tesseracts)).toBeTruthy()
         expect(Array.length).toBeGreaterThanOrEqual(1);
       })
+    });
+
+    describe("getLogs", () => {
+      const provider = new VoyageProvider("babylon");
+      const address = "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce";
+
+      it("should return an result", async () => {
+        const logs = await provider.getLogs(address, [5, -1]);
+        expect(logs).toBeDefined();
+        expect(Array.isArray(logs)).toBeTruthy();
+      });
+
+      it("should return an result with topics", async () => {
+        const logs = await provider.getLogs(address, [5, 15], [["Transfer"]]);
+        expect(logs).toBeDefined();
+        expect(Array.isArray(logs)).toBeTruthy();
+      });
+
+      it("should throw error if height range is invalid", async () => {
+        expect(async () => {
+          await provider.getLogs(address, [0, 100])
+        }).rejects.toThrow(/Invalid query range/i);
+      });
     });
 });
