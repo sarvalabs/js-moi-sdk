@@ -325,6 +325,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call or processing the response.
      */
     getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>;
+    private hashTopics;
     /**
      * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
      * If the topics are not provided, all logs are returned.

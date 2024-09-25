@@ -6,7 +6,7 @@ import {
     LogicInvokeReceipt,
     Tesseract, bytesToHex,
     decodeBase64,
-    hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, unmarshal, type NumberLike
+    hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
@@ -877,6 +877,23 @@ export class BaseProvider extends AbstractProvider {
             throw error;
         }
     }
+
+    private hashTopics(topics: NestedArray<string>): NestedArray<string> {
+        const result : NestedArray<string> = topics.slice();
+
+        for(let i = 0; i < topics.length; i++) {
+          const element = topics[i];
+          
+          if (Array.isArray(element)) {
+            topics[i] = this.hashTopics(element);
+            continue;
+          }
+
+          topics[i] = topicHash(element);
+        }
+
+        return result;
+    }
     
     /**
      * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
@@ -907,10 +924,12 @@ export class BaseProvider extends AbstractProvider {
 
         const payload = {
             address,
-            topics,
+            topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
         }
+
+        console.log(payload);
 
         const response = await this.execute<Log[]>("moi.GetLogs", payload);
         return this.processResponse(response).map((log) => ({
