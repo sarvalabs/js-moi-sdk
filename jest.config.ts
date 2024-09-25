@@ -42,7 +42,15 @@ const configuration: Config = {
             transform: {
                 '^.+\\.tsx?$': 'ts-jest',
             },
-        }
+        },
+        // {
+        //     displayName: 'js-moi-providers',
+        //     testEnvironment: 'ts-node',
+        //     testMatch: ['<rootDir>/packages/js-moi-providers/__tests__/*.test.ts'],
+        //     transform: {
+        //         '^.+\\.tsx?$': 'ts-jest',
+        //     },
+        // }
     ],
     testTimeout: 700000,
     maxConcurrency: 1
