@@ -1,6 +1,6 @@
 import { ErrorCode, ErrorUtils, decodeBase64, defineReadOnly, encodeToString } from "js-moi-utils";
 import { w3cwebsocket as WsConn } from "websocket";
-import type { Log } from "../types/jsonrpc";
+import type { Log, LogFilter } from "../types/jsonrpc";
 import { WebsocketProviderOptions } from "../types/provider";
 import { InflightRequest, Subscription, TesseractParams } from "../types/websocket";
 import * as errors from "./errors";
@@ -445,14 +445,23 @@ export class WebSocketProvider extends JsonRpcProvider {
                 });
                 break;
             
-            case WebSocketEvents.LOGS:
-                this._subscribe("logs", [ "newLogs", event.params ], (result: Log) => {
-                    this.emit(WebSocketEvents.LOGS, {
-                        ...result,
-                        data: encodeToString(decodeBase64(result.data)) // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
-                    });
+            case WebSocketEvents.LOGS:{
+                const params = {
+                    address: (<LogFilter>event.params).address,
+                    start_height: (<LogFilter>event.params).height[0],
+                    end_height: (<LogFilter>event.params).height[1],
+                    topics: (<LogFilter>event.params).topics
+                };
+
+                console.log("params:", params);
+
+                this._subscribe("logs", ["newLogs", params], (result: Log) => {
+                  this.emit(WebSocketEvents.LOGS, {
+                    ...result,
+                    data: encodeToString(decodeBase64(result.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+                  });
                 });
-                break;
+                break;}
                 
             case WebSocketEvents.CONNECT:
 

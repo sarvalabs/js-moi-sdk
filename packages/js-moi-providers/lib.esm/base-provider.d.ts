@@ -486,11 +486,11 @@ export declare class BaseProvider extends AbstractProvider {
     /**
      * Adds an event listener for the specified event.
      *
-     * @param {EventType} eventName - The name of the event to listen to.
+     * @param {EventType} event - The name of the event to listen to.
      * @param {Listener} listener - The listener function to be called when the event is emitted.
      * @returns The instance of the class to allow method chaining.
      */
-    on(eventName: EventType, listener: Listener): this;
+    on(event: EventType, listener: Listener): this;
     /**
      * Adds a one-time event listener for the specified event.
      *

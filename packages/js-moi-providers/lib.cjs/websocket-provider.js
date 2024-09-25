@@ -402,14 +402,22 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
                     this.emit(WebSocketEvents.PENDING_INTERACTIONS, result);
                 });
                 break;
-            case WebSocketEvents.LOGS:
-                this._subscribe("logs", ["newLogs", event.params], (result) => {
+            case WebSocketEvents.LOGS: {
+                const params = {
+                    address: event.params.address,
+                    start_height: event.params.height[0],
+                    end_height: event.params.height[1],
+                    topics: event.params.topics
+                };
+                console.log("params:", params);
+                this._subscribe("logs", ["newLogs", params], (result) => {
                     this.emit(WebSocketEvents.LOGS, {
                         ...result,
-                        data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(result.data)) // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+                        data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(result.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
                     });
                 });
                 break;
+            }
             case WebSocketEvents.CONNECT:
             case WebSocketEvents.RECONNECT:
             case WebSocketEvents.CLOSE:

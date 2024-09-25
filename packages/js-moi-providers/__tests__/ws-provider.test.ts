@@ -1,5 +1,6 @@
 import { Signer } from "js-moi-signer";
 import { AssetStandard, hexToBN, IxType } from "js-moi-utils";
+import type { EventType } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { WebSocketEvents, WebSocketProvider } from "../src.ts/websocket-provider";
 import { initializeWallet } from "./utils/utils";
@@ -88,4 +89,17 @@ describe("Test Websocket Provider", () => {
             }
         });
     });
+
+    test("should receive a event log", () => {
+        const logEvent: EventType = {
+            address:
+              "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce",
+            topics: [],
+            height: [-1, -1],
+          };
+          
+        wsProvider.on(logEvent, (log) => {
+            expect(log).toBeTruthy();
+        })
+    })
 });

@@ -1326,16 +1326,19 @@ export class BaseProvider extends AbstractProvider {
     /**
      * Adds an event listener for the specified event.
      * 
-     * @param {EventType} eventName - The name of the event to listen to.
+     * @param {EventType} event - The name of the event to listen to.
      * @param {Listener} listener - The listener function to be called when the event is emitted.
      * @returns The instance of the class to allow method chaining.
      */
-    public on(eventName: EventType, listener: Listener): this {
-        if (typeof eventName === "object" && "topics" in eventName) {
-            eventName.topics = this.hashTopics(eventName.topics);
+    public on(event: EventType, listener: Listener): this {
+        if (typeof event === "object" && "address" in event && "height" in event) {
+            if (event.topics == null) {
+                event.topics = [];
+            }
+            event.topics = this.hashTopics(event.topics);
         }
 
-        return this._addEventListener(eventName, listener, false);
+        return this._addEventListener(event, listener, false);
     }
 
     /**
