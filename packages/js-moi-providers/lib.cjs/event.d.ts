@@ -1,9 +1,11 @@
 import { EventType, Listener } from "../types/event";
+import type { EventTag } from "./base-provider";
 export default class Event {
     readonly listener: Listener;
     readonly once: boolean;
     readonly tag: string;
-    constructor(tag: string, listener: Listener, once: boolean);
+    readonly params: unknown;
+    constructor(tag: EventTag, listener: Listener, once: boolean);
     /**
      * Returns the name of the event.
      * @returns The event name.

@@ -1,6 +1,6 @@
-import { JsonRpcProvider } from "./jsonrpc-provider";
-import Event from "./event";
 import { WebsocketProviderOptions } from "../types/provider";
+import Event from "./event";
+import { JsonRpcProvider } from "./jsonrpc-provider";
 /**
  * Enum defining the WebSocket events.
  */
@@ -12,7 +12,8 @@ export declare enum WebSocketEvents {
     RECONNECT = "reconnect",
     CLOSE = "close",
     DEBUG = "debug",
-    ERROR = "error"
+    ERROR = "error",
+    LOGS = "logs"
 }
 /**
  * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based

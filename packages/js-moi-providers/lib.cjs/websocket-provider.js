@@ -26,8 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebSocketProvider = exports.WebSocketEvents = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
-const jsonrpc_provider_1 = require("./jsonrpc-provider");
 const errors = __importStar(require("./errors"));
+const jsonrpc_provider_1 = require("./jsonrpc-provider");
 let nextReqId = 1;
 /**
  * Enum defining the WebSocket events.
@@ -42,6 +42,7 @@ var WebSocketEvents;
     WebSocketEvents["CLOSE"] = "close";
     WebSocketEvents["DEBUG"] = "debug";
     WebSocketEvents["ERROR"] = "error";
+    WebSocketEvents["LOGS"] = "logs";
 })(WebSocketEvents || (exports.WebSocketEvents = WebSocketEvents = {}));
 /**
  * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based
@@ -399,6 +400,14 @@ class WebSocketProvider extends jsonrpc_provider_1.JsonRpcProvider {
             case WebSocketEvents.PENDING_INTERACTIONS:
                 this._subscribe("pending_interactions", ["newPendingInteractions"], (result) => {
                     this.emit(WebSocketEvents.PENDING_INTERACTIONS, result);
+                });
+                break;
+            case WebSocketEvents.LOGS:
+                this._subscribe("logs", ["newLogs", event.params], (result) => {
+                    this.emit(WebSocketEvents.LOGS, {
+                        ...result,
+                        data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(result.data)) // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+                    });
                 });
                 break;
             case WebSocketEvents.CONNECT:

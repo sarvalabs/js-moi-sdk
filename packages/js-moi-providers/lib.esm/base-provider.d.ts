@@ -5,6 +5,10 @@ import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, Callo
 import { type NestedArray } from "../types/util";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
+export interface EventTag {
+    event: string;
+    params?: unknown;
+}
 /**
  * Class representing a base provider for interacting with the MOI protocol.
  * Extends the AbstractProvider class and provides implementations for

@@ -7,8 +7,10 @@ class Event {
     listener;
     once;
     tag;
+    params;
     constructor(tag, listener, once) {
-        (0, js_moi_utils_1.defineReadOnly)(this, "tag", tag);
+        (0, js_moi_utils_1.defineReadOnly)(this, "tag", tag.event);
+        (0, js_moi_utils_1.defineReadOnly)(this, "params", tag.params);
         (0, js_moi_utils_1.defineReadOnly)(this, "listener", listener);
         (0, js_moi_utils_1.defineReadOnly)(this, "once", once);
     }

@@ -1,10 +1,11 @@
-import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, decodeBase64, defineReadOnly, encodeToString } from "js-moi-utils";
 import { w3cwebsocket as WsConn } from "websocket";
-import {JsonRpcProvider} from "./jsonrpc-provider";
-import Event from "./event";
-import * as errors from "./errors";
+import type { Log } from "../types/jsonrpc";
 import { WebsocketProviderOptions } from "../types/provider";
-import { InflightRequest, TesseractParams, Subscription } from "../types/websocket";
+import { InflightRequest, Subscription, TesseractParams } from "../types/websocket";
+import * as errors from "./errors";
+import Event from "./event";
+import { JsonRpcProvider } from "./jsonrpc-provider";
 
 let nextReqId = 1;
 
@@ -20,6 +21,7 @@ export enum WebSocketEvents {
     CLOSE = 'close',
     DEBUG = 'debug',
     ERROR = 'error',
+    LOGS = 'logs'
 }
 
 /**
@@ -440,6 +442,15 @@ export class WebSocketProvider extends JsonRpcProvider {
             case WebSocketEvents.PENDING_INTERACTIONS: 
                 this._subscribe("pending_interactions", ["newPendingInteractions"], (result: any) => {
                     this.emit(WebSocketEvents.PENDING_INTERACTIONS, result);
+                });
+                break;
+            
+            case WebSocketEvents.LOGS:
+                this._subscribe("logs", [ "newLogs", event.params ], (result: Log) => {
+                    this.emit(WebSocketEvents.LOGS, {
+                        ...result,
+                        data: encodeToString(decodeBase64(result.data)) // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+                    });
                 });
                 break;
                 

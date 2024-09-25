@@ -5,8 +5,10 @@ export default class Event {
     listener;
     once;
     tag;
+    params;
     constructor(tag, listener, once) {
-        defineReadOnly(this, "tag", tag);
+        defineReadOnly(this, "tag", tag.event);
+        defineReadOnly(this, "params", tag.params);
         defineReadOnly(this, "listener", listener);
         defineReadOnly(this, "once", once);
     }

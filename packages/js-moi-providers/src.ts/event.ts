@@ -1,5 +1,6 @@
-import { EventType, Listener } from "../types/event";
 import { defineReadOnly } from "js-moi-utils";
+import { EventType, Listener } from "../types/event";
+import type { EventTag } from "./base-provider";
 
 // List of events that can be polled
 const PollableEvents = [ "all_tesseracts", "tesseract" ];
@@ -8,9 +9,11 @@ export default class Event {
     readonly listener: Listener;
     readonly once: boolean;
     readonly tag: string;
+    readonly params: unknown;
 
-    constructor(tag: string, listener: Listener, once: boolean) {
-        defineReadOnly(this, "tag", tag);
+    constructor(tag: EventTag, listener: Listener, once: boolean) {
+        defineReadOnly(this, "tag", tag.event);
+        defineReadOnly(this, "params", tag.params);
         defineReadOnly(this, "listener", listener);
         defineReadOnly(this, "once", once);
     }

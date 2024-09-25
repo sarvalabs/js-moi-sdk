@@ -6,6 +6,7 @@ import {
     LogicInvokeReceipt,
     Tesseract, bytesToHex,
     decodeBase64,
+    encodeToString,
     hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
@@ -30,6 +31,11 @@ const defaultTimeout: number = 120;
 const defaultOptions: Options = {
     tesseract_number: -1
 }
+
+export interface EventTag {
+    event: string;
+    params?: unknown;
+};
 
 /**
  * Class representing a base provider for interacting with the MOI protocol.
@@ -929,12 +935,10 @@ export class BaseProvider extends AbstractProvider {
             end_height: end
         }
 
-        console.log(payload);
-
         const response = await this.execute<Log[]>("moi.GetLogs", payload);
         return this.processResponse(response).map((log) => ({
           ...log,
-          data: "0x" + bytesToHex(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+          data: encodeToString(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
         }));
     }
 
@@ -1296,7 +1300,7 @@ export class BaseProvider extends AbstractProvider {
 
         let eventTag = getEventTag(eventName);
         this._events = this._events.filter((event) => {
-            if (event.tag !== eventTag) { return true; }
+            if (event.tag !== eventTag.event) { return true; }
 
             setTimeout(() => {
                 event.listener.apply(this, args);
@@ -1325,6 +1329,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns The instance of the class to allow method chaining.
      */
     public on(eventName: EventType, listener: Listener): this {
+        if (typeof eventName === "object" && "topics" in eventName) {
+            eventName.topics = this.hashTopics(eventName.topics);
+        }
+
         return this._addEventListener(eventName, listener, false);
     }
 
@@ -1351,7 +1359,7 @@ export class BaseProvider extends AbstractProvider {
 
         let eventTag = getEventTag(eventName);
         return this._events.filter((event) => {
-            return (event.tag === eventTag);
+            return (event.tag === eventTag.event);
         }).length;
     }
 
@@ -1368,7 +1376,7 @@ export class BaseProvider extends AbstractProvider {
 
         let eventTag = getEventTag(eventName);
         return this._events
-            .filter((event) => (event.tag === eventTag))
+            .filter((event) => (event.tag === eventTag.event))
             .map((event) => event.listener);
     }
 
@@ -1392,7 +1400,7 @@ export class BaseProvider extends AbstractProvider {
         let found = false;
         let eventTag = getEventTag(eventName);
         this._events = this._events.filter((event) => {
-            if (event.tag !== eventTag || event.listener != listener) { return true; }
+            if (event.tag !== eventTag.event || event.listener != listener) { return true; }
             if (found) { return true; }
             found = true;
             stopped.push(event);
@@ -1421,7 +1429,7 @@ export class BaseProvider extends AbstractProvider {
         } else {
             const eventTag = getEventTag(eventName);
             this._events = this._events.filter((event) => {
-                if (event.tag !== eventTag) { return true; }
+                if (event.tag !== eventTag.event) { return true; }
                 stopped.push(event);
                 return false;
             });
@@ -1438,20 +1446,24 @@ export class BaseProvider extends AbstractProvider {
  * Retrieves the event tag based on the event name.
  * 
  * @param {EventType} eventName - The name of the event.
- * @returns {string} The event tag.
+ * @returns The tag for the event.
  * @throws {Error} if the event name is invalid.
  */
-const getEventTag = (eventName: EventType): string => {
+const getEventTag = (eventName: EventType): EventTag => {
     if (typeof(eventName) === "string") {
         eventName = eventName.toLowerCase();
 
         if (hexDataLength(eventName) === 32) {
-            return "tesseract:" + eventName;
+            return { event: "tesseract:" + eventName };
         }
 
         if (eventName.indexOf(":") === -1) {
-            return eventName;
+            return { event: eventName };
         }
+    }
+
+    if (typeof eventName === "object" && "topics" in eventName) {
+        return { event: "logs", params: eventName };
     }
 
     throw new Error("invalid event - " + eventName);
