@@ -1,8 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
-import { type NestedArray } from "../types/util";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 /**
@@ -338,14 +337,7 @@ export declare class BaseProvider extends AbstractProvider {
      *
      * @throws Error if difference between start height and end height is greater than 10.
      */
-    getLogs(address: string, height: [start: number, end: number], topics?: NestedArray<string>): Promise<{
-        data: string;
-        address: string;
-        topics: string[];
-        ix_hash: string;
-        ts_hash: string;
-        participants: import("js-moi-utils").Participants;
-    }[]>;
+    getLogs(logFilter: LogFilter): Promise<Log[]>;
     /**
      * Retrieves all the interactions that are pending for inclusion in the next
      * Tesseract(s) or are scheduled for future execution.

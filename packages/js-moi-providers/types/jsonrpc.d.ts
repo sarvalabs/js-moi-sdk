@@ -8,6 +8,7 @@ import {
     LogicInvokeReceipt,
     Participants
 } from "js-moi-utils";
+import type { NestedArray } from "./util";
 
 export interface Options {
     tesseract_number?: number;
@@ -330,4 +331,10 @@ export interface Log {
     ix_hash: string;
     ts_hash: string;
     participants: Participants;
+}
+
+export interface LogFilter {
+    address: string;
+    height: [start: number, end: number];
+    topics?: NestedArray<string>;
 }

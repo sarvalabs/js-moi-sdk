@@ -21,7 +21,9 @@ import {
     Registry,
     Status,
     SyncStatus,
-    TDU
+    TDU,
+    type Log,
+    type LogFilter
 } from "../types/jsonrpc";
 
 /**
@@ -75,6 +77,7 @@ export abstract class AbstractProvider {
     abstract getPendingInteractionFilter(): Promise<Filter>
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>
+    abstract getLogs(filter: LogFilter): Promise<Log[]>
 
     // Event Emitter (ish)
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;

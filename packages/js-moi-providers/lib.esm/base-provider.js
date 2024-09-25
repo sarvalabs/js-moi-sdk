@@ -725,7 +725,11 @@ export class BaseProvider extends AbstractProvider {
      *
      * @throws Error if difference between start height and end height is greater than 10.
      */
-    async getLogs(address, height, topics = []) {
+    async getLogs(logFilter) {
+        if (logFilter.topics == null) {
+            logFilter.topics = [];
+        }
+        const { address, height, topics } = logFilter;
         if (!isValidAddress(address)) {
             ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
         }

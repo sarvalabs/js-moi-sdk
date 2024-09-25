@@ -425,22 +425,32 @@ describe("Test JsonRpcProvider Query Calls", () => {
       const address = "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce";
 
       it("should return an result", async () => {
-        const logs = await provider.getLogs(address, [5, -1]);
+        const logs = await provider.getLogs({
+          address: address,
+          height: [0, 10]
+        });
         console.log(logs)
         expect(logs).toBeDefined();
         expect(Array.isArray(logs)).toBeTruthy();
       });
 
       it("should return an result with topics", async () => {
-        const logs = await provider.getLogs(address, [5, 15], [["Transfer"]]);
+        const logs = await provider.getLogs({
+          address: address,
+          height: [0, 10],
+          topics: [["Transfer"]]
+        })
         expect(logs).toBeDefined();
         expect(Array.isArray(logs)).toBeTruthy();
       });
 
       it("should throw error if height range is invalid", async () => {
         expect(async () => {
-          await provider.getLogs(address, [0, 100])
-        }).rejects.toThrow(/Invalid query range/i);
+          await provider.getLogs({
+            address: address,
+            height: [10, 0]
+          })
+        }).rejects.toThrow(/Invalid query range|Invalid height query/i);
       });
     });
 });
