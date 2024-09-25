@@ -109,7 +109,9 @@ export declare class ManifestCoder {
      * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
      * @returns {T | null} The decoded event log data, or null if the log data is empty.
      */
-    decodeEventOutput<T>(logData: string): T | null;
+    decodeEventOutput(event: "builtin.Log", logData: string): {
+        value: string;
+    } | null;
     /**
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.

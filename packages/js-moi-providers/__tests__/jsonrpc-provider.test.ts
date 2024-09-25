@@ -426,6 +426,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
       it("should return an result", async () => {
         const logs = await provider.getLogs(address, [5, -1]);
+        console.log(logs)
         expect(logs).toBeDefined();
         expect(Array.isArray(logs)).toBeTruthy();
       });
