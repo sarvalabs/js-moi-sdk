@@ -736,13 +736,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         if (!(0, js_moi_utils_1.isValidAddress)(address)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
         }
-        const [start, end] = height;
-        if (start >= end) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Start height should be less than end height", "height", height);
-        }
         if (!Array.isArray(topics)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
         }
+        const [start, end] = height;
         const payload = {
             address,
             topics: this.hashTopics(topics),

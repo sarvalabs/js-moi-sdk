@@ -425,7 +425,8 @@ describe("Test JsonRpcProvider Query Calls", () => {
       const address = "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce";
 
       it("should return an result", async () => {
-        const logs = await provider.getLogs(address, [5, 15]);
+        const logs = await provider.getLogs(address, [5, -1]);
+        console.log(logs)
         expect(logs).toBeDefined();
         expect(Array.isArray(logs)).toBeTruthy();
       });

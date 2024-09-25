@@ -29,13 +29,13 @@ describe("Test Schema", () => {
         expect(stateSchema).toEqual({
             kind: "struct",
             fields: {
-                symbol: {
+                Symbol: {
                     kind: "string",
                 },
-                supply: {
+                Supply: {
                     kind: "integer",
                 },
-                balances: {
+                Balances: {
                     kind: "map",
                     fields: {
                         keys: {
