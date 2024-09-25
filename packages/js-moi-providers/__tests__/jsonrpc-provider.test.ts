@@ -3,7 +3,7 @@ import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from
 import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
-import { getRandomSupply } from "./utils/utils";
+import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
 const HOST = "http://localhost:1600";
 const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
@@ -21,25 +21,25 @@ describe("Test JsonRpcProvider Query Calls", () => {
     const supply = getRandomSupply();
     MNEMONIC;
 
-    // beforeAll(async() => {
-    //   signer = await initializeWallet(provider, MNEMONIC);
-    //   const nonce = await signer.getNonce();
-    //   const ixResponse = await signer.sendInteraction({
-    //     type: IxType.ASSET_CREATE,
-    //     nonce: nonce,
-    //     fuel_price: 1,
-    //     fuel_limit: 200,
-    //     payload: {
-    //         standard: AssetStandard.MAS0,
-    //         symbol: getRandomSymbol(),
-    //         supply: supply
-    //     }
-    //   });
+    beforeAll(async() => {
+      signer = await initializeWallet(provider, MNEMONIC);
+      const nonce = await signer.getNonce();
+      const ixResponse = await signer.sendInteraction({
+        type: IxType.ASSET_CREATE,
+        nonce: nonce,
+        fuel_price: 1,
+        fuel_limit: 200,
+        payload: {
+            standard: AssetStandard.MAS0,
+            symbol: getRandomSymbol(),
+            supply: supply
+        }
+      });
 
-    //   ixHash = ixResponse.hash;
-    //   ixReceipt = await ixResponse.wait();
-    //   nextNonce = Number(nonce) + 1
-    // });
+      ixHash = ixResponse.hash;
+      ixReceipt = await ixResponse.wait();
+      nextNonce = Number(nonce) + 1
+    });
 
     describe('getBalance', () => {
       it('should return the asset balance', async () => {
