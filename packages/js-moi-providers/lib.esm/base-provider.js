@@ -742,7 +742,6 @@ export class BaseProvider extends AbstractProvider {
             start_height: start,
             end_height: end
         };
-        console.log(payload);
         const response = await this.execute("moi.GetLogs", payload);
         return this.processResponse(response).map((log) => ({
             ...log,
