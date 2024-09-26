@@ -199,7 +199,7 @@ export class WebsocketProvider extends BaseProvider {
 
     on(eventName: NewLogs, listener: (log: Log) => void): this;
     on(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
-    on<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    on<K extends keyof WebsocketEventMap>(eventName: K, listener: (...args: WebsocketEventMap[K]) => void): this;
     on(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
             super.on(eventName, listener);
@@ -212,12 +212,10 @@ export class WebsocketProvider extends BaseProvider {
                 if (_sub?.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
-                // @ts-ignore - don't want to expose the message event
                 super.on(_sub.uuid, listener);
             } else {
                 const uuid = `${eventName.event}:${randomUUID()}`;
                 this.subscriptions.set(eventName, { uuid });
-                // @ts-ignore - don't want to expose the message event
                 super.on(uuid, listener);
             }
         }
@@ -240,15 +238,12 @@ export class WebsocketProvider extends BaseProvider {
                         return
                     }
 
-                    // @ts-ignore - don't want to expose the message event
                     if (typeof eventName === "string") {
-
-                        this.emit(eventName, this.processWsResult(eventName, data.params.result));
+                        this.emit(eventName, this.processWsResult(eventName as ProviderEvents, data.params.result));
                         return;
                     }
 
                     if (typeof eventName === "object" && _sub.uuid != null) {
-                        // @ts-ignore - don't want to expose the message event
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
@@ -275,12 +270,10 @@ export class WebsocketProvider extends BaseProvider {
                 if (_sub?.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
-                // @ts-ignore - don't want to expose the message event
                 super.once(_sub.uuid, listener);
             } else {
                 const uuid = `${eventName.event}:${randomUUID()}`;
                 this.subscriptions.set(eventName, { uuid });
-                // @ts-ignore - don't want to expose the message event
                 super.once(uuid, listener);
             }
         }
@@ -303,15 +296,12 @@ export class WebsocketProvider extends BaseProvider {
                         return
                     }
 
-                    // @ts-ignore - don't want to expose the message event
                     if (typeof eventName === "string") {
-
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
                     }
 
                     if (typeof eventName === "object" && _sub.uuid != null) {
-                        // @ts-ignore - don't want to expose the message event
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
@@ -339,7 +329,6 @@ export class WebsocketProvider extends BaseProvider {
                 return this;
             }
 
-            // @ts-ignore - don't want to expose the message event
             super.removeListener(_sub.uuid, listener);
             this.subscriptions.delete(eventName);
         }

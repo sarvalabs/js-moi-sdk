@@ -158,13 +158,11 @@ export class WebsocketProvider extends BaseProvider {
                 if (_sub?.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
-                // @ts-ignore - don't want to expose the message event
                 super.on(_sub.uuid, listener);
             }
             else {
                 const uuid = `${eventName.event}:${randomUUID()}`;
                 this.subscriptions.set(eventName, { uuid });
-                // @ts-ignore - don't want to expose the message event
                 super.on(uuid, listener);
             }
         }
@@ -181,13 +179,11 @@ export class WebsocketProvider extends BaseProvider {
                     if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
                         return;
                     }
-                    // @ts-ignore - don't want to expose the message event
                     if (typeof eventName === "string") {
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
                     }
                     if (typeof eventName === "object" && _sub.uuid != null) {
-                        // @ts-ignore - don't want to expose the message event
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
@@ -229,7 +225,6 @@ export class WebsocketProvider extends BaseProvider {
                     if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
                         return;
                     }
-                    // @ts-ignore - don't want to expose the message event
                     if (typeof eventName === "string") {
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
@@ -253,7 +248,6 @@ export class WebsocketProvider extends BaseProvider {
             if (_sub?.uuid == null) {
                 return this;
             }
-            // @ts-ignore - don't want to expose the message event
             super.removeListener(_sub.uuid, listener);
             this.subscriptions.delete(eventName);
         }

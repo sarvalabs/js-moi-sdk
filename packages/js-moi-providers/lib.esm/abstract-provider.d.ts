@@ -13,19 +13,19 @@ export type NewLogs = {
 };
 export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount | NewLogs;
 export interface WebsocketEventMap {
-    "newTesseracts": [tesseract: Tesseract];
-    "newPendingInteractions": [interactionHash: string];
-    "connect": [];
-    "debug": [];
-    "error": [error: unknown];
-    "close": [];
-    "reconnect": [attempt: number];
+    newTesseracts: [tesseract: Tesseract];
+    newPendingInteractions: [interactionHash: string];
+    connect: [];
+    debug: [];
+    error: [error: unknown];
+    close: [];
+    reconnect: [attempt: number];
 }
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
  */
-export declare abstract class AbstractProvider extends EventEmitter<WebsocketEventMap> {
+export declare abstract class AbstractProvider extends EventEmitter {
     abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
     abstract getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
     abstract getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
