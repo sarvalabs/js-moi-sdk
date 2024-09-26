@@ -906,6 +906,18 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 }
                 params = [event.event, { address: event.params }];
             }
+            if (event.event === 'newLogs') {
+                if (!(0, js_moi_utils_1.isValidAddress)(event.params.address)) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params.address);
+                }
+                if (event.params.topics == null) {
+                    event.params.topics = [];
+                }
+                if (Array.isArray(event.params.topics) === false) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "event.params.topics", event.params.topics);
+                }
+                params = [event.event, { address: event.params.address, topics: this.hashTopics(event.params.topics), start_height: event.params.height[0], end_height: event.params.height[1] }];
+            }
         }
         const response = await this.execute("moi.subscribe", params);
         return this.processResponse(response);
@@ -1017,6 +1029,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
         if (typeof event === "object" && event.event === "newTesseractsByAccount") {
             return result;
+        }
+        if (typeof event === "object" && event.event === "newLogs") {
+            const log = result;
+            return { ...log, data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(log.data)) };
         }
         js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid event type", "event", event);
     }

@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
 import { BaseProvider } from "./base-provider";
 export class WebsocketProvider extends BaseProvider {
@@ -51,6 +52,29 @@ export class WebsocketProvider extends BaseProvider {
                 this.ws = this.createNewWebsocket(this.host, this.options);
                 this.emit('reconnect', this.reconnects);
             }, this.options.reconnect.delay);
+        }
+    }
+    async disconnect() {
+        if (this.ws.readyState === this.ws.OPEN) {
+            this.ws.close();
+        }
+        if (this.ws.readyState === this.ws.CLOSED) {
+            ErrorUtils.throwError("Closing on a closed connection", ErrorCode.ACTION_REJECTED);
+        }
+        if (this.ws.readyState === this.ws.CLOSING) {
+            return new Promise((resolve) => {
+                this.once('close', () => {
+                    resolve();
+                });
+            });
+        }
+        if (this.ws.readyState === this.ws.CONNECTING) {
+            return new Promise((resolve) => {
+                this.once('connect', () => {
+                    this.ws.close(1000);
+                    resolve();
+                });
+            });
         }
     }
     handleOnConnect() {

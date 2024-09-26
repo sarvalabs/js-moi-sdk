@@ -1119,6 +1119,22 @@ export class BaseProvider extends AbstractProvider {
                 params = [event.event, { address: event.params }];
             }
 
+            if (event.event === 'newLogs') {
+                if (!isValidAddress(event.params.address)) {
+                    ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params.address);
+                }
+
+                if (event.params.topics == null) {
+                    event.params.topics = [];
+                }
+
+                if (Array.isArray(event.params.topics) === false) {
+                    ErrorUtils.throwArgumentError("Topics should be an array", "event.params.topics", event.params.topics);
+                }
+
+                params = [event.event, { address: event.params.address, topics: this.hashTopics(event.params.topics), start_height: event.params.height[0], end_height: event.params.height[1] }];
+            }
+
         }
         
 
@@ -1252,6 +1268,11 @@ export class BaseProvider extends AbstractProvider {
 
         if (typeof event === "object" && event.event === "newTesseractsByAccount") {
             return result;
+        }
+
+        if (typeof event === "object" && event.event === "newLogs") {
+            const log = result as Log;
+            return { ...log, data: encodeToString(decodeBase64(log.data)) };
         }
 
         ErrorUtils.throwArgumentError("Invalid event type", "event", event);

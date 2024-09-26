@@ -1,7 +1,7 @@
-import type { Tesseract } from "js-moi-utils";
+import { type Tesseract } from "js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
-import type { RpcResponse } from "../types/jsonrpc";
-import type { ProviderEvents, WebsocketEventMap } from "./abstract-provider";
+import type { Log, RpcResponse } from "../types/jsonrpc";
+import type { NewLogs, NewTesseractsByAccount, ProviderEvents, WebsocketEventMap } from "./abstract-provider";
 import { BaseProvider } from "./base-provider";
 type TypeOfWebsocketConst = ConstructorParameters<typeof Websocket>;
 interface WebsocketConnection {
@@ -25,6 +25,7 @@ export declare class WebsocketProvider extends BaseProvider {
     constructor(host: string, options?: WebsocketConnection);
     private createNewWebsocket;
     private reconnect;
+    disconnect(): Promise<void>;
     private handleOnConnect;
     private handleOnError;
     private handleOnClose;
@@ -32,20 +33,14 @@ export declare class WebsocketProvider extends BaseProvider {
     private handleRpcRequest;
     private isSubscriptionEvent;
     getSubscription(eventName: ProviderEvents): Promise<string>;
-    on<K>(eventName: {
-        event: "newTesseractsByAccount";
-        params: string;
-    }, listener: (tesseract: Tesseract) => void): this;
+    on(eventName: NewLogs, listener: (log: Log) => void): this;
+    on(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     on<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
-    once<K>(eventName: {
-        event: "newTesseractsByAccount";
-        params: string;
-    }, listener: (tesseract: Tesseract) => void): this;
+    once<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
+    once<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
     once<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
-    removeListener<K>(eventName: {
-        event: "newTesseractsByAccount";
-        params: string;
-    }, listener: (tesseract: Tesseract) => void): this;
+    removeListener<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
+    removeListener<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
 }
 export {};

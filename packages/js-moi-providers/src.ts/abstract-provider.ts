@@ -26,28 +26,20 @@ import {
     type LogFilter
 } from "../types/jsonrpc";
 
-type NewTesseractsByAccount = { event: "newTesseractsByAccount", params: string };
+export type NewTesseractsByAccount = { event: "newTesseractsByAccount", params: string };
 
-export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount;
+export type NewLogs = { event: "newLogs", params: LogFilter };
 
+export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount | NewLogs;
 
 export interface WebsocketEventMap {
     "newTesseracts": [tesseract: Tesseract],
-    "newTesseractsByAccount": [tesseracts: Tesseract],
-    "newLogs": [logs: Log],
     "newPendingInteractions": [interactionHash: string],
     "connect": [],
     "debug": [],
     "error": [error: unknown],
     "close": []
     "reconnect": [attempt: number]
-}
-
-export interface WebsocketSubscriptionParams {
-    "newTesseracts": [],
-    "newTesseractsByAccount": [address: string],
-    "newLogs": [],
-    "newPendingInteractions": [],
 }
 
 /**

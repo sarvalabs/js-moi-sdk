@@ -3,27 +3,23 @@ import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
-type NewTesseractsByAccount = {
+export type NewTesseractsByAccount = {
     event: "newTesseractsByAccount";
     params: string;
 };
-export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount;
+export type NewLogs = {
+    event: "newLogs";
+    params: LogFilter;
+};
+export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount | NewLogs;
 export interface WebsocketEventMap {
     "newTesseracts": [tesseract: Tesseract];
-    "newTesseractsByAccount": [tesseracts: Tesseract];
-    "newLogs": [logs: Log];
     "newPendingInteractions": [interactionHash: string];
     "connect": [];
     "debug": [];
     "error": [error: unknown];
     "close": [];
     "reconnect": [attempt: number];
-}
-export interface WebsocketSubscriptionParams {
-    "newTesseracts": [];
-    "newTesseractsByAccount": [address: string];
-    "newLogs": [];
-    "newPendingInteractions": [];
 }
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
@@ -69,5 +65,4 @@ export declare abstract class AbstractProvider extends EventEmitter<WebsocketEve
     abstract getLogs(filter: LogFilter): Promise<Log[]>;
     abstract getSubscription(event: ProviderEvents): Promise<string>;
 }
-export {};
 //# sourceMappingURL=abstract-provider.d.ts.map

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketProvider = void 0;
 const crypto_1 = require("crypto");
+const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
 class WebsocketProvider extends base_provider_1.BaseProvider {
@@ -54,6 +55,29 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                 this.ws = this.createNewWebsocket(this.host, this.options);
                 this.emit('reconnect', this.reconnects);
             }, this.options.reconnect.delay);
+        }
+    }
+    async disconnect() {
+        if (this.ws.readyState === this.ws.OPEN) {
+            this.ws.close();
+        }
+        if (this.ws.readyState === this.ws.CLOSED) {
+            js_moi_utils_1.ErrorUtils.throwError("Closing on a closed connection", js_moi_utils_1.ErrorCode.ACTION_REJECTED);
+        }
+        if (this.ws.readyState === this.ws.CLOSING) {
+            return new Promise((resolve) => {
+                this.once('close', () => {
+                    resolve();
+                });
+            });
+        }
+        if (this.ws.readyState === this.ws.CONNECTING) {
+            return new Promise((resolve) => {
+                this.once('connect', () => {
+                    this.ws.close(1000);
+                    resolve();
+                });
+            });
         }
     }
     handleOnConnect() {

@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
-import type { Tesseract } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, type Tesseract } from "js-moi-utils";
 import { w3cwebsocket as Websocket, type ICloseEvent } from "websocket";
-import type { RpcResponse } from "../types/jsonrpc";
-import type { ProviderEvents, WebsocketEventMap } from "./abstract-provider";
+import type { Log, RpcResponse } from "../types/jsonrpc";
+import type { NewLogs, NewTesseractsByAccount, ProviderEvents, WebsocketEventMap } from "./abstract-provider";
 import { BaseProvider } from "./base-provider";
 
 type TypeOfWebsocketConst = ConstructorParameters<typeof Websocket>;
@@ -81,6 +81,33 @@ export class WebsocketProvider extends BaseProvider {
         }
     }
 
+    public async disconnect(): Promise<void> {
+        if (this.ws.readyState === this.ws.OPEN) {
+            this.ws.close();
+        }
+
+        if (this.ws.readyState === this.ws.CLOSED) {
+            ErrorUtils.throwError("Closing on a closed connection", ErrorCode.ACTION_REJECTED);
+        }
+
+        if (this.ws.readyState === this.ws.CLOSING) {
+            return new Promise((resolve) => {
+                this.once('close', () => {
+                    resolve();
+                });
+            });
+        }
+
+        if (this.ws.readyState === this.ws.CONNECTING) {
+            return new Promise((resolve) => {
+                this.once('connect', () => {
+                    this.ws.close(1000);
+                    resolve();
+                });
+            });
+        }
+    }
+
     private handleOnConnect(): void {
         this.reconnects = 0;
         this.emit('connect');
@@ -148,7 +175,7 @@ export class WebsocketProvider extends BaseProvider {
     }
 
     private isSubscriptionEvent(eventName: ProviderEvents): boolean {
-        const events: (keyof WebsocketEventMap)[] = ['newTesseracts', 'newTesseractsByAccount', 'newLogs', 'newPendingInteractions'];
+        const events = ['newTesseracts', 'newTesseractsByAccount', 'newLogs', 'newPendingInteractions'];
         const name = typeof eventName === "string" ? eventName : eventName.event;
         return events.includes(name);
     }
@@ -170,7 +197,8 @@ export class WebsocketProvider extends BaseProvider {
         return await sub.subID;
     }
 
-    on<K>(eventName: { event: "newTesseractsByAccount", params: string }, listener: (tesseract: Tesseract) => void): this;
+    on(eventName: NewLogs, listener: (log: Log) => void): this;
+    on(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     on<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
     on(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
@@ -232,7 +260,8 @@ export class WebsocketProvider extends BaseProvider {
         return this;
     }
 
-    once<K>(eventName: { event: "newTesseractsByAccount", params: string }, listener: (tesseract: Tesseract) => void): this;
+    once<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
+    once<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
     once<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
     once(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
@@ -295,7 +324,8 @@ export class WebsocketProvider extends BaseProvider {
     }
 
     
-    removeListener<K>(eventName: { event: "newTesseractsByAccount", params: string }, listener: (tesseract: Tesseract) => void): this;
+    removeListener<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
+    removeListener<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
     removeListener(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
@@ -316,4 +346,3 @@ export class WebsocketProvider extends BaseProvider {
         return this;
     }
 }
-
