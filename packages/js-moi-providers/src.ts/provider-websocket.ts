@@ -40,7 +40,6 @@ export class WebsocketProvider extends BaseProvider {
         ws.onopen = () => this.handleOnConnect();
         ws.onerror = (error) => this.handleOnError(error);
         ws.onclose = (event) => this.handleOnClose(event);
-        // @ts-ignore - don't want to expose the message event
         ws.onmessage = (message) => this.emit('message', message);
 
         if (options?.timeout) {
