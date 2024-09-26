@@ -81,7 +81,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
      * @param event - The event to start.
      */
     _startEvent(event) {
-        super._startEvent(event);
+        // super._startEvent(event);
     }
     /**
      * Stops an event.
@@ -89,7 +89,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
      * @param event - The event to stop.
      */
     _stopEvent(event) {
-        super._stopEvent(event);
+        // super._stopEvent(event);
     }
 }
 exports.JsonRpcProvider = JsonRpcProvider;

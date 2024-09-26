@@ -75,7 +75,7 @@ export class JsonRpcProvider extends BaseProvider {
      * @param event - The event to start.
      */
     _startEvent(event) {
-        super._startEvent(event);
+        // super._startEvent(event);
     }
     /**
      * Stops an event.
@@ -83,7 +83,7 @@ export class JsonRpcProvider extends BaseProvider {
      * @param event - The event to stop.
      */
     _stopEvent(event) {
-        super._stopEvent(event);
+        // super._stopEvent(event);
     }
 }
 //# sourceMappingURL=jsonrpc-provider.js.map

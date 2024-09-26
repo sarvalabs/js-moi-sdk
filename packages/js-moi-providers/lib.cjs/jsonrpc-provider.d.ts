@@ -1,6 +1,6 @@
+import { RpcResponse } from "../types/jsonrpc";
 import { BaseProvider } from "./base-provider";
 import Event from "./event";
-import { RpcResponse } from "../types/jsonrpc";
 /**
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
  */

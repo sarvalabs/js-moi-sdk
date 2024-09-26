@@ -1,6 +1,6 @@
+import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import { EventType, Listener } from "../types/event";
 import {
     AccountMetaInfo,
     AccountState,
@@ -26,11 +26,30 @@ import {
     type LogFilter
 } from "../types/jsonrpc";
 
+interface WebsocketEventMap {
+    "newTesseract": [tesseract: Tesseract],
+    "newTesseractsByAccount": [tesseracts: Tesseract],
+    "newLogs": [logs: Log],
+    "newPendingInteractions": [interactionHash: string],
+    "connect": [],
+    "debug": [],
+    "error": [error: unknown],
+    "close": []
+    "reconnect": [attempt: number]
+}
+
+export interface WebsocketSubscriptionParams {
+    "newTesseract": [],
+    "newTesseractsByAccount": [address: string],
+    "newLogs": [],
+    "newPendingInteractions": [],
+}
+
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
  */
-export abstract class AbstractProvider {
+export abstract class AbstractProvider extends EventEmitter<WebsocketEventMap> {
     // Account Methods
     abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>
     abstract getContextInfo(address: string, options?: Options): Promise<ContextInfo>
@@ -77,39 +96,6 @@ export abstract class AbstractProvider {
     abstract getPendingInteractionFilter(): Promise<Filter>
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>
-    abstract getLogs(filter: LogFilter): Promise<Log[]>
-
-    // Event Emitter (ish)
-    abstract on(eventName: EventType, listener: Listener): AbstractProvider;
-    abstract once(eventName: EventType, listener: Listener): AbstractProvider;
-    abstract listenerCount(eventName?: EventType): number;
-    abstract listeners(eventName?: EventType): Array<Listener>;
-    abstract off(eventName: EventType, listener?: Listener): AbstractProvider;
-    abstract removeAllListeners(eventName?: EventType): AbstractProvider;
-
-    // Alias for "on"
-
-    /**
-     * Alias for "on" method.
-     * 
-     * @param eventName - The name of the event.
-     * @param listener - The listener function to be called when the event is emitted.
-     * @returns The provider instance for chaining.
-     */
-    addListener(eventName: EventType, listener: Listener): AbstractProvider {
-        return this.on(eventName, listener);
-    }
-
-    // Alias for "off"
-
-    /**
-     * Alias for "off" method.
-     * 
-     * @param eventName - The name of the event.
-     * @param listener - The listener function to be unregistered.
-     * @returns The provider instance for chaining.
-     */
-    removeListener(eventName: EventType, listener: Listener): AbstractProvider {
-        return this.off(eventName, listener);
-    }
+    abstract getLogs(filter: LogFilter): Promise<Log[]>;
+    abstract subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void>
 }

@@ -1,12 +1,30 @@
+/// <reference types="node" />
+import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import { EventType, Listener } from "../types/event";
 import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
+interface WebsocketEventMap {
+    "newTesseract": [tesseract: Tesseract];
+    "newTesseractsByAccount": [tesseracts: Tesseract];
+    "newLogs": [logs: Log];
+    "newPendingInteractions": [interactionHash: string];
+    "connect": [];
+    "debug": [];
+    "error": [error: unknown];
+    "close": [];
+    "reconnect": [attempt: number];
+}
+export interface WebsocketSubscriptionParams {
+    "newTesseract": [];
+    "newTesseractsByAccount": [address: string];
+    "newLogs": [];
+    "newPendingInteractions": [];
+}
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
  */
-export declare abstract class AbstractProvider {
+export declare abstract class AbstractProvider extends EventEmitter<WebsocketEventMap> {
     abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
     abstract getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
     abstract getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
@@ -44,27 +62,7 @@ export declare abstract class AbstractProvider {
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>;
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>;
     abstract getLogs(filter: LogFilter): Promise<Log[]>;
-    abstract on(eventName: EventType, listener: Listener): AbstractProvider;
-    abstract once(eventName: EventType, listener: Listener): AbstractProvider;
-    abstract listenerCount(eventName?: EventType): number;
-    abstract listeners(eventName?: EventType): Array<Listener>;
-    abstract off(eventName: EventType, listener?: Listener): AbstractProvider;
-    abstract removeAllListeners(eventName?: EventType): AbstractProvider;
-    /**
-     * Alias for "on" method.
-     *
-     * @param eventName - The name of the event.
-     * @param listener - The listener function to be called when the event is emitted.
-     * @returns The provider instance for chaining.
-     */
-    addListener(eventName: EventType, listener: Listener): AbstractProvider;
-    /**
-     * Alias for "off" method.
-     *
-     * @param eventName - The name of the event.
-     * @param listener - The listener function to be unregistered.
-     * @returns The provider instance for chaining.
-     */
-    removeListener(eventName: EventType, listener: Listener): AbstractProvider;
+    abstract subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void>;
 }
+export {};
 //# sourceMappingURL=abstract-provider.d.ts.map

@@ -14,9 +14,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.WebsocketProvider = void 0;
 __exportStar(require("./abstract-provider"), exports);
 __exportStar(require("./base-provider"), exports);
 __exportStar(require("./jsonrpc-provider"), exports);
 __exportStar(require("./voyage-provider"), exports);
-__exportStar(require("./websocket-provider"), exports);
+var provider_websocket_1 = require("./provider-websocket");
+Object.defineProperty(exports, "WebsocketProvider", { enumerable: true, get: function () { return provider_websocket_1.WebsocketProvider; } });
 //# sourceMappingURL=index.js.map
