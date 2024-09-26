@@ -202,13 +202,11 @@ export class WebsocketProvider extends BaseProvider {
                 if (_sub?.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
-                // @ts-ignore - don't want to expose the message event
                 super.once(_sub.uuid, listener);
             }
             else {
                 const uuid = `${eventName.event}:${randomUUID()}`;
                 this.subscriptions.set(eventName, { uuid });
-                // @ts-ignore - don't want to expose the message event
                 super.once(uuid, listener);
             }
         }
@@ -230,7 +228,6 @@ export class WebsocketProvider extends BaseProvider {
                         return;
                     }
                     if (typeof eventName === "object" && _sub.uuid != null) {
-                        // @ts-ignore - don't want to expose the message event
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
