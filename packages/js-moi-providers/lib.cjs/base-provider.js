@@ -23,7 +23,6 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         // Events being listened to
         this._events = [];
     }
-    async subscribe(event, ...args) { }
     /**
      * Helper function to process the RPC response and extract the relevant data.
      * If the response has a result, it checks if the result has data and returns it.
@@ -895,6 +894,22 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
+    async getSubscription(event) {
+        let params = [];
+        if (typeof event === "string") {
+            params = event;
+        }
+        if (typeof event === "object") {
+            if (event.event === 'newTesseractsByAccount') {
+                if (!(0, js_moi_utils_1.isValidAddress)(event.params)) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
+                }
+                params = [event.event, { address: event.params }];
+            }
+        }
+        const response = await this.execute("moi.subscribe", params);
+        return this.processResponse(response);
+    }
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
@@ -990,6 +1005,21 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 throw new Error("Unsupported interaction type encountered");
         }
     }
+    processWsResult(event, result) {
+        if (event === 'newPendingInteractions') {
+            if (typeof result === "string") {
+                return result.startsWith("0x") ? result : `0x${result}`;
+            }
+            js_moi_utils_1.ErrorUtils.throwError("Invalid response received", js_moi_utils_1.ErrorCode.SERVER_ERROR);
+        }
+        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
+            return result;
+        }
+        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
+            return result;
+        }
+        js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+    }
     /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.
@@ -1027,27 +1057,4 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     }
 }
 exports.BaseProvider = BaseProvider;
-// // helper functions
-// /**
-//  * Retrieves the event tag based on the event name.
-//  * 
-//  * @param {EventType} eventName - The name of the event.
-//  * @returns The tag for the event.
-//  * @throws {Error} if the event name is invalid.
-//  */
-// const getEventTag = (eventName: EventType): EventTag => {
-//     if (typeof(eventName) === "string") {
-//         eventName = eventName.toLowerCase();
-//         if (hexDataLength(eventName) === 32) {
-//             return { event: "tesseract:" + eventName };
-//         }
-//         if (eventName.indexOf(":") === -1) {
-//             return { event: eventName };
-//         }
-//     }
-//     if (typeof eventName === "object" && "topics" in eventName) {
-//         return { event: "logs", params: eventName };
-//     }
-//     throw new Error("invalid event - " + eventName);
-// }
 //# sourceMappingURL=base-provider.js.map

@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
-import { AbstractProvider, type WebsocketSubscriptionParams } from "./abstract-provider";
+import { AbstractProvider, type ProviderEvents } from "./abstract-provider";
 import Event from "./event";
 export interface EventTag {
     event: string;
@@ -15,7 +15,6 @@ export interface EventTag {
 export declare class BaseProvider extends AbstractProvider {
     protected _events: Event[];
     constructor();
-    subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void>;
     /**
      * Helper function to process the RPC response and extract the relevant data.
      * If the response has a result, it checks if the result has data and returns it.
@@ -401,6 +400,7 @@ export declare class BaseProvider extends AbstractProvider {
      * the response.
      */
     getNodeInfo(): Promise<NodeInfo>;
+    getSubscription(event: ProviderEvents): Promise<string>;
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
@@ -423,6 +423,7 @@ export declare class BaseProvider extends AbstractProvider {
      * data is missing.
      */
     protected processReceipt(receipt: InteractionReceipt): any;
+    protected processWsResult(event: ProviderEvents, result: unknown): unknown;
     /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.

@@ -21,7 +21,7 @@ import {
     type LogFilter
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
-import { AbstractProvider, type WebsocketSubscriptionParams } from "./abstract-provider";
+import { AbstractProvider, type ProviderEvents } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
 
@@ -50,8 +50,6 @@ export class BaseProvider extends AbstractProvider {
         // Events being listened to
         this._events = [];
     }
-
-    async subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void> {}
 
     /**
      * Helper function to process the RPC response and extract the relevant data.
@@ -1105,6 +1103,29 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
+    public async getSubscription(event: ProviderEvents): Promise<string> {
+        let params: unknown = [];
+
+        if (typeof event === "string") {
+            params = event;
+        }
+
+        if (typeof event === "object") {
+            if (event.event === 'newTesseractsByAccount') {
+                if (!isValidAddress(event.params)) {
+                    ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
+                }
+
+                params = [event.event, { address: event.params }];
+            }
+
+        }
+        
+
+        const response = await this.execute("moi.subscribe", params);
+        return this.processResponse(response);
+    }
+
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract 
      * and returns the interaction receipt.
@@ -1216,6 +1237,26 @@ export class BaseProvider extends AbstractProvider {
         }
     }
 
+    protected processWsResult(event: ProviderEvents, result: unknown): unknown {
+        if (event === 'newPendingInteractions') {
+            if (typeof result === "string") {
+                return result.startsWith("0x") ? result : `0x${result}`;
+            }
+
+            ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
+        }
+
+        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
+            return result;
+        }
+
+        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
+            return result;
+        }
+
+        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+    }
+
     /**
      * Waits for the interaction with the specified hash to be included in a 
      * tesseract and returns the result based on the interaction type.
@@ -1252,33 +1293,5 @@ export class BaseProvider extends AbstractProvider {
      */
     protected execute<T = any>(method: string, params: any): Promise<RpcResponse<T>> {
         throw new Error(method + " not implemented")
-    }
+    } 
 }
-
-// // helper functions
-// /**
-//  * Retrieves the event tag based on the event name.
-//  * 
-//  * @param {EventType} eventName - The name of the event.
-//  * @returns The tag for the event.
-//  * @throws {Error} if the event name is invalid.
-//  */
-// const getEventTag = (eventName: EventType): EventTag => {
-//     if (typeof(eventName) === "string") {
-//         eventName = eventName.toLowerCase();
-
-//         if (hexDataLength(eventName) === 32) {
-//             return { event: "tesseract:" + eventName };
-//         }
-
-//         if (eventName.indexOf(":") === -1) {
-//             return { event: eventName };
-//         }
-//     }
-
-//     if (typeof eventName === "object" && "topics" in eventName) {
-//         return { event: "logs", params: eventName };
-//     }
-
-//     throw new Error("invalid event - " + eventName);
-// }

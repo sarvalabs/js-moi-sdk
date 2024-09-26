@@ -26,8 +26,13 @@ import {
     type LogFilter
 } from "../types/jsonrpc";
 
-interface WebsocketEventMap {
-    "newTesseract": [tesseract: Tesseract],
+type NewTesseractsByAccount = { event: "newTesseractsByAccount", params: string };
+
+export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount;
+
+
+export interface WebsocketEventMap {
+    "newTesseracts": [tesseract: Tesseract],
     "newTesseractsByAccount": [tesseracts: Tesseract],
     "newLogs": [logs: Log],
     "newPendingInteractions": [interactionHash: string],
@@ -39,7 +44,7 @@ interface WebsocketEventMap {
 }
 
 export interface WebsocketSubscriptionParams {
-    "newTesseract": [],
+    "newTesseracts": [],
     "newTesseractsByAccount": [address: string],
     "newLogs": [],
     "newPendingInteractions": [],
@@ -97,5 +102,5 @@ export abstract class AbstractProvider extends EventEmitter<WebsocketEventMap> {
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>
     abstract getLogs(filter: LogFilter): Promise<Log[]>;
-    abstract subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void>
+    abstract getSubscription(event: ProviderEvents) : Promise<string>;
 }

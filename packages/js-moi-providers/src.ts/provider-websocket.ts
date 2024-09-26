@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
+import type { Tesseract } from "js-moi-utils";
 import { w3cwebsocket as Websocket, type ICloseEvent } from "websocket";
 import type { RpcResponse } from "../types/jsonrpc";
-import type { WebsocketSubscriptionParams } from "./abstract-provider";
+import type { ProviderEvents, WebsocketEventMap } from "./abstract-provider";
 import { BaseProvider } from "./base-provider";
 
 type TypeOfWebsocketConst = ConstructorParameters<typeof Websocket>;
@@ -24,6 +25,7 @@ export class WebsocketProvider extends BaseProvider {
     private reconnectInterval?: NodeJS.Timeout;
     private readonly host: string;
     private readonly options?: WebsocketConnection;
+    private readonly subscriptions: Map<ProviderEvents, { subID?: Promise<string>, uuid?: string }> = new Map();
 
     constructor(host: string, options?: WebsocketConnection) {
         super();
@@ -79,12 +81,12 @@ export class WebsocketProvider extends BaseProvider {
         }
     }
 
-    handleOnConnect(): void {
+    private handleOnConnect(): void {
         this.reconnects = 0;
         this.emit('connect');
     }
 
-    handleOnError(error: Error): void {
+    private handleOnError(error: Error): void {
         this.emit('error', error);
     }
 
@@ -145,7 +147,173 @@ export class WebsocketProvider extends BaseProvider {
         });
     }
 
-    public async subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void> {
-        this.execute("moi.subscribe", [])
+    private isSubscriptionEvent(eventName: ProviderEvents): boolean {
+        const events: (keyof WebsocketEventMap)[] = ['newTesseracts', 'newTesseractsByAccount', 'newLogs', 'newPendingInteractions'];
+        const name = typeof eventName === "string" ? eventName : eventName.event;
+        return events.includes(name);
+    }
+
+    public override async getSubscription(eventName: ProviderEvents): Promise<string> {
+        const sub = this.subscriptions.get(eventName);
+
+        if (sub?.subID != null) {
+            return await this.subscriptions.get(eventName).subID;
+        }
+
+        if (sub == null) {
+            const promise = super.getSubscription(eventName);
+            this.subscriptions.set(eventName, { subID: promise });
+            return await promise;
+        }
+
+        sub.subID = super.getSubscription(eventName);
+        return await sub.subID;
+    }
+
+    on<K>(eventName: { event: "newTesseractsByAccount", params: string }, listener: (tesseract: Tesseract) => void): this;
+    on<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    on(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
+        if (typeof eventName === "string") {
+            super.on(eventName, listener);
+        }
+
+        if (typeof eventName === "object") {
+            if (this.subscriptions.has(eventName)) {
+                const _sub = this.subscriptions.get(eventName);
+    
+                if (_sub?.uuid == null) {
+                    _sub.uuid = `${eventName.event}:${randomUUID()}`;
+                }
+                // @ts-ignore - don't want to expose the message event
+                super.on(_sub.uuid, listener);
+            } else {
+                const uuid = `${eventName.event}:${randomUUID()}`;
+                this.subscriptions.set(eventName, { uuid });
+                // @ts-ignore - don't want to expose the message event
+                super.on(uuid, listener);
+            }
+        }
+
+        if (this.isSubscriptionEvent(eventName)) {
+            const _sub = this.subscriptions.get(eventName);
+            
+            if (_sub?.subID !=  null) {
+                return this;
+            }
+            
+            
+            this.getSubscription(eventName).then((subscription) => {
+                console.log("Subscribing to", eventName, subscription);
+                // @ts-ignore - don't want to expose the message event
+                this.on("message", (message: MessageEvent<string>) => {
+                    const data = JSON.parse(message.data);
+
+                    if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
+                        return
+                    }
+
+                    // @ts-ignore - don't want to expose the message event
+                    if (typeof eventName === "string") {
+
+                        this.emit(eventName, this.processWsResult(eventName, data.params.result));
+                        return;
+                    }
+
+                    if (typeof eventName === "object" && _sub.uuid != null) {
+                        // @ts-ignore - don't want to expose the message event
+                        this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
+                        return;
+                    }
+
+                });
+            });
+        }
+
+        return this;
+    }
+
+    once<K>(eventName: { event: "newTesseractsByAccount", params: string }, listener: (tesseract: Tesseract) => void): this;
+    once<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    once(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
+        if (typeof eventName === "string") {
+            super.once(eventName, listener);
+        }
+
+        if (typeof eventName === "object") {
+            if (this.subscriptions.has(eventName)) {
+                const _sub = this.subscriptions.get(eventName);
+    
+                if (_sub?.uuid == null) {
+                    _sub.uuid = `${eventName.event}:${randomUUID()}`;
+                }
+                // @ts-ignore - don't want to expose the message event
+                super.once(_sub.uuid, listener);
+            } else {
+                const uuid = `${eventName.event}:${randomUUID()}`;
+                this.subscriptions.set(eventName, { uuid });
+                // @ts-ignore - don't want to expose the message event
+                super.once(uuid, listener);
+            }
+        }
+
+        if (this.isSubscriptionEvent(eventName)) {
+            const _sub = this.subscriptions.get(eventName);
+            
+            if (_sub?.subID !=  null) {
+                return this;
+            }
+            
+            
+            this.getSubscription(eventName).then((subscription) => {
+                console.log("Subscribing to", eventName, subscription);
+                // @ts-ignore - don't want to expose the message event
+                this.on("message", (message: MessageEvent<string>) => {
+                    const data = JSON.parse(message.data);
+
+                    if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
+                        return
+                    }
+
+                    // @ts-ignore - don't want to expose the message event
+                    if (typeof eventName === "string") {
+
+                        this.emit(eventName, this.processWsResult(eventName, data.params.result));
+                        return;
+                    }
+
+                    if (typeof eventName === "object" && _sub.uuid != null) {
+                        // @ts-ignore - don't want to expose the message event
+                        this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
+                        return;
+                    }
+
+                });
+            });
+        }
+
+        return this;
+    }
+
+    
+    removeListener<K>(eventName: { event: "newTesseractsByAccount", params: string }, listener: (tesseract: Tesseract) => void): this;
+    removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    removeListener(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
+        if (typeof eventName === "string") {
+            super.removeListener(eventName, listener);
+        }
+
+        if (typeof eventName === "object") {
+            const _sub = this.subscriptions.get(eventName);
+
+            if (_sub?.uuid == null) {
+                return this;
+            }
+
+            // @ts-ignore - don't want to expose the message event
+            super.removeListener(_sub.uuid, listener);
+            this.subscriptions.delete(eventName);
+        }
+        return this;
     }
 }
+

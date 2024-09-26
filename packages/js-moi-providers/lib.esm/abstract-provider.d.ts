@@ -3,8 +3,13 @@ import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
-interface WebsocketEventMap {
-    "newTesseract": [tesseract: Tesseract];
+type NewTesseractsByAccount = {
+    event: "newTesseractsByAccount";
+    params: string;
+};
+export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount;
+export interface WebsocketEventMap {
+    "newTesseracts": [tesseract: Tesseract];
     "newTesseractsByAccount": [tesseracts: Tesseract];
     "newLogs": [logs: Log];
     "newPendingInteractions": [interactionHash: string];
@@ -15,7 +20,7 @@ interface WebsocketEventMap {
     "reconnect": [attempt: number];
 }
 export interface WebsocketSubscriptionParams {
-    "newTesseract": [];
+    "newTesseracts": [];
     "newTesseractsByAccount": [address: string];
     "newLogs": [];
     "newPendingInteractions": [];
@@ -62,7 +67,7 @@ export declare abstract class AbstractProvider extends EventEmitter<WebsocketEve
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>;
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>;
     abstract getLogs(filter: LogFilter): Promise<Log[]>;
-    abstract subscribe<T extends keyof WebsocketSubscriptionParams>(event: T, ...args: WebsocketSubscriptionParams[T]): Promise<void>;
+    abstract getSubscription(event: ProviderEvents): Promise<string>;
 }
 export {};
 //# sourceMappingURL=abstract-provider.d.ts.map
