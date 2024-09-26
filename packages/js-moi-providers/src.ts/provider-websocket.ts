@@ -36,7 +36,7 @@ export class WebsocketProvider extends BaseProvider {
 
     private createNewWebsocket(host: string, options?: WebsocketConnection): Websocket {
         const ws = new Websocket(host, options?.protocols, undefined, options?.headers ?? {}, options?.requestOptions, options?.clientConfig);
-        
+
         ws.onopen = () => this.handleOnConnect();
         ws.onerror = (error) => this.handleOnError(error);
         ws.onclose = (event) => this.handleOnClose(event);
@@ -118,13 +118,13 @@ export class WebsocketProvider extends BaseProvider {
 
     private handleOnClose(event: ICloseEvent): void {
         const isError = event.code !== 1000;
-        
+
         if (isError) {
             if (this.options?.reconnect && this.reconnects < this.options.reconnect.maxAttempts) {
                 if (this.reconnectInterval) {
                     clearInterval(this.reconnectInterval);
                 }
-                
+
                 this.reconnect();
                 return;
             }
@@ -207,7 +207,7 @@ export class WebsocketProvider extends BaseProvider {
         if (typeof eventName === "object") {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
-    
+
                 if (_sub?.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
@@ -221,12 +221,12 @@ export class WebsocketProvider extends BaseProvider {
 
         if (this.isSubscriptionEvent(eventName)) {
             const _sub = this.subscriptions.get(eventName);
-            
-            if (_sub?.subID !=  null) {
+
+            if (_sub?.subID != null) {
                 return this;
             }
-            
-            
+
+
             this.getSubscription(eventName).then((subscription) => {
                 console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
@@ -265,7 +265,7 @@ export class WebsocketProvider extends BaseProvider {
         if (typeof eventName === "object") {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
-    
+
                 if (_sub?.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
@@ -279,12 +279,12 @@ export class WebsocketProvider extends BaseProvider {
 
         if (this.isSubscriptionEvent(eventName)) {
             const _sub = this.subscriptions.get(eventName);
-            
-            if (_sub?.subID !=  null) {
+
+            if (_sub?.subID != null) {
                 return this;
             }
-            
-            
+
+
             this.getSubscription(eventName).then((subscription) => {
                 console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
@@ -312,7 +312,6 @@ export class WebsocketProvider extends BaseProvider {
         return this;
     }
 
-    
     removeListener<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
     removeListener<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;

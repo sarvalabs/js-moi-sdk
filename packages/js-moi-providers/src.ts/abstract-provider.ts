@@ -30,13 +30,12 @@ export type NewTesseractsByAccount = { event: "newTesseractsByAccount", params: 
 
 export type NewLogs = { event: "newLogs", params: LogFilter };
 
-export type ProviderEvents = keyof WebsocketEventMap | NewTesseractsByAccount | NewLogs;
+export type ProviderEvents = keyof WebsocketEventMap | { event: string, params: any };
 
 export interface WebsocketEventMap {
     newTesseracts: [tesseract: Tesseract];
     newPendingInteractions: [interactionHash: string];
     connect: [];
-    debug: [];
     error: [error: unknown];
     close: [];
     reconnect: [attempt: number];
