@@ -10,7 +10,6 @@ const js_moi_utils_1 = require("js-moi-utils");
 const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 const logic_id_1 = require("./logic-id");
 const routine_options_1 = require("./routine-options");
-const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
@@ -127,21 +126,11 @@ class LogicBase extends element_descriptor_1.default {
             type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
         };
-        if (option.sender != null) {
-            params.sender = option.sender;
-        }
-        else {
-            if (this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
-            }
-        }
-        if (option.fuelPrice != null) {
-            params.fuel_price = option.fuelPrice;
-        }
-        if (option.fuelLimit != null) {
-            params.fuel_limit = option.fuelLimit;
-        }
-        return { type, params: { ...params, ...option } };
+        params.sender = option.sender ?? this.signer?.getAddress();
+        params.fuel_price = option.fuelPrice;
+        params.fuel_limit = option.fuelLimit;
+        params.nonce = option.nonce;
+        return { type, params };
     }
     /**
      * Creates a logic interaction request object based on the given interaction object.
@@ -185,8 +174,7 @@ class LogicBase extends element_descriptor_1.default {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

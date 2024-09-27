@@ -9,8 +9,6 @@ import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 
-const DEFAULT_FUEL_PRICE = 1;
-
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base 
  * class for logic-related operations.
@@ -20,6 +18,7 @@ export abstract class LogicBase extends ElementDescriptor {
     protected signer?: Signer;
     protected provider: AbstractProvider;
     protected manifestCoder: ManifestCoder;
+    
 
     constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
         super(manifest.elements)
@@ -116,7 +115,6 @@ export abstract class LogicBase extends ElementDescriptor {
                         ErrorCode.NOT_INITIALIZED
                     );
                 }
-                
                 return this.provider.estimateFuel(params as CallorEstimateIxObject);
             }
             case "send": {
@@ -158,23 +156,12 @@ export abstract class LogicBase extends ElementDescriptor {
             payload: ixObject.createPayload(),
         }
 
-        if(option.sender != null) {
-            params.sender = option.sender;
-        } else {
-            if(this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
-            }
-        }
+        params.sender = option.sender ?? this.signer?.getAddress();
+        params.fuel_price = option.fuelPrice;
+        params.fuel_limit = option.fuelLimit;
+        params.nonce = option.nonce;
 
-        if(option.fuelPrice != null) {
-            params.fuel_price = option.fuelPrice;
-        }
-
-        if(option.fuelLimit != null) {
-            params.fuel_limit = option.fuelLimit;
-        }
-
-        return { type, params: { ...params, ...option } }
+        return { type, params }
     }
 
     /**
@@ -227,9 +214,7 @@ export abstract class LogicBase extends ElementDescriptor {
         }
 
         ixObject.send = async (): Promise<InteractionResponse> => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
-
+            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
             return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }
         
