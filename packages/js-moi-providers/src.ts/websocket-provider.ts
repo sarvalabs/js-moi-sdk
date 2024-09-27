@@ -28,6 +28,10 @@ export class WebsocketProvider extends BaseProvider {
     private readonly subscriptions: Map<ProviderEvents, { subID?: Promise<string>, uuid?: string }> = new Map();
 
     constructor(host: string, options?: WebsocketConnection) {
+        if (!host.startsWith("ws://") || !host.startsWith("wss://")) {
+            ErrorUtils.throwArgumentError("Invalid host", "host", host);
+        }
+
         super();
         this.host = host;
         this.options = options;
@@ -228,7 +232,6 @@ export class WebsocketProvider extends BaseProvider {
 
 
             this.getSubscription(eventName).then((subscription) => {
-                console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
                 this.on("message", (message: MessageEvent<string>) => {
                     const data = JSON.parse(message.data);
@@ -286,7 +289,6 @@ export class WebsocketProvider extends BaseProvider {
 
 
             this.getSubscription(eventName).then((subscription) => {
-                console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
                 this.on("message", (message: MessageEvent<string>) => {
                     const data = JSON.parse(message.data);

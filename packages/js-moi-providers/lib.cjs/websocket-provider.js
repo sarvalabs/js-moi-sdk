@@ -13,6 +13,9 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     options;
     subscriptions = new Map();
     constructor(host, options) {
+        if (!host.startsWith("ws://") || !host.startsWith("wss://")) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid host", "host", host);
+        }
         super();
         this.host = host;
         this.options = options;
@@ -174,7 +177,6 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                 return this;
             }
             this.getSubscription(eventName).then((subscription) => {
-                console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
                 this.on("message", (message) => {
                     const data = JSON.parse(message.data);
@@ -218,7 +220,6 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                 return this;
             }
             this.getSubscription(eventName).then((subscription) => {
-                console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
                 this.on("message", (message) => {
                     const data = JSON.parse(message.data);

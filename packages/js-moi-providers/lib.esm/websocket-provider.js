@@ -10,6 +10,9 @@ export class WebsocketProvider extends BaseProvider {
     options;
     subscriptions = new Map();
     constructor(host, options) {
+        if (!host.startsWith("ws://") || !host.startsWith("wss://")) {
+            ErrorUtils.throwArgumentError("Invalid host", "host", host);
+        }
         super();
         this.host = host;
         this.options = options;
@@ -171,7 +174,6 @@ export class WebsocketProvider extends BaseProvider {
                 return this;
             }
             this.getSubscription(eventName).then((subscription) => {
-                console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
                 this.on("message", (message) => {
                     const data = JSON.parse(message.data);
@@ -215,7 +217,6 @@ export class WebsocketProvider extends BaseProvider {
                 return this;
             }
             this.getSubscription(eventName).then((subscription) => {
-                console.log("Subscribing to", eventName, subscription);
                 // @ts-ignore - don't want to expose the message event
                 this.on("message", (message) => {
                     const data = JSON.parse(message.data);

@@ -1,13 +1,10 @@
-import { Signer } from "js-moi-signer";
 import { Wallet } from "js-moi-wallet";
-import { JsonRpcProvider } from "../../src.ts/jsonrpc-provider";
+import type { AbstractProvider } from "../../src.ts/abstract-provider";
 
-export const initializeWallet = async (provider: JsonRpcProvider, mnemonic: string): Promise<Signer> => {
+export const initializeWallet = async (provider: AbstractProvider, mnemonic: string): Promise<Wallet> => {
     const derivationPath = "m/44'/6174'/0'/0/1";
-    
     const wallet =  await Wallet.fromMnemonic(mnemonic, derivationPath);
     wallet.connect(provider);
-
     return wallet;
 }
 
