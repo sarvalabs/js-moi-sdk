@@ -42,6 +42,36 @@ export declare class WebsocketProvider extends BaseProvider {
     removeListener<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
     removeListener<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    /**
+     * This method removes a listener from the provider
+     *
+     * @param eventName - The event to remove the listener from
+     * @param listener - The listener to remove
+     * @returns - The provider instance
+     */
+    off(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    /**
+     * This methods returns all the listeners for a given event
+     *
+     * @param eventName - The event to get the listeners for
+     * @returns - An array of listeners
+     */
+    listeners<K>(eventName: string | symbol): Function[];
+    /**
+     * Returns the number of listeners for the specified event name.
+     *
+     * @param eventName - The name of the event.
+     * @param listener - (Optional) The listener function.
+     * @returns The number of listeners for the specified event name.
+     */
+    listenerCount<K>(eventName: string | symbol, listener?: Function): number;
+    /**
+     * Removes all event listeners for the specified event or all events.
+     *
+     * @param event - The event to remove listeners for. If not specified, all listeners for all events will be removed.
+     * @returns The instance of the class with all listeners removed.
+     */
+    removeAllListeners(event?: string | symbol): this;
 }
 export {};
 //# sourceMappingURL=websocket-provider.d.ts.map

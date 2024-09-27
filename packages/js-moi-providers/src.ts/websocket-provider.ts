@@ -203,6 +203,13 @@ export class WebsocketProvider extends BaseProvider {
     on(eventName: NewLogs, listener: (log: Log) => void): this;
     on(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     on<K extends keyof WebsocketEventMap>(eventName: K, listener: (...args: WebsocketEventMap[K]) => void): this;
+    /**
+     * This method listens to events emitted by the provider for the given event
+     * 
+     * @param eventName - The event to listen to this can be a string or an object
+     * @param listener - The callback function to be called when the event is emitted
+     * @returns - The provider instance
+     */
     on(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
             super.on(eventName, listener);
@@ -260,6 +267,13 @@ export class WebsocketProvider extends BaseProvider {
     once<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     once<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
     once<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    /**
+     * Adds a one-time listener function for the specified event.
+     * 
+     * @param eventName - The name of the event to listen for.
+     * @param listener - A function to be called when the event is triggered.
+     * @returns The WebSocketProvider instance.
+     */
     once(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
             super.once(eventName, listener);
@@ -317,6 +331,13 @@ export class WebsocketProvider extends BaseProvider {
     removeListener<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
     removeListener<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
     removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    /**
+     * Removes a listener from the WebSocket provider.
+     * 
+     * @param eventName - The name of the event or an object representing a subscription.
+     * @param listener - The listener function to be removed.
+     * @returns The WebSocket provider instance.
+     */
     removeListener(eventName: ProviderEvents, listener: (...args: any[]) => void): this {
         if (typeof eventName === "string") {
             super.removeListener(eventName, listener);
@@ -333,5 +354,47 @@ export class WebsocketProvider extends BaseProvider {
             this.subscriptions.delete(eventName);
         }
         return this;
+    }
+
+    /**
+     * This method removes a listener from the provider
+     * 
+     * @param eventName - The event to remove the listener from
+     * @param listener - The listener to remove
+     * @returns - The provider instance
+     */
+    off(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        return super.off(eventName, listener);
+    }
+
+    /**
+     * This methods returns all the listeners for a given event
+     * 
+     * @param eventName - The event to get the listeners for
+     * @returns - An array of listeners
+     */
+    listeners<K>(eventName: string | symbol): Function[] {
+        return super.listeners(eventName);
+    }
+
+    /**
+     * Returns the number of listeners for the specified event name.
+     * 
+     * @param eventName - The name of the event.
+     * @param listener - (Optional) The listener function.
+     * @returns The number of listeners for the specified event name.
+     */
+    listenerCount<K>(eventName: string | symbol, listener?: Function): number {
+        return super.listenerCount(eventName, listener);
+    }
+
+    /**
+     * Removes all event listeners for the specified event or all events.
+     * 
+     * @param event - The event to remove listeners for. If not specified, all listeners for all events will be removed.
+     * @returns The instance of the class with all listeners removed.
+     */
+    removeAllListeners(event?: string | symbol): this {
+        return super.removeAllListeners(event);
     }
 }

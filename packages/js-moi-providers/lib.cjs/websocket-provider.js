@@ -153,6 +153,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         sub.subID = super.getSubscription(eventName);
         return await sub.subID;
     }
+    /**
+     * This method listens to events emitted by the provider for the given event
+     *
+     * @param eventName - The event to listen to this can be a string or an object
+     * @param listener - The callback function to be called when the event is emitted
+     * @returns - The provider instance
+     */
     on(eventName, listener) {
         if (typeof eventName === "string") {
             super.on(eventName, listener);
@@ -196,6 +203,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         }
         return this;
     }
+    /**
+     * Adds a one-time listener function for the specified event.
+     *
+     * @param eventName - The name of the event to listen for.
+     * @param listener - A function to be called when the event is triggered.
+     * @returns The WebSocketProvider instance.
+     */
     once(eventName, listener) {
         if (typeof eventName === "string") {
             super.once(eventName, listener);
@@ -239,6 +253,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         }
         return this;
     }
+    /**
+     * Removes a listener from the WebSocket provider.
+     *
+     * @param eventName - The name of the event or an object representing a subscription.
+     * @param listener - The listener function to be removed.
+     * @returns The WebSocket provider instance.
+     */
     removeListener(eventName, listener) {
         if (typeof eventName === "string") {
             super.removeListener(eventName, listener);
@@ -252,6 +273,44 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
             this.subscriptions.delete(eventName);
         }
         return this;
+    }
+    /**
+     * This method removes a listener from the provider
+     *
+     * @param eventName - The event to remove the listener from
+     * @param listener - The listener to remove
+     * @returns - The provider instance
+     */
+    off(eventName, listener) {
+        return super.off(eventName, listener);
+    }
+    /**
+     * This methods returns all the listeners for a given event
+     *
+     * @param eventName - The event to get the listeners for
+     * @returns - An array of listeners
+     */
+    listeners(eventName) {
+        return super.listeners(eventName);
+    }
+    /**
+     * Returns the number of listeners for the specified event name.
+     *
+     * @param eventName - The name of the event.
+     * @param listener - (Optional) The listener function.
+     * @returns The number of listeners for the specified event name.
+     */
+    listenerCount(eventName, listener) {
+        return super.listenerCount(eventName, listener);
+    }
+    /**
+     * Removes all event listeners for the specified event or all events.
+     *
+     * @param event - The event to remove listeners for. If not specified, all listeners for all events will be removed.
+     * @returns The instance of the class with all listeners removed.
+     */
+    removeAllListeners(event) {
+        return super.removeAllListeners(event);
     }
 }
 exports.WebsocketProvider = WebsocketProvider;
