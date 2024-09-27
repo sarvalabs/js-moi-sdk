@@ -17,11 +17,8 @@ const defaultOptions = {
  * account operations, execution, and querying RPC methods.
  */
 class BaseProvider extends abstract_provider_1.AbstractProvider {
-    _events;
     constructor() {
         super();
-        // Events being listened to
-        this._events = [];
     }
     /**
      * Helper function to process the RPC response and extract the relevant data.

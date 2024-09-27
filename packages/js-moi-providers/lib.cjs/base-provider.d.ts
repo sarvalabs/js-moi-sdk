@@ -2,7 +2,6 @@ import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
 import { AbstractProvider, type ProviderEvents } from "./abstract-provider";
-import Event from "./event";
 export interface EventTag {
     event: string;
     params?: unknown;
@@ -13,7 +12,6 @@ export interface EventTag {
  * account operations, execution, and querying RPC methods.
  */
 export declare class BaseProvider extends AbstractProvider {
-    protected _events: Event[];
     constructor();
     /**
      * Helper function to process the RPC response and extract the relevant data.

@@ -19,6 +19,6 @@ __exportStar(require("./abstract-provider"), exports);
 __exportStar(require("./base-provider"), exports);
 __exportStar(require("./jsonrpc-provider"), exports);
 __exportStar(require("./voyage-provider"), exports);
-var provider_websocket_1 = require("./provider-websocket");
-Object.defineProperty(exports, "WebsocketProvider", { enumerable: true, get: function () { return provider_websocket_1.WebsocketProvider; } });
+var websocket_provider_1 = require("./websocket-provider");
+Object.defineProperty(exports, "WebsocketProvider", { enumerable: true, get: function () { return websocket_provider_1.WebsocketProvider; } });
 //# sourceMappingURL=index.js.map

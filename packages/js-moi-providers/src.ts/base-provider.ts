@@ -22,7 +22,6 @@ import {
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
 import { AbstractProvider, type ProviderEvents } from "./abstract-provider";
-import Event from "./event";
 import { processIxObject } from "./interaction";
 
 // Default timeout value in seconds
@@ -43,12 +42,8 @@ export interface EventTag {
  * account operations, execution, and querying RPC methods.
  */
 export class BaseProvider extends AbstractProvider {
-    protected _events: Event[];
-
     constructor() {
         super();
-        // Events being listened to
-        this._events = [];
     }
 
     /**

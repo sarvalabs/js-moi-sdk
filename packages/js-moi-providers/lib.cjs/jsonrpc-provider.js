@@ -75,22 +75,6 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
             js_moi_utils_1.ErrorUtils.throwError(`Error: ${error.message}`, js_moi_utils_1.ErrorCode.NETWORK_ERROR);
         }
     }
-    /**
-     * Starts an event.
-     *
-     * @param event - The event to start.
-     */
-    _startEvent(event) {
-        // super._startEvent(event);
-    }
-    /**
-     * Stops an event.
-     *
-     * @param event - The event to stop.
-     */
-    _stopEvent(event) {
-        // super._stopEvent(event);
-    }
 }
 exports.JsonRpcProvider = JsonRpcProvider;
 //# sourceMappingURL=jsonrpc-provider.js.map

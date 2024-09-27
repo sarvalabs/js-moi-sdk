@@ -254,4 +254,4 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     }
 }
 exports.WebsocketProvider = WebsocketProvider;
-//# sourceMappingURL=provider-websocket.js.map
+//# sourceMappingURL=websocket-provider.js.map

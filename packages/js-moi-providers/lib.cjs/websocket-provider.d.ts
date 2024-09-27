@@ -44,4 +44,4 @@ export declare class WebsocketProvider extends BaseProvider {
     removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
 }
 export {};
-//# sourceMappingURL=provider-websocket.d.ts.map
+//# sourceMappingURL=websocket-provider.d.ts.map

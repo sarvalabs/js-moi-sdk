@@ -250,4 +250,4 @@ export class WebsocketProvider extends BaseProvider {
         return this;
     }
 }
-//# sourceMappingURL=provider-websocket.js.map
+//# sourceMappingURL=websocket-provider.js.map
