@@ -36,6 +36,10 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/guardian.json",
                 expected: "../../manifests/guardian-polo.txt",
+            },
+            {
+                manifest: "../../manifests/lock-ledger.json",
+                expected: "../../manifests/lock-ledger-polo.txt",
             }
         ]
 
@@ -117,10 +121,15 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/guardian-polo.txt",
                 expected: "../../manifests/guardian.json",
+            },
+            {
+                manifest: "../../manifests/lock-ledger-polo.txt",
+                expected: "../../manifests/lock-ledger.json",
             }
         ];
 
         await Promise.all(testCases.map(async (testCase) => {
+            console.log(testCase);
             const [polo, expected] = await Promise.all([
                 loadFile(testCase.manifest),
                 loadManifestFromFile(testCase.expected),
