@@ -89,7 +89,7 @@ export declare class ManifestCoder {
      * @param manifest - The manifest hash as a Uint8Array.
      * @returns The JSON representation of the manifest.
      */
-    private static fromManifestHashToJson;
+    private static decodeManifestToJson;
     /**
      * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
      *

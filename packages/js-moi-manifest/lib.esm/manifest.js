@@ -226,7 +226,7 @@ export class ManifestCoder {
      * @param manifest - The manifest hash as a Uint8Array.
      * @returns The JSON representation of the manifest.
      */
-    static fromManifestHashToJson(manifest) {
+    static decodeManifestToJson(manifest) {
         const decoded = new Depolorizer(manifest).depolorize(this.MANIFEST_SCHEMA);
         for (let i = 0; i < decoded.elements.length; i += 1) {
             const element = decoded.elements[i];
@@ -336,7 +336,7 @@ export class ManifestCoder {
             manifest = hexToBytes(manifest);
         }
         if (format === ManifestFormat.JSON) {
-            return this.fromManifestHashToJson(manifest);
+            return this.decodeManifestToJson(manifest);
         }
         ErrorUtils.throwArgumentError("Unsupported format", "format", format);
     }
