@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
 import { BaseProvider } from "./base-provider";
+const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
 export class WebsocketProvider extends BaseProvider {
     ws;
     reconnects = 0;
@@ -10,7 +11,7 @@ export class WebsocketProvider extends BaseProvider {
     options;
     subscriptions = new Map();
     constructor(host, options) {
-        if (!host.startsWith("ws://") || !host.startsWith("wss://")) {
+        if (!WEBSOCKET_HOST_REGEX.test(host)) {
             ErrorUtils.throwArgumentError("Invalid host", "host", host);
         }
         super();

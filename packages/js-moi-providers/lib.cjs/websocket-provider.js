@@ -5,6 +5,7 @@ const crypto_1 = require("crypto");
 const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
+const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
 class WebsocketProvider extends base_provider_1.BaseProvider {
     ws;
     reconnects = 0;
@@ -13,7 +14,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     options;
     subscriptions = new Map();
     constructor(host, options) {
-        if (!host.startsWith("ws://") || !host.startsWith("wss://")) {
+        if (!WEBSOCKET_HOST_REGEX.test(host)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid host", "host", host);
         }
         super();

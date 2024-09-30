@@ -19,6 +19,8 @@ interface WebsocketConnection {
     timeout?: number;
 }
 
+const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
+
 export class WebsocketProvider extends BaseProvider {
     private ws: Websocket;
     private reconnects = 0;
@@ -28,7 +30,7 @@ export class WebsocketProvider extends BaseProvider {
     private readonly subscriptions: Map<ProviderEvents, { subID?: Promise<string>, uuid?: string }> = new Map();
 
     constructor(host: string, options?: WebsocketConnection) {
-        if (!host.startsWith("ws://") || !host.startsWith("wss://")) {
+        if (!WEBSOCKET_HOST_REGEX.test(host)) {
             ErrorUtils.throwArgumentError("Invalid host", "host", host);
         }
 
