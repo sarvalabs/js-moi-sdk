@@ -14,6 +14,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ManifestFormat = void 0;
 __exportStar(require("./manifest"), exports);
+var manifest_format_1 = require("./manifest-format");
+Object.defineProperty(exports, "ManifestFormat", { enumerable: true, get: function () { return manifest_format_1.ManifestFormat; } });
 __exportStar(require("./schema"), exports);
 //# sourceMappingURL=index.js.map

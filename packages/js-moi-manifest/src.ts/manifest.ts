@@ -1,7 +1,8 @@
-import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
-import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
+import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, isHex, trimHexPrefix } from "js-moi-utils";
+import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema, WireType } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
+import { ManifestFormat } from "./manifest-format";
 import { Schema } from "./schema";
 
 /**
@@ -278,5 +279,183 @@ export class ManifestCoder {
         }
 
         return null;
+    }
+
+    /**
+     * Converts a manifest hash to JSON representation.
+     * 
+     * @param manifest - The manifest hash as a Uint8Array.
+     * @returns The JSON representation of the manifest.
+     */
+    private static fromManifestHashToJson(manifest: Uint8Array): LogicManifest.Manifest {
+        const decoded: any = new Depolorizer(manifest).depolorize(this.MANIFEST_SCHEMA);
+
+        for (let i = 0; i < decoded.elements.length; i += 1) {
+            const element = decoded.elements[i];
+
+            if (element.deps.length == 0) {
+                delete element.deps;
+            }
+
+            let buff: Uint8Array | null = null;
+            let schema = null;
+
+            switch (element.kind) {
+                case "constant": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_PACK,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_CONSTANT_SCHEMA;
+                    break;
+                }
+
+                case "typedef": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_WORD,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_TYPEDEF_SCHEMA;
+                    break;
+                }
+
+                case "state": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_PACK,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_STATE_SCHEMA;
+                    break;
+                }
+
+                case "routine": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_PACK,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_ROUTINE_SCHEMA;
+                    break;
+                }
+
+                case "method": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_PACK,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_METHOD_SCHEMA;
+                    break;
+                }
+
+                case "class": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_PACK,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_CLASS_SCHEMA;
+                    break;
+                }
+
+                case "event": {
+                    buff = new Uint8Array([
+                        WireType.WIRE_PACK,
+                        ...element.data,
+                    ]);
+                    schema = Schema.PISA_EVENT_SCHEMA;
+                    break;
+                }
+
+                default: 
+                    ErrorUtils.throwError(`Unsupported kind: ${element.kind}`, ErrorCode.UNSUPPORTED_OPERATION);
+            }
+
+            if (schema == null || buff == null) {
+                ErrorUtils.throwError("Invalid schema or buffer", ErrorCode.UNEXPECTED_ARGUMENT);
+            }
+
+            const polo = new Depolorizer(buff);
+            element.data = polo.depolorize(schema);
+
+            if (["routine", "method"].includes(element.kind)) {
+                for (const [key, value] of Object.entries(
+                    element.data.executes
+                )) {
+                    // If value of `Instruction[key]` is empty, remove it
+                    if (value === "") {
+                        delete element.data.executes[key];
+                    }
+
+                    // If value of `Instruction` is empty, remove it
+                    if (Array.isArray(value) && value.length === 0) {
+                        delete element.data.executes[key];
+                    }
+
+                    // Required to convert Uint8Array to integer array
+                    if (value instanceof Uint8Array) {
+                        element.data.executes[key] = Array.from(value);
+                    }
+                }
+            }
+        }
+
+        return decoded;
+    }
+
+    /**
+     * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
+     * 
+     * @param {string | Uint8Array} manifest - The manifest `string` or `Uint8Array` to decode.
+     * @param {ManifestFormat} format - The format of the manifest.
+     * @returns {LogicManifest.Manifest} The decoded `LogicManifest.Manifest` object
+     * 
+     * @throws {Error} If the manifest is invalid or the format is unsupported.
+     */
+    public static decodeManifest(manifest: string | Uint8Array, format: ManifestFormat): LogicManifest.Manifest {
+        if (typeof manifest === "string") {
+            if (!isHex(manifest)) {
+                ErrorUtils.throwArgumentError(
+                    "Invalid manifest",
+                    "manifest",
+                    manifest
+                );
+            }
+
+            manifest = hexToBytes(manifest);
+        }
+
+        if (format === ManifestFormat.JSON) {
+            return this.fromManifestHashToJson(manifest);
+        }
+
+        ErrorUtils.throwArgumentError("Unsupported format", "format", format);
+    }
+
+    private static MANIFEST_SCHEMA = {
+        kind: "struct",
+        fields: {
+            syntax: {
+                kind: "integer",
+            },
+            engine: Schema.PISA_ENGINE_SCHEMA,
+            elements: {
+                kind: "array",
+                fields: {
+                    values: {
+                        kind: "struct",
+                        fields: {
+                            ptr: {
+                                kind: "integer",
+                            },
+                            deps: Schema.PISA_DEPS_SCHEMA,
+                            kind: {
+                                kind: "string",
+                            },
+                            data: {
+                                kind: "raw",
+                            }
+                        },
+                    },
+                },
+            },
+        },
     }
 }

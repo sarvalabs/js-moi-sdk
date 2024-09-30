@@ -179,6 +179,16 @@ Methods
 
     >> 0x0e4f065 ... 50000
 
+.. autofunction:: decodeManifest
+
+.. code-block:: javascript
+
+    // Example
+    const decodedManifest = ManifestCoder.decodeManifest(encodedManifest, ManifestFormat.JSON);
+    console.log(decodedManifest)
+
+    >> { syntax: 1, engine: { kind: "PISA", flags: [] }, elements: [...] }
+
 .. autofunction:: encodeArguments
 
 .. code-block:: javascript
