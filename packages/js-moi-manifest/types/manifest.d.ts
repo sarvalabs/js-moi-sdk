@@ -2,6 +2,7 @@ export declare module LogicManifest {
     export interface EngineConfig {
         kind: string;
         flags: string[];
+        version: string;
     }
     
     export interface TypeField {
