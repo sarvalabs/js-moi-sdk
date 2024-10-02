@@ -53,6 +53,9 @@ export class Schema {
                     },
                 },
             },
+            version: {
+                kind: "string",
+            }
         },
     };
 
