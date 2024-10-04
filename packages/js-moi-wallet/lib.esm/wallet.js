@@ -193,16 +193,8 @@ export class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    getAddress() {
+    async getAddress() {
         return "0x" + this.publicKey.slice(2);
-    }
-    /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    get address() {
-        return this.getAddress();
     }
     /**
      * Connects the wallet to the given provider.
@@ -222,7 +214,7 @@ export class Wallet extends Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message, sigAlgo) {
+    async sign(message, sigAlgo) {
         if (sigAlgo == null) {
             ErrorUtils.throwError("Signature type cannot be undefined", ErrorCode.INVALID_ARGUMENT);
         }
@@ -249,10 +241,10 @@ export class Wallet extends Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject, sigAlgo) {
+    async signInteraction(ixObject, sigAlgo) {
         try {
             const ixData = serializeIxObject(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
+            const signature = await this.sign(ixData, sigAlgo);
             return {
                 ix_args: bytesToHex(ixData),
                 signature: signature,

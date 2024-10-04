@@ -71,7 +71,7 @@ export class LogicBase extends ElementDescriptor {
         if (this.getIxType(ixObject.routine.kind) !== IxType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError("This logic object doesn't have address set yet, please set an address first.", ErrorCode.NOT_INITIALIZED);
         }
-        const { type, params } = this.processArguments(ixObject, method, option);
+        const { type, params } = await this.processArguments(ixObject, method, option);
         switch (type) {
             case "call": {
                 const response = await this.provider.call(params);
@@ -115,7 +115,7 @@ export class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    processArguments(ixObject, type, option) {
+    async processArguments(ixObject, type, option) {
         const params = {
             type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
@@ -125,7 +125,7 @@ export class LogicBase extends ElementDescriptor {
         }
         else {
             if (this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
+                params.sender = await this.signer.getAddress();
             }
         }
         if (option.fuelPrice != null) {

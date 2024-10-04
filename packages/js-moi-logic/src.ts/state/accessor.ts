@@ -1,5 +1,6 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import BN from "bn.js";
+import { Buffer } from "buffer";
 import { encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 
@@ -14,8 +15,8 @@ export class StorageKey {
         return encodeToString(this.toBuffer());
     }
 
-    toBuffer(): Buffer {
-        return this.value.toBuffer("be", 32);
+    toBuffer(): Uint8Array {
+        return Uint8Array.from(this.value.toArray("be", 32));
     }
 }
 

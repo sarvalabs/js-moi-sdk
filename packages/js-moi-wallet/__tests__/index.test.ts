@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
 import { AssetStandard, isValidAddress } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts/index";
@@ -14,7 +15,7 @@ describe("Wallet", () => {
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(wallet.address).toBe(ADDRESS);
+            expect(await wallet.getAddress()).toBe(ADDRESS);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
@@ -24,7 +25,7 @@ describe("Wallet", () => {
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(wallet.address).toBe(ADDRESS);
+            expect(await wallet.getAddress()).toBe(ADDRESS);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
@@ -34,17 +35,17 @@ describe("Wallet", () => {
         test(Wallet.fromMnemonic.name, async () => {
             const wallet = await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH);
 
-            expect(wallet.address).toBe(ADDRESS);
+            expect(await wallet.getAddress()).toBe(ADDRESS);
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic).toBe(MNEMONIC);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
         });
 
-        test(Wallet.fromMnemonicSync.name, () => {
+        test(Wallet.fromMnemonicSync.name, async () => {
             const wallet =  Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
 
-            expect(wallet.address).toBe(ADDRESS);
+            expect(await wallet.getAddress()).toBe(ADDRESS);
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic).toBe(MNEMONIC);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
@@ -61,12 +62,12 @@ describe("Wallet", () => {
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
 
-        test(Wallet.createRandomSync.name, () => {
+        test(Wallet.createRandomSync.name, async () => {
             const wallet = Wallet.createRandomSync();
 
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet).toBeDefined();
-            expect(isValidAddress(wallet.address)).toBeTruthy();
+            expect(isValidAddress(await wallet.getAddress())).toBeTruthy();
             expect(wallet.privateKey).toBeDefined();
             expect(wallet.mnemonic.split(" ").length).toBe(12);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
@@ -94,7 +95,7 @@ describe("Wallet", () => {
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(wallet.address).toBe(ADDRESS);
+            expect(await wallet.getAddress()).toBe(ADDRESS);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
@@ -107,21 +108,49 @@ describe("Wallet", () => {
             wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
         });
 
+        const signedMessage = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
+        const message = "Hello, MOI";
+
         test("sign", () => {
-            const message = "Hello, MOI";
             const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
             const signature = wallet.sign(Buffer.from(message), algo);
 
-            expect(signature).toBe(
-                "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
-            );
+            expect(signature).toBe(signedMessage);
         });
 
-        test("signInteraction", () => {
+        describe("verify", () => {
+            test("should return true if the signature is valid", () => {
+                const isVerified = wallet.verify(Buffer.from(message), signedMessage, wallet.publicKey);
+                expect(isVerified).toBeTruthy();
+            });
+
+            test("should return false if the signature is invalid", () => {
+                const invalidSignature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2s70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726401";
+                const isVerified = wallet.verify(Buffer.from("Hello, MOI!"), invalidSignature, wallet.publicKey);
+                expect(isVerified).toBeFalsy();
+            });
+            
+            test("should return false if the public key is invalid", () => {
+                const isVerified = wallet.verify(Buffer.from(message), signedMessage, Buffer.from("invalid public key"));
+                expect(isVerified).toBeFalsy();
+            });
+
+            test("should return false if the message is invalid", () => {
+                const isVerified = wallet.verify(randomBytes(10), signedMessage, wallet.publicKey);
+                expect(isVerified).toBeFalsy();
+            });
+
+            test("should return false if the public key is wrong", () => {
+                const isVerified = wallet.verify(Buffer.from(message), signedMessage, Wallet.createRandomSync().publicKey);
+                expect(isVerified).toBeFalsy();
+            });
+        });
+
+        test("signInteraction", async () => {
             const ixObject = {
                 type: 3,
                 nonce: 0,
-                sender: wallet.address,
+                sender: await wallet.getAddress(),
                 fuel_price: 1,
                 fuel_limit: 200,
                 payload: {
@@ -132,7 +161,7 @@ describe("Wallet", () => {
             };
 
             const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
-            const ixArgs = wallet.signInteraction(ixObject, algo);
+            const ixArgs = await wallet.signInteraction(ixObject, algo);
 
             expect(ixArgs).toBeDefined();
             expect(ixArgs).toMatchObject<InteractionRequest>({
@@ -144,8 +173,8 @@ describe("Wallet", () => {
             );
         });
 
-        test("address", () => {
-            expect(wallet.address).toBe(ADDRESS);
+        test("address", async () => {
+            expect(await wallet.getAddress()).toBe(ADDRESS);
         });
 
         test("isInitialized", () => {

@@ -79,13 +79,7 @@ export declare class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    getAddress(): string;
-    /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    get address(): string;
+    getAddress(): Promise<string>;
     /**
      * Connects the wallet to the given provider.
      *
@@ -102,7 +96,7 @@ export declare class Wallet extends Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message: Uint8Array, sigAlgo: SigType): string;
+    sign(message: Uint8Array, sigAlgo: SigType): Promise<string>;
     /**
      * Signs an interaction object using the wallet's private key and the
      * specified signature algorithm. The interaction object is serialized
@@ -114,7 +108,7 @@ export declare class Wallet extends Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
+    signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
     /**
      * Initializes the wallet from a provided mnemonic.
      *

@@ -94,7 +94,7 @@ export abstract class LogicBase extends ElementDescriptor {
             );
         }
 
-        const { type, params } = this.processArguments(ixObject, method, option);
+        const { type, params } = await this.processArguments(ixObject, method, option);
 
         switch (type) {
             case "call": {
@@ -151,7 +151,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    protected processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): LogicIxArguments {
+    protected async processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): Promise<LogicIxArguments> {
         const params: InteractionObject = {
             type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
@@ -161,7 +161,7 @@ export abstract class LogicBase extends ElementDescriptor {
             params.sender = option.sender;
         } else {
             if(this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
+                params.sender = await this.signer.getAddress();
             }
         }
 

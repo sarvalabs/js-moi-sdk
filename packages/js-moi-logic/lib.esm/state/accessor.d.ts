@@ -1,10 +1,11 @@
 /// <reference types="node" />
 import BN from "bn.js";
+import { Buffer } from "buffer";
 export declare class StorageKey {
     private value;
     constructor(value: number | string | Buffer | Uint8Array | BN);
     hex(): string;
-    toBuffer(): Buffer;
+    toBuffer(): Uint8Array;
 }
 /**
  * Represents an accessor that provides access to a slot hash.
