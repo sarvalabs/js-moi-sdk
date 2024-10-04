@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateStorageKey = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
+const buffer_1 = require("buffer");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 class StorageKey {
@@ -17,7 +18,7 @@ class StorageKey {
         return (0, js_moi_utils_1.encodeToString)(this.toBuffer());
     }
     toBuffer() {
-        return this.value.toBuffer("be", 32);
+        return Uint8Array.from(this.value.toArray("be", 32));
     }
 }
 exports.StorageKey = StorageKey;
@@ -82,7 +83,7 @@ class PropertyAccessor extends AbstractAccessor {
                 polorizer.polorizeBool(key);
                 break;
             case key instanceof Uint8Array:
-            case key instanceof Buffer:
+            case key instanceof buffer_1.Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
@@ -96,8 +97,8 @@ class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
+        const separator = buffer_1.Buffer.from(".");
+        const buffer = buffer_1.Buffer.concat([hash.toBuffer(), separator, this.key]);
         return new StorageKey(this.sum256(buffer));
     }
 }
