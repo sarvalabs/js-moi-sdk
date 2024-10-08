@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
@@ -43,6 +43,7 @@ export declare abstract class AbstractProvider {
     abstract getPendingInteractionFilter(): Promise<Filter>;
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>;
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>;
+    abstract getLogs(filter: LogFilter): Promise<Log[]>;
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;
     abstract once(eventName: EventType, listener: Listener): AbstractProvider;
     abstract listenerCount(eventName?: EventType): number;

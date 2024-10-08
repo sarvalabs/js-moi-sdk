@@ -17,7 +17,8 @@ import {
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
     RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
-    type Log
+    type Log,
+    type LogFilter
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
 import { AbstractProvider } from "./abstract-provider";
@@ -907,7 +908,13 @@ export class BaseProvider extends AbstractProvider {
      * 
      * @throws Error if difference between start height and end height is greater than 10.
      */
-    public async getLogs(address: string, height: [start: number, end: number], topics: NestedArray<string> = []) {
+    public async getLogs(logFilter: LogFilter): Promise<Log[]> {
+        if (logFilter.topics == null) {
+            logFilter.topics = [];
+        }
+
+        const { address, height, topics } = logFilter;
+        
         if(!isValidAddress(address)) {
             ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
         }
@@ -915,7 +922,7 @@ export class BaseProvider extends AbstractProvider {
         if (!Array.isArray(topics)) {
             ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
         }
-        
+
         const [start, end] = height;
         const payload = {
             address,

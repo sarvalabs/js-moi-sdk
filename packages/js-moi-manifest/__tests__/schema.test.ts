@@ -28,23 +28,27 @@ describe("Test Schema", () => {
     const state = stateElement?.data as LogicManifest.State;
     const stateSchema = schema.parseFields(state.fields);
 
-    expect(stateSchema).toEqual({
-      kind: "struct",
-      fields: {
-        Symbol: { kind: "string" },
-        Supply: { kind: "integer" },
-        Balances: {
-          kind: "map",
-          fields: {
-            keys: {
-              kind: "bytes",
+        expect(stateSchema).toEqual({
+            kind: "struct",
+            fields: {
+                Symbol: {
+                    kind: "string",
+                },
+                Supply: {
+                    kind: "integer",
+                },
+                Balances: {
+                    kind: "map",
+                    fields: {
+                        keys: {
+                            kind: "bytes",
+                        },
+                        values: {
+                            kind: "integer",
+                        },
+                    },
+                },
             },
-            values: {
-              kind: "integer",
-            },
-          },
-        },
-      },
+        });
     });
-  });
 });

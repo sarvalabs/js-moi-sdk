@@ -193,26 +193,20 @@ class ManifestCoder {
     /**
      * Decodes a log data from an event emitted in a logic.
      *
-     * @param {string} eventOrLogData - The name of the event or the log data to decode, represented as a hexadecimal string prefixed with "0x".
-     * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @param {string} event - The name of the event.
+     * @param {string} logData - The POLO encoded log data to be decoded.
      * @returns {T | null} The decoded event log data, or null if the log data is empty.
      */
-    decodeEventOutput(eventOrLogData, logData) {
-        if (logData == null) {
-            if (!(0, js_moi_utils_1.isHex)(eventOrLogData)) {
-                js_moi_utils_1.ErrorUtils.throwArgumentError("Expected a POLO encoded event log data", "eventOrLogData", eventOrLogData);
-            }
-            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(eventOrLogData)).depolorize(js_moi_utils_1.DEFAULT_EVENT_SCHEMA);
+    decodeEventOutput(event, logData) {
+        if (event === "builtin.Log") {
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(js_moi_utils_1.DEFAULT_EVENT_SCHEMA);
         }
-        if (!(0, js_moi_utils_1.isHex)(logData)) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Expected a POLO encoded event log data", "logData", logData);
-        }
-        const element = this.elementDescriptor.getEventElement(eventOrLogData);
+        const element = this.elementDescriptor.getEventElement(event);
         if (element == null) {
-            throw new Error(`Event ${eventOrLogData} not found in manifest`);
+            throw new Error(`Event ${event} not found in manifest`);
         }
         if (logData && logData !== "0x") {
-            const element = this.elementDescriptor.getEventElement(eventOrLogData);
+            const element = this.elementDescriptor.getEventElement(event);
             const schema = this.schema.parseFields(element.data.fields);
             return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(schema);
         }
