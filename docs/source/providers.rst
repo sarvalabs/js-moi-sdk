@@ -418,6 +418,8 @@ Query Methods
 
 .. autofunction:: getPendingInteractionFilter
 
+.. autofunction:: getLogsFilter
+
 .. autofunction:: getFilterChanges
 
 .. autofunction:: removeFilter
