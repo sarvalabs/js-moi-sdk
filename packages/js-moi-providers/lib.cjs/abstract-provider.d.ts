@@ -43,6 +43,7 @@ export declare abstract class AbstractProvider {
     abstract getPendingInteractionFilter(): Promise<Filter>;
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>;
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>;
+    abstract getLogsFilter(filter: LogFilter): Promise<Filter>;
     abstract getLogs(filter: LogFilter): Promise<Log[]>;
     abstract on(eventName: EventType, listener: Listener): AbstractProvider;
     abstract once(eventName: EventType, listener: Listener): AbstractProvider;

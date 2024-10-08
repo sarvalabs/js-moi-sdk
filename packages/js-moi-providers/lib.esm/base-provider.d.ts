@@ -171,6 +171,13 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getPendingInteractionFilter(): Promise<Filter>;
     /**
+     * Create a filter object for the logs.
+     *
+     * @param {LogFilter} filter - The log filter object.
+     * @returns {Promise<Filter>} A promise that resolves to a Filter object.
+     */
+    getLogsFilter(filter: LogFilter): Promise<Filter>;
+    /**
      * Asynchronously removes the filter and returns a Promise that resolves to a
      * object.
      * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
