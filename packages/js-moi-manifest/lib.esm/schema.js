@@ -41,9 +41,6 @@ export class Schema {
                         kind: "string",
                     },
                 },
-            },
-            version: {
-                kind: "string",
             }
         },
     };

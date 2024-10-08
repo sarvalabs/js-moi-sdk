@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { type LogicManifest } from "js-moi-manifest";
 import type ElementDescriptor from "../element-descriptor";
 import { type Accessor, type AccessorProvider, type StorageTypeProvider } from "./accessor";
