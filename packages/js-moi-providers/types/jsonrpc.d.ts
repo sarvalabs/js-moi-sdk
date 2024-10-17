@@ -285,14 +285,57 @@ export interface AssetActionPayload {
     asset_id: string;
     amount: number | bigint;
 }
+
+export interface LogicDeployPayload {
+    manifest: string;
+    callsite: string;
+    calldata: string;
+}
+
+export interface LogicActionPayload {
+    logic_id: string;
+    callsite: string;
+    calldata: string;
+}
+
 export interface LogicPayload {
+    logic_id?: string;
+    callsite: string;
+    calldata: string;
+    manifest?: string;
+}
+
+interface ProcessedAssetActionPayload {
+    benefactor: Uint8Array;
+    beneficiary: Uint8Array;
+    asset_id: string;
+    amount: number | bigint;
+}
+
+interface ProcessedLogicPayload {
     logic_id?: string;
     callsite: string;
     calldata: Uint8Array;
     manifest?: Uint8Array;
 }
 
-export type TransactionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload | any;
+type ProcessedTransactionPayload = AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
+
+type TxPayloadMap = {
+    [TxType.ASSET_CREATE]: AssetCreatePayload;
+    [TxType.ASSET_TRANSFER]: AssetActionPayload;
+    [TxType.ASSET_MINT]: AssetSupplyPayload;
+    [TxType.ASSET_BURN]: AssetSupplyPayload;
+    [TxType.LOGIC_DEPLOY]: LogicPayload;
+    [TxType.LOGIC_ENLIST]: LogicPayload;
+    [TxType.LOGIC_INVOKE]: LogicPayload;
+};
+
+export type TransactionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
+
+// export type TransactionPayload = {
+//     [K in keyof TxPayloadMap]: { type: K; payload: TxPayloadMap[K] }
+// }[keyof TxPayloadMap];
 
 interface IxAssetFund {
     asset_id: string;

@@ -2,51 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeIxObject = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_providers_1 = require("js-moi-providers");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
-/**
- * Processes the payload based on the transaction type.
- *
- * @param {TxType} txType - The transaction type.
- * @param {TransactionPayload} payload - The transaction payload.
- * @returns {TransactionPayload} - The processed transaction payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
- */
-const processPayload = (txType, payload) => {
-    switch (txType) {
-        case js_moi_utils_1.TxType.ASSET_CREATE:
-            return { ...payload };
-        case js_moi_utils_1.TxType.ASSET_MINT:
-        case js_moi_utils_1.TxType.ASSET_BURN: {
-            const supplyPayload = payload;
-            return {
-                ...supplyPayload,
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(supplyPayload.asset_id),
-            };
-        }
-        case js_moi_utils_1.TxType.ASSET_TRANSFER: {
-            const actionPayload = payload;
-            return {
-                ...actionPayload,
-                benefactor: (0, js_moi_utils_1.hexToBytes)(actionPayload.benefactor ?? js_moi_constants_1.ZERO_ADDRESS),
-                beneficiary: (0, js_moi_utils_1.hexToBytes)(actionPayload.beneficiary),
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(actionPayload.asset_id),
-            };
-        }
-        case js_moi_utils_1.TxType.LOGIC_DEPLOY:
-            return { ...payload };
-        case js_moi_utils_1.TxType.LOGIC_INVOKE:
-        case js_moi_utils_1.TxType.LOGIC_ENLIST: {
-            const logicPayload = payload;
-            return {
-                ...logicPayload,
-                logic_id: (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id),
-            };
-        }
-        default:
-            throw new Error(`Unsupported transaction type: ${txType}`);
-    }
-};
 /**
  * Processes the interaction object to extract and consolidate asset funds from
  * transactions and asset funds.
@@ -59,7 +17,6 @@ const processFunds = (ixObject) => {
     ixObject.transactions.forEach(transaction => {
         switch (transaction.type) {
             case js_moi_utils_1.TxType.ASSET_TRANSFER:
-            case js_moi_utils_1.TxType.ASSET_MINT:
             case js_moi_utils_1.TxType.ASSET_BURN: {
                 const payload = transaction.payload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
@@ -169,27 +126,8 @@ const processTransactions = (transactions) => {
         if (!transaction.payload) {
             js_moi_utils_1.ErrorUtils.throwError("Payload is missing!", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
-        const payload = processPayload(transaction.type, transaction.payload);
-        const polorizer = new js_polo_1.Polorizer();
-        switch (transaction.type) {
-            case js_moi_utils_1.TxType.ASSET_TRANSFER:
-                polorizer.polorize(payload, js_moi_utils_1.assetActionSchema);
-                return { ...transaction, payload: polorizer.bytes() };
-            case js_moi_utils_1.TxType.ASSET_CREATE:
-                polorizer.polorize(payload, js_moi_utils_1.assetCreateSchema);
-                return { ...transaction, payload: polorizer.bytes() };
-            case js_moi_utils_1.TxType.ASSET_MINT:
-            case js_moi_utils_1.TxType.ASSET_BURN:
-                polorizer.polorize(payload, js_moi_utils_1.assetSupplySchema);
-                return { ...transaction, payload: polorizer.bytes() };
-            case js_moi_utils_1.TxType.LOGIC_DEPLOY:
-            case js_moi_utils_1.TxType.LOGIC_INVOKE:
-            case js_moi_utils_1.TxType.LOGIC_ENLIST:
-                polorizer.polorize(payload, js_moi_utils_1.logicSchema);
-                return { ...transaction, payload: polorizer.bytes() };
-            default:
-                js_moi_utils_1.ErrorUtils.throwError("Unsupported interaction type!", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
-        }
+        const payload = (0, js_moi_providers_1.serializePayload)(transaction.type, transaction.payload);
+        return { ...transaction, payload };
     });
 };
 /**

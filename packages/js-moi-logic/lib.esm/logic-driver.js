@@ -1,6 +1,6 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
 /**
@@ -91,8 +91,7 @@ export class LogicDriver extends LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
-            payload.calldata = hexToBytes(calldata);
+            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
         }
         return payload;
     }

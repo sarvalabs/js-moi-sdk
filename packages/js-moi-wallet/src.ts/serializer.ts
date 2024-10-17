@@ -1,61 +1,13 @@
 import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
-    assetCreateSchema, assetSupplySchema, assetActionSchema, 
-    logicSchema, LockType} from "js-moi-utils";
-import { TransactionPayload, LogicPayload, InteractionObject, 
-    AssetActionPayload, AssetSupplyPayload, IxTransaction } from "js-moi-providers";
+    
+    LockType} from "js-moi-utils";
+import { LogicPayload, InteractionObject, 
+    AssetActionPayload, AssetSupplyPayload, IxTransaction, 
+    serializePayload} from "js-moi-providers";
 import { ProcessedIxParticipant, ProcessedIxObject, ProcessedIxTransaction, 
     ProcessedIxAssetFund } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
-
-/**
- * Processes the payload based on the transaction type.
- *
- * @param {TxType} txType - The transaction type.
- * @param {TransactionPayload} payload - The transaction payload.
- * @returns {TransactionPayload} - The processed transaction payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
- */
-const processPayload = (txType: TxType, payload: TransactionPayload): TransactionPayload => {
-    switch(txType) {
-        case TxType.ASSET_CREATE:
-            return { ...payload };
-
-        case TxType.ASSET_MINT:
-        case TxType.ASSET_BURN: {
-            const supplyPayload = payload as AssetSupplyPayload;
-            return {
-                ...supplyPayload,
-                asset_id: trimHexPrefix(supplyPayload.asset_id),
-            };
-        }
-
-        case TxType.ASSET_TRANSFER: {
-            const actionPayload = payload as AssetActionPayload;
-            return {
-                ...actionPayload,
-                benefactor: hexToBytes(actionPayload.benefactor ?? ZERO_ADDRESS),
-                beneficiary: hexToBytes(actionPayload.beneficiary),
-                asset_id: trimHexPrefix(actionPayload.asset_id),
-            };
-        }
-
-        case TxType.LOGIC_DEPLOY:
-            return { ...payload };
-
-        case TxType.LOGIC_INVOKE:
-        case TxType.LOGIC_ENLIST: {
-            const logicPayload = payload as LogicPayload;
-            return {
-                ...logicPayload,
-                logic_id: trimHexPrefix(logicPayload.logic_id),
-            };
-        }
-
-        default:
-            throw new Error(`Unsupported transaction type: ${txType}`);
-    }
-};
 
 /**
  * Processes the interaction object to extract and consolidate asset funds from 
@@ -70,7 +22,6 @@ const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
     ixObject.transactions.forEach(transaction => {
         switch(transaction.type) {
             case TxType.ASSET_TRANSFER:
-            case TxType.ASSET_MINT:
             case TxType.ASSET_BURN: {
                 const payload = transaction.payload as AssetSupplyPayload | AssetActionPayload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
@@ -207,31 +158,9 @@ const processTransactions = (transactions: IxTransaction[]): ProcessedIxTransact
             )
         }
 
-        const payload = processPayload(transaction.type, transaction.payload);
-        const polorizer = new Polorizer();
+        const payload = serializePayload(transaction.type, transaction.payload);
 
-        switch(transaction.type) {
-            case TxType.ASSET_TRANSFER:
-                polorizer.polorize(payload, assetActionSchema)
-                return {...transaction, payload: polorizer.bytes()}
-            case TxType.ASSET_CREATE:
-                polorizer.polorize(payload, assetCreateSchema)
-                return {...transaction, payload: polorizer.bytes()}
-            case TxType.ASSET_MINT:
-            case TxType.ASSET_BURN:
-                polorizer.polorize(payload, assetSupplySchema)
-                return {...transaction, payload: polorizer.bytes()}
-            case TxType.LOGIC_DEPLOY:
-            case TxType.LOGIC_INVOKE:
-            case TxType.LOGIC_ENLIST:
-                polorizer.polorize(payload, logicSchema)
-                return {...transaction, payload: polorizer.bytes()}
-            default:
-                ErrorUtils.throwError(
-                    "Unsupported interaction type!", 
-                    ErrorCode.UNSUPPORTED_OPERATION
-                );
-        }
+        return {...transaction, payload}
     })
 }
 

@@ -1,7 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { RoutineOption } from "../types/logic";
 import { LogicBase } from "./logic-base";
@@ -27,16 +27,15 @@ export class LogicFactory extends LogicBase {
      */
     protected createPayload(ixObject: LogicIxObject): LogicPayload {
         const payload = {
-            manifest: hexToBytes(this.encodedManifest),
+            manifest: this.encodedManifest,
             callsite: ixObject.routine.name
         } as LogicPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(
+            payload.calldata = this.manifestCoder.encodeArguments(
                 ixObject.routine.accepts, 
                 ixObject.arguments
             );
-            payload.calldata = hexToBytes(calldata);
         }
 
         return payload;

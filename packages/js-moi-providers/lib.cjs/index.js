@@ -19,4 +19,5 @@ __exportStar(require("./base-provider"), exports);
 __exportStar(require("./jsonrpc-provider"), exports);
 __exportStar(require("./voyage-provider"), exports);
 __exportStar(require("./websocket-provider"), exports);
+__exportStar(require("./interaction"), exports);
 //# sourceMappingURL=index.js.map

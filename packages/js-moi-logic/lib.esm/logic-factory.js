@@ -1,5 +1,5 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
 /**
  * This class represents a factory for deploying logic.
@@ -20,12 +20,11 @@ export class LogicFactory extends LogicBase {
      */
     createPayload(ixObject) {
         const payload = {
-            manifest: hexToBytes(this.encodedManifest),
+            manifest: this.encodedManifest,
             callsite: ixObject.routine.name
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
-            payload.calldata = hexToBytes(calldata);
+            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
         }
         return payload;
     }
