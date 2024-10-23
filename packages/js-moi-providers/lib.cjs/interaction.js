@@ -40,7 +40,7 @@ exports.validateAssetSupplyPayload = validateAssetSupplyPayload;
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateAssetTransferPayload = (payload) => {
-    if ('benefactor' in payload && 'beneficiary' in payload && 'asset_id' in payload && 'amount' in payload) {
+    if ('beneficiary' in payload && 'asset_id' in payload && 'amount' in payload) {
         return payload;
     }
     throw new Error("Invalid payload for ASSET_TRANSFER");
