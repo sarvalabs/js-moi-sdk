@@ -34,7 +34,7 @@ export enum TxType {
  * Enumerates the types of particpant locks in the system.
  */
 export enum LockType {
-    READ_ONLY_LOCK,
     MUTATE_LOCK,
+    READ_ONLY_LOCK,
     OBSERVER_LOCK
 }

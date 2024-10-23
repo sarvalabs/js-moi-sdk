@@ -28,8 +28,8 @@ export declare enum TxType {
  * Enumerates the types of particpant locks in the system.
  */
 export declare enum LockType {
-    READ_ONLY_LOCK = 0,
-    MUTATE_LOCK = 1,
+    MUTATE_LOCK = 0,
+    READ_ONLY_LOCK = 1,
     OBSERVER_LOCK = 2
 }
 //# sourceMappingURL=interaction.d.ts.map
