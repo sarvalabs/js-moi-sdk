@@ -41,7 +41,7 @@ export const assetCreateSchema = {
     }
 }
 
-export const DEFAULT_EVENT_SCHEMA = {
+export const builtInLogEventSchema = {
     kind: "struct",
     fields: {
         value: {

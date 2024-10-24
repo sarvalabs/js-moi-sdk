@@ -1,4 +1,4 @@
-import { bytesToHex, deepCopy, DEFAULT_EVENT_SCHEMA, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
+import { builtInLogEventSchema, bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
@@ -375,7 +375,7 @@ export class ManifestCoder {
      */
     public decodeEventOutput<T>(event: string, logData: string): T | null {
         if (event === "builtin.Log") {
-            return new Depolorizer(hexToBytes(logData)).depolorize(DEFAULT_EVENT_SCHEMA) as T;
+            return new Depolorizer(hexToBytes(logData)).depolorize(builtInLogEventSchema) as T;
         }
 
         const element = this.elementDescriptor.getEventElement(event);
