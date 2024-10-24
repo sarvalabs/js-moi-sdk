@@ -23,17 +23,6 @@ describe("Test ManifestCoder", () => {
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
         });
-
-        test("When the field is passed as a routine schema", () => {
-            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-                element.data = element.data as LogicManifest.Routine;
-                return element.data.name === "Seed";
-            });
-            const routine = routineElement?.data as LogicManifest.Routine;
-            const calldata = manifestCoder.encodeArguments(routine, "MOI", 100_000_000);
-
-            expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
-        });
     });
 
     describe("Decode polo encoded arguments", () => {
