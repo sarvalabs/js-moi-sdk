@@ -5,6 +5,10 @@ const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_id_1 = require("./logic-id");
+const routine_options_1 = require("./routine-options");
+/**
+ * The default fuel price used for logic interactions.
+ */
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -122,21 +126,11 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             type: this.getIxType(ixObject.routine.kind),
             payload: ixObject.createPayload(),
         };
-        if (option.sender != null) {
-            params.sender = option.sender;
-        }
-        else {
-            if (this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
-            }
-        }
-        if (option.fuelPrice != null) {
-            params.fuel_price = option.fuelPrice;
-        }
-        if (option.fuelLimit != null) {
-            params.fuel_limit = option.fuelLimit;
-        }
-        return { type, params: { ...params, ...option } };
+        params.sender = option.sender ?? this.signer?.getAddress();
+        params.fuel_price = option.fuelPrice;
+        params.fuel_limit = option.fuelLimit;
+        params.nonce = option.nonce;
+        return { type, params };
     }
     /**
      * Creates a logic interaction request object based on the given interaction object.
@@ -147,6 +141,10 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
+            const error = "error" in ix.receipt.extra_data ? js_moi_manifest_1.ManifestCoder.decodeException(ix.receipt.extra_data.error) : null;
+            if (error != null) {
+                js_moi_utils_1.ErrorUtils.throwError(error.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
             return await ix.result();
         };
         return {
@@ -164,7 +162,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
-        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
+        const option = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
             arguments: args
@@ -173,8 +171,8 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

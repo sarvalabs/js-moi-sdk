@@ -4,9 +4,13 @@ import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, Int
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
-import { LogicIxRequest, RoutineOption } from "../types/logic";
+import { LogicIxRequest } from "../types/logic";
 import { LogicId } from "./logic-id";
+import { RoutineOption } from "./routine-options";
 
+/**
+ * The default fuel price used for logic interactions.
+ */
 const DEFAULT_FUEL_PRICE = 1;
 
 /**
@@ -18,6 +22,7 @@ export abstract class LogicBase extends ElementDescriptor {
     protected signer?: Signer;
     protected provider: AbstractProvider;
     protected manifestCoder: ManifestCoder;
+    
 
     constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
         super(manifest)
@@ -113,7 +118,6 @@ export abstract class LogicBase extends ElementDescriptor {
                         ErrorCode.NOT_INITIALIZED
                     );
                 }
-                
                 return this.provider.estimateFuel(params as CallorEstimateIxObject);
             }
             case "send": {
@@ -155,23 +159,12 @@ export abstract class LogicBase extends ElementDescriptor {
             payload: ixObject.createPayload(),
         }
 
-        if(option.sender != null) {
-            params.sender = option.sender;
-        } else {
-            if(this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
-            }
-        }
+        params.sender = option.sender ?? this.signer?.getAddress();
+        params.fuel_price = option.fuelPrice;
+        params.fuel_limit = option.fuelLimit;
+        params.nonce = option.nonce;
 
-        if(option.fuelPrice != null) {
-            params.fuel_price = option.fuelPrice;
-        }
-
-        if(option.fuelLimit != null) {
-            params.fuel_limit = option.fuelLimit;
-        }
-
-        return { type, params: { ...params, ...option } }
+        return { type, params }
     }
 
     /**
@@ -183,6 +176,14 @@ export abstract class LogicBase extends ElementDescriptor {
     protected createIxRequest(ixObject: LogicIxObject): LogicIxRequest {
         const unwrap = async () => {
             const ix = await ixObject.call();
+            const error =
+                "error" in ix.receipt.extra_data ? ManifestCoder.decodeException(ix.receipt.extra_data.error) : null;
+
+
+            if (error != null) {
+                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
+
             return await ix.result();
         }
 
@@ -202,8 +203,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicIxRequest {
-
-        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
+        const option = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.pop() : {};
 
         const ixObject: LogicIxObject = {
             routine: routine,
@@ -215,8 +215,8 @@ export abstract class LogicBase extends ElementDescriptor {
         }
 
         ixObject.send = async (): Promise<InteractionResponse> => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;  
 
             return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }

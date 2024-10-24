@@ -1,4 +1,4 @@
-import { Config } from "jest"
+import { Config } from "jest";
 
 const configuration: Config = {
     projects: [
@@ -56,5 +56,4 @@ const configuration: Config = {
     maxConcurrency: 1
 }
 
-
-export default configuration
+export default configuration;

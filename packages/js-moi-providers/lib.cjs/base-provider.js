@@ -362,6 +362,33 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
+     * Create a filter object for the logs.
+     *
+     * @param {LogFilter} filter - The log filter object.
+     * @returns {Promise<Filter>} A promise that resolves to a Filter object.
+     */
+    async getLogsFilter(filter) {
+        if (filter.topics == null) {
+            filter.topics = [];
+        }
+        const { address, height, topics } = filter;
+        if (!(0, js_moi_utils_1.isValidAddress)(address)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+        if (!Array.isArray(topics)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+        const [start, end] = height;
+        const payload = {
+            address,
+            topics: this.hashTopics(topics),
+            start_height: start,
+            end_height: end
+        };
+        const response = await this.execute("moi.NewLogFilter", payload);
+        return this.processResponse(response);
+    }
+    /**
      * Asynchronously removes the filter and returns a Promise that resolves to a
      * object.
      * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.

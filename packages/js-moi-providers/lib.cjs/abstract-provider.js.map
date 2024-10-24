@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"abstract-provider.js","sourceRoot":"","sources":["../src.ts/abstract-provider.ts"],"names":[],"mappings":";;;AAAA,mCAAsC;AA2CtC;;;GAGG;AACH,MAAsB,gBAAiB,SAAQ,qBAAY;CAiD1D;AAjDD,4CAiDC"}
+=======
+{"version":3,"file":"abstract-provider.js","sourceRoot":"","sources":["../src.ts/abstract-provider.ts"],"names":[],"mappings":";;;AA4BA;;;GAGG;AACH,MAAsB,gBAAgB;IA0DlC,iBAAiB;IAEjB;;;;;;OAMG;IACH,WAAW,CAAC,SAAoB,EAAE,QAAkB;QAChD,OAAO,IAAI,CAAC,EAAE,CAAC,SAAS,EAAE,QAAQ,CAAC,CAAC;IACxC,CAAC;IAED,kBAAkB;IAElB;;;;;;OAMG;IACH,cAAc,CAAC,SAAoB,EAAE,QAAkB;QACnD,OAAO,IAAI,CAAC,GAAG,CAAC,SAAS,EAAE,QAAQ,CAAC,CAAC;IACzC,CAAC;CACJ;AAnFD,4CAmFC"}
+>>>>>>> feat/add-log-rpc-method

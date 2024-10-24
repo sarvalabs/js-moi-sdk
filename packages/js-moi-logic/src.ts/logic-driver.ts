@@ -5,6 +5,7 @@ import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils"
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
+import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
 
 /**
@@ -59,9 +60,9 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 return;
             }
 
-            routines[routine.name] = async (...params: any[]) => {
+            routines[routine.name] = async (...params: [...args: any[], options: RoutineOption | undefined]) => {
                 const argsLen =
-                    params.at(-1) && typeof params.at(-1) === "object"
+                    params.at(-1) && params.at(-1) instanceof RoutineOption
                         ? params.length - 1
                         : params.length;
 
