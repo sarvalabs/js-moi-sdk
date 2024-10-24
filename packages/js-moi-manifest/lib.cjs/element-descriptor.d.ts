@@ -1,15 +1,15 @@
-import { LogicManifest } from "js-moi-manifest";
-import { CallSite, MethodDef } from "../types/logic";
-import { ContextStateMatrix } from "./state";
+import type { CallSite, EventDef, LogicManifest, MethodDef } from "../types/manifest";
+import { ContextStateMatrix } from "./context-state-matrix";
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-export default class ElementDescriptor {
+export declare class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element>;
     protected callSites: Map<string, CallSite>;
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, MethodDef>;
+    protected eventsDefs: Map<string, EventDef>;
     constructor(elements: LogicManifest.Element[]);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
@@ -35,6 +35,7 @@ export default class ElementDescriptor {
      * @returns {Map<string, number>} The class definitions map.
      */
     getClassDefs(): Map<string, number>;
+    getEvents(): Map<string, EventDef>;
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
@@ -75,5 +76,15 @@ export default class ElementDescriptor {
      * @throws {Error} if the method name is invalid.
      */
     getMethodElement(methodName: string): LogicManifest.Element;
+    /**
+     * Retrieves the element from the logic manifest based on the given
+     * event name.
+     *
+     * @param {string} eventName - The name of the event.
+     * @returns {LogicManifest.Element<LogicManifest.Event>} The event element.
+     *
+     * @throws {Error} if the event name is invalid.
+     */
+    getEventElement(eventName: string): LogicManifest.Element<LogicManifest.Event>;
 }
 //# sourceMappingURL=element-descriptor.d.ts.map

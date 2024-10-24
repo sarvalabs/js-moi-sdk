@@ -41,6 +41,15 @@ export const assetCreateSchema = {
     }
 }
 
+export const builtInLogEventSchema = {
+    kind: "struct",
+    fields: {
+        value: {
+            kind: "string"
+        }
+    }
+}
+
 export const assetMintOrBurnSchema = {
     kind: "struct",
     fields: {

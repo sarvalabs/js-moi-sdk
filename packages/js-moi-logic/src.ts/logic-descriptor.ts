@@ -1,9 +1,8 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { ContextStateKind, LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
-import { ContextStateKind } from "./state";
 
 export enum EngineKind {
     PISA = "PISA",

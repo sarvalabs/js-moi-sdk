@@ -9,8 +9,8 @@
             "ptr": 0,
             "kind": "constant",
             "data": {
-                "type": "u64",
-                "value": "0x0302"
+                "type": "string",
+                "value": "0x0673656564656420"
             }
         },
         {
@@ -18,7 +18,7 @@
             "kind": "constant",
             "data": {
                 "type": "string",
-                "value": "0x067a65726f206164647265737320666f722073656e646572"
+                "value": "0x06207769746820"
             }
         },
         {
@@ -26,15 +26,15 @@
             "kind": "constant",
             "data": {
                 "type": "string",
-                "value": "0x067a65726f206164647265737320666f72207265636569766572"
+                "value": "0x0620"
             }
         },
         {
             "ptr": 3,
             "kind": "constant",
             "data": {
-                "type": "string",
-                "value": "0x06696e73756666696369656e742062616c616e636520666f722073656e646572"
+                "type": "u64",
+                "value": "0x0312"
             }
         },
         {
@@ -42,33 +42,90 @@
             "kind": "constant",
             "data": {
                 "type": "string",
-                "value": "0x06696e73756666696369656e742062616c616e636520666f72206275726e"
+                "value": "0x0673656e64657220686173206e6f2062616c616e6365"
             }
         },
         {
             "ptr": 5,
+            "kind": "constant",
+            "data": {
+                "type": "string",
+                "value": "0x0673656e6465722068617320696e73756666696369656e742062616c616e6365"
+            }
+        },
+        {
+            "ptr": 6,
+            "kind": "constant",
+            "data": {
+                "type": "string",
+                "value": "0x06696e76616c6964206275726e20616d6f756e743a206578636565647320737570706c79"
+            }
+        },
+        {
+            "ptr": 7,
+            "kind": "constant",
+            "data": {
+                "type": "string",
+                "value": "0x06696e76616c6964206275726e20616d6f756e743a2073656e64657220686173206e6f2062616c616e6365"
+            }
+        },
+        {
+            "ptr": 8,
+            "kind": "constant",
+            "data": {
+                "type": "string",
+                "value": "0x06696e76616c6964206275726e20616d6f756e743a20696e73756666696369656e742062616c616e6365"
+            }
+        },
+        {
+            "ptr": 9,
             "kind": "typedef",
             "data": "map[address]u256"
         },
         {
-            "ptr": 6,
+            "ptr": 10,
+            "kind": "event",
+            "data": {
+                "name": "Transfer",
+                "topics": 2,
+                "fields": [
+                    {
+                        "slot": 0,
+                        "label": "sender",
+                        "type": "address"
+                    },
+                    {
+                        "slot": 1,
+                        "label": "receiver",
+                        "type": "address"
+                    },
+                    {
+                        "slot": 2,
+                        "label": "amount",
+                        "type": "u256"
+                    }
+                ]
+            }
+        },
+        {
+            "ptr": 11,
             "kind": "state",
             "data": {
                 "mode": "persistent",
                 "fields": [
                     {
                         "slot": 0,
-                        "label": "symbol",
+                        "label": "Symbol",
                         "type": "string"
                     },
                     {
                         "slot": 1,
-                        "label": "supply",
+                        "label": "Supply",
                         "type": "u256"
                     },
                     {
                         "slot": 2,
-                        "label": "balances",
+                        "label": "Balances",
                         "type": "map[address]u256"
                     }
                 ]
@@ -81,9 +138,9 @@
             ],
             "kind": "routine",
             "data": {
-                "name": "Seeder",
+                "name": "Seed",
                 "mode": "persistent",
-                "kind": "deployer",
+                "kind": "deploy",
                 "accepts": [
                     {
                         "slot": 0,
@@ -182,7 +239,7 @@
             "data": {
                 "name": "Decimals",
                 "mode": "readonly",
-                "kind": "invokable",
+                "kind": "invoke",
                 "accepts": [],
                 "returns": [
                     {
@@ -249,11 +306,11 @@
             "data": {
                 "name": "BalanceOf",
                 "mode": "readonly",
-                "kind": "invokable",
+                "kind": "invoke",
                 "accepts": [
                     {
                         "slot": 0,
-                        "label": "address",
+                        "label": "addr",
                         "type": "address"
                     }
                 ],
@@ -298,17 +355,17 @@
             "data": {
                 "name": "Transfer",
                 "mode": "persistent",
-                "kind": "invokable",
+                "kind": "invoke",
                 "accepts": [
                     {
                         "slot": 0,
-                        "label": "receiver",
-                        "type": "address"
+                        "label": "amount",
+                        "type": "u256"
                     },
                     {
                         "slot": 1,
-                        "label": "amount",
-                        "type": "u256"
+                        "label": "receiver",
+                        "type": "address"
                     }
                 ],
                 "returns": [],
@@ -429,7 +486,7 @@
             "data": {
                 "name": "Mint",
                 "mode": "persistent",
-                "kind": "invokable",
+                "kind": "invoke",
                 "accepts": [
                     {
                         "slot": 0,
@@ -498,7 +555,7 @@
             "data": {
                 "name": "Burn",
                 "mode": "persistent",
-                "kind": "invokable",
+                "kind": "invoke",
                 "accepts": [
                     {
                         "slot": 0,

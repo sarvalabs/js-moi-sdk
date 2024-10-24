@@ -1,4 +1,4 @@
-import { Config } from "jest"
+import { Config } from "jest";
 
 const configuration: Config = {
     projects: [
@@ -42,11 +42,18 @@ const configuration: Config = {
             transform: {
                 '^.+\\.tsx?$': 'ts-jest',
             },
-        }
+        },
+        // {
+        //     displayName: 'js-moi-providers',
+        //     testEnvironment: 'ts-node',
+        //     testMatch: ['<rootDir>/packages/js-moi-providers/__tests__/*.test.ts'],
+        //     transform: {
+        //         '^.+\\.tsx?$': 'ts-jest',
+        //     },
+        // }
     ],
     testTimeout: 700000,
     maxConcurrency: 1
 }
 
-
-export default configuration
+export default configuration;

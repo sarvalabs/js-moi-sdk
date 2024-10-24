@@ -1,11 +1,12 @@
 import { Signer } from "js-moi-signer";
 import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "js-moi-utils";
+import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
-const HOST = "http://localhost:1600";
-const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
+const HOST = "<PROVIDE YOUR JSON RPC HOST>";
+const MNEMONIC = "<PROVIDE YOUR MNEMONIC HERE>";
 const ADDRESS = "0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db";
 
 
@@ -18,6 +19,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
     let ixReceipt: InteractionReceipt;
     let nextNonce = 0;
     const supply = getRandomSupply();
+    MNEMONIC;
 
     beforeAll(async() => {
       signer = await initializeWallet(provider, MNEMONIC);
@@ -416,5 +418,38 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(Array.isArray(tesseracts)).toBeTruthy()
         expect(Array.length).toBeGreaterThanOrEqual(1);
       })
+    });
+
+    describe("getLogs", () => {
+      const provider = new VoyageProvider("babylon");
+      const address = "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce";
+
+      it("should return an result", async () => {
+        const logs = await provider.getLogs({
+          address: address,
+          height: [0, 10]
+        });
+        expect(logs).toBeDefined();
+        expect(Array.isArray(logs)).toBeTruthy();
+      });
+
+      it("should return an result with topics", async () => {
+        const logs = await provider.getLogs({
+          address: address,
+          height: [0, 10],
+          topics: [["Transfer"]]
+        })
+        expect(logs).toBeDefined();
+        expect(Array.isArray(logs)).toBeTruthy();
+      });
+
+      it("should throw error if height range is invalid", async () => {
+        expect(async () => {
+          await provider.getLogs({
+            address: address,
+            height: [10, 0]
+          })
+        }).rejects.toThrow(/Invalid query range|Invalid height query/i);
+      });
     });
 });

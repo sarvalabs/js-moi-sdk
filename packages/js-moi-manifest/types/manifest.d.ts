@@ -65,12 +65,14 @@ export declare module LogicManifest {
     }
     
     export type TypeDef = string;
+
+    export type ElementKind = State | Constant | TypeDef | Routine | Class | Method | Event;
     
-    export interface Element {
+    export interface Element<TElementKind = ElementKind> {
         ptr: number;
         kind: string;
         deps?: number[] | null;
-        data: State | Constant | TypeDef | Routine | Class | Method;
+        data: TElementKind;
     }
     
     export interface Manifest {
@@ -78,4 +80,35 @@ export declare module LogicManifest {
         engine: EngineConfig;
         elements: Element[];
     }
+
+    export interface EventDef {
+        ptr: number;
+        topics: number;
+    }
+    
+    export interface MethodDef {
+        ptr: number;
+        class: string;
+    }
+    
+    export interface CallSite {
+        ptr: number,
+        kind: string
+    }
+}
+
+
+export interface EventDef {
+    ptr: number;
+    topics: number;
+}
+
+export interface MethodDef {
+    ptr: number;
+    class: string;
+}
+
+export interface CallSite {
+    ptr: number,
+    kind: string
 }

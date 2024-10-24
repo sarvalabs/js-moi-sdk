@@ -1,4 +1,4 @@
-import type { LogicManifest } from "js-moi-manifest";
+import type { LogicManifest } from "../types/manifest";
 
 export enum ContextStateKind {
     PersistentState,

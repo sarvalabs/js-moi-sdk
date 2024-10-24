@@ -1,7 +1,6 @@
-import { isPrimitiveType, Schema, type LogicManifest } from "js-moi-manifest";
+import { isPrimitiveType, Schema, type ElementDescriptor, type LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 
-import type ElementDescriptor from "../element-descriptor";
 import {
     ArrayIndexAccessor,
     ClassFieldAccessor,

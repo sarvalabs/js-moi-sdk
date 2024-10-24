@@ -9,4 +9,5 @@ export * from "./json";
 export * from "./object";
 export * from "./properties";
 export * from "./schema";
+export { topicHash } from "./logic-events";
 //# sourceMappingURL=index.js.map

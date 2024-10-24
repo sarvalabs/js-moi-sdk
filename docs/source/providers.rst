@@ -392,6 +392,8 @@ Query Methods
 
 .. autofunction:: getAssetInfoByAssetID
 
+.. autofunction:: getLogs
+
 .. autofunction:: getInteractionReceipt
 
 .. autofunction:: getStorageAt
@@ -415,6 +417,8 @@ Query Methods
 .. autofunction:: getNewTesseractsByAccountFilter
 
 .. autofunction:: getPendingInteractionFilter
+
+.. autofunction:: getLogsFilter
 
 .. autofunction:: getFilterChanges
 
@@ -540,35 +544,25 @@ WebSocket connection, facilitating real-time interaction with the blockchain.
 .. code-block:: javascript
 
     // Example
-    const provider = new WebSocketProvider("ws://localhost:1600/ws", {
-        reconnectOptions: {
-            auto: true,
-            delay: 5000,
-            maxAttempts: 50
-        }
-    });
+    const provider = new WebSocketProvider("ws://localhost:1600/ws");
 
 WebSocket Events
 ~~~~~~~~~~~~~~~~
 The event's listed below are related to the WebSocketProvider itself and 
 its connection status and operation. These are not specific to blockchain data.
 
-``CONNECT`` - This event is triggered when the WebSocketProvider successfully 
+``connect`` - This event is triggered when the WebSocketProvider successfully 
 establishes a connection with the MOI node. It indicates that the WebSocket 
 connection has been established and is ready for sending and receiving data.
 
-``RECONNECT`` - This event occurs when the WebSocketProvider attempts to 
+``reconnect`` - This event occurs when the WebSocketProvider attempts to 
 reconnect to the MOI node after a disconnection.
 
-``CLOSE`` - This event is emitted when the WebSocket connection is closed 
+``close`` - This event is emitted when the WebSocket connection is closed 
 intentionally or due to an error. It provides information about the reason for 
 the closure, such as a manual disconnection or a network failure.
 
-``DEBUG`` - This event is primarily used for debugging purposes. It provides 
-additional information or logs related to the WebSocketProvider's internal 
-operations, network communication, or any other relevant debugging details.
-
-``ERROR`` - This event is emitted when an error occurs during the 
+``error`` - This event is emitted when an error occurs during the 
 WebSocketProvider's operation. It indicates that something unexpected or 
 erroneous has happened, such as a network error, an invalid response from the 
 MOI node, or any other unforeseen issue.
@@ -577,16 +571,18 @@ Protocol Events
 ~~~~~~~~~~~~~~~
 The event's listed below are specific to blockchain data.
 
-``ALL_TESSERACTS`` - This event is triggered when a new tesseract is mined on 
+``newTesseracts`` - This event is triggered when a new tesseract is mined on 
 the blockchain. It provides information about the tesseract, such as its 
 height, hash, timestamp, and other relevant data.
 
-``0x...`` (address) - This event is triggered when a new tesseract belonging to 
+``newTesseractsByAccount`` - This event is triggered when a new tesseract belonging to 
 the given address is mined on the blockchain. It provides information about the 
-tesseract.
+tesseract. The address parameter can be passed as show in the example below.
 
-``PENDING_INTERACTIONS`` - This event is emitted when a new interaction is added to
+``newPendingInteractions`` - This event is emitted when a new interaction is added to
 interaction pool. It provides an interaction hash.
+
+``newLogs`` - This event is triggered when new logs are added for a given address and topics.
 
 Usage
 ~~~~~
@@ -601,70 +597,37 @@ Subscribing to all tesseracts
         console.log("New tesseract finalized", tesseract);
     };
 
-    // Listen for "connect" event
-    provider.on(WebSocketEvents.CONNECT, () => {
-        console.log("WebSocket connection established successfully");
+    provider.on("newTesseracts", handleTesseracts);
 
-        // Listen for "tesseracts" event
-        provider.on(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
-
-        // Listen for "pending_interactions" event
-        provider.on(WebSocketEvents.PENDING_INTERACTIONS, handleInteraction);
-    });
-
-    // Listen for "debug" event
-    provider.on(WebSocketEvents.DEBUG, (info) => {
-        console.log("WebSocket provider debug info:", info);
-    });
-
-    // Handle WebSocket connection errors
-    provider.on(WebSocketEvents.ERROR, (err) => {
+    provider.on("error", (err) => {
         console.log("WebSocket connection error:", err);
     });
 
-    // Handle WebSocket connection close
-    provider.on(WebSocketEvents.CLOSE, (info) => {
+    provider.on("close", (info) => {
         console.log("WebSocket connection closed: ", info);
 
         // Remove "tesseracts" event listener
-        provider.off(WebSocketEvents.ALL_TESSERACTS, handleTesseracts);
+        provider.off("newTesseracts", handleTesseracts);
     });
 
-Subscribing to account specific tesseracts
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Subscribing to tesseracts by address
 
 .. code-block:: javascript
 
     // Example
-    const adddress = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
-    const handleTesseracts = async (tesseract) => {
-        console.log("New tesseract finalized", tesseract);
-    };
+    const ws = new WebsocketProvider("wss://localhost:8080");
 
-    // Listen for "connect" event
-    provider.on(WebSocketEvents.CONNECT, () => {
-        console.log("WebSocket connection established successfully");
-
-        // Listen for "tesseracts" event
-        provider.on(adddress, handleTesseracts);
+    ws.on({ event: "newTesseractsByAccount", params: { address: "0x...abc" } }, (tesseract) => {
+        console.log(tesseract);
     });
 
-    // Listen for "debug" event
-    provider.on(WebSocketEvents.DEBUG, (info) => {
-        console.log("WebSocket provider debug info:", info);
-    });
+Subscribing to new logs
+^^^^^^^^^^^^^^^^^^^^^^^
 
-    // Handle WebSocket connection errors
-    provider.on(WebSocketEvents.ERROR, (err) => {
-        console.log("WebSocket connection error:", err);
-    });
+.. code-block:: javascript
 
-    // Handle WebSocket connection close
-    provider.on(WebSocketEvents.CLOSE, (info) => {
-        console.log("WebSocket connection closed: ", info);
-
-        // Remove "tesseracts" event listener
-        provider.off(adddress, handleTesseracts);
+    provider.on({ event: "newLogs", params: { address: "0x..abc", height: [-1, -1], topics: [] } }, (log) => {
+        console.log("New log", log);
     });
 
 Websocket enabled JSON-RPC communication
@@ -673,19 +636,18 @@ Websocket enabled JSON-RPC communication
 .. code-block:: javascript
 
     // Example
-    const address = "0x102e973bc33200fdb3383b4c8e490433743211edb33e53b8915d5a4b2668cf5e";
-    const contextInfo = await provider.getContextInfo(address)
-    console.log(contextInfo)
+    const address = "0x...abc";
+    const tdu = await provider.getTDU(address)
+    console.log(tdu)
 
     // Output
     /*
-        {
-            "behaviour_nodes": [
-                "3WwLTp3WztxoLKKdPSLn9PRDPyB5mvVfGCpahP9kYaiqjrE8LwH1.16Uiu2HAm6wumV4gJkAAqTkfowUcbF1i1yQmLFcAhjbbJuDu2hURC"
-            ],
-            "random_nodes": [],
-            "storage_nodes": []
-        }
+        [
+            {
+                "asset_id": "0x...xyz",
+                "amount": "0xF4161"
+            }
+        ]
     */
 
 Voyage Provider
