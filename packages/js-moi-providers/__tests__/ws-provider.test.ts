@@ -1,5 +1,6 @@
 import { hexToBytes, IxType } from "js-moi-utils";
 import { Wallet } from "js-moi-wallet";
+import { WebSocketEvent } from "../src.ts/websocket-events";
 import { WebsocketProvider } from "../src.ts/websocket-provider";
 import { getRandomSupply, initializeWallet } from "./utils/utils";
 
@@ -67,7 +68,7 @@ describe("Test Websocket Provider", () => {
         });
 
         test("should emit a event when connection is established", async () => {
-            provider.on("connect", () => {
+            provider.on(WebSocketEvent.Connect, () => {
                 // @ts-ignore
                 expect(provider.ws).toBeDefined();
                 // @ts-ignore
@@ -76,7 +77,7 @@ describe("Test Websocket Provider", () => {
         });
 
         test("should be able to listen to new pending interactions events", async () => {
-            provider.on("newPendingInteractions", (ixHash) => {
+            provider.on(WebSocketEvent.NewPendingInteractions, (ixHash) => {
                 expect(ixHash).toBeDefined();
                 expect(typeof ixHash).toBe("string");
                 expect(ixHash.startsWith("0x")).toBeTruthy();
@@ -84,7 +85,7 @@ describe("Test Websocket Provider", () => {
         }, 10000);
 
         test("should be able to listen to new tesseract", async () => {
-            provider.on("newTesseracts", (tesseract) => {
+            provider.on(WebSocketEvent.NewTesseracts, (tesseract) => {
                 expect(tesseract).toBeDefined();
                 expect(tesseract.hash).toBeDefined();
                 expect(tesseract.hash.startsWith("0x")).toBeTruthy();
@@ -94,7 +95,7 @@ describe("Test Websocket Provider", () => {
 
         test("should be able to listen to tesseract of specific address", async () => {
             provider.on(
-                { event: "newTesseractsByAccount", params: { address: receiver } },
+                { event: WebSocketEvent.NewTesseractsByAccount, params: { address: receiver } },
                 (tesseract) => {
                     const isReceiverParticipating = tesseract.participants.some(
                         (p) => p.address === receiver
@@ -140,7 +141,7 @@ describe("Test Websocket Provider", () => {
             test("should be able to listen to new logs", async () => {
                 provider.on(
                     {
-                        event: "newLogs",
+                        event: WebSocketEvent.NewLog,
                         params: {
                             address: getWallet().getAddress(),
                             height: [-1, -1],

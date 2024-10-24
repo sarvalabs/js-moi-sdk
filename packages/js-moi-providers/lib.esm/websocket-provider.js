@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
 import { BaseProvider } from "./base-provider";
+import { WebSocketEvent } from "./websocket-events";
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
 export class WebsocketProvider extends BaseProvider {
     ws;
@@ -66,14 +67,14 @@ export class WebsocketProvider extends BaseProvider {
         }
         if (this.ws.readyState === this.ws.CLOSING) {
             return new Promise((resolve) => {
-                this.once('close', () => {
+                this.once(WebSocketEvent.Close, () => {
                     resolve();
                 });
             });
         }
         if (this.ws.readyState === this.ws.CONNECTING) {
             return new Promise((resolve) => {
-                this.once('connect', () => {
+                this.once(WebSocketEvent.Connect, () => {
                     this.ws.close(1000);
                     resolve();
                 });
@@ -103,7 +104,7 @@ export class WebsocketProvider extends BaseProvider {
     execute(method, params) {
         if (this.ws.readyState !== this.ws.OPEN) {
             return new Promise((resolve) => {
-                this.once('connect', async () => {
+                this.once(WebSocketEvent.Connect, async () => {
                     resolve(await this.handleRpcRequest(method, params));
                 });
             });

@@ -597,17 +597,17 @@ Subscribing to all tesseracts
         console.log("New tesseract finalized", tesseract);
     };
 
-    provider.on("newTesseracts", handleTesseracts);
+    provider.on(WebSocketEvent.NewTesseracts, handleTesseracts);
 
-    provider.on("error", (err) => {
+    provider.on(WebSocketEvent.Error, (err) => {
         console.log("WebSocket connection error:", err);
     });
 
-    provider.on("close", (info) => {
+    provider.on(WebSocketEvent.Close, (info) => {
         console.log("WebSocket connection closed: ", info);
 
         // Remove "tesseracts" event listener
-        provider.off("newTesseracts", handleTesseracts);
+        provider.off(WebSocketEvent.NewTesseracts, handleTesseracts);
     });
 
 Subscribing to tesseracts by address
@@ -617,7 +617,7 @@ Subscribing to tesseracts by address
     // Example
     const ws = new WebsocketProvider("wss://localhost:8080");
 
-    ws.on({ event: "newTesseractsByAccount", params: { address: "0x...abc" } }, (tesseract) => {
+    ws.on({ event: WebSocketEvent.MewTesseractsByAccount, params: { address: "0x...abc" } }, (tesseract) => {
         console.log(tesseract);
     });
 
@@ -626,7 +626,7 @@ Subscribing to new logs
 
 .. code-block:: javascript
 
-    provider.on({ event: "newLogs", params: { address: "0x..abc", height: [-1, -1], topics: [] } }, (log) => {
+    provider.on({ event: WebSocketEvent.NewLog, params: { address: "0x..abc", height: [-1, -1], topics: [] } }, (log) => {
         console.log("New log", log);
     });
 
