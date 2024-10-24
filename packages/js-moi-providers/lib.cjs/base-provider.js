@@ -773,11 +773,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         const response = await this.execute("moi.GetLogs", payload);
         return this.processResponse(response).map((log) => ({
             ...log,
-<<<<<<< HEAD
             data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
-=======
-            data: "0x" + (0, js_moi_utils_1.bytesToHex)((0, js_moi_utils_1.decodeBase64)(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
->>>>>>> develop
         }));
     }
     /**

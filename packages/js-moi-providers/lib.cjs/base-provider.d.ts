@@ -1,18 +1,11 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-<<<<<<< HEAD
 import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
 import { AbstractProvider, type ProviderEvents } from "./abstract-provider";
 export interface EventTag {
     event: string;
     params?: unknown;
 }
-=======
-import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
-import { AbstractProvider } from "./abstract-provider";
-import Event from "./event";
->>>>>>> develop
 /**
  * Class representing a base provider for interacting with the MOI protocol.
  * Extends the AbstractProvider class and provides implementations for

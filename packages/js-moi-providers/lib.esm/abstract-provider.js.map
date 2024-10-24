@@ -1,9 +1,1 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-{"version":3,"file":"abstract-provider.js","sourceRoot":"","sources":["../src.ts/abstract-provider.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,QAAQ,CAAC;AA2CtC;;;GAGG;AACH,MAAM,OAAgB,gBAAiB,SAAQ,YAAY;CAiD1D"}
-=======
-{"version":3,"file":"abstract-provider.js","sourceRoot":"","sources":["../src.ts/abstract-provider.ts"],"names":[],"mappings":"AA4BA;;;GAGG;AACH,MAAM,OAAgB,gBAAgB;IA0DlC,iBAAiB;IAEjB;;;;;;OAMG;IACH,WAAW,CAAC,SAAoB,EAAE,QAAkB;QAChD,OAAO,IAAI,CAAC,EAAE,CAAC,SAAS,EAAE,QAAQ,CAAC,CAAC;IACxC,CAAC;IAED,kBAAkB;IAElB;;;;;;OAMG;IACH,cAAc,CAAC,SAAoB,EAAE,QAAkB;QACnD,OAAO,IAAI,CAAC,GAAG,CAAC,SAAS,EAAE,QAAQ,CAAC,CAAC;IACzC,CAAC;CACJ"}
->>>>>>> feat/add-log-rpc-method
-=======
-{"version":3,"file":"abstract-provider.js","sourceRoot":"","sources":["../src.ts/abstract-provider.ts"],"names":[],"mappings":"AA4BA;;;GAGG;AACH,MAAM,OAAgB,gBAAgB;IA0DlC,iBAAiB;IAEjB;;;;;;OAMG;IACH,WAAW,CAAC,SAAoB,EAAE,QAAkB;QAChD,OAAO,IAAI,CAAC,EAAE,CAAC,SAAS,EAAE,QAAQ,CAAC,CAAC;IACxC,CAAC;IAED,kBAAkB;IAElB;;;;;;OAMG;IACH,cAAc,CAAC,SAAoB,EAAE,QAAkB;QACnD,OAAO,IAAI,CAAC,GAAG,CAAC,SAAS,EAAE,QAAQ,CAAC,CAAC;IACzC,CAAC;CACJ"}
->>>>>>> develop
+{"version":3,"file":"abstract-provider.js","sourceRoot":"","sources":["../src.ts/abstract-provider.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,QAAQ,CAAC;AA2CtC;;;GAGG;AACH,MAAM,OAAgB,gBAAiB,SAAQ,YAAY;CAkD1D"}
