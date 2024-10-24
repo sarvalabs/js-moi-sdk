@@ -357,7 +357,7 @@ export interface LogFilter {
 }
 export type NewTesseractsByAccount = {
     event: "newTesseractsByAccount";
-    params: string;
+    params: { address: string };
 };
 
 export type NewLogs = { event: "newLogs"; params: LogFilter };

@@ -575,7 +575,7 @@ The event's listed below are specific to blockchain data.
 the blockchain. It provides information about the tesseract, such as its 
 height, hash, timestamp, and other relevant data.
 
-``newTesseractsByAccount`` (address) - This event is triggered when a new tesseract belonging to 
+``newTesseractsByAccount`` - This event is triggered when a new tesseract belonging to 
 the given address is mined on the blockchain. It provides information about the 
 tesseract. The address parameter can be passed as show in the example below.
 
@@ -617,11 +617,9 @@ Subscribing to tesseracts by address
     // Example
     const ws = new WebsocketProvider("wss://localhost:8080");
 
-    ws.on({ event: "newTesseractsByAccount", params: "0x...abc" }, (tesseract) => {
+    ws.on({ event: "newTesseractsByAccount", params: { address: "0x...abc" } }, (tesseract) => {
         console.log(tesseract);
     });
-
-    provider.on("newTesseractsByAccount", address, handleTesseractsByAccount);
 
 Subscribing to new logs
 ^^^^^^^^^^^^^^^^^^^^^^^

@@ -922,7 +922,7 @@ export class BaseProvider extends AbstractProvider {
         }
         if (typeof event === "object") {
             if (event.event === 'newTesseractsByAccount') {
-                if (!isValidAddress(event.params)) {
+                if (!isValidAddress(event.params.address)) {
                     ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
                 }
                 params = [event.event, { address: event.params }];

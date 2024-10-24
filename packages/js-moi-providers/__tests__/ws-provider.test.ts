@@ -94,7 +94,7 @@ describe("Test Websocket Provider", () => {
 
         test("should be able to listen to tesseract of specific address", async () => {
             provider.on(
-                { event: "newTesseractsByAccount", params: receiver },
+                { event: "newTesseractsByAccount", params: { address: receiver } },
                 (tesseract) => {
                     const isReceiverParticipating = tesseract.participants.some(
                         (p) => p.address === receiver
