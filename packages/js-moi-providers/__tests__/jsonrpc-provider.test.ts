@@ -429,7 +429,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           address: address,
           height: [0, 10]
         });
-        console.log(logs)
+        
         expect(logs).toBeDefined();
         expect(Array.isArray(logs)).toBeTruthy();
       });
