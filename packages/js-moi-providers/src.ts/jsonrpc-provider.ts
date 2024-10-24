@@ -1,8 +1,7 @@
 import fetch from "cross-fetch";
 import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
-import { BaseProvider } from "./base-provider";
-import Event from "./event";
 import { RpcResponse } from "../types/jsonrpc";
+import { BaseProvider } from "./base-provider";
 
 /**
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.
@@ -87,23 +86,5 @@ export class JsonRpcProvider extends BaseProvider {
                 ErrorCode.NETWORK_ERROR
             )
         }
-    }
-
-    /**
-     * Starts an event.
-     *
-     * @param event - The event to start.
-     */
-    protected _startEvent(event: Event): void {
-        super._startEvent(event);
-    }
-
-    /**
-     * Stops an event.
-     *
-     * @param event - The event to stop.
-     */
-    protected _stopEvent(event: Event): void {
-        super._stopEvent(event);
     }
 }

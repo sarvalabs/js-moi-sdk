@@ -1,13 +1,15 @@
 import {
-    AssetCreationReceipt,
-    AssetMintOrBurnReceipt,
-    AssetStandard,
-    IxType,
-    LogicDeployReceipt,
-    LogicEnlistReceipt,
-    LogicInvokeReceipt,
-    Participants
+  AssetCreationReceipt,
+  AssetMintOrBurnReceipt,
+  AssetStandard,
+  IxType,
+  LogicDeployReceipt,
+  LogicEnlistReceipt,
+  LogicInvokeReceipt,
+  Participants,
+  type Tesseract
 } from "js-moi-utils";
+import type { WebSocketEvent } from "../src.ts/websocket-events";
 import type { NestedArray } from "./util";
 
 export interface Options {
@@ -337,4 +339,39 @@ export interface LogFilter {
     address: string;
     height: [start: number, end: number];
     topics?: NestedArray<string>;
+}
+
+
+export interface Log {
+    address: string;
+    topics: string[];
+    data: string;
+    ix_hash: string;
+    ts_hash: string;
+    participants: Participants;
+}
+
+export interface LogFilter {
+    address: string;
+    height: [start: number, end: number];
+    topics?: NestedArray<string>;
+}
+export type NewTesseractsByAccount = {
+    event: WebSocketEvent.NewTesseractsByAccount;
+    params: { address: string };
+};
+
+export type NewLogs = { event: WebSocketEvent.NewLog; params: LogFilter };
+
+export type ProviderEvents =
+    | keyof WebsocketEventMap
+    | { event: string; params: any };
+
+export interface WebsocketEventMap {
+    [WebSocketEvent.NewTesseracts]: [tesseract: Tesseract];
+    [WebSocketEvent.NewPendingInteractions]: [interactionHash: string];
+    [WebSocketEvent.Connect]: [];
+    [WebSocketEvent.Error]: [error: unknown];
+    [WebSocketEvent.Close]: [];
+    [WebSocketEvent.Reconnect]: [attempt: number];
 }

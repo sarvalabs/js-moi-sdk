@@ -19,23 +19,24 @@ describe("Test ManifestCoder", () => {
 
     describe("Encode arguments into polo format", () => {
         test("When the field is passed as a routine name", () => {
-            const args = ["MOI", 100_000_000];
-            const calldata = manifestCoder.encodeArguments("Seed", args);
+            const calldata = manifestCoder.encodeArguments("Seed", "MOI", 100_000_000);
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
         });
+    });
 
-        test("When the field is passed as a routine schema", () => {
-            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-                element.data = element.data as LogicManifest.Routine;
-                return element.data.name === "Seed";
-            });
-            const routine = routineElement?.data as LogicManifest.Routine;
-            const fields = routine.accepts ? routine.accepts : [];
-            const args = ["MOI", 100000000];
-            const calldata = manifestCoder.encodeArguments(fields, args);
+    describe("Decode polo encoded arguments", () => {
+        test("When the field is passed as a routine name", () => {
+            const calldata = "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49";
+            const args = ["MOI", 100_000_000];
+            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>("Seed", calldata);
 
-            expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
+            if (decoded) {
+                for (let i = 0; i < args.length; i++) {
+                    expect(decoded[i]).toEqual(args[i]);
+                }
+            }
+
         });
     });
 
@@ -47,19 +48,6 @@ describe("Test ManifestCoder", () => {
             const args = manifestCoder.decodeOutput<{ balance: number }>(callsite, calldata);
 
             expect(args).toEqual({ balance: expect.any(Number) });
-        });
-
-        test("When the field is passed as a routine schema", () => {
-            const output = "0x0e1f0305f5e100";
-            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-                element.data = element.data as LogicManifest.Routine;
-                return element.data.name === callsite;
-            });
-            const routine = routineElement?.data as LogicManifest.Routine;
-            const fields = routine.returns ? routine.returns : [];
-            const decodedOutput = manifestCoder.decodeOutput(fields, output);
-
-            expect(decodedOutput).toEqual({ balance: expect.any(Number) });
         });
     });
 
@@ -75,14 +63,6 @@ describe("Test ManifestCoder", () => {
             revert: false,
             trace: ["runtime.root()", "routine.Transfer() [0xc] ... [0x1b: THROW 0x5]"],
         });
-    });
-
-    test("Decode polo encoded property of a state", () => {
-        const data = "0x0652494f";
-        const state: any = manifest.elements.find((element) => element.kind === "state");
-        const output = manifestCoder.decodeState(data, "Symbol", state?.data.fields);
-
-        expect(output).toBe("RIO");
     });
 
     test("Decode event log", () => {

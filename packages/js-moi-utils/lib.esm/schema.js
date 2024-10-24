@@ -39,7 +39,7 @@ export const assetCreateSchema = {
         logic_payload: logicSchema
     }
 };
-export const DEFAULT_EVENT_SCHEMA = {
+export const builtInLogEventSchema = {
     kind: "struct",
     fields: {
         value: {
