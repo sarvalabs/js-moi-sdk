@@ -20,7 +20,7 @@ describe("Test ManifestCoder", () => {
     describe("Encode arguments into polo format", () => {
         test("When the field is passed as a routine name", () => {
             const args = ["MOI", 100_000_000];
-            const calldata = manifestCoder.encodeArguments("Seeder", args);
+            const calldata = manifestCoder.encodeArguments("Seed", args);
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
         });
@@ -80,7 +80,7 @@ describe("Test ManifestCoder", () => {
     test("Decode polo encoded property of a state", () => {
         const data = "0x0652494f";
         const state: any = manifest.elements.find((element) => element.kind === "state");
-        const output = manifestCoder.decodeState(data, "symbol", state?.data.fields);
+        const output = manifestCoder.decodeState(data, "Symbol", state?.data.fields);
 
         expect(output).toBe("RIO");
     });

@@ -4,8 +4,14 @@ import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-m
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
+<<<<<<< HEAD
 import { LogicIxRequest, RoutineOption } from "../types/logic";
+=======
+import { LogicIxRequest } from "../types/logic";
+import ElementDescriptor from "./element-descriptor";
+>>>>>>> develop
 import { LogicId } from "./logic-id";
+import { RoutineOption } from "./routine-options";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
