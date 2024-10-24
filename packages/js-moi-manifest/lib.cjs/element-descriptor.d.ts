@@ -1,12 +1,9 @@
 import type { LogicManifest } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
-<<<<<<< HEAD
 export interface EventDef {
     ptr: number;
     topics: number;
 }
-=======
->>>>>>> develop
 export interface MethodDef {
     ptr: number;
     class: string;
@@ -24,10 +21,7 @@ export declare class ElementDescriptor {
     protected callSites: Map<string, CallSite>;
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, MethodDef>;
-<<<<<<< HEAD
     protected eventsDef: Map<string, EventDef>;
-=======
->>>>>>> develop
     constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.

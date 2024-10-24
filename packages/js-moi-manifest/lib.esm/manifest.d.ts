@@ -95,7 +95,6 @@ export declare class ManifestCoder {
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
     decodeOutput<T>(field: LogicManifest.TypeField[], output: string): T | null;
-<<<<<<< HEAD
     /**
      * Decodes a log data from an event emitted in a logic.
      *
@@ -113,8 +112,6 @@ export declare class ManifestCoder {
     decodeEventOutput(event: "builtin.Log", logData: string): {
         value: string;
     } | null;
-=======
->>>>>>> develop
     /**
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.
