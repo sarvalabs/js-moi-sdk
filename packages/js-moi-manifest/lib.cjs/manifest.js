@@ -19,7 +19,7 @@ class ManifestCoder {
      * Creates an instance of ManifestCoder.
      */
     constructor(descriptorOrManifest) {
-        this.elementDescriptor = descriptorOrManifest instanceof element_descriptor_1.ElementDescriptor ? descriptorOrManifest : new element_descriptor_1.ElementDescriptor(descriptorOrManifest);
+        this.elementDescriptor = descriptorOrManifest instanceof element_descriptor_1.ElementDescriptor ? descriptorOrManifest : new element_descriptor_1.ElementDescriptor(descriptorOrManifest.elements);
     }
     get schema() {
         return new schema_1.Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());

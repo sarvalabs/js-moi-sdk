@@ -15,12 +15,11 @@ export class ElementDescriptor {
     protected methodDefs: Map<string, MethodDef> = new Map();
     protected eventsDef = new Map<string, EventDef>();
 
-    constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest) {
-        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
-        this.stateMatrix = new ContextStateMatrix(elementsArr);
+    constructor(elements: LogicManifest.Element[]) {
+        this.stateMatrix = new ContextStateMatrix(elements);
 
         // Populate the maps for elements, call sites, class and method definitions.
-        elementsArr.forEach((element) => {
+        for (const element of elements) {
             this.elements.set(element.ptr, element);
 
             switch (element.kind) {
@@ -51,7 +50,7 @@ export class ElementDescriptor {
                 default:
                     break;
             }
-        });
+        }
     }
 
     /**

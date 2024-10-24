@@ -34,7 +34,7 @@ export class ManifestCoder {
      * Creates an instance of ManifestCoder.
      */
     constructor(descriptorOrManifest: LogicManifest.Manifest | ElementDescriptor) {
-        this.elementDescriptor = descriptorOrManifest instanceof ElementDescriptor ? descriptorOrManifest : new ElementDescriptor(descriptorOrManifest);
+        this.elementDescriptor = descriptorOrManifest instanceof ElementDescriptor ? descriptorOrManifest : new ElementDescriptor(descriptorOrManifest.elements);
     }
 
     private get schema(): Schema {

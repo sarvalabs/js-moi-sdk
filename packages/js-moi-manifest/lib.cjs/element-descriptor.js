@@ -14,10 +14,9 @@ class ElementDescriptor {
     methodDefs = new Map();
     eventsDef = new Map();
     constructor(elements) {
-        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
-        this.stateMatrix = new context_state_matrix_1.ContextStateMatrix(elementsArr);
+        this.stateMatrix = new context_state_matrix_1.ContextStateMatrix(elements);
         // Populate the maps for elements, call sites, class and method definitions.
-        elementsArr.forEach((element) => {
+        for (const element of elements) {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
                 case "class":
@@ -47,7 +46,7 @@ class ElementDescriptor {
                 default:
                     break;
             }
-        });
+        }
     }
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.

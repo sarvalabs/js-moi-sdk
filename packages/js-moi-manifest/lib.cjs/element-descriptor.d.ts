@@ -10,7 +10,7 @@ export declare class ElementDescriptor {
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, MethodDef>;
     protected eventsDef: Map<string, EventDef>;
-    constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest);
+    constructor(elements: LogicManifest.Element[]);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
      *
