@@ -175,12 +175,13 @@ Methods
 .. code-block:: javascript
 
     // Example
-    const args = ["MOI", 100_000_000];
-    const calldata = manifestCoder.encodeArguments("Seeder", args);
+    const calldata = manifestCoder.encodeArguments("Seeder", "MOI", 100_000_000);
 
     console.log(calldata)
 
     >> "0x0d6f0665...d4f49"
+
+.. autofunction:: decodeArguments
 
 .. autofunction:: decodeOutput
 
