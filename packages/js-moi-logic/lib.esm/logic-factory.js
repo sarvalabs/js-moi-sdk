@@ -1,6 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
+import { RoutineOption } from "./routine-options";
 /**
  * This class represents a factory for deploying logic.
  */
@@ -76,7 +77,7 @@ export class LogicFactory extends LogicBase {
         });
         if (builder) {
             const builderRoutine = builder.data;
-            const argsLen = args.at(-1) && typeof args.at(-1) === "object" ? args.length - 1 : args.length;
+            const argsLen = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.length - 1 : args.length;
             if (builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
                 ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.MISSING_ARGUMENT);
             }
