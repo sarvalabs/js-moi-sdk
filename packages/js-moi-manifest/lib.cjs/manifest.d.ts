@@ -96,6 +96,23 @@ export declare class ManifestCoder {
      */
     decodeOutput<T>(field: LogicManifest.TypeField[], output: string): T | null;
     /**
+     * Decodes a log data from an event emitted in a logic.
+     *
+     * @param {string} event - The name of the event.
+     * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    decodeEventOutput<T>(event: string, logData: string): T | null;
+    /**
+     * Decodes a log data from an event emitted in a logic.
+     *
+     * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    decodeEventOutput(event: "builtin.Log", logData: string): {
+        value: string;
+    } | null;
+    /**
      * Decodes an exception thrown by a logic routine call.
      * The exception data is decoded using the predefined exception schema.
      * Returns the decoded exception object, or null if the error is empty.

@@ -368,6 +368,33 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
+     * Create a filter object for the logs.
+     *
+     * @param {LogFilter} filter - The log filter object.
+     * @returns {Promise<Filter>} A promise that resolves to a Filter object.
+     */
+    async getLogsFilter(filter) {
+        if (filter.topics == null) {
+            filter.topics = [];
+        }
+        const { address, height, topics } = filter;
+        if (!(0, js_moi_utils_1.isValidAddress)(address)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+        if (!Array.isArray(topics)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+        const [start, end] = height;
+        const payload = {
+            address,
+            topics: this.hashTopics(topics),
+            start_height: start,
+            end_height: end
+        };
+        const response = await this.execute("moi.NewLogFilter", payload);
+        return this.processResponse(response);
+    }
+    /**
      * Asynchronously removes the filter and returns a Promise that resolves to a
      * object.
      * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
@@ -706,6 +733,54 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         catch (error) {
             throw error;
         }
+    }
+    hashTopics(topics) {
+        const result = topics.slice();
+        for (let i = 0; i < topics.length; i++) {
+            const element = topics[i];
+            if (Array.isArray(element)) {
+                topics[i] = this.hashTopics(element);
+                continue;
+            }
+            topics[i] = (0, js_moi_utils_1.topicHash)(element);
+        }
+        return result;
+    }
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     *
+     * @param {string} address - The address for which to retrieve the tesseract logs.
+     * @param {Tuple<number>} height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param {NestedArray<string>}topics - The topics to filter the logs. (optional)
+     *
+     * @returns A Promise that resolves to an array of logs.
+     *
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    async getLogs(logFilter) {
+        if (logFilter.topics == null) {
+            logFilter.topics = [];
+        }
+        const { address, height, topics } = logFilter;
+        if (!(0, js_moi_utils_1.isValidAddress)(address)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+        if (!Array.isArray(topics)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+        const [start, end] = height;
+        const payload = {
+            address,
+            topics: this.hashTopics(topics),
+            start_height: start,
+            end_height: end
+        };
+        const response = await this.execute("moi.GetLogs", payload);
+        return this.processResponse(response).map((log) => ({
+            ...log,
+            data: "0x" + (0, js_moi_utils_1.bytesToHex)((0, js_moi_utils_1.decodeBase64)(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+        }));
     }
     /**
      * Retrieves all the interactions that are pending for inclusion in the next

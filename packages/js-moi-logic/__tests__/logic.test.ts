@@ -8,8 +8,8 @@ import { loadManifestFromFile } from "js-moi-manifest/__tests__/utils/helper";
 import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "js-moi-providers";
 import { createRoutineOption } from "../src.ts/routine-options";
 
-const HOST = "http://91.107.196.216";
-const MNEMONIC = "only possible mechanic sun senior afford ready smart exist refuse abuse denial";
+const HOST = "<PROVIDE YOUR JSON RPC HOST>";
+const MNEMONIC = "<PROVIDE YOUR MNEMONIC HERE>";
 const INITIAL_SUPPLY = 100000000;
 const SYMBOL = "MOI";
 const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";

@@ -64,12 +64,14 @@ export declare module LogicManifest {
     }
     
     export type TypeDef = string;
+
+    export type ElementKind = State | Constant | TypeDef | Routine | Class | Method | Event;
     
-    export interface Element {
+    export interface Element<TElementKind = ElementKind> {
         ptr: number;
         kind: string;
         deps?: number[] | null;
-        data: State | Constant | TypeDef | Routine | Class | Method;
+        data: TElementKind;
     }
     
     export interface Manifest {

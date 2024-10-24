@@ -1,4 +1,4 @@
-import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
+import { bytesToHex, deepCopy, DEFAULT_EVENT_SCHEMA, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
@@ -298,10 +298,50 @@ export class ManifestCoder {
         }
 
         if(output && output != "0x" && fields && fields.length) {
-            const decodedOutput = hexToBytes(output)
-            const depolorizer = new Depolorizer(decodedOutput)
             const schema = this.schema.parseFields(fields);
-            return depolorizer.depolorize(schema) as T
+            return new Depolorizer(hexToBytes(output)).depolorize(schema) as T
+        }
+
+        return null
+    }
+
+    /**
+     * Decodes a log data from an event emitted in a logic.
+     * 
+     * @param {string} event - The name of the event.
+     * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    public decodeEventOutput<T>(event: string, logData: string): T | null;
+    /**
+     * Decodes a log data from an event emitted in a logic.
+     * 
+     * @param {string} logData - The log data to decode, represented as a hexadecimal string prefixed with "0x".
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    public decodeEventOutput(event: "builtin.Log", logData: string): { value: string } | null;
+    /**
+     * Decodes a log data from an event emitted in a logic.
+     * 
+     * @param {string} event - The name of the event.
+     * @param {string} logData - The POLO encoded log data to be decoded.
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    public decodeEventOutput<T>(event: string, logData: string): T | null {
+        if (event === "builtin.Log") {
+            return new Depolorizer(hexToBytes(logData)).depolorize(DEFAULT_EVENT_SCHEMA) as T;
+        }
+
+        const element = this.elementDescriptor.getEventElement(event);
+
+        if (element == null) {
+            throw new Error(`Event ${event} not found in manifest`);
+        }
+
+        if (logData && logData !== "0x") {
+            const element = this.elementDescriptor.getEventElement(event);
+            const schema = this.schema.parseFields(element.data.fields);
+            return  new Depolorizer(hexToBytes(logData)).depolorize(schema) as T;
         }
 
         return null

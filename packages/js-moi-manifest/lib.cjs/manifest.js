@@ -185,10 +185,30 @@ class ManifestCoder {
             fields = element.returns;
         }
         if (output && output != "0x" && fields && fields.length) {
-            const decodedOutput = (0, js_moi_utils_1.hexToBytes)(output);
-            const depolorizer = new js_polo_1.Depolorizer(decodedOutput);
             const schema = this.schema.parseFields(fields);
-            return depolorizer.depolorize(schema);
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(output)).depolorize(schema);
+        }
+        return null;
+    }
+    /**
+     * Decodes a log data from an event emitted in a logic.
+     *
+     * @param {string} event - The name of the event.
+     * @param {string} logData - The POLO encoded log data to be decoded.
+     * @returns {T | null} The decoded event log data, or null if the log data is empty.
+     */
+    decodeEventOutput(event, logData) {
+        if (event === "builtin.Log") {
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(js_moi_utils_1.DEFAULT_EVENT_SCHEMA);
+        }
+        const element = this.elementDescriptor.getEventElement(event);
+        if (element == null) {
+            throw new Error(`Event ${event} not found in manifest`);
+        }
+        if (logData && logData !== "0x") {
+            const element = this.elementDescriptor.getEventElement(event);
+            const schema = this.schema.parseFields(element.data.fields);
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(schema);
         }
         return null;
     }

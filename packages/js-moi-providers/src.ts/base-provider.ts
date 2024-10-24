@@ -1,18 +1,26 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import {
     AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
-    IxType, LogicDeployReceipt, LogicInvokeReceipt, LogicEnlistReceipt, Tesseract, bytesToHex, hexDataLength, hexToBN, hexToBytes, toQuantity, unmarshal, type NumberLike
+    IxType, LogicDeployReceipt,
+    LogicEnlistReceipt,
+    LogicInvokeReceipt,
+    Tesseract, bytesToHex,
+    decodeBase64,
+    hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import { EventType, Listener } from "../types/event";
 import {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    InspectResponse,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
     RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
-    InspectResponse
+    type Log,
+    type LogFilter
 } from "../types/jsonrpc";
+import { type NestedArray } from "../types/util";
 import { AbstractProvider } from "./abstract-provider";
 import Event from "./event";
 import { processIxObject } from "./interaction";
@@ -451,6 +459,39 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
+     * Create a filter object for the logs.
+     * 
+     * @param {LogFilter} filter - The log filter object.
+     * @returns {Promise<Filter>} A promise that resolves to a Filter object.
+     */
+    async getLogsFilter(filter: LogFilter): Promise<Filter> {
+        if (filter.topics == null) {
+            filter.topics = [];
+        }
+
+        const { address, height, topics } = filter;
+        
+        if(!isValidAddress(address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+
+        if (!Array.isArray(topics)) {
+            ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+
+        const [start, end] = height;
+        const payload = {
+            address,
+            topics: this.hashTopics(topics),
+            start_height: start,
+            end_height: end
+        }
+
+        const response = await this.execute<Filter>("moi.NewLogFilter", payload);
+        return this.processResponse(response);
+    }
+
+    /**
      * Asynchronously removes the filter and returns a Promise that resolves to a
      * object.
      * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
@@ -869,6 +910,65 @@ export class BaseProvider extends AbstractProvider {
         } catch (error) {
             throw error;
         }
+    }
+
+    private hashTopics(topics: NestedArray<string>): NestedArray<string> {
+        const result : NestedArray<string> = topics.slice();
+
+        for(let i = 0; i < topics.length; i++) {
+          const element = topics[i];
+          
+          if (Array.isArray(element)) {
+            topics[i] = this.hashTopics(element);
+            continue;
+          }
+
+          topics[i] = topicHash(element);
+        }
+
+        return result;
+    }
+    
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     * 
+     * @param {string} address - The address for which to retrieve the tesseract logs.
+     * @param {Tuple<number>} height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive. 
+     * @param {NestedArray<string>}topics - The topics to filter the logs. (optional)
+     * 
+     * @returns A Promise that resolves to an array of logs.
+     * 
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    public async getLogs(logFilter: LogFilter): Promise<Log[]> {
+        if (logFilter.topics == null) {
+            logFilter.topics = [];
+        }
+
+        const { address, height, topics } = logFilter;
+        
+        if(!isValidAddress(address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        }
+
+        if (!Array.isArray(topics)) {
+            ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
+        }
+
+        const [start, end] = height;
+        const payload = {
+            address,
+            topics: this.hashTopics(topics),
+            start_height: start,
+            end_height: end
+        }
+
+        const response = await this.execute<Log[]>("moi.GetLogs", payload);
+        return this.processResponse(response).map((log) => ({
+          ...log,
+          data: "0x" + bytesToHex(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+        }));
     }
 
     /**

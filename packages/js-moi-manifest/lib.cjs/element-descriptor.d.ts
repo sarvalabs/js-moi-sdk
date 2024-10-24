@@ -1,5 +1,9 @@
 import type { LogicManifest } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
+export interface EventDef {
+    ptr: number;
+    topics: number;
+}
 export interface MethodDef {
     ptr: number;
     class: string;
@@ -17,6 +21,7 @@ export declare class ElementDescriptor {
     protected callSites: Map<string, CallSite>;
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, MethodDef>;
+    protected eventsDef: Map<string, EventDef>;
     constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
@@ -42,6 +47,7 @@ export declare class ElementDescriptor {
      * @returns {Map<string, number>} The class definitions map.
      */
     getClassDefs(): Map<string, number>;
+    getEvents(): Map<string, EventDef>;
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
@@ -82,5 +88,15 @@ export declare class ElementDescriptor {
      * @throws {Error} if the method name is invalid.
      */
     getMethodElement(methodName: string): LogicManifest.Element;
+    /**
+     * Retrieves the element from the logic manifest based on the given
+     * event name.
+     *
+     * @param {string} eventName - The name of the event.
+     * @returns {LogicManifest.Element<LogicManifest.Event>} The event element.
+     *
+     * @throws {Error} if the event name is invalid.
+     */
+    getEventElement(eventName: string): LogicManifest.Element<LogicManifest.Event>;
 }
 //# sourceMappingURL=element-descriptor.d.ts.map

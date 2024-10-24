@@ -392,6 +392,8 @@ Query Methods
 
 .. autofunction:: getAssetInfoByAssetID
 
+.. autofunction:: getLogs
+
 .. autofunction:: getInteractionReceipt
 
 .. autofunction:: getStorageAt
@@ -415,6 +417,8 @@ Query Methods
 .. autofunction:: getNewTesseractsByAccountFilter
 
 .. autofunction:: getPendingInteractionFilter
+
+.. autofunction:: getLogsFilter
 
 .. autofunction:: getFilterChanges
 

@@ -84,4 +84,32 @@ describe("Test ManifestCoder", () => {
 
         expect(output).toBe("RIO");
     });
+
+    test("Decode event log", () => {
+      const testTable = [
+        {
+          event: "builtin.Log",
+          log: "0x0d2f065576616c756506736565646564206239306633396663663334366261333236303531383636393439356635643336386138643162623830323335383466363765386135363731636633633536636520776974682031303030303030302044554d4d",
+          expected: {
+            value: expect.any(String),
+          },
+        },
+        {
+            event: "Transfer",
+            log: "0x0daf010665860185029606f506616d6f756e740364726563656976657206190f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce73656e64657206b90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce",
+            expected: {
+              amount: expect.any(Number),
+              receiver: expect.any(Uint8Array),
+              sender: expect.any(Uint8Array),
+            },
+          },
+      ];
+
+      for (const test of testTable) {
+        const decoded = manifestCoder.decodeEventOutput(test.event, test.log);
+        expect(decoded).not.toBeNull();
+        expect(decoded).toEqual(test.expected);
+      }
+    });
+    
 });

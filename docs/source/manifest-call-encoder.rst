@@ -216,6 +216,8 @@ Methods
             ],
         }
 
+.. autofunction:: decodeEventOutput
+
 .. autofunction:: decodeState
 
 .. code-block:: javascript
