@@ -79,7 +79,7 @@ export declare class ManifestCoder {
      * @param {LogicManifest.Routine} routine - The fields associated with the arguments.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      *
-     * @returns {T} The decoded arguments.
+     * @returns {T | null} The decoded arguments.
      */
     decodeArguments<T>(routine: LogicManifest.Routine, calldata: string): T;
     /**
@@ -89,7 +89,7 @@ export declare class ManifestCoder {
      * @param {string} routine - The name of the routine associated with the arguments.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      *
-     * @returns {T} The decoded arguments.
+     * @returns {T | null} The decoded arguments.
      */
     decodeArguments<T>(routine: string, calldata: string): T;
     /**
@@ -108,12 +108,11 @@ export declare class ManifestCoder {
      * The output data is decoded using the provided fields and schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
      *
-     * @param {string} output - The output data to decode, represented as a
-     hexadecimal string prefixed with "0x".
-     * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
+     * @param {LogicManifest.Routine} routine - The fields associated with the output data.
+     * @param {string} output - The output data to decode, represented as a  hexadecimal string prefixed with "0x".
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    decodeOutput<T>(field: LogicManifest.TypeField[], output: string): T | null;
+    decodeOutput<T>(routine: LogicManifest.Routine, output: string): T | null;
     /**
      * Decodes a log data from an event emitted in a logic.
      *

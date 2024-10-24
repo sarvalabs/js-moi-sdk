@@ -177,7 +177,7 @@ export class ManifestCoder {
      * @param {(LogicManifest.Routine | string)} fields - The fields associated with the arguments or the name of the routine.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      *
-     * @returns {T} The decoded arguments.
+     * @returns {T | null} The decoded arguments.
      */
     decodeArguments(routine, calldata) {
         let fields;
@@ -188,6 +188,9 @@ export class ManifestCoder {
         else {
             fields = routine.accepts;
         }
+        if (fields && fields.length === 0) {
+            return null;
+        }
         const schema = this.schema.parseFields(fields ?? []);
         const decodedCalldata = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
         return fields.map((field) => decodedCalldata[field.label]);
@@ -197,14 +200,18 @@ export class ManifestCoder {
      * The output data is decoded using the provided fields and schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
      *
+     * @param {string} routineOrCallsite - The name of the routine associated with the output data.
      * @param {string} output - The output data to decode, represented as a hexadecimal string prefixed with "0x".
-     * @param {string} fields - The name of the routine associated with the output data.
      * @returns {T | null} The decoded output data, or null if the output is empty.
      */
-    decodeOutput(fields, output) {
-        if (typeof fields === "string") {
-            const element = this.elementDescriptor.getRoutineElement(fields).data;
+    decodeOutput(routineOrCallsite, output) {
+        let fields;
+        if (typeof routineOrCallsite === "string") {
+            const element = this.elementDescriptor.getRoutineElement(routineOrCallsite).data;
             fields = element.returns;
+        }
+        else {
+            fields = routineOrCallsite.returns;
         }
         if (output && output != "0x" && fields && fields.length) {
             const schema = this.schema.parseFields(fields);

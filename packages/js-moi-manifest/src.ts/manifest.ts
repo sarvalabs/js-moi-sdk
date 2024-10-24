@@ -269,7 +269,7 @@ export class ManifestCoder {
      * @param {LogicManifest.Routine} routine - The fields associated with the arguments.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      * 
-     * @returns {T} The decoded arguments.
+     * @returns {T | null} The decoded arguments.
      */
     public decodeArguments<T>(routine: LogicManifest.Routine, calldata: string): T;
     /**
@@ -279,7 +279,7 @@ export class ManifestCoder {
      * @param {string} routine - The name of the routine associated with the arguments.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      * 
-     * @returns {T} The decoded arguments.
+     * @returns {T | null} The decoded arguments.
      */
     public decodeArguments<T>(routine: string, calldata: string): T;
     /**
@@ -289,9 +289,9 @@ export class ManifestCoder {
      * @param {(LogicManifest.Routine | string)} fields - The fields associated with the arguments or the name of the routine.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      * 
-     * @returns {T} The decoded arguments.
+     * @returns {T | null} The decoded arguments.
      */
-    public decodeArguments<T>(routine: LogicManifest.Routine | string, calldata: string): T {
+    public decodeArguments<T>(routine: LogicManifest.Routine | string, calldata: string): T | null {
         let fields: LogicManifest.TypeField[];
 
         if (typeof routine === "string") {
@@ -299,6 +299,10 @@ export class ManifestCoder {
             fields = element.accepts
         } else {
             fields = routine.accepts
+        }
+
+        if (fields && fields.length === 0) {
+            return null
         }
 
         const schema = this.schema.parseFields(fields ?? []);
@@ -322,25 +326,28 @@ export class ManifestCoder {
      * The output data is decoded using the provided fields and schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
      *
-     * @param {string} output - The output data to decode, represented as a 
-     hexadecimal string prefixed with "0x".
-     * @param {LogicManifest.TypeField[]} fields - The fields associated with the output data.
+     * @param {LogicManifest.Routine} routine - The fields associated with the output data.
+     * @param {string} output - The output data to decode, represented as a  hexadecimal string prefixed with "0x".
      * @returns {unknown | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput<T>(field: LogicManifest.TypeField[], output: string): T | null;
+    public decodeOutput<T>(routine: LogicManifest.Routine, output: string): T | null;
     /**
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the provided fields and schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
      * 
+     * @param {string} routineOrCallsite - The name of the routine associated with the output data.
      * @param {string} output - The output data to decode, represented as a hexadecimal string prefixed with "0x".
-     * @param {string} fields - The name of the routine associated with the output data.
      * @returns {T | null} The decoded output data, or null if the output is empty.
      */
-    public decodeOutput<T>(fields: LogicManifest.TypeField[] | string, output: string): T | null {
-        if (typeof fields === "string") {
-            const element  = this.elementDescriptor.getRoutineElement(fields).data as LogicManifest.Routine
+    public decodeOutput<T>(routineOrCallsite: LogicManifest.Routine | string, output: string): T | null {
+        let fields: LogicManifest.TypeField[];
+        
+        if (typeof routineOrCallsite === "string") {
+            const element  = this.elementDescriptor.getRoutineElement(routineOrCallsite).data as LogicManifest.Routine
             fields = element.returns
+        } else {
+            fields = routineOrCallsite.returns
         }
 
         if(output && output != "0x" && fields && fields.length) {

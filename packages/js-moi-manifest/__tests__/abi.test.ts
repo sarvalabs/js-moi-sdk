@@ -80,8 +80,7 @@ describe("Test ManifestCoder", () => {
                 return element.data.name === callsite;
             });
             const routine = routineElement?.data as LogicManifest.Routine;
-            const fields = routine.returns ? routine.returns : [];
-            const decodedOutput = manifestCoder.decodeOutput(fields, output);
+            const decodedOutput = manifestCoder.decodeOutput(routine, output);
 
             expect(decodedOutput).toEqual({ balance: expect.any(Number) });
         });
