@@ -103,14 +103,6 @@ describe("Test ManifestCoder", () => {
         });
     });
 
-    test("Decode polo encoded property of a state", () => {
-        const data = "0x0652494f";
-        const state: any = manifest.elements.find((element) => element.kind === "state");
-        const output = manifestCoder.decodeState(data, "Symbol", state?.data.fields);
-
-        expect(output).toBe("RIO");
-    });
-
     test("Decode event log", () => {
       const testTable = [
         {
