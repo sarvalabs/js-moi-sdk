@@ -94,7 +94,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ...ixObject.arguments);
+            const calldata = this.manifestCoder.encodeArguments(ixObject.routine, ...ixObject.arguments);
             payload.calldata = (0, js_moi_utils_1.hexToBytes)(calldata);
         }
         return payload;

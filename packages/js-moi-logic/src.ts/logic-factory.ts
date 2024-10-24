@@ -32,10 +32,7 @@ export class LogicFactory extends LogicBase {
         } as LogicPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(
-                ixObject.routine.accepts, 
-                ...ixObject.arguments
-            );
+            const calldata = this.manifestCoder.encodeArguments(ixObject.routine, ...ixObject.arguments);
             payload.calldata = hexToBytes(calldata);
         }
 
