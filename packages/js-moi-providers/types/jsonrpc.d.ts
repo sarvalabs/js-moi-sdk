@@ -9,6 +9,7 @@ import {
   Participants,
   type Tesseract
 } from "js-moi-utils";
+import type { WebSocketEvent } from "../src.ts/websocket-events";
 import type { NestedArray } from "./util";
 
 export interface Options {
@@ -356,21 +357,21 @@ export interface LogFilter {
     topics?: NestedArray<string>;
 }
 export type NewTesseractsByAccount = {
-    event: "newTesseractsByAccount";
+    event: WebSocketEvent.NewTesseractsByAccount;
     params: { address: string };
 };
 
-export type NewLogs = { event: "newLogs"; params: LogFilter };
+export type NewLogs = { event: WebSocketEvent.NewLog; params: LogFilter };
 
 export type ProviderEvents =
     | keyof WebsocketEventMap
     | { event: string; params: any };
 
 export interface WebsocketEventMap {
-    newTesseracts: [tesseract: Tesseract];
-    newPendingInteractions: [interactionHash: string];
-    connect: [];
-    error: [error: unknown];
-    close: [];
-    reconnect: [attempt: number];
+    [WebSocketEvent.NewTesseracts]: [tesseract: Tesseract];
+    [WebSocketEvent.NewPendingInteractions]: [interactionHash: string];
+    [WebSocketEvent.Connect]: [];
+    [WebSocketEvent.Error]: [error: unknown];
+    [WebSocketEvent.Close]: [];
+    [WebSocketEvent.Reconnect]: [attempt: number];
 }

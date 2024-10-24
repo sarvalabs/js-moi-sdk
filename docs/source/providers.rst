@@ -551,18 +551,18 @@ WebSocket Events
 The event's listed below are related to the WebSocketProvider itself and 
 its connection status and operation. These are not specific to blockchain data.
 
-``connect`` - This event is triggered when the WebSocketProvider successfully 
+``WebSocketEvent.Connect`` - This event is triggered when the WebSocketProvider successfully 
 establishes a connection with the MOI node. It indicates that the WebSocket 
 connection has been established and is ready for sending and receiving data.
 
-``reconnect`` - This event occurs when the WebSocketProvider attempts to 
+``WebSocketEvent.Reconnect`` - This event occurs when the WebSocketProvider attempts to 
 reconnect to the MOI node after a disconnection.
 
-``close`` - This event is emitted when the WebSocket connection is closed 
+``WebSocketEvent.Close`` - This event is emitted when the WebSocket connection is closed 
 intentionally or due to an error. It provides information about the reason for 
 the closure, such as a manual disconnection or a network failure.
 
-``error`` - This event is emitted when an error occurs during the 
+``WebSocketEvent.Error`` - This event is emitted when an error occurs during the 
 WebSocketProvider's operation. It indicates that something unexpected or 
 erroneous has happened, such as a network error, an invalid response from the 
 MOI node, or any other unforeseen issue.
@@ -571,18 +571,18 @@ Protocol Events
 ~~~~~~~~~~~~~~~
 The event's listed below are specific to blockchain data.
 
-``newTesseracts`` - This event is triggered when a new tesseract is mined on 
+``WebSocketEvent.NewTesseracts`` - This event is triggered when a new tesseract is mined on 
 the blockchain. It provides information about the tesseract, such as its 
 height, hash, timestamp, and other relevant data.
 
-``newTesseractsByAccount`` - This event is triggered when a new tesseract belonging to 
+``WebSocketEvent.NewTesseractsByAccount`` - This event is triggered when a new tesseract belonging to 
 the given address is mined on the blockchain. It provides information about the 
 tesseract. The address parameter can be passed as show in the example below.
 
-``newPendingInteractions`` - This event is emitted when a new interaction is added to
+``WebSocketEvent.NewPendingInteractions`` - This event is emitted when a new interaction is added to
 interaction pool. It provides an interaction hash.
 
-``newLogs`` - This event is triggered when new logs are added for a given address and topics.
+``WebSocketEvent.NewLogs`` - This event is triggered when new logs are added for a given address and topics.
 
 Usage
 ~~~~~
@@ -597,17 +597,17 @@ Subscribing to all tesseracts
         console.log("New tesseract finalized", tesseract);
     };
 
-    provider.on("newTesseracts", handleTesseracts);
+    provider.on(WebSocketEvent.NewTesseracts, handleTesseracts);
 
-    provider.on("error", (err) => {
+    provider.on(WebSocketEvent.Error, (err) => {
         console.log("WebSocket connection error:", err);
     });
 
-    provider.on("close", (info) => {
+    provider.on(WebSocketEvent.Close, (info) => {
         console.log("WebSocket connection closed: ", info);
 
         // Remove "tesseracts" event listener
-        provider.off("newTesseracts", handleTesseracts);
+        provider.off(WebSocketEvent.NewTesseracts, handleTesseracts);
     });
 
 Subscribing to tesseracts by address
@@ -617,7 +617,7 @@ Subscribing to tesseracts by address
     // Example
     const ws = new WebsocketProvider("wss://localhost:8080");
 
-    ws.on({ event: "newTesseractsByAccount", params: { address: "0x...abc" } }, (tesseract) => {
+    ws.on({ event: WebSocketEvent.NewTesseractsByAccount, params: { address: "0x...abc" } }, (tesseract) => {
         console.log(tesseract);
     });
 
@@ -626,7 +626,16 @@ Subscribing to new logs
 
 .. code-block:: javascript
 
-    provider.on({ event: "newLogs", params: { address: "0x..abc", height: [-1, -1], topics: [] } }, (log) => {
+    provider.on({ event: WebSocketEvent.NewLog, params: { address: "0x..abc", height: [-1, -1], topics: [] } }, (log) => {
+        console.log("New log", log);
+    });
+
+Subscribing to pending interactions
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    provider.on(WebSocketEvent.NewPendingInteractions, (log) => {
         console.log("New log", log);
     });
 

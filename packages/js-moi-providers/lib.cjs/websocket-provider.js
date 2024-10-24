@@ -5,6 +5,7 @@ const crypto_1 = require("crypto");
 const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
+const websocket_events_1 = require("./websocket-events");
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
 class WebsocketProvider extends base_provider_1.BaseProvider {
     ws;
@@ -69,14 +70,14 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         }
         if (this.ws.readyState === this.ws.CLOSING) {
             return new Promise((resolve) => {
-                this.once('close', () => {
+                this.once(websocket_events_1.WebSocketEvent.Close, () => {
                     resolve();
                 });
             });
         }
         if (this.ws.readyState === this.ws.CONNECTING) {
             return new Promise((resolve) => {
-                this.once('connect', () => {
+                this.once(websocket_events_1.WebSocketEvent.Connect, () => {
                     this.ws.close(1000);
                     resolve();
                 });
@@ -106,7 +107,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     execute(method, params) {
         if (this.ws.readyState !== this.ws.OPEN) {
             return new Promise((resolve) => {
-                this.once('connect', async () => {
+                this.once(websocket_events_1.WebSocketEvent.Connect, async () => {
                     resolve(await this.handleRpcRequest(method, params));
                 });
             });
