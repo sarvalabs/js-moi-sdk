@@ -1,20 +1,19 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const js_moi_utils_1 = require("js-moi-utils");
-const state_1 = require("./state");
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ContextStateMatrix } from "./context-state-matrix";
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-class ElementDescriptor {
+export class ElementDescriptor {
     stateMatrix;
     elements = new Map();
     callSites = new Map();
     classDefs = new Map();
     methodDefs = new Map();
     constructor(elements) {
-        this.stateMatrix = new state_1.ContextStateMatrix(elements);
+        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
+        this.stateMatrix = new ContextStateMatrix(elementsArr);
         // Populate the maps for elements, call sites, class and method definitions.
-        elements.forEach((element) => {
+        elementsArr.forEach((element) => {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
                 case "class":
@@ -92,7 +91,7 @@ class ElementDescriptor {
     getClassMethods(className) {
         const classPtr = this.classDefs.get(className);
         if (classPtr === undefined) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid class name: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
         const classMethods = new Map();
         this.methodDefs.forEach((method, methodName) => {
@@ -114,7 +113,7 @@ class ElementDescriptor {
     getRoutineElement(routineName) {
         const callsite = this.callSites.get(routineName);
         if (!callsite) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${routineName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(`Invalid routine name: ${routineName}`, ErrorCode.INVALID_ARGUMENT);
         }
         return this.elements.get(callsite.ptr);
     }
@@ -128,7 +127,7 @@ class ElementDescriptor {
     getClassElement(className) {
         const ptr = this.classDefs.get(className);
         if (ptr === undefined) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(`Invalid routine name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
         return this.elements.get(ptr);
     }
@@ -143,10 +142,9 @@ class ElementDescriptor {
     getMethodElement(methodName) {
         const methodDef = this.methodDefs.get(methodName);
         if (!methodDef) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${methodName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(`Invalid routine name: ${methodName}`, ErrorCode.INVALID_ARGUMENT);
         }
         return this.elements.get(methodDef.ptr);
     }
 }
-exports.default = ElementDescriptor;
 //# sourceMappingURL=element-descriptor.js.map

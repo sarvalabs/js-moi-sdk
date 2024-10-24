@@ -1,16 +1,23 @@
-import { LogicManifest } from "js-moi-manifest";
-import { CallSite, MethodDef } from "../types/logic";
-import { ContextStateMatrix } from "./state";
+import type { LogicManifest } from "../types/manifest";
+import { ContextStateMatrix } from "./context-state-matrix";
+export interface MethodDef {
+    ptr: number;
+    class: string;
+}
+export interface CallSite {
+    ptr: number;
+    kind: string;
+}
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
-export default class ElementDescriptor {
+export declare class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element>;
     protected callSites: Map<string, CallSite>;
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, MethodDef>;
-    constructor(elements: LogicManifest.Element[]);
+    constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
      *

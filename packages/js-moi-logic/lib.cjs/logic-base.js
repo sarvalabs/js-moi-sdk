@@ -1,13 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
-const element_descriptor_1 = __importDefault(require("./element-descriptor"));
 const logic_id_1 = require("./logic-id");
 const routine_options_1 = require("./routine-options");
 /**
@@ -19,13 +15,13 @@ const DEFAULT_FUEL_PRICE = 1;
  * class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
  */
-class LogicBase extends element_descriptor_1.default {
+class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     signer;
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(this.elements, this.classDefs);
+        super(manifest);
+        this.manifestCoder = new js_moi_manifest_1.ManifestCoder(manifest);
         this.connect(arg);
     }
     /**
@@ -145,10 +141,7 @@ class LogicBase extends element_descriptor_1.default {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const error = "error" in ix.receipt.extra_data &&
-                ix.receipt.extra_data.error != "0x"
-                ? js_moi_manifest_1.ManifestCoder.decodeException(ix.receipt.extra_data.error)
-                : null;
+            const error = "error" in ix.receipt.extra_data ? js_moi_manifest_1.ManifestCoder.decodeException(ix.receipt.extra_data.error) : null;
             if (error != null) {
                 js_moi_utils_1.ErrorUtils.throwError(error.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, { cause: error });
             }

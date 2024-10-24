@@ -1,7 +1,6 @@
-import { ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
-import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**
@@ -18,8 +17,8 @@ export class LogicBase extends ElementDescriptor {
     provider;
     manifestCoder;
     constructor(manifest, arg) {
-        super(manifest.elements);
-        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs);
+        super(manifest);
+        this.manifestCoder = new ManifestCoder(manifest);
         this.connect(arg);
     }
     /**
@@ -139,10 +138,7 @@ export class LogicBase extends ElementDescriptor {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            const error = "error" in ix.receipt.extra_data &&
-                ix.receipt.extra_data.error != "0x"
-                ? ManifestCoder.decodeException(ix.receipt.extra_data.error)
-                : null;
+            const error = "error" in ix.receipt.extra_data ? ManifestCoder.decodeException(ix.receipt.extra_data.error) : null;
             if (error != null) {
                 ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
             }
