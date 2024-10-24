@@ -5,6 +5,10 @@ import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**
+ * The default fuel price used for logic interactions.
+ */
+const DEFAULT_FUEL_PRICE = 1;
+/**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
  * It defines common properties and abstract methods that subclasses should implement.
@@ -169,6 +173,7 @@ export class LogicBase extends ElementDescriptor {
         };
         ixObject.send = async () => {
             option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

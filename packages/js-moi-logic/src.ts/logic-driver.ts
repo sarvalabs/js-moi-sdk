@@ -60,7 +60,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 return;
             }
 
-            routines[routine.name] = async (...params: [...args: any[], options: RoutineOption]) => {
+            routines[routine.name] = async (...params: [...args: any[], options: RoutineOption | undefined]) => {
                 const argsLen =
                     params.at(-1) && params.at(-1) instanceof RoutineOption
                         ? params.length - 1
