@@ -174,17 +174,21 @@ export class ManifestCoder {
      * Decodes the arguments passed to a logic routine call.
      * The arguments are decoded using the provided fields and schema.
      *
-     * @param {(LogicManifest.TypeField[] | string)} fields - The fields associated with the arguments or the name of the routine.
+     * @param {(LogicManifest.Routine | string)} fields - The fields associated with the arguments or the name of the routine.
      * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
      *
      * @returns {T} The decoded arguments.
      */
-    decodeArguments(fields, calldata) {
-        if (typeof fields === "string") {
-            const element = this.elementDescriptor.getRoutineElement(fields).data;
+    decodeArguments(routine, calldata) {
+        let fields;
+        if (typeof routine === "string") {
+            const element = this.elementDescriptor.getRoutineElement(routine).data;
             fields = element.accepts;
         }
-        const schema = this.schema.parseFields(fields);
+        else {
+            fields = routine.accepts;
+        }
+        const schema = this.schema.parseFields(fields ?? []);
         const decodedCalldata = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
         return fields.map((field) => decodedCalldata[field.label]);
     }

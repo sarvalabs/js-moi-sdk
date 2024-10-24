@@ -54,9 +54,8 @@ describe("Test ManifestCoder", () => {
             });
             const calldata = "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49"
             const routine = routineElement?.data as LogicManifest.Routine;
-            const fields = routine.accepts ? routine.accepts : [];
             const args = ["MOI", 100000000];
-            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>(fields, calldata);
+            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>(routine, calldata);
 
             for (let i = 0; i < args.length; i++) {
                 expect(decoded[i]).toEqual(args[i]);
