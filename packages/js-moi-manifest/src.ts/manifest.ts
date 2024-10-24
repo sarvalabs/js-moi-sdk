@@ -219,7 +219,7 @@ export class ManifestCoder {
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string prefixed with "0x".
      */
-    public encodeArguments(fields: LogicManifest.TypeField[], args: any[]): string;
+    public encodeArguments(fields: LogicManifest.TypeField[], ...args: any[]): string;
     /**
      * Encodes the provided arguments based on the given manifest routine
      * parameters and its types (the accepts property in routine).
@@ -232,7 +232,7 @@ export class ManifestCoder {
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string prefixed with "0x".
      */
-    public encodeArguments(fields: string, args: any[]): string;
+    public encodeArguments(fields: string, ...args: any[]): string;
     /**
      * Encodes the provided arguments based on the given manifest routine
      * parameters and its types (the accepts property in routine).
@@ -245,7 +245,7 @@ export class ManifestCoder {
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string prefixed with "0x".
      */
-    public encodeArguments(fields: LogicManifest.TypeField[] | string, args: any[]): string {
+    public encodeArguments(fields: LogicManifest.TypeField[] | string, ...args: any[]): string {
         if (typeof fields === "string") {
             const element  = this.elementDescriptor.getRoutineElement(fields).data as LogicManifest.Routine
             fields = element.accepts

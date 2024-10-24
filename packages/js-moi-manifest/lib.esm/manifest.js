@@ -155,7 +155,7 @@ export class ManifestCoder {
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string prefixed with "0x".
      */
-    encodeArguments(fields, args) {
+    encodeArguments(fields, ...args) {
         if (typeof fields === "string") {
             const element = this.elementDescriptor.getRoutineElement(fields).data;
             fields = element.accepts;

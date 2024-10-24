@@ -19,8 +19,7 @@ describe("Test ManifestCoder", () => {
 
     describe("Encode arguments into polo format", () => {
         test("When the field is passed as a routine name", () => {
-            const args = ["MOI", 100_000_000];
-            const calldata = manifestCoder.encodeArguments("Seed", args);
+            const calldata = manifestCoder.encodeArguments("Seed", "MOI", 100_000_000);
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
         });
@@ -32,8 +31,7 @@ describe("Test ManifestCoder", () => {
             });
             const routine = routineElement?.data as LogicManifest.Routine;
             const fields = routine.accepts ? routine.accepts : [];
-            const args = ["MOI", 100000000];
-            const calldata = manifestCoder.encodeArguments(fields, args);
+            const calldata = manifestCoder.encodeArguments(fields, "MOI", 100_000_000);
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
         });

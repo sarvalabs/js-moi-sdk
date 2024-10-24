@@ -59,7 +59,7 @@ export declare class ManifestCoder {
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string prefixed with "0x".
      */
-    encodeArguments(fields: LogicManifest.TypeField[], args: any[]): string;
+    encodeArguments(fields: LogicManifest.TypeField[], ...args: any[]): string;
     /**
      * Encodes the provided arguments based on the given manifest routine
      * parameters and its types (the accepts property in routine).
@@ -72,7 +72,7 @@ export declare class ManifestCoder {
      * @param {any[]} args - The arguments to encode.
      * @returns {string} The POLO-encoded calldata as a hexadecimal string prefixed with "0x".
      */
-    encodeArguments(fields: string, args: any[]): string;
+    encodeArguments(fields: string, ...args: any[]): string;
     /**
      * Decodes the arguments passed to a logic routine call.
      * The arguments are decoded using the provided fields and schema.

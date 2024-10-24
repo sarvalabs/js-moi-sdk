@@ -124,7 +124,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
         Object.keys(ixObject.routine.accepts).length > 0) {
             const calldata = this.manifestCoder.encodeArguments(
                 ixObject.routine.accepts, 
-                ixObject.arguments
+                ...ixObject.arguments
             );
             payload.calldata = hexToBytes(calldata);
         }
