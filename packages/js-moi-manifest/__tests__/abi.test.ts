@@ -40,6 +40,34 @@ describe("Test ManifestCoder", () => {
     });
 
     describe("Decode polo encoded arguments", () => {
+        test("When the field is passed as a routine name", () => {
+            const calldata = "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49";
+            const args = ["MOI", 100_000_000];
+            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>("Seed", calldata);
+
+            for (let i = 0; i < args.length; i++) {
+                expect(decoded[i]).toEqual(args[i]);
+            }
+        });
+
+        test("When the field is passed as a routine schema", () => {
+            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
+                element.data = element.data as LogicManifest.Routine;
+                return element.data.name === "Seed";
+            });
+            const calldata = "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49"
+            const routine = routineElement?.data as LogicManifest.Routine;
+            const fields = routine.accepts ? routine.accepts : [];
+            const args = ["MOI", 100000000];
+            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>(fields, calldata);
+
+            for (let i = 0; i < args.length; i++) {
+                expect(decoded[i]).toEqual(args[i]);
+            }
+        });
+    });
+
+    describe("Decode polo encoded arguments", () => {
         const calldata = "0x0e1f0305f5e100";
         const callsite = "BalanceOf";
 

@@ -74,6 +74,26 @@ export declare class ManifestCoder {
      */
     encodeArguments(fields: string, args: any[]): string;
     /**
+     * Decodes the arguments passed to a logic routine call.
+     * The arguments are decoded using the provided fields and schema.
+     *
+     * @param {LogicManifest.TypeField[]} fields - The fields associated with the arguments.
+     * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
+     *
+     * @returns {T} The decoded arguments.
+     */
+    decodeArguments<T>(fields: LogicManifest.TypeField[], calldata: string): T;
+    /**
+     * Decodes the arguments passed to a logic routine call.
+     * The arguments are decoded using the provided fields and schema.
+     *
+     * @param {string} fields - The name of the routine associated with the arguments.
+     * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
+     *
+     * @returns {T} The decoded arguments.
+     */
+    decodeArguments<T>(fields: string, calldata: string): T;
+    /**
      * Decodes the output data returned from a logic routine call.
      * The output data is decoded using the predefined schema.
      * Returns the decoded output data as an unknown type, or null if the output is empty.
