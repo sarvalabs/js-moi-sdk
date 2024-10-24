@@ -91,7 +91,7 @@ export class Signer {
                 ErrorUtils.throwError(`Invalid fuel limit. Expected number or bigint, got ${typeof ixObject.fuel_limit}`, ErrorCode.INVALID_ARGUMENT);
             }
             if (ixObject.fuel_price < 0) {
-                ErrorUtils.throwError("Fuel price cannot be negative", ErrorCode.INVALID_ARGUMENT);
+                ErrorUtils.throwError("Fuel price cannot be negative", ErrorCode.INTERACTION_UNDERPRICED);
             }
             if (ixObject.fuel_limit <= 0) {
                 ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);

@@ -97,7 +97,7 @@ class Signer {
                 js_moi_utils_1.ErrorUtils.throwError(`Invalid fuel limit. Expected number or bigint, got ${typeof ixObject.fuel_limit}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             if (ixObject.fuel_price < 0) {
-                js_moi_utils_1.ErrorUtils.throwError("Fuel price cannot be negative", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+                js_moi_utils_1.ErrorUtils.throwError("Fuel price cannot be negative", js_moi_utils_1.ErrorCode.INTERACTION_UNDERPRICED);
             }
             if (ixObject.fuel_limit <= 0) {
                 js_moi_utils_1.ErrorUtils.throwError("Fuel limit must be greater than 0", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);

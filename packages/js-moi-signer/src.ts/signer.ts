@@ -122,7 +122,7 @@ export abstract class Signer {
             }
 
             if(ixObject.fuel_price < 0) {
-                ErrorUtils.throwError("Fuel price cannot be negative", ErrorCode.INVALID_ARGUMENT);
+                ErrorUtils.throwError("Fuel price cannot be negative", ErrorCode.INTERACTION_UNDERPRICED);
             }
 
             if (ixObject.fuel_limit <= 0) {
