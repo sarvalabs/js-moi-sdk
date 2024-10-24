@@ -52,7 +52,7 @@ export class Schema {
                         kind: "string",
                     },
                 },
-            },
+            }
         },
     };
 

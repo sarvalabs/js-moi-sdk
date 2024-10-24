@@ -55,7 +55,7 @@ export declare const assetCreateSchema: {
         };
     };
 };
-export declare const DEFAULT_EVENT_SCHEMA: {
+export declare const builtInLogEventSchema: {
     kind: string;
     fields: {
         value: {

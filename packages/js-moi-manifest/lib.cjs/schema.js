@@ -48,7 +48,7 @@ class Schema {
                         kind: "string",
                     },
                 },
-            },
+            }
         },
     };
     static PISA_DEPS_SCHEMA = {

@@ -28,7 +28,7 @@ class LogicFactory extends logic_base_1.LogicBase {
             callsite: ixObject.routine.name
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            const calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
             payload.calldata = (0, js_moi_utils_1.hexToBytes)(calldata);
         }
         return payload;
