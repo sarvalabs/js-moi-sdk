@@ -330,6 +330,7 @@ Functions
     Developers should ensure they should pass signer instance while
     doing mutating routine calls to avoid encountering this exception.
 
+.. autofunction:: createRoutineOption
 
 Usage
 ~~~~~
@@ -412,10 +413,11 @@ the last argument in the deploy call.
     const logic = await getLogicDriver(logicId, wallet);
 
     // Execute a mutating routine call
-    const option = {
+    const option = createRoutineOption({
         fuelPrice: 1,
         fuelLimit: 6420,
-    }
+    });
+    
     const ix = await logic.routines.Transfer(address, 1000, option);
     console.log(ix.hash); //  0x010000423d3233...
 
