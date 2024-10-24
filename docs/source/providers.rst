@@ -610,6 +610,19 @@ Subscribing to all tesseracts
         provider.off("newTesseracts", handleTesseracts);
     });
 
+Subscribing to tesseracts by address
+
+.. code-block:: javascript
+
+    // Example
+    const ws = new WebsocketProvider("wss://localhost:8080");
+
+    ws.on({ event: "newTesseractsByAccount", params: "0x...abc" }, (tesseract) => {
+        console.log(tesseract);
+    });
+
+    provider.on("newTesseractsByAccount", address, handleTesseractsByAccount);
+
 Subscribing to new logs
 ^^^^^^^^^^^^^^^^^^^^^^^
 
