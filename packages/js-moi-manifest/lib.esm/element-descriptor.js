@@ -9,7 +9,7 @@ export class ElementDescriptor {
     callSites = new Map();
     classDefs = new Map();
     methodDefs = new Map();
-    eventsDef = new Map();
+    eventsDefs = new Map();
     constructor(elements) {
         this.stateMatrix = new ContextStateMatrix(elements);
         // Populate the maps for elements, call sites, class and method definitions.
@@ -38,7 +38,7 @@ export class ElementDescriptor {
                     break;
                 case "event":
                     const eventData = element.data;
-                    this.eventsDef.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
+                    this.eventsDefs.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
                     break;
                 default:
                     break;
@@ -78,7 +78,7 @@ export class ElementDescriptor {
         return this.classDefs;
     }
     getEvents() {
-        return this.eventsDef;
+        return this.eventsDefs;
     }
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
@@ -163,7 +163,7 @@ export class ElementDescriptor {
      * @throws {Error} if the event name is invalid.
      */
     getEventElement(eventName) {
-        const eventDef = this.eventsDef.get(eventName);
+        const eventDef = this.eventsDefs.get(eventName);
         if (!eventDef) {
             return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);
         }

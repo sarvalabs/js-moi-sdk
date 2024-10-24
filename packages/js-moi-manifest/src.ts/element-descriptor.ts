@@ -13,7 +13,7 @@ export class ElementDescriptor {
     protected callSites: Map<string, CallSite> = new Map();
     protected classDefs: Map<string, number> = new Map();
     protected methodDefs: Map<string, MethodDef> = new Map();
-    protected eventsDef = new Map<string, EventDef>();
+    protected eventsDefs = new Map<string, EventDef>();
 
     constructor(elements: LogicManifest.Element[]) {
         this.stateMatrix = new ContextStateMatrix(elements);
@@ -45,7 +45,7 @@ export class ElementDescriptor {
                     break;
                 case "event":
                     const eventData = element.data as LogicManifest.Event;
-                    this.eventsDef.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
+                    this.eventsDefs.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
                     break;
                 default:
                     break;
@@ -90,7 +90,7 @@ export class ElementDescriptor {
     }
 
     public getEvents(): Map<string, EventDef> {
-        return this.eventsDef;
+        return this.eventsDefs;
     }
 
     /**
@@ -190,7 +190,7 @@ export class ElementDescriptor {
      * @throws {Error} if the event name is invalid.
      */
     public getEventElement(eventName: string) {
-        const eventDef = this.eventsDef.get(eventName);
+        const eventDef = this.eventsDefs.get(eventName);
 
         if (!eventDef) {
             return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);
