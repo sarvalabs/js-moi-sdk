@@ -599,11 +599,11 @@ Subscribing to all tesseracts
 
     provider.on("newTesseracts", handleTesseracts);
 
-    provider.on(WebSocketEvents.ERROR, (err) => {
+    provider.on("error", (err) => {
         console.log("WebSocket connection error:", err);
     });
 
-    provider.on(WebSocketEvents.CLOSE, (info) => {
+    provider.on("close", (info) => {
         console.log("WebSocket connection closed: ", info);
 
         // Remove "tesseracts" event listener
