@@ -9,19 +9,21 @@ import {
     encodeToString,
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
-import {
+import type {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
     InspectResponse,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
-    InteractionRequest, InteractionResponse, LogicManifestParams, NodeInfo, Options, Registry,
-    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse,
-    type Log,
-    type LogFilter
+    InteractionRequest, InteractionResponse,
+    Log, LogFilter,
+    LogicManifestParams, NodeInfo, Options,
+    ProviderEvents,
+    Registry,
+    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
-import { AbstractProvider, type ProviderEvents } from "./abstract-provider";
+import { AbstractProvider } from "./abstract-provider";
 import { processIxObject } from "./interaction";
 
 // Default timeout value in seconds

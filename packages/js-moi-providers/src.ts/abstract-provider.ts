@@ -2,44 +2,32 @@ import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
 import {
-    AccountMetaInfo,
-    AccountState,
-    AssetInfo,
-    CallorEstimateIxObject,
-    CallorEstimateOptions,
-    Content,
-    ContentFrom,
-    ContextInfo,
-    Encoding,
-    Filter, FilterDeletionResult,
-    Inspect,
-    InteractionCallResponse,
-    InteractionReceipt,
-    InteractionRequest, InteractionResponse,
-    NodeInfo,
-    Options,
-    Registry,
-    Status,
-    SyncStatus,
-    TDU,
-    type Log,
-    type LogFilter
+  AccountMetaInfo,
+  AccountState,
+  AssetInfo,
+  CallorEstimateIxObject,
+  CallorEstimateOptions,
+  Content,
+  ContentFrom,
+  ContextInfo,
+  Encoding,
+  Filter, FilterDeletionResult,
+  Inspect,
+  InteractionCallResponse,
+  InteractionReceipt,
+  InteractionRequest, InteractionResponse,
+  NodeInfo,
+  Options,
+  Registry,
+  Status,
+  SyncStatus,
+  TDU,
+  type Log,
+  type LogFilter,
+  type ProviderEvents
 } from "../types/jsonrpc";
 
-export type NewTesseractsByAccount = { event: "newTesseractsByAccount", params: string };
 
-export type NewLogs = { event: "newLogs", params: LogFilter };
-
-export type ProviderEvents = keyof WebsocketEventMap | { event: string, params: any };
-
-export interface WebsocketEventMap {
-    newTesseracts: [tesseract: Tesseract];
-    newPendingInteractions: [interactionHash: string];
-    connect: [];
-    error: [error: unknown];
-    close: [];
-    reconnect: [attempt: number];
-}
 
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.

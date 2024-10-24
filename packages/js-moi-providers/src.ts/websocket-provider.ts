@@ -1,8 +1,7 @@
 import { randomUUID } from "crypto";
 import { ErrorCode, ErrorUtils, type Tesseract } from "js-moi-utils";
 import { w3cwebsocket as Websocket, type ICloseEvent } from "websocket";
-import type { Log, RpcResponse } from "../types/jsonrpc";
-import type { NewLogs, NewTesseractsByAccount, ProviderEvents, WebsocketEventMap } from "./abstract-provider";
+import type { Log, NewLogs, NewTesseractsByAccount, ProviderEvents, RpcResponse, WebsocketEventMap } from "../types/jsonrpc";
 import { BaseProvider } from "./base-provider";
 
 type TypeOfWebsocketConst = ConstructorParameters<typeof Websocket>;

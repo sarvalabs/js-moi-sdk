@@ -1,12 +1,13 @@
 import {
-    AssetCreationReceipt,
-    AssetMintOrBurnReceipt,
-    AssetStandard,
-    IxType,
-    LogicDeployReceipt,
-    LogicEnlistReceipt,
-    LogicInvokeReceipt,
-    Participants
+  AssetCreationReceipt,
+  AssetMintOrBurnReceipt,
+  AssetStandard,
+  IxType,
+  LogicDeployReceipt,
+  LogicEnlistReceipt,
+  LogicInvokeReceipt,
+  Participants,
+  type Tesseract
 } from "js-moi-utils";
 import type { NestedArray } from "./util";
 
@@ -337,4 +338,39 @@ export interface LogFilter {
     address: string;
     height: [start: number, end: number];
     topics?: NestedArray<string>;
+}
+
+
+export interface Log {
+    address: string;
+    topics: string[];
+    data: string;
+    ix_hash: string;
+    ts_hash: string;
+    participants: Participants;
+}
+
+export interface LogFilter {
+    address: string;
+    height: [start: number, end: number];
+    topics?: NestedArray<string>;
+}
+export type NewTesseractsByAccount = {
+    event: "newTesseractsByAccount";
+    params: string;
+};
+
+export type NewLogs = { event: "newLogs"; params: LogFilter };
+
+export type ProviderEvents =
+    | keyof WebsocketEventMap
+    | { event: string; params: any };
+
+export interface WebsocketEventMap {
+    newTesseracts: [tesseract: Tesseract];
+    newPendingInteractions: [interactionHash: string];
+    connect: [];
+    error: [error: unknown];
+    close: [];
+    reconnect: [attempt: number];
 }
