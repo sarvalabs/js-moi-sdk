@@ -1,5 +1,9 @@
 import { ManifestCoder } from "js-moi-manifest";
+<<<<<<< HEAD
 import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, decodeBase64, encodeToString, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
+=======
+import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, decodeBase64, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
+>>>>>>> develop
 import { AbstractProvider } from "./abstract-provider";
 import { processIxObject } from "./interaction";
 // Default timeout value in seconds
@@ -770,7 +774,11 @@ export class BaseProvider extends AbstractProvider {
         const response = await this.execute("moi.GetLogs", payload);
         return this.processResponse(response).map((log) => ({
             ...log,
+<<<<<<< HEAD
             data: encodeToString(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+=======
+            data: "0x" + bytesToHex(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+>>>>>>> develop
         }));
     }
     /**

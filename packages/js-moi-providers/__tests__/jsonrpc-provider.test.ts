@@ -5,8 +5,8 @@ import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
-const HOST = "http://localhost:1600";
-const MNEMONIC = "chest shoe under dice puzzle drive pact amount useless cruise recall chalk";
+const HOST = "<PROVIDE YOUR JSON RPC HOST>";
+const MNEMONIC = "<PROVIDE YOUR MNEMONIC HERE>";
 const ADDRESS = "0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db";
 
 
@@ -429,7 +429,6 @@ describe("Test JsonRpcProvider Query Calls", () => {
           address: address,
           height: [0, 10]
         });
-        console.log(logs)
         expect(logs).toBeDefined();
         expect(Array.isArray(logs)).toBeTruthy();
       });
