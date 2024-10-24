@@ -28,7 +28,7 @@ describe("Test ManifestCoder", () => {
         test("When the field is passed as a routine schema", () => {
             const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
                 element.data = element.data as LogicManifest.Routine;
-                return element.data.name === "Seeder";
+                return element.data.name === "Seed";
             });
             const routine = routineElement?.data as LogicManifest.Routine;
             const fields = routine.accepts ? routine.accepts : [];
