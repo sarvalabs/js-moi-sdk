@@ -1,17 +1,5 @@
-import type { LogicManifest } from "../types/manifest";
+import type { CallSite, EventDef, LogicManifest, MethodDef } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
-export interface EventDef {
-    ptr: number;
-    topics: number;
-}
-export interface MethodDef {
-    ptr: number;
-    class: string;
-}
-export interface CallSite {
-    ptr: number;
-    kind: string;
-}
 /**
  * This class represents a descriptor for elements in the logic manifest.
  */
