@@ -31,24 +31,12 @@ describe("Test ManifestCoder", () => {
             const args = ["MOI", 100_000_000];
             const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>("Seed", calldata);
 
-            for (let i = 0; i < args.length; i++) {
-                expect(decoded[i]).toEqual(args[i]);
+            if (decoded) {
+                for (let i = 0; i < args.length; i++) {
+                    expect(decoded[i]).toEqual(args[i]);
+                }
             }
-        });
 
-        test("When the field is passed as a routine schema", () => {
-            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-                element.data = element.data as LogicManifest.Routine;
-                return element.data.name === "Seed";
-            });
-            const calldata = "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49"
-            const routine = routineElement?.data as LogicManifest.Routine;
-            const args = ["MOI", 100000000];
-            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>(routine, calldata);
-
-            for (let i = 0; i < args.length; i++) {
-                expect(decoded[i]).toEqual(args[i]);
-            }
         });
     });
 
@@ -60,18 +48,6 @@ describe("Test ManifestCoder", () => {
             const args = manifestCoder.decodeOutput<{ balance: number }>(callsite, calldata);
 
             expect(args).toEqual({ balance: expect.any(Number) });
-        });
-
-        test("When the field is passed as a routine schema", () => {
-            const output = "0x0e1f0305f5e100";
-            const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-                element.data = element.data as LogicManifest.Routine;
-                return element.data.name === callsite;
-            });
-            const routine = routineElement?.data as LogicManifest.Routine;
-            const decodedOutput = manifestCoder.decodeOutput(routine, output);
-
-            expect(decodedOutput).toEqual({ balance: expect.any(Number) });
         });
     });
 

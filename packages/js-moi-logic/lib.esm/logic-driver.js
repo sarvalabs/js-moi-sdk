@@ -91,7 +91,7 @@ export class LogicDriver extends LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine, ...ixObject.arguments);
+            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
             payload.calldata = hexToBytes(calldata);
         }
         return payload;
@@ -107,9 +107,8 @@ export class LogicDriver extends LogicDescriptor {
      */
     async processResult(response, timeout) {
         try {
-            const routine = this.getRoutineElement(response.routine_name);
             const result = await response.result(timeout);
-            return this.manifestCoder.decodeOutput(routine.data["returns"], result.outputs);
+            return this.manifestCoder.decodeOutput(response.routine_name, result.outputs);
         }
         catch (err) {
             throw err;

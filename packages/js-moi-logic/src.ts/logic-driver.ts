@@ -140,10 +140,8 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     protected async processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null> {
         try {
-            const routine = this.getRoutineElement(response.routine_name)
             const result = await response.result(timeout);
-
-            return this.manifestCoder.decodeOutput(routine.data["returns"], result.outputs);
+            return this.manifestCoder.decodeOutput(response.routine_name, result.outputs);
         } catch(err) {
             throw err;
         }

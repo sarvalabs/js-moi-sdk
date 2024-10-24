@@ -218,96 +218,41 @@ export class ManifestCoder {
         return "0x" + bytesToHex((documentEncode(calldata, schema).bytes()))
     }
 
+   
     /**
-     * Decodes the arguments passed to a logic routine call.
-     * The arguments are decoded using the provided fields and schema.
-     * 
-     * @param {LogicManifest.Routine} routine - The fields associated with the arguments.
-     * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
-     * 
-     * @returns {T | null} The decoded arguments.
+     * Decodes the provided calldata into the expected arguments for a given routine.
+     *
+     * @template T - The type of the decoded arguments.
+     * @param {string} routine - The name of the routine whose arguments are to be decoded.
+     * @param {string} calldata - The calldata to decode.
+     * @returns {T | null} - The decoded arguments as an object of type T, or null if the routine accepts no arguments.
      */
-    public decodeArguments<T>(routine: LogicManifest.Routine, calldata: string): T;
-    /**
-     * Decodes the arguments passed to a logic routine call.
-     * The arguments are decoded using the provided fields and schema.
-     * 
-     * @param {string} routine - The name of the routine associated with the arguments.
-     * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
-     * 
-     * @returns {T | null} The decoded arguments.
-     */
-    public decodeArguments<T>(routine: string, calldata: string): T;
-    /**
-     * Decodes the arguments passed to a logic routine call.
-     * The arguments are decoded using the provided fields and schema.
-     * 
-     * @param {(LogicManifest.Routine | string)} fields - The fields associated with the arguments or the name of the routine.
-     * @param {string} calldata - The calldata to decode, represented as a hexadecimal string prefixed with "0x".
-     * 
-     * @returns {T | null} The decoded arguments.
-     */
-    public decodeArguments<T>(routine: LogicManifest.Routine | string, calldata: string): T | null {
-        let fields: LogicManifest.TypeField[];
+    public decodeArguments<T>(routine: string, calldata: string): T | null {
+        const element  = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
 
-        if (typeof routine === "string") {
-            const element  = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
-            fields = element.accepts
-        } else {
-            fields = routine.accepts
-        }
-
-        if (fields && fields.length === 0) {
+        if (element && element.accepts.length === 0) {
             return null
         }
 
-        const schema = this.schema.parseFields(fields ?? []);
+        const schema = this.schema.parseFields(element.accepts ?? []);
         const decodedCalldata = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
-        return fields.map((field: LogicManifest.TypeField) => decodedCalldata[field.label]) as T;
+        return element.accepts.map((field: LogicManifest.TypeField) => decodedCalldata[field.label]) as T;
     }
 
     /**
-     * Decodes the output data returned from a logic routine call.
-     * The output data is decoded using the predefined schema.
-     * Returns the decoded output data as an unknown type, or null if the output is empty.
-     * 
-     * @param {string} output - The output data to decode, represented as a hexadecimal string prefixed with "0x".
-     * @param {string} callsite - The name of the routine associated with the output data.
-     * 
-     * @returns {T | null} The decoded output data, or null if the output is empty.
-     */
-    public decodeOutput<T>(callsite: string, output: string): T | null;
-    /**
-     * Decodes the output data returned from a logic routine call.
-     * The output data is decoded using the provided fields and schema.
-     * Returns the decoded output data as an unknown type, or null if the output is empty.
+     * Decodes the output of a routine.
      *
-     * @param {LogicManifest.Routine} routine - The fields associated with the output data.
-     * @param {string} output - The output data to decode, represented as a  hexadecimal string prefixed with "0x".
-     * @returns {unknown | null} The decoded output data, or null if the output is empty.
+     * @template T - The type to which the output should be decoded.
+     * @param {string} routine - The name of the routine whose output is to be decoded.
+     * @param {string} output - The output string to decode.
+     * @returns {T | null} - The decoded output as type T, or null if the output is invalid or the routine has no return schema.
      */
-    public decodeOutput<T>(routine: LogicManifest.Routine, output: string): T | null;
-    /**
-     * Decodes the output data returned from a logic routine call.
-     * The output data is decoded using the provided fields and schema.
-     * Returns the decoded output data as an unknown type, or null if the output is empty.
-     * 
-     * @param {string} routineOrCallsite - The routine or callsite associated with the output data.
-     * @param {string} output - The output data to decode, represented as a hexadecimal string prefixed with "0x".
-     * @returns {T | null} The decoded output data, or null if the output is empty.
-     */
-    public decodeOutput<T>(routineOrCallsite: LogicManifest.Routine | string, output: string): T | null {
-        let fields: LogicManifest.TypeField[];
+    public decodeOutput<T>(routine: string, output: string): T | null {
+        const element  = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
         
-        if (typeof routineOrCallsite === "string") {
-            const element  = this.elementDescriptor.getRoutineElement(routineOrCallsite).data as LogicManifest.Routine
-            fields = element.returns
-        } else {
-            fields = routineOrCallsite.returns
-        }
 
-        if(output && output != "0x" && fields && fields.length) {
-            const schema = this.schema.parseFields(fields);
+        if(output && output != "0x" && element.returns && element.returns.length) {
+            const schema = this.schema.parseFields(element.returns);
             return new Depolorizer(hexToBytes(output)).depolorize(schema) as T
         }
 
