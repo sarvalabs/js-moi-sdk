@@ -19,13 +19,6 @@ export class ManifestCoder {
     /**
      * Creates an instance of ManifestCoder.
      * 
-     * @param {LogicManifest.Manifest} elementDescriptor - The element descriptor.
-     * @constructor
-     */
-    constructor(elementDescriptor: ElementDescriptor);
-    /**
-     * Creates an instance of ManifestCoder.
-     * 
      * @param {LogicManifest.Manifest} manifest - The logic manifest.
      * @constructor
      */
@@ -33,8 +26,8 @@ export class ManifestCoder {
     /**
      * Creates an instance of ManifestCoder.
      */
-    constructor(descriptorOrManifest: LogicManifest.Manifest | ElementDescriptor) {
-        this.elementDescriptor = descriptorOrManifest instanceof ElementDescriptor ? descriptorOrManifest : new ElementDescriptor(descriptorOrManifest.elements);
+    constructor(manifest: LogicManifest.Manifest) {
+        this.elementDescriptor = new ElementDescriptor(manifest.elements);
     }
 
     private get schema(): Schema {

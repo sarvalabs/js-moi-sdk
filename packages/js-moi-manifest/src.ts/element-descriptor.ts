@@ -42,7 +42,7 @@ export class ElementDescriptor {
                         kind: routineData.kind,
                     };
                     this.callSites.set(routineData.name, callsite);
-                    break;
+                break;
                 case "event":
                     const eventData = element.data as LogicManifest.Event;
                     this.eventsDefs.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
