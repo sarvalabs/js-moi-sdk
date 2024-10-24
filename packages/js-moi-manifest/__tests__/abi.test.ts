@@ -30,8 +30,7 @@ describe("Test ManifestCoder", () => {
                 return element.data.name === "Seed";
             });
             const routine = routineElement?.data as LogicManifest.Routine;
-            const fields = routine.accepts ? routine.accepts : [];
-            const calldata = manifestCoder.encodeArguments(fields, "MOI", 100_000_000);
+            const calldata = manifestCoder.encodeArguments(routine, "MOI", 100_000_000);
 
             expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
         });
