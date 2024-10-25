@@ -150,7 +150,7 @@ class JsonManifestSerializer extends base_manifest_serializer_1.BaseManifestSeri
     deserialize(data) {
         const depolorizer = new js_polo_1.Depolorizer(this.getPoloBytes(data));
         const decoded = depolorizer.depolorize(JsonManifestSerializer.MANIFEST_SCHEMA);
-        if (!("elements" in decoded) && !Array.isArray(decoded.elements)) {
+        if (!super.validate(decoded)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid manifest.", "data", data);
         }
         this.deserializeElements(decoded.elements);

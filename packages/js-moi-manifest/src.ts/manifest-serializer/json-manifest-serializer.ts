@@ -191,7 +191,7 @@ export class JsonManifestSerializer extends BaseManifestSerializer {
             JsonManifestSerializer.MANIFEST_SCHEMA
         );
 
-        if (!("elements" in decoded) && !Array.isArray(decoded.elements)) {
+        if (!super.validate(decoded)) {
             ErrorUtils.throwArgumentError("Invalid manifest.", "data", data);
         }
 
