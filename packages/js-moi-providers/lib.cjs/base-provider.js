@@ -928,7 +928,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 if (!(0, js_moi_utils_1.isValidAddress)(event.params.address)) {
                     js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
                 }
-                params = [event.event, { address: event.params }];
+                params = [event.event, { address: event.params.address }];
             }
             if (event.event === 'newLogs') {
                 if (!(0, js_moi_utils_1.isValidAddress)(event.params.address)) {

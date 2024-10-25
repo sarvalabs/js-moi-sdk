@@ -1146,7 +1146,7 @@ export class BaseProvider extends AbstractProvider {
                     ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
                 }
 
-                params = [event.event, { address: event.params }];
+                params = [event.event, { address: event.params.address }];
             }
 
             if (event.event === 'newLogs') {
