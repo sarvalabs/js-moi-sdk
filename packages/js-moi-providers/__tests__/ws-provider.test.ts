@@ -4,9 +4,9 @@ import { WebSocketEvent } from "../src.ts/websocket-events";
 import { WebsocketProvider } from "../src.ts/websocket-provider";
 import { getRandomSupply, initializeWallet } from "./utils/utils";
 
-const MNEMONIC = "<YOUR MNEMONIC HERE>";
-const HOST = "<YOUR WEBSOCKET HOST HERE>";
-const ASSET_ID = "<YOUR ASSET ID WHICH HAVE BALANCE>";
+const HOST = "ws://141.94.161.24:1600/ws";
+const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
+const ASSET_ID = "0x00000000c67fbf5825d505586701135114fe76f5c0b18675c4a08467e8aa1495482c20c7";
 
 describe("Test Websocket Provider", () => {
     const isValidMnemonic = MNEMONIC.split(" ").length === 12;
@@ -14,7 +14,7 @@ describe("Test Websocket Provider", () => {
         throw new Error("Invalid mnemonic");
     }
    
-    if (!HOST.startsWith("ws://") || !HOST.startsWith("wss://")) {
+    if (!HOST.startsWith("ws://") && !HOST.startsWith("wss://")) {
         throw new Error("Provider host is not websocket host");
     }
 

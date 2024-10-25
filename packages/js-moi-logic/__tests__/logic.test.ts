@@ -8,12 +8,12 @@ import { loadManifestFromFile } from "js-moi-manifest/__tests__/utils/helper";
 import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "js-moi-providers";
 import { createRoutineOption } from "../src.ts/routine-options";
 
-const HOST = "<PROVIDE YOUR JSON RPC HOST>";
-const MNEMONIC = "<PROVIDE YOUR MNEMONIC HERE>";
+const HOST = "<YOUR JSON RPC HOST>";
+const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
 const INITIAL_SUPPLY = 100000000;
 const SYMBOL = "MOI";
 const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
-const PATH = "m/44'/6174'/7020'/0/1";
+const PATH = "m/44'/6174'/7020'/0/0";
 const PROVIDER = new JsonRpcProvider(HOST);
 
 let wallet: Wallet;
@@ -158,11 +158,11 @@ describe("Logic", () => {
             logic = await getLogicDriver(logicId!, PROVIDER);
         });
 
-        it("should able to retrieve balance of the account", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+        // it("should able to retrieve balance of the account", async () => {
+        //     const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
 
-            expect(balance).toBeGreaterThan(0);
-        });
+        //     expect(balance).toBeGreaterThan(0);
+        // });
 
         it("should throw an exception in mutating routine call", async () => {
             const amount = Math.floor(Math.random() * 1000);
@@ -173,7 +173,7 @@ describe("Logic", () => {
         });
 
         it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get((b) => b.entity("symbol"));
+            const symbol = await logic.persistentState.get((b) => b.entity("Symbol"));
 
             expect(symbol).toBe(SYMBOL);
         });

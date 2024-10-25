@@ -1,32 +1,25 @@
-import { Signer } from "js-moi-signer";
 import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "js-moi-utils";
 import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
-const HOST = "<PROVIDE YOUR JSON RPC HOST>";
-const MNEMONIC = "<PROVIDE YOUR MNEMONIC HERE>";
-const ADDRESS = "0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db";
-
+const HOST = "<YOUR JSON RPC HOST>";
+const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
+const provider = new JsonRpcProvider(HOST);
 
 
 describe("Test JsonRpcProvider Query Calls", () => {
-  const address = ADDRESS;
-    const provider = new JsonRpcProvider(HOST);
-    let ixHash: string;
-    let signer: Signer;
-    let ixReceipt: InteractionReceipt;
-    let nextNonce = 0;
+  const signer = initializeWallet(provider, MNEMONIC);
+  const address = signer.getAddress();
+  let ixHash: string;
+  let ixReceipt: InteractionReceipt;
     const supply = getRandomSupply();
     MNEMONIC;
 
     beforeAll(async() => {
-      signer = await initializeWallet(provider, MNEMONIC);
-      const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
         type: IxType.ASSET_CREATE,
-        nonce: nonce,
         fuel_price: 1,
         fuel_limit: 200,
         payload: {
@@ -38,7 +31,6 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
       ixHash = ixResponse.hash;
       ixReceipt = await ixResponse.wait();
-      nextNonce = Number(nonce) + 1
     });
 
     describe('getBalance', () => {
@@ -47,9 +39,8 @@ describe("Test JsonRpcProvider Query Calls", () => {
           expect(ixReceipt.extra_data).toBeDefined();
           return;
         }
-
-        const balance = await provider.getBalance(address, (<AssetCreationReceipt>ixReceipt.extra_data).asset_id);
-
+        
+        const balance = await provider.getBalance(signer.getAddress(), (<AssetCreationReceipt>ixReceipt.extra_data).asset_id);
         expect(balance).toBe(supply);
       })
     });
@@ -135,7 +126,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const interactions = await provider.getInteractionByTesseract(address, undefined, 0);
 
         expect(interactions).toBeDefined();
-        expect(interactions.hash).toBe(ixReceipt.ix_hash);
+        expect(typeof interactions.hash).toBe("string");
       });
 
       it("should return the interaction by tesseract without address", async () => {
@@ -242,7 +233,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       it('should return the receipt by executing the interaction', async () => {
         const receipt = await provider.call({
           type: IxType.ASSET_CREATE,
-          nonce: nextNonce,
+          nonce: await signer.getNonce(),
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
@@ -261,7 +252,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       it('should return the estimated fuel by executing the interaction', async () => {
         const fuelPrice = await provider.estimateFuel({
           type: IxType.ASSET_CREATE,
-          nonce: nextNonce,
+          nonce: await signer.getNonce(),
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,

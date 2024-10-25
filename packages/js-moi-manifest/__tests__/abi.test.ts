@@ -141,7 +141,6 @@ describe("Test ManifestCoder", () => {
         ];
 
         await Promise.all(testCases.map(async (testCase) => {
-            console.log(testCase);
             const [polo, expected] = await Promise.all([
                 loadFile(testCase.manifest),
                 loadManifestFromFile(testCase.expected),
