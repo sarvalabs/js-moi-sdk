@@ -119,7 +119,7 @@ export class LogicDriver extends LogicDescriptor {
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signer - The instance of the `Signer` or `AbstractProvider`.
+ * @param {Signer} signer - The signer instance for the logic driver.
  * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.

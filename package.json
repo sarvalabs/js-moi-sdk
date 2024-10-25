@@ -13,6 +13,7 @@
     "check-types": "tsc --noEmit",
     "test:coverage": "jest --coverage --env=node --colors --verbose",
     "docs": "make -C docs html",
+    "watch:docs": "make -C docs watch",
     "prebuild": "npm run clean"
   },
   "repository": {

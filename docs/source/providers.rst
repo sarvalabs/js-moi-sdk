@@ -611,11 +611,12 @@ Subscribing to all tesseracts
     });
 
 Subscribing to tesseracts by address
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: javascript
 
     // Example
-    const ws = new WebsocketProvider("wss://localhost:8080");
+    const ws = new WebsocketProvider("ws://localhost:8080");
 
     ws.on({ event: WebSocketEvent.NewTesseractsByAccount, params: { address: "0x...abc" } }, (tesseract) => {
         console.log(tesseract);
@@ -631,7 +632,7 @@ Subscribing to new logs
     });
 
 Subscribing to pending interactions
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: javascript
 
