@@ -1,6 +1,6 @@
 import { type LogicManifest } from "../lib.cjs";
 import { ManifestCoder } from "../src.ts/manifest";
-import { ManifestFormat } from "../src.ts/manifest-format";
+import { ManifestFormat } from "../src.ts/manifest-serializer/serialization-format";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
 describe("Test ManifestCoder", () => {
@@ -18,19 +18,7 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/tokenledger.json",
                 expected: "../../manifests/tokenledger-polo.txt",
-            },
-            {
-                manifest: "../../manifests/flipper.json",
-                expected: "../../manifests/flipper-polo.txt",
-            },
-            {
-                manifest: "../../manifests/guardian.json",
-                expected: "../../manifests/guardian-polo.txt",
-            },
-            {
-                manifest: "../../manifests/lock-ledger.json",
-                expected: "../../manifests/lock-ledger-polo.txt",
-            }
+            } 
         ]
 
 

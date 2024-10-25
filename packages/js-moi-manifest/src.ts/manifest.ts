@@ -3,7 +3,7 @@ import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema, WireType 
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
 import { ElementDescriptor } from "./element-descriptor";
-import { ManifestFormat } from "./manifest-format";
+import { ManifestFormat } from "./manifest-serializer/serialization-format";
 import { Schema } from "./schema";
 
 /**
