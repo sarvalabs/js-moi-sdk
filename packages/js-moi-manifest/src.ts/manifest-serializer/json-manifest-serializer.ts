@@ -96,7 +96,7 @@ export class JsonManifestSerializer extends BaseManifestSerializer {
         return polorizer;
     }
 
-    private deserializeElement(element: any) {
+    private deserializeElement(element) {
         if (element.deps.length == 0) {
             delete element.deps;
         }
@@ -187,9 +187,7 @@ export class JsonManifestSerializer extends BaseManifestSerializer {
 
     deserialize(data: string | Uint8Array): LogicManifest.Manifest {
         const depolorizer = new Depolorizer(this.getPoloBytes(data));
-        const decoded: any = depolorizer.depolorize(
-            JsonManifestSerializer.MANIFEST_SCHEMA
-        );
+        const decoded = depolorizer.depolorize(JsonManifestSerializer.MANIFEST_SCHEMA);
 
         if (!super.validate(decoded)) {
             ErrorUtils.throwArgumentError("Invalid manifest.", "data", data);
