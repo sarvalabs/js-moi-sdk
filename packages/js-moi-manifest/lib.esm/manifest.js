@@ -212,8 +212,7 @@ export class ManifestCoder {
     * @param {string | Uint8Array} manifest - The manifest data to decode, provided as a string or Uint8Array.
     * @param {ManifestCoderFormat} format - The format of the manifest, either JSON or YAML.
     *
-    * @returns {LogicManifest.Manifest | string} - Returns a `LogicManifest.Manifest` object if JSON format is used,
-    *                                               or a string representation if YAML format is used.
+    * @returns {LogicManifest.Manifest | string} - Returns a `LogicManifest.Manifest` object if JSON format is used or a string representation if YAML format is used.
     *
     * @throws {Error} - Throws an error if the format is unsupported.
     */
