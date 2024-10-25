@@ -6,7 +6,7 @@ exports.ManifestCoderFormat = void 0;
  */
 var ManifestCoderFormat;
 (function (ManifestCoderFormat) {
-    ManifestCoderFormat["JSON"] = "json";
-    ManifestCoderFormat["POLO"] = "polo";
+    ManifestCoderFormat["JSON"] = "JSON";
+    ManifestCoderFormat["YAML"] = "YAML";
 })(ManifestCoderFormat || (exports.ManifestCoderFormat = ManifestCoderFormat = {}));
 //# sourceMappingURL=serialization-format.js.map

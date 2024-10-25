@@ -6,6 +6,7 @@ const js_polo_1 = require("js-polo");
 const element_descriptor_1 = require("./element-descriptor");
 const json_manifest_coder_1 = require("./manifest-coder/json-manifest-coder");
 const serialization_format_1 = require("./manifest-coder/serialization-format");
+const yaml_manifest_coder_1 = require("./manifest-coder/yaml-manifest-coder");
 const schema_1 = require("./schema");
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
@@ -186,30 +187,46 @@ class ManifestCoder {
         return null;
     }
     /**
-    * Encodes a logic manifest into POLO format. The manifest is processed and
-    * serialized according to the predefined schema.
-    * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
-    *
-    * @static
-    * @param {LogicManifest.Manifest} manifest - The logic manifest to encode.
-    * @returns {string} The POLO-encoded data.
-    */
+     * Encodes a manifest into a hexadecimal string.
+     *
+     * This function supports encoding both JSON and YAML manifest formats.
+     * If the input manifest is an object, it is assumed to be a JSON manifest and
+     * is encoded using the `JsonManifestCoder`. If the input manifest is a string,
+     * it is assumed to be a YAML manifest and is encoded using the `YamlManifestCoder`.
+     *
+     * @param manifest - The manifest to encode. It can be either a string (YAML) or an object (JSON).
+     * @returns The encoded manifest as a hexadecimal string prefixed with "0x".
+     * @throws Will throw an error if the manifest type is unsupported.
+     */
     static encodeManifest(manifest) {
-        const serializer = new json_manifest_coder_1.JsonManifestCoder();
-        return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
+        if (typeof manifest === "object" && manifest !== null) {
+            const serializer = new json_manifest_coder_1.JsonManifestCoder();
+            return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
+        }
+        if (typeof manifest === "string") {
+            const serializer = new yaml_manifest_coder_1.YamlManifestCoder();
+            return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
+        }
+        js_moi_utils_1.ErrorUtils.throwError("Unsupported manifest type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
     /**
-     * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
-     *
-     * @param {string | Uint8Array} manifest - The manifest `string` or `Uint8Array` to decode.
-     * @param {ManifestCoderFormat} format - The format of the manifest.
-     * @returns {LogicManifest.Manifest} The decoded `LogicManifest.Manifest` object
-     *
-     * @throws {Error} If the manifest is invalid or the format is unsupported.
-     */
+    * Decodes a given manifest in either JSON or YAML format.
+    *
+    * @param {string | Uint8Array} manifest - The manifest data to decode, provided as a string or Uint8Array.
+    * @param {ManifestCoderFormat} format - The format of the manifest, either JSON or YAML.
+    *
+    * @returns {LogicManifest.Manifest | string} - Returns a `LogicManifest.Manifest` object if JSON format is used,
+    *                                               or a string representation if YAML format is used.
+    *
+    * @throws {Error} - Throws an error if the format is unsupported.
+    */
     static decodeManifest(manifest, format) {
         if (format === serialization_format_1.ManifestCoderFormat.JSON) {
             const serializer = new json_manifest_coder_1.JsonManifestCoder();
+            return serializer.decode(manifest);
+        }
+        if (format === serialization_format_1.ManifestCoderFormat.YAML) {
+            const serializer = new yaml_manifest_coder_1.YamlManifestCoder();
             return serializer.decode(manifest);
         }
         js_moi_utils_1.ErrorUtils.throwError("Unsupported manifest format", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

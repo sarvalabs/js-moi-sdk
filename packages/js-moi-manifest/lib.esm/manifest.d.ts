@@ -85,24 +85,39 @@ export declare class ManifestCoder {
      */
     static decodeException(error: string): Exception | null;
     /**
-    * Encodes a logic manifest into POLO format. The manifest is processed and
-    * serialized according to the predefined schema.
-    * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
-    *
-    * @static
-    * @param {LogicManifest.Manifest} manifest - The logic manifest to encode.
-    * @returns {string} The POLO-encoded data.
-    */
-    static encodeManifest(manifest: LogicManifest.Manifest): string;
-    /**
-     * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
+     * Encodes a manifest into a hexadecimal string.
      *
-     * @param {string | Uint8Array} manifest - The manifest `string` or `Uint8Array` to decode.
-     * @param {ManifestCoderFormat} format - The format of the manifest.
-     * @returns {LogicManifest.Manifest} The decoded `LogicManifest.Manifest` object
+     * This function supports encoding both JSON and YAML manifest formats.
+     * If the input manifest is an object, it is assumed to be a JSON manifest and
+     * is encoded using the `JsonManifestCoder`. If the input manifest is a string,
+     * it is assumed to be a YAML manifest and is encoded using the `YamlManifestCoder`.
      *
-     * @throws {Error} If the manifest is invalid or the format is unsupported.
+     * @param manifest - The manifest to encode. It can be either a string (YAML) or an object (JSON).
+     * @returns The encoded manifest as a hexadecimal string prefixed with "0x".
+     * @throws Will throw an error if the manifest type is unsupported.
      */
-    static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat): LogicManifest.Manifest;
+    static encodeManifest(manifest: string | LogicManifest.Manifest): string;
+    /**
+     * Decodes a given manifest in either JSON format.
+     *
+     * @param manifest - The manifest data to decode, provided as a string or Uint8Array.
+     * @param format - The format of the manifest in JSON string.
+     *
+     * @returns Returns a JSON manifest object.
+     *
+     * @throws Throws an error if the format is unsupported.
+     */
+    static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.JSON): LogicManifest.Manifest;
+    /**
+    * Decodes a given manifest in either YAML format.
+    *
+    * @param {string | Uint8Array} manifest The manifest data to decode, provided as a string or Uint8Array.
+    * @param {ManifestCoderFormat} format The format of the manifest in YAML string.
+    *
+    * @returns {string} Returns a YAML string representation.
+    *
+    * @throws {Error} Throws an error if the format is unsupported.
+    */
+    static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.YAML): string;
 }
 //# sourceMappingURL=manifest.d.ts.map
