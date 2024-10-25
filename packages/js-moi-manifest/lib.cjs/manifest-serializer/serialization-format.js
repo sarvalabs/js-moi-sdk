@@ -7,5 +7,6 @@ exports.ManifestFormat = void 0;
 var ManifestFormat;
 (function (ManifestFormat) {
     ManifestFormat["JSON"] = "json";
+    ManifestFormat["POLO"] = "polo";
 })(ManifestFormat || (exports.ManifestFormat = ManifestFormat = {}));
 //# sourceMappingURL=serialization-format.js.map

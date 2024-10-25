@@ -4,4 +4,5 @@
  */
 export enum ManifestFormat {
     JSON = "json",
+    POLO = "polo",
 }

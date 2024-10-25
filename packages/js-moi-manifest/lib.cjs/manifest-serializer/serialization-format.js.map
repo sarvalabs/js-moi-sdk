@@ -1,1 +1,1 @@
-{"version":3,"file":"serialization-format.js","sourceRoot":"","sources":["../../src.ts/manifest-serializer/serialization-format.ts"],"names":[],"mappings":";;;AACA;;GAEG;AACH,IAAY,cAEX;AAFD,WAAY,cAAc;IACtB,+BAAa,CAAA;AACjB,CAAC,EAFW,cAAc,8BAAd,cAAc,QAEzB"}
+{"version":3,"file":"serialization-format.js","sourceRoot":"","sources":["../../src.ts/manifest-serializer/serialization-format.ts"],"names":[],"mappings":";;;AACA;;GAEG;AACH,IAAY,cAGX;AAHD,WAAY,cAAc;IACtB,+BAAa,CAAA;IACb,+BAAa,CAAA;AACjB,CAAC,EAHW,cAAc,8BAAd,cAAc,QAGzB"}
