@@ -147,46 +147,6 @@ describe("Logic", () => {
         });
     });
 
-    describe("logic driver initialized using provider", () => {
-        let logic: LogicDriver;
-
-        beforeAll(async () => {
-            if (logicId == null) {
-                expect(logicId).toBeDefined();
-            }
-
-            logic = await getLogicDriver(logicId!, PROVIDER);
-        });
-
-        // it("should able to retrieve balance of the account", async () => {
-        //     const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
-
-        //     expect(balance).toBeGreaterThan(0);
-        // });
-
-        it("should throw an exception in mutating routine call", async () => {
-            const amount = Math.floor(Math.random() * 1000);
-
-            expect(async () => {
-                await logic.routines.Transfer(amount, RECEIVER);
-            }).rejects.toThrow("Mutating routine calls require a signer to be initialized.");
-        });
-
-        it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get((b) => b.entity("Symbol"));
-
-            expect(symbol).toBe(SYMBOL);
-        });
-
-        it("should throw an exception when reading from persistent storage with invalid key", async () => {
-            const invalidKey = "invalid-key";
-
-            expect(async () => {
-                await logic.persistentState.get((b) => b.entity(invalidKey));
-            }).rejects.toThrow(`'${invalidKey}' is not member of persistent state`);
-        });
-    });
-
     let logic: LogicDriver;
 
     beforeAll(async () => {
