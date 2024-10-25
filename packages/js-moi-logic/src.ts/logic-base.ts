@@ -24,10 +24,10 @@ export abstract class LogicBase extends ElementDescriptor {
     protected manifestCoder: ManifestCoder;
     
 
-    constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
+    constructor(manifest: LogicManifest.Manifest, signer: Signer) {
         super(manifest.elements)
         this.manifestCoder = new ManifestCoder(manifest);
-        this.connect(arg)
+        this.connect(signer)
     }
 
     // abstract methods to be implemented by subclasses
@@ -67,15 +67,16 @@ export abstract class LogicBase extends ElementDescriptor {
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      * 
-     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
+     * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
-    public connect(arg: AbstractProvider | Signer): void {
-        if (arg instanceof Signer) {
-            this.signer = arg;
-            this.provider = arg.getProvider();
+    public connect(signer: Signer): void {
+        if (signer instanceof Signer) {
+            this.signer = signer;
+            this.provider = signer.getProvider();
             return;
         }
-        this.provider = arg;
+
+        this.provider = signer;
     }
 
     /**
@@ -232,3 +233,5 @@ export abstract class LogicBase extends ElementDescriptor {
         return this.createIxRequest(ixObject);
     }
 }
+
+

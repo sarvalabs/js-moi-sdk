@@ -1,5 +1,4 @@
 import { ContextStateKind, LogicManifest, ManifestCoder } from "js-moi-manifest";
-import type { AbstractProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
@@ -21,8 +20,8 @@ export abstract class LogicDescriptor extends LogicBase {
     protected sealed: boolean;
     protected assetLogic: boolean;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider) {
-        super(manifest, arg)
+    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
+        super(manifest, signer)
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = ManifestCoder.encodeManifest(this.manifest);

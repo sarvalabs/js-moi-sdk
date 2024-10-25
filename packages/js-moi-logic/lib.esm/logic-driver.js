@@ -119,20 +119,17 @@ export class LogicDriver extends LogicDescriptor {
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
+ * @param {Signer | AbstractProvider} signer - The instance of the `Signer` or `AbstractProvider`.
  * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async (logicId, signerOrProvider, options) => {
-    const provider = signerOrProvider instanceof Signer ? signerOrProvider.getProvider() : signerOrProvider;
+export const getLogicDriver = async (logicId, signer, options) => {
+    const provider = signer instanceof Signer ? signer.getProvider() : signer;
     const manifest = await provider.getLogicManifest(logicId, "JSON", options);
     if (typeof manifest !== "object") {
         ErrorUtils.throwError("Invalid logic manifest", ErrorCode.INVALID_ARGUMENT);
     }
-    // below check added for type safety
-    return signerOrProvider instanceof Signer
-        ? new LogicDriver(logicId, manifest, signerOrProvider)
-        : new LogicDriver(logicId, manifest, signerOrProvider);
+    return new LogicDriver(logicId, manifest, signer);
 };
 //# sourceMappingURL=logic-driver.js.map

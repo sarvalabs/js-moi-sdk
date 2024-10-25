@@ -1,5 +1,5 @@
 import { LogicManifest } from "js-moi-manifest";
-import { LogicPayload, Options, type AbstractProvider } from "js-moi-providers";
+import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
@@ -12,8 +12,7 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
     readonly routines: Routines<T>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
-    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
-    constructor(logicId: string, manifest: LogicManifest.Manifest, provider: AbstractProvider);
+    constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer);
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
@@ -48,38 +47,14 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
      */
     protected processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
 }
-type LogicRoutines = Record<string, (...args: any) => any>;
-interface GetLogicDriver {
-    /**
-     * Returns a logic driver instance based on the given logic id.
-     *
-     * @param {string} logicId - The logic id of the logic.
-     * @param {Signer} signer - The signer instance.
-     * @param {Options} options - The custom tesseract options for retrieving
-     * logic manifest. (optional)
-     * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
-     */
-    <TLogic extends LogicRoutines>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<TLogic>>;
-    /**
-     * Returns a logic driver instance based on the given logic id.
-     *
-     * @param {string} logicId - The logic id of the logic.
-     * @param {AbstractProvider} provider - The provider instance.
-     * @param {Options} options - The custom tesseract options for retrieving
-     * logic manifest. (optional)
-     * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
-     */
-    <TLogic extends LogicRoutines>(logicId: string, provider: AbstractProvider, options?: Options): Promise<LogicDriver<TLogic>>;
-}
 /**
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
+ * @param {Signer | AbstractProvider} signer - The instance of the `Signer` or `AbstractProvider`.
  * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export declare const getLogicDriver: GetLogicDriver;
-export {};
+export declare const getLogicDriver: <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options) => Promise<LogicDriver<T>>;
 //# sourceMappingURL=logic-driver.d.ts.map

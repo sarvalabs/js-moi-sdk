@@ -16,7 +16,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
     protected signer?: Signer;
     protected provider: AbstractProvider;
     protected manifestCoder: ManifestCoder;
-    constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider);
+    constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
     /**
@@ -34,9 +34,9 @@ export declare abstract class LogicBase extends ElementDescriptor {
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
-     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
+     * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
-    connect(arg: AbstractProvider | Signer): void;
+    connect(signer: Signer): void;
     /**
      * Executes a routine with the given arguments and returns the interaction response.
      *
