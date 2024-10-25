@@ -18,7 +18,19 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/tokenledger.json",
                 expected: "../../manifests/tokenledger-polo.txt",
-            } 
+            },
+            {
+                manifest: "../../manifests/flipper.json",
+                expected: "../../manifests/flipper-polo.txt",
+            },
+            {
+                manifest: "../../manifests/guardian.json",
+                expected: "../../manifests/guardian-polo.txt",
+            },
+            {
+                manifest: "../../manifests/lock-ledger.json",
+                expected: "../../manifests/lock-ledger-polo.txt",
+            }
         ]
 
 

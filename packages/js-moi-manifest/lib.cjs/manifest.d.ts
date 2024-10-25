@@ -1,6 +1,6 @@
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { ManifestFormat } from "./manifest-format";
+import { ManifestFormat } from "./manifest-serializer/serialization-format";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -19,16 +19,6 @@ export declare class ManifestCoder {
      */
     constructor(manifest: LogicManifest.Manifest);
     private get schema();
-    /**
-     * Encodes a logic manifest into POLO format. The manifest is processed and
-     * serialized according to the predefined schema.
-     * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
-     *
-     * @static
-     * @param {LogicManifest.Manifest} manifest - The logic manifest to encode.
-     * @returns {string} The POLO-encoded data.
-     */
-    static encodeManifest(manifest: LogicManifest.Manifest): string;
     /**
      * Parses the calldata arguments based on the provided POLO Schema.
      * The calldata arguments is recursively processed and transformed according to the schema.
@@ -95,12 +85,15 @@ export declare class ManifestCoder {
      */
     static decodeException(error: string): Exception | null;
     /**
-     * Converts a manifest hash to JSON representation.
-     *
-     * @param manifest - The manifest hash as a Uint8Array.
-     * @returns The JSON representation of the manifest.
-     */
-    private static decodeManifestToJson;
+    * Encodes a logic manifest into POLO format. The manifest is processed and
+    * serialized according to the predefined schema.
+    * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
+    *
+    * @static
+    * @param {LogicManifest.Manifest} manifest - The logic manifest to encode.
+    * @returns {string} The POLO-encoded data.
+    */
+    static encodeManifest(manifest: LogicManifest.Manifest): string;
     /**
      * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
      *
@@ -111,6 +104,5 @@ export declare class ManifestCoder {
      * @throws {Error} If the manifest is invalid or the format is unsupported.
      */
     static decodeManifest(manifest: string | Uint8Array, format: ManifestFormat): LogicManifest.Manifest;
-    private static MANIFEST_SCHEMA;
 }
 //# sourceMappingURL=manifest.d.ts.map

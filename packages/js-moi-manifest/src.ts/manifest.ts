@@ -1,8 +1,9 @@
-import { builtInLogEventSchema, bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, isHex, trimHexPrefix } from "js-moi-utils";
-import { Depolorizer, documentEncode, Polorizer, Schema as PoloSchema, WireType } from "js-polo";
+import { builtInLogEventSchema, bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
+import { Depolorizer, documentEncode, Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
 import { ElementDescriptor } from "./element-descriptor";
+import { JsonManifestSerializer } from "./manifest-serializer/json-manifest-serializer";
 import { ManifestFormat } from "./manifest-serializer/serialization-format";
 import { Schema } from "./schema";
 
@@ -33,70 +34,6 @@ export class ManifestCoder {
 
     private get schema(): Schema {
         return new Schema(this.elementDescriptor.getElements(), this.elementDescriptor.getClassDefs());
-    }
-
-    /** 
-     * Encodes a logic manifest into POLO format. The manifest is processed and 
-     * serialized according to the predefined schema.
-     * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
-     *
-     * @static
-     * @param {LogicManifest.Manifest} manifest - The logic manifest to encode.
-     * @returns {string} The POLO-encoded data.
-     */
-    public static encodeManifest(manifest: LogicManifest.Manifest): string {
-        const polorizer = new Polorizer();
-        polorizer.polorizeInteger(manifest.syntax);
-        polorizer.polorize(manifest.engine, Schema.PISA_ENGINE_SCHEMA);
-    
-        if(manifest.elements) {
-            const elements = new Polorizer();
-        
-            manifest.elements.forEach((value) => {
-                const element = new Polorizer();
-        
-                element.polorizeInteger(value.ptr);
-                element.polorize(value.deps, Schema.PISA_DEPS_SCHEMA);
-                element.polorizeString(value.kind);
-        
-                switch(value.kind) {    
-                    case "constant":
-                        element.polorize(value.data, Schema.PISA_CONSTANT_SCHEMA);
-                        break;
-                    case "typedef":
-                        element.polorize(value.data, Schema.PISA_TYPEDEF_SCHEMA);
-                        break;
-                    case "class":
-                        element.polorize(value.data, Schema.PISA_CLASS_SCHEMA);
-                        break;
-                    case "method":
-                        element.polorize(value.data, Schema.PISA_METHOD_SCHEMA);
-                        break;
-                    case "routine":
-                        element.polorize(value.data, Schema.PISA_ROUTINE_SCHEMA);
-                        break;
-                    case "event":
-                        element.polorize(value.data, Schema.PISA_EVENT_SCHEMA);
-                        break;
-                    case "state":
-                        element.polorize(value.data, Schema.PISA_STATE_SCHEMA);
-                        break;
-                    default:
-                        ErrorUtils.throwError(
-                            `Unsupported kind: ${value.kind}`, 
-                            ErrorCode.UNSUPPORTED_OPERATION,
-                        );
-                }
-        
-                elements.polorizePacked(element);
-            })
-        
-            polorizer.polorizePacked(elements);
-        }
-
-        const bytes = polorizer.bytes();
-    
-        return "0x" + bytesToHex(bytes);
     }
 
     /**
@@ -322,123 +259,18 @@ export class ManifestCoder {
         return null
     }
 
-    /**
-     * Converts a manifest hash to JSON representation.
-     * 
-     * @param manifest - The manifest hash as a Uint8Array.
-     * @returns The JSON representation of the manifest.
+     /** 
+     * Encodes a logic manifest into POLO format. The manifest is processed and 
+     * serialized according to the predefined schema.
+     * Returns the POLO-encoded data as a hexadecimal string prefixed with "0x".
+     *
+     * @static
+     * @param {LogicManifest.Manifest} manifest - The logic manifest to encode.
+     * @returns {string} The POLO-encoded data.
      */
-    private static decodeManifestToJson(manifest: Uint8Array): LogicManifest.Manifest {
-        const decoded: any = new Depolorizer(manifest).depolorize(this.MANIFEST_SCHEMA);
-
-        for (let i = 0; i < decoded.elements.length; i += 1) {
-            const element = decoded.elements[i];
-
-            if (element.deps.length == 0) {
-                delete element.deps;
-            }
-
-            let buff: Uint8Array | null = null;
-            let schema = null;
-
-            switch (element.kind) {
-                case "constant": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_PACK,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_CONSTANT_SCHEMA;
-                    break;
-                }
-
-                case "typedef": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_WORD,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_TYPEDEF_SCHEMA;
-                    break;
-                }
-
-                case "state": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_PACK,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_STATE_SCHEMA;
-                    break;
-                }
-
-                case "routine": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_PACK,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_ROUTINE_SCHEMA;
-                    break;
-                }
-
-                case "method": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_PACK,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_METHOD_SCHEMA;
-                    break;
-                }
-
-                case "class": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_PACK,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_CLASS_SCHEMA;
-                    break;
-                }
-
-                case "event": {
-                    buff = new Uint8Array([
-                        WireType.WIRE_PACK,
-                        ...element.data,
-                    ]);
-                    schema = Schema.PISA_EVENT_SCHEMA;
-                    break;
-                }
-
-                default: 
-                    ErrorUtils.throwError(`Unsupported kind: ${element.kind}`, ErrorCode.UNSUPPORTED_OPERATION);
-            }
-
-            if (schema == null || buff == null) {
-                ErrorUtils.throwError("Invalid schema or buffer", ErrorCode.UNEXPECTED_ARGUMENT);
-            }
-
-            const polo = new Depolorizer(buff);
-            element.data = polo.depolorize(schema);
-
-            if (["routine", "method"].includes(element.kind)) {
-                for (const [key, value] of Object.entries(
-                    element.data.executes
-                )) {
-                    // If value of `Instruction[key]` is empty, remove it
-                    if (value === "") {
-                        delete element.data.executes[key];
-                    }
-
-                    // If value of `Instruction` is empty, remove it
-                    if (Array.isArray(value) && value.length === 0) {
-                        delete element.data.executes[key];
-                    }
-
-                    // Required to convert Uint8Array to integer array
-                    if (value instanceof Uint8Array) {
-                        element.data.executes[key] = Array.from(value);
-                    }
-                }
-            }
-        }
-
-        return decoded;
+     public static encodeManifest(manifest: LogicManifest.Manifest): string {
+        const serializer = new JsonManifestSerializer();
+        return "0x" + bytesToHex(serializer.serialize(manifest));
     }
 
     /**
@@ -451,52 +283,12 @@ export class ManifestCoder {
      * @throws {Error} If the manifest is invalid or the format is unsupported.
      */
     public static decodeManifest(manifest: string | Uint8Array, format: ManifestFormat): LogicManifest.Manifest {
-        if (typeof manifest === "string") {
-            if (!isHex(manifest)) {
-                ErrorUtils.throwArgumentError(
-                    "Invalid manifest",
-                    "manifest",
-                    manifest
-                );
-            }
-
-            manifest = hexToBytes(manifest);
-        }
-
+        
         if (format === ManifestFormat.JSON) {
-            return this.decodeManifestToJson(manifest);
+            const serializer = new JsonManifestSerializer();
+            return serializer.deserialize(manifest);
         }
 
-        ErrorUtils.throwArgumentError("Unsupported format", "format", format);
-    }
-
-    private static MANIFEST_SCHEMA = {
-        kind: "struct",
-        fields: {
-            syntax: {
-                kind: "integer",
-            },
-            engine: Schema.PISA_ENGINE_SCHEMA,
-            elements: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "struct",
-                        fields: {
-                            ptr: {
-                                kind: "integer",
-                            },
-                            deps: Schema.PISA_DEPS_SCHEMA,
-                            kind: {
-                                kind: "string",
-                            },
-                            data: {
-                                kind: "raw",
-                            }
-                        },
-                    },
-                },
-            },
-        },
+        ErrorUtils.throwError("Unsupported manifest format", ErrorCode.UNSUPPORTED_OPERATION);
     }
 }
