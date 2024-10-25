@@ -14,14 +14,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ManifestFormat = exports.JsonManifestSerializer = exports.BaseManifestSerializer = void 0;
+exports.ManifestCoderFormat = void 0;
 __exportStar(require("./manifest"), exports);
-var base_manifest_serializer_1 = require("./manifest-serializer/base-manifest-serializer");
-Object.defineProperty(exports, "BaseManifestSerializer", { enumerable: true, get: function () { return base_manifest_serializer_1.BaseManifestSerializer; } });
-var json_manifest_serializer_1 = require("./manifest-serializer/json-manifest-serializer");
-Object.defineProperty(exports, "JsonManifestSerializer", { enumerable: true, get: function () { return json_manifest_serializer_1.JsonManifestSerializer; } });
-var serialization_format_1 = require("./manifest-serializer/serialization-format");
-Object.defineProperty(exports, "ManifestFormat", { enumerable: true, get: function () { return serialization_format_1.ManifestFormat; } });
+var serialization_format_1 = require("./manifest-coder/serialization-format");
+Object.defineProperty(exports, "ManifestCoderFormat", { enumerable: true, get: function () { return serialization_format_1.ManifestCoderFormat; } });
 __exportStar(require("./context-state-matrix"), exports);
 __exportStar(require("./element-descriptor"), exports);
 __exportStar(require("./schema"), exports);

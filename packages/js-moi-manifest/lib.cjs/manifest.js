@@ -4,8 +4,8 @@ exports.ManifestCoder = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const element_descriptor_1 = require("./element-descriptor");
-const json_manifest_serializer_1 = require("./manifest-serializer/json-manifest-serializer");
-const serialization_format_1 = require("./manifest-serializer/serialization-format");
+const json_manifest_coder_1 = require("./manifest-coder/json-manifest-coder");
+const serialization_format_1 = require("./manifest-coder/serialization-format");
 const schema_1 = require("./schema");
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
@@ -195,22 +195,22 @@ class ManifestCoder {
     * @returns {string} The POLO-encoded data.
     */
     static encodeManifest(manifest) {
-        const serializer = new json_manifest_serializer_1.JsonManifestSerializer();
-        return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.serialize(manifest));
+        const serializer = new json_manifest_coder_1.JsonManifestCoder();
+        return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
     }
     /**
      * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
      *
      * @param {string | Uint8Array} manifest - The manifest `string` or `Uint8Array` to decode.
-     * @param {ManifestFormat} format - The format of the manifest.
+     * @param {ManifestCoderFormat} format - The format of the manifest.
      * @returns {LogicManifest.Manifest} The decoded `LogicManifest.Manifest` object
      *
      * @throws {Error} If the manifest is invalid or the format is unsupported.
      */
     static decodeManifest(manifest, format) {
-        if (format === serialization_format_1.ManifestFormat.JSON) {
-            const serializer = new json_manifest_serializer_1.JsonManifestSerializer();
-            return serializer.deserialize(manifest);
+        if (format === serialization_format_1.ManifestCoderFormat.JSON) {
+            const serializer = new json_manifest_coder_1.JsonManifestCoder();
+            return serializer.decode(manifest);
         }
         js_moi_utils_1.ErrorUtils.throwError("Unsupported manifest format", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }

@@ -1,6 +1,6 @@
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
-import { ManifestFormat } from "./manifest-serializer/serialization-format";
+import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -98,11 +98,11 @@ export declare class ManifestCoder {
      * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
      *
      * @param {string | Uint8Array} manifest - The manifest `string` or `Uint8Array` to decode.
-     * @param {ManifestFormat} format - The format of the manifest.
+     * @param {ManifestCoderFormat} format - The format of the manifest.
      * @returns {LogicManifest.Manifest} The decoded `LogicManifest.Manifest` object
      *
      * @throws {Error} If the manifest is invalid or the format is unsupported.
      */
-    static decodeManifest(manifest: string | Uint8Array, format: ManifestFormat): LogicManifest.Manifest;
+    static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat): LogicManifest.Manifest;
 }
 //# sourceMappingURL=manifest.d.ts.map

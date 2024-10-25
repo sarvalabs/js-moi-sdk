@@ -3,8 +3,8 @@ import { Depolorizer, documentEncode, Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
 import { ElementDescriptor } from "./element-descriptor";
-import { JsonManifestSerializer } from "./manifest-serializer/json-manifest-serializer";
-import { ManifestFormat } from "./manifest-serializer/serialization-format";
+import { JsonManifestCoder } from "./manifest-coder/json-manifest-coder";
+import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
 import { Schema } from "./schema";
 
 /**
@@ -269,24 +269,24 @@ export class ManifestCoder {
      * @returns {string} The POLO-encoded data.
      */
      public static encodeManifest(manifest: LogicManifest.Manifest): string {
-        const serializer = new JsonManifestSerializer();
-        return "0x" + bytesToHex(serializer.serialize(manifest));
+        const serializer = new JsonManifestCoder();
+        return "0x" + bytesToHex(serializer.encode(manifest));
     }
 
     /**
      * Decodes a POLO encoded manifest into a `LogicManifest.Manifest` object.
      * 
      * @param {string | Uint8Array} manifest - The manifest `string` or `Uint8Array` to decode.
-     * @param {ManifestFormat} format - The format of the manifest.
+     * @param {ManifestCoderFormat} format - The format of the manifest.
      * @returns {LogicManifest.Manifest} The decoded `LogicManifest.Manifest` object
      * 
      * @throws {Error} If the manifest is invalid or the format is unsupported.
      */
-    public static decodeManifest(manifest: string | Uint8Array, format: ManifestFormat): LogicManifest.Manifest {
+    public static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat): LogicManifest.Manifest {
         
-        if (format === ManifestFormat.JSON) {
-            const serializer = new JsonManifestSerializer();
-            return serializer.deserialize(manifest);
+        if (format === ManifestCoderFormat.JSON) {
+            const serializer = new JsonManifestCoder();
+            return serializer.decode(manifest);
         }
 
         ErrorUtils.throwError("Unsupported manifest format", ErrorCode.UNSUPPORTED_OPERATION);
