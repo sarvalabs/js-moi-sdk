@@ -17,19 +17,19 @@ describe("Test ManifestCoder", () => {
         const testcases = [
             {
                 manifest: "../../manifests/tokenledger.json",
-                expected: "../../manifests/tokenledger-polo.txt",
+                expected: "../../manifests/tokenledger.polo",
             },
             {
                 manifest: "../../manifests/flipper.json",
-                expected: "../../manifests/flipper-polo.txt",
+                expected: "../../manifests/flipper.polo",
             },
             {
                 manifest: "../../manifests/guardian.json",
-                expected: "../../manifests/guardian-polo.txt",
+                expected: "../../manifests/guardian.polo",
             },
             {
                 manifest: "../../manifests/lock-ledger.json",
-                expected: "../../manifests/lock-ledger-polo.txt",
+                expected: "../../manifests/lock-ledger.polo",
             }
         ]
 
@@ -123,19 +123,19 @@ describe("Test ManifestCoder", () => {
     test("it should decode polo-encoded manifest", async () => {
         const testCases = [
             {
-                manifest: "../../manifests/tokenledger-polo.txt",
+                manifest: "../../manifests/tokenledger.polo",
                 expected: "../../manifests/tokenledger.json",
             },
             {
-                manifest: "../../manifests/flipper-polo.txt",
+                manifest: "../../manifests/flipper.polo",
                 expected: "../../manifests/flipper.json",
             },
             {
-                manifest: "../../manifests/guardian-polo.txt",
+                manifest: "../../manifests/guardian.polo",
                 expected: "../../manifests/guardian.json",
             },
             {
-                manifest: "../../manifests/lock-ledger-polo.txt",
+                manifest: "../../manifests/lock-ledger.polo",
                 expected: "../../manifests/lock-ledger.json",
             }
         ];
