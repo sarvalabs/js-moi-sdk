@@ -577,7 +577,7 @@ height, hash, timestamp, and other relevant data.
 
 ``WebSocketEvent.NewTesseractsByAccount`` - This event is triggered when a new tesseract belonging to 
 the given address is mined on the blockchain. It provides information about the 
-tesseract. The address parameter can be passed as show in the example below.
+tesseract.
 
 ``WebSocketEvent.NewPendingInteractions`` - This event is emitted when a new interaction is added to
 interaction pool. It provides an interaction hash.
