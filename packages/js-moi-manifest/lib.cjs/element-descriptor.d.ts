@@ -1,4 +1,4 @@
-import type { CallSite, EventDef, LogicManifest, MethodDef } from "../types/manifest";
+import type { LogicManifest } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
 /**
  * This class represents a descriptor for elements in the logic manifest.
@@ -6,10 +6,10 @@ import { ContextStateMatrix } from "./context-state-matrix";
 export declare class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element>;
-    protected callSites: Map<string, CallSite>;
+    protected callSites: Map<string, LogicManifest.CallSite>;
     protected classDefs: Map<string, number>;
-    protected methodDefs: Map<string, MethodDef>;
-    protected eventsDefs: Map<string, EventDef>;
+    protected methodDefs: Map<string, LogicManifest.MethodDef>;
+    protected eventsDefs: Map<string, LogicManifest.EventDef>;
     constructor(elements: LogicManifest.Element[]);
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
@@ -28,20 +28,20 @@ export declare class ElementDescriptor {
      *
      * @returns {Map<string, CallSite>} The call sites map.
      */
-    getCallsites(): Map<string, CallSite>;
+    getCallsites(): Map<string, LogicManifest.CallSite>;
     /**
      * Retrieves the map of class definitions associated with the ElementDescriptor.
      *
      * @returns {Map<string, number>} The class definitions map.
      */
     getClassDefs(): Map<string, number>;
-    getEvents(): Map<string, EventDef>;
+    getEvents(): Map<string, LogicManifest.EventDef>;
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
      *
      * @returns {Map<string, MethodDef>} The method definitions map.
      */
-    getMethodDefs(): Map<string, MethodDef>;
+    getMethodDefs(): Map<string, LogicManifest.MethodDef>;
     /**
      * Retrieves the methods of a class based on the given class name.
      *

@@ -101,19 +101,20 @@ export declare module LogicManifest {
     ptr: number;
     kind: string;
   }
+  
+  export interface EventDef {
+    ptr: number;
+    topics: number;
+  }
+
+  export interface MethodDef {
+    ptr: number;
+    class: string;
+  }
+
+  export interface CallSite {
+    ptr: number;
+    kind: string;
+  }
 }
 
-export interface EventDef {
-  ptr: number;
-  topics: number;
-}
-
-export interface MethodDef {
-  ptr: number;
-  class: string;
-}
-
-export interface CallSite {
-  ptr: number;
-  kind: string;
-}

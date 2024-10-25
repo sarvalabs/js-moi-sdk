@@ -1,5 +1,5 @@
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import type { CallSite, EventDef, LogicManifest, MethodDef } from "../types/manifest";
+import type { LogicManifest } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
 
 
@@ -10,10 +10,10 @@ import { ContextStateMatrix } from "./context-state-matrix";
 export class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element> = new Map();
-    protected callSites: Map<string, CallSite> = new Map();
+    protected callSites: Map<string, LogicManifest.CallSite> = new Map();
     protected classDefs: Map<string, number> = new Map();
-    protected methodDefs: Map<string, MethodDef> = new Map();
-    protected eventsDefs = new Map<string, EventDef>();
+    protected methodDefs: Map<string, LogicManifest.MethodDef> = new Map();
+    protected eventsDefs = new Map<string, LogicManifest.EventDef>();
 
     constructor(elements: LogicManifest.Element[]) {
         this.stateMatrix = new ContextStateMatrix(elements);
@@ -29,7 +29,7 @@ export class ElementDescriptor {
                     break;
                 case "method":
                     const methodData = element.data as LogicManifest.Method;
-                    const methodDef: MethodDef = {
+                    const methodDef: LogicManifest.MethodDef = {
                         ptr: element.ptr,
                         class: methodData.class,
                     };
@@ -37,7 +37,7 @@ export class ElementDescriptor {
                     break;
                 case "routine":
                     const routineData = element.data as LogicManifest.Routine;
-                    const callsite: CallSite = {
+                    const callsite: LogicManifest.CallSite = {
                         ptr: element.ptr,
                         kind: routineData.kind,
                     };
@@ -76,7 +76,7 @@ export class ElementDescriptor {
      *
      * @returns {Map<string, CallSite>} The call sites map.
      */
-    public getCallsites(): Map<string, CallSite> {
+    public getCallsites(): Map<string, LogicManifest.CallSite> {
         return this.callSites;
     }
 
@@ -89,7 +89,7 @@ export class ElementDescriptor {
         return this.classDefs;
     }
 
-    public getEvents(): Map<string, EventDef> {
+    public getEvents(): Map<string, LogicManifest.EventDef> {
         return this.eventsDefs;
     }
 
@@ -98,7 +98,7 @@ export class ElementDescriptor {
      *
      * @returns {Map<string, MethodDef>} The method definitions map.
      */
-    public getMethodDefs(): Map<string, MethodDef> {
+    public getMethodDefs(): Map<string, LogicManifest.MethodDef> {
         return this.methodDefs;
     }
 
