@@ -299,29 +299,17 @@ The ``CallorEstimateIxObject`` interface extends ``InteractionObject`` and repre
 * ``nonce`` - ``number | bigint``: The nonce value.
 * ``sender`` - ``string``: The sender of the interaction.
 
-**WsReconnectOptions**
+**WebsocketConnection**
 
-The ``WsReconnectOptions`` interface represents options for websocket reconnection. It has the following properties:
+The ``WebsocketConnection`` interface represents options for a websocket provider. It has the following properties:
 
-* ``auto`` - ``boolean``: Specifies if automatic reconnection should be enabled (optional).
-* ``delay`` - ``number``: The delay duration in milliseconds between reconnection attempts (optional).
-* ``maxAttempts`` - ``number``: The maximum number of reconnection attempts (optional).
-* ``onTimeout`` - ``boolean``: Specifies whether the reconnection attempts should be triggered on timeout (optional).
-
-**WebsocketProviderOptions**
-
-The ``WebsocketProviderOptions`` interface represents options for a websocket provider. It has the following properties:
-
-* ``host`` - ``string``: The host of the websocket connection (optional).
-* ``timeout`` - ``number``: The timeout value for the connection (optional).
-* ``reconnect`` - ``any``: Reconnection options for the websocket connection (optional).
-* ``reconnectDelay`` - ``number``: The delay duration for reconnection attempts (optional).
-* ``reconnectOptions`` - ``WsReconnectOptions``: Additional options for reconnection (optional).
-* ``headers`` - ``any``: Custom headers for the websocket connection (optional).
-* ``protocol`` - ``string``: The protocol to be used for the connection (optional).
+* ``protocols`` - ``object``: The protocols for the websocket connection (optional).
+* ``headers`` - ``object``: The headers for the websocket connection (optional).
+* ``requestOptions`` - ``object``: The request options for the websocket connection (optional).
 * ``clientConfig`` - ``object``: Configuration options for the websocket client (optional).
-* ``requestOptions`` - ``any``: Additional options for the websocket connection request (optional).
-* ``origin`` - ``string``: The origin for the websocket connection (optional).
+* ``reconnect`` - ``object``: Configuration options for websocket reconnection (optional).
+* ``timeout`` - ``number``: The timeout duration in milliseconds for the websocket connection (optional).
+
 
 .. note::
 
@@ -544,7 +532,13 @@ WebSocket connection, facilitating real-time interaction with the blockchain.
 .. code-block:: javascript
 
     // Example
-    const provider = new WebSocketProvider("ws://localhost:1600/ws");
+    const provider = new WebsocketProvider("wss://localhost:8080", {
+        timeout: 20000,
+        reconnect: {
+            delay: 1000,
+            maxAttempts: 5000
+        }
+    });
 
 WebSocket Events
 ~~~~~~~~~~~~~~~~
