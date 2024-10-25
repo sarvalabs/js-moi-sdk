@@ -1,6 +1,6 @@
 import { type LogicManifest } from "../lib.cjs";
 import { ManifestCoder } from "../src.ts/manifest";
-import { ManifestFormat } from "../src.ts/manifest-serializer/serialization-format";
+import { ManifestCoderFormat } from "../src.ts/manifest-coder/serialization-format";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
 describe("Test ManifestCoder", () => {
@@ -146,8 +146,37 @@ describe("Test ManifestCoder", () => {
                 loadManifestFromFile(testCase.expected),
             ]);
 
-            const manifest = ManifestCoder.decodeManifest(polo, ManifestFormat.JSON);
+            const manifest = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.JSON);
             expect(manifest).toEqual(expected);
+        }));
+    });
+
+    test("Encoding JSON into YAML", async () => {
+        const testCases = [
+            {
+                manifest: "../../manifests/tokenledger.polo",
+                expected: "../../manifests/tokenledger.json",
+            },
+            {
+                manifest: "../../manifests/flipper.polo",
+                expected: "../../manifests/flipper.json",
+            },
+            {
+                manifest: "../../manifests/guardian.polo",
+                expected: "../../manifests/guardian.json",
+            },
+            {
+                manifest: "../../manifests/lock-ledger.polo",
+                expected: "../../manifests/lock-ledger.json",
+            }
+        ];
+
+        await Promise.all(testCases.map(async (testCase) => {
+            const polo= await loadFile(testCase.manifest)
+            const yaml = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML);
+            
+            expect(ManifestCoder.encodeManifest(yaml)).toBe(polo);
+            expect(ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML)).toEqual(yaml);
         }));
     });
 });
