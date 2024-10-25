@@ -8,12 +8,8 @@ import { LogicFactory } from "../src.ts/logic-factory";
 import { ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "../src.ts/state/accessor";
 import { loadManifestFromFile } from "./utils/utils";
 
-const HOST = "<YOUR JSON RPC HOST>";
-const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
-const PATH = "m/44'/6174'/7020'/0/0";
-const PROVIDER = new JsonRpcProvider(HOST);
-
-const wallet = Wallet.fromMnemonicSync(MNEMONIC, PATH);
+const PROVIDER = new JsonRpcProvider(process.env.JSON_RPC_URL);
+const wallet = Wallet.fromMnemonicSync(process.env.SRP, process.env.DEVIATION_PATH);
 wallet.connect(PROVIDER);
 
 describe("Slot Key Generation", () => {
@@ -126,7 +122,7 @@ describe("Accessing Persistance Storage", () => {
 
         await new Promise((resolve) => setTimeout(resolve, 3000)); // This is wait time as instantly fetching logic causing logic not found error
 
-        logic = await getLogicDriver(result.logic_id, PROVIDER);
+        logic = await getLogicDriver(result.logic_id, wallet);
     });
 
     test("it should return the size of the map", async () => {

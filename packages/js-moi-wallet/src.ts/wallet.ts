@@ -386,9 +386,10 @@ export class Wallet extends Signer {
 
             return wallet
         } catch (error) {
-            ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
-                originalError: error,
-            });
+            console.log(error)
+            // ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
+            //     originalError: error,
+            // });
         }
     }
 

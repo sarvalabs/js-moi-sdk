@@ -2,8 +2,9 @@ import { Wallet } from "js-moi-wallet";
 import type { AbstractProvider } from "../../src.ts/abstract-provider";
 
 export const initializeWallet = (provider: AbstractProvider, mnemonic: string): Wallet => {
-    const derivationPath = "m/44'/6174'/7020'/0/0";
-    const wallet =  Wallet.fromMnemonicSync(mnemonic, derivationPath);
+    console.log("mnemonic", mnemonic);
+    console.log("process.env.DEVIATION_PATH", process.env.DEVIATION_PATH);
+    const wallet =  Wallet.fromMnemonicSync(mnemonic, process.env.DEVIATION_PATH);
     wallet.connect(provider);
     return wallet;
 }

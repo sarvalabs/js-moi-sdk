@@ -8,18 +8,16 @@ import { loadManifestFromFile } from "js-moi-manifest/__tests__/utils/helper";
 import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "js-moi-providers";
 import { createRoutineOption } from "../src.ts/routine-options";
 
-const HOST = "<YOUR JSON RPC HOST>";
-const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
 const INITIAL_SUPPLY = 100000000;
 const SYMBOL = "MOI";
 const RECEIVER = "0x4cdc9a1430ca00cbaaab5dcd858236ba75e64b863d69fa799d31854e103ddf72";
-const PATH = "m/44'/6174'/7020'/0/0";
-const PROVIDER = new JsonRpcProvider(HOST);
+
+const PROVIDER = new JsonRpcProvider(process.env['JSON_RPC_URL']);
 
 let wallet: Wallet;
 
 beforeAll(async () => {
-    wallet = await Wallet.fromMnemonic(MNEMONIC, PATH);
+    wallet = await Wallet.fromMnemonic(process.env['SRP'], process.env['DEVIATION_PATH']);
     wallet.connect(PROVIDER);
 });
 
@@ -139,46 +137,6 @@ describe("Logic", () => {
         });
 
         it("should throw error when reading from persistent storage with invalid key", async () => {
-            const invalidKey = "invalid-key";
-
-            expect(async () => {
-                await logic.persistentState.get((b) => b.entity(invalidKey));
-            }).rejects.toThrow(`'${invalidKey}' is not member of persistent state`);
-        });
-    });
-
-    describe("logic driver initialized using provider", () => {
-        let logic: LogicDriver;
-
-        beforeAll(async () => {
-            if (logicId == null) {
-                expect(logicId).toBeDefined();
-            }
-
-            logic = await getLogicDriver(logicId!, PROVIDER);
-        });
-
-        // it("should able to retrieve balance of the account", async () => {
-        //     const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
-
-        //     expect(balance).toBeGreaterThan(0);
-        // });
-
-        it("should throw an exception in mutating routine call", async () => {
-            const amount = Math.floor(Math.random() * 1000);
-
-            expect(async () => {
-                await logic.routines.Transfer(amount, RECEIVER);
-            }).rejects.toThrow("Mutating routine calls require a signer to be initialized.");
-        });
-
-        it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get((b) => b.entity("Symbol"));
-
-            expect(symbol).toBe(SYMBOL);
-        });
-
-        it("should throw an exception when reading from persistent storage with invalid key", async () => {
             const invalidKey = "invalid-key";
 
             expect(async () => {

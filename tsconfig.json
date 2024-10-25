@@ -19,7 +19,7 @@
         "experimentalDecorators": true,
         "noUnusedLocals": true,
         "incremental": true,
-        "tsBuildInfoFile": "dist/.tsbuildinfo"
+        "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
     },
     "ts-node": {
         "esm": true
@@ -86,6 +86,6 @@
             "path": "./packages/js-moi/tsconfig.esm.json"
         }
     ],
-    "include": ["packages/**/*.ts"],
-    "exclude": ["node_modules", "**/__tests__/**" ,"dist"]
+    "include": ["./.env.d.ts", "packages/**/*"],
+    "exclude": ["node_modules" ,"dist"]
 }

@@ -4,26 +4,16 @@ import { WebSocketEvent } from "../src.ts/websocket-events";
 import { WebsocketProvider } from "../src.ts/websocket-provider";
 import { getRandomSupply, initializeWallet } from "./utils/utils";
 
-const HOST = "<YOUR WEBSOCKET HOST PATH (ws://localhost:1600/ws)>";
-const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
+
 const ASSET_ID = "0x00000000c67fbf5825d505586701135114fe76f5c0b18675c4a08467e8aa1495482c20c7";
 
 describe("Test Websocket Provider", () => {
-    const isValidMnemonic = MNEMONIC.split(" ").length === 12;
-    if (!isValidMnemonic) {
-        throw new Error("Invalid mnemonic");
-    }
-   
-    if (!HOST.startsWith("ws://") && !HOST.startsWith("wss://")) {
-        throw new Error("Provider host is not websocket host");
-    }
-
     if (!ASSET_ID.startsWith("0x")) {
         throw new Error("Invalid asset id");
     }
 
     let wallet: Wallet | undefined;
-    const provider = new WebsocketProvider(HOST);
+    const provider = new WebsocketProvider(process.env.WS_URL);
 
     const getWallet = () => {
         if (!wallet) {
@@ -33,7 +23,7 @@ describe("Test Websocket Provider", () => {
     };
 
     beforeAll(async () => {
-        wallet = await initializeWallet(provider, MNEMONIC);
+        wallet = initializeWallet(provider, process.env.SRP);
     });
 
     describe("It should be able to perform rpc calls", () => {

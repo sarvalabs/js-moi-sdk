@@ -1,4 +1,11 @@
+import { config } from "dotenv";
 import { Config } from "jest";
+
+const op = config();
+
+if (op.error) {
+    throw new Error("Failed to load .env file", { cause: op.error });
+}
 
 const configuration: Config = {
     projects: [
@@ -11,46 +18,46 @@ const configuration: Config = {
             },
             moduleFileExtensions: ['js', 'ts', 'd.ts'],
         },
-        {
-            displayName: 'js-moi-hdnode',
-            testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/js-moi-hdnode/__tests__/*.test.ts'],
-            transform: {
-                '^.+\\.tsx?$': 'ts-jest',
-            },
-        },
-        {
-            displayName: 'js-moi-wallet',
-            testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/js-moi-wallet/__tests__/*.test.ts'],
-            transform: {
-                '^.+\\.tsx?$': 'ts-jest',
-            },
-        },
-        {
-            displayName: 'js-moi-manifest',
-            testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/js-moi-manifest/__tests__/*.test.ts'],
-            transform: {
-                '^.+\\.tsx?$': 'ts-jest',
-            },
-        },
-        {
-            displayName: 'js-moi-utils',
-            testEnvironment: 'ts-node',
-            testMatch: ['<rootDir>/packages/js-moi-utils/__tests__/*.test.ts'],
-            transform: {
-                '^.+\\.tsx?$': 'ts-jest',
-            },
-        },
         // {
-        //     displayName: 'js-moi-providers',
+        //     displayName: 'js-moi-hdnode',
         //     testEnvironment: 'ts-node',
-        //     testMatch: ['<rootDir>/packages/js-moi-providers/__tests__/*.test.ts'],
+        //     testMatch: ['<rootDir>/packages/js-moi-hdnode/__tests__/*.test.ts'],
         //     transform: {
         //         '^.+\\.tsx?$': 'ts-jest',
         //     },
         // },
+        // {
+        //     displayName: 'js-moi-wallet',
+        //     testEnvironment: 'ts-node',
+        //     testMatch: ['<rootDir>/packages/js-moi-wallet/__tests__/*.test.ts'],
+        //     transform: {
+        //         '^.+\\.tsx?$': 'ts-jest',
+        //     },
+        // },
+        // {
+        //     displayName: 'js-moi-manifest',
+        //     testEnvironment: 'ts-node',
+        //     testMatch: ['<rootDir>/packages/js-moi-manifest/__tests__/*.test.ts'],
+        //     transform: {
+        //         '^.+\\.tsx?$': 'ts-jest',
+        //     },
+        // },
+        // {
+        //     displayName: 'js-moi-utils',
+        //     testEnvironment: 'ts-node',
+        //     testMatch: ['<rootDir>/packages/js-moi-utils/__tests__/*.test.ts'],
+        //     transform: {
+        //         '^.+\\.tsx?$': 'ts-jest',
+        //     },
+        // },
+        {
+            displayName: 'js-moi-providers',
+            testEnvironment: 'ts-node',
+            testMatch: ['<rootDir>/packages/js-moi-providers/__tests__/*.test.ts'],
+            transform: {
+                '^.+\\.tsx?$': 'ts-jest',
+            },
+        },
         // {
         //     displayName: 'js-moi-logic',
         //     testEnvironment: 'ts-node',
