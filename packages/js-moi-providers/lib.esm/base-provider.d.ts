@@ -406,6 +406,7 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getNodeInfo(): Promise<NodeInfo>;
     getSubscription(event: ProviderEvents): Promise<string>;
+    private validateAndFormatEvent;
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.

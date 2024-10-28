@@ -1141,31 +1141,36 @@ export class BaseProvider extends AbstractProvider {
         }
 
         if (typeof event === "object") {
-            if (!isValidAddress(event.params.address)) {
-                ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params);
-            }
-
-            if (event.event === 'newTesseractsByAccount') {
-                params = [event.event, { address: event.params.address }];
-            }
-
-            if (event.event === 'newLogs') {
-                if (event.params.topics == null) {
-                    event.params.topics = [];
-                }
-
-                if (Array.isArray(event.params.topics) === false) {
-                    ErrorUtils.throwArgumentError("Topics should be an array", "event.params.topics", event.params.topics);
-                }
-
-                params = [event.event, { address: event.params.address, topics: this.hashTopics(event.params.topics), start_height: event.params.height[0], end_height: event.params.height[1] }];
-            }
+            params = this.validateAndFormatEvent(event);
 
         }
         
-
         const response = await this.execute("moi.subscribe", params);
         return this.processResponse(response);
+    }
+
+    private validateAndFormatEvent(event: { event: string; params: any; }) {
+        if (!isValidAddress(event.params.address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params);
+        }
+
+        if (event.event === 'newTesseractsByAccount') {
+            return [event.event, { address: event.params.address }];
+        }
+
+        if (event.event === 'newLogs') {
+            if (event.params.topics == null) {
+                event.params.topics = [];
+            }
+
+            if (Array.isArray(event.params.topics) === false) {
+                ErrorUtils.throwArgumentError("Topics should be an array", "event.params.topics", event.params.topics);
+            }
+
+            return [event.event, { address: event.params.address, topics: this.hashTopics(event.params.topics), start_height: event.params.height[0], end_height: event.params.height[1] }];
+        }
+
+        throw ErrorUtils.throwError("Invalid event type", ErrorCode.INVALID_ARGUMENT);
     }
 
     /**
