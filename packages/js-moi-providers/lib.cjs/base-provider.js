@@ -924,16 +924,13 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             params = event;
         }
         if (typeof event === "object") {
+            if (!(0, js_moi_utils_1.isValidAddress)(event.params.address)) {
+                js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params);
+            }
             if (event.event === 'newTesseractsByAccount') {
-                if (!(0, js_moi_utils_1.isValidAddress)(event.params.address)) {
-                    js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
-                }
                 params = [event.event, { address: event.params.address }];
             }
             if (event.event === 'newLogs') {
-                if (!(0, js_moi_utils_1.isValidAddress)(event.params.address)) {
-                    js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params.address);
-                }
                 if (event.params.topics == null) {
                     event.params.topics = [];
                 }

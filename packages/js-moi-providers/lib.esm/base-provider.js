@@ -921,16 +921,13 @@ export class BaseProvider extends AbstractProvider {
             params = event;
         }
         if (typeof event === "object") {
+            if (!isValidAddress(event.params.address)) {
+                ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params);
+            }
             if (event.event === 'newTesseractsByAccount') {
-                if (!isValidAddress(event.params.address)) {
-                    ErrorUtils.throwArgumentError("Invalid address provided", "event.params", event.params);
-                }
                 params = [event.event, { address: event.params.address }];
             }
             if (event.event === 'newLogs') {
-                if (!isValidAddress(event.params.address)) {
-                    ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params.address);
-                }
                 if (event.params.topics == null) {
                     event.params.topics = [];
                 }
