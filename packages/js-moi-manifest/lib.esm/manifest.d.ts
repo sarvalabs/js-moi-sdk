@@ -85,6 +85,18 @@ export declare class ManifestCoder {
      */
     static decodeException(error: string): Exception | null;
     /**
+    * Decodes a specific state field from the data retrieved from a logic.
+    * The state data is decoded using the provided fields and schema.
+    * Returns the decoded value of the specified field, or null if the data is empty.
+    *
+    * @param {string} data - The state data to decode, represented as a hexadecimal string prefixed with "0x".
+    * @param {string} field - The field to be decoded from the state data.
+    * @param {LogicManifest.TypeField[]} fields - The fields associated with the state data.
+    *
+    * @returns {unknown | null} The decoded value of the specified field, or null if the data is empty.
+    */
+    decodeState(data: string, field: string, fields: LogicManifest.TypeField[]): unknown | null;
+    /**
      * Encodes a manifest into a hexadecimal string.
      *
      * This function supports encoding both JSON and YAML manifest formats.

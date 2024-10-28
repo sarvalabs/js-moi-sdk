@@ -229,6 +229,8 @@ Methods
 
 .. autofunction:: decodeEventOutput
 
+.. autofunction:: decodeState
+
 Schema
 ------
 

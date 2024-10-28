@@ -184,6 +184,26 @@ export class ManifestCoder {
         return null;
     }
     /**
+    * Decodes a specific state field from the data retrieved from a logic.
+    * The state data is decoded using the provided fields and schema.
+    * Returns the decoded value of the specified field, or null if the data is empty.
+    *
+    * @param {string} data - The state data to decode, represented as a hexadecimal string prefixed with "0x".
+    * @param {string} field - The field to be decoded from the state data.
+    * @param {LogicManifest.TypeField[]} fields - The fields associated with the state data.
+    *
+    * @returns {unknown | null} The decoded value of the specified field, or null if the data is empty.
+    */
+    decodeState(data, field, fields) {
+        if (data && data != "0x") {
+            const decodedData = hexToBytes(data);
+            const depolorizer = new Depolorizer(decodedData);
+            const schema = this.schema.parseFields(fields);
+            return depolorizer.depolorize(schema.fields[field]);
+        }
+        return null;
+    }
+    /**
      * Encodes a manifest into a hexadecimal string.
      *
      * This function supports encoding both JSON and YAML manifest formats.
