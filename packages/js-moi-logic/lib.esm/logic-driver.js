@@ -1,4 +1,3 @@
-import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
@@ -125,8 +124,7 @@ export class LogicDriver extends LogicDescriptor {
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
 export const getLogicDriver = async (logicId, signer, options) => {
-    const provider = signer instanceof Signer ? signer.getProvider() : signer;
-    const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+    const manifest = await signer.getProvider().getLogicManifest(logicId, "JSON", options);
     if (typeof manifest !== "object") {
         ErrorUtils.throwError("Invalid logic manifest", ErrorCode.INVALID_ARGUMENT);
     }

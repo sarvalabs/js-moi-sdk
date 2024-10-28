@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
-const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
 const routine_options_1 = require("./routine-options");
@@ -129,8 +128,7 @@ exports.LogicDriver = LogicDriver;
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
 const getLogicDriver = async (logicId, signer, options) => {
-    const provider = signer instanceof js_moi_signer_1.Signer ? signer.getProvider() : signer;
-    const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+    const manifest = await signer.getProvider().getLogicManifest(logicId, "JSON", options);
     if (typeof manifest !== "object") {
         js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }

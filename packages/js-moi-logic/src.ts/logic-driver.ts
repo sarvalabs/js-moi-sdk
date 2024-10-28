@@ -156,8 +156,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
 export const getLogicDriver = async <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: Options): Promise<LogicDriver<T>> => {
-    const provider = signer instanceof Signer ? signer.getProvider() : signer;
-    const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+    const manifest = await signer.getProvider().getLogicManifest(logicId, "JSON", options);
 
     if (typeof manifest !== "object") {
         ErrorUtils.throwError(
