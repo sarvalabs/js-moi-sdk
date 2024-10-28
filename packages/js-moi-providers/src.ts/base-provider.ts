@@ -18,11 +18,11 @@ import type {
     InteractionRequest, InteractionResponse,
     Log, LogFilter,
     LogicManifestParams, NodeInfo, Options,
-    ProviderEvents,
     Registry,
     RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
+import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
 import { processIxObject } from "./interaction";
 
