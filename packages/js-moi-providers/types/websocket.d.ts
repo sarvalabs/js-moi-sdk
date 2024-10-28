@@ -1,6 +1,6 @@
-import type { Tesseract } from "js-moi-utils/src.ts";
-import type { WebSocketEvent } from "../src.ts/index.js";
-import type { LogFilter } from "./jsonrpc.js";
+import type { Tesseract } from "js-moi-utils";
+import type { WebSocketEvent } from "../src.ts/websocket-events";
+import type { LogFilter } from "./jsonrpc";
 
 export type NewTesseractsByAccount = {
     event: WebSocketEvent.NewTesseractsByAccount;
