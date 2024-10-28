@@ -79,7 +79,7 @@ describe("Test ManifestCoder", () => {
         });
     });
 
-    test("Decoding polo exception", () => {
+    test("Decode polo encoded exception", () => {
         const error =
             "0x0e6f0666d104de04737472696e67696e73756666696369656e742062616c616e636520666f722073656e6465723f06e60172756e74696d652e726f6f742829726f7574696e652e5472616e736665722829205b3078635d202e2e2e205b307831623a205448524f57203078355d";
         const exception = ManifestCoder.decodeException(error);
@@ -93,7 +93,7 @@ describe("Test ManifestCoder", () => {
         });
     });
 
-    test("Decode event log", () => {
+    test("Decode polo encoded event log", () => {
       const testTable = [
         {
           event: "builtin.Log",
