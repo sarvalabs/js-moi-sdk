@@ -126,7 +126,7 @@ describe("Accessing Persistance Storage", () => {
 
         await new Promise((resolve) => setTimeout(resolve, 3000)); // This is wait time as instantly fetching logic causing logic not found error
 
-        logic = await getLogicDriver(result.logic_id, PROVIDER);
+        logic = await getLogicDriver(result.logic_id, wallet);
     });
 
     test("it should return the size of the map", async () => {
