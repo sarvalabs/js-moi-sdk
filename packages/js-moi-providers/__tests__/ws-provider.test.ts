@@ -4,9 +4,9 @@ import { WebSocketEvent } from "../src.ts/websocket-events";
 import { WebsocketProvider } from "../src.ts/websocket-provider";
 import { getRandomSupply, initializeWallet } from "./utils/utils";
 
-const HOST = "<YOUR WEBSOCKET HOST PATH (ws://localhost:1600/ws)>";
-const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
-const ASSET_ID = "0x00000000c67fbf5825d505586701135114fe76f5c0b18675c4a08467e8aa1495482c20c7";
+const HOST = "<YOUR WEBSOCKET HOST>";
+const MNEMONIC = "<YOUR MNEMONIC>";
+const ASSET_ID = "<YOUR ASSET ID>";
 
 describe("Test Websocket Provider", () => {
     const isValidMnemonic = MNEMONIC.split(" ").length === 12;
