@@ -4,7 +4,8 @@ export class RoutineOption {
     fuelLimit;
     fuelPrice;
     constructor(options = {}) {
-        for (const key of Object.keys(options)) {
+        const keys = Object.keys(options);
+        for (const key of keys) {
             this[key] = options[key];
         }
     }

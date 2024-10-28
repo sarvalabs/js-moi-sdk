@@ -129,10 +129,6 @@ export abstract class Signer {
                 ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);
             }
 
-            if (ixObject.nonce != null && typeof ixObject.nonce !== "number") {
-                ErrorUtils.throwError(`Invalid nonce. Expected number, got ${typeof ixObject.nonce}`, ErrorCode.INVALID_ARGUMENT);
-            }
-
             if(ixObject.nonce != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
                 if(ixObject.nonce < nonce) {
