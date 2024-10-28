@@ -338,3 +338,20 @@ export interface LogFilter {
     height: [start: number, end: number];
     topics?: NestedArray<string>;
 }
+
+
+export interface Log {
+    address: string;
+    topics: string[];
+    data: string;
+    ix_hash: string;
+    ts_hash: string;
+    participants: Participants;
+}
+
+export interface LogFilter {
+    address: string;
+    height: [start: number, end: number];
+    topics?: NestedArray<string>;
+}
+

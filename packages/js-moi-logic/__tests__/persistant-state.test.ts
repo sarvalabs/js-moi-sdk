@@ -8,9 +8,10 @@ import { LogicFactory } from "../src.ts/logic-factory";
 import { ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "../src.ts/state/accessor";
 import { loadManifestFromFile } from "./utils/utils";
 
-const MNEMONIC = "laptop hybrid ripple unaware entire cover flag rally deliver adjust nerve ready";
-const PATH = "m/44'/6174'/0'/0/1";
-const PROVIDER = new JsonRpcProvider("http://localhost:1600");
+const HOST = "<YOUR JSON RPC HOST>";
+const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
+const PATH = "m/44'/6174'/7020'/0/0";
+const PROVIDER = new JsonRpcProvider(HOST);
 
 const wallet = Wallet.fromMnemonicSync(MNEMONIC, PATH);
 wallet.connect(PROVIDER);
@@ -125,11 +126,11 @@ describe("Accessing Persistance Storage", () => {
 
         await new Promise((resolve) => setTimeout(resolve, 3000)); // This is wait time as instantly fetching logic causing logic not found error
 
-        logic = await getLogicDriver(result.logic_id, PROVIDER);
+        logic = await getLogicDriver(result.logic_id, wallet);
     });
 
     test("it should return the size of the map", async () => {
-        const length = await logic.persistentState.get<number>((accessor) => accessor.entity("balances"));
+        const length = await logic.persistentState.get<number>((accessor) => accessor.entity("Balances"));
 
         expect(typeof length).toBe("number");
         expect(length).toBe(1);
@@ -137,14 +138,14 @@ describe("Accessing Persistance Storage", () => {
 
     test("it should able access value of map", async () => {
         const address = hexToBytes(wallet.address);
-        const balance = await logic.persistentState.get<string>((accessor) => accessor.entity("balances").property(address));
+        const balance = await logic.persistentState.get<string>((accessor) => accessor.entity("Balances").property(address));
 
         expect(typeof balance).toBe("number");
         expect(balance).toBe(supply);
     });
 
     test("it should be able to access primitive in state", async () => {
-        const value = await logic.persistentState.get<string>((accessor) => accessor.entity("symbol"));
+        const value = await logic.persistentState.get<string>((accessor) => accessor.entity("Symbol"));
 
         expect(typeof value).toBe("string");
         expect(value).toBe(symbol);

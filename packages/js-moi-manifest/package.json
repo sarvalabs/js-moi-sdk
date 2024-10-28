@@ -24,6 +24,7 @@
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
     "js-moi-utils": "^0.4.1",
-    "js-polo": "^0.1.3"
+    "js-polo": "0.1.4",
+    "yaml": "^2.6.0"
   }
 }

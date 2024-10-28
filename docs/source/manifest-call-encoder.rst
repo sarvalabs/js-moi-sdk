@@ -170,17 +170,28 @@ Methods
 
     >> "0x0e4f065...50000"
 
+.. autofunction:: decodeManifest
+
+.. code-block:: javascript
+
+    // Example
+    const decodedManifest = ManifestCoder.decodeManifest(encodedManifest, ManifestFormat.JSON);
+    console.log(decodedManifest)
+
+    >> { syntax: 1, engine: { kind: "PISA", flags: [] }, elements: [...] }
+
 .. autofunction:: encodeArguments
 
 .. code-block:: javascript
 
     // Example
-    const args = ["MOI", 100_000_000];
-    const calldata = manifestCoder.encodeArguments("Seeder", args);
+    const calldata = manifestCoder.encodeArguments("Seeder", "MOI", 100_000_000);
 
     console.log(calldata)
 
     >> "0x0d6f0665...d4f49"
+
+.. autofunction:: decodeArguments
 
 .. autofunction:: decodeOutput
 
@@ -217,22 +228,6 @@ Methods
         }
 
 .. autofunction:: decodeEventOutput
-
-.. autofunction:: decodeState
-
-.. code-block:: javascript
-
-    // Example
-    const data = "0x064c4f4749432d546f6b656e";
-
-    const state = manifest.elements.find(element =>
-        element.kind === "state"
-    )
-
-    const output = manifestCoder.decodeState(data, "name", state.data.fields)
-    console.log(output)
-
-    >> "RIO"
 
 Schema
 ------

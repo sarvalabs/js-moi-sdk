@@ -2,20 +2,7 @@ import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import type { LogicManifest } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
 
-export interface EventDef {
-    ptr: number;
-    topics: number;
-}
 
-export interface MethodDef {
-    ptr: number;
-    class: string;
-}
-
-export interface CallSite {
-    ptr: number,
-    kind: string
-}
 
 /**
  * This class represents a descriptor for elements in the logic manifest.
@@ -23,17 +10,16 @@ export interface CallSite {
 export class ElementDescriptor {
     protected stateMatrix: ContextStateMatrix;
     protected elements: Map<number, LogicManifest.Element> = new Map();
-    protected callSites: Map<string, CallSite> = new Map();
+    protected callSites: Map<string, LogicManifest.CallSite> = new Map();
     protected classDefs: Map<string, number> = new Map();
-    protected methodDefs: Map<string, MethodDef> = new Map();
-    protected eventsDef = new Map<string, EventDef>();
+    protected methodDefs: Map<string, LogicManifest.MethodDef> = new Map();
+    protected eventsDefs = new Map<string, LogicManifest.EventDef>();
 
-    constructor(elements: LogicManifest.Element[] | LogicManifest.Manifest) {
-        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
-        this.stateMatrix = new ContextStateMatrix(elementsArr);
+    constructor(elements: LogicManifest.Element[]) {
+        this.stateMatrix = new ContextStateMatrix(elements);
 
         // Populate the maps for elements, call sites, class and method definitions.
-        elementsArr.forEach((element) => {
+        for (const element of elements) {
             this.elements.set(element.ptr, element);
 
             switch (element.kind) {
@@ -43,7 +29,7 @@ export class ElementDescriptor {
                     break;
                 case "method":
                     const methodData = element.data as LogicManifest.Method;
-                    const methodDef: MethodDef = {
+                    const methodDef: LogicManifest.MethodDef = {
                         ptr: element.ptr,
                         class: methodData.class,
                     };
@@ -51,20 +37,20 @@ export class ElementDescriptor {
                     break;
                 case "routine":
                     const routineData = element.data as LogicManifest.Routine;
-                    const callsite: CallSite = {
+                    const callsite: LogicManifest.CallSite = {
                         ptr: element.ptr,
                         kind: routineData.kind,
                     };
                     this.callSites.set(routineData.name, callsite);
-                    break;
+                break;
                 case "event":
                     const eventData = element.data as LogicManifest.Event;
-                    this.eventsDef.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
+                    this.eventsDefs.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
                     break;
                 default:
                     break;
             }
-        });
+        }
     }
 
     /**
@@ -90,7 +76,7 @@ export class ElementDescriptor {
      *
      * @returns {Map<string, CallSite>} The call sites map.
      */
-    public getCallsites(): Map<string, CallSite> {
+    public getCallsites(): Map<string, LogicManifest.CallSite> {
         return this.callSites;
     }
 
@@ -103,8 +89,8 @@ export class ElementDescriptor {
         return this.classDefs;
     }
 
-    public getEvents(): Map<string, EventDef> {
-        return this.eventsDef;
+    public getEvents(): Map<string, LogicManifest.EventDef> {
+        return this.eventsDefs;
     }
 
     /**
@@ -112,7 +98,7 @@ export class ElementDescriptor {
      *
      * @returns {Map<string, MethodDef>} The method definitions map.
      */
-    public getMethodDefs(): Map<string, MethodDef> {
+    public getMethodDefs(): Map<string, LogicManifest.MethodDef> {
         return this.methodDefs;
     }
 
@@ -204,7 +190,7 @@ export class ElementDescriptor {
      * @throws {Error} if the event name is invalid.
      */
     public getEventElement(eventName: string) {
-        const eventDef = this.eventsDef.get(eventName);
+        const eventDef = this.eventsDefs.get(eventName);
 
         if (!eventDef) {
             return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);

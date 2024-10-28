@@ -11,9 +11,11 @@ export class RoutineOption implements IRoutineOption {
     public sender?: string;
     public fuelLimit?: number;
     public fuelPrice?: number;
+
     constructor(options: IRoutineOption = {}) {
-        for (const key of Object.keys(options)) {
-            this[key] = options[key]
+        const keys = Object.keys(options) as Array<keyof IRoutineOption>
+        for (const key of keys) {
+            this[key as keyof typeof RoutineOption] = options[key]
         }
     }
 }

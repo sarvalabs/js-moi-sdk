@@ -113,11 +113,11 @@ export abstract class Signer {
                 ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
             }
 
-            if (typeof ixObject.fuel_price !== "number" || typeof ixObject.fuel_price !== "bigint") {
+            if (typeof ixObject.fuel_price !== "number" && typeof ixObject.fuel_price !== "bigint") {
                 ErrorUtils.throwError(`Invalid fuel price. Expected number or bigint, got ${typeof ixObject.fuel_price}`, ErrorCode.INVALID_ARGUMENT);
             }
 
-            if (typeof ixObject.fuel_limit !== "number" || typeof ixObject.fuel_limit !== "bigint") {
+            if (typeof ixObject.fuel_limit !== "number" && typeof ixObject.fuel_limit !== "bigint") {
                 ErrorUtils.throwError(`Invalid fuel limit. Expected number or bigint, got ${typeof ixObject.fuel_limit}`, ErrorCode.INVALID_ARGUMENT);
             }
 
@@ -127,10 +127,6 @@ export abstract class Signer {
 
             if (ixObject.fuel_limit <= 0) {
                 ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);
-            }
-
-            if (typeof ixObject.nonce !== "number") {
-                ErrorUtils.throwError(`Invalid nonce. Expected number, got ${typeof ixObject.nonce}`, ErrorCode.INVALID_ARGUMENT);
             }
 
             if(ixObject.nonce != null) {

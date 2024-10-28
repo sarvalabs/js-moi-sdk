@@ -19,10 +19,10 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     signer;
     provider;
     manifestCoder;
-    constructor(manifest, arg) {
-        super(manifest);
+    constructor(manifest, signer) {
+        super(manifest.elements);
         this.manifestCoder = new js_moi_manifest_1.ManifestCoder(manifest);
-        this.connect(arg);
+        this.connect(signer);
     }
     /**
      * Returns the logic ID associated with the LogicBase instance.
@@ -52,15 +52,15 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
-     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
+     * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
-    connect(arg) {
-        if (arg instanceof js_moi_signer_1.Signer) {
-            this.signer = arg;
-            this.provider = arg.getProvider();
+    connect(signer) {
+        if (signer instanceof js_moi_signer_1.Signer) {
+            this.signer = signer;
+            this.provider = signer.getProvider();
             return;
         }
-        this.provider = arg;
+        this.provider = signer;
     }
     /**
      * Executes a routine with the given arguments and returns the interaction response.

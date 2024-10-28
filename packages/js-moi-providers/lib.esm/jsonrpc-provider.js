@@ -69,21 +69,5 @@ export class JsonRpcProvider extends BaseProvider {
             ErrorUtils.throwError(`Error: ${error.message}`, ErrorCode.NETWORK_ERROR);
         }
     }
-    /**
-     * Starts an event.
-     *
-     * @param event - The event to start.
-     */
-    _startEvent(event) {
-        super._startEvent(event);
-    }
-    /**
-     * Stops an event.
-     *
-     * @param event - The event to stop.
-     */
-    _stopEvent(event) {
-        super._stopEvent(event);
-    }
 }
 //# sourceMappingURL=jsonrpc-provider.js.map

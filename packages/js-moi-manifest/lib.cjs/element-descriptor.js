@@ -12,12 +12,11 @@ class ElementDescriptor {
     callSites = new Map();
     classDefs = new Map();
     methodDefs = new Map();
-    eventsDef = new Map();
+    eventsDefs = new Map();
     constructor(elements) {
-        const elementsArr = Array.isArray(elements) ? elements : elements.elements;
-        this.stateMatrix = new context_state_matrix_1.ContextStateMatrix(elementsArr);
+        this.stateMatrix = new context_state_matrix_1.ContextStateMatrix(elements);
         // Populate the maps for elements, call sites, class and method definitions.
-        elementsArr.forEach((element) => {
+        for (const element of elements) {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
                 case "class":
@@ -42,12 +41,12 @@ class ElementDescriptor {
                     break;
                 case "event":
                     const eventData = element.data;
-                    this.eventsDef.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
+                    this.eventsDefs.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
                     break;
                 default:
                     break;
             }
-        });
+        }
     }
     /**
      * Retrieves the state matrix associated with the ElementDescriptor.
@@ -82,7 +81,7 @@ class ElementDescriptor {
         return this.classDefs;
     }
     getEvents() {
-        return this.eventsDef;
+        return this.eventsDefs;
     }
     /**
      * Retrieves the map of method definitions associated with the ElementDescriptor.
@@ -167,7 +166,7 @@ class ElementDescriptor {
      * @throws {Error} if the event name is invalid.
      */
     getEventElement(eventName) {
-        const eventDef = this.eventsDef.get(eventName);
+        const eventDef = this.eventsDefs.get(eventName);
         if (!eventDef) {
             return js_moi_utils_1.ErrorUtils.throwError(`Invalid event name: ${eventName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }

@@ -1,24 +1,21 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, decodeBase64, hexDataLength, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, decodeBase64, encodeToString, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
-import Event from "./event";
 import { processIxObject } from "./interaction";
 // Default timeout value in seconds
 const defaultTimeout = 120;
 const defaultOptions = {
     tesseract_number: -1
 };
+;
 /**
  * Class representing a base provider for interacting with the MOI protocol.
  * Extends the AbstractProvider class and provides implementations for
  * account operations, execution, and querying RPC methods.
  */
 export class BaseProvider extends AbstractProvider {
-    _events;
     constructor() {
         super();
-        // Events being listened to
-        this._events = [];
     }
     /**
      * Helper function to process the RPC response and extract the relevant data.
@@ -773,7 +770,7 @@ export class BaseProvider extends AbstractProvider {
         const response = await this.execute("moi.GetLogs", payload);
         return this.processResponse(response).map((log) => ({
             ...log,
-            data: "0x" + bytesToHex(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
+            data: encodeToString(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
         }));
     }
     /**
@@ -918,6 +915,35 @@ export class BaseProvider extends AbstractProvider {
             throw error;
         }
     }
+    async getSubscription(event) {
+        let params = [];
+        if (typeof event === "string") {
+            params = event;
+        }
+        if (typeof event === "object") {
+            params = this.validateAndFormatEvent(event);
+        }
+        const response = await this.execute("moi.subscribe", params);
+        return this.processResponse(response);
+    }
+    validateAndFormatEvent(event) {
+        if (!isValidAddress(event.params.address)) {
+            ErrorUtils.throwArgumentError("Invalid address provided", "event.params.address", event.params);
+        }
+        if (event.event === 'newTesseractsByAccount') {
+            return [event.event, { address: event.params.address }];
+        }
+        if (event.event === 'newLogs') {
+            if (event.params.topics == null) {
+                event.params.topics = [];
+            }
+            if (Array.isArray(event.params.topics) === false) {
+                ErrorUtils.throwArgumentError("Topics should be an array", "event.params.topics", event.params.topics);
+            }
+            return [event.event, { address: event.params.address, topics: this.hashTopics(event.params.topics), start_height: event.params.height[0], end_height: event.params.height[1] }];
+        }
+        throw ErrorUtils.throwError("Invalid event type", ErrorCode.INVALID_ARGUMENT);
+    }
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
@@ -1013,6 +1039,25 @@ export class BaseProvider extends AbstractProvider {
                 throw new Error("Unsupported interaction type encountered");
         }
     }
+    processWsResult(event, result) {
+        if (event === 'newPendingInteractions') {
+            if (typeof result === "string") {
+                return result.startsWith("0x") ? result : `0x${result}`;
+            }
+            ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
+        }
+        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
+            return result;
+        }
+        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
+            return result;
+        }
+        if (typeof event === "object" && event.event === "newLogs") {
+            const log = result;
+            return { ...log, data: encodeToString(decodeBase64(log.data)) };
+        }
+        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+    }
     /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.
@@ -1048,193 +1093,5 @@ export class BaseProvider extends AbstractProvider {
     execute(method, params) {
         throw new Error(method + " not implemented");
     }
-    /**
-     * Starts the specified event by performing necessary actions.
-     *
-     * @param {Event} event - The event to start.
-     */
-    _startEvent(event) {
-    }
-    /**
-     * Stops the specified event by performing necessary actions.
-     *
-     * @param {Event} event - The event to stop.
-     */
-    _stopEvent(event) {
-    }
-    /**
-     * Adds an event listener for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event to listen to.
-     * @param {Listener} listener - The listener function to be called when the
-     * event is emitted.
-     * @param {boolean} once - Indicates whether the listener should be called
-     * only once (true) or multiple times (false).
-     * @returns The instance of the class to allow method chaining.
-     */
-    _addEventListener(eventName, listener, once) {
-        const event = new Event(getEventTag(eventName), listener, once);
-        this._events.push(event);
-        this._startEvent(event);
-        return this;
-    }
-    /**
-     * Emits the specified event and calls all the associated listeners.
-     *
-     * @param {EventType} eventName - The name of the event to emit.
-     * @param {Array<any>} args - The arguments to be passed to the event listeners.
-     * @returns {boolean} A boolean indicating whether any listeners were called
-     * for the event.
-     */
-    emit(eventName, ...args) {
-        let result = false;
-        let stopped = [];
-        let eventTag = getEventTag(eventName);
-        this._events = this._events.filter((event) => {
-            if (event.tag !== eventTag) {
-                return true;
-            }
-            setTimeout(() => {
-                event.listener.apply(this, args);
-            }, 0);
-            result = true;
-            if (event.once) {
-                stopped.push(event);
-                return false;
-            }
-            return true;
-        });
-        stopped.forEach((event) => { this._stopEvent(event); });
-        return result;
-    }
-    /**
-     * Adds an event listener for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event to listen to.
-     * @param {Listener} listener - The listener function to be called when the event is emitted.
-     * @returns The instance of the class to allow method chaining.
-     */
-    on(eventName, listener) {
-        return this._addEventListener(eventName, listener, false);
-    }
-    /**
-     * Adds a one-time event listener for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event to listen to.
-     * @param {Listener} listener - The listener function to be called when the
-     * event is emitted.
-     * @returns The instance of the class to allow method chaining.
-     */
-    once(eventName, listener) {
-        return this._addEventListener(eventName, listener, true);
-    }
-    /**
-     * Returns the number of listeners for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event.
-     * @returns {number} The number of listeners for the event.
-     */
-    listenerCount(eventName) {
-        if (!eventName) {
-            return this._events.length;
-        }
-        let eventTag = getEventTag(eventName);
-        return this._events.filter((event) => {
-            return (event.tag === eventTag);
-        }).length;
-    }
-    /**
-     * Returns an array of listeners for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event.
-     * @returns An array of listeners for the event.
-     */
-    listeners(eventName) {
-        if (eventName == null) {
-            return this._events.map((event) => event.listener);
-        }
-        let eventTag = getEventTag(eventName);
-        return this._events
-            .filter((event) => (event.tag === eventTag))
-            .map((event) => event.listener);
-    }
-    /**
-     * Removes an event listener for the specified event. If no listener is
-     * specified, removes all listeners for the event.
-     *
-     * @param {EventType} eventName - The name of the event to remove the
-     * listener from.
-     * @param {Listener} listener - The listener function to remove. If not
-     * provided, removes all listeners for the event.
-     * @returns The instance of the class to allow method chaining.
-     */
-    off(eventName, listener) {
-        if (listener == null) {
-            return this.removeAllListeners(eventName);
-        }
-        const stopped = [];
-        let found = false;
-        let eventTag = getEventTag(eventName);
-        this._events = this._events.filter((event) => {
-            if (event.tag !== eventTag || event.listener != listener) {
-                return true;
-            }
-            if (found) {
-                return true;
-            }
-            found = true;
-            stopped.push(event);
-            return false;
-        });
-        stopped.forEach((event) => { this._stopEvent(event); });
-        return this;
-    }
-    /**
-     * Removes all listeners for the specified event. If no event is specified,
-     * removes all listeners for all events.
-     *
-     * @param {EventType} eventName - The name of the event to remove all
-     * listeners from.
-     * @returns The instance of the class to allow method chaining.
-     */
-    removeAllListeners(eventName) {
-        let stopped = [];
-        if (eventName == null) {
-            stopped = this._events;
-            this._events = [];
-        }
-        else {
-            const eventTag = getEventTag(eventName);
-            this._events = this._events.filter((event) => {
-                if (event.tag !== eventTag) {
-                    return true;
-                }
-                stopped.push(event);
-                return false;
-            });
-        }
-        stopped.forEach((event) => { this._stopEvent(event); });
-        return this;
-    }
 }
-// helper functions
-/**
- * Retrieves the event tag based on the event name.
- *
- * @param {EventType} eventName - The name of the event.
- * @returns {string} The event tag.
- * @throws {Error} if the event name is invalid.
- */
-const getEventTag = (eventName) => {
-    if (typeof (eventName) === "string") {
-        eventName = eventName.toLowerCase();
-        if (hexDataLength(eventName) === 32) {
-            return "tesseract:" + eventName;
-        }
-        if (eventName.indexOf(":") === -1) {
-            return eventName;
-        }
-    }
-    throw new Error("invalid event - " + eventName);
-};
 //# sourceMappingURL=base-provider.js.map
