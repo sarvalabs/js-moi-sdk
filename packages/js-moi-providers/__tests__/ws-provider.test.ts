@@ -1,3 +1,5 @@
+import assert from "assert";
+
 import { hexToBytes, IxType } from "js-moi-utils";
 import { Wallet } from "js-moi-wallet";
 import { WebSocketEvent } from "../src.ts/websocket-events";
@@ -10,35 +12,18 @@ const ASSET_ID = "<YOUR ASSET ID>";
 
 describe("Test Websocket Provider", () => {
     const isValidMnemonic = MNEMONIC.split(" ").length === 12;
-    if (!isValidMnemonic) {
-        throw new Error("Invalid mnemonic");
-    }
-   
-    if (!HOST.startsWith("ws://") && !HOST.startsWith("wss://")) {
-        throw new Error("Provider host is not websocket host");
-    }
-
-    if (!ASSET_ID.startsWith("0x")) {
-        throw new Error("Invalid asset id");
-    }
-
-    let wallet: Wallet | undefined;
+    const isValidHost = HOST.startsWith("ws://") || HOST.startsWith("wss://");
+    
+    assert(isValidMnemonic, "Mnemonic is not valid");
+    assert(isValidHost, "Host is not valid");
+    assert(ASSET_ID.startsWith("0x"), "Asset ID is not valid");
+    
     const provider = new WebsocketProvider(HOST);
-
-    const getWallet = () => {
-        if (!wallet) {
-            throw new Error("Wallet not initialized");
-        }
-        return wallet;
-    };
-
-    beforeAll(async () => {
-        wallet = await initializeWallet(provider, MNEMONIC);
-    });
+    const wallet = initializeWallet(provider, MNEMONIC);
 
     describe("It should be able to perform rpc calls", () => {
         it("should be able to get TDUs", async () => {
-            const tdu = await provider.getTDU(getWallet().getAddress());
+            const tdu = await provider.getTDU(wallet.getAddress());
 
             expect(tdu).toBeDefined();
             expect(Array.isArray(tdu)).toBeTruthy();
@@ -46,11 +31,11 @@ describe("Test Websocket Provider", () => {
 
         it("should be able to get account info", async () => {
             const account = await provider.getAccountMetaInfo(
-                getWallet().getAddress()
+                wallet.getAddress()
             );
 
             expect(account).toBeDefined();
-            expect(account.address).toBe(getWallet().getAddress());
+            expect(account.address).toBe(wallet.getAddress());
         });
     });
 
@@ -58,7 +43,7 @@ describe("Test Websocket Provider", () => {
         const receiver = Wallet.createRandomSync().address;
 
         beforeAll(async () => {
-            await getWallet().sendInteraction({
+            await wallet.sendInteraction({
                 type: IxType.VALUE_TRANSFER,
                 receiver: receiver,
                 fuel_price: 1,
@@ -95,7 +80,10 @@ describe("Test Websocket Provider", () => {
 
         test("should be able to listen to tesseract of specific address", async () => {
             provider.on(
-                { event: WebSocketEvent.NewTesseractsByAccount, params: { address: receiver } },
+                {
+                    event: WebSocketEvent.NewTesseractsByAccount,
+                    params: { address: receiver },
+                },
                 (tesseract) => {
                     const isReceiverParticipating = tesseract.participants.some(
                         (p) => p.address === receiver
@@ -107,7 +95,7 @@ describe("Test Websocket Provider", () => {
 
         describe("It should be able to listen to new logs", () => {
             beforeAll(async () => {
-                const ix = await getWallet().sendInteraction({
+                const ix = await wallet.sendInteraction({
                     type: IxType.LOGIC_DEPLOY,
                     fuel_price: 1,
                     fuel_limit: 10000,
@@ -124,7 +112,7 @@ describe("Test Websocket Provider", () => {
 
                 const result = await ix.result();
 
-                await getWallet().sendInteraction({
+                await wallet.sendInteraction({
                     type: IxType.LOGIC_INVOKE,
                     fuel_price: 1,
                     fuel_limit: 10000,
@@ -143,7 +131,7 @@ describe("Test Websocket Provider", () => {
                     {
                         event: WebSocketEvent.NewLog,
                         params: {
-                            address: getWallet().getAddress(),
+                            address: wallet.getAddress(),
                             height: [-1, -1],
                             topics: [],
                         },
