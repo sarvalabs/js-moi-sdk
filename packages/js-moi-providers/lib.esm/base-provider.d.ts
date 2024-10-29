@@ -1,16 +1,18 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import { EventType, Listener } from "../types/event";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import type { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
-import Event from "./event";
+export interface EventTag {
+    event: string;
+    params?: unknown;
+}
 /**
  * Class representing a base provider for interacting with the MOI protocol.
  * Extends the AbstractProvider class and provides implementations for
  * account operations, execution, and querying RPC methods.
  */
 export declare class BaseProvider extends AbstractProvider {
-    protected _events: Event[];
     constructor();
     /**
      * Helper function to process the RPC response and extract the relevant data.
@@ -171,6 +173,13 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getPendingInteractionFilter(): Promise<Filter>;
     /**
+     * Create a filter object for the logs.
+     *
+     * @param {LogFilter} filter - The log filter object.
+     * @returns {Promise<Filter>} A promise that resolves to a Filter object.
+     */
+    getLogsFilter(filter: LogFilter): Promise<Filter>;
+    /**
      * Asynchronously removes the filter and returns a Promise that resolves to a
      * object.
      * The object has a `status` property, which is true if the filter is successfully removed, otherwise false.
@@ -324,6 +333,20 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call or processing the response.
      */
     getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>;
+    private hashTopics;
+    /**
+     * Retrieves all tesseract logs associated with a specified account within the provided tesseract range.
+     * If the topics are not provided, all logs are returned.
+     *
+     * @param {string} address - The address for which to retrieve the tesseract logs.
+     * @param {Tuple<number>} height - The height range for the tesseracts. The start height is inclusive, and the end height is exclusive.
+     * @param {NestedArray<string>}topics - The topics to filter the logs. (optional)
+     *
+     * @returns A Promise that resolves to an array of logs.
+     *
+     * @throws Error if difference between start height and end height is greater than 10.
+     */
+    getLogs(logFilter: LogFilter): Promise<Log[]>;
     /**
      * Retrieves all the interactions that are pending for inclusion in the next
      * Tesseract(s) or are scheduled for future execution.
@@ -383,6 +406,8 @@ export declare class BaseProvider extends AbstractProvider {
      * the response.
      */
     getNodeInfo(): Promise<NodeInfo>;
+    getSubscription(event: ProviderEvents): Promise<string>;
+    private validateAndFormatEvent;
     /**
      * Waits for the interaction with the specified hash to be included in a tesseract
      * and returns the interaction receipt.
@@ -405,6 +430,7 @@ export declare class BaseProvider extends AbstractProvider {
      * data is missing.
      */
     protected processReceipt(receipt: InteractionReceipt): any;
+    protected processWsResult(event: ProviderEvents, result: unknown): unknown;
     /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.
@@ -433,88 +459,5 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if the method is not implemented.
      */
     protected execute<T = any>(method: string, params: any): Promise<RpcResponse<T>>;
-    /**
-     * Starts the specified event by performing necessary actions.
-     *
-     * @param {Event} event - The event to start.
-     */
-    protected _startEvent(event: Event): void;
-    /**
-     * Stops the specified event by performing necessary actions.
-     *
-     * @param {Event} event - The event to stop.
-     */
-    protected _stopEvent(event: Event): void;
-    /**
-     * Adds an event listener for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event to listen to.
-     * @param {Listener} listener - The listener function to be called when the
-     * event is emitted.
-     * @param {boolean} once - Indicates whether the listener should be called
-     * only once (true) or multiple times (false).
-     * @returns The instance of the class to allow method chaining.
-     */
-    protected _addEventListener(eventName: EventType, listener: Listener, once: boolean): this;
-    /**
-     * Emits the specified event and calls all the associated listeners.
-     *
-     * @param {EventType} eventName - The name of the event to emit.
-     * @param {Array<any>} args - The arguments to be passed to the event listeners.
-     * @returns {boolean} A boolean indicating whether any listeners were called
-     * for the event.
-     */
-    protected emit(eventName: EventType, ...args: Array<any>): boolean;
-    /**
-     * Adds an event listener for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event to listen to.
-     * @param {Listener} listener - The listener function to be called when the event is emitted.
-     * @returns The instance of the class to allow method chaining.
-     */
-    on(eventName: EventType, listener: Listener): this;
-    /**
-     * Adds a one-time event listener for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event to listen to.
-     * @param {Listener} listener - The listener function to be called when the
-     * event is emitted.
-     * @returns The instance of the class to allow method chaining.
-     */
-    once(eventName: EventType, listener: Listener): this;
-    /**
-     * Returns the number of listeners for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event.
-     * @returns {number} The number of listeners for the event.
-     */
-    listenerCount(eventName?: EventType): number;
-    /**
-     * Returns an array of listeners for the specified event.
-     *
-     * @param {EventType} eventName - The name of the event.
-     * @returns An array of listeners for the event.
-     */
-    listeners(eventName?: EventType): Array<Listener>;
-    /**
-     * Removes an event listener for the specified event. If no listener is
-     * specified, removes all listeners for the event.
-     *
-     * @param {EventType} eventName - The name of the event to remove the
-     * listener from.
-     * @param {Listener} listener - The listener function to remove. If not
-     * provided, removes all listeners for the event.
-     * @returns The instance of the class to allow method chaining.
-     */
-    off(eventName: EventType, listener?: Listener): this;
-    /**
-     * Removes all listeners for the specified event. If no event is specified,
-     * removes all listeners for all events.
-     *
-     * @param {EventType} eventName - The name of the event to remove all
-     * listeners from.
-     * @returns The instance of the class to allow method chaining.
-     */
-    removeAllListeners(eventName?: EventType): this;
 }
 //# sourceMappingURL=base-provider.d.ts.map

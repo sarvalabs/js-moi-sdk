@@ -1,12 +1,12 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
 import { InteractionCallResponse, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { IxType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
-import { LogicIxRequest, RoutineOption } from "../types/logic";
-import ElementDescriptor from "./element-descriptor";
+import { LogicIxRequest } from "../types/logic";
 import { LogicId } from "./logic-id";
+import { RoutineOption } from "./routine-options";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
@@ -16,7 +16,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
     protected signer?: Signer;
     protected provider: AbstractProvider;
     protected manifestCoder: ManifestCoder;
-    constructor(manifest: LogicManifest.Manifest, arg: Signer | AbstractProvider);
+    constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicPayload;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
     /**
@@ -34,9 +34,9 @@ export declare abstract class LogicBase extends ElementDescriptor {
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
-     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
+     * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
-    connect(arg: AbstractProvider | Signer): void;
+    connect(signer: Signer): void;
     /**
      * Executes a routine with the given arguments and returns the interaction response.
      *

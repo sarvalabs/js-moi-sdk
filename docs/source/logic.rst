@@ -322,14 +322,7 @@ Functions
     const wallet = await initWallet();
     const logicDriver = await getLogicDriver(logicId, wallet);
 
-.. warning::
-    When the logic driver is initialized with a provider,
-    any attempt to execute a mutating routine will trigger the SDK to
-    raise an exception. The error message associated with this exception
-    will state: **"Mutating routine calls require a signer to be initialized"**.
-    Developers should ensure they should pass signer instance while
-    doing mutating routine calls to avoid encountering this exception.
-
+.. autofunction:: createRoutineOption
 
 Usage
 ~~~~~
@@ -412,10 +405,11 @@ the last argument in the deploy call.
     const logic = await getLogicDriver(logicId, wallet);
 
     // Execute a mutating routine call
-    const option = {
+    const option = createRoutineOption({
         fuelPrice: 1,
         fuelLimit: 6420,
-    }
+    });
+    
     const ix = await logic.routines.Transfer(address, 1000, option);
     console.log(ix.hash); //  0x010000423d3233...
 

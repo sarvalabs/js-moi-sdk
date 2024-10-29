@@ -1,18 +1,12 @@
 import { LogicManifest } from "js-moi-manifest";
 import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
+import type { RoutineOption } from "../src.ts/routine-options";
 
 export interface LogicIxRequest {
     call: () => Promise<InteractionCallResponse>;
     send: () => Promise<InteractionResponse>;
     estimateFuel: () => Promise<number | bigint>;
     unwrap: () => Promise<any>;
-}
-
-export interface RoutineOption {
-    fuelPrice?: number;
-    fuelLimit?: number;
-    sender?: string;
-    nonce?: number;
 }
 
 export interface Routine<T extends (...args: any[]) => any> {
@@ -30,14 +24,4 @@ export interface Routine<T extends (...args: any[]) => any> {
 
 export type Routines<T extends Record<string, (...args: any[]) => any>> = {
     [K in keyof T]: T[K] extends (...args: any[]) => any ? Routine<T[K]> : never;
-}
-
-export interface CallSite {
-    ptr: number,
-    kind: string
-}
-
-export interface MethodDef {
-    ptr: number;
-    class: string;
 }

@@ -1,7 +1,6 @@
-import { ManifestCoder } from "js-moi-manifest";
+import { ContextStateKind, ManifestCoder } from "js-moi-manifest";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
-import { ContextStateKind } from "./state";
 export var EngineKind;
 (function (EngineKind) {
     EngineKind["PISA"] = "PISA";
@@ -18,8 +17,8 @@ export class LogicDescriptor extends LogicBase {
     engine;
     sealed;
     assetLogic;
-    constructor(logicId, manifest, arg) {
-        super(manifest, arg);
+    constructor(logicId, manifest, signer) {
+        super(manifest, signer);
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = ManifestCoder.encodeManifest(this.manifest);

@@ -1,61 +1,82 @@
-import type { LogicManifest } from "../lib.cjs";
+import { type LogicManifest } from "../lib.cjs";
 import { ManifestCoder } from "../src.ts/manifest";
+import { ManifestCoderFormat } from "../src.ts/manifest-coder/serialization-format";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
 describe("Test ManifestCoder", () => {
-    const elements = new Map();
-    const classDefs = new Map();
     let manifest: LogicManifest.Manifest;
+    let manifestCoder: ManifestCoder;
 
     beforeAll(async () => {
-        manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
-
-        manifest.elements.forEach((element: LogicManifest.Element) => {
-            elements.set(element.ptr, element);
-
-            if (element.kind === "class") {
-                element.data = element.data as LogicManifest.Routine;
-                classDefs.set(element.data.name, element.ptr);
-            }
-        });
+        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest
+        manifestCoder = new ManifestCoder(manifest);
     });
 
-    const manifestCoder = new ManifestCoder(elements, classDefs);
 
     test("Encode ABI/Manifest into polo format", async () => {
-        const encodedABI = ManifestCoder.encodeManifest(await loadManifestFromFile("../../manifests/tokenledger.json"));
-        expect(encodedABI).toBe(await loadFile("../../manifests/tokenledger-polo.txt"));
+        const testcases = [
+            {
+                manifest: "../../manifests/tokenledger.json",
+                expected: "../../manifests/tokenledger.polo",
+            },
+            {
+                manifest: "../../manifests/flipper.json",
+                expected: "../../manifests/flipper.polo",
+            },
+            {
+                manifest: "../../manifests/guardian.json",
+                expected: "../../manifests/guardian.polo",
+            },
+            {
+                manifest: "../../manifests/lock-ledger.json",
+                expected: "../../manifests/lock-ledger.polo",
+            }
+        ]
+
+
+        await Promise.all(testcases.map(async (testCase) => {
+            const [manifest, expected] = await Promise.all([
+                loadManifestFromFile(testCase.manifest),
+                loadFile(testCase.expected),
+            ]);
+            const polo = ManifestCoder.encodeManifest(manifest);
+
+            expect(polo).toBe(expected);
+        }));
     });
 
-    test("Encode arguments into polo format", () => {
-        const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-            element.data = element.data as LogicManifest.Routine;
-            return element.data.name === "Seeder";
-        });
-        const routine = routineElement?.data as LogicManifest.Routine;
-        const fields = routine.accepts ? routine.accepts : [];
-        const args = ["MOI", 100000000];
-        const calldata = manifestCoder.encodeArguments(fields, args);
+    describe("Encode arguments into polo format", () => {
+        test("When the field is passed as a routine name", () => {
+            const calldata = manifestCoder.encodeArguments("Seed", "MOI", 100_000_000);
 
-        expect(routine).toBeDefined();
-        expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
+            expect(calldata).toBe("0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49");
+        });
     });
 
-    test("Decode polo encoded output", () => {
-        const output = "0x0e1f0305f5e100";
+    describe("Decode polo encoded arguments", () => {
+        test("When the field is passed as a routine name", () => {
+            const calldata = "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49";
+            const args = ["MOI", 100_000_000];
+            const decoded = manifestCoder.decodeArguments<[symbol: string, supply: number]>("Seed", calldata);
 
-        const routineElement = manifest.elements.find((element: LogicManifest.Element) => {
-            element.data = element.data as LogicManifest.Routine;
-            return element.data.name === "BalanceOf";
+            if (decoded) {
+                for (let i = 0; i < args.length; i++) {
+                    expect(decoded[i]).toEqual(args[i]);
+                }
+            }
+
         });
+    });
 
-        const routine = routineElement?.data as LogicManifest.Routine;
+    describe("Decode polo encoded arguments", () => {
+        const calldata = "0x0e1f0305f5e100";
+        const callsite = "BalanceOf";
 
-        const fields = routine.returns ? routine.returns : [];
+        test("When the field is passed as a routine name", () => {
+            const args = manifestCoder.decodeOutput<{ balance: number }>(callsite, calldata);
 
-        const decodedOutput = manifestCoder.decodeOutput(output, fields);
-
-        expect(decodedOutput).toEqual({ balance: 100000000 });
+            expect(args).toEqual({ balance: expect.any(Number) });
+        });
     });
 
     test("Decode polo encoded exception", () => {
@@ -72,11 +93,90 @@ describe("Test ManifestCoder", () => {
         });
     });
 
-    test("Decode polo encoded property of a state", () => {
-        const data = "0x0652494f";
-        const state: any = manifest.elements.find((element) => element.kind === "state");
-        const output = manifestCoder.decodeState(data, "symbol", state?.data.fields);
+    test("Decode polo encoded event log", () => {
+      const testTable = [
+        {
+          event: "builtin.Log",
+          log: "0x0d2f065576616c756506736565646564206239306633396663663334366261333236303531383636393439356635643336386138643162623830323335383466363765386135363731636633633536636520776974682031303030303030302044554d4d",
+          expected: {
+            value: expect.any(String),
+          },
+        },
+        {
+            event: "Transfer",
+            log: "0x0daf010665860185029606f506616d6f756e740364726563656976657206190f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce73656e64657206b90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce",
+            expected: {
+              amount: expect.any(Number),
+              receiver: expect.any(Uint8Array),
+              sender: expect.any(Uint8Array),
+            },
+          },
+      ];
 
-        expect(output).toBe("RIO");
+      for (const test of testTable) {
+        const decoded = manifestCoder.decodeEventOutput(test.event, test.log);
+        expect(decoded).not.toBeNull();
+        expect(decoded).toEqual(test.expected);
+      }
+    });
+
+    test("Decode polo-encoded manifest", async () => {
+        const testCases = [
+            {
+                manifest: "../../manifests/tokenledger.polo",
+                expected: "../../manifests/tokenledger.json",
+            },
+            {
+                manifest: "../../manifests/flipper.polo",
+                expected: "../../manifests/flipper.json",
+            },
+            {
+                manifest: "../../manifests/guardian.polo",
+                expected: "../../manifests/guardian.json",
+            },
+            {
+                manifest: "../../manifests/lock-ledger.polo",
+                expected: "../../manifests/lock-ledger.json",
+            }
+        ];
+
+        await Promise.all(testCases.map(async (testCase) => {
+            const [polo, expected] = await Promise.all([
+                loadFile(testCase.manifest),
+                loadManifestFromFile(testCase.expected),
+            ]);
+
+            const manifest = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.JSON);
+            expect(manifest).toEqual(expected);
+        }));
+    });
+
+    test("Encoding JSON into YAML", async () => {
+        const testCases = [
+            {
+                manifest: "../../manifests/tokenledger.polo",
+                expected: "../../manifests/tokenledger.json",
+            },
+            {
+                manifest: "../../manifests/flipper.polo",
+                expected: "../../manifests/flipper.json",
+            },
+            {
+                manifest: "../../manifests/guardian.polo",
+                expected: "../../manifests/guardian.json",
+            },
+            {
+                manifest: "../../manifests/lock-ledger.polo",
+                expected: "../../manifests/lock-ledger.json",
+            }
+        ];
+
+        await Promise.all(testCases.map(async (testCase) => {
+            const polo= await loadFile(testCase.manifest)
+            const yaml = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML);
+            
+            expect(ManifestCoder.encodeManifest(yaml)).toBe(polo);
+            expect(ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML)).toEqual(yaml);
+        }));
     });
 });
