@@ -5,8 +5,6 @@ import {
     LogicEnlistReceipt,
     LogicInvokeReceipt,
     Tesseract, bytesToHex,
-    decodeBase64,
-    encodeToString,
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import type {
@@ -967,10 +965,7 @@ export class BaseProvider extends AbstractProvider {
         }
 
         const response = await this.execute<Log[]>("moi.GetLogs", payload);
-        return this.processResponse(response).map((log) => ({
-          ...log,
-          data: encodeToString(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
-        }));
+        return this.processResponse(response);
     }
 
     /**
@@ -1293,17 +1288,12 @@ export class BaseProvider extends AbstractProvider {
             ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
         }
 
-        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
+        if (typeof event === "string" && event === "newTesseracts") {
             return result;
         }
 
-        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
+        if (typeof event === "object" && ["newTesseractsByAccount", "newLogs"].includes(event.event)) {
             return result;
-        }
-
-        if (typeof event === "object" && event.event === "newLogs") {
-            const log = result as Log;
-            return { ...log, data: encodeToString(decodeBase64(log.data)) };
         }
 
         ErrorUtils.throwArgumentError("Invalid event type", "event", event);

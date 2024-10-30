@@ -771,10 +771,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             end_height: end
         };
         const response = await this.execute("moi.GetLogs", payload);
-        return this.processResponse(response).map((log) => ({
-            ...log,
-            data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
-        }));
+        return this.processResponse(response);
     }
     /**
      * Retrieves all the interactions that are pending for inclusion in the next
@@ -1049,15 +1046,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             }
             js_moi_utils_1.ErrorUtils.throwError("Invalid response received", js_moi_utils_1.ErrorCode.SERVER_ERROR);
         }
-        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
+        if (typeof event === "string" && event === "newTesseracts") {
             return result;
         }
-        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
+        if (typeof event === "object" && ["newTesseractsByAccount", "newLogs"].includes(event.event)) {
             return result;
-        }
-        if (typeof event === "object" && event.event === "newLogs") {
-            const log = result;
-            return { ...log, data: (0, js_moi_utils_1.encodeToString)((0, js_moi_utils_1.decodeBase64)(log.data)) };
         }
         js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid event type", "event", event);
     }
