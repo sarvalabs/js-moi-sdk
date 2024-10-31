@@ -1045,6 +1045,25 @@ export class BaseProvider extends AbstractProvider {
         }
         ErrorUtils.throwArgumentError("Invalid event type", "event", event);
     }
+    processWsResult(event, result) {
+        if (event === 'newPendingInteractions') {
+            if (typeof result === "string") {
+                return result.startsWith("0x") ? result : `0x${result}`;
+            }
+            ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
+        }
+        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
+            return result;
+        }
+        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
+            return result;
+        }
+        if (typeof event === "object" && event.event === "newLogs") {
+            const log = result;
+            return { ...log, data: encodeToString(decodeBase64(log.data)) };
+        }
+        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+    }
     /**
      * Waits for the interaction with the specified hash to be included in a
      * tesseract and returns the result based on the interaction type.
