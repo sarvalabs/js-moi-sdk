@@ -4,14 +4,14 @@ import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 /**
  * Processes the interaction object to extract and consolidate asset funds from
- * transactions and asset funds.
+ * ix_operations and asset funds.
  *
- * @param {InteractionObject} ixObject - The interaction object containing transactions and asset funds.
+ * @param {InteractionObject} ixObject - The interaction object containing ix_operations and asset funds.
  * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
  */
 const processFunds = (ixObject) => {
     const assetFunds = new Map();
-    ixObject.transactions.forEach(transaction => {
+    ixObject.ix_operations.forEach(transaction => {
         switch (transaction.type) {
             case TxType.ASSET_TRANSFER:
             case TxType.ASSET_BURN: {
@@ -36,10 +36,10 @@ const processFunds = (ixObject) => {
     return Array.from(assetFunds, ([asset_id, amount]) => ({ asset_id, amount }));
 };
 /**
- * Processes a series of transactions and returns an array of processed participants.
+ * Processes a series of ix_operations and returns an array of processed participants.
  * Each participant is derived based on the type of transaction and its associated payload.
  *
- * @param {IxTransaction[]} steps - The array of transaction steps to process.
+ * @param {IxOperation[]} steps - The array of transaction steps to process.
  * @returns {ProcessedIxParticipant[]} - The array of processed participants.
  * @throws {Error} - Throws an error if an unsupported transaction type is encountered.
  */
@@ -57,8 +57,8 @@ const processParticipants = (ixObject) => {
             lock_type: LockType.MUTATE_LOCK
         });
     }
-    // Process transactions and add participants
-    ixObject.transactions.forEach((transaction) => {
+    // Process ix_operations and add participants
+    ixObject.ix_operations.forEach((transaction) => {
         switch (transaction.type) {
             case TxType.ASSET_CREATE:
                 break;
@@ -111,15 +111,15 @@ const processParticipants = (ixObject) => {
     return Array.from(participants.values());
 };
 /**
- * Processes an array of transactions by serializing their payloads into byte form
- * and returns the processed transactions.
+ * Processes an array of ix_operations by serializing their payloads into byte form
+ * and returns the processed ix_operations.
  *
- * @param {IxTransaction[]} transactions - Transactions to process.
- * @returns {ProcessedIxTransaction[]} - Processed transactions with serialized payloads.
+ * @param {IxOperation[]} ix_operations - Transactions to process.
+ * @returns {ProcessedIxOperation[]} - Processed ix_operations with serialized payloads.
  * @throws {Error} - If the payload is missing or transaction type is unsupported.
  */
-const processTransactions = (transactions) => {
-    return transactions.map(transaction => {
+const processTransactions = (ix_operations) => {
+    return ix_operations.map(transaction => {
         if (!transaction.payload) {
             ErrorUtils.throwError("Payload is missing!", ErrorCode.MISSING_ARGUMENT);
         }
@@ -143,7 +143,7 @@ const processIxObject = (ixObject) => {
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
             funds: processFunds(ixObject),
-            transactions: processTransactions(ixObject.transactions),
+            ix_operations: processTransactions(ixObject.ix_operations),
             participants: processParticipants(ixObject),
         };
     }

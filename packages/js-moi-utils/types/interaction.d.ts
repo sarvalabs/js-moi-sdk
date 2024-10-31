@@ -33,7 +33,7 @@ export interface Interaction {
     fuel_price: string;
     fuel_limit: string;
 
-    transactions: Transaction[]
+    ix_operations: Transaction[]
     
     hash: string;
     signature: string;

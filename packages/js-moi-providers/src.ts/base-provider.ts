@@ -1229,7 +1229,7 @@ export class BaseProvider extends AbstractProvider {
      * data is missing.
      */
     protected processReceipt(receipt: InteractionReceipt): ExecutionResult[] {
-        return receipt.transactions.map(transaction => {
+        return receipt.ix_operations.map(transaction => {
             switch (hexToBN(transaction.tx_type)) {
                 case TxType.ASSET_TRANSFER:
                     return null;

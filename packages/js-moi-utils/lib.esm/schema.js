@@ -112,7 +112,7 @@ export const ixObjectSchema = {
                 }
             }
         },
-        transactions: {
+        ix_operations: {
             kind: "array",
             fields: {
                 values: {

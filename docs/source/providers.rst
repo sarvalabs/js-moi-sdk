@@ -185,9 +185,9 @@ The ``ExecutionResult`` - ``AssetCreationResult``, ``AssetSupplyResult``, ``Logi
 ``LogicInvokeResult``, or ``null``: represents the detailed outcome of a transaction execution. 
 It can vary based on the specific type of transaction.
 
-**TransactionResult**
+**OperationResult**
 
-The ``TransactionResult`` interface represents the outcome of a processed transaction, 
+The ``OperationResult`` interface represents the outcome of a processed transaction, 
 including its type, execution status, and resulting data.
 
 * ``tx_type`` - ``string``: The type of transaction.
@@ -202,7 +202,7 @@ The ``InteractionReceipt`` interface represents a receipt for an interaction. It
 * ``status`` - ``number``: The status of the interaction.
 * ``fuel_used`` - ``string``: The amount of fuel used for the interaction.
 * ``participants`` - ``Participant[]``: The participants involved in the interaction.
-* ``transactions`` - ``TransactionResult[]``: A list of transaction results.
+* ``ix_operations`` - ``OperationResult[]``: A list of transaction results.
 * ``from`` - ``string``: The sender of the interaction.
 * ``ix_index`` - ``string``: The index of the interaction.
 * ``ts_hash`` - ``string``: The hash of the tesseract.
@@ -309,9 +309,9 @@ The ``IxFund`` type represents the asset and the amount required for validating 
 * ``amount`` - ``number | bigint``: The total required amount for the interaction, 
 specified as either a ``number`` or a ``bigint``.
 
-**IxTransaction**
+**IxOperation**
 
-The ``IxTransaction`` type  represents an individual transaction that is part of a larger interaction.
+The ``IxOperation`` type  represents an individual transaction that is part of a larger interaction.
 
 * ``type`` - ``string``: The type of the transaction.
 * ``payload`` - ``TransactionPayload``: The specific payload corresponding to the transaction.
@@ -331,7 +331,7 @@ The ``InteractionObject`` interface represents an interaction object. It has the
 * ``payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs. (optional).
 * ``nonce`` - ``number | bigint``: A unique value used to ensure the interaction's uniqueness (optional).
 * ``funds`` - ``IxFund``: The list of asset funds required for the interaction (optional).
-* ``transactions`` - ``IxTransaction``: The list of transactions that are part of the interaction and are to be executed.
+* ``ix_operations`` - ``IxOperation``: The list of ix_operations that are part of the interaction and are to be executed.
 * ``pariticipants`` - ``IxParticipant``: The list of participants involved in the interaction, along with their respective lock types (optional).
 * ``fuel_price`` - ``number | bigint``: The price per unit of fuel for executing the interaction.
 * ``fuel_limit`` - ``number | bigint``: The maximum amount of fuel that can be consumed during the processing of the interaction.
@@ -534,7 +534,7 @@ Tesseract
                     "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
                     "fuel_price": "0x1",
                     "fuel_limit": "0xc8",
-                    "transactions": [
+                    "ix_operations": [
                         {
                             "type": 3,
                             "payload": {
@@ -779,7 +779,7 @@ Interaction By Hash
             "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
             "fuel_price": "0x1",
             "fuel_limit": "0xc8",
-            "transactions": [
+            "ix_operations": [
                 {
                     "type": 3,
                     "payload": {

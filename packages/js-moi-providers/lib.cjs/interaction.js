@@ -175,7 +175,7 @@ const processIxObject = (ixObject) => {
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
             funds: [],
-            transactions: ixObject.transactions.map(transaction => ({
+            ix_operations: ixObject.ix_operations.map(transaction => ({
                 ...transaction,
                 payload: "0x" + (0, js_moi_utils_1.bytesToHex)((0, exports.serializePayload)(transaction.type, transaction.payload)),
             })),

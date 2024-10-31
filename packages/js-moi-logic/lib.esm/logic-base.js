@@ -120,7 +120,7 @@ export class LogicBase extends ElementDescriptor {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            transactions: [
+            ix_operations: [
                 {
                     type: this.getTxType(ixObject.routine.kind),
                     payload: ixObject.createPayload(),

@@ -21,7 +21,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       const ixResponse = await signer.sendInteraction({
         fuel_price: 1,
         fuel_limit: 200,
-        transactions: [
+        ix_operations: [
           {
             type: TxType.ASSET_CREATE,
             payload: {
@@ -39,12 +39,12 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe('getBalance', () => {
       it('should return the asset balance', async () => {
-        if (!ixReceipt.transactions[0].data) {
-          expect(ixReceipt.transactions[0].data).toBeDefined();
+        if (!ixReceipt.ix_operations[0].data) {
+          expect(ixReceipt.ix_operations[0].data).toBeDefined();
           return;
         }
         
-        const balance = await provider.getBalance(signer.getAddress(), (<AssetCreationResult>ixReceipt.transactions[0].data).asset_id);
+        const balance = await provider.getBalance(signer.getAddress(), (<AssetCreationResult>ixReceipt.ix_operations[0].data).asset_id);
         expect(balance).toBe(supply);
       })
     });
@@ -82,7 +82,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const tdu = await provider.getTDU(address);
         expect(tdu).toBeDefined();
         
-        const extraData = ixReceipt.transactions[0].data as AssetCreationResult
+        const extraData = ixReceipt.ix_operations[0].data as AssetCreationResult
         const asset = tdu.find(asset => asset.asset_id === extraData.asset_id);
 
         expect(asset).toBeDefined();
@@ -240,7 +240,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
-          transactions: [
+          ix_operations: [
             {
               type: TxType.ASSET_CREATE,
               payload: {
@@ -263,7 +263,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
-          transactions: [
+          ix_operations: [
             {
               type: TxType.ASSET_CREATE,
               payload: {
@@ -407,7 +407,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           nonce: nonce,
           fuel_price: 1,
           fuel_limit: 200,
-          transactions: [
+          ix_operations: [
             {
               type: TxType.ASSET_CREATE,
               payload: {

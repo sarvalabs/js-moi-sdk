@@ -169,7 +169,7 @@ Methods
         sender: address,
         fuel_price: 1,
         fuel_limit: 200,
-        transactions: [
+        ix_operations: [
             {
                 type: TxType.ASSET_CREATE,
                 payload: {

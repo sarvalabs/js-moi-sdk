@@ -991,7 +991,7 @@ export class BaseProvider extends AbstractProvider {
      * data is missing.
      */
     processReceipt(receipt) {
-        return receipt.transactions.map(transaction => {
+        return receipt.ix_operations.map(transaction => {
             switch (hexToBN(transaction.tx_type)) {
                 case TxType.ASSET_TRANSFER:
                     return null;
@@ -1025,25 +1025,6 @@ export class BaseProvider extends AbstractProvider {
                     throw new Error("Unsupported interaction type encountered");
             }
         });
-    }
-    processWsResult(event, result) {
-        if (event === 'newPendingInteractions') {
-            if (typeof result === "string") {
-                return result.startsWith("0x") ? result : `0x${result}`;
-            }
-            ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
-        }
-        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
-            return result;
-        }
-        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
-            return result;
-        }
-        if (typeof event === "object" && event.event === "newLogs") {
-            const log = result;
-            return { ...log, data: encodeToString(decodeBase64(log.data)) };
-        }
-        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
     }
     processWsResult(event, result) {
         if (event === 'newPendingInteractions') {

@@ -46,7 +46,7 @@ describe("Test Websocket Provider", () => {
             await wallet.sendInteraction({
                 fuel_price: 1,
                 fuel_limit: 100,
-                transactions: [
+                ix_operations: [
                     {
                         type: TxType.ASSET_TRANSFER,
                         payload: {
@@ -105,7 +105,7 @@ describe("Test Websocket Provider", () => {
                 const ix = await wallet.sendInteraction({
                     fuel_price: 1,
                     fuel_limit: 10000,
-                    transactions: [
+                    ix_operations: [
                         {
                             type: TxType.LOGIC_DEPLOY,
                             payload: {
@@ -122,7 +122,7 @@ describe("Test Websocket Provider", () => {
                 await wallet.sendInteraction({
                     fuel_price: 1,
                     fuel_limit: 10000,
-                    transactions: [
+                    ix_operations: [
                         {
                             type: TxType.LOGIC_INVOKE,
                             payload: {

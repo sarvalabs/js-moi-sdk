@@ -123,7 +123,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      */
     processArguments(ixObject, type, option) {
         const params = {
-            transactions: [
+            ix_operations: [
                 {
                     type: this.getTxType(ixObject.routine.kind),
                     payload: ixObject.createPayload(),

@@ -115,7 +115,7 @@ exports.ixObjectSchema = {
                 }
             }
         },
-        transactions: {
+        ix_operations: {
             kind: "array",
             fields: {
                 values: {

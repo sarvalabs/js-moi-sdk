@@ -90,7 +90,7 @@ export abstract class Signer {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
-        if(ixObject.transactions == null || ixObject.transactions.length == 0) {
+        if(ixObject.ix_operations == null || ixObject.ix_operations.length == 0) {
             ErrorUtils.throwError("Transactions list is missing", ErrorCode.MISSING_ARGUMENT);
         }
 

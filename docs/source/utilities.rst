@@ -49,7 +49,7 @@ It contains the following properties:
 **Interaction**
 
 The ``Interaction`` interface represents a complete interaction, which bundles 
-multiple transactions and metadata to be processed on the MOI network. 
+multiple ix_operations and metadata to be processed on the MOI network. 
 It includes the following properties:
 
 * ``sender`` - ``string``: The address of the participant initiating the interaction.
@@ -57,7 +57,7 @@ It includes the following properties:
 * ``nonce`` - ``string``: The nonce value.
 * ``fuel_price`` - ``string``: The price per unit of fuel for processing the interaction.
 * ``fuel_limit`` - ``string``: The maximum amount of fuel allocated for the interaction execution.
-* ``transactions`` - ``string``: The serialized representation of the transactions included in the interaction.
+* ``ix_operations`` - ``string``: The serialized representation of the ix_operations included in the interaction.
 * ``hash`` - ``string``: The unique cryptographic hash of the interaction, used for identification and verification.
 * ``signature`` - ``string``: The cryptographic signature of the interaction, ensuring its authenticity.
 * ``ts_hash`` - ``string``: The hash of the associated tesseract, representing the outcome of the interaction.

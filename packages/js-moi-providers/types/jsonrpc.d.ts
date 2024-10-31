@@ -83,7 +83,7 @@ export interface ContextHash {
 export type ExecutionResult = AssetCreationResult | AssetSupplyResult | 
 LogicDeployResult | LogicInvokeResult | LogicEnlistResult | null;
 
-export interface TransactionResult {
+export interface OperationResult {
     tx_type: string;
     status: number;
     data: ExecutionResult
@@ -93,7 +93,7 @@ export interface InteractionReceipt {
     ix_hash: string;
     status: number;
     fuel_used: string;
-    transactions: TransactionResult[];
+    ix_operations: OperationResult[];
     from: string;
     ix_index: string;
     ts_hash: string;
@@ -275,6 +275,11 @@ export interface AssetCreatePayload {
     logic_payload?: LogicPayload;
 }
 
+export interface ParticipantCreatePayload {
+    address: string;
+    amount: string;
+}
+
 export interface AssetSupplyPayload {
     asset_id: string;
     amount: number | bigint;
@@ -320,7 +325,7 @@ interface ProcessedLogicPayload {
     manifest?: Uint8Array;
 }
 
-type ProcessedTransactionPayload = AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
+type ProcessedTransactionPayload = AssetCreatePayload | ParticipantCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
 
 type TxPayloadMap = {
     [TxType.ASSET_CREATE]: AssetCreatePayload;
@@ -343,7 +348,7 @@ interface IxAssetFund {
     amount: number | bigint;
 }
 
-interface IxTransaction {
+interface IxOperation {
     type: TxType;
     payload?: TransactionPayload;
 }
@@ -368,7 +373,7 @@ interface InteractionObject {
     fuel_limit?: number | bigint;
     
     funds?: IxAssetFund[]
-    transactions?: IxTransaction[]
+    ix_operations?: IxOperation[]
     participants?: IxParticipant[]
 
     perception?: Uint8Array

@@ -3,6 +3,7 @@
  */
 export enum TxType {
     INVALID_IX,
+    PARTICIPANT_CREATE,
     ASSET_TRANSFER,
     FUEL_SUPPLY,
 

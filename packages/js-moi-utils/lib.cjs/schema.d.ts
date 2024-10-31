@@ -139,7 +139,7 @@ export declare const ixObjectSchema: {
                 };
             };
         };
-        transactions: {
+        ix_operations: {
             kind: string;
             fields: {
                 values: {

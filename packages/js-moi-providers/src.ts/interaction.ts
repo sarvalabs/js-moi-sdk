@@ -193,7 +193,7 @@ export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxOb
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
             funds: [],
-            transactions: ixObject.transactions.map(transaction => ({
+            ix_operations: ixObject.ix_operations.map(transaction => ({
                 ...transaction, 
                 payload: "0x" + bytesToHex(serializePayload(transaction.type, transaction.payload)),
             })),

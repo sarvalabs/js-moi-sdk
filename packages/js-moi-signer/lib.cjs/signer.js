@@ -72,7 +72,7 @@ class Signer {
         if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
             js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
-        if (ixObject.transactions == null || ixObject.transactions.length == 0) {
+        if (ixObject.ix_operations == null || ixObject.ix_operations.length == 0) {
             js_moi_utils_1.ErrorUtils.throwError("Transactions list is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
         if (method === "send") {
