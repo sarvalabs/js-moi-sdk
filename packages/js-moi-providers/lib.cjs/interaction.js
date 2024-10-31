@@ -1,9 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processIxObject = exports.serializePayload = exports.validateLogicPayload = exports.validateLogicDeployPayload = exports.validateAssetTransferPayload = exports.validateAssetSupplyPayload = exports.validateAssetCreatePayload = void 0;
+exports.processIxObject = exports.serializePayload = exports.validateLogicPayload = exports.validateLogicDeployPayload = exports.validateAssetTransferPayload = exports.validateAssetSupplyPayload = exports.validateAssetCreatePayload = exports.validateParticipantCreatePayload = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const js_moi_constants_1 = require("js-moi-constants");
+/**
+ * Validates the payload for PARTICIPANT_CREATE transaction type.
+ *
+ * @param {TransactionPayload} payload - The transaction payload.
+ * @returns {AssetActionPayload} - The validated payload.
+ * @throws {Error} - Throws an error if the payload is invalid.
+ */
+const validateParticipantCreatePayload = (payload) => {
+    if ('address' in payload && 'amount' in payload) {
+        return payload;
+    }
+    throw new Error("Invalid participant create payload");
+};
+exports.validateParticipantCreatePayload = validateParticipantCreatePayload;
 /**
  * Validates the payload for ASSET_CREATE transaction type.
  *
@@ -15,7 +29,7 @@ const validateAssetCreatePayload = (payload) => {
     if ('symbol' in payload && 'supply' in payload && 'standard' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for ASSET_CREATE");
+    throw new Error("Invalid asset create payload");
 };
 exports.validateAssetCreatePayload = validateAssetCreatePayload;
 /**
@@ -29,7 +43,7 @@ const validateAssetSupplyPayload = (payload) => {
     if ('asset_id' in payload && 'amount' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for ASSET_MINT/ASSET_BURN");
+    throw new Error("Invalid asset mint or burn payload");
 };
 exports.validateAssetSupplyPayload = validateAssetSupplyPayload;
 /**
@@ -43,7 +57,7 @@ const validateAssetTransferPayload = (payload) => {
     if ('beneficiary' in payload && 'asset_id' in payload && 'amount' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for ASSET_TRANSFER");
+    throw new Error("Invalid asset transfer payload");
 };
 exports.validateAssetTransferPayload = validateAssetTransferPayload;
 /**
@@ -57,7 +71,7 @@ const validateLogicDeployPayload = (payload) => {
     if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for LOGIC_DEPLOY");
+    throw new Error("Invalid logic deploy payload");
 };
 exports.validateLogicDeployPayload = validateLogicDeployPayload;
 /**
@@ -71,7 +85,7 @@ const validateLogicPayload = (payload) => {
     if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for LOGIC_INVOKE/LOGIC_ENLIST");
+    throw new Error("Invalid logic invoke or enlist payload");
 };
 exports.validateLogicPayload = validateLogicPayload;
 /**
@@ -84,6 +98,13 @@ exports.validateLogicPayload = validateLogicPayload;
  */
 const processPayload = (txType, payload) => {
     switch (txType) {
+        case js_moi_utils_1.TxType.PARTICIPANT_CREATE: {
+            const participantPayload = (0, exports.validateParticipantCreatePayload)(payload);
+            return {
+                ...participantPayload,
+                address: (0, js_moi_utils_1.hexToBytes)(participantPayload.address),
+            };
+        }
         case js_moi_utils_1.TxType.ASSET_CREATE: {
             const createPayload = (0, exports.validateAssetCreatePayload)(payload);
             return { ...createPayload };
@@ -140,6 +161,9 @@ const serializePayload = (txType, payload) => {
     const polorizer = new js_polo_1.Polorizer();
     const processedPayload = processPayload(txType, payload);
     switch (txType) {
+        case js_moi_utils_1.TxType.PARTICIPANT_CREATE:
+            polorizer.polorize(processedPayload, js_moi_utils_1.participantCreateSchema);
+            return polorizer.bytes();
         case js_moi_utils_1.TxType.ASSET_TRANSFER:
             polorizer.polorize(processedPayload, js_moi_utils_1.assetActionSchema);
             return polorizer.bytes();

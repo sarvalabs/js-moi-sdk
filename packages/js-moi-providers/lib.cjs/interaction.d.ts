@@ -1,6 +1,14 @@
 import { TxType } from "js-moi-utils";
 import { ProcessedIxObject } from "../types/interaction";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, TransactionPayload } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, TransactionPayload } from "../types/jsonrpc";
+/**
+ * Validates the payload for PARTICIPANT_CREATE transaction type.
+ *
+ * @param {TransactionPayload} payload - The transaction payload.
+ * @returns {AssetActionPayload} - The validated payload.
+ * @throws {Error} - Throws an error if the payload is invalid.
+ */
+export declare const validateParticipantCreatePayload: (payload: TransactionPayload) => ParticipantCreatePayload;
 /**
  * Validates the payload for ASSET_CREATE transaction type.
  *

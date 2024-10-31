@@ -26,6 +26,17 @@ export declare const logicSchema: {
         };
     };
 };
+export declare const participantCreateSchema: {
+    kind: string;
+    fields: {
+        address: {
+            kind: string;
+        };
+        amount: {
+            kind: string;
+        };
+    };
+};
 export declare const assetCreateSchema: {
     kind: string;
     fields: {

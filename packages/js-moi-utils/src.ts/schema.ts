@@ -27,6 +27,18 @@ export const logicSchema = {
     }
 }
 
+export const participantCreateSchema = {
+    kind: "struct",
+    fields: {
+        address: {
+            kind: "bytes"
+        },
+        amount: {
+            kind: "integer"
+        }
+    }
+}
+
 export const assetCreateSchema = {
     kind: "struct",
     fields: {

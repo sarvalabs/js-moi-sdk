@@ -3,7 +3,8 @@ import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchem
     LockType} from "js-moi-utils";
 import { LogicPayload, InteractionObject, 
     AssetActionPayload, AssetSupplyPayload, IxOperation, 
-    serializePayload} from "js-moi-providers";
+    serializePayload,
+    ParticipantCreatePayload} from "js-moi-providers";
 import { ProcessedIxParticipant, ProcessedIxObject, ProcessedIxOperation, 
     ProcessedIxAssetFund } from "js-moi-signer";
 import { ZERO_ADDRESS } from "js-moi-constants";
@@ -84,6 +85,15 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
     // Process ix_operations and add participants
     ixObject.ix_operations.forEach((transaction) => {
         switch (transaction.type) {
+            case TxType.PARTICIPANT_CREATE: {
+                const participantCreatePayload = transaction.payload as ParticipantCreatePayload;
+
+                participants.set(participantCreatePayload.address, {
+                    address: hexToBytes(participantCreatePayload.address),
+                    lock_type: LockType.MUTATE_LOCK
+                });
+                break;
+            }
             case TxType.ASSET_CREATE:
                 break;
             case TxType.ASSET_MINT:

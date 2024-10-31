@@ -63,6 +63,14 @@ const processParticipants = (ixObject) => {
     // Process ix_operations and add participants
     ixObject.ix_operations.forEach((transaction) => {
         switch (transaction.type) {
+            case js_moi_utils_1.TxType.PARTICIPANT_CREATE: {
+                const participantCreatePayload = transaction.payload;
+                participants.set(participantCreatePayload.address, {
+                    address: (0, js_moi_utils_1.hexToBytes)(participantCreatePayload.address),
+                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+                });
+                break;
+            }
             case js_moi_utils_1.TxType.ASSET_CREATE:
                 break;
             case js_moi_utils_1.TxType.ASSET_MINT:

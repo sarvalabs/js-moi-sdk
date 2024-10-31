@@ -993,6 +993,7 @@ export class BaseProvider extends AbstractProvider {
     processReceipt(receipt) {
         return receipt.ix_operations.map(transaction => {
             switch (hexToBN(transaction.tx_type)) {
+                case TxType.PARTICIPANT_CREATE:
                 case TxType.ASSET_TRANSFER:
                     return null;
                 case TxType.ASSET_CREATE:

@@ -1,8 +1,23 @@
-import { ErrorCode, ErrorUtils, TxType, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { ProcessedIxObject } from "../types/interaction";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ProcessedTransactionPayload, TransactionPayload } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedTransactionPayload, TransactionPayload } from "../types/jsonrpc";
+
+/**
+ * Validates the payload for PARTICIPANT_CREATE transaction type.
+ *
+ * @param {TransactionPayload} payload - The transaction payload.
+ * @returns {AssetActionPayload} - The validated payload.
+ * @throws {Error} - Throws an error if the payload is invalid.
+ */
+export const validateParticipantCreatePayload = (payload: TransactionPayload): ParticipantCreatePayload => {
+    if ('address' in payload && 'amount' in payload) {
+        return payload as ParticipantCreatePayload;
+    }
+
+    throw new Error("Invalid participant create payload");
+};
 
 /**
  * Validates the payload for ASSET_CREATE transaction type.
@@ -16,7 +31,7 @@ export const validateAssetCreatePayload = (payload: TransactionPayload): AssetCr
         return payload as AssetCreatePayload;
     }
 
-    throw new Error("Invalid payload for ASSET_CREATE");
+    throw new Error("Invalid asset create payload");
 };
 
 /**
@@ -31,7 +46,7 @@ export const validateAssetSupplyPayload = (payload: TransactionPayload): AssetSu
         return payload as AssetSupplyPayload;
     }
 
-    throw new Error("Invalid payload for ASSET_MINT/ASSET_BURN");
+    throw new Error("Invalid asset mint or burn payload");
 };
 
 /**
@@ -46,7 +61,7 @@ export const validateAssetTransferPayload = (payload: TransactionPayload): Asset
         return payload as AssetActionPayload;
     }
 
-    throw new Error("Invalid payload for ASSET_TRANSFER");
+    throw new Error("Invalid asset transfer payload");
 };
 
 /**
@@ -61,7 +76,7 @@ export const validateLogicDeployPayload = (payload: TransactionPayload): LogicPa
         return payload as LogicPayload;
     }
 
-    throw new Error("Invalid payload for LOGIC_DEPLOY");
+    throw new Error("Invalid logic deploy payload");
 };
 
 /**
@@ -76,7 +91,7 @@ export const validateLogicPayload = (payload: TransactionPayload): LogicPayload 
         return payload as LogicPayload;
     }
 
-    throw new Error("Invalid payload for LOGIC_INVOKE/LOGIC_ENLIST");
+    throw new Error("Invalid logic invoke or enlist payload");
 };
 
 /**
@@ -89,6 +104,15 @@ export const validateLogicPayload = (payload: TransactionPayload): LogicPayload 
  */
 const processPayload = (txType: TxType, payload: TransactionPayload): ProcessedTransactionPayload => {
     switch (txType) {
+        case TxType.PARTICIPANT_CREATE: {
+            const participantPayload = validateParticipantCreatePayload(payload);
+
+            return {
+                ...participantPayload,
+                address: hexToBytes(participantPayload.address),
+            };
+        }
+
         case TxType.ASSET_CREATE: {
             const createPayload = validateAssetCreatePayload(payload);
             return { ...createPayload };
@@ -155,6 +179,9 @@ export const serializePayload = (txType: TxType, payload: TransactionPayload): U
     const polorizer = new Polorizer()
     const processedPayload = processPayload(txType, payload)
     switch(txType) {
+        case TxType.PARTICIPANT_CREATE:
+            polorizer.polorize(processedPayload, participantCreateSchema);
+            return polorizer.bytes()
         case TxType.ASSET_TRANSFER:
             polorizer.polorize(processedPayload, assetActionSchema);
             return polorizer.bytes()

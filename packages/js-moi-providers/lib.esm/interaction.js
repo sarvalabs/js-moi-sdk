@@ -1,6 +1,19 @@
-import { ErrorCode, ErrorUtils, TxType, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, TxType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ZERO_ADDRESS } from "js-moi-constants";
+/**
+ * Validates the payload for PARTICIPANT_CREATE transaction type.
+ *
+ * @param {TransactionPayload} payload - The transaction payload.
+ * @returns {AssetActionPayload} - The validated payload.
+ * @throws {Error} - Throws an error if the payload is invalid.
+ */
+export const validateParticipantCreatePayload = (payload) => {
+    if ('address' in payload && 'amount' in payload) {
+        return payload;
+    }
+    throw new Error("Invalid participant create payload");
+};
 /**
  * Validates the payload for ASSET_CREATE transaction type.
  *
@@ -12,7 +25,7 @@ export const validateAssetCreatePayload = (payload) => {
     if ('symbol' in payload && 'supply' in payload && 'standard' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for ASSET_CREATE");
+    throw new Error("Invalid asset create payload");
 };
 /**
  * Validates the payload for ASSET_MINT and ASSET_BURN transaction types.
@@ -25,7 +38,7 @@ export const validateAssetSupplyPayload = (payload) => {
     if ('asset_id' in payload && 'amount' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for ASSET_MINT/ASSET_BURN");
+    throw new Error("Invalid asset mint or burn payload");
 };
 /**
  * Validates the payload for ASSET_TRANSFER transaction type.
@@ -38,7 +51,7 @@ export const validateAssetTransferPayload = (payload) => {
     if ('beneficiary' in payload && 'asset_id' in payload && 'amount' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for ASSET_TRANSFER");
+    throw new Error("Invalid asset transfer payload");
 };
 /**
  * Validates the payload for LOGIC_DEPLOY transaction type.
@@ -51,7 +64,7 @@ export const validateLogicDeployPayload = (payload) => {
     if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for LOGIC_DEPLOY");
+    throw new Error("Invalid logic deploy payload");
 };
 /**
  * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST transaction types.
@@ -64,7 +77,7 @@ export const validateLogicPayload = (payload) => {
     if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
         return payload;
     }
-    throw new Error("Invalid payload for LOGIC_INVOKE/LOGIC_ENLIST");
+    throw new Error("Invalid logic invoke or enlist payload");
 };
 /**
  * Processes the payload based on the transaction type.
@@ -76,6 +89,13 @@ export const validateLogicPayload = (payload) => {
  */
 const processPayload = (txType, payload) => {
     switch (txType) {
+        case TxType.PARTICIPANT_CREATE: {
+            const participantPayload = validateParticipantCreatePayload(payload);
+            return {
+                ...participantPayload,
+                address: hexToBytes(participantPayload.address),
+            };
+        }
         case TxType.ASSET_CREATE: {
             const createPayload = validateAssetCreatePayload(payload);
             return { ...createPayload };
@@ -132,6 +152,9 @@ export const serializePayload = (txType, payload) => {
     const polorizer = new Polorizer();
     const processedPayload = processPayload(txType, payload);
     switch (txType) {
+        case TxType.PARTICIPANT_CREATE:
+            polorizer.polorize(processedPayload, participantCreateSchema);
+            return polorizer.bytes();
         case TxType.ASSET_TRANSFER:
             polorizer.polorize(processedPayload, assetActionSchema);
             return polorizer.bytes();

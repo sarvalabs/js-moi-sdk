@@ -277,7 +277,7 @@ export interface AssetCreatePayload {
 
 export interface ParticipantCreatePayload {
     address: string;
-    amount: string;
+    amount: number;
 }
 
 export interface AssetSupplyPayload {
@@ -311,6 +311,11 @@ export interface LogicPayload {
     manifest?: string;
 }
 
+interface ProcessedParticipantCreatePayload {
+    address: Uint8Array;
+    amount: number | bigint;
+}
+
 interface ProcessedAssetActionPayload {
     benefactor: Uint8Array;
     beneficiary: Uint8Array;
@@ -325,7 +330,7 @@ interface ProcessedLogicPayload {
     manifest?: Uint8Array;
 }
 
-type ProcessedTransactionPayload = AssetCreatePayload | ParticipantCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
+type ProcessedTransactionPayload = ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
 
 type TxPayloadMap = {
     [TxType.ASSET_CREATE]: AssetCreatePayload;
@@ -337,7 +342,7 @@ type TxPayloadMap = {
     [TxType.LOGIC_INVOKE]: LogicPayload;
 };
 
-export type TransactionPayload = AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
+export type TransactionPayload = ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
 
 // export type TransactionPayload = {
 //     [K in keyof TxPayloadMap]: { type: K; payload: TxPayloadMap[K] }
