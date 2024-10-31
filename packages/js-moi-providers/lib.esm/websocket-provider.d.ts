@@ -1,128 +1,77 @@
-import { JsonRpcProvider } from "./jsonrpc-provider";
-import Event from "./event";
-import { WebsocketProviderOptions } from "../types/provider";
-/**
- * Enum defining the WebSocket events.
- */
-export declare enum WebSocketEvents {
-    TESSERACT = "tesseract",
-    ALL_TESSERACTS = "all_tesseracts",
-    PENDING_INTERACTIONS = "pending_interactions",
-    CONNECT = "connect",
-    RECONNECT = "reconnect",
-    CLOSE = "close",
-    DEBUG = "debug",
-    ERROR = "error"
+import { type Tesseract } from "js-moi-utils";
+import { w3cwebsocket as Websocket } from "websocket";
+import type { Log, RpcResponse } from "../types/jsonrpc";
+import type { NewLogs, NewTesseractsByAccount, ProviderEvents, WebsocketEventMap } from "../types/websocket";
+import { BaseProvider } from "./base-provider";
+type TypeOfWebsocketConst = ConstructorParameters<typeof Websocket>;
+interface WebsocketConnection {
+    protocols?: TypeOfWebsocketConst[1];
+    headers?: TypeOfWebsocketConst[3];
+    requestOptions?: TypeOfWebsocketConst[4];
+    clientConfig?: TypeOfWebsocketConst[5];
+    reconnect?: {
+        delay: number;
+        maxAttempts: number;
+    };
+    timeout?: number;
 }
-/**
- * WebSocketProvider class extends the JsonRpcProvider class and provides WebSocket-based
- * communication with the JSON-RPC endpoint.
- */
-export declare class WebSocketProvider extends JsonRpcProvider {
-    private requestQueue;
-    private responseQueue;
-    private connection;
-    private wsConnOptions;
-    private reconnecting;
-    private reconnAttempts;
-    private subscriptions;
-    private subsIds;
-    constructor(host: string, options?: WebsocketProviderOptions);
-    /**
-     * Establishes a WebSocket connection with the provided host.
-     * Creates a new WebSocket connection instance and sets up event handlers.
-     */
-    private connect;
-    /**
-     * Sets up event listeners for the WebSocket connection.
-     */
-    private addEventListener;
-    /**
-     * Removes event listeners from the WebSocket connection.
-     */
-    private removeEventListener;
-    /**
-     * Initiates a reconnection to the WebSocket server.
-     * If there are pending requests in the response queue, their callbacks are
-     * invoked with a reconnection error.
-     * If the maximum reconnection attempts have not been reached, it schedules
-     * another reconnection attempt.
-     * If the maximum reconnection attempts have been reached, it invokes the
-     * error event and clears the request queue.
-     */
+export declare class WebsocketProvider extends BaseProvider {
+    private ws;
+    private reconnects;
+    private reconnectInterval?;
+    private readonly host;
+    private readonly options?;
+    private readonly subscriptions;
+    constructor(host: string, options?: WebsocketConnection);
+    private createNewWebsocket;
     private reconnect;
-    /**
-     * Event handler triggered when the WebSocket connection is successfully established.
-     * Invokes pending requests in the request queue if any.
-     */
-    private onConnect;
-    /**
-     * Checks if the WebSocket connection has failed based on the close event.
-     *
-     * @param event The close event object.
-     * @returns A boolean indicating whether the connection has failed.
-     */
-    private isConnectionFailed;
-    /**
-     * Method called when the WebSocket connection is closed.
-     *
-     * @param event - The close event.
-     */
-    private onClose;
-    /**
-     * Method called when a message is received through the WebSocket connection.
-     *
-     * @param event - The message event.
-     */
-    private onMessage;
-    /**
-     * Method called when the WebSocket connection fails to connect.
-     *
-     * @param event - The connect failed event.
-     */
-    private onConnectFailed;
-    /**
-     * Sends a request over the WebSocket connection.
-     *
-     * @param requestId - The ID of the request.
-     * @param request - The request object.
-     */
-    private sendRequest;
-    /**
-     * Sends a request over the WebSocket connection and returns a Promise that
-     * resolves with the response.
-     *
-     * @param method - The method of the request.
-     * @param params - The parameters of the request.
-     * @returns A Promise that resolves with the response or rejects with an error.
-     */
-    protected send(method: string, params: any[]): Promise<any>;
-    /**
-     * Subscribes to an event.
-     *
-     * @param tag - The tag associated with the subscription.
-     * @param param - The parameters of the subscription.
-     * @param processFunc - The function to process the subscription result.
-     * @returns A Promise that resolves when the subscription is complete.
-     */
-    protected _subscribe(tag: string, param: Array<any>, processFunc: (result: any) => void): Promise<void>;
-    /**
-     * Starts listening to an event.
-     *
-     * @param event - The event to start listening to.
-     */
-    protected _startEvent(event: Event): void;
-    /**
-     * Stops listening to an event.
-     *
-     * @param event - The event to stop listening to.
-     */
-    protected _stopEvent(event: Event): void;
-    /**
-     * Disconnects the WebSocket connection.
-     *
-     * @returns A Promise that resolves when the disconnect operation is complete.
-     */
     disconnect(): Promise<void>;
+    private handleOnConnect;
+    private handleOnError;
+    private handleOnClose;
+    protected execute<T = unknown>(method: string, params: any): Promise<RpcResponse<T>>;
+    private handleRpcRequest;
+    private isSubscriptionEvent;
+    getSubscription(eventName: ProviderEvents): Promise<string>;
+    on(eventName: NewLogs, listener: (log: Log) => void): this;
+    on(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
+    on<K extends keyof WebsocketEventMap>(eventName: K, listener: (...args: WebsocketEventMap[K]) => void): this;
+    once<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
+    once<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
+    once<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    removeListener<K>(eventName: NewLogs, listener: (logs: Log) => void): this;
+    removeListener<K>(eventName: NewTesseractsByAccount, listener: (tesseract: Tesseract) => void): this;
+    removeListener<K>(eventName: keyof WebsocketEventMap | K, listener: K extends keyof WebsocketEventMap ? WebsocketEventMap[K] extends unknown[] ? (...args: WebsocketEventMap[K]) => void : never : never): this;
+    /**
+     * This method removes a listener from the provider
+     *
+     * @param eventName - The event to remove the listener from
+     * @param listener - The listener to remove
+     * @returns - The provider instance
+     */
+    off(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    /**
+     * This methods returns all the listeners for a given event
+     *
+     * @param eventName - The event to get the listeners for
+     * @returns - An array of listeners
+     */
+    listeners<K>(eventName: string | symbol): Function[];
+    /**
+     * Returns the number of listeners for the specified event name.
+     *
+     * @param eventName - The name of the event.
+     * @param listener - (Optional) The listener function.
+     * @returns The number of listeners for the specified event name.
+     */
+    listenerCount<K>(eventName: string | symbol, listener?: Function): number;
+    /**
+     * Removes all event listeners for the specified event or all events.
+     *
+     * @param event - The event to remove listeners for. If not specified, all listeners for all events will be removed.
+     * @returns The instance of the class with all listeners removed.
+     */
+    removeAllListeners(event?: string | symbol): this;
 }
+export {};
 //# sourceMappingURL=websocket-provider.d.ts.map

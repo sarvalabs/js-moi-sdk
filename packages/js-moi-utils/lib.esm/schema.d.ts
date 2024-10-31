@@ -187,4 +187,12 @@ export declare const ixObjectSchema: {
         };
     };
 };
+export declare const builtInLogEventSchema: {
+    kind: string;
+    fields: {
+        value: {
+            kind: string;
+        };
+    };
+};
 //# sourceMappingURL=schema.d.ts.map

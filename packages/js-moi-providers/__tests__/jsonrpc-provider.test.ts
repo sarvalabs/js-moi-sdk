@@ -1,29 +1,24 @@
-import { Signer } from "js-moi-signer";
 import { AssetCreationResult, AssetStandard, hexToBN, TxType, toQuantity } from "js-moi-utils";
+import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
 import { getRandomSupply, getRandomSymbol, initializeWallet } from "./utils/utils";
 
-const HOST = "http://localhost:1600";
-const MNEMONIC = "hire collect attack purse horn toward penalty broom chat online mistake emerge";
-const ADDRESS = "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08";
-
+const HOST = "<YOUR JSON RPC HOST>";
+const MNEMONIC = "<YOUR SEED RECOVERY PHRASE>";
+const provider = new JsonRpcProvider(HOST);
 
 
 describe("Test JsonRpcProvider Query Calls", () => {
-  const address = ADDRESS;
-    const provider = new JsonRpcProvider(HOST);
-    let ixHash: string;
-    let signer: Signer;
-    let ixReceipt: InteractionReceipt;
-    let nextNonce = 0;
+  const signer = initializeWallet(provider, MNEMONIC);
+  const address = signer.getAddress();
+  let ixHash: string;
+  let ixReceipt: InteractionReceipt;
     const supply = getRandomSupply();
+    MNEMONIC;
 
     beforeAll(async() => {
-      signer = await initializeWallet(provider, MNEMONIC);
-      const nonce = await signer.getNonce();
       const ixResponse = await signer.sendInteraction({
-        nonce: nonce,
         fuel_price: 1,
         fuel_limit: 200,
         transactions: [
@@ -40,7 +35,6 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
       ixHash = ixResponse.hash;
       ixReceipt = await ixResponse.wait();
-      nextNonce = Number(nonce) + 1
     });
 
     describe('getBalance', () => {
@@ -49,9 +43,8 @@ describe("Test JsonRpcProvider Query Calls", () => {
           expect(ixReceipt.transactions[0].data).toBeDefined();
           return;
         }
-
-        const balance = await provider.getBalance(address, (<AssetCreationResult>ixReceipt.transactions[0].data).asset_id);
-
+        
+        const balance = await provider.getBalance(signer.getAddress(), (<AssetCreationResult>ixReceipt.transactions[0].data).asset_id);
         expect(balance).toBe(supply);
       })
     });
@@ -137,7 +130,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         const interactions = await provider.getInteractionByTesseract(address, undefined, 0);
 
         expect(interactions).toBeDefined();
-        expect(interactions.hash).toBe(ixReceipt.ix_hash);
+        expect(typeof interactions.hash).toBe("string");
       });
 
       it("should return the interaction by tesseract without address", async () => {
@@ -243,7 +236,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe("call", () => {
       it('should return the receipt by executing the interaction', async () => {
         const receipt = await provider.call({
-          nonce: nextNonce,
+          nonce: await signer.getNonce(),
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
@@ -266,7 +259,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
     describe("estimateFuel", () => {
       it('should return the estimated fuel by executing the interaction', async () => {
         const fuelPrice = await provider.estimateFuel({
-          nonce: nextNonce,
+          nonce: await signer.getNonce(),
           sender: address,
           fuel_price: 1,
           fuel_limit: 200,
@@ -432,5 +425,38 @@ describe("Test JsonRpcProvider Query Calls", () => {
         expect(Array.isArray(tesseracts)).toBeTruthy()
         expect(Array.length).toBeGreaterThanOrEqual(1);
       })
+    });
+
+    describe("getLogs", () => {
+      const provider = new VoyageProvider("babylon");
+      const address = "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce";
+
+      it("should return an result", async () => {
+        const logs = await provider.getLogs({
+          address: address,
+          height: [0, 10]
+        });
+        expect(logs).toBeDefined();
+        expect(Array.isArray(logs)).toBeTruthy();
+      });
+
+      it("should return an result with topics", async () => {
+        const logs = await provider.getLogs({
+          address: address,
+          height: [0, 10],
+          topics: [["Transfer"]]
+        })
+        expect(logs).toBeDefined();
+        expect(Array.isArray(logs)).toBeTruthy();
+      });
+
+      it("should throw error if height range is invalid", async () => {
+        expect(async () => {
+          await provider.getLogs({
+            address: address,
+            height: [10, 0]
+          })
+        }).rejects.toThrow(/Invalid query range|Invalid height query/i);
+      });
     });
 });

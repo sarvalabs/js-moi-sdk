@@ -76,8 +76,17 @@ export class Signer {
             if (ixObject.fuel_limit == null) {
                 ErrorUtils.throwError("Fuel limit is missing", ErrorCode.MISSING_ARGUMENT);
             }
-            if (ixObject.fuel_price === 0) {
-                ErrorUtils.throwError("Invalid fuel price", ErrorCode.INTERACTION_UNDERPRICED);
+            if (typeof ixObject.fuel_price !== "number" && typeof ixObject.fuel_price !== "bigint") {
+                ErrorUtils.throwError(`Invalid fuel price. Expected number or bigint, got ${typeof ixObject.fuel_price}`, ErrorCode.INVALID_ARGUMENT);
+            }
+            if (typeof ixObject.fuel_limit !== "number" && typeof ixObject.fuel_limit !== "bigint") {
+                ErrorUtils.throwError(`Invalid fuel limit. Expected number or bigint, got ${typeof ixObject.fuel_limit}`, ErrorCode.INVALID_ARGUMENT);
+            }
+            if (ixObject.fuel_price < 0) {
+                ErrorUtils.throwError("Fuel price cannot be negative", ErrorCode.INTERACTION_UNDERPRICED);
+            }
+            if (ixObject.fuel_limit <= 0) {
+                ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);
             }
             if (ixObject.nonce != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
@@ -185,6 +194,9 @@ export class Signer {
         }
         else {
             verificationKey = publicKey;
+        }
+        if (verificationKey.length === 33) {
+            verificationKey = verificationKey.slice(1);
         }
         const sig = new Signature();
         sig.unmarshall(signature);

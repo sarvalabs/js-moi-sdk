@@ -21,4 +21,5 @@ export * from "./schema";
 export { Interaction, Participant, Participants } from "../types/interaction";
 export { Tesseract } from "../types/tesseract";
 
+export { topicHash } from "./logic-events";
 

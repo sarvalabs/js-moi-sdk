@@ -160,4 +160,12 @@ export const ixObjectSchema = {
         }
     }
 };
+export const builtInLogEventSchema = {
+    kind: "struct",
+    fields: {
+        value: {
+            kind: "string"
+        }
+    }
+};
 //# sourceMappingURL=schema.js.map

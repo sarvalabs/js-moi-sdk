@@ -3,8 +3,8 @@ import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
-import { RoutineOption } from "../types/logic";
 import { LogicBase } from "./logic-base";
+import { RoutineOption } from "./routine-options";
 
 /**
  * This class represents a factory for deploying logic.
@@ -33,8 +33,8 @@ export class LogicFactory extends LogicBase {
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(
-                ixObject.routine.accepts, 
-                ixObject.arguments
+                payload.callsite, 
+                ...ixObject.arguments,
             );
         }
 
@@ -92,7 +92,7 @@ export class LogicFactory extends LogicBase {
         if(builder) {
             const builderRoutine = builder.data as LogicManifest.Routine;
 
-            const argsLen = args.at(-1) && typeof args.at(-1) === "object" ? args.length - 1 : args.length;
+            const argsLen = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.length - 1 : args.length;
 
             
             if(builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {

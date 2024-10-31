@@ -8,6 +8,7 @@ import {
     LogicEnlistResult,
     Participants
 } from "js-moi-utils";
+import type { NestedArray } from "./util";
 
 export interface Options {
     tesseract_number?: number;
@@ -399,3 +400,35 @@ export interface RpcResponse<T> {
     error?: RpcError;
     id: 1;
 }
+
+export interface Log {
+    address: string;
+    topics: string[];
+    data: string;
+    ix_hash: string;
+    ts_hash: string;
+    participants: Participants;
+}
+
+export interface LogFilter {
+    address: string;
+    height: [start: number, end: number];
+    topics?: NestedArray<string>;
+}
+
+
+export interface Log {
+    address: string;
+    topics: string[];
+    data: string;
+    ix_hash: string;
+    ts_hash: string;
+    participants: Participants;
+}
+
+export interface LogFilter {
+    address: string;
+    height: [start: number, end: number];
+    topics?: NestedArray<string>;
+}
+

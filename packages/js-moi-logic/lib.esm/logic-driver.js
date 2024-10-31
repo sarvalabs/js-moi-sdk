@@ -1,7 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
+import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -45,7 +45,7 @@ export class LogicDriver extends LogicDescriptor {
                 return;
             }
             routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && typeof params.at(-1) === "object"
+                const argsLen = params.at(-1) && params.at(-1) instanceof RoutineOption
                     ? params.length - 1
                     : params.length;
                 if (routine.accepts && argsLen < routine.accepts.length) {
@@ -91,7 +91,7 @@ export class LogicDriver extends LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
         }
         return payload;
     }
@@ -106,10 +106,9 @@ export class LogicDriver extends LogicDescriptor {
      */
     async processResult(response, timeout) {
         try {
-            const routine = this.getRoutineElement(response.routine_name);
             const result = await response.result(timeout);
             return {
-                output: this.manifestCoder.decodeOutput(result[0].outputs, routine.data["returns"]),
+                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
                 error: ManifestCoder.decodeException(result[0].error)
             };
         }
@@ -122,20 +121,16 @@ export class LogicDriver extends LogicDescriptor {
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
+ * @param {Signer} signer - The signer instance for the logic driver.
  * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export const getLogicDriver = async (logicId, signerOrProvider, options) => {
-    const provider = signerOrProvider instanceof Signer ? signerOrProvider.getProvider() : signerOrProvider;
-    const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+export const getLogicDriver = async (logicId, signer, options) => {
+    const manifest = await signer.getProvider().getLogicManifest(logicId, "JSON", options);
     if (typeof manifest !== "object") {
         ErrorUtils.throwError("Invalid logic manifest", ErrorCode.INVALID_ARGUMENT);
     }
-    // below check added for type safety
-    return signerOrProvider instanceof Signer
-        ? new LogicDriver(logicId, manifest, signerOrProvider)
-        : new LogicDriver(logicId, manifest, signerOrProvider);
+    return new LogicDriver(logicId, manifest, signer);
 };
 //# sourceMappingURL=logic-driver.js.map

@@ -1,8 +1,11 @@
-import { ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, TxType } from "js-moi-utils";
-import ElementDescriptor from "./element-descriptor";
 import { LogicId } from "./logic-id";
+import { RoutineOption } from "./routine-options";
+/**
+ * The default fuel price used for logic interactions.
+ */
 const DEFAULT_FUEL_PRICE = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
@@ -13,10 +16,10 @@ export class LogicBase extends ElementDescriptor {
     signer;
     provider;
     manifestCoder;
-    constructor(manifest, arg) {
+    constructor(manifest, signer) {
         super(manifest.elements);
-        this.manifestCoder = new ManifestCoder(this.elements, this.classDefs);
-        this.connect(arg);
+        this.manifestCoder = new ManifestCoder(manifest);
+        this.connect(signer);
     }
     /**
      * Returns the logic ID associated with the LogicBase instance.
@@ -46,15 +49,15 @@ export class LogicBase extends ElementDescriptor {
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
-     * @param {Signer | AbstractProvider} arg -  The signer or provider instance.
+     * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
-    connect(arg) {
-        if (arg instanceof Signer) {
-            this.signer = arg;
-            this.provider = arg.getProvider();
+    connect(signer) {
+        if (signer instanceof Signer) {
+            this.signer = signer;
+            this.provider = signer.getProvider();
             return;
         }
-        this.provider = arg;
+        this.provider = signer;
     }
     /**
      * Executes a routine with the given arguments and returns the interaction response.
@@ -124,21 +127,11 @@ export class LogicBase extends ElementDescriptor {
                 }
             ]
         };
-        if (option.sender != null) {
-            params.sender = option.sender;
-        }
-        else {
-            if (this.signer?.isInitialized()) {
-                params.sender = this.signer.getAddress();
-            }
-        }
-        if (option.fuelPrice != null) {
-            params.fuel_price = option.fuelPrice;
-        }
-        if (option.fuelLimit != null) {
-            params.fuel_limit = option.fuelLimit;
-        }
-        return { type, params: { ...params, ...option } };
+        params.sender = option.sender ?? this.signer?.getAddress();
+        params.fuel_price = option.fuelPrice;
+        params.fuel_limit = option.fuelLimit;
+        params.nonce = option.nonce;
+        return { type, params };
     }
     /**
      * Creates a logic interaction request object based on the given interaction object.
@@ -149,6 +142,11 @@ export class LogicBase extends ElementDescriptor {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
+            // const error =
+            //     "error" in ix.receipt.extra_data ? ManifestCoder.decodeException(ix.receipt.extra_data.error) : null;
+            // if (error != null) {
+            //     ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+            // }
             return await ix.result();
         };
         return {
@@ -166,7 +164,7 @@ export class LogicBase extends ElementDescriptor {
      * @returns {LogicIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
-        const option = args.at(-1) && typeof args.at(-1) === "object" ? args.pop() : {};
+        const option = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
             arguments: args
@@ -175,8 +173,8 @@ export class LogicBase extends ElementDescriptor {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit != null ? option.fuelLimit : await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice != null ? option.fuelPrice : DEFAULT_FUEL_PRICE;
+            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {

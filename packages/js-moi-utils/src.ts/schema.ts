@@ -164,3 +164,12 @@ export const ixObjectSchema =  {
         }
     }
 }
+
+export const builtInLogEventSchema = {
+    kind: "struct",
+    fields: {
+        value: {
+            kind: "string"
+        }
+    }
+}

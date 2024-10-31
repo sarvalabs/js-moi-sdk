@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ixObjectSchema = exports.assetSupplySchema = exports.assetActionSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
+exports.builtInLogEventSchema = exports.ixObjectSchema = exports.assetSupplySchema = exports.assetActionSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
 exports.logicSchema = {
     kind: "struct",
     fields: {
@@ -160,6 +160,14 @@ exports.ixObjectSchema = {
                     kind: "bytes"
                 }
             }
+        }
+    }
+};
+exports.builtInLogEventSchema = {
+    kind: "struct",
+    fields: {
+        value: {
+            kind: "string"
         }
     }
 };

@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
+const routine_options_1 = require("./routine-options");
 const state_1 = require("./state");
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -48,7 +48,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 return;
             }
             routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && typeof params.at(-1) === "object"
+                const argsLen = params.at(-1) && params.at(-1) instanceof routine_options_1.RoutineOption
                     ? params.length - 1
                     : params.length;
                 if (routine.accepts && argsLen < routine.accepts.length) {
@@ -94,7 +94,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.accepts, ixObject.arguments);
+            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
         }
         return payload;
     }
@@ -109,10 +109,9 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     async processResult(response, timeout) {
         try {
-            const routine = this.getRoutineElement(response.routine_name);
             const result = await response.result(timeout);
             return {
-                output: this.manifestCoder.decodeOutput(result[0].outputs, routine.data["returns"]),
+                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
                 error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
             };
         }
@@ -126,21 +125,17 @@ exports.LogicDriver = LogicDriver;
  * Returns a logic driver instance based on the given logic id.
  *
  * @param {string} logicId - The logic id of the logic.
- * @param {Signer | AbstractProvider} signerOrProvider - The instance of the `Signer` or `AbstractProvider`.
+ * @param {Signer} signer - The signer instance for the logic driver.
  * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-const getLogicDriver = async (logicId, signerOrProvider, options) => {
-    const provider = signerOrProvider instanceof js_moi_signer_1.Signer ? signerOrProvider.getProvider() : signerOrProvider;
-    const manifest = await provider.getLogicManifest(logicId, "JSON", options);
+const getLogicDriver = async (logicId, signer, options) => {
+    const manifest = await signer.getProvider().getLogicManifest(logicId, "JSON", options);
     if (typeof manifest !== "object") {
         js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
-    // below check added for type safety
-    return signerOrProvider instanceof js_moi_signer_1.Signer
-        ? new LogicDriver(logicId, manifest, signerOrProvider)
-        : new LogicDriver(logicId, manifest, signerOrProvider);
+    return new LogicDriver(logicId, manifest, signer);
 };
 exports.getLogicDriver = getLogicDriver;
 //# sourceMappingURL=logic-driver.js.map

@@ -2,8 +2,8 @@ import { LogicManifest } from "js-moi-manifest";
 import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
-import { RoutineOption } from "../types/logic";
 import { LogicBase } from "./logic-base";
+import { RoutineOption } from "./routine-options";
 /**
  * This class represents a factory for deploying logic.
  */

@@ -1,9 +1,9 @@
 build
 node_modules
-package-lock.json
 .DS_Store
 **/.tsbuildinfo
 **/src/**/*.js.map
 **/__tests__/**/*.js.map
 dist
 coverage
+.vscode
