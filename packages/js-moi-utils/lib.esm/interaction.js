@@ -31,8 +31,8 @@ export var TxType;
  */
 export var LockType;
 (function (LockType) {
-    LockType[LockType["READ_ONLY_LOCK"] = 0] = "READ_ONLY_LOCK";
-    LockType[LockType["MUTATE_LOCK"] = 1] = "MUTATE_LOCK";
-    LockType[LockType["OBSERVER_LOCK"] = 2] = "OBSERVER_LOCK";
+    LockType[LockType["MUTATE_LOCK"] = 0] = "MUTATE_LOCK";
+    LockType[LockType["READ_LOCK"] = 1] = "READ_LOCK";
+    LockType[LockType["NO_LOCK"] = 2] = "NO_LOCK";
 })(LockType || (LockType = {}));
 //# sourceMappingURL=interaction.js.map
