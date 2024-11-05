@@ -18,7 +18,7 @@ js-moi-sdk package.
 
     console.log(moi.VERSION)
 
-    >> 0.6.0-sephorum
+    >> 0.5.0
 
 MOI Derivation Path
 -------------------
