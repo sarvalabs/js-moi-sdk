@@ -1,4 +1,4 @@
-import { TxType } from "../src.ts/interaction";
+import { OpType } from "../src.ts/interaction";
 
 export interface ContextDelta {
     role: number;
@@ -18,7 +18,7 @@ export interface Participant {
 }
 
 export interface Transaction {
-    type: TxType;
+    type: OpType;
     payload: Uint8Array;
 }
 

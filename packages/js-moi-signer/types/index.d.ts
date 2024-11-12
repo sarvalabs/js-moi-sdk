@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { TxType } from "js-moi-utils";
+import { OpType } from "js-moi-utils";
 
 export interface ISignature {
     Digest(): Uint8Array;
@@ -39,7 +39,7 @@ interface ProcessedIxPreferences {
 }
 
 interface ProcessedIxOperation {
-    type: TxType
+    type: OpType
     payload: Uint8Array
 }
 

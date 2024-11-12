@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, TxType, bytesToHex, decodeBase64, encodeToString, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType, bytesToHex, decodeBase64, encodeToString, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import { processIxObject } from "./interaction";
 // Default timeout value in seconds
@@ -993,31 +993,31 @@ export class BaseProvider extends AbstractProvider {
     processReceipt(receipt) {
         return receipt.ix_operations.map(transaction => {
             switch (hexToBN(transaction.tx_type)) {
-                case TxType.PARTICIPANT_CREATE:
-                case TxType.ASSET_TRANSFER:
+                case OpType.PARTICIPANT_CREATE:
+                case OpType.ASSET_TRANSFER:
                     return null;
-                case TxType.ASSET_CREATE:
+                case OpType.ASSET_CREATE:
                     if (transaction.data) {
                         return transaction.data;
                     }
                     throw new Error("Failed to retrieve asset creation response");
-                case TxType.ASSET_MINT:
-                case TxType.ASSET_BURN:
+                case OpType.ASSET_MINT:
+                case OpType.ASSET_BURN:
                     if (transaction.data) {
                         return transaction.data;
                     }
                     throw new Error("Failed to retrieve asset mint/burn response");
-                case TxType.LOGIC_DEPLOY:
+                case OpType.LOGIC_DEPLOY:
                     if (transaction.data) {
                         return transaction.data;
                     }
                     throw new Error("Failed to retrieve logic deploy response");
-                case TxType.LOGIC_INVOKE:
+                case OpType.LOGIC_INVOKE:
                     if (transaction.data) {
                         return transaction.data;
                     }
                     throw new Error("Failed to retrieve logic invoke response");
-                case TxType.LOGIC_ENLIST:
+                case OpType.LOGIC_ENLIST:
                     if (transaction.data) {
                         return transaction.data;
                     }

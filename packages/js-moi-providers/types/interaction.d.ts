@@ -1,9 +1,9 @@
-import { TxType } from "js-moi-utils";
+import { OpType } from "js-moi-utils";
 import { IxAssetFund, IxParticipant, IxPreferences } from "./jsonrpc";
 
 
 interface IxOperation {
-    type: TxType;
+    type: OpType;
     payload?: string;
 }
 

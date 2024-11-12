@@ -7,7 +7,7 @@ const js_moi_constants_1 = require("js-moi-constants");
 /**
  * Validates the payload for PARTICIPANT_CREATE transaction type.
  *
- * @param {TransactionPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The transaction payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -21,7 +21,7 @@ exports.validateParticipantCreatePayload = validateParticipantCreatePayload;
 /**
  * Validates the payload for ASSET_CREATE transaction type.
  *
- * @param {TransactionPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The transaction payload.
  * @returns {AssetCreatePayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -35,7 +35,7 @@ exports.validateAssetCreatePayload = validateAssetCreatePayload;
 /**
  * Validates the payload for ASSET_MINT and ASSET_BURN transaction types.
  *
- * @param {TransactionPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The transaction payload.
  * @returns {AssetSupplyPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -49,7 +49,7 @@ exports.validateAssetSupplyPayload = validateAssetSupplyPayload;
 /**
  * Validates the payload for ASSET_TRANSFER transaction type.
  *
- * @param {TransactionPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The transaction payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -63,7 +63,7 @@ exports.validateAssetTransferPayload = validateAssetTransferPayload;
 /**
  * Validates the payload for LOGIC_DEPLOY transaction type.
  *
- * @param {TransactionPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The transaction payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -77,7 +77,7 @@ exports.validateLogicDeployPayload = validateLogicDeployPayload;
 /**
  * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST transaction types.
  *
- * @param {TransactionPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The transaction payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -91,33 +91,33 @@ exports.validateLogicPayload = validateLogicPayload;
 /**
  * Processes the payload based on the transaction type.
  *
- * @param {TxType} txType - The transaction type.
- * @param {TransactionPayload} payload - The transaction payload.
- * @returns {TransactionPayload} - The processed transaction payload.
+ * @param {OpType} txType - The transaction type.
+ * @param {OperationPayload} payload - The transaction payload.
+ * @returns {OperationPayload} - The processed transaction payload.
  * @throws {Error} - Throws an error if the transaction type is unsupported.
  */
 const processPayload = (txType, payload) => {
     switch (txType) {
-        case js_moi_utils_1.TxType.PARTICIPANT_CREATE: {
+        case js_moi_utils_1.OpType.PARTICIPANT_CREATE: {
             const participantPayload = (0, exports.validateParticipantCreatePayload)(payload);
             return {
                 ...participantPayload,
                 address: (0, js_moi_utils_1.hexToBytes)(participantPayload.address),
             };
         }
-        case js_moi_utils_1.TxType.ASSET_CREATE: {
+        case js_moi_utils_1.OpType.ASSET_CREATE: {
             const createPayload = (0, exports.validateAssetCreatePayload)(payload);
             return { ...createPayload };
         }
-        case js_moi_utils_1.TxType.ASSET_MINT:
-        case js_moi_utils_1.TxType.ASSET_BURN: {
+        case js_moi_utils_1.OpType.ASSET_MINT:
+        case js_moi_utils_1.OpType.ASSET_BURN: {
             const supplyPayload = (0, exports.validateAssetSupplyPayload)(payload);
             return {
                 ...supplyPayload,
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(supplyPayload.asset_id),
             };
         }
-        case js_moi_utils_1.TxType.ASSET_TRANSFER: {
+        case js_moi_utils_1.OpType.ASSET_TRANSFER: {
             const actionPayload = (0, exports.validateAssetTransferPayload)(payload);
             return {
                 ...actionPayload,
@@ -126,7 +126,7 @@ const processPayload = (txType, payload) => {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(actionPayload.asset_id),
             };
         }
-        case js_moi_utils_1.TxType.LOGIC_DEPLOY: {
+        case js_moi_utils_1.OpType.LOGIC_DEPLOY: {
             const logicPayload = (0, exports.validateLogicDeployPayload)(payload);
             return {
                 manifest: (0, js_moi_utils_1.hexToBytes)(logicPayload.manifest),
@@ -134,8 +134,8 @@ const processPayload = (txType, payload) => {
                 calldata: (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata),
             };
         }
-        case js_moi_utils_1.TxType.LOGIC_INVOKE:
-        case js_moi_utils_1.TxType.LOGIC_ENLIST: {
+        case js_moi_utils_1.OpType.LOGIC_INVOKE:
+        case js_moi_utils_1.OpType.LOGIC_ENLIST: {
             const logicPayload = (0, exports.validateLogicPayload)(payload);
             return {
                 logic_id: (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id),
@@ -152,8 +152,8 @@ const processPayload = (txType, payload) => {
  * This function polorizes (serializes) the payload using the appropriate schema
  * based on the transaction type and returns it as a byte array.
  *
- * @param {TxType} txType - The type of the transaction (e.g., ASSET_TRANSFER, ASSET_CREATE).
- * @param {TransactionPayload} payload - The payload of the transaction to be serialized.
+ * @param {OpType} txType - The type of the transaction (e.g., ASSET_TRANSFER, ASSET_CREATE).
+ * @param {OperationPayload} payload - The payload of the transaction to be serialized.
  * @returns {Uint8Array} - A serialized byte array representing the processed payload.
  * @throws {Error} - Throws an error if the transaction type is unsupported.
  */
@@ -161,22 +161,22 @@ const serializePayload = (txType, payload) => {
     const polorizer = new js_polo_1.Polorizer();
     const processedPayload = processPayload(txType, payload);
     switch (txType) {
-        case js_moi_utils_1.TxType.PARTICIPANT_CREATE:
+        case js_moi_utils_1.OpType.PARTICIPANT_CREATE:
             polorizer.polorize(processedPayload, js_moi_utils_1.participantCreateSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.TxType.ASSET_TRANSFER:
+        case js_moi_utils_1.OpType.ASSET_TRANSFER:
             polorizer.polorize(processedPayload, js_moi_utils_1.assetActionSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.TxType.ASSET_CREATE:
+        case js_moi_utils_1.OpType.ASSET_CREATE:
             polorizer.polorize(processedPayload, js_moi_utils_1.assetCreateSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.TxType.ASSET_MINT:
-        case js_moi_utils_1.TxType.ASSET_BURN:
+        case js_moi_utils_1.OpType.ASSET_MINT:
+        case js_moi_utils_1.OpType.ASSET_BURN:
             polorizer.polorize(processedPayload, js_moi_utils_1.assetSupplySchema);
             return polorizer.bytes();
-        case js_moi_utils_1.TxType.LOGIC_DEPLOY:
-        case js_moi_utils_1.TxType.LOGIC_INVOKE:
-        case js_moi_utils_1.TxType.LOGIC_ENLIST:
+        case js_moi_utils_1.OpType.LOGIC_DEPLOY:
+        case js_moi_utils_1.OpType.LOGIC_INVOKE:
+        case js_moi_utils_1.OpType.LOGIC_ENLIST:
             polorizer.polorize(processedPayload, js_moi_utils_1.logicSchema);
             return polorizer.bytes();
         default:

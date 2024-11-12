@@ -171,7 +171,7 @@ Methods
         fuel_limit: 200,
         ix_operations: [
             {
-                type: TxType.ASSET_CREATE,
+                type: OpType.ASSET_CREATE,
                 payload: {
                     standard: AssetStandard.MAS0,
                     symbol: "SIG",

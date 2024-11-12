@@ -2,7 +2,7 @@ import {
     AssetCreationResult,
     AssetSupplyResult,
     AssetStandard,
-    TxType,
+    OpType,
     LogicDeployResult,
     LogicInvokeResult,
     LogicEnlistResult,
@@ -330,21 +330,21 @@ interface ProcessedLogicPayload {
     manifest?: Uint8Array;
 }
 
-type ProcessedTransactionPayload = ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
+type ProcessedOperationPayload = ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
 
 type TxPayloadMap = {
-    [TxType.ASSET_CREATE]: AssetCreatePayload;
-    [TxType.ASSET_TRANSFER]: AssetActionPayload;
-    [TxType.ASSET_MINT]: AssetSupplyPayload;
-    [TxType.ASSET_BURN]: AssetSupplyPayload;
-    [TxType.LOGIC_DEPLOY]: LogicPayload;
-    [TxType.LOGIC_ENLIST]: LogicPayload;
-    [TxType.LOGIC_INVOKE]: LogicPayload;
+    [OpType.ASSET_CREATE]: AssetCreatePayload;
+    [OpType.ASSET_TRANSFER]: AssetActionPayload;
+    [OpType.ASSET_MINT]: AssetSupplyPayload;
+    [OpType.ASSET_BURN]: AssetSupplyPayload;
+    [OpType.LOGIC_DEPLOY]: LogicPayload;
+    [OpType.LOGIC_ENLIST]: LogicPayload;
+    [OpType.LOGIC_INVOKE]: LogicPayload;
 };
 
-export type TransactionPayload = ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
+export type OperationPayload = ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
 
-// export type TransactionPayload = {
+// export type OperationPayload = {
 //     [K in keyof TxPayloadMap]: { type: K; payload: TxPayloadMap[K] }
 // }[keyof TxPayloadMap];
 
@@ -354,8 +354,8 @@ interface IxAssetFund {
 }
 
 interface IxOperation {
-    type: TxType;
-    payload?: TransactionPayload;
+    type: OpType;
+    payload?: OperationPayload;
 }
 
 interface IxParticipant {

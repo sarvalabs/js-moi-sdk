@@ -2,7 +2,7 @@ import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest
 import type { AbstractProvider } from "js-moi-providers";
 import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, TxType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest } from "../types/logic";
 import { LogicId } from "./logic-id";
@@ -49,16 +49,16 @@ export abstract class LogicBase extends ElementDescriptor {
     /**
      * Returns the interaction type based on the routine kind.
      * 
-     * @returns {TxType} The interaction type.
+     * @returns {OpType} The interaction type.
      */
-    protected getTxType(kind: string): TxType {
+    protected getTxType(kind: string): OpType {
         switch(kind){
             case "deploy":
-                return TxType.LOGIC_DEPLOY;
+                return OpType.LOGIC_DEPLOY;
             case "invoke":
-                return TxType.LOGIC_INVOKE;
+                return OpType.LOGIC_INVOKE;
             case "enlist":
-                return TxType.LOGIC_ENLIST;
+                return OpType.LOGIC_ENLIST;
             default:
                 throw new Error("Unsupported routine kind!");
         }
@@ -91,7 +91,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     protected async executeRoutine(ixObject: LogicIxObject, method: string, option: RoutineOption): Promise<InteractionCallResponse | number | bigint | InteractionResponse> {
-        if (this.getTxType(ixObject.routine.kind) !== TxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getTxType(ixObject.routine.kind) !== OpType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError(
                 "This logic object doesn't have logic id assigned yet, please assign an logic id.",
                 ErrorCode.NOT_INITIALIZED

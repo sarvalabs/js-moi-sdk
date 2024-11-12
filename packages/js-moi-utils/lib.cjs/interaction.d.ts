@@ -1,7 +1,7 @@
 /**
  * Enumerates the types of Transactions in the system.
  */
-export declare enum TxType {
+export declare enum OpType {
     INVALID_IX = 0,
     PARTICIPANT_CREATE = 1,
     ASSET_TRANSFER = 2,

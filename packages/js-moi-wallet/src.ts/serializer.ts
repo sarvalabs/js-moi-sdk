@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, TxType, hexToBytes, trimHexPrefix, ixObjectSchema, 
+import { ErrorCode, ErrorUtils, OpType, hexToBytes, trimHexPrefix, ixObjectSchema, 
     
     LockType} from "js-moi-utils";
 import { LogicPayload, InteractionObject, 
@@ -22,8 +22,8 @@ const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
 
     ixObject.ix_operations.forEach(transaction => {
         switch(transaction.type) {
-            case TxType.ASSET_TRANSFER:
-            case TxType.ASSET_BURN: {
+            case OpType.ASSET_TRANSFER:
+            case OpType.ASSET_BURN: {
                 const payload = transaction.payload as AssetSupplyPayload | AssetActionPayload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
 
@@ -85,7 +85,7 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
     // Process ix_operations and add participants
     ixObject.ix_operations.forEach((transaction) => {
         switch (transaction.type) {
-            case TxType.PARTICIPANT_CREATE: {
+            case OpType.PARTICIPANT_CREATE: {
                 const participantCreatePayload = transaction.payload as ParticipantCreatePayload;
 
                 participants.set(participantCreatePayload.address, {
@@ -94,10 +94,10 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
                 });
                 break;
             }
-            case TxType.ASSET_CREATE:
+            case OpType.ASSET_CREATE:
                 break;
-            case TxType.ASSET_MINT:
-            case TxType.ASSET_BURN: {
+            case OpType.ASSET_MINT:
+            case OpType.ASSET_BURN: {
                 const assetSupplyPayload = transaction.payload as AssetSupplyPayload;
                 const address = trimHexPrefix(assetSupplyPayload.asset_id).slice(8);
 
@@ -107,7 +107,7 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
                 });
                 break;
             }
-            case TxType.ASSET_TRANSFER: {
+            case OpType.ASSET_TRANSFER: {
                 const assetActionPayload = transaction.payload as AssetActionPayload;
 
                 participants.set(assetActionPayload.beneficiary, {
@@ -116,10 +116,10 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
                 });
                 break;
             }
-            case TxType.LOGIC_DEPLOY:
+            case OpType.LOGIC_DEPLOY:
                 break;
-            case TxType.LOGIC_ENLIST:
-            case TxType.LOGIC_INVOKE: {
+            case OpType.LOGIC_ENLIST:
+            case OpType.LOGIC_INVOKE: {
                 const logicPayload = transaction.payload as LogicPayload;
                 const address = trimHexPrefix(logicPayload.logic_id).slice(6);
 

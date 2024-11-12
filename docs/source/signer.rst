@@ -86,7 +86,7 @@ Regular Methods
         fuel_limit: 200,
         ix_operations: [
             {
-                type: TxType.ASSET_CREATE,
+                type: OpType.ASSET_CREATE,
                 payload: {
                     standard: AssetStandard.MAS0,
                     symbol: "TOKYO",
@@ -113,7 +113,7 @@ Regular Methods
         fuel_limit: 200,
         ix_operations: [
             {
-                type: TxType.ASSET_CREATE,
+                type: OpType.ASSET_CREATE,
                 payload: {
                     standard: AssetStandard.MAS0,
                     symbol: "NOVA",
@@ -121,7 +121,7 @@ Regular Methods
                 }
             },
             {
-                type: TxType.ASSET_MINT,
+                type: OpType.ASSET_MINT,
                 payload: {
                     asset_id: "0x00000000b9a9d618867bec092db71c06c368a6d7f78dc01cf36f86a35991fee11303c3d9",
                     amount: 50000

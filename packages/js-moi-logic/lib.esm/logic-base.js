@@ -1,6 +1,6 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, TxType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**
@@ -32,16 +32,16 @@ export class LogicBase extends ElementDescriptor {
     /**
      * Returns the interaction type based on the routine kind.
      *
-     * @returns {TxType} The interaction type.
+     * @returns {OpType} The interaction type.
      */
     getTxType(kind) {
         switch (kind) {
             case "deploy":
-                return TxType.LOGIC_DEPLOY;
+                return OpType.LOGIC_DEPLOY;
             case "invoke":
-                return TxType.LOGIC_INVOKE;
+                return OpType.LOGIC_INVOKE;
             case "enlist":
-                return TxType.LOGIC_ENLIST;
+                return OpType.LOGIC_ENLIST;
             default:
                 throw new Error("Unsupported routine kind!");
         }
@@ -71,7 +71,7 @@ export class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getTxType(ixObject.routine.kind) !== TxType.LOGIC_DEPLOY && !this.getLogicId()) {
+        if (this.getTxType(ixObject.routine.kind) !== OpType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = this.processArguments(ixObject, method, option);

@@ -296,9 +296,9 @@ The ``LogicPayload`` interface represents a payload for logic deployment or invo
 * ``calldata`` - ``Uint8Array``: The calldata for the logic execution.
 * ``manifest`` - ``Uint8Array``: The encoded manifest to deploy (optional).
 
-**TransactionPayload**
+**OperationPayload**
 
-The ``TransactionPayload`` type represents a payload for an transaction. It can be one of the following types: ``AssetActionPayload``, 
+The ``OperationPayload`` type represents a payload for an transaction. It can be one of the following types: ``AssetActionPayload``, 
 ``AssetCreatePayload``, ``AssetSupplyPayload``, or ``LogicPayload``.
 
 **IxFund**
@@ -314,7 +314,7 @@ specified as either a ``number`` or a ``bigint``.
 The ``IxOperation`` type  represents an individual transaction that is part of a larger interaction.
 
 * ``type`` - ``string``: The type of the transaction.
-* ``payload`` - ``TransactionPayload``: The specific payload corresponding to the transaction.
+* ``payload`` - ``OperationPayload``: The specific payload corresponding to the transaction.
 
 **IxParticipant**
 

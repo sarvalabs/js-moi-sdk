@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
-import { AssetStandard, isValidAddress, TxType } from "js-moi-utils";
+import { AssetStandard, isValidAddress, OpType } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts/index";
 
 const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
@@ -154,7 +154,7 @@ describe("Wallet", () => {
                 fuel_limit: 200,
                 ix_operations: [
                     {
-                        type: TxType.ASSET_CREATE,
+                        type: OpType.ASSET_CREATE,
                         payload: {
                             standard: AssetStandard.MAS0,
                             symbol: "SIG",

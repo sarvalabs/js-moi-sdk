@@ -16,8 +16,8 @@ const processFunds = (ixObject) => {
     const assetFunds = new Map();
     ixObject.ix_operations.forEach(transaction => {
         switch (transaction.type) {
-            case js_moi_utils_1.TxType.ASSET_TRANSFER:
-            case js_moi_utils_1.TxType.ASSET_BURN: {
+            case js_moi_utils_1.OpType.ASSET_TRANSFER:
+            case js_moi_utils_1.OpType.ASSET_BURN: {
                 const payload = transaction.payload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
                 if (typeof payload.amount === "bigint" || typeof amount === "bigint") {
@@ -63,7 +63,7 @@ const processParticipants = (ixObject) => {
     // Process ix_operations and add participants
     ixObject.ix_operations.forEach((transaction) => {
         switch (transaction.type) {
-            case js_moi_utils_1.TxType.PARTICIPANT_CREATE: {
+            case js_moi_utils_1.OpType.PARTICIPANT_CREATE: {
                 const participantCreatePayload = transaction.payload;
                 participants.set(participantCreatePayload.address, {
                     address: (0, js_moi_utils_1.hexToBytes)(participantCreatePayload.address),
@@ -71,10 +71,10 @@ const processParticipants = (ixObject) => {
                 });
                 break;
             }
-            case js_moi_utils_1.TxType.ASSET_CREATE:
+            case js_moi_utils_1.OpType.ASSET_CREATE:
                 break;
-            case js_moi_utils_1.TxType.ASSET_MINT:
-            case js_moi_utils_1.TxType.ASSET_BURN: {
+            case js_moi_utils_1.OpType.ASSET_MINT:
+            case js_moi_utils_1.OpType.ASSET_BURN: {
                 const assetSupplyPayload = transaction.payload;
                 const address = (0, js_moi_utils_1.trimHexPrefix)(assetSupplyPayload.asset_id).slice(8);
                 participants.set(address, {
@@ -83,7 +83,7 @@ const processParticipants = (ixObject) => {
                 });
                 break;
             }
-            case js_moi_utils_1.TxType.ASSET_TRANSFER: {
+            case js_moi_utils_1.OpType.ASSET_TRANSFER: {
                 const assetActionPayload = transaction.payload;
                 participants.set(assetActionPayload.beneficiary, {
                     address: (0, js_moi_utils_1.hexToBytes)(assetActionPayload.beneficiary),
@@ -91,10 +91,10 @@ const processParticipants = (ixObject) => {
                 });
                 break;
             }
-            case js_moi_utils_1.TxType.LOGIC_DEPLOY:
+            case js_moi_utils_1.OpType.LOGIC_DEPLOY:
                 break;
-            case js_moi_utils_1.TxType.LOGIC_ENLIST:
-            case js_moi_utils_1.TxType.LOGIC_INVOKE: {
+            case js_moi_utils_1.OpType.LOGIC_ENLIST:
+            case js_moi_utils_1.OpType.LOGIC_INVOKE: {
                 const logicPayload = transaction.payload;
                 const address = (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id).slice(6);
                 participants.set(address, {

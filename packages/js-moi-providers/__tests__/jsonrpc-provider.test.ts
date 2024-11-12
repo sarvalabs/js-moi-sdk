@@ -1,4 +1,4 @@
-import { AssetCreationResult, AssetStandard, hexToBN, TxType, toQuantity } from "js-moi-utils";
+import { AssetCreationResult, AssetStandard, hexToBN, OpType, toQuantity } from "js-moi-utils";
 import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";
@@ -23,7 +23,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         fuel_limit: 200,
         ix_operations: [
           {
-            type: TxType.ASSET_CREATE,
+            type: OpType.ASSET_CREATE,
             payload: {
               standard: AssetStandard.MAS0,
               symbol: getRandomSymbol(),
@@ -242,7 +242,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           fuel_limit: 200,
           ix_operations: [
             {
-              type: TxType.ASSET_CREATE,
+              type: OpType.ASSET_CREATE,
               payload: {
                 standard: AssetStandard.MAS0,
                 symbol: "CALL",
@@ -265,7 +265,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           fuel_limit: 200,
           ix_operations: [
             {
-              type: TxType.ASSET_CREATE,
+              type: OpType.ASSET_CREATE,
               payload: {
                 standard: AssetStandard.MAS0,
                 symbol: "ESTIMATE",
@@ -409,7 +409,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
           fuel_limit: 200,
           ix_operations: [
             {
-              type: TxType.ASSET_CREATE,
+              type: OpType.ASSET_CREATE,
               payload: {
                 standard: AssetStandard.MAS0,
                 symbol: "TESTING",
