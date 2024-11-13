@@ -444,12 +444,12 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
       * @throws {Error} if there is an error executing the RPC call.
       *
       * @example
-      * // Retrieve Tesseract by address with interactions and options
-      * provider.getTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', true, { tesseract_number: '0' })
+      * // Retrieve Tesseract by address with interactions, commit_info and options
+      * provider.getTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', true, true, { tesseract_number: '0' })
       *
       * @example
-      * // Retrieve Tesseract by tesseract hash with interactions and options
-      * provider.getTesseract(true, { tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' })
+      * // Retrieve Tesseract by tesseract hash with interactions, commit_info and options
+      * provider.getTesseract(true, true, { tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' })
       */
     async getTesseract(arg1, arg2, arg3, arg4) {
         try {
