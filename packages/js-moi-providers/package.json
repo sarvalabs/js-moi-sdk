@@ -26,7 +26,6 @@
     "cross-fetch": "^4.0.0",
     "events": "npm:events@^3.3.0",
     "js-moi-manifest": "^0.5.0",
-    "crypto": "npm:crypto-browserify",
     "js-moi-utils": "^0.5.0",
     "websocket": "^1.0.35"
   },
