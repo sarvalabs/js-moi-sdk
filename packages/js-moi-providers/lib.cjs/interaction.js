@@ -185,6 +185,139 @@ const serializePayload = (txType, payload) => {
 };
 exports.serializePayload = serializePayload;
 /**
+ * Processes the interaction object to extract and consolidate asset funds from
+ * ix_operations and asset funds.
+ *
+ * @param {InteractionObject} ixObject - The interaction object containing ix_operations and asset funds.
+ * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
+ */
+const processFunds = (ixObject) => {
+    const assetFunds = new Map();
+    ixObject.ix_operations.forEach(operation => {
+        switch (operation.type) {
+            case js_moi_utils_1.OpType.ASSET_TRANSFER:
+            case js_moi_utils_1.OpType.ASSET_BURN: {
+                const payload = operation.payload;
+                const amount = assetFunds.get(payload.asset_id) ?? 0;
+                if (typeof payload.amount === "bigint" || typeof amount === "bigint") {
+                    assetFunds.set(payload.asset_id, BigInt(payload.amount) + BigInt(amount));
+                    return;
+                }
+                assetFunds.set(payload.asset_id, Number(payload.amount) + Number(amount));
+            }
+        }
+    });
+    if (ixObject.funds != null) {
+        // Add additional asset funds to the list if not present
+        ixObject.funds.forEach(assetFund => {
+            if (!assetFunds.has(assetFund.asset_id)) {
+                assetFunds.set(assetFund.asset_id, assetFund.amount);
+            }
+        });
+    }
+    return Array.from(assetFunds, ([asset_id, amount]) => ({ asset_id, amount }));
+};
+/**
+ * Processes a series of ix_operations and returns an array of processed participants.
+ * Each participant is derived based on the type of operation and its associated payload.
+ *
+ * @param {IxOperation[]} steps - The array of operation steps to process.
+ * @returns {IxParticipant[]} - The array of processed participants.
+ * @throws {Error} - Throws an error if an unsupported operation type is encountered.
+ */
+const processParticipants = (ixObject) => {
+    const participants = new Map();
+    // Add sender to participants
+    participants.set((0, js_moi_utils_1.trimHexPrefix)(ixObject.sender), {
+        address: ixObject.sender,
+        lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+    });
+    // Add payer if it exists
+    if (ixObject.payer != null) {
+        participants.set((0, js_moi_utils_1.trimHexPrefix)(ixObject.payer), {
+            address: ixObject.payer,
+            lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+        });
+    }
+    // Process ix_operations and add participants
+    ixObject.ix_operations.forEach((operation) => {
+        switch (operation.type) {
+            case js_moi_utils_1.OpType.PARTICIPANT_CREATE: {
+                const participantCreatePayload = operation.payload;
+                participants.set(participantCreatePayload.address, {
+                    address: participantCreatePayload.address,
+                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            case js_moi_utils_1.OpType.ASSET_CREATE:
+                break;
+            case js_moi_utils_1.OpType.ASSET_MINT:
+            case js_moi_utils_1.OpType.ASSET_BURN: {
+                const assetSupplyPayload = operation.payload;
+                const address = "0x" + (0, js_moi_utils_1.trimHexPrefix)(assetSupplyPayload.asset_id).slice(8);
+                participants.set(address, {
+                    address: address,
+                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            case js_moi_utils_1.OpType.ASSET_TRANSFER: {
+                const assetActionPayload = operation.payload;
+                participants.set(assetActionPayload.beneficiary, {
+                    address: assetActionPayload.beneficiary,
+                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            case js_moi_utils_1.OpType.LOGIC_DEPLOY:
+                break;
+            case js_moi_utils_1.OpType.LOGIC_ENLIST:
+            case js_moi_utils_1.OpType.LOGIC_INVOKE: {
+                const logicPayload = operation.payload;
+                const address = "0x" + (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id).slice(6);
+                participants.set(address, {
+                    address: address,
+                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            default:
+                js_moi_utils_1.ErrorUtils.throwError("Unsupported Ix type", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+    });
+    // Add additional participants if they exist
+    if (ixObject.participants != null) {
+        ixObject.participants.forEach((participant) => {
+            const address = (0, js_moi_utils_1.trimHexPrefix)(participant.address);
+            if (!participants.has(address)) {
+                participants.set(address, {
+                    address: participant.address,
+                    lock_type: participant.lock_type
+                });
+            }
+        });
+    }
+    return Array.from(participants.values());
+};
+/**
+ * Processes an array of ix_operations by serializing their payloads into byte form
+ * and returns the processed ix_operations.
+ *
+ * @param {IxOperation[]} ix_operations - Operations to process.
+ * @returns {ProcessedIxOperation[]} - Processed ix_operations with serialized payloads.
+ * @throws {Error} - If the payload is missing or operation type is unsupported.
+ */
+const processOperations = (ix_operations) => {
+    return ix_operations.map(operation => {
+        if (!operation.payload) {
+            js_moi_utils_1.ErrorUtils.throwError("Payload is missing!", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+        }
+        const payload = (0, exports.serializePayload)(operation.type, operation.payload);
+        return { ...operation, payload: "0x" + (0, js_moi_utils_1.bytesToHex)(payload) };
+    });
+};
+/**
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
@@ -198,12 +331,9 @@ const processIxObject = (ixObject) => {
             sender: ixObject.sender,
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
-            funds: [],
-            ix_operations: ixObject.ix_operations.map(operation => ({
-                ...operation,
-                payload: "0x" + (0, js_moi_utils_1.bytesToHex)((0, exports.serializePayload)(operation.type, operation.payload)),
-            })),
-            participants: []
+            funds: processFunds(ixObject),
+            ix_operations: processOperations(ixObject.ix_operations),
+            participants: processParticipants(ixObject)
         };
     }
     catch (err) {

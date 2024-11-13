@@ -1,8 +1,8 @@
-import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix, LockType } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { ProcessedIxObject } from "../types/interaction";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload, InteractionObject, IxOperation, ProcessedIxOperation, IxParticipant, IxAssetFund } from "../types/jsonrpc";
 
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
@@ -206,6 +206,170 @@ export const serializePayload = (txType: OpType, payload: OperationPayload): Uin
 }
 
 /**
+ * Processes the interaction object to extract and consolidate asset funds from 
+ * ix_operations and asset funds.
+ *
+ * @param {InteractionObject} ixObject - The interaction object containing ix_operations and asset funds.
+ * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
+ */
+const processFunds = (ixObject: InteractionObject): IxAssetFund[] => {
+    const assetFunds = new Map<string, number | bigint>();
+
+    ixObject.ix_operations.forEach(operation => {
+        switch(operation.type) {
+            case OpType.ASSET_TRANSFER:
+            case OpType.ASSET_BURN: {
+                const payload = operation.payload as AssetSupplyPayload | AssetActionPayload;
+                const amount = assetFunds.get(payload.asset_id) ?? 0;
+
+                if(typeof payload.amount === "bigint" || typeof amount === "bigint") {
+                    assetFunds.set(
+                        payload.asset_id, 
+                        BigInt(payload.amount) + BigInt(amount),
+                    );
+                    return;
+                }
+                
+                assetFunds.set(
+                    payload.asset_id, 
+                    Number(payload.amount) + Number(amount),
+                );
+            }
+        }
+    });
+
+    if(ixObject.funds != null) {
+        // Add additional asset funds to the list if not present
+        ixObject.funds.forEach(assetFund => {
+            if (!assetFunds.has(assetFund.asset_id)) {
+                assetFunds.set(assetFund.asset_id, assetFund.amount);
+            }
+        });
+    }
+
+    return Array.from(assetFunds, ([asset_id, amount]) => 
+        ({ asset_id, amount })
+    ) as IxAssetFund[];
+}
+
+/**
+ * Processes a series of ix_operations and returns an array of processed participants.
+ * Each participant is derived based on the type of operation and its associated payload.
+ *
+ * @param {IxOperation[]} steps - The array of operation steps to process.
+ * @returns {IxParticipant[]} - The array of processed participants.
+ * @throws {Error} - Throws an error if an unsupported operation type is encountered.
+ */
+const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
+    const participants = new Map<string, IxParticipant>();
+
+    // Add sender to participants
+    participants.set(trimHexPrefix(ixObject.sender), {
+        address: ixObject.sender,
+        lock_type: LockType.MUTATE_LOCK
+    });
+
+    // Add payer if it exists
+    if (ixObject.payer != null) {
+        participants.set(trimHexPrefix(ixObject.payer), {
+            address: ixObject.payer,
+            lock_type: LockType.MUTATE_LOCK
+        });
+    }
+
+    // Process ix_operations and add participants
+    ixObject.ix_operations.forEach((operation) => {
+        switch (operation.type) {
+            case OpType.PARTICIPANT_CREATE: {
+                const participantCreatePayload = operation.payload as ParticipantCreatePayload;
+
+                participants.set(participantCreatePayload.address, {
+                    address: participantCreatePayload.address,
+                    lock_type: LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            case OpType.ASSET_CREATE:
+                break;
+            case OpType.ASSET_MINT:
+            case OpType.ASSET_BURN: {
+                const assetSupplyPayload = operation.payload as AssetSupplyPayload;
+                const address = "0x" + trimHexPrefix(assetSupplyPayload.asset_id).slice(8);
+
+                participants.set(address, {
+                    address: address,
+                    lock_type: LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            case OpType.ASSET_TRANSFER: {
+                const assetActionPayload = operation.payload as AssetActionPayload;
+
+                participants.set(assetActionPayload.beneficiary, {
+                    address: assetActionPayload.beneficiary,
+                    lock_type: LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            case OpType.LOGIC_DEPLOY:
+                break;
+            case OpType.LOGIC_ENLIST:
+            case OpType.LOGIC_INVOKE: {
+                const logicPayload = operation.payload as LogicPayload;
+                const address = "0x" + trimHexPrefix(logicPayload.logic_id).slice(6);
+
+                participants.set(address, {
+                    address: address,
+                    lock_type: LockType.MUTATE_LOCK
+                });
+                break;
+            }
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
+    });
+
+    // Add additional participants if they exist
+    if (ixObject.participants != null) {
+        ixObject.participants.forEach((participant) => {
+            const address = trimHexPrefix(participant.address);
+
+            if (!participants.has(address)) {
+                participants.set(address, {
+                    address: participant.address,
+                    lock_type: participant.lock_type
+                });
+            }
+        });
+    }
+
+    return Array.from(participants.values());
+};
+
+/**
+ * Processes an array of ix_operations by serializing their payloads into byte form 
+ * and returns the processed ix_operations.
+ * 
+ * @param {IxOperation[]} ix_operations - Operations to process.
+ * @returns {ProcessedIxOperation[]} - Processed ix_operations with serialized payloads.
+ * @throws {Error} - If the payload is missing or operation type is unsupported.
+ */
+const processOperations = (ix_operations: IxOperation[]): ProcessedIxOperation[] => {
+    return ix_operations.map(operation => {
+        if(!operation.payload) {
+            ErrorUtils.throwError(
+                "Payload is missing!",
+                ErrorCode.MISSING_ARGUMENT
+            )
+        }
+
+        const payload = serializePayload(operation.type, operation.payload);
+
+        return {...operation, payload: "0x" + bytesToHex(payload)}
+    })
+}
+
+/**
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
@@ -219,12 +383,9 @@ export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxOb
             sender: ixObject.sender,
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
-            funds: [],
-            ix_operations: ixObject.ix_operations.map(operation => ({
-                ...operation, 
-                payload: "0x" + bytesToHex(serializePayload(operation.type, operation.payload)),
-            })),
-            participants: []
+            funds: processFunds(ixObject),
+            ix_operations: processOperations(ixObject.ix_operations),
+            participants: processParticipants(ixObject)
         };
     } catch(err) {
         ErrorUtils.throwError(

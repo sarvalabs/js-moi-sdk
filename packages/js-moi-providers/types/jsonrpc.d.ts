@@ -332,38 +332,29 @@ interface ProcessedLogicPayload {
 
 type ProcessedOperationPayload = ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
 
-type TxPayloadMap = {
-    [OpType.ASSET_CREATE]: AssetCreatePayload;
-    [OpType.ASSET_TRANSFER]: AssetActionPayload;
-    [OpType.ASSET_MINT]: AssetSupplyPayload;
-    [OpType.ASSET_BURN]: AssetSupplyPayload;
-    [OpType.LOGIC_DEPLOY]: LogicPayload;
-    [OpType.LOGIC_ENLIST]: LogicPayload;
-    [OpType.LOGIC_INVOKE]: LogicPayload;
-};
-
 export type OperationPayload = ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
 
-// export type OperationPayload = {
-//     [K in keyof TxPayloadMap]: { type: K; payload: TxPayloadMap[K] }
-// }[keyof TxPayloadMap];
-
-interface IxAssetFund {
+export interface IxAssetFund {
     asset_id: string;
     amount: number | bigint;
 }
 
-interface IxOperation {
+export interface IxOperation {
     type: OpType;
-    payload?: OperationPayload;
+    payload: OperationPayload;
 }
 
-interface IxParticipant {
+interface ProcessedIxOperation {
+    type: OpType;
+    payload: string;
+}
+
+export interface IxParticipant {
     address: string;
     lock_type: number;
 }
 
-interface IxPreferences {
+export interface IxPreferences {
     compute: Uint8Array;
     consensus: Uint8Array;
 }

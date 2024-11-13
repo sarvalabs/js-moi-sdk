@@ -6,7 +6,7 @@ import { LogicPayload, InteractionObject,
     serializePayload,
     ParticipantCreatePayload} from "js-moi-providers";
 import { ProcessedIxParticipant, ProcessedIxObject, ProcessedIxOperation, 
-    ProcessedIxAssetFund } from "js-moi-signer";
+    ProcessedIxAssetFund } from "../types/interaction";
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 
