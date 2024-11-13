@@ -6,7 +6,8 @@ const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
 const websocket_events_1 = require("./websocket-events");
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
-const randomUUID = globalThis.crypto.randomUUID;
+const crypto = globalThis.crypto ?? global.crypto;
+const randomUUID = crypto.randomUUID;
 class WebsocketProvider extends base_provider_1.BaseProvider {
     ws;
     reconnects = 0;
