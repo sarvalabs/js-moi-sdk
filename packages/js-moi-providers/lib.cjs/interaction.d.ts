@@ -2,62 +2,62 @@ import { OpType } from "js-moi-utils";
 import { ProcessedIxObject } from "../types/interaction";
 import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, OperationPayload } from "../types/jsonrpc";
 /**
- * Validates the payload for PARTICIPANT_CREATE transaction type.
+ * Validates the payload for PARTICIPANT_CREATE operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateParticipantCreatePayload: (payload: OperationPayload) => ParticipantCreatePayload;
 /**
- * Validates the payload for ASSET_CREATE transaction type.
+ * Validates the payload for ASSET_CREATE operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetCreatePayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateAssetCreatePayload: (payload: OperationPayload) => AssetCreatePayload;
 /**
- * Validates the payload for ASSET_MINT and ASSET_BURN transaction types.
+ * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetSupplyPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateAssetSupplyPayload: (payload: OperationPayload) => AssetSupplyPayload;
 /**
- * Validates the payload for ASSET_TRANSFER transaction type.
+ * Validates the payload for ASSET_TRANSFER operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateAssetTransferPayload: (payload: OperationPayload) => AssetActionPayload;
 /**
- * Validates the payload for LOGIC_DEPLOY transaction type.
+ * Validates the payload for LOGIC_DEPLOY operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateLogicDeployPayload: (payload: OperationPayload) => LogicPayload;
 /**
- * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST transaction types.
+ * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateLogicPayload: (payload: OperationPayload) => LogicPayload;
 /**
- * Serializes the payload of a transaction based on its type.
+ * Serializes the payload of a operation based on its type.
  * This function polorizes (serializes) the payload using the appropriate schema
- * based on the transaction type and returns it as a byte array.
+ * based on the operation type and returns it as a byte array.
  *
- * @param {OpType} txType - The type of the transaction (e.g., ASSET_TRANSFER, ASSET_CREATE).
- * @param {OperationPayload} payload - The payload of the transaction to be serialized.
+ * @param {OpType} txType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
+ * @param {OperationPayload} payload - The payload of the operation to be serialized.
  * @returns {Uint8Array} - A serialized byte array representing the processed payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
+ * @throws {Error} - Throws an error if the operation type is unsupported.
  */
 export declare const serializePayload: (txType: OpType, payload: OperationPayload) => Uint8Array;
 /**

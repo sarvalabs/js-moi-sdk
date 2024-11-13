@@ -5,9 +5,9 @@ const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const js_moi_constants_1 = require("js-moi-constants");
 /**
- * Validates the payload for PARTICIPANT_CREATE transaction type.
+ * Validates the payload for PARTICIPANT_CREATE operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -19,9 +19,9 @@ const validateParticipantCreatePayload = (payload) => {
 };
 exports.validateParticipantCreatePayload = validateParticipantCreatePayload;
 /**
- * Validates the payload for ASSET_CREATE transaction type.
+ * Validates the payload for ASSET_CREATE operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetCreatePayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -33,9 +33,9 @@ const validateAssetCreatePayload = (payload) => {
 };
 exports.validateAssetCreatePayload = validateAssetCreatePayload;
 /**
- * Validates the payload for ASSET_MINT and ASSET_BURN transaction types.
+ * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetSupplyPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -47,9 +47,9 @@ const validateAssetSupplyPayload = (payload) => {
 };
 exports.validateAssetSupplyPayload = validateAssetSupplyPayload;
 /**
- * Validates the payload for ASSET_TRANSFER transaction type.
+ * Validates the payload for ASSET_TRANSFER operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -61,9 +61,9 @@ const validateAssetTransferPayload = (payload) => {
 };
 exports.validateAssetTransferPayload = validateAssetTransferPayload;
 /**
- * Validates the payload for LOGIC_DEPLOY transaction type.
+ * Validates the payload for LOGIC_DEPLOY operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -75,9 +75,9 @@ const validateLogicDeployPayload = (payload) => {
 };
 exports.validateLogicDeployPayload = validateLogicDeployPayload;
 /**
- * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST transaction types.
+ * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -89,12 +89,12 @@ const validateLogicPayload = (payload) => {
 };
 exports.validateLogicPayload = validateLogicPayload;
 /**
- * Processes the payload based on the transaction type.
+ * Processes the payload based on the operation type.
  *
- * @param {OpType} txType - The transaction type.
- * @param {OperationPayload} payload - The transaction payload.
- * @returns {OperationPayload} - The processed transaction payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
+ * @param {OpType} txType - The operation type.
+ * @param {OperationPayload} payload - The operation payload.
+ * @returns {OperationPayload} - The processed operation payload.
+ * @throws {Error} - Throws an error if the operation type is unsupported.
  */
 const processPayload = (txType, payload) => {
     switch (txType) {
@@ -144,18 +144,18 @@ const processPayload = (txType, payload) => {
             };
         }
         default:
-            js_moi_utils_1.ErrorUtils.throwError(`Unsupported transaction type: ${txType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${txType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 /**
- * Serializes the payload of a transaction based on its type.
+ * Serializes the payload of a operation based on its type.
  * This function polorizes (serializes) the payload using the appropriate schema
- * based on the transaction type and returns it as a byte array.
+ * based on the operation type and returns it as a byte array.
  *
- * @param {OpType} txType - The type of the transaction (e.g., ASSET_TRANSFER, ASSET_CREATE).
- * @param {OperationPayload} payload - The payload of the transaction to be serialized.
+ * @param {OpType} txType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
+ * @param {OperationPayload} payload - The payload of the operation to be serialized.
  * @returns {Uint8Array} - A serialized byte array representing the processed payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
+ * @throws {Error} - Throws an error if the operation type is unsupported.
  */
 const serializePayload = (txType, payload) => {
     const polorizer = new js_polo_1.Polorizer();
@@ -180,7 +180,7 @@ const serializePayload = (txType, payload) => {
             polorizer.polorize(processedPayload, js_moi_utils_1.logicSchema);
             return polorizer.bytes();
         default:
-            js_moi_utils_1.ErrorUtils.throwError(`Unsupported transaction type: ${txType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${txType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 exports.serializePayload = serializePayload;
@@ -199,9 +199,9 @@ const processIxObject = (ixObject) => {
             fuel_price: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_price),
             fuel_limit: (0, js_moi_utils_1.toQuantity)(ixObject.fuel_limit),
             funds: [],
-            ix_operations: ixObject.ix_operations.map(transaction => ({
-                ...transaction,
-                payload: "0x" + (0, js_moi_utils_1.bytesToHex)((0, exports.serializePayload)(transaction.type, transaction.payload)),
+            ix_operations: ixObject.ix_operations.map(operation => ({
+                ...operation,
+                payload: "0x" + (0, js_moi_utils_1.bytesToHex)((0, exports.serializePayload)(operation.type, operation.payload)),
             })),
             participants: []
         };

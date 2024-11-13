@@ -38,13 +38,13 @@ The ``Participant`` interface represents a participant object. It has the follow
 * ``context_delta`` - ``ContextDelta``: The object representing the context delta of the participant.
 * ``state_delta`` - ``string``: The state delta of the participant.
 
-**Transaction**
+**Operation**
 
-The ``Transaction`` interface represents an individual transaction within an interaction. 
+The ``Operation`` interface represents an individual operation within an interaction. 
 It contains the following properties:
 
-* ``type`` - ``number``: The type of the transaction.
-* ``payload`` - ``Uint8Array``: The serialized payload containing the transaction data.
+* ``type`` - ``number``: The type of the operation.
+* ``payload`` - ``Uint8Array``: The serialized payload containing the operation data.
 
 **Interaction**
 

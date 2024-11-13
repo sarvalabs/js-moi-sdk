@@ -17,7 +17,7 @@ export interface Participant {
     state_hash: string;
 }
 
-export interface Transaction {
+export interface Operation {
     type: OpType;
     payload: Uint8Array;
 }
@@ -33,7 +33,7 @@ export interface Interaction {
     fuel_price: string;
     fuel_limit: string;
 
-    ix_operations: Transaction[]
+    ix_operations: Operation[]
     
     hash: string;
     signature: string;

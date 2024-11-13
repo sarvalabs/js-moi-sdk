@@ -1221,43 +1221,43 @@ export class BaseProvider extends AbstractProvider {
 
     /**
      * Process the interaction receipt to determine the appropriate execution result 
-     * based on the transaction type.
+     * based on the operation type.
      * 
      * @param {InteractionReceipt} receipt - The interaction receipt to be processed.
-     * @returns {ExecutionResult[]} The processed execution results based on the transaction type.
-     * @throws {Error} If the transaction type is unsupported or the expected response
+     * @returns {ExecutionResult[]} The processed execution results based on the operation type.
+     * @throws {Error} If the operation type is unsupported or the expected response
      * data is missing.
      */
     protected processReceipt(receipt: InteractionReceipt): ExecutionResult[] {
-        return receipt.ix_operations.map(transaction => {
-            switch (hexToBN(transaction.tx_type)) {
+        return receipt.ix_operations.map(operation => {
+            switch (hexToBN(operation.tx_type)) {
                 case OpType.PARTICIPANT_CREATE:
                 case OpType.ASSET_TRANSFER:
                     return null;
                 case OpType.ASSET_CREATE:
-                    if (transaction.data) {
-                        return transaction.data as AssetCreationResult;
+                    if (operation.data) {
+                        return operation.data as AssetCreationResult;
                     }
                     throw new Error("Failed to retrieve asset creation response");
                 case OpType.ASSET_MINT:
                 case OpType.ASSET_BURN:
-                    if (transaction.data) {
-                        return transaction.data as AssetSupplyResult;
+                    if (operation.data) {
+                        return operation.data as AssetSupplyResult;
                     }
                     throw new Error("Failed to retrieve asset mint/burn response");
                 case OpType.LOGIC_DEPLOY:
-                    if (transaction.data) {
-                        return transaction.data as LogicDeployResult;
+                    if (operation.data) {
+                        return operation.data as LogicDeployResult;
                     }
                     throw new Error("Failed to retrieve logic deploy response");
                 case OpType.LOGIC_INVOKE:
-                    if (transaction.data) {
-                        return transaction.data as LogicInvokeResult;
+                    if (operation.data) {
+                        return operation.data as LogicInvokeResult;
                     }
                     throw new Error("Failed to retrieve logic invoke response");
                 case OpType.LOGIC_ENLIST:
-                    if (transaction.data) {
-                        return transaction.data as LogicEnlistResult;
+                    if (operation.data) {
+                        return operation.data as LogicEnlistResult;
                     }
                     throw new Error("Failed to retrieve logic enlist response");
                 default:

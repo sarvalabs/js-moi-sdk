@@ -54,7 +54,7 @@ export class LogicFactory extends LogicBase {
 
             return { 
                 logic_id: result[0].logic_id ? result[0].logic_id : "", 
-                error: ManifestCoder.decodeException(result.error) 
+                error: ManifestCoder.decodeException(result[0].error) 
             };
         } catch(err) {
             throw err;

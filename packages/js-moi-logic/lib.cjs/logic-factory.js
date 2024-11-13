@@ -44,7 +44,7 @@ class LogicFactory extends logic_base_1.LogicBase {
             const result = await response.result(timeout);
             return {
                 logic_id: result[0].logic_id ? result[0].logic_id : "",
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result.error)
+                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
             };
         }
         catch (err) {

@@ -67,7 +67,7 @@ export class Signer {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.ix_operations == null || ixObject.ix_operations.length == 0) {
-            ErrorUtils.throwError("Transactions list is missing", ErrorCode.MISSING_ARGUMENT);
+            ErrorUtils.throwError("Operations list is missing", ErrorCode.MISSING_ARGUMENT);
         }
         if (method === "send") {
             if (ixObject.fuel_price == null) {

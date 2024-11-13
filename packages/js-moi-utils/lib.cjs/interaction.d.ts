@@ -1,5 +1,5 @@
 /**
- * Enumerates the types of Transactions in the system.
+ * Enumerates the types of Operations in the system.
  */
 export declare enum OpType {
     INVALID_IX = 0,

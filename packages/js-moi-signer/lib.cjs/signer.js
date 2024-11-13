@@ -73,7 +73,7 @@ class Signer {
             js_moi_utils_1.ErrorUtils.throwError("Sender address mismatches with the signer", js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.ix_operations == null || ixObject.ix_operations.length == 0) {
-            js_moi_utils_1.ErrorUtils.throwError("Transactions list is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError("Operations list is missing", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
         }
         if (method === "send") {
             if (ixObject.fuel_price == null) {

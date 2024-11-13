@@ -142,11 +142,6 @@ export class LogicBase extends ElementDescriptor {
     createIxRequest(ixObject) {
         const unwrap = async () => {
             const ix = await ixObject.call();
-            // const error =
-            //     "error" in ix.receipt.extra_data ? ManifestCoder.decodeException(ix.receipt.extra_data.error) : null;
-            // if (error != null) {
-            //     ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
-            // }
             return await ix.result();
         };
         return {

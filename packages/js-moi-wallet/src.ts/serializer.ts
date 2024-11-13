@@ -20,11 +20,11 @@ import { Polorizer } from "js-polo";
 const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
     const assetFunds = new Map<string, number | bigint>();
 
-    ixObject.ix_operations.forEach(transaction => {
-        switch(transaction.type) {
+    ixObject.ix_operations.forEach(operation => {
+        switch(operation.type) {
             case OpType.ASSET_TRANSFER:
             case OpType.ASSET_BURN: {
-                const payload = transaction.payload as AssetSupplyPayload | AssetActionPayload;
+                const payload = operation.payload as AssetSupplyPayload | AssetActionPayload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
 
                 if(typeof payload.amount === "bigint" || typeof amount === "bigint") {
@@ -59,11 +59,11 @@ const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
 
 /**
  * Processes a series of ix_operations and returns an array of processed participants.
- * Each participant is derived based on the type of transaction and its associated payload.
+ * Each participant is derived based on the type of operation and its associated payload.
  *
- * @param {IxOperation[]} steps - The array of transaction steps to process.
+ * @param {IxOperation[]} steps - The array of operation steps to process.
  * @returns {ProcessedIxParticipant[]} - The array of processed participants.
- * @throws {Error} - Throws an error if an unsupported transaction type is encountered.
+ * @throws {Error} - Throws an error if an unsupported operation type is encountered.
  */
 const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipant[] => {
     const participants = new Map<string, ProcessedIxParticipant>();
@@ -83,10 +83,10 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
     }
 
     // Process ix_operations and add participants
-    ixObject.ix_operations.forEach((transaction) => {
-        switch (transaction.type) {
+    ixObject.ix_operations.forEach((operation) => {
+        switch (operation.type) {
             case OpType.PARTICIPANT_CREATE: {
-                const participantCreatePayload = transaction.payload as ParticipantCreatePayload;
+                const participantCreatePayload = operation.payload as ParticipantCreatePayload;
 
                 participants.set(participantCreatePayload.address, {
                     address: hexToBytes(participantCreatePayload.address),
@@ -98,7 +98,7 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
                 break;
             case OpType.ASSET_MINT:
             case OpType.ASSET_BURN: {
-                const assetSupplyPayload = transaction.payload as AssetSupplyPayload;
+                const assetSupplyPayload = operation.payload as AssetSupplyPayload;
                 const address = trimHexPrefix(assetSupplyPayload.asset_id).slice(8);
 
                 participants.set(address, {
@@ -108,7 +108,7 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
                 break;
             }
             case OpType.ASSET_TRANSFER: {
-                const assetActionPayload = transaction.payload as AssetActionPayload;
+                const assetActionPayload = operation.payload as AssetActionPayload;
 
                 participants.set(assetActionPayload.beneficiary, {
                     address: hexToBytes(assetActionPayload.beneficiary),
@@ -120,7 +120,7 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
                 break;
             case OpType.LOGIC_ENLIST:
             case OpType.LOGIC_INVOKE: {
-                const logicPayload = transaction.payload as LogicPayload;
+                const logicPayload = operation.payload as LogicPayload;
                 const address = trimHexPrefix(logicPayload.logic_id).slice(6);
 
                 participants.set(address, {
@@ -155,22 +155,22 @@ const processParticipants = (ixObject: InteractionObject): ProcessedIxParticipan
  * Processes an array of ix_operations by serializing their payloads into byte form 
  * and returns the processed ix_operations.
  * 
- * @param {IxOperation[]} ix_operations - Transactions to process.
+ * @param {IxOperation[]} ix_operations - Operations to process.
  * @returns {ProcessedIxOperation[]} - Processed ix_operations with serialized payloads.
- * @throws {Error} - If the payload is missing or transaction type is unsupported.
+ * @throws {Error} - If the payload is missing or operation type is unsupported.
  */
-const processTransactions = (ix_operations: IxOperation[]): ProcessedIxOperation[] => {
-    return ix_operations.map(transaction => {
-        if(!transaction.payload) {
+const processOperations = (ix_operations: IxOperation[]): ProcessedIxOperation[] => {
+    return ix_operations.map(operation => {
+        if(!operation.payload) {
             ErrorUtils.throwError(
                 "Payload is missing!",
                 ErrorCode.MISSING_ARGUMENT
             )
         }
 
-        const payload = serializePayload(transaction.type, transaction.payload);
+        const payload = serializePayload(operation.type, operation.payload);
 
-        return {...transaction, payload}
+        return {...operation, payload}
     })
 }
 
@@ -190,7 +190,7 @@ const processIxObject = (ixObject: InteractionObject): ProcessedIxObject => {
             fuel_price: ixObject.fuel_price,
             fuel_limit: ixObject.fuel_limit,
             funds: processFunds(ixObject),
-            ix_operations: processTransactions(ixObject.ix_operations),
+            ix_operations: processOperations(ixObject.ix_operations),
             participants: processParticipants(ixObject),
         } as ProcessedIxObject;
     } catch(err) {

@@ -182,17 +182,17 @@ The ``ContextHash`` interface represents context hash information. It has the fo
 **ExecutionResult**
 
 The ``ExecutionResult`` - ``AssetCreationResult``, ``AssetSupplyResult``, ``LogicDeployResult``, 
-``LogicInvokeResult``, or ``null``: represents the detailed outcome of a transaction execution. 
-It can vary based on the specific type of transaction.
+``LogicInvokeResult``, or ``null``: represents the detailed outcome of a operation execution. 
+It can vary based on the specific type of operation.
 
 **OperationResult**
 
-The ``OperationResult`` interface represents the outcome of a processed transaction, 
+The ``OperationResult`` interface represents the outcome of a processed operation, 
 including its type, execution status, and resulting data.
 
-* ``tx_type`` - ``string``: The type of transaction.
-* ``status`` - ``number``: The status code indicating the result of the transaction.
-* ``data`` - ``ExecutionResult``: The detailed transaction execution result specific to the transaction type or null
+* ``tx_type`` - ``string``: The type of operation.
+* ``status`` - ``number``: The status code indicating the result of the operation.
+* ``data`` - ``ExecutionResult``: The detailed operation execution result specific to the operation type or null
 
 **InteractionReceipt**
 
@@ -202,7 +202,7 @@ The ``InteractionReceipt`` interface represents a receipt for an interaction. It
 * ``status`` - ``number``: The status of the interaction.
 * ``fuel_used`` - ``string``: The amount of fuel used for the interaction.
 * ``participants`` - ``Participant[]``: The participants involved in the interaction.
-* ``ix_operations`` - ``OperationResult[]``: A list of transaction results.
+* ``ix_operations`` - ``OperationResult[]``: A list of operation results.
 * ``from`` - ``string``: The sender of the interaction.
 * ``ix_index`` - ``string``: The index of the interaction.
 * ``ts_hash`` - ``string``: The hash of the tesseract.
@@ -259,6 +259,13 @@ The ``ConnectionsInfo`` interface provides information about connections and act
 * ``outbound_conn_count`` - ``number``: The count of outbound connections.
 * ``active_pub_sub_topics`` - A dictionary where the keys are topic strings and the values are numbers representing the count of active connections for each topic.
 
+**ParticipantCreatePayload**
+
+The ``ParticipantCreatePayload`` interface represents a payload for creating an participant. It has the following properties:
+
+* ``address`` - ``string``: The participant's address to register on the network.
+* ``amount`` - ``number | bigint``: The initial deposit amount.
+
 **AssetActionPayload**
 
 The ``AssetActionPayload`` interface represents a payload for transferring/approving/revoking an asset. It has the following properties:
@@ -298,8 +305,8 @@ The ``LogicPayload`` interface represents a payload for logic deployment or invo
 
 **OperationPayload**
 
-The ``OperationPayload`` type represents a payload for an transaction. It can be one of the following types: ``AssetActionPayload``, 
-``AssetCreatePayload``, ``AssetSupplyPayload``, or ``LogicPayload``.
+The ``OperationPayload`` type represents a payload for an operation. It can be one of the following types: ``ParticipantCreatePayload``, 
+``AssetActionPayload``, ``AssetCreatePayload``, ``AssetSupplyPayload``, or ``LogicPayload``.
 
 **IxFund**
 
@@ -311,10 +318,10 @@ specified as either a ``number`` or a ``bigint``.
 
 **IxOperation**
 
-The ``IxOperation`` type  represents an individual transaction that is part of a larger interaction.
+The ``IxOperation`` type represents an individual operation that is part of a larger interaction.
 
-* ``type`` - ``string``: The type of the transaction.
-* ``payload`` - ``OperationPayload``: The specific payload corresponding to the transaction.
+* ``type`` - ``string``: The type of the operation.
+* ``payload`` - ``OperationPayload``: The specific payload corresponding to the operation.
 
 **IxParticipant**
 

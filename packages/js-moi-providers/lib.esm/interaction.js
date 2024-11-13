@@ -2,9 +2,9 @@ import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetActionSche
 import { Polorizer } from "js-polo";
 import { ZERO_ADDRESS } from "js-moi-constants";
 /**
- * Validates the payload for PARTICIPANT_CREATE transaction type.
+ * Validates the payload for PARTICIPANT_CREATE operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -15,9 +15,9 @@ export const validateParticipantCreatePayload = (payload) => {
     throw new Error("Invalid participant create payload");
 };
 /**
- * Validates the payload for ASSET_CREATE transaction type.
+ * Validates the payload for ASSET_CREATE operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetCreatePayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -28,9 +28,9 @@ export const validateAssetCreatePayload = (payload) => {
     throw new Error("Invalid asset create payload");
 };
 /**
- * Validates the payload for ASSET_MINT and ASSET_BURN transaction types.
+ * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetSupplyPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -41,9 +41,9 @@ export const validateAssetSupplyPayload = (payload) => {
     throw new Error("Invalid asset mint or burn payload");
 };
 /**
- * Validates the payload for ASSET_TRANSFER transaction type.
+ * Validates the payload for ASSET_TRANSFER operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {AssetActionPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -54,9 +54,9 @@ export const validateAssetTransferPayload = (payload) => {
     throw new Error("Invalid asset transfer payload");
 };
 /**
- * Validates the payload for LOGIC_DEPLOY transaction type.
+ * Validates the payload for LOGIC_DEPLOY operation type.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -67,9 +67,9 @@ export const validateLogicDeployPayload = (payload) => {
     throw new Error("Invalid logic deploy payload");
 };
 /**
- * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST transaction types.
+ * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
  *
- * @param {OperationPayload} payload - The transaction payload.
+ * @param {OperationPayload} payload - The operation payload.
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
@@ -80,12 +80,12 @@ export const validateLogicPayload = (payload) => {
     throw new Error("Invalid logic invoke or enlist payload");
 };
 /**
- * Processes the payload based on the transaction type.
+ * Processes the payload based on the operation type.
  *
- * @param {OpType} txType - The transaction type.
- * @param {OperationPayload} payload - The transaction payload.
- * @returns {OperationPayload} - The processed transaction payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
+ * @param {OpType} txType - The operation type.
+ * @param {OperationPayload} payload - The operation payload.
+ * @returns {OperationPayload} - The processed operation payload.
+ * @throws {Error} - Throws an error if the operation type is unsupported.
  */
 const processPayload = (txType, payload) => {
     switch (txType) {
@@ -135,18 +135,18 @@ const processPayload = (txType, payload) => {
             };
         }
         default:
-            ErrorUtils.throwError(`Unsupported transaction type: ${txType}`, ErrorCode.UNSUPPORTED_OPERATION);
+            ErrorUtils.throwError(`Unsupported operation type: ${txType}`, ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 /**
- * Serializes the payload of a transaction based on its type.
+ * Serializes the payload of a operation based on its type.
  * This function polorizes (serializes) the payload using the appropriate schema
- * based on the transaction type and returns it as a byte array.
+ * based on the operation type and returns it as a byte array.
  *
- * @param {OpType} txType - The type of the transaction (e.g., ASSET_TRANSFER, ASSET_CREATE).
- * @param {OperationPayload} payload - The payload of the transaction to be serialized.
+ * @param {OpType} txType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
+ * @param {OperationPayload} payload - The payload of the operation to be serialized.
  * @returns {Uint8Array} - A serialized byte array representing the processed payload.
- * @throws {Error} - Throws an error if the transaction type is unsupported.
+ * @throws {Error} - Throws an error if the operation type is unsupported.
  */
 export const serializePayload = (txType, payload) => {
     const polorizer = new Polorizer();
@@ -171,7 +171,7 @@ export const serializePayload = (txType, payload) => {
             polorizer.polorize(processedPayload, logicSchema);
             return polorizer.bytes();
         default:
-            ErrorUtils.throwError(`Unsupported transaction type: ${txType}`, ErrorCode.UNSUPPORTED_OPERATION);
+            ErrorUtils.throwError(`Unsupported operation type: ${txType}`, ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 /**
@@ -189,9 +189,9 @@ export const processIxObject = (ixObject) => {
             fuel_price: toQuantity(ixObject.fuel_price),
             fuel_limit: toQuantity(ixObject.fuel_limit),
             funds: [],
-            ix_operations: ixObject.ix_operations.map(transaction => ({
-                ...transaction,
-                payload: "0x" + bytesToHex(serializePayload(transaction.type, transaction.payload)),
+            ix_operations: ixObject.ix_operations.map(operation => ({
+                ...operation,
+                payload: "0x" + bytesToHex(serializePayload(operation.type, operation.payload)),
             })),
             participants: []
         };

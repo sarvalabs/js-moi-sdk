@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LockType = exports.OpType = void 0;
 /**
- * Enumerates the types of Transactions in the system.
+ * Enumerates the types of Operations in the system.
  */
 var OpType;
 (function (OpType) {
