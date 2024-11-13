@@ -448,17 +448,19 @@ export class BaseProvider extends AbstractProvider {
       * // Retrieve Tesseract by tesseract hash with interactions and options
       * provider.getTesseract(true, { tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' })
       */
-    async getTesseract(arg1, arg2, arg3) {
+    async getTesseract(arg1, arg2, arg3, arg4) {
         try {
             const params = {};
             if (typeof arg1 === 'string') {
                 params['address'] = arg1;
                 params['with_interactions'] = arg2;
-                params['options'] = arg3 ?? defaultOptions;
+                params['with_commit_info'] = arg3;
+                params['options'] = arg4 ?? defaultOptions;
             }
             if (typeof arg1 === 'boolean') {
                 params['with_interactions'] = arg1;
-                params['options'] = arg2 ?? defaultOptions;
+                params['with_commit_info'] = arg2;
+                params['options'] = arg3 ?? defaultOptions;
             }
             const response = await this.execute("moi.Tesseract", params);
             return this.processResponse(response);

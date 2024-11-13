@@ -66,7 +66,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
 
       it('should return the context info by hash', async() => {
-        const tesseract = await provider.getTesseract(address, false);
+        const tesseract = await provider.getTesseract(address, false, false);
         expect(tesseract).toBeDefined();
 
         const contextInfo = await provider.getContextInfo(address, {
@@ -114,7 +114,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       });
 
       it('should return the interaction count by hash', async() => {
-        const tesseract = await provider.getTesseract(address, false);
+        const tesseract = await provider.getTesseract(address, false, false);
         expect(tesseract).toBeDefined();
 
         const ixCount = await provider.getInteractionCount(address, {
@@ -134,7 +134,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       });
 
       it("should return the interaction by tesseract without address", async () => {
-        const tesseract = await provider.getTesseract(address, true);
+        const tesseract = await provider.getTesseract(address, true, false);
         const interaction = await provider.getInteractionByTesseract({ tesseract_hash: tesseract.hash }, 0);
 
         expect(interaction).toBeDefined();
@@ -166,7 +166,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
       })
 
       it('should return the account state by hash', async() => {
-        const tesseract = await provider.getTesseract(address, false);
+        const tesseract = await provider.getTesseract(address, false, false);
         expect(tesseract).toBeDefined();
 
         const accountState = await provider.getAccountState(address, {
@@ -187,7 +187,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
 
     describe('getTesseract', () => {
         it('should return the latest tesseract', async () => {
-          const tesseract = await provider.getTesseract(address, false);
+          const tesseract = await provider.getTesseract(address, false, false);
           const participant = tesseract.participants.find(p => p.address === address);
 
           if (!participant) {
@@ -201,7 +201,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
         });
 
         it('should return the tesseract by height', async() => {
-          const tesseract = await provider.getTesseract(address, false, {
+          const tesseract = await provider.getTesseract(address, false, false, {
             tesseract_number: 0
           });
 
@@ -214,10 +214,10 @@ describe("Test JsonRpcProvider Query Calls", () => {
         });
 
         it('should return the tesseract by hash', async() => {
-          const tesseract = await provider.getTesseract(address, false);
+          const tesseract = await provider.getTesseract(address, false, false);
           expect(tesseract).toBeDefined();
 
-          const tesseractByHash = await provider.getTesseract(false, {
+          const tesseractByHash = await provider.getTesseract(false, false, {
             tesseract_hash: tesseract.hash
           });
 

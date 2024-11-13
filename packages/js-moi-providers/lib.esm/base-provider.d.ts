@@ -211,7 +211,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
+    getTesseract(address: string, with_interactions: boolean, with_commit_info: boolean, options?: Options): Promise<Tesseract>;
     /**
       * Retrieves a Tesseract for a specified tesseract hash.
       *
@@ -221,7 +221,7 @@ export declare class BaseProvider extends AbstractProvider {
       * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
       * @throws {Error} if there is an error executing the RPC call.
       */
-    getTesseract(with_interactions: boolean, options: Options): Promise<Tesseract>;
+    getTesseract(with_interactions: boolean, with_commit_info: boolean, options: Options): Promise<Tesseract>;
     /**
      * Retrieves the logic id's associated with a specific address.
      *

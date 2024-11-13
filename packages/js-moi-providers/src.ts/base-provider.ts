@@ -554,7 +554,7 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      */
-   getTesseract(address: string, with_interactions: boolean, options?: Options): Promise<Tesseract>;
+   getTesseract(address: string, with_interactions: boolean, with_commit_info: boolean, options?: Options): Promise<Tesseract>;
    /**
      * Retrieves a Tesseract for a specified tesseract hash.
      * 
@@ -564,7 +564,7 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Tesseract>} A promise that resolves to the Tesseract.
      * @throws {Error} if there is an error executing the RPC call.
      */
-   getTesseract(with_interactions: boolean, options: Options): Promise<Tesseract>;
+   getTesseract(with_interactions: boolean, with_commit_info: boolean, options: Options): Promise<Tesseract>;
    /**
      * Retrieves a Tesseract for a specific address or tesseract hash.
      * 
@@ -582,19 +582,21 @@ export class BaseProvider extends AbstractProvider {
      * // Retrieve Tesseract by tesseract hash with interactions and options
      * provider.getTesseract(true, { tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' })
      */
-   async getTesseract(arg1: unknown, arg2: unknown, arg3?: unknown): Promise<Tesseract> {
+   async getTesseract(arg1: unknown, arg2: unknown, arg3: unknown, arg4?: unknown): Promise<Tesseract> {
         try {
             const params = {};
 
             if (typeof arg1 === 'string') {
                 params['address'] = arg1;
                 params['with_interactions'] = arg2;
-                params['options'] = arg3 ?? defaultOptions;
+                params['with_commit_info'] = arg3;
+                params['options'] = arg4 ?? defaultOptions;
             }
 
             if (typeof arg1 === 'boolean') {
                 params['with_interactions'] = arg1;
-                params['options'] = arg2 ?? defaultOptions;
+                params['with_commit_info'] = arg2;
+                params['options'] = arg3 ?? defaultOptions;
             }
 
             const response = await this.execute<Tesseract>("moi.Tesseract", params);
