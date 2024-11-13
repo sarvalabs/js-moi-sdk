@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { ErrorCode, ErrorUtils, type Tesseract } from "js-moi-utils";
 import { w3cwebsocket as Websocket, type ICloseEvent } from "websocket";
 import type { Log, RpcResponse } from "../types/jsonrpc";
@@ -21,6 +20,8 @@ interface WebsocketConnection {
 }
 
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
+
+const randomUUID = globalThis.crypto.randomUUID;
 
 export class WebsocketProvider extends BaseProvider {
     private ws: Websocket;
