@@ -196,14 +196,15 @@ const processFunds = (ixObject) => {
     ixObject.ix_operations.forEach(operation => {
         switch (operation.type) {
             case js_moi_utils_1.OpType.ASSET_TRANSFER:
+            case js_moi_utils_1.OpType.ASSET_MINT:
             case js_moi_utils_1.OpType.ASSET_BURN: {
                 const payload = operation.payload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
                 if (typeof payload.amount === "bigint" || typeof amount === "bigint") {
-                    assetFunds.set(payload.asset_id, BigInt(payload.amount) + BigInt(amount));
+                    assetFunds.set(payload.asset_id, (0, js_moi_utils_1.toQuantity)(BigInt(payload.amount) + BigInt(amount)));
                     return;
                 }
-                assetFunds.set(payload.asset_id, Number(payload.amount) + Number(amount));
+                assetFunds.set(payload.asset_id, (0, js_moi_utils_1.toQuantity)(Number(payload.amount) + Number(amount)));
             }
         }
     });
@@ -211,7 +212,7 @@ const processFunds = (ixObject) => {
         // Add additional asset funds to the list if not present
         ixObject.funds.forEach(assetFund => {
             if (!assetFunds.has(assetFund.asset_id)) {
-                assetFunds.set(assetFund.asset_id, assetFund.amount);
+                assetFunds.set(assetFund.asset_id, (0, js_moi_utils_1.toQuantity)(assetFund.amount));
             }
         });
     }
@@ -321,7 +322,7 @@ const processOperations = (ix_operations) => {
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
- * @returns {ProcessedIxObject} - The processed interaction object.
+ * @returns {ProcessedCallorEstimateIxObject} - The processed interaction object.
  * @throws {Error} - Throws an error if the interaction type is unsupported or if there is a missing payload.
  */
 const processIxObject = (ixObject) => {

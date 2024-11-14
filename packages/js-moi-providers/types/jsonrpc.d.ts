@@ -339,6 +339,11 @@ export interface IxAssetFund {
     amount: number | bigint;
 }
 
+interface ProcessedIxAssetFund {
+    asset_id: string;
+    amount: string;
+}
+
 export interface IxOperation {
     type: OpType;
     payload: OperationPayload;
@@ -380,6 +385,24 @@ interface InteractionObject {
 export interface CallorEstimateIxObject extends InteractionObject {
     nonce: number | bigint;
     sender: string
+}
+
+interface ProcessedCallorEstimateIxObject {
+    nonce: string;
+
+    sender: string;
+    payer?: string;
+
+    funds: ProcessedIxAssetFund[]
+    ix_operations: ProcessedIxOperation[]
+    participants: IxParticipant[]
+
+    fuel_price: string;
+    fuel_limit: string;
+
+    perception?: Uint8Array
+
+    preferences?: IxPreferences
 }
 
 export type CallorEstimateOptions = Record<string, Options>

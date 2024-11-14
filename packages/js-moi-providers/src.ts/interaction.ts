@@ -1,8 +1,7 @@
 import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix, LockType } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ZERO_ADDRESS } from "js-moi-constants";
-import { ProcessedIxObject } from "../types/interaction";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload, InteractionObject, IxOperation, ProcessedIxOperation, IxParticipant, IxAssetFund } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload, InteractionObject, IxOperation, ProcessedIxOperation, IxParticipant, ProcessedCallorEstimateIxObject, ProcessedIxAssetFund } from "../types/jsonrpc";
 
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
@@ -212,12 +211,13 @@ export const serializePayload = (txType: OpType, payload: OperationPayload): Uin
  * @param {InteractionObject} ixObject - The interaction object containing ix_operations and asset funds.
  * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
  */
-const processFunds = (ixObject: InteractionObject): IxAssetFund[] => {
-    const assetFunds = new Map<string, number | bigint>();
+const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
+    const assetFunds = new Map<string, string>();
 
     ixObject.ix_operations.forEach(operation => {
         switch(operation.type) {
             case OpType.ASSET_TRANSFER:
+            case OpType.ASSET_MINT:
             case OpType.ASSET_BURN: {
                 const payload = operation.payload as AssetSupplyPayload | AssetActionPayload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
@@ -225,14 +225,14 @@ const processFunds = (ixObject: InteractionObject): IxAssetFund[] => {
                 if(typeof payload.amount === "bigint" || typeof amount === "bigint") {
                     assetFunds.set(
                         payload.asset_id, 
-                        BigInt(payload.amount) + BigInt(amount),
+                        toQuantity(BigInt(payload.amount) + BigInt(amount))
                     );
                     return;
                 }
                 
                 assetFunds.set(
                     payload.asset_id, 
-                    Number(payload.amount) + Number(amount),
+                    toQuantity(Number(payload.amount) + Number(amount)),
                 );
             }
         }
@@ -242,14 +242,14 @@ const processFunds = (ixObject: InteractionObject): IxAssetFund[] => {
         // Add additional asset funds to the list if not present
         ixObject.funds.forEach(assetFund => {
             if (!assetFunds.has(assetFund.asset_id)) {
-                assetFunds.set(assetFund.asset_id, assetFund.amount);
+                assetFunds.set(assetFund.asset_id, toQuantity(assetFund.amount));
             }
         });
     }
 
     return Array.from(assetFunds, ([asset_id, amount]) => 
         ({ asset_id, amount })
-    ) as IxAssetFund[];
+    ) as ProcessedIxAssetFund[];
 }
 
 /**
@@ -373,10 +373,10 @@ const processOperations = (ix_operations: IxOperation[]): ProcessedIxOperation[]
  * Processes the interaction object based on its type and returns the processed object.
  *
  * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
- * @returns {ProcessedIxObject} - The processed interaction object.
+ * @returns {ProcessedCallorEstimateIxObject} - The processed interaction object.
  * @throws {Error} - Throws an error if the interaction type is unsupported or if there is a missing payload.
  */
-export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedIxObject => {
+export const processIxObject = (ixObject: CallorEstimateIxObject): ProcessedCallorEstimateIxObject => {
     try {
         return { 
             nonce: toQuantity(ixObject.nonce),
