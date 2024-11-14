@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
@@ -99,7 +99,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     /**
      * Checks if a routine is mutable based on its name.
      * 
-     * @param {string} routineName - The name of the routine.
+     * @param {string} routine - The name of the routine.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: LogicManifest.Routine): boolean {
@@ -135,17 +135,21 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * 
      * @param {LogicIxResponse} response - The logic interaction response.
      * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult | null>} A promise that resolves to the 
+     * @returns {Promise<unknown>} A promise that resolves to the 
      logic interaction result or null.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
+    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<unknown> {
         try {
             const result = await response.result(timeout);
 
-            return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
-                error: ManifestCoder.decodeException(result[0].error)
-            };
+
+            const error = ManifestCoder.decodeException(result[0].error);
+
+            if (error != null) {
+                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
+
+            return this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs)
         } catch(err) {
             throw err;
         }

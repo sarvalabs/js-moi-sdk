@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse, LogicPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 import { RoutineOption } from "./routine-options";
 
@@ -46,16 +46,19 @@ export class LogicFactory extends LogicBase {
      * 
      * @param {LogicIxResponse} response - The logic interaction response.
      * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult>} The processed logic interaction result.
+     * @returns {Promise<string>} The processed logic interaction result.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
+    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<string> {
         try {
             const result = await response.result(timeout);
 
-            return { 
-                logic_id: result[0].logic_id ? result[0].logic_id : "", 
-                error: ManifestCoder.decodeException(result[0].error) 
-            };
+            const error = ManifestCoder.decodeException(result[0].error);
+            
+            if (error != null) {
+                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
+
+            return result[0].logic_id ? result[0].logic_id : "";
         } catch(err) {
             throw err;
         }

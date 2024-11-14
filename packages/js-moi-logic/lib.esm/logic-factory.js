@@ -34,15 +34,16 @@ export class LogicFactory extends LogicBase {
      *
      * @param {LogicIxResponse} response - The logic interaction response.
      * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult>} The processed logic interaction result.
+     * @returns {Promise<string>} The processed logic interaction result.
      */
     async processResult(response, timeout) {
         try {
             const result = await response.result(timeout);
-            return {
-                logic_id: result[0].logic_id ? result[0].logic_id : "",
-                error: ManifestCoder.decodeException(result[0].error)
-            };
+            const error = ManifestCoder.decodeException(result[0].error);
+            if (error != null) {
+                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
+            return result[0].logic_id ? result[0].logic_id : "";
         }
         catch (err) {
             throw err;

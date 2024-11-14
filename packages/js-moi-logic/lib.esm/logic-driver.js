@@ -72,7 +72,7 @@ export class LogicDriver extends LogicDescriptor {
     /**
      * Checks if a routine is mutable based on its name.
      *
-     * @param {string} routineName - The name of the routine.
+     * @param {string} routine - The name of the routine.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
@@ -107,10 +107,11 @@ export class LogicDriver extends LogicDescriptor {
     async processResult(response, timeout) {
         try {
             const result = await response.result(timeout);
-            return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
-                error: ManifestCoder.decodeException(result[0].error)
-            };
+            const error = ManifestCoder.decodeException(result[0].error);
+            if (error != null) {
+                ErrorUtils.throwError(error.error, ErrorCode.CALL_EXCEPTION, { cause: error });
+            }
+            return this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs);
         }
         catch (err) {
             throw err;
