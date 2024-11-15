@@ -1,23 +1,26 @@
 import { LogicManifest } from "js-moi-manifest";
 import {
     AssetCreationResult, AssetSupplyResult, ErrorCode, ErrorUtils, Interaction,
-    OpType, LogicDeployResult, LogicInvokeResult, LogicEnlistResult,
+    LogicDeployResult,
+    LogicEnlistResult,
+    LogicInvokeResult,
+    OpType,
     Tesseract, bytesToHex,
-    decodeBase64,
-    encodeToString,
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import type {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
-    Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding,
+    ExecutionResult,
+    Filter, FilterDeletionResult, Inspect,
     InspectResponse,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse,
     Log, LogFilter,
     LogicManifestParams, NodeInfo, Options,
     Registry,
-    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse, ExecutionResult
+    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
 import type { ProviderEvents } from "../types/websocket";
@@ -967,10 +970,7 @@ export class BaseProvider extends AbstractProvider {
         }
 
         const response = await this.execute<Log[]>("moi.GetLogs", payload);
-        return this.processResponse(response).map((log) => ({
-          ...log,
-          data: encodeToString(decodeBase64(log.data)), // FIXME: remove this once PR (https://github.com/sarvalabs/go-moi/pull/1023) is merged
-        }));
+        return this.processResponse(response);
     }
 
     /**
@@ -1269,6 +1269,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     protected processWsResult(event: ProviderEvents, result: unknown): unknown {
+        const eventName = typeof event === "object" ? event.event : event
+        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs", "newPendingInteractions"];
+
+        if (!validEvents.includes(eventName)) {
+            ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+        }
+
         if (event === 'newPendingInteractions') {
             if (typeof result === "string") {
                 return result.startsWith("0x") ? result : `0x${result}`;
@@ -1277,20 +1284,7 @@ export class BaseProvider extends AbstractProvider {
             ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
         }
 
-        if (typeof event === "string" && ["newTesseracts"].includes(event)) {
-            return result;
-        }
-
-        if (typeof event === "object" && event.event === "newTesseractsByAccount") {
-            return result;
-        }
-
-        if (typeof event === "object" && event.event === "newLogs") {
-            const log = result as Log;
-            return { ...log, data: encodeToString(decodeBase64(log.data)) };
-        }
-
-        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+        return result;
     }
 
     /**
