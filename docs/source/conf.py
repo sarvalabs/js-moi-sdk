@@ -15,7 +15,7 @@ author = 'Sarva Labs Inc'
 # built documents.
 #
 # The short X.Y version.
-version = u'v0.5.0'
+version = u'v0.6.0'
 # The full version, including alpha/beta/rc tags.
 release = u'v0.6.0'
 
