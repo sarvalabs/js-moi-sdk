@@ -24,12 +24,11 @@ class LogicFactory extends logic_base_1.LogicBase {
      */
     createPayload(ixObject) {
         const payload = {
-            manifest: (0, js_moi_utils_1.hexToBytes)(this.encodedManifest),
+            manifest: this.encodedManifest,
             callsite: ixObject.routine.name
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
-            payload.calldata = (0, js_moi_utils_1.hexToBytes)(calldata);
+            payload.calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
         }
         return payload;
     }
@@ -44,8 +43,8 @@ class LogicFactory extends logic_base_1.LogicBase {
         try {
             const result = await response.result(timeout);
             return {
-                logic_id: result.logic_id ? result.logic_id : "",
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result.error)
+                logic_id: result[0].logic_id ? result[0].logic_id : "",
+                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
             };
         }
         catch (err) {

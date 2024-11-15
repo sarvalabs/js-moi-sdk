@@ -1,8 +1,8 @@
-import { LogicManifest } from "js-moi-manifest";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { LogicPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse } from "../types/interaction";
+import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
+import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
@@ -120,8 +120,10 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
 
         if(ixObject.routine.accepts && 
         Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
-            payload.calldata = hexToBytes(calldata);
+            payload.calldata = this.manifestCoder.encodeArguments(
+                ixObject.routine.name, 
+                ...ixObject.arguments
+            );
         }
 
         return payload;
@@ -136,10 +138,14 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @returns {Promise<LogicIxResult | null>} A promise that resolves to the 
      logic interaction result or null.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null> {
+    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
         try {
             const result = await response.result(timeout);
-            return this.manifestCoder.decodeOutput(response.routine_name, result.outputs);
+
+            return {
+                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
+                error: ManifestCoder.decodeException(result[0].error)
+            };
         } catch(err) {
             throw err;
         }

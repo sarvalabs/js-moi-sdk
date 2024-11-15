@@ -1,4 +1,5 @@
-import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
+import { ManifestCoder } from "js-moi-manifest";
+import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
@@ -90,8 +91,7 @@ export class LogicDriver extends LogicDescriptor {
         };
         if (ixObject.routine.accepts &&
             Object.keys(ixObject.routine.accepts).length > 0) {
-            const calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
-            payload.calldata = hexToBytes(calldata);
+            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
         }
         return payload;
     }
@@ -107,7 +107,10 @@ export class LogicDriver extends LogicDescriptor {
     async processResult(response, timeout) {
         try {
             const result = await response.result(timeout);
-            return this.manifestCoder.decodeOutput(response.routine_name, result.outputs);
+            return {
+                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
+                error: ManifestCoder.decodeException(result[0].error)
+            };
         }
         catch (err) {
             throw err;
