@@ -1027,18 +1027,18 @@ export class BaseProvider extends AbstractProvider {
         });
     }
     processWsResult(event, result) {
+        const eventName = typeof event === "object" ? event.event : event;
+        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs", "newPendingInteractions"];
+        if (!validEvents.includes(eventName)) {
+            ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+        }
         if (event === 'newPendingInteractions') {
             if (typeof result === "string") {
                 return result.startsWith("0x") ? result : `0x${result}`;
             }
             ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
         }
-        const eventName = typeof event === "object" ? event.event : event;
-        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs"];
-        if (validEvents.includes(eventName)) {
-            return result;
-        }
-        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+        return result;
     }
     /**
      * Waits for the interaction with the specified hash to be included in a

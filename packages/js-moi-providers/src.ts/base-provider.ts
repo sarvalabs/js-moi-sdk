@@ -1269,6 +1269,13 @@ export class BaseProvider extends AbstractProvider {
     }
 
     protected processWsResult(event: ProviderEvents, result: unknown): unknown {
+        const eventName = typeof event === "object" ? event.event : event
+        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs", "newPendingInteractions"];
+
+        if (!validEvents.includes(eventName)) {
+            ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+        }
+
         if (event === 'newPendingInteractions') {
             if (typeof result === "string") {
                 return result.startsWith("0x") ? result : `0x${result}`;
@@ -1277,14 +1284,7 @@ export class BaseProvider extends AbstractProvider {
             ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
         }
 
-        const eventName = typeof event === "object" ? event.event : event
-        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs"];
-        
-        if (validEvents.includes(eventName)) {
-            return result;
-        }
-
-        ErrorUtils.throwArgumentError("Invalid event type", "event", event);
+        return result;
     }
 
     /**
