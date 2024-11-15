@@ -1,2 +1,2 @@
-export const VERSION = "0.6.0-sephorum";
+export const VERSION = "0.5.0";
 //# sourceMappingURL=version.js.map

@@ -1,6 +1,6 @@
 {
   "name": "js-moi-constants",
-  "version": "0.6.0-sephorum",
+  "version": "0.5.0",
   "description": "Collection of constant variables used in js-moi-sdk",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",

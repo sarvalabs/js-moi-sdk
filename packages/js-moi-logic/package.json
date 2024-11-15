@@ -1,6 +1,6 @@
 {
   "name": "js-moi-logic",
-  "version": "0.6.0-sephorum",
+  "version": "0.5.0",
   "description": "Module to interact with MOI Logic Objects.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -23,10 +23,10 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-manifest": "^0.6.0-sephorum",
-    "js-moi-utils": "^0.6.0-sephorum",
-    "js-moi-providers": "^0.6.0-sephorum",
-    "js-moi-signer": "^0.6.0-sephorum",
+    "js-moi-manifest": "^0.5.0",
+    "js-moi-utils": "^0.5.0",
+    "js-moi-providers": "^0.5.0",
+    "js-moi-signer": "^0.5.0",
     "@noble/hashes": "^1.1.5",
     "buffer": "^6.0.3"
   }
