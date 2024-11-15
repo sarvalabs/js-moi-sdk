@@ -1033,10 +1033,9 @@ export class BaseProvider extends AbstractProvider {
             }
             ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
         }
-        if (typeof event === "string" && event === "newTesseracts") {
-            return result;
-        }
-        if (typeof event === "object" && ["newTesseractsByAccount", "newLogs"].includes(event.event)) {
+        const eventName = typeof event === "object" ? event.event : event;
+        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs"];
+        if (validEvents.includes(eventName)) {
             return result;
         }
         ErrorUtils.throwArgumentError("Invalid event type", "event", event);

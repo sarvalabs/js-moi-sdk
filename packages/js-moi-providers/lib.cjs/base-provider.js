@@ -1036,10 +1036,9 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             }
             js_moi_utils_1.ErrorUtils.throwError("Invalid response received", js_moi_utils_1.ErrorCode.SERVER_ERROR);
         }
-        if (typeof event === "string" && event === "newTesseracts") {
-            return result;
-        }
-        if (typeof event === "object" && ["newTesseractsByAccount", "newLogs"].includes(event.event)) {
+        const eventName = typeof event === "object" ? event.event : event;
+        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs"];
+        if (validEvents.includes(eventName)) {
             return result;
         }
         js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid event type", "event", event);

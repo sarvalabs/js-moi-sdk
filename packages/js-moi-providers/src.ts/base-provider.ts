@@ -1,21 +1,26 @@
 import { LogicManifest } from "js-moi-manifest";
 import {
     AssetCreationResult, AssetSupplyResult, ErrorCode, ErrorUtils, Interaction,
-    OpType, LogicDeployResult, LogicInvokeResult, LogicEnlistResult,
+    LogicDeployResult,
+    LogicEnlistResult,
+    LogicInvokeResult,
+    OpType,
     Tesseract, bytesToHex,
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import type {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
-    Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect,
+    Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding,
+    ExecutionResult,
+    Filter, FilterDeletionResult, Inspect,
     InspectResponse,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse,
     Log, LogFilter,
     LogicManifestParams, NodeInfo, Options,
     Registry,
-    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse, ExecutionResult
+    RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
 import type { ProviderEvents } from "../types/websocket";
@@ -1272,11 +1277,10 @@ export class BaseProvider extends AbstractProvider {
             ErrorUtils.throwError("Invalid response received", ErrorCode.SERVER_ERROR);
         }
 
-        if (typeof event === "string" && event === "newTesseracts") {
-            return result;
-        }
-
-        if (typeof event === "object" && ["newTesseractsByAccount", "newLogs"].includes(event.event)) {
+        const eventName = typeof event === "object" ? event.event : event
+        const validEvents = ["newTesseracts", "newTesseractsByAccount", "newLogs"];
+        
+        if (validEvents.includes(eventName)) {
             return result;
         }
 
