@@ -5,9 +5,8 @@ const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
 const websocket_events_1 = require("./websocket-events");
+const crypto_1 = require("crypto");
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
-const crypto = globalThis.crypto ?? global.crypto;
-const randomUUID = crypto.randomUUID;
 class WebsocketProvider extends base_provider_1.BaseProvider {
     ws;
     reconnects = 0;
@@ -121,7 +120,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
             method: method,
             params: inputParams,
             jsonrpc: "2.0",
-            id: randomUUID(),
+            id: (0, crypto_1.randomUUID)(),
         };
         return new Promise((resolve) => {
             const handler = (message) => {
@@ -171,12 +170,12 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
                 if (_sub?.uuid == null) {
-                    _sub.uuid = `${eventName.event}:${randomUUID()}`;
+                    _sub.uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 }
                 super.on(_sub.uuid, listener);
             }
             else {
-                const uuid = `${eventName.event}:${randomUUID()}`;
+                const uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 this.subscriptions.set(eventName, { uuid });
                 super.on(uuid, listener);
             }
@@ -221,12 +220,12 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
                 if (_sub?.uuid == null) {
-                    _sub.uuid = `${eventName.event}:${randomUUID()}`;
+                    _sub.uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 }
                 super.once(_sub.uuid, listener);
             }
             else {
-                const uuid = `${eventName.event}:${randomUUID()}`;
+                const uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 this.subscriptions.set(eventName, { uuid });
                 super.once(uuid, listener);
             }

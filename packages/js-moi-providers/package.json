@@ -27,6 +27,7 @@
     "events": "npm:events@^3.3.0",
     "js-moi-manifest": "^0.6.0",
     "js-moi-utils": "^0.6.0",
+    "crypto": "npm:crypto-browserify",
     "websocket": "^1.0.35"
   },
   "devDependencies": {
