@@ -1,5 +1,5 @@
 import { OpType } from "js-moi-utils";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, OperationPayload, ProcessedCallorEstimateIxObject } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, OperationPayload, ParticipantCreatePayload, ProcessedCallorEstimateIxObject } from "../types/jsonrpc";
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
  *

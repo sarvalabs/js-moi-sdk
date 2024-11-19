@@ -1,7 +1,7 @@
-import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix, LockType } from "js-moi-utils";
-import { Polorizer } from "js-polo";
 import { ZERO_ADDRESS } from "js-moi-constants";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload, InteractionObject, IxOperation, ProcessedIxOperation, IxParticipant, ProcessedCallorEstimateIxObject, ProcessedIxAssetFund } from "../types/jsonrpc";
+import { assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { Polorizer } from "js-polo";
+import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, InteractionObject, IxOperation, IxParticipant, LogicPayload, OperationPayload, ParticipantCreatePayload, ProcessedCallorEstimateIxObject, ProcessedIxAssetFund, ProcessedIxOperation, ProcessedOperationPayload } from "../types/jsonrpc";
 
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
@@ -71,7 +71,7 @@ export const validateAssetTransferPayload = (payload: OperationPayload): AssetAc
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicDeployPayload = (payload: OperationPayload): LogicPayload => {
-    if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('manifest' in payload && 'callsite' in payload) {
         return payload as LogicPayload;
     }
 
@@ -86,7 +86,7 @@ export const validateLogicDeployPayload = (payload: OperationPayload): LogicPayl
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicPayload = (payload: OperationPayload): LogicPayload => {
-    if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('logic_id' in payload && 'callsite' in payload) {
         return payload as LogicPayload;
     }
 
@@ -151,7 +151,7 @@ const processPayload = (txType: OpType, payload: OperationPayload): ProcessedOpe
             return {
                 logic_id: trimHexPrefix(logicPayload.logic_id),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : undefined,
             };
         }
 
