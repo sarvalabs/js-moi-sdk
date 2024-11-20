@@ -131,7 +131,7 @@ const processPayload = (txType, payload) => {
             return {
                 manifest: (0, js_moi_utils_1.hexToBytes)(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata),
+                calldata: logicPayload.calldata ? (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata) : undefined,
             };
         }
         case js_moi_utils_1.OpType.LOGIC_INVOKE:

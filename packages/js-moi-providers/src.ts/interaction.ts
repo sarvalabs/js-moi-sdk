@@ -141,7 +141,7 @@ const processPayload = (txType: OpType, payload: OperationPayload): ProcessedOpe
             return {
                 manifest: hexToBytes(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : undefined,
             };
         }
 
