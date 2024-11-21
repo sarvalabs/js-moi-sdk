@@ -1,6 +1,6 @@
 {
   "name": "js-moi-utils",
-  "version": "0.6.0-sephorum",
+  "version": "0.6.1-sephorum",
   "description": "Collection of utility functions used in js-moi-sdk.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",

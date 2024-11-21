@@ -1,6 +1,6 @@
 {
   "name": "js-moi-bip39",
-  "version": "0.6.0-sephorum",
+  "version": "0.6.1-sephorum",
   "description": "Bitcoin BIP39 package for deterministic key generation using mnemonic code",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -24,10 +24,10 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-hdnode": "^0.6.0-sephorum",
-    "js-moi-signer": "^0.6.0-sephorum",
-    "js-moi-constants": "^0.6.0-sephorum",
-    "js-moi-utils": "^0.6.0-sephorum",
+    "js-moi-hdnode": "0.6.1-sephorum",
+    "js-moi-signer": "0.6.1-sephorum",
+    "js-moi-constants": "0.6.1-sephorum",
+    "js-moi-utils": "0.6.1-sephorum",
     "buffer": "^6.0.3",
     "@noble/hashes": "^1.1.5"
   }

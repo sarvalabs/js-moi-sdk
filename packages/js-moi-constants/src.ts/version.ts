@@ -1,1 +1,1 @@
-export const VERSION = "0.6.0-sephorum";
+export const VERSION = "0.6.1-sephorum";
