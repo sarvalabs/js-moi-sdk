@@ -10,7 +10,7 @@ your application development.
 
 Installing
 ------------
-Install the latest `release <https://github.com/sarvalabs/js-moi-sdk/releases>`_ 
+Install the latest `release <https://github.com/zenz-solutions/js-moi-sdk/releases>`_ 
 using the following command:
 
 .. code-block:: shell

@@ -4,18 +4,18 @@
  * including enhancements for browser compatibility and TypeScript conversion.
  *
  * Original module available at: https://github.com/bitcoinjs/bip39
- * Modified version available at: https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-bip39
+ * Modified version available at: https://github.com/zenz-solutions/js-moi-sdk/tree/main/packages/js-moi-bip39
  *
  * Copyright (c) 2014, Wei Lu <luwei.here@gmail.com> and Daniel Cousens <email@dcousens.com>
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
  *
  **/
-import { Buffer } from "buffer";
+import { pbkdf2, pbkdf2Async } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha256";
 import { sha512 } from "@noble/hashes/sha512";
 import { randomBytes } from "@noble/hashes/utils";
-import { pbkdf2, pbkdf2Async } from "@noble/hashes/pbkdf2";
-import { wordlists, _default } from "./_wordlists";
+import { Buffer } from "buffer";
+import { _default, wordlists } from "./_wordlists";
 let DEFAULT_WORDLIST = _default;
 const INVALID_MNEMONIC = 'Invalid mnemonic';
 const INVALID_ENTROPY = 'Invalid entropy';

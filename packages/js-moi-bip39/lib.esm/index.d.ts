@@ -4,12 +4,12 @@
  * including enhancements for browser compatibility and TypeScript conversion.
  *
  * Original module available at: https://github.com/bitcoinjs/bip39
- * Modified version available at: https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-bip39
+ * Modified version available at: https://github.com/zenz-solutions/js-moi-sdk/tree/main/packages/js-moi-bip39
  *
  * Copyright (c) 2014, Wei Lu <luwei.here@gmail.com> and Daniel Cousens <email@dcousens.com>
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
  *
  **/
-export * from "./bip39";
 export * from "./_wordlists";
+export * from "./bip39";
 //# sourceMappingURL=index.d.ts.map

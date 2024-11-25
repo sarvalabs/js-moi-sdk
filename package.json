@@ -18,11 +18,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sarvalabs/js-moi-sdk.git"
+    "url": "git+https://github.com/zenz-solutions/js-moi-sdk.git"
   },
-  "homepage": "https://github.com/sarvalabs/js-moi-sdk",
+  "homepage": "https://github.com/zenz-solutions/js-moi-sdk",
   "bugs": {
-    "url": "https://github.com/sarvalabs/js-moi-sdk/issues"
+    "url": "https://github.com/zenz-solutions/js-moi-sdk/issues"
   },
   "keywords": [
     "moichain",

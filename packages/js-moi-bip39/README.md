@@ -1,8 +1,8 @@
 ![image](https://moi-js.s3.amazonaws.com/moi-banner.png)
 
-[latestrelease]: https://github.com/sarvalabs/js-moi-sdk/releases/latest
-[issueslink]: https://github.com/sarvalabs/js-moi-sdk/issues
-[pullslink]: https://github.com/sarvalabs/js-moi-sdk/pulls
+[latestrelease]: https://github.com/zenz-solutions/js-moi-sdk/releases/latest
+[issueslink]: https://github.com/zenz-solutions/js-moi-sdk/issues
+[pullslink]: https://github.com/zenz-solutions/js-moi-sdk/pulls
 [pkgdocs]: https://docs.moi.technology/docs/build/packages/js-moi-sdk
 
 [![docs](https://img.shields.io/badge/npm-documentation-red?style=for-the-badge)][pkgdocs]
@@ -17,12 +17,12 @@
 
 # js-moi-bip39
 
-This is a sub-package of [js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk).
+This is a sub-package of [js-moi-sdk](https://github.com/zenz-solutions/js-moi-sdk).
 
 The **js-moi-bip39** package provides functionality for generating and managing mnemonic phrases according to the BIP39 standard. The BIP39 standard defines a method for generating a mnemonic phrase, which is a human-readable set of words that can be used to derive deterministic cryptographic keys. By using js-moi-bip39, you can generate and manage these mnemonic phrases, which can then be used with other packages.
 
 ## Installation
-Install the latest [release](https://github.com/sarvalabs/js-moi-sdk/releases) using the following command.
+Install the latest [release](https://github.com/zenz-solutions/js-moi-sdk/releases) using the following command.
 
 ```sh
 npm install js-moi-bip39

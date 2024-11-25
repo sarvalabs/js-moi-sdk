@@ -1,8 +1,8 @@
 ![image](https://moi-js.s3.amazonaws.com/moi-banner.png)
 
-[latestrelease]: https://github.com/sarvalabs/js-moi-sdk/releases/latest
-[issueslink]: https://github.com/sarvalabs/js-moi-sdk/issues
-[pullslink]: https://github.com/sarvalabs/js-moi-sdk/pulls
+[latestrelease]: https://github.com/zenz-solutions/js-moi-sdk/releases/latest
+[issueslink]: https://github.com/zenz-solutions/js-moi-sdk/issues
+[pullslink]: https://github.com/zenz-solutions/js-moi-sdk/pulls
 [pkgdocs]: https://docs.moi.technology/docs/build/packages/js-moi-sdk
 
 [![docs](https://img.shields.io/badge/npm-documentation-red?style=for-the-badge)][pkgdocs]
@@ -17,12 +17,12 @@
 
 # js-moi-manifest
 
-This is a sub-package of [js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk).
+This is a sub-package of [js-moi-sdk](https://github.com/zenz-solutions/js-moi-sdk).
 
 The **js-moi-manifest** package encodes and decodes data according to the MOI Manifest specification, facilitating interaction with logic objects. It simplifies the process of encoding and decoding data structures, making it easier to work with MOI logic objects.
 
 ## Installation
-Install the latest [release](https://github.com/sarvalabs/js-moi-sdk/releases) using the following command.
+Install the latest [release](https://github.com/zenz-solutions/js-moi-sdk/releases) using the following command.
 
 ```sh
 npm install js-moi-manifest
