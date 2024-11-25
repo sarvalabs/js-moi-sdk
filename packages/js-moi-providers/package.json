@@ -10,7 +10,7 @@
   "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",
   "repository": {
     "type": "git",
-    "url": "git://github.com/sarvalabs/js-moi-sdk.git"
+    "url": "git://github.com/zenz-solutions/js-moi-sdk.git"
   },
   "bugs": {
     "url": "https://github.com/zenz-solutions/js-moi-sdk/issues"
