@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "@zenz-solutions/js-moi-utils";
 export default class Signature {
     prefix;
     digest;

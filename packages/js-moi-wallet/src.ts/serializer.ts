@@ -1,7 +1,7 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, logicSchema} from "js-moi-utils";
-import { AssetMintOrBurnPayload, InteractionPayload, LogicPayload, InteractionObject } from "js-moi-providers";
-import { ProcessedIxObject } from "js-moi-signer";
-import { ZERO_ADDRESS } from "js-moi-constants";
+import { ZERO_ADDRESS } from "@zenz-solutions/js-moi-constants";
+import { AssetMintOrBurnPayload, InteractionObject, InteractionPayload, LogicPayload } from "@zenz-solutions/js-moi-providers";
+import { ProcessedIxObject } from "@zenz-solutions/js-moi-signer";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, hexToBytes, ixObjectSchema, logicSchema, trimHexPrefix } from "@zenz-solutions/js-moi-utils";
 import { Polorizer } from "js-polo";
 
 /**

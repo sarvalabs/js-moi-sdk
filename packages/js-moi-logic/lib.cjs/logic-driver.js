@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
 const routine_options_1 = require("./routine-options");
 const state_1 = require("./state");

@@ -31,7 +31,7 @@ npm install js-moi-bip39
 ## Usage
 
 ```javascript
-    import { generateMnemonic } from "js-moi-bip39";
+    import { generateMnemonic } from "@zenz-solutions/js-moi-bip39";
 
     const mnemonic = generateMnemonic()
     console.log(mnemonic)

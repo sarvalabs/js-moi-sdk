@@ -27,7 +27,7 @@
   "keywords": [
     "moichain",
     "moi",
-    "js-moi-sdk"
+    "@zenz-solutions/js-moi-sdk"
   ],
   "workspaces": [
     "packages/*"

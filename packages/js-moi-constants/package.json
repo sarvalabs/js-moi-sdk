@@ -1,5 +1,5 @@
 {
-  "name": "js-moi-constants",
+  "name": "@zenz-solutions/js-moi-constants",
   "version": "0.6.1-sephorum",
   "description": "Collection of constant variables used in js-moi-sdk",
   "main": "./lib.cjs/index.js",

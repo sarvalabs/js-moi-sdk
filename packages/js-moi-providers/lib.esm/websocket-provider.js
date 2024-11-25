@@ -1,5 +1,5 @@
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import { randomUUID } from "crypto";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
 import { BaseProvider } from "./base-provider";
 import { WebSocketEvent } from "./websocket-events";

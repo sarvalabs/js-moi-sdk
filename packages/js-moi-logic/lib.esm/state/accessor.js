@@ -1,6 +1,6 @@
 import { blake2b } from "@noble/hashes/blake2b";
+import { encodeToString } from "@zenz-solutions/js-moi-utils";
 import BN from "bn.js";
-import { encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 export class StorageKey {
     value;

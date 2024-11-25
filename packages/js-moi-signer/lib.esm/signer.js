@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, isValidAddress } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, isValidAddress } from "@zenz-solutions/js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 /**

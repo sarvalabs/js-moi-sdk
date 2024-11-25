@@ -1,4 +1,4 @@
-import type { Tesseract } from "js-moi-utils";
+import type { Tesseract } from "@zenz-solutions/js-moi-utils";
 import type { WebSocketEvent } from "../src.ts/websocket-events";
 import type { LogFilter } from "./jsonrpc";
 

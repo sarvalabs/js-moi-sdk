@@ -1,8 +1,8 @@
-import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
-import type { AbstractProvider } from "js-moi-providers";
-import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "js-moi-providers";
-import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
+import { ElementDescriptor, LogicManifest, ManifestCoder } from "@zenz-solutions/js-moi-manifest";
+import type { AbstractProvider } from "@zenz-solutions/js-moi-providers";
+import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "@zenz-solutions/js-moi-providers";
+import { Signer } from "@zenz-solutions/js-moi-signer";
+import { ErrorCode, ErrorUtils, IxType } from "@zenz-solutions/js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest } from "../types/logic";
 import { LogicId } from "./logic-id";

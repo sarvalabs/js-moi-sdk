@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processIxObject = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const js_polo_1 = require("js-polo");
 const serializePayload = (ixType, payload) => {
     let polorizer = new js_polo_1.Polorizer();

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PendingRequestsOnReconnectingError = exports.MaxAttemptsReachedOnReconnectingError = exports.InvalidConnection = exports.ConnectionNotOpenError = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const connectionError = (msg, event) => {
     try {
         const error = new Error(msg);

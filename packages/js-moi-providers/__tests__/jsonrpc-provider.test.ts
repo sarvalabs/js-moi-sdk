@@ -1,4 +1,4 @@
-import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "js-moi-utils";
+import { AssetCreationReceipt, AssetStandard, hexToBN, IxType, toQuantity } from "@zenz-solutions/js-moi-utils";
 import { VoyageProvider } from "../lib.cjs";
 import { JsonRpcProvider } from "../src.ts/jsonrpc-provider";
 import { Filter, InteractionReceipt } from "../types/jsonrpc";

@@ -29,7 +29,7 @@ npm install js-moi-sdk
 ## Usage
 
 ```javascript
-    import { JsonRpcProvider } from "js-moi-sdk";
+    import { JsonRpcProvider } from "@zenz-solutions/js-moi-sdk";
 
     (async() => {
         const provider = new JsonRpcProvider("http://localhost:1600");

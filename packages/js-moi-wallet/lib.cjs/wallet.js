@@ -28,13 +28,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = exports.CURVE = void 0;
 const utils_1 = require("@noble/hashes/utils");
+const bip39 = __importStar(require("@zenz-solutions/js-moi-bip39"));
+const js_moi_constants_1 = require("@zenz-solutions/js-moi-constants");
+const js_moi_hdnode_1 = require("@zenz-solutions/js-moi-hdnode");
+const js_moi_signer_1 = require("@zenz-solutions/js-moi-signer");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const buffer_1 = require("buffer");
 const elliptic_1 = __importDefault(require("elliptic"));
-const bip39 = __importStar(require("js-moi-bip39"));
-const js_moi_constants_1 = require("js-moi-constants");
-const js_moi_hdnode_1 = require("js-moi-hdnode");
-const js_moi_signer_1 = require("js-moi-signer");
-const js_moi_utils_1 = require("js-moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
 const keystore_1 = require("./keystore");
 const serializer_1 = require("./serializer");

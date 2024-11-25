@@ -1,5 +1,5 @@
 {
-  "name": "js-moi-signer",
+  "name": "@zenz-solutions/js-moi-signer",
   "version": "0.6.1-sephorum",
   "description": "This package enables users to sign and verify messages in their applications.",
   "main": "./lib.cjs/index.js",
@@ -23,8 +23,8 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-providers": "0.6.1-sephorum",
-    "js-moi-utils": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-providers": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-utils": "0.6.1-sephorum",
     "buffer": "^6.0.3",
     "@noble/hashes": "^1.1.5",
     "@noble/secp256k1": "^1.7.1"

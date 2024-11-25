@@ -1,6 +1,6 @@
-import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
-import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, IxType } from "js-moi-utils";
+import { ElementDescriptor, ManifestCoder } from "@zenz-solutions/js-moi-manifest";
+import { Signer } from "@zenz-solutions/js-moi-signer";
+import { ErrorCode, ErrorUtils, IxType } from "@zenz-solutions/js-moi-utils";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**

@@ -1,4 +1,4 @@
-import type { ElementDescriptor } from "js-moi-manifest";
+import type { ElementDescriptor } from "@zenz-solutions/js-moi-manifest";
 import { type AccessorBuilder } from "./accessor-builder";
 export declare class EntityBuilder {
     private readonly slot;

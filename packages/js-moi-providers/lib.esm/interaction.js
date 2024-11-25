@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "@zenz-solutions/js-moi-utils";
 import { Polorizer } from "js-polo";
 const serializePayload = (ixType, payload) => {
     let polorizer = new Polorizer();

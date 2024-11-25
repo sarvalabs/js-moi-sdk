@@ -7,7 +7,7 @@ import {
     LogicEnlistReceipt,
     LogicInvokeReceipt,
     Participants
-} from "js-moi-utils";
+} from "@zenz-solutions/js-moi-utils";
 import type { NestedArray } from "./util";
 
 export interface Options {

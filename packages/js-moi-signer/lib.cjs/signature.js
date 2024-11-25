@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 class Signature {
     prefix;
     digest;

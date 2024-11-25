@@ -1,5 +1,5 @@
 {
-  "name": "js-moi-hdnode",
+  "name": "@zenz-solutions/js-moi-hdnode",
   "version": "0.6.1-sephorum",
   "description": "BIP32 HD Node for cryptocurrency key management.",
   "main": "./lib.cjs/index.js",
@@ -28,7 +28,7 @@
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
     "hdkey": "^2.1.0",
-    "js-moi-utils": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-utils": "0.6.1-sephorum",
     "process": "^0.11.10",
     "secp256k1": "^5.0.0",
     "stream": "npm:stream-browserify"

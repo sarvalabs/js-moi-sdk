@@ -1,12 +1,12 @@
 import { randomBytes } from "@noble/hashes/utils";
+import * as bip39 from "@zenz-solutions/js-moi-bip39";
+import { MOI_DERIVATION_PATH } from "@zenz-solutions/js-moi-constants";
+import { HDNode } from "@zenz-solutions/js-moi-hdnode";
+import { AbstractProvider, InteractionObject, InteractionRequest } from "@zenz-solutions/js-moi-providers";
+import { SigType, Signer } from "@zenz-solutions/js-moi-signer";
+import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex } from "@zenz-solutions/js-moi-utils";
 import { Buffer } from "buffer";
 import elliptic from "elliptic";
-import * as bip39 from "js-moi-bip39";
-import { MOI_DERIVATION_PATH } from "js-moi-constants";
-import { HDNode } from "js-moi-hdnode";
-import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
-import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex } from "js-moi-utils";
 
 import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";

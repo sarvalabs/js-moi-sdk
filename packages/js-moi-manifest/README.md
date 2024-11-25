@@ -31,7 +31,7 @@ npm install js-moi-manifest
 ## Usage
 
 ```javascript
-    import { ManifestCoder } from "js-moi-manifest";
+    import { ManifestCoder } from "@zenz-solutions/js-moi-manifest";
 
     const encodedManifest = ManifestCoder.encodeManifest(manifest)
     console.log(encodedManifest)

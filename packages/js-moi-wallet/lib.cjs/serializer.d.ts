@@ -1,4 +1,4 @@
-import { InteractionObject } from "js-moi-providers";
+import { InteractionObject } from "@zenz-solutions/js-moi-providers";
 /**
  * POLO encodes an interaction object into a Uint8Array representation.
  *

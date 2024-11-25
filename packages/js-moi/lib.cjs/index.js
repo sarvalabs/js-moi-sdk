@@ -14,13 +14,13 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("js-moi-bip39"), exports);
-__exportStar(require("js-moi-constants"), exports);
-__exportStar(require("js-moi-hdnode"), exports);
-__exportStar(require("js-moi-logic"), exports);
-__exportStar(require("js-moi-manifest"), exports);
-__exportStar(require("js-moi-providers"), exports);
-__exportStar(require("js-moi-signer"), exports);
-__exportStar(require("js-moi-utils"), exports);
-__exportStar(require("js-moi-wallet"), exports);
+__exportStar(require("@zenz-solutions/js-moi-bip39"), exports);
+__exportStar(require("@zenz-solutions/js-moi-constants"), exports);
+__exportStar(require("@zenz-solutions/js-moi-hdnode"), exports);
+__exportStar(require("@zenz-solutions/js-moi-logic"), exports);
+__exportStar(require("@zenz-solutions/js-moi-manifest"), exports);
+__exportStar(require("@zenz-solutions/js-moi-providers"), exports);
+__exportStar(require("@zenz-solutions/js-moi-signer"), exports);
+__exportStar(require("@zenz-solutions/js-moi-utils"), exports);
+__exportStar(require("@zenz-solutions/js-moi-wallet"), exports);
 //# sourceMappingURL=index.js.map

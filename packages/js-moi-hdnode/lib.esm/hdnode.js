@@ -1,6 +1,6 @@
 import { HDKey } from "@scure/bip32";
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import { Buffer } from "buffer";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
 /**
  * This class represents a Hierarchical Deterministic (HD) Node used in
  * cryptographic key generation and derivation.

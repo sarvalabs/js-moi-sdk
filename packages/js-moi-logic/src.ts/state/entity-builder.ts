@@ -1,5 +1,5 @@
-import type { ElementDescriptor, LogicManifest } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import type { ElementDescriptor, LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import { type AccessorBuilder, SlotAccessorBuilder } from "./accessor-builder";
 
 export class EntityBuilder {

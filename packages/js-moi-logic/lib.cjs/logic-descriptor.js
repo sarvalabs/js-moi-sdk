@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicDescriptor = exports.EngineKind = void 0;
-const js_moi_manifest_1 = require("js-moi-manifest");
+const js_moi_manifest_1 = require("@zenz-solutions/js-moi-manifest");
 const logic_base_1 = require("./logic-base");
 const logic_id_1 = require("./logic-id");
 var EngineKind;

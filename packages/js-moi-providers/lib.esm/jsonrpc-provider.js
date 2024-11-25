@@ -1,5 +1,5 @@
+import { CustomError, ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import fetch from "cross-fetch";
-import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
 import { BaseProvider } from "./base-provider";
 /**
  * A class that represents a JSON-RPC provider for making RPC calls over HTTP.

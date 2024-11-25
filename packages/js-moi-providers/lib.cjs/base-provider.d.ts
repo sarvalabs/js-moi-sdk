@@ -1,5 +1,5 @@
-import { LogicManifest } from "js-moi-manifest";
-import { Interaction, Tesseract } from "js-moi-utils";
+import { LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { Interaction, Tesseract } from "@zenz-solutions/js-moi-utils";
 import type { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";

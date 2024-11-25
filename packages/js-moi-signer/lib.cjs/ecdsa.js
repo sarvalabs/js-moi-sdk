@@ -30,7 +30,7 @@ const blake2b_1 = require("@noble/hashes/blake2b");
 const hmac_1 = require("@noble/hashes/hmac");
 const sha256_1 = require("@noble/hashes/sha256");
 const nobleECC = __importStar(require("@noble/secp256k1"));
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const signature_1 = __importDefault(require("./signature"));
 const utils_1 = require("./utils");
 /**

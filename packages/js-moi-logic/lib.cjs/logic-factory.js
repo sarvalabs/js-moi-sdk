@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicFactory = void 0;
-const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_manifest_1 = require("@zenz-solutions/js-moi-manifest");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const logic_base_1 = require("./logic-base");
 const routine_options_1 = require("./routine-options");
 /**

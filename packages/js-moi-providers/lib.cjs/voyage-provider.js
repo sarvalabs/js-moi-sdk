@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoyageProvider = void 0;
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const base_provider_1 = require("./base-provider");
-const js_moi_utils_1 = require("js-moi-utils");
 /**
  * A provider for making RPC calls to voyage nodes.
  */

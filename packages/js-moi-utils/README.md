@@ -31,7 +31,7 @@ npm install js-moi-utils
 ## Usage
 
 ```javascript
-    import { isValidAddress } from "js-moi-utils";
+    import { isValidAddress } from "@zenz-solutions/js-moi-utils";
 
     const isValid = isValidAddress("0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba")
     console.log(isValid)

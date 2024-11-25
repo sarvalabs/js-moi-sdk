@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { Depolorizer, Polorizer, WireType } from "js-polo";
 import type { LogicManifest } from "../../types/manifest";
 import { Schema } from "../schema";

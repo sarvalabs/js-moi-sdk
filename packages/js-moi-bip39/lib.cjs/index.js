@@ -26,6 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
  *
  **/
-__exportStar(require("./bip39"), exports);
 __exportStar(require("./_wordlists"), exports);
+__exportStar(require("./bip39"), exports);
 //# sourceMappingURL=index.js.map

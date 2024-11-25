@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HDNode = void 0;
 const bip32_1 = require("@scure/bip32");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const buffer_1 = require("buffer");
-const js_moi_utils_1 = require("js-moi-utils");
 /**
  * This class represents a Hierarchical Deterministic (HD) Node used in
  * cryptographic key generation and derivation.

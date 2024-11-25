@@ -1,5 +1,5 @@
+import { bytesToHex, hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { Buffer } from "buffer";
-import { bytesToHex, hexToBytes } from "js-moi-utils";
 /**
  * Represents a LogicID, which is an identifier for a logic.
  */

@@ -1,5 +1,5 @@
-import { AbstractProvider, CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, isValidAddress } from "js-moi-utils";
+import { AbstractProvider, CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "@zenz-solutions/js-moi-providers";
+import { ErrorCode, ErrorUtils, IxType, hexToBytes, isValidAddress } from "@zenz-solutions/js-moi-utils";
 import { SigType, SigningAlgorithms } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";

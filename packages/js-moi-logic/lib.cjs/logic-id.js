@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicId = void 0;
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const buffer_1 = require("buffer");
-const js_moi_utils_1 = require("js-moi-utils");
 /**
  * Represents a LogicID, which is an identifier for a logic.
  */

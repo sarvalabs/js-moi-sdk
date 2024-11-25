@@ -1,5 +1,5 @@
-import { ContextStateKind, LogicManifest, ManifestCoder } from "js-moi-manifest";
-import { Signer } from "js-moi-signer";
+import { ContextStateKind, LogicManifest, ManifestCoder } from "@zenz-solutions/js-moi-manifest";
+import { Signer } from "@zenz-solutions/js-moi-signer";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
 

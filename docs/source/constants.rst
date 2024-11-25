@@ -14,7 +14,7 @@ js-moi-sdk package.
 .. code-block:: javascript
 
     // Example
-    import * as moi from "js-moi-sdk";
+    import * as moi from "@zenz-solutions/js-moi-sdk";
 
     console.log(moi.VERSION)
 
@@ -29,7 +29,7 @@ derivation process.
 .. code-block:: javascript
 
     // Example
-    import * as moi from "js-moi-sdk";
+    import * as moi from "@zenz-solutions/js-moi-sdk";
 
     console.log(moi.MOI_DERIVATION_PATH)
 
@@ -45,7 +45,7 @@ addresses.
 .. code-block:: javascript
 
     // Example
-    import * as moi from "js-moi-sdk";
+    import * as moi from "@zenz-solutions/js-moi-sdk";
 
     console.log(moi.MOI_DERIVATION_BASE_PATH)
 

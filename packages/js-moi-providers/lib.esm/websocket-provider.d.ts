@@ -1,4 +1,4 @@
-import { type Tesseract } from "js-moi-utils";
+import { type Tesseract } from "@zenz-solutions/js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
 import type { Log, RpcResponse } from "../types/jsonrpc";
 import type { NewLogs, NewTesseractsByAccount, ProviderEvents, WebsocketEventMap } from "../types/websocket";

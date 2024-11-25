@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketProvider = void 0;
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const crypto_1 = require("crypto");
-const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
 const websocket_events_1 = require("./websocket-events");

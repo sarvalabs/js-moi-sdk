@@ -2,8 +2,8 @@ import { blake2b } from "@noble/hashes/blake2b";
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import * as nobleECC from '@noble/secp256k1';
+import { hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { Buffer } from "buffer";
-import { hexToBytes } from "js-moi-utils";
 
 import { SigType } from "../types";
 import Signature from "./signature";

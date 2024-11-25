@@ -31,7 +31,7 @@ npm install js-moi-providers
 ## Usage
 
 ```javascript
-    import { JsonRpcProvider } from "js-moi-providers";
+    import { JsonRpcProvider } from "@zenz-solutions/js-moi-providers";
 
     (async() => {
         const provider = new JsonRpcProvider("http://localhost:1600");

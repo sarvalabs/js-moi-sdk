@@ -1,5 +1,5 @@
 {
-  "name": "js-moi-logic",
+  "name": "@zenz-solutions/js-moi-logic",
   "version": "0.6.1-sephorum",
   "description": "Module to interact with MOI Logic Objects.",
   "main": "./lib.cjs/index.js",
@@ -17,16 +17,16 @@
   },
   "keywords": [
     "moichain",
-    "js-moi-sdk",
+    "@zenz-solutions/js-moi-sdk",
     "smart contracts"
   ],
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-manifest": "0.6.1-sephorum",
-    "js-moi-utils": "0.6.1-sephorum",
-    "js-moi-providers": "0.6.1-sephorum",
-    "js-moi-signer": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-manifest": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-utils": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-providers": "0.6.1-sephorum",
+    "@zenz-solutions/js-moi-signer": "0.6.1-sephorum",
     "@noble/hashes": "^1.1.5",
     "buffer": "^6.0.3"
   }

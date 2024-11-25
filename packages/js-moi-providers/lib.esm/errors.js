@@ -1,4 +1,4 @@
-import { defineReadOnly } from "js-moi-utils";
+import { defineReadOnly } from "@zenz-solutions/js-moi-utils";
 const connectionError = (msg, event) => {
     try {
         const error = new Error(msg);

@@ -1,5 +1,5 @@
 {
-  "name": "js-moi-utils",
+  "name": "@zenz-solutions/js-moi-utils",
   "version": "0.6.1-sephorum",
   "description": "Collection of utility functions used in js-moi-sdk.",
   "main": "./lib.cjs/index.js",

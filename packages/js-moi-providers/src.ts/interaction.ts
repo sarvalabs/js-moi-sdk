@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, bytesToHex, logicSchema, toQuantity } from "@zenz-solutions/js-moi-utils";
 import { Polorizer } from "js-polo";
 import { ProcessedIxObject } from "../types/interaction";
 import { CallorEstimateIxObject, InteractionPayload } from "../types/jsonrpc";

@@ -1,7 +1,7 @@
+import { CustomError, ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import fetch from 'cross-fetch';
-import { BaseProvider } from './base-provider';
-import { ErrorCode, ErrorUtils, CustomError } from "js-moi-utils";
 import { RpcResponse } from '../types/jsonrpc';
+import { BaseProvider } from './base-provider';
 
 /**
  * A provider for making RPC calls to voyage nodes.

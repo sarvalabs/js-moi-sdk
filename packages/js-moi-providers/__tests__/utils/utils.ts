@@ -1,4 +1,4 @@
-import { Wallet } from "js-moi-wallet";
+import { Wallet } from "@zenz-solutions/js-moi-wallet";
 import type { AbstractProvider } from "../../src.ts/abstract-provider";
 
 export const initializeWallet = (provider: AbstractProvider, mnemonic: string): Wallet => {

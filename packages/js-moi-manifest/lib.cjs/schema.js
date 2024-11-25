@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = exports.isClass = exports.isMap = exports.isArray = exports.isPrimitiveType = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
 const isPrimitiveType = (type) => {

@@ -1,5 +1,5 @@
-import { ManifestCoder } from "js-moi-manifest";
-import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
+import { ManifestCoder } from "@zenz-solutions/js-moi-manifest";
+import { CustomError, ErrorCode, ErrorUtils, IxType, bytesToHex, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "@zenz-solutions/js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
 import { processIxObject } from "./interaction";
 // Default timeout value in seconds

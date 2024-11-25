@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeIxObject = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
-const js_moi_constants_1 = require("js-moi-constants");
+const js_moi_constants_1 = require("@zenz-solutions/js-moi-constants");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const js_polo_1 = require("js-polo");
 /**
  * Processes the payload based on the interaction type.

@@ -1,11 +1,11 @@
-import { Wallet } from "js-moi-wallet";
+import { Wallet } from "@zenz-solutions/js-moi-wallet";
 
 import { LogicDriver, getLogicDriver } from "../src.ts/logic-driver";
 import { LogicFactory } from "../src.ts/logic-factory";
 
-import type { LogicManifest } from "js-moi-manifest";
-import { loadManifestFromFile } from "js-moi-manifest/__tests__/utils/helper";
-import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "js-moi-providers";
+import type { LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { loadManifestFromFile } from "@zenz-solutions/js-moi-manifest/__tests__/utils/helper";
+import { JsonRpcProvider, type InteractionReceipt, type InteractionResponse } from "@zenz-solutions/js-moi-providers";
 import { createRoutineOption } from "../src.ts/routine-options";
 
 const HOST = "<YOUR JSON RPC HOST>";

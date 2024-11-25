@@ -1,5 +1,5 @@
-import { ManifestCoder } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ManifestCoder } from "@zenz-solutions/js-moi-manifest";
+import { ErrorCode, ErrorUtils, hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { LogicBase } from "./logic-base";
 import { RoutineOption } from "./routine-options";
 /**

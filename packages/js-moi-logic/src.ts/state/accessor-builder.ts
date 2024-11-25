@@ -1,5 +1,5 @@
-import { isPrimitiveType, Schema, type ElementDescriptor, type LogicManifest } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { isPrimitiveType, Schema, type ElementDescriptor, type LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 
 import {
     ArrayIndexAccessor,

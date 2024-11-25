@@ -31,7 +31,7 @@ npm install js-moi-constants
 ## Usage
 
 ```javascript
-    import { MOI_DERIVATION_PATH } from "js-moi-constants";
+    import { MOI_DERIVATION_PATH } from "@zenz-solutions/js-moi-constants";
 
     console.log(MOI_DERIVATION_PATH)
 

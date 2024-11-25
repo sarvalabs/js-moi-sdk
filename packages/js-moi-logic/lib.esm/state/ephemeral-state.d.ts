@@ -1,4 +1,4 @@
-import type { AbstractProvider } from "js-moi-providers";
+import type { AbstractProvider } from "@zenz-solutions/js-moi-providers";
 import type { LogicDriver } from "../logic-driver";
 import { type AccessorBuilder } from "./accessor-builder";
 import { EntityBuilder } from "./entity-builder";

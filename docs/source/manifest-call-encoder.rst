@@ -152,7 +152,7 @@ and runtime schema.
 .. code-block:: javascript
 
     // Example
-    import { ManifestCoder } from "js-moi-sdk";
+    import { ManifestCoder } from "@zenz-solutions/js-moi-sdk";
 
     const manifest = { ... }
     const manifestCoder = new ManifestCoder(manifest);

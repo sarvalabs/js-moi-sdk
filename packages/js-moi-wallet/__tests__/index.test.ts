@@ -1,6 +1,6 @@
+import { VoyageProvider, type InteractionRequest } from "@zenz-solutions/js-moi-providers";
+import { AssetStandard, isValidAddress } from "@zenz-solutions/js-moi-utils";
 import { randomBytes } from "crypto";
-import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
-import { AssetStandard, isValidAddress } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts/index";
 
 const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";

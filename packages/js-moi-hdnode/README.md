@@ -31,7 +31,7 @@ npm install js-moi-hdnode
 ## Usage
 
 ```javascript
-    import { HDNode } from "js-moi-hdnode";
+    import { HDNode } from "@zenz-solutions/js-moi-hdnode";
 
     const seed = ...;
     const hdNode = HDNode.fromSeed(seed);

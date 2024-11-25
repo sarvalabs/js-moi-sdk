@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
 exports.generateStorageKey = generateStorageKey;
 const blake2b_1 = require("@noble/hashes/blake2b");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const bn_js_1 = __importDefault(require("bn.js"));
-const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 class StorageKey {
     value;

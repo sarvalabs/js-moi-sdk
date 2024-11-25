@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ElementDescriptor = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const context_state_matrix_1 = require("./context-state-matrix");
 /**
  * This class represents a descriptor for elements in the logic manifest.

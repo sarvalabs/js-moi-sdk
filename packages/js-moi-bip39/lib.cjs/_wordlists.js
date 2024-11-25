@@ -16,16 +16,16 @@ exports._default = exports.wordlists = void 0;
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
  *
  **/
-const czech_json_1 = __importDefault(require("../wordlists/czech.json"));
 const chinese_simplified_json_1 = __importDefault(require("../wordlists/chinese_simplified.json"));
 const chinese_traditional_json_1 = __importDefault(require("../wordlists/chinese_traditional.json"));
-const korean_json_1 = __importDefault(require("../wordlists/korean.json"));
+const czech_json_1 = __importDefault(require("../wordlists/czech.json"));
+const english_json_1 = __importDefault(require("../wordlists/english.json"));
 const french_json_1 = __importDefault(require("../wordlists/french.json"));
 const italian_json_1 = __importDefault(require("../wordlists/italian.json"));
-const spanish_json_1 = __importDefault(require("../wordlists/spanish.json"));
 const japanese_json_1 = __importDefault(require("../wordlists/japanese.json"));
+const korean_json_1 = __importDefault(require("../wordlists/korean.json"));
 const portuguese_json_1 = __importDefault(require("../wordlists/portuguese.json"));
-const english_json_1 = __importDefault(require("../wordlists/english.json"));
+const spanish_json_1 = __importDefault(require("../wordlists/spanish.json"));
 exports.wordlists = {
     czech: czech_json_1.default,
     chinese_simplified: chinese_simplified_json_1.default,

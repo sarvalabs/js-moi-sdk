@@ -1,9 +1,9 @@
 import { scrypt } from "@noble/hashes/scrypt";
 import { keccak_256 } from "@noble/hashes/sha3";
 import { randomBytes } from "@noble/hashes/utils";
+import { ErrorCode, ErrorUtils, bytesToHex } from "@zenz-solutions/js-moi-utils";
 import { CTR } from "aes-js";
 import { Buffer } from "buffer";
-import { ErrorCode, ErrorUtils, bytesToHex } from "js-moi-utils";
 import { Keystore } from "../types/keystore";
 
 /**

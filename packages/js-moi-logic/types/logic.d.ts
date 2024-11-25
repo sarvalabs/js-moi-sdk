@@ -1,5 +1,5 @@
-import { LogicManifest } from "js-moi-manifest";
-import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
+import { LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { InteractionCallResponse, InteractionResponse } from "@zenz-solutions/js-moi-providers";
 import type { RoutineOption } from "../src.ts/routine-options";
 
 export interface LogicIxRequest {

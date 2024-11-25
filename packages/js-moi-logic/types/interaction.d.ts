@@ -1,5 +1,5 @@
-import { LogicManifest, Exception } from "js-moi-manifest";
-import { InteractionResponse, InteractionObject, LogicPayload, InteractionCallResponse } from "js-moi-providers";
+import { Exception, LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { InteractionCallResponse, InteractionObject, InteractionResponse, LogicPayload } from "@zenz-solutions/js-moi-providers";
 
 export interface LogicIxObject {
     routine: LogicManifest.Routine;

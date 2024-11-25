@@ -1,5 +1,5 @@
-import { ErrorCode, ErrorUtils, IxType, hexToBytes, trimHexPrefix, ixObjectSchema, assetCreateSchema, assetMintOrBurnSchema, logicSchema } from "js-moi-utils";
-import { ZERO_ADDRESS } from "js-moi-constants";
+import { ZERO_ADDRESS } from "@zenz-solutions/js-moi-constants";
+import { ErrorCode, ErrorUtils, IxType, assetCreateSchema, assetMintOrBurnSchema, hexToBytes, ixObjectSchema, logicSchema, trimHexPrefix } from "@zenz-solutions/js-moi-utils";
 import { Polorizer } from "js-polo";
 /**
  * Processes the payload based on the interaction type.

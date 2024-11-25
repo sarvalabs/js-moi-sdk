@@ -1,4 +1,4 @@
-import { type ElementDescriptor, type LogicManifest } from "js-moi-manifest";
+import { type ElementDescriptor, type LogicManifest } from "@zenz-solutions/js-moi-manifest";
 import { type Accessor, type AccessorProvider, type StorageTypeProvider } from "./accessor";
 export interface AccessorBuilder {
     /**

@@ -1,6 +1,6 @@
+import { InteractionPayload } from "@zenz-solutions/js-moi-providers";
+import { IxType } from "@zenz-solutions/js-moi-utils";
 import { Buffer } from "buffer";
-import { InteractionPayload } from "js-moi-providers";
-import { IxType } from "js-moi-utils";
 
 export interface ISignature {
     Digest(): Uint8Array;

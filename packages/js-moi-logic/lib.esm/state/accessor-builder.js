@@ -1,5 +1,5 @@
-import { isPrimitiveType, Schema } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { isPrimitiveType, Schema } from "@zenz-solutions/js-moi-manifest";
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, } from "./accessor";
 const VALUE_TYPE_INDEX = 1;
 export class SlotAccessorBuilder {

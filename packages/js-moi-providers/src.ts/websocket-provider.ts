@@ -1,5 +1,5 @@
+import { ErrorCode, ErrorUtils, type Tesseract } from "@zenz-solutions/js-moi-utils";
 import { randomUUID } from "crypto";
-import { ErrorCode, ErrorUtils, type Tesseract } from "js-moi-utils";
 import { w3cwebsocket as Websocket, type ICloseEvent } from "websocket";
 import type { Log, RpcResponse } from "../types/jsonrpc";
 import type { NewLogs, NewTesseractsByAccount, ProviderEvents, WebsocketEventMap } from "../types/websocket";

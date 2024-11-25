@@ -31,8 +31,8 @@ npm install js-moi-wallet
 ## Usage
 
 ```javascript
-    import { Wallet } from "js-moi-wallet";
-    import { getLogicDriver } from "js-moi-logic";
+    import { Wallet } from "@zenz-solutions/js-moi-wallet";
+    import { getLogicDriver } from "@zenz-solutions/js-moi-logic";
 
      const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";

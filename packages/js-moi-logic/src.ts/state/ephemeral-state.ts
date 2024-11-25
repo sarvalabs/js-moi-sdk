@@ -1,6 +1,6 @@
-import { isPrimitiveType, Schema } from "js-moi-manifest";
-import type { AbstractProvider } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { isPrimitiveType, Schema } from "@zenz-solutions/js-moi-manifest";
+import type { AbstractProvider } from "@zenz-solutions/js-moi-providers";
+import { ErrorCode, ErrorUtils, hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { Depolorizer } from "js-polo";
 
 import type { LogicDriver } from "../logic-driver";

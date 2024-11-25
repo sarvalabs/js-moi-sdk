@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import { Schema as PoloSchema } from "js-polo";
 import { LogicManifest } from "../types/manifest";
 

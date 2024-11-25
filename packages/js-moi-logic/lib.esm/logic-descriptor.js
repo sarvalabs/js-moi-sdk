@@ -1,4 +1,4 @@
-import { ContextStateKind, ManifestCoder } from "js-moi-manifest";
+import { ContextStateKind, ManifestCoder } from "@zenz-solutions/js-moi-manifest";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
 export var EngineKind;

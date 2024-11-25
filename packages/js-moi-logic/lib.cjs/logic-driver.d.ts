@@ -1,6 +1,6 @@
-import { LogicManifest } from "js-moi-manifest";
-import { LogicPayload, Options } from "js-moi-providers";
-import { Signer } from "js-moi-signer";
+import { LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { LogicPayload, Options } from "@zenz-solutions/js-moi-providers";
+import { Signer } from "@zenz-solutions/js-moi-signer";
 import { LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";

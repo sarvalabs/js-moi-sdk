@@ -1,5 +1,5 @@
-import { LogicManifest } from "js-moi-manifest";
-import { Signer } from "js-moi-signer";
+import { LogicManifest } from "@zenz-solutions/js-moi-manifest";
+import { Signer } from "@zenz-solutions/js-moi-signer";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
 export declare enum EngineKind {

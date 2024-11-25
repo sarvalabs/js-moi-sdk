@@ -1,6 +1,6 @@
+import { AbstractProvider, InteractionObject, InteractionRequest } from "@zenz-solutions/js-moi-providers";
+import { SigType, Signer } from "@zenz-solutions/js-moi-signer";
 import { Buffer } from "buffer";
-import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
-import { SigType, Signer } from "js-moi-signer";
 import { Keystore } from "../types/keystore";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"

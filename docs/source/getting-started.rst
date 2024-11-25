@@ -24,14 +24,14 @@ importing `js-moi-sdk`.
 
 .. code-block:: javascript
 
-   const moi = require("js-moi-sdk")
+   const moi = require("@zenz-solutions/js-moi-sdk")
 
 If you are using ES6 or above, you can use the import statement to 
 import `js-moi-sdk`.
 
 .. code-block:: javascript
 
-   import * as moi from "js-moi-sdk"
+   import * as moi from "@zenz-solutions/js-moi-sdk"
 
 Key Concepts
 ------------

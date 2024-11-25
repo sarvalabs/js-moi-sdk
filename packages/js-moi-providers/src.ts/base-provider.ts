@@ -1,4 +1,4 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { LogicManifest, ManifestCoder } from "@zenz-solutions/js-moi-manifest";
 import {
     AssetCreationReceipt, AssetMintOrBurnReceipt, CustomError, ErrorCode, ErrorUtils, Interaction,
     IxType, LogicDeployReceipt,
@@ -6,7 +6,7 @@ import {
     LogicInvokeReceipt,
     Tesseract, bytesToHex,
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
-} from "js-moi-utils";
+} from "@zenz-solutions/js-moi-utils";
 import type {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,

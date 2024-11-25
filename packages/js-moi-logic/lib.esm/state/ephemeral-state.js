@@ -1,5 +1,5 @@
-import { isPrimitiveType, Schema } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { isPrimitiveType, Schema } from "@zenz-solutions/js-moi-manifest";
+import { ErrorCode, ErrorUtils, hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { generateStorageKey } from "./accessor";
 import { SlotAccessorBuilder } from "./accessor-builder";

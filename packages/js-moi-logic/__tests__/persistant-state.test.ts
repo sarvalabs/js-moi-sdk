@@ -1,8 +1,8 @@
+import { hexToBytes } from "@zenz-solutions/js-moi-utils";
+import { Wallet } from "@zenz-solutions/js-moi-wallet";
 import { BN } from "bn.js";
-import { hexToBytes } from "js-moi-utils";
-import { Wallet } from "js-moi-wallet";
 
-import { JsonRpcProvider } from "js-moi-providers";
+import { JsonRpcProvider } from "@zenz-solutions/js-moi-providers";
 import { getLogicDriver, type LogicDriver } from "../src.ts/logic-driver";
 import { LogicFactory } from "../src.ts/logic-factory";
 import { ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "../src.ts/state/accessor";

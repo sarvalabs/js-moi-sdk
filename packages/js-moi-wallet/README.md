@@ -31,7 +31,7 @@ npm install js-moi-wallet
 ## Usage
 
 ```javascript
-    import { Wallet } from "js-moi-wallet";
+    import { Wallet } from "@zenz-solutions/js-moi-wallet";
 
     const initWallet = async () => {
         const mnemonic = "mother clarify push liquid ordinary social track ...";

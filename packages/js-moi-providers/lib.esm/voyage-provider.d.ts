@@ -1,5 +1,5 @@
-import { BaseProvider } from './base-provider';
 import { RpcResponse } from '../types/jsonrpc';
+import { BaseProvider } from './base-provider';
 /**
  * A provider for making RPC calls to voyage nodes.
  */

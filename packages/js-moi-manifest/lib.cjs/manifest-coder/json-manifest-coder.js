@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonManifestCoder = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const js_polo_1 = require("js-polo");
 const schema_1 = require("../schema");
 const base_manifest_coder_1 = require("./base-manifest-coder");

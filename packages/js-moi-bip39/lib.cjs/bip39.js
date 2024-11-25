@@ -13,11 +13,11 @@ exports.getDefaultWordlist = exports.validateMnemonic = exports.generateMnemonic
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
  *
  **/
-const buffer_1 = require("buffer");
+const pbkdf2_1 = require("@noble/hashes/pbkdf2");
 const sha256_1 = require("@noble/hashes/sha256");
 const sha512_1 = require("@noble/hashes/sha512");
 const utils_1 = require("@noble/hashes/utils");
-const pbkdf2_1 = require("@noble/hashes/pbkdf2");
+const buffer_1 = require("buffer");
 const _wordlists_1 = require("./_wordlists");
 let DEFAULT_WORDLIST = _wordlists_1._default;
 const INVALID_MNEMONIC = 'Invalid mnemonic';

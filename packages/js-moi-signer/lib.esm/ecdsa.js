@@ -2,7 +2,7 @@ import { blake2b } from "@noble/hashes/blake2b";
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import * as nobleECC from '@noble/secp256k1';
-import { hexToBytes } from "js-moi-utils";
+import { hexToBytes } from "@zenz-solutions/js-moi-utils";
 import Signature from "./signature";
 import { JoinSignature, bip66Decode, bip66Encode, fromDER, toDER } from "./utils";
 /**

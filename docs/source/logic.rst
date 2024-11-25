@@ -155,7 +155,7 @@ Methods
 
 .. code-block:: javascript
 
-    import { LogicFactory } from "js-moi-sdk";
+    import { LogicFactory } from "@zenz-solutions/js-moi-sdk";
     import { wallet } from "./wallet";
 
     const factory = new LogicFactory(manifest, wallet);
@@ -173,7 +173,7 @@ the last argument in the deploy call.
 
 .. code-block:: javascript
 
-    import { LogicFactory } from "js-moi-sdk";
+    import { LogicFactory } from "@zenz-solutions/js-moi-sdk";
     import { wallet } from "./wallet";
 
     const factory = new LogicFactory(manifest, wallet);
@@ -331,7 +331,7 @@ Usage
 
 .. code-block:: javascript
 
-    import { getLogicDriver } from "js-moi-sdk";
+    import { getLogicDriver } from "@zenz-solutions/js-moi-sdk";
     import { wallet } from "./wallet";
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
@@ -349,7 +349,7 @@ Usage
 
 .. code-block:: javascript
 
-    import { getLogicDriver } from "js-moi-sdk";
+    import { getLogicDriver } from "@zenz-solutions/js-moi-sdk";
     import { wallet } from "./wallet";
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
@@ -367,7 +367,7 @@ Usage
 
 .. code-block:: javascript
 
-    import { getLogicDriver } from "js-moi-sdk";
+    import { getLogicDriver } from "@zenz-solutions/js-moi-sdk";
     import { wallet } from "./wallet";
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
@@ -395,7 +395,7 @@ the last argument in the deploy call.
 
 .. code-block:: javascript
 
-    import { getLogicDriver } from "js-moi-sdk";
+    import { getLogicDriver } from "@zenz-solutions/js-moi-sdk";
     import { wallet } from "./wallet";
 
     const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";

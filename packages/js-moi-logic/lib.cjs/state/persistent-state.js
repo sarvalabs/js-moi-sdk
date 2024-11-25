@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersistentState = void 0;
-const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_manifest_1 = require("@zenz-solutions/js-moi-manifest");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const js_polo_1 = require("js-polo");
 const accessor_1 = require("./accessor");
 const accessor_builder_1 = require("./accessor-builder");

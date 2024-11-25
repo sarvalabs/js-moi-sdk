@@ -1,7 +1,7 @@
 import assert from "assert";
 
-import { hexToBytes, IxType } from "js-moi-utils";
-import { Wallet } from "js-moi-wallet";
+import { hexToBytes, IxType } from "@zenz-solutions/js-moi-utils";
+import { Wallet } from "@zenz-solutions/js-moi-wallet";
 import { WebSocketEvent } from "../src.ts/websocket-events";
 import { WebsocketProvider } from "../src.ts/websocket-provider";
 import { getRandomSupply, initializeWallet } from "./utils/utils";

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SlotAccessorBuilder = void 0;
-const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_manifest_1 = require("@zenz-solutions/js-moi-manifest");
+const js_moi_utils_1 = require("@zenz-solutions/js-moi-utils");
 const accessor_1 = require("./accessor");
 const VALUE_TYPE_INDEX = 1;
 class SlotAccessorBuilder {

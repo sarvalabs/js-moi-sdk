@@ -1,4 +1,4 @@
-import { IxType } from "js-moi-utils";
+import { IxType } from "@zenz-solutions/js-moi-utils";
 
 export interface ProcessedIxObject {
     type: IxType;

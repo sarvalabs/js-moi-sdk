@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, defineReadOnly, hexToBytes } from "@zenz-solutions/js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";

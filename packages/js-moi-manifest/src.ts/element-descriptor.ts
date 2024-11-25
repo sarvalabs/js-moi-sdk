@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils } from "@zenz-solutions/js-moi-utils";
 import type { LogicManifest } from "../types/manifest";
 import { ContextStateMatrix } from "./context-state-matrix";
 
