@@ -4,7 +4,7 @@ import { BaseProvider } from "./base-provider";
 import { WebSocketEvent } from "./websocket-events";
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
 const crypto = globalThis.crypto ?? global.crypto;
-const randomUUID = crypto.randomUUID;
+const randomUUID = () => crypto.randomUUID();
 export class WebsocketProvider extends BaseProvider {
     ws;
     reconnects = 0;
