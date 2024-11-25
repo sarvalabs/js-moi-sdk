@@ -103,7 +103,7 @@ export const bytesToHex = (data) => {
  * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
  */
 export const isHex = (data) => {
-    return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+    return typeof data === "string" && /^(0x)?[0-9A-Fa-f]+$/g.test(data);
 };
 /**
  * Removes the '0x' prefix from a hexadecimal string if present.

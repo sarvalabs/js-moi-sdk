@@ -120,7 +120,7 @@ export const bytesToHex = (data: Uint8Array): string => {
  * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
  */
 export const isHex = (data: string): boolean => {
-  return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+  return typeof data === "string" && /^(0x)?[0-9A-Fa-f]+$/g.test(data);
 };
 
 /**
