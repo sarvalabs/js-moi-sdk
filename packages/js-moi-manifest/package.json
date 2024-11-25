@@ -4,6 +4,9 @@
   "description": "Module to encode and decode MOI Logic Engine input and output.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
+  "publishConfig": {
+    "@zenz-solutions:registry": "https://npm.pkg.github.com"
+   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

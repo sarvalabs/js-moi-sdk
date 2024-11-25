@@ -4,6 +4,9 @@
   "description": "Module to interact with the MOI accounts.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
+  "publishConfig": {
+    "@zenz-solutions:registry": "https://npm.pkg.github.com"
+   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
