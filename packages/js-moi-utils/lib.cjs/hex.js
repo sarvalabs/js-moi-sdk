@@ -115,7 +115,7 @@ exports.bytesToHex = bytesToHex;
  * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
  */
 const isHex = (data) => {
-    return typeof data === "string" && /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+    return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
 };
 exports.isHex = isHex;
 /**
