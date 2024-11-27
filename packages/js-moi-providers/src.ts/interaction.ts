@@ -71,7 +71,7 @@ export const validateAssetTransferPayload = (payload: OperationPayload): AssetAc
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicDeployPayload = (payload: OperationPayload): LogicPayload => {
-    if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('manifest' in payload && 'callsite' in payload) {
         return payload as LogicPayload;
     }
 
@@ -86,7 +86,7 @@ export const validateLogicDeployPayload = (payload: OperationPayload): LogicPayl
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicPayload = (payload: OperationPayload): LogicPayload => {
-    if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('logic_id' in payload && 'callsite' in payload) {
         return payload as LogicPayload;
     }
 
@@ -141,7 +141,7 @@ const processPayload = (txType: OpType, payload: OperationPayload): ProcessedOpe
             return {
                 manifest: hexToBytes(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : undefined ,
             };
         }
 
@@ -151,7 +151,7 @@ const processPayload = (txType: OpType, payload: OperationPayload): ProcessedOpe
             return {
                 logic_id: trimHexPrefix(logicPayload.logic_id),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : undefined ,
             };
         }
 

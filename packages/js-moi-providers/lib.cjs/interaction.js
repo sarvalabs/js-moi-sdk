@@ -68,7 +68,7 @@ exports.validateAssetTransferPayload = validateAssetTransferPayload;
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateLogicDeployPayload = (payload) => {
-    if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('manifest' in payload && 'callsite' in payload) {
         return payload;
     }
     throw new Error("Invalid logic deploy payload");
@@ -82,7 +82,7 @@ exports.validateLogicDeployPayload = validateLogicDeployPayload;
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateLogicPayload = (payload) => {
-    if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('logic_id' in payload && 'callsite' in payload) {
         return payload;
     }
     throw new Error("Invalid logic invoke or enlist payload");
@@ -131,7 +131,7 @@ const processPayload = (txType, payload) => {
             return {
                 manifest: (0, js_moi_utils_1.hexToBytes)(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata),
+                calldata: logicPayload.calldata ? (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata) : undefined,
             };
         }
         case js_moi_utils_1.OpType.LOGIC_INVOKE:
@@ -140,7 +140,7 @@ const processPayload = (txType, payload) => {
             return {
                 logic_id: (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id),
                 callsite: logicPayload.callsite,
-                calldata: (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata),
+                calldata: logicPayload.calldata ? (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata) : undefined,
             };
         }
         default:
