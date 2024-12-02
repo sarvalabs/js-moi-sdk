@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processIxObject = exports.serializePayload = exports.validateLogicPayload = exports.validateLogicDeployPayload = exports.validateAssetTransferPayload = exports.validateAssetSupplyPayload = exports.validateAssetCreatePayload = exports.validateParticipantCreatePayload = void 0;
+exports.processIxObject = exports.serializePayload = exports.validateLogicActionPayload = exports.validateLogicDeployPayload = exports.validateAssetTransferPayload = exports.validateAssetSupplyPayload = exports.validateAssetCreatePayload = exports.validateParticipantCreatePayload = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const js_moi_constants_1 = require("js-moi-constants");
@@ -68,7 +68,7 @@ exports.validateAssetTransferPayload = validateAssetTransferPayload;
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateLogicDeployPayload = (payload) => {
-    if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('manifest' in payload && 'callsite' in payload) {
         return payload;
     }
     throw new Error("Invalid logic deploy payload");
@@ -81,13 +81,13 @@ exports.validateLogicDeployPayload = validateLogicDeployPayload;
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
-const validateLogicPayload = (payload) => {
-    if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
+const validateLogicActionPayload = (payload) => {
+    if ('logic_id' in payload && 'callsite' in payload) {
         return payload;
     }
     throw new Error("Invalid logic invoke or enlist payload");
 };
-exports.validateLogicPayload = validateLogicPayload;
+exports.validateLogicActionPayload = validateLogicActionPayload;
 /**
  * Processes the payload based on the operation type.
  *
@@ -131,16 +131,16 @@ const processPayload = (txType, payload) => {
             return {
                 manifest: (0, js_moi_utils_1.hexToBytes)(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata),
+                calldata: logicPayload.calldata ? (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata) : null,
             };
         }
         case js_moi_utils_1.OpType.LOGIC_INVOKE:
         case js_moi_utils_1.OpType.LOGIC_ENLIST: {
-            const logicPayload = (0, exports.validateLogicPayload)(payload);
+            const logicPayload = (0, exports.validateLogicActionPayload)(payload);
             return {
                 logic_id: (0, js_moi_utils_1.trimHexPrefix)(logicPayload.logic_id),
                 callsite: logicPayload.callsite,
-                calldata: (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata),
+                calldata: logicPayload.calldata ? (0, js_moi_utils_1.hexToBytes)(logicPayload.calldata) : null,
             };
         }
         default:
@@ -196,7 +196,6 @@ const processFunds = (ixObject) => {
     ixObject.ix_operations.forEach(operation => {
         switch (operation.type) {
             case js_moi_utils_1.OpType.ASSET_TRANSFER:
-            case js_moi_utils_1.OpType.ASSET_MINT:
             case js_moi_utils_1.OpType.ASSET_BURN: {
                 const payload = operation.payload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;

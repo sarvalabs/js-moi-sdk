@@ -307,7 +307,7 @@ export interface LogicActionPayload {
 export interface LogicPayload {
     logic_id?: string;
     callsite: string;
-    calldata: string;
+    calldata?: string;
     manifest?: string;
 }
 
@@ -374,7 +374,7 @@ interface InteractionObject {
     fuel_limit?: number | bigint;
     
     funds?: IxAssetFund[]
-    ix_operations?: IxOperation[]
+    ix_operations: IxOperation[]
     participants?: IxParticipant[]
 
     perception?: Uint8Array

@@ -47,7 +47,7 @@ export declare const validateLogicDeployPayload: (payload: OperationPayload) => 
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
-export declare const validateLogicPayload: (payload: OperationPayload) => LogicPayload;
+export declare const validateLogicActionPayload: (payload: OperationPayload) => LogicPayload;
 /**
  * Serializes the payload of a operation based on its type.
  * This function polorizes (serializes) the payload using the appropriate schema

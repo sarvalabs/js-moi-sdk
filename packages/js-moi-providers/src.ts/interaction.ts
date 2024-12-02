@@ -71,7 +71,7 @@ export const validateAssetTransferPayload = (payload: OperationPayload): AssetAc
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicDeployPayload = (payload: OperationPayload): LogicPayload => {
-    if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('manifest' in payload && 'callsite' in payload) {
         return payload as LogicPayload;
     }
 
@@ -85,8 +85,8 @@ export const validateLogicDeployPayload = (payload: OperationPayload): LogicPayl
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
-export const validateLogicPayload = (payload: OperationPayload): LogicPayload => {
-    if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
+export const validateLogicActionPayload = (payload: OperationPayload): LogicPayload => {
+    if ('logic_id' in payload && 'callsite' in payload) {
         return payload as LogicPayload;
     }
 
@@ -141,17 +141,17 @@ const processPayload = (txType: OpType, payload: OperationPayload): ProcessedOpe
             return {
                 manifest: hexToBytes(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : null,
             };
         }
 
         case OpType.LOGIC_INVOKE:
         case OpType.LOGIC_ENLIST: {
-            const logicPayload = validateLogicPayload(payload);
+            const logicPayload = validateLogicActionPayload(payload);
             return {
                 logic_id: trimHexPrefix(logicPayload.logic_id),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : null,
             };
         }
 
@@ -217,7 +217,6 @@ const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
     ixObject.ix_operations.forEach(operation => {
         switch(operation.type) {
             case OpType.ASSET_TRANSFER:
-            case OpType.ASSET_MINT:
             case OpType.ASSET_BURN: {
                 const payload = operation.payload as AssetSupplyPayload | AssetActionPayload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;

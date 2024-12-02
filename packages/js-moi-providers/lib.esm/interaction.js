@@ -61,7 +61,7 @@ export const validateAssetTransferPayload = (payload) => {
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicDeployPayload = (payload) => {
-    if ('manifest' in payload && 'callsite' in payload && 'calldata' in payload) {
+    if ('manifest' in payload && 'callsite' in payload) {
         return payload;
     }
     throw new Error("Invalid logic deploy payload");
@@ -73,8 +73,8 @@ export const validateLogicDeployPayload = (payload) => {
  * @returns {LogicPayload} - The validated payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
-export const validateLogicPayload = (payload) => {
-    if ('logic_id' in payload && 'callsite' in payload && 'calldata' in payload) {
+export const validateLogicActionPayload = (payload) => {
+    if ('logic_id' in payload && 'callsite' in payload) {
         return payload;
     }
     throw new Error("Invalid logic invoke or enlist payload");
@@ -122,16 +122,16 @@ const processPayload = (txType, payload) => {
             return {
                 manifest: hexToBytes(logicPayload.manifest),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : null,
             };
         }
         case OpType.LOGIC_INVOKE:
         case OpType.LOGIC_ENLIST: {
-            const logicPayload = validateLogicPayload(payload);
+            const logicPayload = validateLogicActionPayload(payload);
             return {
                 logic_id: trimHexPrefix(logicPayload.logic_id),
                 callsite: logicPayload.callsite,
-                calldata: hexToBytes(logicPayload.calldata),
+                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : null,
             };
         }
         default:
@@ -186,7 +186,6 @@ const processFunds = (ixObject) => {
     ixObject.ix_operations.forEach(operation => {
         switch (operation.type) {
             case OpType.ASSET_TRANSFER:
-            case OpType.ASSET_MINT:
             case OpType.ASSET_BURN: {
                 const payload = operation.payload;
                 const amount = assetFunds.get(payload.asset_id) ?? 0;
