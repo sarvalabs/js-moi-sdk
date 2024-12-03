@@ -44,7 +44,7 @@ export const validateAssetSupplyPayload = (payload) => {
  * Validates the payload for ASSET_TRANSFER operation type.
  *
  * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetActionPayload} - The validated payload.
+ * @returns {AssetActionPayload} - The validated logic action payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateAssetTransferPayload = (payload) => {
@@ -57,7 +57,7 @@ export const validateAssetTransferPayload = (payload) => {
  * Validates the payload for LOGIC_DEPLOY operation type.
  *
  * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicPayload} - The validated payload.
+ * @returns {LogicDeployPayload} - The validated logic deploy payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicDeployPayload = (payload) => {
@@ -70,7 +70,7 @@ export const validateLogicDeployPayload = (payload) => {
  * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
  *
  * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicPayload} - The validated payload.
+ * @returns {LogicActionPayload} - The validated logic action payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateLogicActionPayload = (payload) => {
@@ -82,13 +82,13 @@ export const validateLogicActionPayload = (payload) => {
 /**
  * Processes the payload based on the operation type.
  *
- * @param {OpType} txType - The operation type.
+ * @param {OpType} opType - The operation type.
  * @param {OperationPayload} payload - The operation payload.
  * @returns {OperationPayload} - The processed operation payload.
  * @throws {Error} - Throws an error if the operation type is unsupported.
  */
-const processPayload = (txType, payload) => {
-    switch (txType) {
+const processPayload = (opType, payload) => {
+    switch (opType) {
         case OpType.PARTICIPANT_CREATE: {
             const participantPayload = validateParticipantCreatePayload(payload);
             return {
@@ -135,7 +135,7 @@ const processPayload = (txType, payload) => {
             };
         }
         default:
-            ErrorUtils.throwError(`Unsupported operation type: ${txType}`, ErrorCode.UNSUPPORTED_OPERATION);
+            ErrorUtils.throwError(`Unsupported operation type: ${opType}`, ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 /**
@@ -143,15 +143,15 @@ const processPayload = (txType, payload) => {
  * This function polorizes (serializes) the payload using the appropriate schema
  * based on the operation type and returns it as a byte array.
  *
- * @param {OpType} txType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
+ * @param {OpType} opType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
  * @param {OperationPayload} payload - The payload of the operation to be serialized.
  * @returns {Uint8Array} - A serialized byte array representing the processed payload.
  * @throws {Error} - Throws an error if the operation type is unsupported.
  */
-export const serializePayload = (txType, payload) => {
+export const serializePayload = (opType, payload) => {
     const polorizer = new Polorizer();
-    const processedPayload = processPayload(txType, payload);
-    switch (txType) {
+    const processedPayload = processPayload(opType, payload);
+    switch (opType) {
         case OpType.PARTICIPANT_CREATE:
             polorizer.polorize(processedPayload, participantCreateSchema);
             return polorizer.bytes();
@@ -171,7 +171,7 @@ export const serializePayload = (txType, payload) => {
             polorizer.polorize(processedPayload, logicSchema);
             return polorizer.bytes();
         default:
-            ErrorUtils.throwError(`Unsupported operation type: ${txType}`, ErrorCode.UNSUPPORTED_OPERATION);
+            ErrorUtils.throwError(`Unsupported operation type: ${opType}`, ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 /**

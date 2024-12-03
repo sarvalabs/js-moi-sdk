@@ -275,14 +275,29 @@ export interface AssetCreatePayload {
     logic_payload?: LogicPayload;
 }
 
+export interface AssetCreateOperation {
+    type: OpType.ASSET_CREATE;
+    payload: AssetCreatePayload;
+}
+
 export interface ParticipantCreatePayload {
     address: string;
     amount: number;
 }
 
+export interface ParticipantCreateOperation {
+    type: OpType.PARTICIPANT_CREATE;
+    payload: ParticipantCreatePayload;
+}
+
 export interface AssetSupplyPayload {
     asset_id: string;
     amount: number | bigint;
+}
+
+export interface AssetSupplyOperation {
+    type: OpType.ASSET_MINT | OpType.ASSET_BURN;
+    payload: AssetSupplyPayload;
 }
 
 export interface AssetActionPayload {
@@ -292,16 +307,31 @@ export interface AssetActionPayload {
     amount: number | bigint;
 }
 
+export interface AssetActionOperation {
+    type: OpType.ASSET_TRANSFER;
+    payload: AssetActionPayload;
+}
+
 export interface LogicDeployPayload {
     manifest: string;
     callsite: string;
-    calldata: string;
+    calldata?: string;
+}
+
+export interface LogicDeployOperation {
+    type: OpType.LOGIC_DEPLOY;
+    payload: LogicDeployPayload;
 }
 
 export interface LogicActionPayload {
     logic_id: string;
     callsite: string;
-    calldata: string;
+    calldata?: string;
+}
+
+export interface LogicActionOperation {
+    type: OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST;
+    payload: LogicActionPayload;
 }
 
 export interface LogicPayload {
@@ -326,13 +356,13 @@ interface ProcessedAssetActionPayload {
 interface ProcessedLogicPayload {
     logic_id?: string;
     callsite: string;
-    calldata: Uint8Array;
+    calldata?: Uint8Array;
     manifest?: Uint8Array;
 }
 
-type ProcessedOperationPayload = ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
+type ProcessedOperationPayload = | ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
 
-export type OperationPayload = ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicPayload;
+export type OperationPayload = | ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicDeployPayload | LogicActionPayload;
 
 export interface IxAssetFund {
     asset_id: string;
@@ -344,10 +374,7 @@ interface ProcessedIxAssetFund {
     amount: string;
 }
 
-export interface IxOperation {
-    type: OpType;
-    payload: OperationPayload;
-}
+export type IxOperation = | ParticipantCreateOperation | AssetCreateOperation | AssetActionOperation | AssetSupplyOperation | LogicDeployOperation | LogicActionOperation;
 
 interface ProcessedIxOperation {
     type: OpType;

@@ -50,7 +50,7 @@ exports.validateAssetSupplyPayload = validateAssetSupplyPayload;
  * Validates the payload for ASSET_TRANSFER operation type.
  *
  * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetActionPayload} - The validated payload.
+ * @returns {AssetActionPayload} - The validated logic action payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateAssetTransferPayload = (payload) => {
@@ -64,7 +64,7 @@ exports.validateAssetTransferPayload = validateAssetTransferPayload;
  * Validates the payload for LOGIC_DEPLOY operation type.
  *
  * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicPayload} - The validated payload.
+ * @returns {LogicDeployPayload} - The validated logic deploy payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateLogicDeployPayload = (payload) => {
@@ -78,7 +78,7 @@ exports.validateLogicDeployPayload = validateLogicDeployPayload;
  * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
  *
  * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicPayload} - The validated payload.
+ * @returns {LogicActionPayload} - The validated logic action payload.
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateLogicActionPayload = (payload) => {
@@ -91,13 +91,13 @@ exports.validateLogicActionPayload = validateLogicActionPayload;
 /**
  * Processes the payload based on the operation type.
  *
- * @param {OpType} txType - The operation type.
+ * @param {OpType} opType - The operation type.
  * @param {OperationPayload} payload - The operation payload.
  * @returns {OperationPayload} - The processed operation payload.
  * @throws {Error} - Throws an error if the operation type is unsupported.
  */
-const processPayload = (txType, payload) => {
-    switch (txType) {
+const processPayload = (opType, payload) => {
+    switch (opType) {
         case js_moi_utils_1.OpType.PARTICIPANT_CREATE: {
             const participantPayload = (0, exports.validateParticipantCreatePayload)(payload);
             return {
@@ -144,7 +144,7 @@ const processPayload = (txType, payload) => {
             };
         }
         default:
-            js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${txType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${opType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 /**
@@ -152,15 +152,15 @@ const processPayload = (txType, payload) => {
  * This function polorizes (serializes) the payload using the appropriate schema
  * based on the operation type and returns it as a byte array.
  *
- * @param {OpType} txType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
+ * @param {OpType} opType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
  * @param {OperationPayload} payload - The payload of the operation to be serialized.
  * @returns {Uint8Array} - A serialized byte array representing the processed payload.
  * @throws {Error} - Throws an error if the operation type is unsupported.
  */
-const serializePayload = (txType, payload) => {
+const serializePayload = (opType, payload) => {
     const polorizer = new js_polo_1.Polorizer();
-    const processedPayload = processPayload(txType, payload);
-    switch (txType) {
+    const processedPayload = processPayload(opType, payload);
+    switch (opType) {
         case js_moi_utils_1.OpType.PARTICIPANT_CREATE:
             polorizer.polorize(processedPayload, js_moi_utils_1.participantCreateSchema);
             return polorizer.bytes();
@@ -180,7 +180,7 @@ const serializePayload = (txType, payload) => {
             polorizer.polorize(processedPayload, js_moi_utils_1.logicSchema);
             return polorizer.bytes();
         default:
-            js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${txType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${opType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
 };
 exports.serializePayload = serializePayload;
