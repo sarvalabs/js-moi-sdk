@@ -268,7 +268,7 @@ interface Stream {
 export interface AssetCreatePayload {
     symbol: string;
     supply: number | bigint;
-    standard?: AssetStandard;
+    standard: AssetStandard;
     dimension?: number;
     is_stateful?: boolean;
     is_logical?: boolean;
@@ -301,7 +301,7 @@ export interface AssetSupplyOperation {
 }
 
 export interface AssetActionPayload {
-    benefactor: string;
+    benefactor?: string;
     beneficiary: string;
     asset_id: string;
     amount: number | bigint;
