@@ -150,7 +150,7 @@ exports.isHex = isHex;
  * @returns {string} The trimmed hexadecimal string.
  */
 const trimHexPrefix = (data) => {
-    return data.startsWith("0x") ? data.slice(2) : data;
+    return (0, exports.isHex)(data) ? data.slice(2) : data;
 };
 exports.trimHexPrefix = trimHexPrefix;
 /**

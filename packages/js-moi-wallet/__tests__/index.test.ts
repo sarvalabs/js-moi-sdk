@@ -3,15 +3,21 @@ import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
 import { AssetStandard, isValidAddress, OpType } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts/index";
 
-const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
-const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+const MNEMONIC =
+    "profit behave tribe dash diet stool crawl general country student smooth oxygen";
+const ADDRESS =
+    "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
-const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
+const PRIVATE_KEY =
+    "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
 
 describe("Wallet", () => {
     describe("constructor", () => {
         test("instance is created with a private key (Buffer type) and a specified curve", async () => {
-            const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1);
+            const wallet = new Wallet(
+                Buffer.from(PRIVATE_KEY, "hex"),
+                CURVE.SECP256K1
+            );
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
@@ -43,7 +49,7 @@ describe("Wallet", () => {
         });
 
         test(Wallet.fromMnemonicSync.name, () => {
-            const wallet =  Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+            const wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
 
             expect(wallet.address).toBe(ADDRESS);
             expect(wallet.isInitialized()).toBe(true);
@@ -108,7 +114,8 @@ describe("Wallet", () => {
             wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
         });
 
-        const signedMessage = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
+        const signedMessage =
+            "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
         const message = "Hello, MOI";
 
         test("sign", () => {
@@ -120,50 +127,74 @@ describe("Wallet", () => {
 
         describe("verify", () => {
             test("should return true if the signature is valid", () => {
-                const isVerified = wallet.verify(Buffer.from(message), signedMessage, wallet.publicKey);
+                const isVerified = wallet.verify(
+                    Buffer.from(message),
+                    signedMessage,
+                    wallet.publicKey
+                );
                 expect(isVerified).toBeTruthy();
             });
 
             test("should return false if the signature is invalid", () => {
-                const invalidSignature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2s70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726401";
-                const isVerified = wallet.verify(Buffer.from("Hello, MOI!"), invalidSignature, wallet.publicKey);
+                const invalidSignature =
+                    "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2s70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726401";
+                const isVerified = wallet.verify(
+                    Buffer.from("Hello, MOI!"),
+                    invalidSignature,
+                    wallet.publicKey
+                );
                 expect(isVerified).toBeFalsy();
             });
-            
+
             test("should return false if the public key is invalid", () => {
-                const isVerified = wallet.verify(Buffer.from(message), signedMessage, Buffer.from("invalid public key"));
+                const isVerified = wallet.verify(
+                    Buffer.from(message),
+                    signedMessage,
+                    Buffer.from("invalid public key")
+                );
                 expect(isVerified).toBeFalsy();
             });
 
             test("should return false if the message is invalid", () => {
-                const isVerified = wallet.verify(randomBytes(10), signedMessage, wallet.publicKey);
+                const isVerified = wallet.verify(
+                    randomBytes(10),
+                    signedMessage,
+                    wallet.publicKey
+                );
                 expect(isVerified).toBeFalsy();
             });
 
             test("should return false if the public key is wrong", () => {
-                const isVerified = wallet.verify(Buffer.from(message), signedMessage, Wallet.createRandomSync().publicKey);
+                const isVerified = wallet.verify(
+                    Buffer.from(message),
+                    signedMessage,
+                    Wallet.createRandomSync().publicKey
+                );
                 expect(isVerified).toBeFalsy();
             });
         });
 
         test("signInteraction", () => {
             const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
-            const ixArgs = wallet.signInteraction({
-                nonce: 0,
-                sender: wallet.address,
-                fuel_price: 1,
-                fuel_limit: 200,
-                ix_operations: [
-                    {
-                        type: OpType.ASSET_CREATE,
-                        payload: {
-                            standard: AssetStandard.MAS0,
-                            symbol: "SIG",
-                            supply: 1248577,
+            const ixArgs = wallet.signInteraction(
+                {
+                    nonce: 0,
+                    sender: wallet.address,
+                    fuel_price: 1,
+                    fuel_limit: 200,
+                    ix_operations: [
+                        {
+                            type: OpType.ASSET_CREATE,
+                            payload: {
+                                standard: AssetStandard.MAS0,
+                                symbol: "SIG",
+                                supply: 1248577,
+                            },
                         },
-                    }
-                ]
-            }, algo);
+                    ],
+                },
+                algo
+            );
 
             expect(ixArgs).toBeDefined();
             expect(ixArgs).toMatchObject<InteractionRequest>({
@@ -171,7 +202,7 @@ describe("Wallet", () => {
                 signature: expect.any(String),
             });
             expect(ixArgs.ix_args).toEqual(
-                "0ebf02068604830883089308ae08be088e0be00fe00f870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b000000000000000000000000000000000000000000000000000000000000000001c80f1f0e2f0316040e7f06336363616160534947130d411f0e3f068304870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b"
+                "0x0ebf02068604830883089308ae08be088e0be00fe00f870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b000000000000000000000000000000000000000000000000000000000000000001c80f1f0e2f0316040e7f06336363616160534947130d411f0e3f068304870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b"
             );
         });
 

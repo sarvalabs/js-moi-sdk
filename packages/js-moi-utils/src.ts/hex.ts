@@ -173,7 +173,7 @@ export const isHex = (value: unknown, byteLength?: number): value is Hex => {
  * @returns {string} The trimmed hexadecimal string.
  */
 export const trimHexPrefix = (data: string): string => {
-    return data.startsWith("0x") ? data.slice(2) : data;
+    return isHex(data) ? data.slice(2) : data;
 };
 
 /**

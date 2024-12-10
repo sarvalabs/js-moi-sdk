@@ -37,7 +37,7 @@ export class ManifestCoder {
     parseCalldata(schema, arg, updateType = true) {
         const parsableKinds = ["bytes", "array", "map", "struct"];
         const reconstructSchema = (schema) => {
-            Object.keys(schema.fields).forEach(key => {
+            Object.keys(schema.fields).forEach((key) => {
                 if (schema.fields[key].kind === "struct") {
                     schema.fields[key].kind = "document";
                 }
@@ -58,7 +58,7 @@ export class ManifestCoder {
             return map;
         };
         const parseStruct = (schema, arg, updateType) => {
-            Object.keys(arg).forEach(key => {
+            Object.keys(arg).forEach((key) => {
                 arg[key] = this.parseCalldata(schema.fields[key], arg[key], false);
             });
             const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)));
@@ -82,8 +82,7 @@ export class ManifestCoder {
                 }
                 break;
             case "map":
-                if ((parsableKinds.includes(schema.fields.keys.kind) ||
-                    parsableKinds.includes(schema.fields.values.kind))) {
+                if (parsableKinds.includes(schema.fields.keys.kind) || parsableKinds.includes(schema.fields.values.kind)) {
                     return parseMap(schema, arg);
                 }
                 break;
@@ -108,7 +107,7 @@ export class ManifestCoder {
             acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
             return acc;
         }, {});
-        return "0x" + bytesToHex((documentEncode(calldata, schema).bytes()));
+        return bytesToHex(documentEncode(calldata, schema).bytes());
     }
     /**
      * Decodes the provided calldata into the expected arguments for a given routine.
@@ -198,24 +197,24 @@ export class ManifestCoder {
     static encodeManifest(manifest) {
         if (typeof manifest === "object" && manifest !== null) {
             const serializer = new JsonManifestCoder();
-            return "0x" + bytesToHex(serializer.encode(manifest));
+            return bytesToHex(serializer.encode(manifest));
         }
         if (typeof manifest === "string") {
             const serializer = new YamlManifestCoder();
-            return "0x" + bytesToHex(serializer.encode(manifest));
+            return bytesToHex(serializer.encode(manifest));
         }
         ErrorUtils.throwError("Unsupported manifest type", ErrorCode.UNSUPPORTED_OPERATION);
     }
     /**
-    * Decodes a given manifest in either JSON or YAML format.
-    *
-    * @param {string | Uint8Array} manifest - The manifest data to decode, provided as a string or Uint8Array.
-    * @param {ManifestCoderFormat} format - The format of the manifest, either JSON or YAML.
-    *
-    * @returns {LogicManifest.Manifest | string} - Returns a `LogicManifest.Manifest` object if JSON format is used or a string representation if YAML format is used.
-    *
-    * @throws {Error} - Throws an error if the format is unsupported.
-    */
+     * Decodes a given manifest in either JSON or YAML format.
+     *
+     * @param {string | Uint8Array} manifest - The manifest data to decode, provided as a string or Uint8Array.
+     * @param {ManifestCoderFormat} format - The format of the manifest, either JSON or YAML.
+     *
+     * @returns {LogicManifest.Manifest | string} - Returns a `LogicManifest.Manifest` object if JSON format is used or a string representation if YAML format is used.
+     *
+     * @throws {Error} - Throws an error if the format is unsupported.
+     */
     static decodeManifest(manifest, format) {
         if (format === ManifestCoderFormat.JSON) {
             const serializer = new JsonManifestCoder();

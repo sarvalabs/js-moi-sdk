@@ -136,7 +136,7 @@ export const isHex = (value, byteLength) => {
  * @returns {string} The trimmed hexadecimal string.
  */
 export const trimHexPrefix = (data) => {
-    return data.startsWith("0x") ? data.slice(2) : data;
+    return isHex(data) ? data.slice(2) : data;
 };
 /**
  * Checks if a given value is an address.

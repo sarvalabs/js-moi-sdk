@@ -1,3 +1,4 @@
+import { type Hex } from "js-moi-utils";
 import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
 import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
@@ -37,7 +38,7 @@ export declare class ManifestCoder {
      * @param args - The arguments to be encoded, passed as a variadic parameter.
      * @returns A hexadecimal string representing the encoded arguments.
      */
-    encodeArguments(routine: string, ...args: any[]): string;
+    encodeArguments(routine: string, ...args: any[]): Hex;
     /**
      * Decodes the provided calldata into the expected arguments for a given routine.
      *
@@ -96,7 +97,7 @@ export declare class ManifestCoder {
      * @returns The encoded manifest as a hexadecimal string prefixed with "0x".
      * @throws Will throw an error if the manifest type is unsupported.
      */
-    static encodeManifest(manifest: string | LogicManifest.Manifest): string;
+    static encodeManifest(manifest: string | LogicManifest.Manifest): Hex;
     /**
      * Decodes a given manifest in either JSON format.
      *
@@ -109,15 +110,15 @@ export declare class ManifestCoder {
      */
     static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.JSON): LogicManifest.Manifest;
     /**
-    * Decodes a given manifest in either YAML format.
-    *
-    * @param {string | Uint8Array} manifest The manifest data to decode, provided as a string or Uint8Array.
-    * @param {ManifestCoderFormat} format The format of the manifest in YAML string.
-    *
-    * @returns {string} Returns a YAML string representation.
-    *
-    * @throws {Error} Throws an error if the format is unsupported.
-    */
+     * Decodes a given manifest in either YAML format.
+     *
+     * @param {string | Uint8Array} manifest The manifest data to decode, provided as a string or Uint8Array.
+     * @param {ManifestCoderFormat} format The format of the manifest in YAML string.
+     *
+     * @returns {string} Returns a YAML string representation.
+     *
+     * @throws {Error} Throws an error if the format is unsupported.
+     */
     static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.YAML): string;
 }
 //# sourceMappingURL=manifest.d.ts.map
