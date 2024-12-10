@@ -3,9 +3,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
+exports.isAddress = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
 const buffer_1 = require("buffer");
+const errors_1 = require("./errors");
+/**
+ * Ensures that a given string has the '0x' prefix.
+ * If the string already has the prefix, it is returned as is.
+ * Otherwise, the prefix is added to the string.
+ *
+ * @param {string} hex - The input string.
+ * @returns {Hex} The string with the '0x' prefix.
+ */
+const ensureHexPrefix = (hex) => {
+    if (typeof hex !== "string") {
+        throw new TypeError("Input must be a string");
+    }
+    return (hex.startsWith("0x") ? hex : `0x${hex}`);
+};
+exports.ensureHexPrefix = ensureHexPrefix;
 /**
  * Converts a number, bigint, or BN instance to a hexadecimal string representation.
  * If the input value is not already a BN instance, it is converted to one.
@@ -20,37 +36,34 @@ const numToHex = (value) => {
         value = new bn_js_1.default(value);
     }
     if (value.lt(new bn_js_1.default(0))) {
-        throw new Error('Input must be a positive BN value');
+        throw new Error("Input must be a positive BN value");
     }
     const bigNum = new bn_js_1.default(value.toString()); // Convert bigint to bn.js BN instance
-    return bigNum.toString(16).toUpperCase();
+    return (0, exports.ensureHexPrefix)(bigNum.toString("hex"));
 };
 exports.numToHex = numToHex;
 /**
+ * @deprecated Use `numToHex` instead.
+ *
  * Converts a number, bigint, or BN instance to a quantity string representation.
  * The quantity string is prefixed with "0x" and is obtained by calling `numToHex` function.
  *
  * @param {NumberLike} value - The value to convert to a quantity string.
- * @returns {string} - The quantity string representation of the value.
+ * @returns {Hex} - The quantity string representation of the value.
  * @throws {Error} If an error occurs during the conversion.
  */
-const toQuantity = (value) => {
-    try {
-        return "0x" + (0, exports.numToHex)(value);
-    }
-    catch (err) {
-        throw err;
-    }
-};
+const toQuantity = (value) => (0, exports.numToHex)(value);
 exports.toQuantity = toQuantity;
 /**
+ * @deprecated Use `bytesToHex` instead.
+ *
  * Converts a Uint8Array to a hexadecimal string representation.
  *
  * @param {Uint8Array} data - The Uint8Array to encode as a hexadecimal string.
- * @returns {string} The hexadecimal string representation of the Uint8Array.
+ * @returns {Hex} The hexadecimal string representation of the Uint8Array.
  */
 const encodeToString = (data) => {
-    return "0x" + buffer_1.Buffer.from(data).toString('hex');
+    return (0, exports.ensureHexPrefix)(buffer_1.Buffer.from(data).toString("hex"));
 };
 exports.encodeToString = encodeToString;
 /**
@@ -61,9 +74,9 @@ exports.encodeToString = encodeToString;
  * @throws {Error} If the input string is not a valid hexadecimal string.
  */
 const hexToBytes = (str) => {
-    const hex = str.replace(/^0x/, '').trim();
+    const hex = str.replace(/^0x/, "").trim();
     if (hex.length % 2 !== 0) {
-        throw new Error('Invalid hex string');
+        throw new Error("Invalid hex string");
     }
     const bytes = new Uint8Array(hex.length / 2);
     for (let i = 0; i < hex.length; i += 2) {
@@ -105,17 +118,29 @@ exports.hexToBN = hexToBN;
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const bytesToHex = (data) => {
-    return buffer_1.Buffer.from(data).toString('hex');
+    return `0x${buffer_1.Buffer.from(data).toString("hex")}`;
 };
 exports.bytesToHex = bytesToHex;
 /**
- * Checks if a given string is a valid hexadecimal value.
+ * Checks if a given value is a hexadecimal string.
+ * Optionally, the length of the hexadecimal string can be specified.
  *
- * @param {string} data - The input string.
- * @returns {boolean} True if the input is a valid hexadecimal string, false otherwise.
+ * @param {unknown} value - The value to check.
+ * @param {number} byteLength - The length of the in terms of bytes l.
+ * @returns {boolean} True if the value is a hexadecimal string, false otherwise.
  */
-const isHex = (data) => {
-    return /^(0x)?[0-9A-Fa-f]+$/g.test(data);
+const isHex = (value, byteLength) => {
+    if (typeof value !== "string" || value === "0x") {
+        return false;
+    }
+    let rgx = /^0x[0-9a-fA-F]*$/;
+    if (byteLength != null) {
+        if (byteLength <= 0) {
+            errors_1.ErrorUtils.throwArgumentError("Invalid length, must be a non zero positive number", "length", byteLength);
+        }
+        rgx = new RegExp(`^0x[0-9a-fA-F]{${byteLength * 2}}$`);
+    }
+    return rgx.test(value);
 };
 exports.isHex = isHex;
 /**
@@ -125,10 +150,15 @@ exports.isHex = isHex;
  * @returns {string} The trimmed hexadecimal string.
  */
 const trimHexPrefix = (data) => {
-    if ((0, exports.isHex)(data) && data.startsWith('0x')) {
-        data = data.slice(2);
-    }
-    return data;
+    return data.startsWith("0x") ? data.slice(2) : data;
 };
 exports.trimHexPrefix = trimHexPrefix;
+/**
+ * Checks if a given value is an address.
+ *
+ * @param {unknown} value - The value to check.
+ * @returns {boolean} True if the value is an address, false otherwise.
+ */
+const isAddress = (value) => (0, exports.isHex)(value, 32);
+exports.isAddress = isAddress;
 //# sourceMappingURL=hex.js.map

@@ -1,10 +1,10 @@
-export { Hex } from "../types/hex";
+export { Hex as Hex } from "../types/hex";
 export {
     AssetCreationResult,
     AssetSupplyResult,
     LogicDeployResult,
+    LogicEnlistResult,
     LogicInvokeResult,
-    LogicEnlistResult
 } from "../types/receipt";
 export * from "./address";
 export * from "./asset";
@@ -22,4 +22,3 @@ export { Interaction, Participant, Participants } from "../types/interaction";
 export { Tesseract } from "../types/tesseract";
 
 export { topicHash } from "./logic-events";
-
