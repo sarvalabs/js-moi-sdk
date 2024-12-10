@@ -8,6 +8,7 @@
         "moduleResolution": "NodeNext",
         "declaration": true,
         "pretty": true,
+        "strict": false,
         "sourceMap": true,
         "outDir": "dist",
         "declarationMap": true,
@@ -81,11 +82,11 @@
         },
         {
             "path": "./packages/js-moi/tsconfig.cjs.json"
-        }, 
+        },
         {
             "path": "./packages/js-moi/tsconfig.esm.json"
         }
     ],
     "include": ["packages/**/*.ts"],
-    "exclude": ["node_modules", "**/__tests__/**" ,"dist"]
+    "exclude": ["node_modules", "**/__tests__/**", "dist"]
 }
