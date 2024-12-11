@@ -15,5 +15,10 @@ export type TesseractReference = AbsoluteTesseractReference["absolute"] | Relati
 export type TesseractIncludes = IncludesLookup["moi.Tesseract"][];
 
 export interface TesseractReferenceOption {
+    /**
+     * The reference to the tesseract.
+     * 
+     * It can be either an absolute reference or a relative reference.
+     */
     reference?: TesseractReference;
 }
