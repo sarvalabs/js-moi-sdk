@@ -1,5 +1,5 @@
 import type { Hex } from "js-moi-utils";
-import type { AccountParam, AssetParam, ClientTesseractReferenceParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo } from "./shared";
+import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, TesseractReferenceParam } from "./shared";
 
 interface RpcMethodLookup {
     "moi.Version": {
@@ -7,7 +7,7 @@ interface RpcMethodLookup {
         response: MoiClientInfo;
     };
     "moi.Tesseract": {
-        params: [Required<ClientTesseractReferenceParam> & IncludesParam<"moi.Tesseract">];
+        params: [Required<TesseractReferenceParam> & IncludesParam<"moi.Tesseract">];
         response: unknown;
     };
     "moi.Interaction": {
@@ -15,7 +15,7 @@ interface RpcMethodLookup {
         response: { ix_data: unknown };
     };
     "moi.Account": {
-        params: [AccountParam & ClientTesseractReferenceParam & IncludesParam<"moi.Account">];
+        params: [AccountParam & TesseractReferenceParam & IncludesParam<"moi.Account">];
         response: { account_data: unknown };
     };
     "moi.AccountKey": {
@@ -23,19 +23,19 @@ interface RpcMethodLookup {
         response: { key_data: unknown };
     };
     "moi.AccountAsset": {
-        params: [AccountParam & AssetParam & ClientTesseractReferenceParam & IncludesParam<"moi.AccountAsset">];
+        params: [AccountParam & AssetParam & TesseractReferenceParam & IncludesParam<"moi.AccountAsset">];
         response: { asset_data: unknown };
     };
     "moi.Asset": {
-        params: [AssetParam & ClientTesseractReferenceParam];
+        params: [AssetParam & TesseractReferenceParam];
         response: { asset_data: unknown };
     };
     "moi.Logic": {
-        params: [LogicParam & ClientTesseractReferenceParam];
+        params: [LogicParam & TesseractReferenceParam];
         response: { logic_data: unknown };
     };
     "moi.LogicStorage": {
-        params: [LogicParam & Partial<AccountParam> & ClientTesseractReferenceParam & { storage_key: Hex }];
+        params: [LogicParam & Partial<AccountParam> & TesseractReferenceParam & { storage_key: Hex }];
         response: Hex;
     };
 }

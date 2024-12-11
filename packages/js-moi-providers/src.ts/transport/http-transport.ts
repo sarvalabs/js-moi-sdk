@@ -1,5 +1,5 @@
 import type { JsonRpcRequest, JsonRpcResponse } from "../types/json-rpc";
-import type { Transport } from "../types/provider";
+import type { Transport } from "../types/transport";
 
 export interface HttpTransportOption {
     debug?: (request: JsonRpcRequest, result: { success: boolean; cause?: unknown }) => void;

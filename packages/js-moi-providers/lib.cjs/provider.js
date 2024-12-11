@@ -11,7 +11,7 @@ class Provider {
         this.transport = transport;
     }
     async execute(method, ...params) {
-        const response = await this.transport.request(method, ...params);
+        const response = await this.transport.request(method, params);
         return Provider.processJsonRpcResponse(response);
     }
     async request(method, ...params) {
@@ -25,21 +25,17 @@ class Provider {
     async getVersion() {
         return await this.execute("moi.Version");
     }
-    async getTesseractByReference(reference, includes = []) {
-        return await this.execute("moi.Tesseract", {
-            include: includes,
-            reference: Provider.processTesseractReference(reference),
-        });
+    async getTesseractByReference(reference, include = []) {
+        return await this.execute("moi.Tesseract", { reference, include });
     }
-    async getTesseractByHash(tesseractHash, include) {
-        return await this.getTesseractByReference(tesseractHash, include);
+    async getTesseractByHash(hash, include) {
+        return await this.getTesseractByReference({ absolute: hash }, include);
     }
     async getTesseractByAddressAndHeight(address, height, include) {
         if (height < -1) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        const ref = { address, height };
-        return await this.getTesseractByReference(ref, include);
+        return await this.getTesseractByReference({ relative: { address, height } }, include);
     }
     async getTesseract(hashOrAddress, heightOrInclude, include) {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
@@ -70,11 +66,7 @@ class Provider {
      * @returns A promise that resolves to the account information
      */
     async getAccount(address, option) {
-        return await this.execute("moi.Account", {
-            address,
-            include: option?.include,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+        return await this.execute("moi.Account", { address, ...option });
     }
     /**
      * Retrieves the account key for an account.
@@ -102,12 +94,7 @@ class Provider {
      * @returns A promise that resolves to the account asset information
      */
     async getAccountAsset(address, assetId, option) {
-        return await this.execute("moi.AccountAsset", {
-            address,
-            asset_id: assetId,
-            include: option?.include,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+        return await this.execute("moi.AccountAsset", { address, asset_id: assetId, ...option });
     }
     /**
      * Retrieves information about an asset
@@ -118,10 +105,7 @@ class Provider {
      * @returns A promise that resolves to the asset information
      */
     async getAsset(assetId, option) {
-        return await this.execute("moi.Asset", {
-            asset_id: assetId,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+        return await this.execute("moi.Asset", { asset_id: assetId, ...option });
     }
     /**
      * Retrieves information about a logic
@@ -132,31 +116,15 @@ class Provider {
      * @returns A promise that resolves to the logic information
      */
     async getLogic(logicId, option) {
-        return await this.execute("moi.Logic", {
-            logic_id: logicId,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+        return await this.execute("moi.Logic", { logic_id: logicId, ...option });
     }
     async getLogicStorage(logicId, key, addressOrOption, option) {
         let params;
         if (addressOrOption == null || typeof addressOrOption === "object") {
-            params = [
-                {
-                    logic_id: logicId,
-                    storage_key: key,
-                    reference: addressOrOption?.reference ? Provider.processTesseractReference(addressOrOption.reference) : undefined,
-                },
-            ];
+            params = [{ logic_id: logicId, storage_key: key, ...addressOrOption }];
         }
         if ((0, js_moi_utils_1.isAddress)(addressOrOption)) {
-            params = [
-                {
-                    logic_id: logicId,
-                    storage_key: key,
-                    address: addressOrOption,
-                    reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-                },
-            ];
+            params = [{ logic_id: logicId, storage_key: key, address: addressOrOption, ...option }];
         }
         if (params == null) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
@@ -179,18 +147,6 @@ class Provider {
             js_moi_utils_1.ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
         return response.result;
-    }
-    /**
-     * Processes a Tesseract reference and returns a `ClientTesseractReference`.
-     *
-     * @param reference - The Tesseract reference to process. It can be either an absolute or relative reference.
-     * @returns A `ClientTesseractReference` object containing either an absolute or relative reference.
-     */
-    static processTesseractReference(reference) {
-        if ((0, js_moi_utils_1.isHex)(reference)) {
-            return { absolute: reference };
-        }
-        return { relative: reference };
     }
 }
 exports.Provider = Provider;

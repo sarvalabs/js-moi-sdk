@@ -17,6 +17,8 @@ export interface IncludesLookup {
     "moi.Account": "keys" | "state" | "balances" | "mandates" | "deposits" | "logics" | "guardians" | "controlled" | "enlisted";
     "moi.AccountAsset": "balances" | "mandates" | "deposits";
 }
+export type IncludeFieldsFor<T extends keyof IncludesLookup> = IncludesLookup[T][];
+export type TesseractIncludeFields = IncludeFieldsFor<"moi.Tesseract">;
 export interface AbsoluteTesseractReference {
     /**
      * A 32-byte hash that is unique to the tesseract
@@ -38,23 +40,44 @@ export interface RelativeTesseractOption {
 export interface RelativeTesseractReference {
     relative: RelativeTesseractOption;
 }
-export type ClientTesseractReference = RelativeTesseractReference | AbsoluteTesseractReference;
-export interface ClientTesseractReferenceParam {
-    reference?: ClientTesseractReference;
+export type TesseractReference = {
+    relative: RelativeTesseractOption;
+    absolute?: undefined;
+} | {
+    absolute: Hex;
+    relative?: undefined;
+};
+export interface TesseractReferenceParam {
+    reference?: TesseractReference;
 }
 export interface IncludesParam<T extends keyof IncludesLookup> {
-    include?: IncludesLookup[T][];
+    /**
+     * A list of strings indicating the properties to include in the response for provided method.
+     */
+    include?: IncludeFieldsFor<T>;
 }
 export interface InteractionParam {
+    /**
+     * The unique identifier of the interaction
+     */
     hash: Hex;
 }
 export interface AccountParam {
+    /**
+     * The unique identifier of the account
+     */
     address: Address;
 }
 export interface AssetParam {
+    /**
+     * The unique identifier of the asset
+     */
     asset_id: Hex;
 }
 export interface LogicParam {
+    /**
+     * The unique identifier of the logic
+     */
     logic_id: Hex;
 }
 //# sourceMappingURL=shared.d.ts.map

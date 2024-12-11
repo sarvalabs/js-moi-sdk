@@ -1,8 +1,9 @@
 import { type Hex } from "js-moi-utils";
 import type { JsonRpcResponse } from "./types/json-rpc.ts";
 import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
-import type { TesseractIncludes, TesseractReference, TesseractReferenceOption, Transport } from "./types/provider.d.ts";
-import type { ClientTesseractReference, IncludesParam, MoiClientInfo, RelativeTesseractOption } from "./types/shared.d.ts";
+import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields } from "./types/shared.d.ts";
+import type { Transport } from "./types/transport.js";
+type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider {
     private readonly transport;
     constructor(transport: Transport);
@@ -20,11 +21,11 @@ export declare class Provider {
     /**
      * Retrieves a tesseract by its hash
      *
-     * @param tesseractHash - The hash of the tesseract to retrieve.
+     * @param hash - The hash of the tesseract to retrieve.
      * @param include - The fields to include in the response.
      * @returns A promise that resolves to the tesseract.
      */
-    getTesseract(tesseractHash: Hex, include?: TesseractIncludes): Promise<unknown>;
+    getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<unknown>;
     /**
      * Retrieves a tesseract by its address and height
      *
@@ -34,7 +35,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    getTesseract(address: Hex, height: number, include?: TesseractIncludes): Promise<unknown>;
+    getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<unknown>;
     /**
      * Retrieves a tesseract by its relative reference
      *
@@ -43,7 +44,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludes): Promise<unknown>;
+    getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<unknown>;
     /**
      * Retrieves an interaction by its hash.
      *
@@ -58,7 +59,7 @@ export declare class Provider {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown>;
+    getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "address">): Promise<unknown>;
     /**
      * Retrieves the account key for an account.
      *
@@ -80,7 +81,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the account asset information
      */
-    getAccountAsset(address: Hex, assetId: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.AccountAsset">): Promise<unknown>;
+    getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<unknown>;
     /**
      * Retrieves information about an asset
      *
@@ -89,7 +90,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the asset information
      */
-    getAsset(assetId: Hex, option?: TesseractReferenceOption): Promise<unknown>;
+    getAsset(assetId: Hex, option?: Omit<RpcMethodParams<"moi.Asset">[0], "asset_id">): Promise<unknown>;
     /**
      * Retrieves information about a logic
      *
@@ -98,7 +99,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the logic information
      */
-    getLogic(logicId: Hex, option?: TesseractReferenceOption): Promise<unknown>;
+    getLogic(logicId: Hex, option?: Omit<RpcMethodParams<"moi.Logic">[0], "logic_id">): Promise<unknown>;
     /**
      * Retrieves the value of a storage key for a logic from persistent storage
      *
@@ -108,7 +109,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the value of the storage key
      */
-    getLogicStorage(logicId: Hex, key: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    getLogicStorage(logicId: Hex, key: Hex, option?: LogicStorageOption): Promise<Hex>;
     /**
      * Retrieves the value of a storage key for a logic from ephemeral storage
      *
@@ -119,7 +120,7 @@ export declare class Provider {
      *
      * @returns A promise that resolves to the value of the storage key
      */
-    getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
@@ -130,12 +131,6 @@ export declare class Provider {
      * @throws Will throw an error if the response contains an error.
      */
     protected static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;
-    /**
-     * Processes a Tesseract reference and returns a `ClientTesseractReference`.
-     *
-     * @param reference - The Tesseract reference to process. It can be either an absolute or relative reference.
-     * @returns A `ClientTesseractReference` object containing either an absolute or relative reference.
-     */
-    protected static processTesseractReference(reference: TesseractReference): ClientTesseractReference;
 }
+export {};
 //# sourceMappingURL=provider.d.ts.map

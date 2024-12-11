@@ -1,5 +1,5 @@
-export type { TesseractReference, Transport } from "./types/provider";
-export type { MoiClientInfo } from "./types/shared";
-export { JsonRpcProvider } from "./json-rpc-provider";
+export type { AccountParam, AssetParam, IncludeFieldsFor, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, RelativeTesseractOption, TesseractReference, TesseractReferenceParam, } from "./types/shared";
+export type { Transport } from "./types/transport";
+export { JsonRpcProvider, type JsonRpcProviderOption } from "./json-rpc-provider";
 export { Provider } from "./provider";
 //# sourceMappingURL=index.d.ts.map

@@ -2,8 +2,10 @@ import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils"
 
 import type { JsonRpcResponse } from "./types/json-rpc.ts";
 import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
-import type { TesseractIncludes, TesseractReference, TesseractReferenceOption, Transport } from "./types/provider.d.ts";
-import type { ClientTesseractReference, IncludesParam, MoiClientInfo, RelativeTesseractOption } from "./types/shared.d.ts";
+import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields, TesseractReference } from "./types/shared.d.ts";
+import type { Transport } from "./types/transport.js";
+
+type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 
 export class Provider {
     private readonly transport: Transport;
@@ -17,7 +19,7 @@ export class Provider {
     }
 
     protected async execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
-        const response = await this.transport.request<RpcMethodResponse<T>>(method, ...params);
+        const response = await this.transport.request<RpcMethodResponse<T>>(method, params);
         return Provider.processJsonRpcResponse(response);
     }
 
@@ -34,34 +36,30 @@ export class Provider {
         return await this.execute("moi.Version");
     }
 
-    private async getTesseractByReference(reference: TesseractReference, includes: TesseractIncludes = []): Promise<unknown> {
-        return await this.execute("moi.Tesseract", {
-            include: includes,
-            reference: Provider.processTesseractReference(reference),
-        });
+    private async getTesseractByReference(reference: TesseractReference, include: TesseractIncludeFields = []): Promise<unknown> {
+        return await this.execute("moi.Tesseract", { reference, include });
     }
 
-    private async getTesseractByHash(tesseractHash: Hex, include?: TesseractIncludes): Promise<unknown> {
-        return await this.getTesseractByReference(tesseractHash, include);
+    private async getTesseractByHash(hash: Hex, include?: TesseractIncludeFields): Promise<unknown> {
+        return await this.getTesseractByReference({ absolute: hash }, include);
     }
 
-    private async getTesseractByAddressAndHeight(address: Hex, height: number, include?: TesseractIncludes): Promise<unknown> {
+    private async getTesseractByAddressAndHeight(address: Hex, height: number, include?: TesseractIncludeFields): Promise<unknown> {
         if (height < -1) {
             ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
         }
 
-        const ref: TesseractReference = { address, height };
-        return await this.getTesseractByReference(ref, include);
+        return await this.getTesseractByReference({ relative: { address, height } }, include);
     }
 
     /**
      * Retrieves a tesseract by its hash
      *
-     * @param tesseractHash - The hash of the tesseract to retrieve.
+     * @param hash - The hash of the tesseract to retrieve.
      * @param include - The fields to include in the response.
      * @returns A promise that resolves to the tesseract.
      */
-    public getTesseract(tesseractHash: Hex, include?: TesseractIncludes): Promise<unknown>;
+    public getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<unknown>;
     /**
      * Retrieves a tesseract by its address and height
      *
@@ -71,7 +69,7 @@ export class Provider {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    public getTesseract(address: Hex, height: number, include?: TesseractIncludes): Promise<unknown>;
+    public getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<unknown>;
     /**
      * Retrieves a tesseract by its relative reference
      *
@@ -80,8 +78,8 @@ export class Provider {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    public getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludes): Promise<unknown>;
-    public async getTesseract(hashOrAddress: Hex | RelativeTesseractOption, heightOrInclude?: number | TesseractIncludes, include?: TesseractIncludes): Promise<unknown> {
+    public getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<unknown>;
+    public async getTesseract(hashOrAddress: Hex | RelativeTesseractOption, heightOrInclude?: number | TesseractIncludeFields, include?: TesseractIncludeFields): Promise<unknown> {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
             return await this.getTesseractByAddressAndHeight(hashOrAddress.address, hashOrAddress.height, heightOrInclude);
         }
@@ -114,12 +112,8 @@ export class Provider {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    public async getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown> {
-        return await this.execute("moi.Account", {
-            address,
-            include: option?.include,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+    public async getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "address">): Promise<unknown> {
+        return await this.execute("moi.Account", { address, ...option });
     }
 
     /**
@@ -148,13 +142,8 @@ export class Provider {
      *
      * @returns A promise that resolves to the account asset information
      */
-    public async getAccountAsset(address: Hex, assetId: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.AccountAsset">): Promise<unknown> {
-        return await this.execute("moi.AccountAsset", {
-            address,
-            asset_id: assetId,
-            include: option?.include,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+    public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<unknown> {
+        return await this.execute("moi.AccountAsset", { address, asset_id: assetId, ...option });
     }
 
     /**
@@ -165,11 +154,8 @@ export class Provider {
      *
      * @returns A promise that resolves to the asset information
      */
-    public async getAsset(assetId: Hex, option?: TesseractReferenceOption): Promise<unknown> {
-        return await this.execute("moi.Asset", {
-            asset_id: assetId,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+    public async getAsset(assetId: Hex, option?: Omit<RpcMethodParams<"moi.Asset">[0], "asset_id">): Promise<unknown> {
+        return await this.execute("moi.Asset", { asset_id: assetId, ...option });
     }
 
     /**
@@ -180,11 +166,8 @@ export class Provider {
      *
      * @returns A promise that resolves to the logic information
      */
-    public async getLogic(logicId: Hex, option?: TesseractReferenceOption): Promise<unknown> {
-        return await this.execute("moi.Logic", {
-            logic_id: logicId,
-            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-        });
+    public async getLogic(logicId: Hex, option?: Omit<RpcMethodParams<"moi.Logic">[0], "logic_id">): Promise<unknown> {
+        return await this.execute("moi.Logic", { logic_id: logicId, ...option });
     }
 
     /**
@@ -196,7 +179,7 @@ export class Provider {
      *
      * @returns A promise that resolves to the value of the storage key
      */
-    public async getLogicStorage(logicId: Hex, key: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    public async getLogicStorage(logicId: Hex, key: Hex, option?: LogicStorageOption): Promise<Hex>;
     /**
      * Retrieves the value of a storage key for a logic from ephemeral storage
      *
@@ -207,29 +190,16 @@ export class Provider {
      *
      * @returns A promise that resolves to the value of the storage key
      */
-    public async getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: TesseractReferenceOption): Promise<Hex>;
-    public async getLogicStorage(logicId: Hex, key: Hex, addressOrOption?: Hex | TesseractReferenceOption, option?: TesseractReferenceOption): Promise<Hex> {
+    public async getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
+    public async getLogicStorage(logicId: Hex, key: Hex, addressOrOption?: Hex | LogicStorageOption, option?: LogicStorageOption): Promise<Hex> {
         let params: RpcMethodParams<"moi.LogicStorage"> | undefined;
 
         if (addressOrOption == null || typeof addressOrOption === "object") {
-            params = [
-                {
-                    logic_id: logicId,
-                    storage_key: key,
-                    reference: addressOrOption?.reference ? Provider.processTesseractReference(addressOrOption.reference) : undefined,
-                },
-            ];
+            params = [{ logic_id: logicId, storage_key: key, ...addressOrOption }];
         }
 
         if (isAddress(addressOrOption)) {
-            params = [
-                {
-                    logic_id: logicId,
-                    storage_key: key,
-                    address: addressOrOption,
-                    reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
-                },
-            ];
+            params = [{ logic_id: logicId, storage_key: key, address: addressOrOption, ...option }];
         }
 
         if (params == null) {
@@ -256,19 +226,5 @@ export class Provider {
         }
 
         return response.result;
-    }
-
-    /**
-     * Processes a Tesseract reference and returns a `ClientTesseractReference`.
-     *
-     * @param reference - The Tesseract reference to process. It can be either an absolute or relative reference.
-     * @returns A `ClientTesseractReference` object containing either an absolute or relative reference.
-     */
-    protected static processTesseractReference(reference: TesseractReference): ClientTesseractReference {
-        if (isHex(reference)) {
-            return { absolute: reference };
-        }
-
-        return { relative: reference };
     }
 }
