@@ -25,6 +25,10 @@ interface RpcMethodLookup {
         params: [AccountParam & AssetParam & ClientTesseractReferenceParam & IncludesParam<"moi.AccountAsset">];
         response: { asset_data: unknown };
     };
+    "moi.Asset": {
+        params: [AssetParam & ClientTesseractReferenceParam];
+        response: { asset_data: unknown };
+    };
 }
 
 export type RpcMethod = keyof RpcMethodLookup;

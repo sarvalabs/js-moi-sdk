@@ -52,7 +52,7 @@ export declare class Provider {
      */
     getInteraction(hash: Hex): Promise<unknown>;
     /**
-     * Retrieves the account information by its address and options.
+     * Retrieves information about an account.
      *
      * @param address The address that uniquely identifies the account
      * @param option The options to include and reference
@@ -60,7 +60,7 @@ export declare class Provider {
      */
     getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown>;
     /**
-     * Retrieves the account key by its address and key id.
+     * Retrieves the account key for an account.
      *
      * @param address The address that uniquely identifies the account
      * @param keyId The key id that uniquely identifies the account key
@@ -71,7 +71,25 @@ export declare class Provider {
     getAccountKey(address: Hex, keyId: number, pending?: boolean): Promise<{
         key_data: unknown;
     }>;
+    /**
+     * Retrieves the balances, mandates and deposits for a specific asset on an account
+     *
+     * @param address The address that uniquely identifies the account
+     * @param assetId The asset id that uniquely identifies the asset
+     * @param option The options to include and reference
+     *
+     * @returns A promise that resolves to the account asset information
+     */
     getAccountAsset(address: Hex, assetId: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.AccountAsset">): Promise<unknown>;
+    /**
+     * Retrieves information about an asset
+     *
+     * @param assetId The asset id that uniquely identifies the asset
+     * @param option The options to include and reference
+     *
+     * @returns A promise that resolves to the asset information
+     */
+    getAsset(assetId: Hex, option?: TesseractReferenceOption): Promise<unknown>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

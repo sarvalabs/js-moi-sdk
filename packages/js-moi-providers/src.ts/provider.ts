@@ -108,7 +108,7 @@ export class Provider {
     }
 
     /**
-     * Retrieves the account information by its address and options.
+     * Retrieves information about an account.
      *
      * @param address The address that uniquely identifies the account
      * @param option The options to include and reference
@@ -123,7 +123,7 @@ export class Provider {
     }
 
     /**
-     * Retrieves the account key by its address and key id.
+     * Retrieves the account key for an account.
      *
      * @param address The address that uniquely identifies the account
      * @param keyId The key id that uniquely identifies the account key
@@ -132,14 +132,42 @@ export class Provider {
      * @returns A promise that resolves to the account information for the provided key id
      */
     public async getAccountKey(address: Hex, keyId: number, pending?: boolean) {
-        return await this.execute("moi.AccountKey", { address, key_id: keyId, pending });
+        return await this.execute("moi.AccountKey", {
+            address,
+            key_id: keyId,
+            pending,
+        });
     }
 
+    /**
+     * Retrieves the balances, mandates and deposits for a specific asset on an account
+     *
+     * @param address The address that uniquely identifies the account
+     * @param assetId The asset id that uniquely identifies the asset
+     * @param option The options to include and reference
+     *
+     * @returns A promise that resolves to the account asset information
+     */
     public async getAccountAsset(address: Hex, assetId: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.AccountAsset">): Promise<unknown> {
         return await this.execute("moi.AccountAsset", {
             address,
             asset_id: assetId,
             include: option?.include,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
+    }
+
+    /**
+     * Retrieves information about an asset
+     *
+     * @param assetId The asset id that uniquely identifies the asset
+     * @param option The options to include and reference
+     *
+     * @returns A promise that resolves to the asset information
+     */
+    public async getAsset(assetId: Hex, option?: TesseractReferenceOption): Promise<unknown> {
+        return await this.execute("moi.Asset", {
+            asset_id: assetId,
             reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
         });
     }

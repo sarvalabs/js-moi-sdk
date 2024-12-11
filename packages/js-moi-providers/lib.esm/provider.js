@@ -60,7 +60,7 @@ export class Provider {
         return await this.execute("moi.Interaction", { hash });
     }
     /**
-     * Retrieves the account information by its address and options.
+     * Retrieves information about an account.
      *
      * @param address The address that uniquely identifies the account
      * @param option The options to include and reference
@@ -74,7 +74,7 @@ export class Provider {
         });
     }
     /**
-     * Retrieves the account key by its address and key id.
+     * Retrieves the account key for an account.
      *
      * @param address The address that uniquely identifies the account
      * @param keyId The key id that uniquely identifies the account key
@@ -83,13 +83,40 @@ export class Provider {
      * @returns A promise that resolves to the account information for the provided key id
      */
     async getAccountKey(address, keyId, pending) {
-        return await this.execute("moi.AccountKey", { address, key_id: keyId, pending });
+        return await this.execute("moi.AccountKey", {
+            address,
+            key_id: keyId,
+            pending,
+        });
     }
+    /**
+     * Retrieves the balances, mandates and deposits for a specific asset on an account
+     *
+     * @param address The address that uniquely identifies the account
+     * @param assetId The asset id that uniquely identifies the asset
+     * @param option The options to include and reference
+     *
+     * @returns A promise that resolves to the account asset information
+     */
     async getAccountAsset(address, assetId, option) {
         return await this.execute("moi.AccountAsset", {
             address,
             asset_id: assetId,
             include: option?.include,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
+    }
+    /**
+     * Retrieves information about an asset
+     *
+     * @param assetId The asset id that uniquely identifies the asset
+     * @param option The options to include and reference
+     *
+     * @returns A promise that resolves to the asset information
+     */
+    async getAsset(assetId, option) {
+        return await this.execute("moi.Asset", {
+            asset_id: assetId,
             reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
         });
     }

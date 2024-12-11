@@ -35,6 +35,12 @@ interface RpcMethodLookup {
             asset_data: unknown;
         };
     };
+    "moi.Asset": {
+        params: [AssetParam & ClientTesseractReferenceParam];
+        response: {
+            asset_data: unknown;
+        };
+    };
 }
 export type RpcMethod = keyof RpcMethodLookup;
 export type RpcMethodParams<T> = T extends RpcMethod ? RpcMethodLookup[T]["params"] : unknown[];
