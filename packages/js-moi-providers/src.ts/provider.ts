@@ -116,7 +116,7 @@ export class Provider {
      * @returns {T} - The result from the JSON-RPC response.
      * @throws Will throw an error if the response contains an error.
      */
-    public static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
+    protected static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
         if ("error" in response) {
             const { data } = response.error;
             const params = data ? (typeof data === "object" ? data : { data }) : {};

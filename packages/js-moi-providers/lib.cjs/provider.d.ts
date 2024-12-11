@@ -60,7 +60,7 @@ export declare class Provider {
      * @returns {T} - The result from the JSON-RPC response.
      * @throws Will throw an error if the response contains an error.
      */
-    static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;
+    protected static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;
     /**
      * Processes a Tesseract reference and returns a `ClientTesseractReference`.
      *
