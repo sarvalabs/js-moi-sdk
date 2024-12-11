@@ -65,3 +65,7 @@ export interface AccountParam {
 export interface AssetParam {
     asset_id: Hex;
 }
+
+export interface LogicParam {
+    logic_id: Hex;
+}

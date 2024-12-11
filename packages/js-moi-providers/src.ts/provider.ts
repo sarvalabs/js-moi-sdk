@@ -173,6 +173,73 @@ export class Provider {
     }
 
     /**
+     * Retrieves information about a logic
+     *
+     * @param logicId A unique identifier for the logic
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the logic information
+     */
+    public async getLogic(logicId: Hex, option?: TesseractReferenceOption): Promise<unknown> {
+        return await this.execute("moi.Logic", {
+            logic_id: logicId,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
+    }
+
+    /**
+     * Retrieves the value of a storage key for a logic from persistent storage
+     *
+     * @param logicId The unique identifier for the logic
+     * @param key The storage key to retrieve
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the value of the storage key
+     */
+    public async getLogicStorage(logicId: Hex, key: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    /**
+     * Retrieves the value of a storage key for a logic from ephemeral storage
+     *
+     * @param logicId The unique identifier for the logic
+     * @param key The storage key to retrieve
+     * @param address The address of the account to retrieve the storage key from
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the value of the storage key
+     */
+    public async getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    public async getLogicStorage(logicId: Hex, key: Hex, addressOrOption?: Hex | TesseractReferenceOption, option?: TesseractReferenceOption): Promise<Hex> {
+        let params: RpcMethodParams<"moi.LogicStorage"> | undefined;
+
+        if (addressOrOption == null || typeof addressOrOption === "object") {
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    reference: addressOrOption?.reference ? Provider.processTesseractReference(addressOrOption.reference) : undefined,
+                },
+            ];
+        }
+
+        if (isAddress(addressOrOption)) {
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    address: addressOrOption,
+                    reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+                },
+            ];
+        }
+
+        if (params == null) {
+            ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+        }
+
+        return await this.execute("moi.LogicStorage", ...params);
+    }
+
+    /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
      *

@@ -124,6 +124,46 @@ class Provider {
         });
     }
     /**
+     * Retrieves information about a logic
+     *
+     * @param logicId A unique identifier for the logic
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the logic information
+     */
+    async getLogic(logicId, option) {
+        return await this.execute("moi.Logic", {
+            logic_id: logicId,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
+    }
+    async getLogicStorage(logicId, key, addressOrOption, option) {
+        let params;
+        if (addressOrOption == null || typeof addressOrOption === "object") {
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    reference: addressOrOption?.reference ? Provider.processTesseractReference(addressOrOption.reference) : undefined,
+                },
+            ];
+        }
+        if ((0, js_moi_utils_1.isAddress)(addressOrOption)) {
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    address: addressOrOption,
+                    reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+                },
+            ];
+        }
+        if (params == null) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        return await this.execute("moi.LogicStorage", ...params);
+    }
+    /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
      *

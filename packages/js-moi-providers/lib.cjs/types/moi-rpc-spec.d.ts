@@ -1,4 +1,5 @@
-import type { AccountParam, AssetParam, ClientTesseractReferenceParam, IncludesParam, InteractionParam, MoiClientInfo } from "./shared";
+import type { Hex } from "js-moi-utils";
+import type { AccountParam, AssetParam, ClientTesseractReferenceParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo } from "./shared";
 interface RpcMethodLookup {
     "moi.Version": {
         params: [];
@@ -40,6 +41,18 @@ interface RpcMethodLookup {
         response: {
             asset_data: unknown;
         };
+    };
+    "moi.Logic": {
+        params: [LogicParam & ClientTesseractReferenceParam];
+        response: {
+            logic_data: unknown;
+        };
+    };
+    "moi.LogicStorage": {
+        params: [LogicParam & Partial<AccountParam> & ClientTesseractReferenceParam & {
+            storage_key: Hex;
+        }];
+        response: Hex;
     };
 }
 export type RpcMethod = keyof RpcMethodLookup;

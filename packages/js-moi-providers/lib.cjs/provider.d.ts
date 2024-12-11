@@ -91,6 +91,36 @@ export declare class Provider {
      */
     getAsset(assetId: Hex, option?: TesseractReferenceOption): Promise<unknown>;
     /**
+     * Retrieves information about a logic
+     *
+     * @param logicId A unique identifier for the logic
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the logic information
+     */
+    getLogic(logicId: Hex, option?: TesseractReferenceOption): Promise<unknown>;
+    /**
+     * Retrieves the value of a storage key for a logic from persistent storage
+     *
+     * @param logicId The unique identifier for the logic
+     * @param key The storage key to retrieve
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the value of the storage key
+     */
+    getLogicStorage(logicId: Hex, key: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    /**
+     * Retrieves the value of a storage key for a logic from ephemeral storage
+     *
+     * @param logicId The unique identifier for the logic
+     * @param key The storage key to retrieve
+     * @param address The address of the account to retrieve the storage key from
+     * @param option The options for the tesseract reference
+     *
+     * @returns A promise that resolves to the value of the storage key
+     */
+    getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: TesseractReferenceOption): Promise<Hex>;
+    /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
      *
