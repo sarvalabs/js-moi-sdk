@@ -27,7 +27,7 @@ class Provider {
     }
     async getTesseractByReference(reference, includes = []) {
         return await this.execute("moi.Tesseract", {
-            includes,
+            include: includes,
             reference: Provider.processTesseractReference(reference),
         });
     }
@@ -61,6 +61,13 @@ class Provider {
      */
     async getInteraction(hash) {
         return await this.execute("moi.Interaction", { hash });
+    }
+    async getAccount(address, option) {
+        return await this.execute("moi.Account", {
+            address,
+            include: option?.include,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
     }
     /**
      * Processes a JSON-RPC response and returns the result.

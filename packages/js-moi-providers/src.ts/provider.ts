@@ -1,9 +1,9 @@
 import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils";
 
 import type { JsonRpcResponse } from "./types/json-rpc.ts";
-import type { ClientTesseractReference, RelativeTesseractOption, RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
-import type { TesseractIncludes, TesseractReference, Transport } from "./types/provider.d.ts";
-import type { MoiClientInfo } from "./types/shared.d.ts";
+import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
+import type { TesseractIncludes, TesseractReference, TesseractReferenceOption, Transport } from "./types/provider.d.ts";
+import type { ClientTesseractReference, IncludesParam, MoiClientInfo, RelativeTesseractOption } from "./types/shared.d.ts";
 
 export class Provider {
     private readonly transport: Transport;
@@ -36,7 +36,7 @@ export class Provider {
 
     private async getTesseractByReference(reference: TesseractReference, includes: TesseractIncludes = []): Promise<unknown> {
         return await this.execute("moi.Tesseract", {
-            includes,
+            include: includes,
             reference: Provider.processTesseractReference(reference),
         });
     }
@@ -105,6 +105,14 @@ export class Provider {
      */
     public async getInteraction(hash: Hex): Promise<unknown> {
         return await this.execute("moi.Interaction", { hash });
+    }
+
+    public async getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown> {
+        return await this.execute("moi.Account", {
+            address,
+            include: option?.include,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
     }
 
     /**

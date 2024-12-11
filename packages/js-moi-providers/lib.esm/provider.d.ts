@@ -1,8 +1,8 @@
 import { type Hex } from "js-moi-utils";
 import type { JsonRpcResponse } from "./types/json-rpc.ts";
-import type { ClientTesseractReference, RelativeTesseractOption, RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
-import type { TesseractIncludes, TesseractReference, Transport } from "./types/provider.d.ts";
-import type { MoiClientInfo } from "./types/shared.d.ts";
+import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
+import type { TesseractIncludes, TesseractReference, TesseractReferenceOption, Transport } from "./types/provider.d.ts";
+import type { ClientTesseractReference, IncludesParam, MoiClientInfo, RelativeTesseractOption } from "./types/shared.d.ts";
 export declare class Provider {
     private readonly transport;
     constructor(transport: Transport);
@@ -51,6 +51,7 @@ export declare class Provider {
      * @returns A promise that resolves to the interaction.
      */
     getInteraction(hash: Hex): Promise<unknown>;
+    getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

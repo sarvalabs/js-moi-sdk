@@ -1,6 +1,5 @@
 import type { JsonRpcResponse } from "./json-rpc";
-import type { AbsoluteTesseractReference, RelativeTesseractReference } from "./moi-rpc-spec";
-import type { IncludesLookup } from "./shared";
+import type { AbsoluteTesseractReference, IncludesLookup, RelativeTesseractReference } from "./shared";
 export interface Transport {
     request<TResult = unknown>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<TResult>>;
 }
@@ -11,4 +10,7 @@ export interface Transport {
  */
 export type TesseractReference = AbsoluteTesseractReference["absolute"] | RelativeTesseractReference["relative"];
 export type TesseractIncludes = IncludesLookup["moi.Tesseract"][];
+export interface TesseractReferenceOption {
+    reference?: TesseractReference;
+}
 //# sourceMappingURL=provider.d.ts.map
