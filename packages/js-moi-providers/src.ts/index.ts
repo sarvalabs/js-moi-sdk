@@ -1,3 +1,4 @@
+export { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type {
     AccountParam,
     AssetParam,
