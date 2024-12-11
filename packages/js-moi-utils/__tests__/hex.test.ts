@@ -1,16 +1,6 @@
-import {
-    bytesToHex,
-    encodeToString,
-    hexToBN,
-    hexToBytes,
-    isHex,
-    numToHex,
-    toQuantity,
-    trimHexPrefix,
-} from "../src.ts/hex";
+import { bytesToHex, encodeToString, hexToBN, hexToBytes, isAddress, isHex, numToHex, toQuantity, trimHexPrefix } from "../src.ts/hex";
 
-const randomInt = (min: number, max: number) =>
-    Math.floor(Math.random() * (max - min + 1)) + min;
+const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 describe(numToHex.name, () => {
     test("should convert a positive number to a hexadecimal string", () => {
@@ -25,9 +15,7 @@ describe(numToHex.name, () => {
 
     test("should throw an error for a negative number", () => {
         const value = randomInt(0, 1000000000);
-        expect(() => numToHex(-value)).toThrow(
-            "Input must be a positive BN value"
-        );
+        expect(() => numToHex(-value)).toThrow("Input must be a positive BN value");
     });
 
     test("should have hex prefix in a result", () => {
@@ -48,9 +36,7 @@ describe(toQuantity.name, () => {
     });
 
     test("should throw an error for a negative number", () => {
-        expect(() => toQuantity(-123)).toThrow(
-            "Input must be a positive BN value"
-        );
+        expect(() => toQuantity(-123)).toThrow("Input must be a positive BN value");
     });
 });
 
@@ -105,8 +91,7 @@ describe(isHex.name, () => {
             {
                 input: "12345G",
                 expected: false,
-                message:
-                    "should return false for an invalid hexadecimal string",
+                message: "should return false for an invalid hexadecimal string",
             },
             {
                 input: 12345,
@@ -121,8 +106,7 @@ describe(isHex.name, () => {
             {
                 input: "1234ABCD",
                 expected: false,
-                message:
-                    "should return false for a string without the '0x' prefix",
+                message: "should return false for a string without the '0x' prefix",
             },
             {
                 input: "0x",
@@ -132,44 +116,37 @@ describe(isHex.name, () => {
             {
                 input: "0x123",
                 expected: true,
-                message:
-                    "should return true for a valid short hexadecimal string",
+                message: "should return true for a valid short hexadecimal string",
             },
             {
                 input: "0x1234567890abcdef",
                 expected: true,
-                message:
-                    "should return true for a valid long hexadecimal string",
+                message: "should return true for a valid long hexadecimal string",
             },
             {
                 input: "0x1234567890ABCDEF",
                 expected: true,
-                message:
-                    "should return true for a valid long uppercase hexadecimal string",
+                message: "should return true for a valid long uppercase hexadecimal string",
             },
             {
                 input: "0x1234567890abcdeg",
                 expected: false,
-                message:
-                    "should return false for a string with invalid characters",
+                message: "should return false for a string with invalid characters",
             },
             {
                 input: "0x1234567890abcdefg",
                 expected: false,
-                message:
-                    "should return false for a string with invalid characters at the end",
+                message: "should return false for a string with invalid characters at the end",
             },
             {
                 input: "0x1234567890abcdeff",
                 expected: true,
-                message:
-                    "should return true for a valid hexadecimal string with an even length",
+                message: "should return true for a valid hexadecimal string with an even length",
             },
             {
                 input: "0x1234567890abcdef0",
                 expected: true,
-                message:
-                    "should return true for a valid hexadecimal string with a trailing zero",
+                message: "should return true for a valid hexadecimal string with a trailing zero",
             },
         ];
 
@@ -186,44 +163,37 @@ describe(isHex.name, () => {
                 input: "0x1234ABCD",
                 length: 4,
                 expected: true,
-                message:
-                    "should return true for a valid hexadecimal string of correct length",
+                message: "should return true for a valid hexadecimal string of correct length",
             },
             {
                 input: "0x1234ABCD",
                 length: 3,
                 expected: false,
-                message:
-                    "should return false for a valid hexadecimal string of incorrect length",
+                message: "should return false for a valid hexadecimal string of incorrect length",
             },
             {
                 input: "0x12345G",
                 length: 3,
                 expected: false,
-                message:
-                    "should return false for an invalid hexadecimal string of correct length",
+                message: "should return false for an invalid hexadecimal string of correct length",
             },
             {
                 input: "0x1234",
                 length: 2,
                 expected: true,
-                message:
-                    "should return true for a valid short hexadecimal string of correct length",
+                message: "should return true for a valid short hexadecimal string of correct length",
             },
             {
                 input: "0x1234",
                 length: 3,
                 expected: false,
-                message:
-                    "should return false for a valid short hexadecimal string of incorrect length",
+                message: "should return false for a valid short hexadecimal string of incorrect length",
             },
         ];
 
         for (const testcase of testCasesWithLength) {
             test(testcase.message, () => {
-                expect(isHex(testcase.input, testcase.length)).toBe(
-                    testcase.expected
-                );
+                expect(isHex(testcase.input, testcase.length)).toBe(testcase.expected);
             });
         }
     });
@@ -236,5 +206,17 @@ describe(trimHexPrefix.name, () => {
 
     test("should not remove the '0x' prefix from a non-hexadecimal string", () => {
         expect(trimHexPrefix("0x12345G")).toBe("0x12345G");
+    });
+});
+
+describe(isAddress.name, () => {
+    test("should return true for a valid address", () => {
+        const address = bytesToHex(globalThis.crypto.getRandomValues(new Uint8Array(32)));
+        expect(isAddress(address)).toBe(true);
+    });
+
+    test("should return false for an invalid address", () => {
+        const address = bytesToHex(globalThis.crypto.getRandomValues(new Uint8Array(12)));
+        expect(isAddress(address)).toBe(false);
     });
 });

@@ -50,8 +50,8 @@ class CustomError extends Error {
     toString() {
         const messageDetails = Object.entries(this.params)
             .map(([key, value]) => `${key}=${serializeValue(value)}`)
-            .join(', ');
-        const errorMessageStack = messageDetails ? ` (${messageDetails})` : '';
+            .join(", ");
+        const errorMessageStack = messageDetails ? ` (${messageDetails})` : "";
         return `${this.reason}${errorMessageStack}`;
     }
 }

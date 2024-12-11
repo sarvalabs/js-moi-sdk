@@ -22,7 +22,7 @@ export enum ErrorCode {
     INTERACTION_UNDERPRICED = "ERROR_INTERACTION_UNDERPRICED",
     UNPREDICTABLE_FUEL_LIMIT = "ERROR_UNPREDICTABLE_FUEL_LIMIT",
     ACTION_REJECTED = "ERROR_ACTION_REJECTED",
-    INVALID_SIGNATURE = "ERROR_INVALID_SIGNATURE"
+    INVALID_SIGNATURE = "ERROR_INVALID_SIGNATURE",
 }
 
 /**
@@ -50,15 +50,15 @@ export class CustomError extends Error {
 
     /**
      * Overrides the toString() method to provide a string representation of the error.
-     * 
+     *
      * @returns {string} - The string representation of the error.
      */
     public toString(): string {
         const messageDetails = Object.entries(this.params)
             .map(([key, value]) => `${key}=${serializeValue(value)}`)
-            .join(', ');
+            .join(", ");
 
-        const errorMessageStack = messageDetails ? ` (${messageDetails})` : '';
+        const errorMessageStack = messageDetails ? ` (${messageDetails})` : "";
 
         return `${this.reason}${errorMessageStack}`;
     }
@@ -70,7 +70,7 @@ export class CustomError extends Error {
 export class ErrorUtils {
     /**
      * Throws a CustomError with the specified message, error code, and parameters.
-     * 
+     *
      * @param {string} message - The error message.
      * @param {ErrorCode} code - The error code.
      * @param {ErrorParams} params - The parameters of the error.
@@ -87,9 +87,9 @@ export class ErrorUtils {
     }
 
     /**
-     * Throws a CustomError with the specified argument-related error message, 
+     * Throws a CustomError with the specified argument-related error message,
      * argument name, and value.
-     * 
+     *
      * @param {string} message - The error message.
      * @param {string} name - The name of the argument.
      * @param {any} value - The value of the argument.
@@ -119,4 +119,4 @@ const serializeValue = (value: any): string => {
     } catch (error) {
         return String(value);
     }
-}
+};
