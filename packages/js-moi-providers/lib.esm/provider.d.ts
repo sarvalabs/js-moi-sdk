@@ -51,7 +51,27 @@ export declare class Provider {
      * @returns A promise that resolves to the interaction.
      */
     getInteraction(hash: Hex): Promise<unknown>;
+    /**
+     * Retrieves the account information by its address and options.
+     *
+     * @param address The address that uniquely identifies the account
+     * @param option The options to include and reference
+     * @returns A promise that resolves to the account information
+     */
     getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown>;
+    /**
+     * Retrieves the account key by its address and key id.
+     *
+     * @param address The address that uniquely identifies the account
+     * @param keyId The key id that uniquely identifies the account key
+     * @param pending Whether to include pending account keys
+     *
+     * @returns A promise that resolves to the account information for the provided key id
+     */
+    getAccountKey(address: Hex, keyId: number, pending?: boolean): Promise<{
+        key_data: unknown;
+    }>;
+    getAccountAsset(address: Hex, assetId: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.AccountAsset">): Promise<unknown>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

@@ -17,6 +17,7 @@ export interface MoiClientInfo {
 export interface IncludesLookup {
     "moi.Tesseract": "consensus" | "interactions" | "confirmations";
     "moi.Account": "keys" | "state" | "balances" | "mandates" | "deposits" | "logics" | "guardians" | "controlled" | "enlisted";
+    "moi.AccountAsset": "balances" | "mandates" | "deposits";
 }
 
 export interface AbsoluteTesseractReference {
@@ -59,4 +60,8 @@ export interface InteractionParam {
 
 export interface AccountParam {
     address: Address;
+}
+
+export interface AssetParam {
+    asset_id: Hex;
 }

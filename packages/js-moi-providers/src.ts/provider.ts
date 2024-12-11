@@ -107,9 +107,38 @@ export class Provider {
         return await this.execute("moi.Interaction", { hash });
     }
 
+    /**
+     * Retrieves the account information by its address and options.
+     *
+     * @param address The address that uniquely identifies the account
+     * @param option The options to include and reference
+     * @returns A promise that resolves to the account information
+     */
     public async getAccount(address: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.Account">): Promise<unknown> {
         return await this.execute("moi.Account", {
             address,
+            include: option?.include,
+            reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
+        });
+    }
+
+    /**
+     * Retrieves the account key by its address and key id.
+     *
+     * @param address The address that uniquely identifies the account
+     * @param keyId The key id that uniquely identifies the account key
+     * @param pending Whether to include pending account keys
+     *
+     * @returns A promise that resolves to the account information for the provided key id
+     */
+    public async getAccountKey(address: Hex, keyId: number, pending?: boolean) {
+        return await this.execute("moi.AccountKey", { address, key_id: keyId, pending });
+    }
+
+    public async getAccountAsset(address: Hex, assetId: Hex, option?: TesseractReferenceOption & IncludesParam<"moi.AccountAsset">): Promise<unknown> {
+        return await this.execute("moi.AccountAsset", {
+            address,
+            asset_id: assetId,
             include: option?.include,
             reference: option?.reference ? Provider.processTesseractReference(option.reference) : undefined,
         });

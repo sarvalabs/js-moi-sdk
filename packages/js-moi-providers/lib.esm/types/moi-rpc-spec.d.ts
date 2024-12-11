@@ -1,4 +1,4 @@
-import type { AccountParam, ClientTesseractReferenceParam, IncludesParam, InteractionParam, MoiClientInfo } from "./shared";
+import type { AccountParam, AssetParam, ClientTesseractReferenceParam, IncludesParam, InteractionParam, MoiClientInfo } from "./shared";
 interface RpcMethodLookup {
     "moi.Version": {
         params: [];
@@ -18,6 +18,21 @@ interface RpcMethodLookup {
         params: [AccountParam & ClientTesseractReferenceParam & IncludesParam<"moi.Account">];
         response: {
             account_data: unknown;
+        };
+    };
+    "moi.AccountKey": {
+        params: [AccountParam & {
+            key_id: number;
+            pending?: boolean;
+        }];
+        response: {
+            key_data: unknown;
+        };
+    };
+    "moi.AccountAsset": {
+        params: [AccountParam & AssetParam & ClientTesseractReferenceParam & IncludesParam<"moi.AccountAsset">];
+        response: {
+            asset_data: unknown;
         };
     };
 }
