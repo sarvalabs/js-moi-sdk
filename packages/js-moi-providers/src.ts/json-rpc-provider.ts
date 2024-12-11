@@ -1,8 +1,10 @@
 import { Provider } from "./provider";
-import { HttpTransport } from "./transport/http-transport";
+import { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
+
+interface JsonRpcProviderOption extends HttpTransportOption {}
 
 export class JsonRpcProvider extends Provider {
-    constructor(host: string) {
-        super(new HttpTransport(host));
+    constructor(host: string, option?: JsonRpcProviderOption) {
+        super(new HttpTransport(host, option));
     }
 }

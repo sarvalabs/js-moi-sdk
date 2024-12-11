@@ -2,7 +2,7 @@ import type { JsonRpcResponse } from "./json-rpc";
 import type { AbsoluteTesseractReference, IncludesLookup, RelativeTesseractReference } from "./shared";
 
 export interface Transport {
-    request<TResult = unknown>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<TResult>>;
+    request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>>;
 }
 
 /**
@@ -17,7 +17,7 @@ export type TesseractIncludes = IncludesLookup["moi.Tesseract"][];
 export interface TesseractReferenceOption {
     /**
      * The reference to the tesseract.
-     * 
+     *
      * It can be either an absolute reference or a relative reference.
      */
     reference?: TesseractReference;

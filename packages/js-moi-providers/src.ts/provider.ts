@@ -22,7 +22,7 @@ export class Provider {
     }
 
     public async request<T>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<T>> {
-        return await this.transport.request<T>(method, ...params);
+        return await this.transport.request<T>(method, params);
     }
 
     /**

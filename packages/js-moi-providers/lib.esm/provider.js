@@ -12,7 +12,7 @@ export class Provider {
         return Provider.processJsonRpcResponse(response);
     }
     async request(method, ...params) {
-        return await this.transport.request(method, ...params);
+        return await this.transport.request(method, params);
     }
     /**
      * Retrieves the version and chain id of the MOI protocol network.
