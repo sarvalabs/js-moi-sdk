@@ -8,7 +8,7 @@
         "moduleResolution": "NodeNext",
         "declaration": true,
         "pretty": true,
-        "strict": false,
+        "strict": true,
         "sourceMap": true,
         "outDir": "dist",
         "declarationMap": true,
@@ -26,67 +26,67 @@
         "esm": true
     },
     "references": [
-        {
-            "path": "./packages/js-moi-constants/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-constants/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-utils/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-utils/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-manifest/tsconfig.esm.json"
-        },
+        // {
+        //     "path": "./packages/js-moi-constants/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-constants/tsconfig.esm.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-utils/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-utils/tsconfig.esm.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-manifest/tsconfig.esm.json"
+        // },
         {
             "path": "./packages/js-moi-providers/tsconfig.cjs.json"
         },
         {
             "path": "./packages/js-moi-providers/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-hdnode/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-signer/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-signer/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-bip39/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-bip39/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-wallet/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-wallet/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi-logic/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-logic/tsconfig.esm.json"
-        },
-        {
-            "path": "./packages/js-moi/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi/tsconfig.esm.json"
         }
+        // {
+        //     "path": "./packages/js-moi-hdnode/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
+        // }
+        // {
+        //     "path": "./packages/js-moi-signer/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-signer/tsconfig.esm.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-bip39/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-bip39/tsconfig.esm.json"
+        // }
+        // {
+        //     "path": "./packages/js-moi-wallet/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-wallet/tsconfig.esm.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-logic/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi-logic/tsconfig.esm.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi/tsconfig.cjs.json"
+        // },
+        // {
+        //     "path": "./packages/js-moi/tsconfig.esm.json"
+        // }
     ],
-    "include": ["packages/**/*.ts"],
+    "include": ["packages/js-moi-providers/src.ts/**/*"], // TODO: Change this to the root of the project
     "exclude": ["node_modules", "**/__tests__/**", "dist"]
 }
