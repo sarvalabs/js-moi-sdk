@@ -1,5 +1,5 @@
 /**
- * Marshals the given json object into a Uint8Array by converting it to 
+ * Marshals the given json object into a Uint8Array by converting it to
  * JSON string and encoding as UTF-8.
  *
  * @param {object} data - The data object to marshal.
@@ -8,10 +8,10 @@
 export const marshal = (data: object): Uint8Array => {
     const jsonString = JSON.stringify(data);
     return new TextEncoder().encode(jsonString);
-}
+};
 
 /**
- * Unmarshals the given Uint8Array into its original json object by decoding 
+ * Unmarshals the given Uint8Array into its original json object by decoding
  * it as UTF-8 and parsing the JSON string.
  *
  * @param {Uint8Array} bytes - The bytes to unmarshal.
@@ -23,6 +23,6 @@ export const unmarshal = (bytes: Uint8Array): any => {
         const jsonString = new TextDecoder().decode(bytes);
         return JSON.parse(jsonString);
     } catch (error) {
-        throw new Error('Error deserializing data:', error);
+        throw new Error("Error deserializing data:", { cause: error });
     }
-}
+};

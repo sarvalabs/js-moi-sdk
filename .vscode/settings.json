@@ -1,11 +1,12 @@
 {
     "editor.formatOnSave": true,
     "prettier.tabWidth": 4,
-    "prettier.printWidth": 150,
+    "prettier.printWidth": 180,
     "search.exclude": {
         "**/node_modules": true,
         "**/bower_components": true,
         "**/*.code-search": true,
         "packages/*/lib.*/": true
-    }
+    },
+    "deno.enable": false
 }

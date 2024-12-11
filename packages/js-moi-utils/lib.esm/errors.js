@@ -64,7 +64,7 @@ export class ErrorUtils {
      * @param {ErrorParams} params - The parameters of the error.
      * @throws {CustomError} - Throws a CustomError.
      */
-    static throwError(message, code = ErrorCode.UNKNOWN_ERROR, params = {}) {
+    static throwError(message, code, params = {}) {
         const error = new CustomError(message, code, params);
         if (Error.captureStackTrace) {
             Error.captureStackTrace(error, ErrorUtils.throwError);

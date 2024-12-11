@@ -24,7 +24,7 @@ export declare const isBytes: (value: any) => value is Bytes;
  * @returns {number | null} - The length of the data, or null if the input is
  * not a valid hexadecimal string.
  */
-export declare const hexDataLength: (data: string) => number;
+export declare const hexDataLength: (data: string) => number | null;
 /**
  * Checks if the given value is a valid hexadecimal string.
  *

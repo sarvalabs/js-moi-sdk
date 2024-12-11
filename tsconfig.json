@@ -32,12 +32,12 @@
         // {
         //     "path": "./packages/js-moi-constants/tsconfig.esm.json"
         // },
-        // {
-        //     "path": "./packages/js-moi-utils/tsconfig.cjs.json"
-        // },
-        // {
-        //     "path": "./packages/js-moi-utils/tsconfig.esm.json"
-        // },
+        {
+            "path": "./packages/js-moi-utils/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-utils/tsconfig.esm.json"
+        },
         // {
         //     "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
         // },
@@ -49,7 +49,7 @@
         },
         {
             "path": "./packages/js-moi-providers/tsconfig.esm.json"
-        }
+        },
         // {
         //     "path": "./packages/js-moi-hdnode/tsconfig.cjs.json"
         // },
@@ -80,13 +80,13 @@
         // {
         //     "path": "./packages/js-moi-logic/tsconfig.esm.json"
         // },
-        // {
-        //     "path": "./packages/js-moi/tsconfig.cjs.json"
-        // },
-        // {
-        //     "path": "./packages/js-moi/tsconfig.esm.json"
-        // }
+        {
+            "path": "./packages/js-moi/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi/tsconfig.esm.json"
+        }
     ],
-    "include": ["packages/js-moi-providers/src.ts/**/*"], // TODO: Change this to the root of the project
+    "include": ["packages/js-moi-providers/src.ts/**/*.ts", "packages/js-moi-utils/src.ts/**/*", "packages/js-moi/src.ts/**/*"], // TODO: Change this to the root of the project
     "exclude": ["node_modules", "**/__tests__/**", "dist"]
 }

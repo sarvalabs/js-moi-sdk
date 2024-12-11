@@ -27,7 +27,7 @@ const unmarshal = (bytes) => {
         return JSON.parse(jsonString);
     }
     catch (error) {
-        throw new Error('Error deserializing data:', error);
+        throw new Error("Error deserializing data:", { cause: error });
     }
 };
 exports.unmarshal = unmarshal;

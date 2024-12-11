@@ -36,11 +36,11 @@ interface ErrorParams {
  * CustomError class that extends the Error class.
  */
 export class CustomError extends Error {
-    public code: ErrorCode;
+    public code: ErrorCode | string | number;
     public reason: string;
     public params: ErrorParams;
 
-    constructor(message: string, code: ErrorCode = ErrorCode.UNKNOWN_ERROR, params: ErrorParams = {}) {
+    constructor(message: string, code: ErrorCode | string | number = ErrorCode.UNKNOWN_ERROR, params: ErrorParams = {}) {
         super(message);
         this.code = code;
         this.reason = message;
@@ -76,9 +76,9 @@ export class ErrorUtils {
      * @param {ErrorParams} params - The parameters of the error.
      * @throws {CustomError} - Throws a CustomError.
      */
-    public static throwError(message: string, code: ErrorCode = ErrorCode.UNKNOWN_ERROR, params: ErrorParams = {}): never {
+    public static throwError(message: string, code: ErrorCode | string | number, params: ErrorParams = {}): never {
         const error = new CustomError(message, code, params);
-        
+
         if (Error.captureStackTrace) {
             Error.captureStackTrace(error, ErrorUtils.throwError);
         }
