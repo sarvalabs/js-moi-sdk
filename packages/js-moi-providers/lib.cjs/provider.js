@@ -26,8 +26,10 @@ class Provider {
         return await this.execute("moi.Version");
     }
     async getTesseractByReference(reference, includes = []) {
-        const ref = Provider.processTesseractReference(reference);
-        return await this.execute("moi.Tesseract", ref, includes);
+        return await this.execute("moi.Tesseract", {
+            includes,
+            reference: Provider.processTesseractReference(reference),
+        });
     }
     async getTesseractByHash(tesseractHash, include) {
         return await this.getTesseractByReference(tesseractHash, include);
@@ -50,6 +52,15 @@ class Provider {
             return await this.getTesseractByHash(hashOrAddress, heightOrInclude);
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    }
+    /**
+     * Retrieves an interaction by its hash.
+     *
+     * @param hash - The hash of the interaction to retrieve.
+     * @returns A promise that resolves to the interaction.
+     */
+    async getInteraction(hash) {
+        return await this.execute("moi.Interaction", { hash });
     }
     /**
      * Processes a JSON-RPC response and returns the result.

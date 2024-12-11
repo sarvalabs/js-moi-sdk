@@ -45,6 +45,13 @@ export declare class Provider {
      */
     getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludes): Promise<unknown>;
     /**
+     * Retrieves an interaction by its hash.
+     *
+     * @param hash - The hash of the interaction to retrieve.
+     * @returns A promise that resolves to the interaction.
+     */
+    getInteraction(hash: Hex): Promise<unknown>;
+    /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
      *

@@ -13,6 +13,7 @@ class HttpTransport {
             method: method,
             params: params,
         };
+        console.log(JSON.stringify(request, null, 2));
         const response = await fetch(this.host, {
             method: "POST",
             body: JSON.stringify(request),

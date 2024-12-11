@@ -22,14 +22,29 @@ export interface RelativeTesseractReference {
     relative: RelativeTesseractOption;
 }
 export type ClientTesseractReference = RelativeTesseractReference | AbsoluteTesseractReference;
+interface ReferenceParam {
+    reference: ClientTesseractReference;
+}
+interface IncludesParam<T extends string> {
+    includes: T[];
+}
+interface InteractionParam {
+    hash: Hex;
+}
 interface RpcMethodLookup {
     "moi.Version": {
         params: [];
         response: MoiClientInfo;
     };
     "moi.Tesseract": {
-        params: [reference: ClientTesseractReference, inputs: IncludesLookup["moi.Tesseract"][]];
+        params: [ReferenceParam & IncludesParam<IncludesLookup["moi.Tesseract"]>];
         response: unknown;
+    };
+    "moi.Interaction": {
+        params: [InteractionParam];
+        response: {
+            ix_data: unknown;
+        };
     };
 }
 export type RpcMethod = keyof RpcMethodLookup;

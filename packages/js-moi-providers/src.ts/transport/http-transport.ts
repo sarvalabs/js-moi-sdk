@@ -16,6 +16,8 @@ export class HttpTransport implements Transport {
             params: params,
         };
 
+        console.log(JSON.stringify(request, null, 2));
+
         const response = await fetch(this.host, {
             method: "POST",
             body: JSON.stringify(request),

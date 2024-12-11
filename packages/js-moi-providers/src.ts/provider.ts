@@ -35,8 +35,10 @@ export class Provider {
     }
 
     private async getTesseractByReference(reference: TesseractReference, includes: TesseractIncludes = []): Promise<unknown> {
-        const ref = Provider.processTesseractReference(reference);
-        return await this.execute("moi.Tesseract", ref, includes);
+        return await this.execute("moi.Tesseract", {
+            includes,
+            reference: Provider.processTesseractReference(reference),
+        });
     }
 
     private async getTesseractByHash(tesseractHash: Hex, include?: TesseractIncludes): Promise<unknown> {
@@ -79,7 +81,7 @@ export class Provider {
      * @returns A promise that resolves to the tesseract.
      */
     public getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludes): Promise<unknown>;
-    async getTesseract(hashOrAddress: Hex | RelativeTesseractOption, heightOrInclude?: number | TesseractIncludes, include?: TesseractIncludes): Promise<unknown> {
+    public async getTesseract(hashOrAddress: Hex | RelativeTesseractOption, heightOrInclude?: number | TesseractIncludes, include?: TesseractIncludes): Promise<unknown> {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
             return await this.getTesseractByAddressAndHeight(hashOrAddress.address, hashOrAddress.height, heightOrInclude);
         }
@@ -93,6 +95,16 @@ export class Provider {
         }
 
         ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+    }
+
+    /**
+     * Retrieves an interaction by its hash.
+     *
+     * @param hash - The hash of the interaction to retrieve.
+     * @returns A promise that resolves to the interaction.
+     */
+    public async getInteraction(hash: Hex): Promise<unknown> {
+        return await this.execute("moi.Interaction", { hash });
     }
 
     /**
