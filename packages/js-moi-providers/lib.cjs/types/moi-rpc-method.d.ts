@@ -54,6 +54,28 @@ interface RpcMethodLookup {
         }];
         response: Hex;
     };
+    "moi.LogicEvents": {
+        params: [];
+        response: unknown;
+    };
+    "moi.SyncStatus": {
+        params: [{
+            include_pending_accounts?: boolean;
+        }];
+        response: unknown;
+    };
+    "moi.Subscribe": {
+        params: [];
+        response: unknown;
+    };
+    "moi.Subscription": {
+        params: [];
+        response: unknown;
+    };
+    "moi.Unsubscribe": {
+        params: [];
+        response: unknown;
+    };
 }
 export type RpcMethod = keyof RpcMethodLookup;
 export type RpcMethodParams<T> = T extends RpcMethod ? RpcMethodLookup[T]["params"] : unknown[];
