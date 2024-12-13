@@ -1,9 +1,9 @@
 import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils";
 
-import type { JsonRpcResponse } from "./types/json-rpc.ts";
-import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-spec.d.ts";
-import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields, TesseractReference } from "./types/shared.d.ts";
-import type { Transport } from "./types/transport.js";
+import type { JsonRpcResponse } from "./types/json-rpc";
+import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
+import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields, TesseractReference } from "./types/shared";
+import type { Transport } from "./types/transport";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 
