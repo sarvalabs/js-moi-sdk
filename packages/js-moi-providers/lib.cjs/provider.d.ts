@@ -6,8 +6,9 @@ import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields } f
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter {
-    private readonly transport;
+    private readonly _transport;
     constructor(transport: Transport);
+    get transport(): Transport;
     protected execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;
     request<T>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<T>>;
     /**

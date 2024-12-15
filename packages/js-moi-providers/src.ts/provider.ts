@@ -9,7 +9,7 @@ import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 
 export class Provider extends EventEmitter {
-    private readonly transport: Transport;
+    private readonly _transport: Transport;
 
     public constructor(transport: Transport) {
         super();
@@ -18,16 +18,20 @@ export class Provider extends EventEmitter {
             ErrorUtils.throwError("Transport is required", ErrorCode.INVALID_ARGUMENT);
         }
 
-        this.transport = transport;
+        this._transport = transport;
+    }
+
+    public get transport(): Transport {
+        return this._transport;
     }
 
     protected async execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
-        const response = await this.transport.request<RpcMethodResponse<T>>(method, params);
+        const response = await this._transport.request<RpcMethodResponse<T>>(method, params);
         return Provider.processJsonRpcResponse(response);
     }
 
     public async request<T>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<T>> {
-        return await this.transport.request<T>(method, params);
+        return await this._transport.request<T>(method, params);
     }
 
     /**

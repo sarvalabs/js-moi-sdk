@@ -117,6 +117,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
 
     public async request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>> {
         await this.waitForConnection();
+        console.count("request");
 
         const request: Websocketify<JsonRpcRequest> = this.createPayload(method, params);
 
@@ -140,6 +141,14 @@ export class WebsocketTransport extends EventEmitter implements Transport {
             this.on("message", listener);
             this.send(request);
         });
+    }
+
+    public close(): void {
+        if (this.ws == null) {
+            throw new Error("Websocket is not initialized");
+        }
+        console.log("close");
+        this.ws.close();
     }
 
     private createPayload(method: string, params: unknown[]): Websocketify<JsonRpcRequest> {

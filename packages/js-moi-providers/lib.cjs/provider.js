@@ -7,20 +7,23 @@ exports.Provider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const events_1 = __importDefault(require("events"));
 class Provider extends events_1.default {
-    transport;
+    _transport;
     constructor(transport) {
         super();
         if (transport == null) {
             js_moi_utils_1.ErrorUtils.throwError("Transport is required", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        this.transport = transport;
+        this._transport = transport;
+    }
+    get transport() {
+        return this._transport;
     }
     async execute(method, ...params) {
-        const response = await this.transport.request(method, params);
+        const response = await this._transport.request(method, params);
         return Provider.processJsonRpcResponse(response);
     }
     async request(method, ...params) {
-        return await this.transport.request(method, params);
+        return await this._transport.request(method, params);
     }
     /**
      * Retrieves the version and chain id of the MOI protocol network.

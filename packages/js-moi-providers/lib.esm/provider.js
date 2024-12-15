@@ -1,20 +1,23 @@
 import { ErrorCode, ErrorUtils, isAddress, isHex } from "js-moi-utils";
 import EventEmitter from "events";
 export class Provider extends EventEmitter {
-    transport;
+    _transport;
     constructor(transport) {
         super();
         if (transport == null) {
             ErrorUtils.throwError("Transport is required", ErrorCode.INVALID_ARGUMENT);
         }
-        this.transport = transport;
+        this._transport = transport;
+    }
+    get transport() {
+        return this._transport;
     }
     async execute(method, ...params) {
-        const response = await this.transport.request(method, params);
+        const response = await this._transport.request(method, params);
         return Provider.processJsonRpcResponse(response);
     }
     async request(method, ...params) {
-        return await this.transport.request(method, params);
+        return await this._transport.request(method, params);
     }
     /**
      * Retrieves the version and chain id of the MOI protocol network.

@@ -14,6 +14,7 @@ export declare class WebsocketTransport extends EventEmitter implements Transpor
     protected createNewConnection(): void;
     private waitForConnection;
     request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>>;
+    close(): void;
     private createPayload;
     protected send(data: unknown): void;
     private static validateOptions;

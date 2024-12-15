@@ -3,13 +3,19 @@ import { WebsocketTransport, type WebsocketTransportOptions } from "./transport/
 
 export class WebsocketProvider extends Provider {
     constructor(address: string, options?: WebsocketTransportOptions) {
-        const transport = new WebsocketTransport(address, options);
-        super(transport);
-
+        super(new WebsocketTransport(address, options));
         const events = ["error", "open", "close", "reconnect"];
 
-        for (const event of events) {
-            transport.on(event, (...args) => this.emit(event, ...args));
+        if (this.transport instanceof WebsocketTransport) {
+            for (const event of events) {
+                this.transport.on(event, (...args) => this.emit(event, ...args));
+            }
+        }
+    }
+
+    close(): void {
+        if (this.transport instanceof WebsocketTransport) {
+            this.transport.close();
         }
     }
 }
