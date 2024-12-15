@@ -15,7 +15,7 @@ export class HttpTransport implements Transport {
         this.option = option;
     }
 
-    createPayload(method: string, params: unknown[]): JsonRpcRequest {
+    private createPayload(method: string, params: unknown[]): JsonRpcRequest {
         return {
             id: 1,
             jsonrpc: "2.0",

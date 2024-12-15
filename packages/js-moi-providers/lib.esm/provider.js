@@ -1,7 +1,9 @@
 import { ErrorCode, ErrorUtils, isAddress, isHex } from "js-moi-utils";
-export class Provider {
+import EventEmitter from "events";
+export class Provider extends EventEmitter {
     transport;
     constructor(transport) {
+        super();
         if (transport == null) {
             ErrorUtils.throwError("Transport is required", ErrorCode.INVALID_ARGUMENT);
         }

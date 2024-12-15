@@ -1,4 +1,8 @@
-export { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
+export { JsonRpcProvider, type JsonRpcProviderOption } from "./json-rpc-provider";
+export { Provider } from "./provider";
+export { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
+export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
+export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type {
     AccountParam,
     AssetParam,
@@ -12,6 +16,4 @@ export type {
     TesseractReferenceParam,
 } from "./types/shared";
 export type { Transport } from "./types/transport";
-
-export { JsonRpcProvider, type JsonRpcProviderOption } from "./json-rpc-provider";
-export { Provider } from "./provider";
+export { WebsocketProvider } from "./websocket-provider";

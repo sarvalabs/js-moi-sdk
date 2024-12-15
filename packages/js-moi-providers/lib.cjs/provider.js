@@ -1,10 +1,15 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Provider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-class Provider {
+const events_1 = __importDefault(require("events"));
+class Provider extends events_1.default {
     transport;
     constructor(transport) {
+        super();
         if (transport == null) {
             js_moi_utils_1.ErrorUtils.throwError("Transport is required", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }

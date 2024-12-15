@@ -1,10 +1,11 @@
 import { type Hex } from "js-moi-utils";
+import EventEmitter from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
-export declare class Provider {
+export declare class Provider extends EventEmitter {
     private readonly transport;
     constructor(transport: Transport);
     protected execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;

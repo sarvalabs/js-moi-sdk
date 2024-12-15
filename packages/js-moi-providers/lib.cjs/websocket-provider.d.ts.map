@@ -1,0 +1,1 @@
+{"version":3,"file":"websocket-provider.d.ts","sourceRoot":"","sources":["../src.ts/websocket-provider.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,YAAY,CAAC;AACtC,OAAO,EAAsB,KAAK,yBAAyB,EAAE,MAAM,0BAA0B,CAAC;AAE9F,qBAAa,iBAAkB,SAAQ,QAAQ;gBAC/B,OAAO,EAAE,MAAM,EAAE,OAAO,CAAC,EAAE,yBAAyB;CAUnE"}
