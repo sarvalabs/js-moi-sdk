@@ -1,6 +1,6 @@
 import type { Hex } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, TesseractReferenceParam } from "./shared";
-interface RpcMethodLookup {
+interface MOIExecutionApi {
     "moi.Version": {
         params: [];
         response: MoiClientInfo;
@@ -77,8 +77,8 @@ interface RpcMethodLookup {
         response: unknown;
     };
 }
-export type RpcMethod = keyof RpcMethodLookup;
-export type RpcMethodParams<T> = T extends RpcMethod ? RpcMethodLookup[T]["params"] : unknown[];
-export type RpcMethodResponse<T> = T extends RpcMethod ? RpcMethodLookup[T]["response"] : unknown;
+export type RpcMethod = keyof MOIExecutionApi;
+export type RpcMethodParams<T> = T extends RpcMethod ? MOIExecutionApi[T]["params"] : unknown[];
+export type RpcMethodResponse<T> = T extends RpcMethod ? MOIExecutionApi[T]["response"] : unknown;
 export {};
 //# sourceMappingURL=moi-rpc-method.d.ts.map
