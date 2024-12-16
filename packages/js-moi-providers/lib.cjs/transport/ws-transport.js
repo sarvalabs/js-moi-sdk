@@ -26,7 +26,7 @@ class WebsocketTransport extends events_1.default {
         this.createNewConnection();
     }
     createNewConnection() {
-        this.ws = new ws_1.Websocket(this.address, {});
+        this.ws = new ws_1.Websocket(this.address);
         this.ws.onopen = (e) => {
             this.reconnects = 0;
             this.emit("open", e);

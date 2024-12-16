@@ -20,7 +20,7 @@ export class WebsocketTransport extends EventEmitter {
         this.createNewConnection();
     }
     createNewConnection() {
-        this.ws = new Websocket(this.address, {});
+        this.ws = new Websocket(this.address);
         this.ws.onopen = (e) => {
             this.reconnects = 0;
             this.emit("open", e);
