@@ -95,7 +95,7 @@ export class WebsocketProvider extends Provider {
         const params = typeof event === "object" ? event.params ?? [] : [];
         const eventName = WebsocketProvider.getEventName(event);
         const response = await this.request<string>("moi.subscribe", [eventName, ...params]);
-        const id = WebsocketProvider.processJsonRpcResponse(response);
+        const id = this.processJsonRpcResponse(response);
         const transport = this.transport as WebsocketTransport;
 
         super[type](eventName, listener);
