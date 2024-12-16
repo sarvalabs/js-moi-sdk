@@ -35,6 +35,10 @@ export declare class WebsocketProvider extends Provider {
     private static events;
     private readonly subscriptions;
     constructor(address: string, options?: WebsocketTransportOptions);
+    getSubscriptions(): {
+        id: string;
+        event: ProviderEvent;
+    }[];
     close(): void;
     private handleOnNetworkEventSubscription;
     on<K, T extends ProviderEvent>(event: T, listener: ProviderEventListener<T>): this;

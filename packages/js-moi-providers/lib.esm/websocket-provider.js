@@ -27,6 +27,9 @@ export class WebsocketProvider extends Provider {
             }
         }
     }
+    getSubscriptions() {
+        return Array.from(Iterator.from(this.subscriptions).map(([id, event]) => ({ id, event })));
+    }
     close() {
         if (this.transport instanceof WebsocketTransport) {
             this.transport.close();

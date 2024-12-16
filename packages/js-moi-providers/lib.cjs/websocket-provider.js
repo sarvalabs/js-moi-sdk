@@ -30,6 +30,9 @@ class WebsocketProvider extends provider_1.Provider {
             }
         }
     }
+    getSubscriptions() {
+        return Array.from(Iterator.from(this.subscriptions).map(([id, event]) => ({ id, event })));
+    }
     close() {
         if (this.transport instanceof ws_transport_1.WebsocketTransport) {
             this.transport.close();
