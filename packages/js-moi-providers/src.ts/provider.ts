@@ -27,10 +27,10 @@ export class Provider extends EventEmitter {
 
     protected async execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
         const response = await this._transport.request<RpcMethodResponse<T>>(method, params);
-        return Provider.processJsonRpcResponse(response);
+        return this.processJsonRpcResponse(response);
     }
 
-    public async request<T>(method: string, params: unknown[]): Promise<JsonRpcResponse<T>> {
+    public async request<T>(method: string, params: unknown[] = []): Promise<JsonRpcResponse<T>> {
         return await this._transport.request<T>(method, params);
     }
 
@@ -150,7 +150,11 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the account asset information
      */
     public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<unknown> {
-        return await this.execute("moi.AccountAsset", { address, asset_id: assetId, ...option });
+        return await this.execute("moi.AccountAsset", {
+            address,
+            asset_id: assetId,
+            ...option,
+        });
     }
 
     /**
@@ -206,7 +210,14 @@ export class Provider extends EventEmitter {
         }
 
         if (isAddress(addressOrOption)) {
-            params = [{ logic_id: logicId, storage_key: key, address: addressOrOption, ...option }];
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    address: addressOrOption,
+                    ...option,
+                },
+            ];
         }
 
         if (params == null) {
@@ -230,7 +241,7 @@ export class Provider extends EventEmitter {
      * @returns {T} - The result from the JSON-RPC response.
      * @throws Will throw an error if the response contains an error.
      */
-    protected static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
+    public processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
         if ("error" in response) {
             const { data } = response.error;
             const params = data ? (typeof data === "object" ? data : { data }) : {};

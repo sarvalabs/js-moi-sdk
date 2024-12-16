@@ -10,7 +10,7 @@ export declare class Provider extends EventEmitter {
     constructor(transport: Transport);
     get transport(): Transport;
     protected execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;
-    request<T>(method: string, params: unknown[]): Promise<JsonRpcResponse<T>>;
+    request<T>(method: string, params?: unknown[]): Promise<JsonRpcResponse<T>>;
     /**
      * Retrieves the version and chain id of the MOI protocol network.
      *
@@ -133,7 +133,7 @@ export declare class Provider extends EventEmitter {
      * @returns {T} - The result from the JSON-RPC response.
      * @throws Will throw an error if the response contains an error.
      */
-    protected static processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;
+    processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

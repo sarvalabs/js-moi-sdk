@@ -14,9 +14,9 @@ export class Provider extends EventEmitter {
     }
     async execute(method, ...params) {
         const response = await this._transport.request(method, params);
-        return Provider.processJsonRpcResponse(response);
+        return this.processJsonRpcResponse(response);
     }
-    async request(method, params) {
+    async request(method, params = []) {
         return await this._transport.request(method, params);
     }
     /**
@@ -96,7 +96,11 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the account asset information
      */
     async getAccountAsset(address, assetId, option) {
-        return await this.execute("moi.AccountAsset", { address, asset_id: assetId, ...option });
+        return await this.execute("moi.AccountAsset", {
+            address,
+            asset_id: assetId,
+            ...option,
+        });
     }
     /**
      * Retrieves information about an asset
@@ -126,7 +130,14 @@ export class Provider extends EventEmitter {
             params = [{ logic_id: logicId, storage_key: key, ...addressOrOption }];
         }
         if (isAddress(addressOrOption)) {
-            params = [{ logic_id: logicId, storage_key: key, address: addressOrOption, ...option }];
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    address: addressOrOption,
+                    ...option,
+                },
+            ];
         }
         if (params == null) {
             ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
@@ -146,7 +157,7 @@ export class Provider extends EventEmitter {
      * @returns {T} - The result from the JSON-RPC response.
      * @throws Will throw an error if the response contains an error.
      */
-    static processJsonRpcResponse(response) {
+    processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
             const params = data ? (typeof data === "object" ? data : { data }) : {};

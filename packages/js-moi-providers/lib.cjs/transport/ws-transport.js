@@ -88,7 +88,6 @@ class WebsocketTransport extends events_1.default {
     }
     async request(method, params) {
         await this.waitForConnection();
-        console.count("request");
         const request = this.createPayload(method, params);
         return new Promise((resolve, reject) => {
             const listener = (data) => {
@@ -128,7 +127,6 @@ class WebsocketTransport extends events_1.default {
         };
     }
     send(data) {
-        console.log(data);
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }

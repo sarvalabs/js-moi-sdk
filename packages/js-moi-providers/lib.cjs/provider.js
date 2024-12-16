@@ -20,9 +20,9 @@ class Provider extends events_1.default {
     }
     async execute(method, ...params) {
         const response = await this._transport.request(method, params);
-        return Provider.processJsonRpcResponse(response);
+        return this.processJsonRpcResponse(response);
     }
-    async request(method, params) {
+    async request(method, params = []) {
         return await this._transport.request(method, params);
     }
     /**
@@ -102,7 +102,11 @@ class Provider extends events_1.default {
      * @returns A promise that resolves to the account asset information
      */
     async getAccountAsset(address, assetId, option) {
-        return await this.execute("moi.AccountAsset", { address, asset_id: assetId, ...option });
+        return await this.execute("moi.AccountAsset", {
+            address,
+            asset_id: assetId,
+            ...option,
+        });
     }
     /**
      * Retrieves information about an asset
@@ -132,7 +136,14 @@ class Provider extends events_1.default {
             params = [{ logic_id: logicId, storage_key: key, ...addressOrOption }];
         }
         if ((0, js_moi_utils_1.isAddress)(addressOrOption)) {
-            params = [{ logic_id: logicId, storage_key: key, address: addressOrOption, ...option }];
+            params = [
+                {
+                    logic_id: logicId,
+                    storage_key: key,
+                    address: addressOrOption,
+                    ...option,
+                },
+            ];
         }
         if (params == null) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
@@ -152,7 +163,7 @@ class Provider extends events_1.default {
      * @returns {T} - The result from the JSON-RPC response.
      * @throws Will throw an error if the response contains an error.
      */
-    static processJsonRpcResponse(response) {
+    processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
             const params = data ? (typeof data === "object" ? data : { data }) : {};
