@@ -40,7 +40,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
     }
 
     protected createNewConnection(): void {
-        this.ws = new Websocket(this.address, {});
+        this.ws = new Websocket(this.address);
 
         this.ws.onopen = (e) => {
             this.reconnects = 0;
