@@ -10,7 +10,7 @@ export declare class Provider extends EventEmitter {
     constructor(transport: Transport);
     get transport(): Transport;
     protected execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;
-    request<T>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<T>>;
+    request<T>(method: string, params: unknown[]): Promise<JsonRpcResponse<T>>;
     /**
      * Retrieves the version and chain id of the MOI protocol network.
      *
@@ -123,6 +123,7 @@ export declare class Provider extends EventEmitter {
      * @returns A promise that resolves to the value of the storage key
      */
     getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
+    subscribe(event: string, ...params: unknown[]): Promise<string>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

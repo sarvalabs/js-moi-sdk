@@ -4,9 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketTransport = void 0;
-const utils_1 = require("@noble/hashes/utils");
 const events_1 = __importDefault(require("events"));
-const js_moi_utils_1 = require("js-moi-utils");
 const ws_1 = require("../ws/ws");
 class WebsocketTransport extends events_1.default {
     options;
@@ -36,7 +34,9 @@ class WebsocketTransport extends events_1.default {
         this.ws.onclose = (e) => {
             return this.emit("close", e);
         };
-        this.ws.onmessage = (event) => this.emit("message", event.data);
+        this.ws.onmessage = (event) => {
+            return this.emit("message", event.data);
+        };
         this.ws.onerror = (error) => {
             if (this.options.reconnect && this.reconnects < this.options.reconnect) {
                 this.reconnects += 1;
@@ -116,15 +116,19 @@ class WebsocketTransport extends events_1.default {
         console.log("close");
         this.ws.close();
     }
+    createId() {
+        return globalThis.crypto.randomUUID();
+    }
     createPayload(method, params) {
         return {
-            id: (0, js_moi_utils_1.bytesToHex)((0, utils_1.randomBytes)(32)),
+            id: this.createId(),
             jsonrpc: "2.0",
             method,
             params,
         };
     }
     send(data) {
+        console.log(data);
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }

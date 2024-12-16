@@ -22,7 +22,7 @@ class Provider extends events_1.default {
         const response = await this._transport.request(method, params);
         return Provider.processJsonRpcResponse(response);
     }
-    async request(method, ...params) {
+    async request(method, params) {
         return await this._transport.request(method, params);
     }
     /**
@@ -138,6 +138,10 @@ class Provider extends events_1.default {
             js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         return await this.execute("moi.LogicStorage", ...params);
+    }
+    async subscribe(event, ...params) {
+        params.unshift(event);
+        return await this.execute("moi.Subscribe", [event, ...params]);
     }
     /**
      * Processes a JSON-RPC response and returns the result.

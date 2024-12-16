@@ -1,6 +1,4 @@
-import { randomBytes } from "@noble/hashes/utils";
 import EventEmitter from "events";
-import { bytesToHex } from "js-moi-utils";
 import { Websocket } from "../ws/ws";
 export class WebsocketTransport extends EventEmitter {
     options;
@@ -30,7 +28,9 @@ export class WebsocketTransport extends EventEmitter {
         this.ws.onclose = (e) => {
             return this.emit("close", e);
         };
-        this.ws.onmessage = (event) => this.emit("message", event.data);
+        this.ws.onmessage = (event) => {
+            return this.emit("message", event.data);
+        };
         this.ws.onerror = (error) => {
             if (this.options.reconnect && this.reconnects < this.options.reconnect) {
                 this.reconnects += 1;
@@ -110,15 +110,19 @@ export class WebsocketTransport extends EventEmitter {
         console.log("close");
         this.ws.close();
     }
+    createId() {
+        return globalThis.crypto.randomUUID();
+    }
     createPayload(method, params) {
         return {
-            id: bytesToHex(randomBytes(32)),
+            id: this.createId(),
             jsonrpc: "2.0",
             method,
             params,
         };
     }
     send(data) {
+        console.log(data);
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }

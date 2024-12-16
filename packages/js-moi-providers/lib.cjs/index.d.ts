@@ -5,5 +5,5 @@ export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type { AccountParam, AssetParam, IncludeFieldsFor, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, RelativeTesseractOption, TesseractReference, TesseractReferenceParam, } from "./types/shared";
 export type { Transport } from "./types/transport";
-export { WebsocketProvider } from "./websocket-provider";
+export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./websocket-provider";
 //# sourceMappingURL=index.d.ts.map

@@ -16,7 +16,7 @@ export class Provider extends EventEmitter {
         const response = await this._transport.request(method, params);
         return Provider.processJsonRpcResponse(response);
     }
-    async request(method, ...params) {
+    async request(method, params) {
         return await this._transport.request(method, params);
     }
     /**
@@ -132,6 +132,10 @@ export class Provider extends EventEmitter {
             ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
         }
         return await this.execute("moi.LogicStorage", ...params);
+    }
+    async subscribe(event, ...params) {
+        params.unshift(event);
+        return await this.execute("moi.Subscribe", [event, ...params]);
     }
     /**
      * Processes a JSON-RPC response and returns the result.

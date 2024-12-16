@@ -30,7 +30,7 @@ export class Provider extends EventEmitter {
         return Provider.processJsonRpcResponse(response);
     }
 
-    public async request<T>(method: string, ...params: unknown[]): Promise<JsonRpcResponse<T>> {
+    public async request<T>(method: string, params: unknown[]): Promise<JsonRpcResponse<T>> {
         return await this._transport.request<T>(method, params);
     }
 
@@ -214,6 +214,11 @@ export class Provider extends EventEmitter {
         }
 
         return await this.execute("moi.LogicStorage", ...params);
+    }
+
+    public async subscribe(event: string, ...params: unknown[]): Promise<string> {
+        params.unshift(event);
+        return await this.execute("moi.Subscribe", [event, ...params]);
     }
 
     /**

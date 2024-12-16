@@ -47,8 +47,8 @@ interface RpcMethodLookup {
         response: unknown;
     };
     "moi.Subscribe": {
-        params: [];
-        response: unknown;
+        params: unknown[];
+        response: string;
     };
     "moi.Subscription": {
         params: [];

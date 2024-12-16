@@ -1,6 +1,4 @@
-import { randomBytes } from "@noble/hashes/utils";
 import EventEmitter from "events";
-import { bytesToHex } from "js-moi-utils";
 import type { JsonRpcRequest, JsonRpcResponse } from "../types/json-rpc";
 import type { Transport } from "../types/transport";
 import { Websocket } from "../ws/ws";
@@ -53,7 +51,9 @@ export class WebsocketTransport extends EventEmitter implements Transport {
             return this.emit("close", e);
         };
 
-        this.ws.onmessage = (event) => this.emit("message", event.data);
+        this.ws.onmessage = (event) => {
+            return this.emit("message", event.data);
+        };
 
         this.ws.onerror = (error) => {
             if (this.options.reconnect && this.reconnects < this.options.reconnect) {
@@ -151,9 +151,13 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         this.ws.close();
     }
 
+    private createId(): string {
+        return globalThis.crypto.randomUUID();
+    }
+
     private createPayload(method: string, params: unknown[]): Websocketify<JsonRpcRequest> {
         return {
-            id: bytesToHex(randomBytes(32)),
+            id: this.createId(),
             jsonrpc: "2.0",
             method,
             params,
@@ -161,6 +165,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
     }
 
     protected send(data: unknown): void {
+        console.log(data);
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
