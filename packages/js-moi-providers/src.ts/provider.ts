@@ -2,7 +2,7 @@ import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex, type InteractionRequ
 
 import EventEmitter from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
+import type { AccountAsset, Confirmation, RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
@@ -149,12 +149,22 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account asset information
      */
-    public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<unknown> {
+    public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]> {
         return await this.execute("moi.AccountAsset", {
             address,
             asset_id: assetId,
             ...option,
         });
+    }
+
+    /**
+     * Retrieves the interaction confirmation
+     *
+     * @param hash The hash of the interaction to retrieve the confirmation.
+     * @returns A promise that resolves to object containing the confirmation information.
+     */
+    public async getConfirmation(hash: Hex): Promise<Confirmation> {
+        return await this.execute("moi.Confirmation", { hash });
     }
 
     /**
@@ -245,7 +255,7 @@ export class Provider extends EventEmitter {
 
     public async simulate(interaction: InteractionRequest) {
         throw new Error("Method not implemented.");
-    } 
+    }
 
     /**
      * Submits a signed interaction to the MOI protocol network.

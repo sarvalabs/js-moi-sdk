@@ -6,7 +6,7 @@ export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } fro
 export type {
     AccountAsset,
     AccountKey,
-    Confirmations,
+    Confirmation as Confirmations,
     Interaction,
     InteractionRequest,
     Operation,

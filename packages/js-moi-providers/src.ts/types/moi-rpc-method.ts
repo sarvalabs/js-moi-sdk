@@ -120,7 +120,7 @@ export interface OperationPayload {
     payload: unknown[];
 }
 
-export interface Confirmations {
+export interface Confirmation {
     hash: Hex;
     status: string;
     sender: Hex;
@@ -134,7 +134,7 @@ export interface Tesseract {
     header: TesseractHeader;
     consensus?: Consensus;
     interactions: Interaction[];
-    confirmations: Confirmations[];
+    confirmations: Confirmation[];
 }
 
 export interface AccountKey {
@@ -167,6 +167,10 @@ interface MOIExecutionApi {
     "moi.Version": {
         params: [];
         response: MoiClientInfo;
+    };
+    "moi.Confirmation": {
+        params: [InteractionParam];
+        response: Confirmation;
     };
     "moi.Tesseract": {
         params: [Required<TesseractReferenceParam> & IncludesParam<"moi.Tesseract">];
