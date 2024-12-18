@@ -12,6 +12,7 @@ export * from "./object";
 export * from "./properties";
 export * from "./schema";
 export { Interaction, Participant, Participants } from "../types/interaction";
+export { InteractionRequest } from "../types/ix-object";
 export { Tesseract } from "../types/tesseract";
 export { topicHash } from "./logic-events";
 //# sourceMappingURL=index.d.ts.map

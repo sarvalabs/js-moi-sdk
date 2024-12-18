@@ -88,3 +88,15 @@ export interface LogicParam {
      */
     logic_id: Hex;
 }
+
+export interface SignedInteraction {
+    /**
+     * POLO encoded interaction
+     */
+    interaction: Hex;
+
+    /**
+     * A list of signatures for the interaction
+     */
+    signatures: Hex[];
+}

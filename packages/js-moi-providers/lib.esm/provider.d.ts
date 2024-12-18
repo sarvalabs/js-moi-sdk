@@ -1,8 +1,8 @@
-import { type Hex } from "js-moi-utils";
+import { type Hex, type InteractionRequest } from "js-moi-utils";
 import EventEmitter from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields } from "./types/shared";
+import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter {
@@ -123,6 +123,15 @@ export declare class Provider extends EventEmitter {
      * @returns A promise that resolves to the value of the storage key
      */
     getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
+    private static isSignedInteraction;
+    simulate(interaction: InteractionRequest): Promise<void>;
+    /**
+     * Submits a signed interaction to the MOI protocol network.
+     *
+     * @param interaction - The signed interaction to submit.
+     * @returns A promise that resolves to the hash of the submitted interaction.
+     */
+    submit(interaction: SignedInteraction): Promise<Hex>;
     subscribe(event: string, ...params: unknown[]): Promise<string>;
     /**
      * Processes a JSON-RPC response and returns the result.

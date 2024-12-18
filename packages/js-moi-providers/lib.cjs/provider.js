@@ -150,8 +150,47 @@ class Provider extends events_1.default {
         }
         return await this.execute("moi.LogicStorage", ...params);
     }
+    static isSignedInteraction(ix) {
+        if (typeof ix !== "object" || ix == null) {
+            return false;
+        }
+        if (!("interaction" in ix) || typeof ix.interaction !== "string") {
+            return false;
+        }
+        if (!("signatures" in ix) || !Array.isArray(ix.signatures)) {
+            return false;
+        }
+        return true;
+    }
+    async simulate(interaction) {
+        throw new Error("Method not implemented.");
+    }
+    /**
+     * Submits a signed interaction to the MOI protocol network.
+     *
+     * @param interaction - The signed interaction to submit.
+     * @returns A promise that resolves to the hash of the submitted interaction.
+     */
+    async submit(interaction) {
+        let ix;
+        if (Provider.isSignedInteraction(interaction)) {
+            ix = interaction;
+        }
+        if (ix == null) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        if (!(0, js_moi_utils_1.isHex)(ix.interaction)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid hex string", "interaction", ix.interaction);
+        }
+        if (ix.signatures.length === 0) {
+            js_moi_utils_1.ErrorUtils.throwError("Interaction must be have at least one signature", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
+        }
+        return await this.execute("moi.Submit", {
+            interaction: ix.interaction,
+            signatures: ix.signatures,
+        });
+    }
     async subscribe(event, ...params) {
-        params.unshift(event);
         return await this.execute("moi.Subscribe", [event, ...params]);
     }
     /**

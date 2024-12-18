@@ -1,5 +1,5 @@
 import type { Hex } from "js-moi-utils";
-import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, TesseractReferenceParam } from "./shared";
+import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, SignedInteraction, TesseractReferenceParam } from "./shared";
 
 interface MOIExecutionApi {
     "moi.Version": {
@@ -42,9 +42,9 @@ interface MOIExecutionApi {
         params: [];
         response: unknown;
     };
-    "moi.SyncStatus": {
-        params: [{ include_pending_accounts?: boolean }];
-        response: unknown;
+    "moi.Submit": {
+        params: [ix: SignedInteraction];
+        response: Hex;
     };
     "moi.Subscribe": {
         params: unknown[];
@@ -52,6 +52,10 @@ interface MOIExecutionApi {
     };
     "moi.Subscription": {
         params: [];
+        response: unknown;
+    };
+    "moi.SyncStatus": {
+        params: [{ include_pending_accounts?: boolean }];
         response: unknown;
     };
     "moi.Unsubscribe": {

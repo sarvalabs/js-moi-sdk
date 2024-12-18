@@ -1,9 +1,9 @@
-import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex, type InteractionRequest } from "js-moi-utils";
 
 import EventEmitter from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, TesseractIncludeFields, TesseractReference } from "./types/shared";
+import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -227,8 +227,58 @@ export class Provider extends EventEmitter {
         return await this.execute("moi.LogicStorage", ...params);
     }
 
+    private static isSignedInteraction(ix: unknown): ix is SignedInteraction {
+        if (typeof ix !== "object" || ix == null) {
+            return false;
+        }
+
+        if (!("interaction" in ix) || typeof ix.interaction !== "string") {
+            return false;
+        }
+
+        if (!("signatures" in ix) || !Array.isArray(ix.signatures)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public async simulate(interaction: InteractionRequest) {
+        throw new Error("Method not implemented.");
+    }
+
+    /**
+     * Submits a signed interaction to the MOI protocol network.
+     *
+     * @param interaction - The signed interaction to submit.
+     * @returns A promise that resolves to the hash of the submitted interaction.
+     */
+    public async submit(interaction: SignedInteraction): Promise<Hex> {
+        let ix: SignedInteraction | undefined;
+
+        if (Provider.isSignedInteraction(interaction)) {
+            ix = interaction;
+        }
+
+        if (ix == null) {
+            ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+        }
+
+        if (!isHex(ix.interaction)) {
+            ErrorUtils.throwArgumentError("Must be a valid hex string", "interaction", ix.interaction);
+        }
+
+        if (ix.signatures.length === 0) {
+            ErrorUtils.throwError("Interaction must be have at least one signature", ErrorCode.INVALID_SIGNATURE);
+        }
+
+        return await this.execute("moi.Submit", {
+            interaction: ix.interaction,
+            signatures: ix.signatures,
+        });
+    }
+
     public async subscribe(event: string, ...params: unknown[]): Promise<string> {
-        params.unshift(event);
         return await this.execute("moi.Subscribe", [event, ...params]);
     }
 
