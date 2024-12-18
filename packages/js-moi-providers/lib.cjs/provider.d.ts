@@ -1,7 +1,7 @@
 import { type Hex, type InteractionRequest } from "js-moi-utils";
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
+import type { AccountAsset, Confirmation, Interaction, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -27,7 +27,7 @@ export declare class Provider extends EventEmitter {
      * @param include - The fields to include in the response.
      * @returns A promise that resolves to the tesseract.
      */
-    getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<unknown>;
+    getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract>;
     /**
      * Retrieves a tesseract by its address and height
      *
@@ -37,7 +37,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<unknown>;
+    getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<Tesseract>;
     /**
      * Retrieves a tesseract by its relative reference
      *
@@ -46,14 +46,14 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<unknown>;
+    getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<Tesseract>;
     /**
      * Retrieves an interaction by its hash.
      *
      * @param hash - The hash of the interaction to retrieve.
      * @returns A promise that resolves to the interaction.
      */
-    getInteraction(hash: Hex): Promise<unknown>;
+    getInteraction(hash: Hex): Promise<Interaction>;
     /**
      * Retrieves information about an account.
      *
@@ -71,9 +71,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account information for the provided key id
      */
-    getAccountKey(address: Hex, keyId: number, pending?: boolean): Promise<{
-        key_data: unknown;
-    }>;
+    getAccountKey(address: Hex, keyId: number, pending?: boolean): Promise<import("./types/moi-rpc-method").AccountKey>;
     /**
      * Retrieves the balances, mandates and deposits for a specific asset on an account
      *
@@ -83,7 +81,14 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account asset information
      */
-    getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<unknown>;
+    getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]>;
+    /**
+     * Retrieves the interaction confirmation
+     *
+     * @param hash The hash of the interaction to retrieve the confirmation.
+     * @returns A promise that resolves to object containing the confirmation information.
+     */
+    getConfirmation(hash: Hex): Promise<Confirmation>;
     /**
      * Retrieves information about an asset
      *

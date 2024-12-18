@@ -1,8 +1,8 @@
 import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex, type InteractionRequest } from "js-moi-utils";
 
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { AccountAsset, Confirmation, RpcMethod, RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
+import type { AccountAsset, Confirmation, Interaction, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
@@ -43,15 +43,15 @@ export class Provider extends EventEmitter {
         return await this.execute("moi.Version");
     }
 
-    private async getTesseractByReference(reference: TesseractReference, include: TesseractIncludeFields = []): Promise<unknown> {
+    private async getTesseractByReference(reference: TesseractReference, include: TesseractIncludeFields = []): Promise<Tesseract> {
         return await this.execute("moi.Tesseract", { reference, include });
     }
 
-    private async getTesseractByHash(hash: Hex, include?: TesseractIncludeFields): Promise<unknown> {
+    private async getTesseractByHash(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract> {
         return await this.getTesseractByReference({ absolute: hash }, include);
     }
 
-    private async getTesseractByAddressAndHeight(address: Hex, height: number, include?: TesseractIncludeFields): Promise<unknown> {
+    private async getTesseractByAddressAndHeight(address: Hex, height: number, include?: TesseractIncludeFields): Promise<Tesseract> {
         if (height < -1) {
             ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
         }
@@ -66,7 +66,7 @@ export class Provider extends EventEmitter {
      * @param include - The fields to include in the response.
      * @returns A promise that resolves to the tesseract.
      */
-    public getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<unknown>;
+    public getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract>;
     /**
      * Retrieves a tesseract by its address and height
      *
@@ -76,7 +76,7 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    public getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<unknown>;
+    public getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<Tesseract>;
     /**
      * Retrieves a tesseract by its relative reference
      *
@@ -85,8 +85,12 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the tesseract.
      */
-    public getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<unknown>;
-    public async getTesseract(hashOrAddress: Hex | RelativeTesseractOption, heightOrInclude?: number | TesseractIncludeFields, include?: TesseractIncludeFields): Promise<unknown> {
+    public getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<Tesseract>;
+    public async getTesseract(
+        hashOrAddress: Hex | RelativeTesseractOption,
+        heightOrInclude?: number | TesseractIncludeFields,
+        include?: TesseractIncludeFields
+    ): Promise<Tesseract> {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
             return await this.getTesseractByAddressAndHeight(hashOrAddress.address, hashOrAddress.height, heightOrInclude);
         }
@@ -108,7 +112,7 @@ export class Provider extends EventEmitter {
      * @param hash - The hash of the interaction to retrieve.
      * @returns A promise that resolves to the interaction.
      */
-    public async getInteraction(hash: Hex): Promise<unknown> {
+    public async getInteraction(hash: Hex): Promise<Interaction> {
         return await this.execute("moi.Interaction", { hash });
     }
 

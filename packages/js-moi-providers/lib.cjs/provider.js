@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Provider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-const events_1 = __importDefault(require("events"));
-class Provider extends events_1.default {
+const events_1 = require("events");
+class Provider extends events_1.EventEmitter {
     _transport;
     constructor(transport) {
         super();
@@ -107,6 +104,15 @@ class Provider extends events_1.default {
             asset_id: assetId,
             ...option,
         });
+    }
+    /**
+     * Retrieves the interaction confirmation
+     *
+     * @param hash The hash of the interaction to retrieve the confirmation.
+     * @returns A promise that resolves to object containing the confirmation information.
+     */
+    async getConfirmation(hash) {
+        return await this.execute("moi.Confirmation", { hash });
     }
     /**
      * Retrieves information about an asset

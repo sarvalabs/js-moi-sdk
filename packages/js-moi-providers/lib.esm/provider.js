@@ -1,5 +1,5 @@
 import { ErrorCode, ErrorUtils, isAddress, isHex } from "js-moi-utils";
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 export class Provider extends EventEmitter {
     _transport;
     constructor(transport) {
@@ -101,6 +101,15 @@ export class Provider extends EventEmitter {
             asset_id: assetId,
             ...option,
         });
+    }
+    /**
+     * Retrieves the interaction confirmation
+     *
+     * @param hash The hash of the interaction to retrieve the confirmation.
+     * @returns A promise that resolves to object containing the confirmation information.
+     */
+    async getConfirmation(hash) {
+        return await this.execute("moi.Confirmation", { hash });
     }
     /**
      * Retrieves information about an asset
