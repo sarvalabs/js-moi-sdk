@@ -1,5 +1,114 @@
-import type { Hex } from "js-moi-utils";
+import type { Hex, OpType } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, SignedInteraction, TesseractReferenceParam } from "./shared";
+
+interface ParticipantContextDelta {
+    behavior: Hex[];
+    stochastic: Hex[];
+    replaced: Hex[];
+}
+
+interface ParticipantContext {
+    latest: Hex;
+    previous: Hex;
+    delta: ParticipantContextDelta;
+}
+
+interface Participant {
+    address: Hex;
+    height: number;
+    lock: string;
+    notary: boolean;
+    transition: Hex;
+    state: Hex;
+    context: ParticipantContext;
+}
+
+interface Account {
+    address: Hex;
+    sequence: number;
+    key_id: number;
+}
+
+interface Interaction {
+    hash: Hex;
+    sender: Account;
+    payer: Account;
+    fuel_limit: number;
+    fuel_tip: number;
+    tesseract: {
+        hash: Hex;
+        index: number;
+    };
+    participants: Participant[];
+    operations: {
+        string: OpType;
+        payload: unknown[];
+    }[];
+}
+
+interface Consensus {
+    ics: {
+        seed: Hex;
+        proof: Hex;
+        cluster_id: Hex;
+        stochastic: {
+            size: number;
+            nodes: Hex[];
+        };
+    };
+    operator: Hex;
+    proposer: Hex;
+    propose_view: number;
+    commit_view: number;
+    commits: {
+        qc_type: string;
+        signer_indices: string;
+        signature: Hex;
+        previous: {
+            address: Hex;
+            commit_hash: Hex;
+            evidence_hash: Hex;
+        };
+    };
+}
+
+interface TesseractHeader {
+    seal: Hex;
+    epoch: number;
+    timestamp: number;
+    interactions: Hex;
+    confirmations: Hex;
+    fuel: {
+        limit: number;
+        used: number;
+        tip: number;
+    };
+    participants: Participant[];
+}
+
+interface Confirmations {
+    hash: Hex;
+    status: string;
+    sender: Hex;
+    fuel_used: number;
+    tesseract: {
+        hash: Hex;
+        index: number;
+    };
+    operations: {
+        string: OpType;
+        status: string;
+        payload: unknown[];
+    }[];
+}
+
+interface Tesseract {
+    hash: Hex;
+    header: TesseractHeader;
+    consensus?: Consensus;
+    interactions: Interaction[];
+    confirmations: Confirmations[];
+}
 
 interface MOIExecutionApi {
     "moi.Version": {
