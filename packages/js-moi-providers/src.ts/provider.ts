@@ -245,7 +245,7 @@ export class Provider extends EventEmitter {
 
     public async simulate(interaction: InteractionRequest) {
         throw new Error("Method not implemented.");
-    }
+    } 
 
     /**
      * Submits a signed interaction to the MOI protocol network.
