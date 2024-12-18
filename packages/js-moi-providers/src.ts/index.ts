@@ -3,7 +3,19 @@ export { Provider } from "./provider";
 export { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
 export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
-export type { RpcMethodParams, RpcMethodResponse } from "./types/moi-rpc-method";
+export type {
+    AccountAsset,
+    AccountKey,
+    Confirmations,
+    Interaction,
+    InteractionRequest,
+    Operation,
+    OperationPayload,
+    Participant,
+    RpcMethodParams,
+    RpcMethodResponse,
+    Tesseract,
+} from "./types/moi-rpc-method";
 export type {
     AccountParam,
     AssetParam,

@@ -1,6 +1,12 @@
 import type { Hex, OpType } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, SignedInteraction, TesseractReferenceParam } from "./shared";
 
+interface Account {
+    address: Hex;
+    sequence: number;
+    key_id: number;
+}
+
 interface ParticipantContextDelta {
     behavior: Hex[];
     stochastic: Hex[];
@@ -13,7 +19,7 @@ interface ParticipantContext {
     delta: ParticipantContextDelta;
 }
 
-interface Participant {
+export interface Participant {
     address: Hex;
     height: number;
     lock: string;
@@ -23,27 +29,49 @@ interface Participant {
     context: ParticipantContext;
 }
 
-interface Account {
-    address: Hex;
-    sequence: number;
-    key_id: number;
+export interface Operation {
+    type: OpType;
+    payload: unknown;
 }
 
-interface Interaction {
-    hash: Hex;
+interface InteractionShared {
     sender: Account;
     payer: Account;
     fuel_limit: number;
     fuel_tip: number;
-    tesseract: {
-        hash: Hex;
-        index: number;
+    operations: Operation[];
+}
+
+interface Fund {
+    asset: Hex;
+    label: string;
+    type: string;
+}
+
+interface InteractionPreference {
+    compute: Hex;
+    consensus: {
+        mtq: Hex;
+        nodes: Hex[];
     };
+}
+
+export interface InteractionRequest extends InteractionShared {
+    funds: Fund[];
+    participants: Pick<Participant, "address" | "lock" | "notary">[];
+    preferences: InteractionPreference;
+    perception: Hex;
+}
+
+interface InteractionTesseract {
+    hash: Hex;
+    index: number;
+}
+
+export interface Interaction extends InteractionShared {
+    hash: Hex;
+    tesseract: InteractionTesseract;
     participants: Participant[];
-    operations: {
-        string: OpType;
-        payload: unknown[];
-    }[];
 }
 
 interface Consensus {
@@ -86,28 +114,53 @@ interface TesseractHeader {
     participants: Participant[];
 }
 
-interface Confirmations {
+export interface OperationPayload {
+    type: OpType;
+    status: string;
+    payload: unknown[];
+}
+
+export interface Confirmations {
     hash: Hex;
     status: string;
     sender: Hex;
     fuel_used: number;
-    tesseract: {
-        hash: Hex;
-        index: number;
-    };
-    operations: {
-        string: OpType;
-        status: string;
-        payload: unknown[];
-    }[];
+    tesseract: InteractionTesseract;
+    operations: OperationPayload[];
 }
 
-interface Tesseract {
+export interface Tesseract {
     hash: Hex;
     header: TesseractHeader;
     consensus?: Consensus;
     interactions: Interaction[];
     confirmations: Confirmations[];
+}
+
+export interface AccountKey {
+    key_id: number;
+    weight: number;
+    revoked: boolean;
+    public_key: Hex;
+    sequence: number;
+    algorithm: string;
+}
+
+interface Mandate {
+    spender: Hex;
+    amount: number;
+}
+
+interface Deposit {
+    locker: Hex;
+    amount: number;
+}
+
+export interface AccountAsset {
+    asset_id: Hex;
+    balance: number;
+    mandates: Mandate[];
+    deposits: Deposit[];
 }
 
 interface MOIExecutionApi {
@@ -117,11 +170,11 @@ interface MOIExecutionApi {
     };
     "moi.Tesseract": {
         params: [Required<TesseractReferenceParam> & IncludesParam<"moi.Tesseract">];
-        response: unknown;
+        response: Tesseract;
     };
     "moi.Interaction": {
         params: [InteractionParam];
-        response: { ix_data: unknown };
+        response: Interaction;
     };
     "moi.Account": {
         params: [AccountParam & TesseractReferenceParam & IncludesParam<"moi.Account">];
@@ -129,11 +182,11 @@ interface MOIExecutionApi {
     };
     "moi.AccountKey": {
         params: [AccountParam & { key_id: number; pending?: boolean }];
-        response: { key_data: unknown };
+        response: AccountKey;
     };
     "moi.AccountAsset": {
         params: [AccountParam & AssetParam & TesseractReferenceParam & IncludesParam<"moi.AccountAsset">];
-        response: { asset_data: unknown };
+        response: AccountAsset[];
     };
     "moi.Asset": {
         params: [AssetParam & TesseractReferenceParam];
