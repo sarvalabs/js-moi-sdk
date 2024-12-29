@@ -33,6 +33,7 @@ export class ParticipantCreateSerializer implements OperationSerializer<Particip
             },
         },
     };
+
     serialize(payload: ParticipantCreatePayload): Uint8Array {
         const polorizer = new Polorizer();
         console.log(payload);
