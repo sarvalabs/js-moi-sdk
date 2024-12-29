@@ -1,7 +1,7 @@
-import { type Hex, type InteractionRequest } from "js-moi-utils";
+import { type Hex } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { AccountAsset, Confirmation, Interaction, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
+import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;

@@ -1,8 +1,8 @@
-import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex, type InteractionRequest } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils";
 
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { AccountAsset, Confirmation, Interaction, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
+import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 

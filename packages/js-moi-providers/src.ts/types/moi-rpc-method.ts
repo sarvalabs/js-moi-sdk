@@ -1,4 +1,4 @@
-import type { Hex, OpType } from "js-moi-utils";
+import { Hex, OpType } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, SignedInteraction, TesseractReferenceParam } from "./shared";
 
 interface Account {
@@ -29,17 +29,34 @@ export interface Participant {
     context: ParticipantContext;
 }
 
-export interface Operation {
-    type: OpType;
-    payload: unknown;
+interface ParticipantCreatePayload {
+    address: Hex;
+    amount: number;
+    keys: unknown[];
 }
+
+interface AssetCreatePayload {
+    symbol: string;
+    standard: number;
+    supply: number;
+    logic: unknown;
+}
+
+type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE ? ParticipantCreatePayload : T extends OpType.ASSET_CREATE ? AssetCreatePayload : never;
+
+export interface Operation<TOpType extends OpType> {
+    type: TOpType;
+    payload: OperationPayload<TOpType>;
+}
+
+export type IxOperation = Operation<OpType.PARTICIPANT_CREATE> | Operation<OpType.ASSET_CREATE>;
 
 interface InteractionShared {
     sender: Account;
     payer: Account;
     fuel_limit: number;
     fuel_tip: number;
-    operations: Operation[];
+    operations: IxOperation[];
 }
 
 interface Fund {
@@ -114,7 +131,7 @@ interface TesseractHeader {
     participants: Participant[];
 }
 
-export interface OperationPayload {
+export interface OperationPayloadConfirmation {
     type: OpType;
     status: string;
     payload: unknown[];
@@ -126,7 +143,7 @@ export interface Confirmation {
     sender: Hex;
     fuel_used: number;
     tesseract: InteractionTesseract;
-    operations: OperationPayload[];
+    operations: OperationPayloadConfirmation[];
 }
 
 export interface Tesseract {

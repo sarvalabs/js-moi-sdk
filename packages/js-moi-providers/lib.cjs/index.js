@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebsocketProvider = exports.WebsocketEvent = exports.WebsocketTransport = exports.HttpTransport = exports.Provider = exports.JsonRpcProvider = void 0;
+exports.WebsocketProvider = exports.WebsocketEvent = exports.WebsocketTransport = exports.HttpTransport = exports.InteractionSerializer = exports.Provider = exports.JsonRpcProvider = void 0;
 var json_rpc_provider_1 = require("./json-rpc-provider");
 Object.defineProperty(exports, "JsonRpcProvider", { enumerable: true, get: function () { return json_rpc_provider_1.JsonRpcProvider; } });
 var provider_1 = require("./provider");
 Object.defineProperty(exports, "Provider", { enumerable: true, get: function () { return provider_1.Provider; } });
+var serializer_1 = require("./serializer/serializer");
+Object.defineProperty(exports, "InteractionSerializer", { enumerable: true, get: function () { return serializer_1.InteractionSerializer; } });
 var http_transport_1 = require("./transport/http-transport");
 Object.defineProperty(exports, "HttpTransport", { enumerable: true, get: function () { return http_transport_1.HttpTransport; } });
 var ws_transport_1 = require("./transport/ws-transport");
