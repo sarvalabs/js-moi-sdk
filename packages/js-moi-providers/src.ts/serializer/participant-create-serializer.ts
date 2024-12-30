@@ -8,20 +8,16 @@ export class ParticipantCreateSerializer extends OperationSerializer {
     public readonly schema: Schema = {
         kind: "struct",
         fields: {
-            account: {
-                kind: "bytes",
-            },
-            amount: {
-                kind: "integer",
-            },
+            account: { kind: "bytes" },
+            amount: { kind: "integer" },
             keys: {
                 kind: "array",
                 fields: {
                     kind: "struct",
                     fields: {
-                        keys: {
-                            kind: "bytes",
-                        },
+                        public_key: { kind: "bytes" },
+                        weight: { kind: "integer" },
+                        algorithm: { kind: "string" },
                     },
                 },
             },
