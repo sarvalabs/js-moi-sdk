@@ -35,7 +35,7 @@ interface AssetCreatePayload {
     supply: number;
     logic: unknown;
 }
-type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE ? ParticipantCreatePayload : T extends OpType.ASSET_CREATE ? AssetCreatePayload : never;
+export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE ? ParticipantCreatePayload : T extends OpType.ASSET_CREATE ? AssetCreatePayload : never;
 export interface Operation<TOpType extends OpType> {
     type: TOpType;
     payload: OperationPayload<TOpType>;

@@ -1,17 +1,11 @@
-import { Address, OpType } from "js-moi-utils";
-import { Polorizer, type Schema } from "js-polo";
-import type { OperationSerializer } from "./op-serializer";
+import { OpType } from "js-moi-utils";
+import type { Schema } from "js-polo";
+import { OperationSerializer } from "./op-serializer";
 
-export interface ParticipantCreatePayload {
-    account: Address;
-    amount: number;
-    keys: { keys: string }[];
-}
-
-export class ParticipantCreateSerializer implements OperationSerializer<ParticipantCreatePayload> {
+export class ParticipantCreateSerializer extends OperationSerializer {
     public readonly type = OpType.PARTICIPANT_CREATE;
 
-    private static SCHEMA: Schema = {
+    public readonly schema: Schema = {
         kind: "struct",
         fields: {
             account: {
@@ -33,15 +27,4 @@ export class ParticipantCreateSerializer implements OperationSerializer<Particip
             },
         },
     };
-
-    serialize(payload: ParticipantCreatePayload): Uint8Array {
-        const polorizer = new Polorizer();
-        console.log(payload);
-        polorizer.polorize(payload, this.getSchema());
-        return polorizer.bytes();
-    }
-
-    getSchema() {
-        return ParticipantCreateSerializer.SCHEMA;
-    }
 }

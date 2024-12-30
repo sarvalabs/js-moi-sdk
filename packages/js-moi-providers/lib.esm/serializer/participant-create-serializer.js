@@ -1,8 +1,8 @@
 import { OpType } from "js-moi-utils";
-import { Polorizer } from "js-polo";
-export class ParticipantCreateSerializer {
+import { OperationSerializer } from "./op-serializer";
+export class ParticipantCreateSerializer extends OperationSerializer {
     type = OpType.PARTICIPANT_CREATE;
-    static SCHEMA = {
+    schema = {
         kind: "struct",
         fields: {
             account: {
@@ -24,14 +24,5 @@ export class ParticipantCreateSerializer {
             },
         },
     };
-    serialize(payload) {
-        const polorizer = new Polorizer();
-        console.log(payload);
-        polorizer.polorize(payload, this.getSchema());
-        return polorizer.bytes();
-    }
-    getSchema() {
-        return ParticipantCreateSerializer.SCHEMA;
-    }
 }
 //# sourceMappingURL=participant-create-serializer.js.map

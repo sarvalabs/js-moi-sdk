@@ -1,1 +1,1 @@
-{"version":3,"file":"op-serializer.js","sourceRoot":"","sources":["../../src.ts/serializer/op-serializer.ts"],"names":[],"mappings":""}
+{"version":3,"file":"op-serializer.js","sourceRoot":"","sources":["../../src.ts/serializer/op-serializer.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAe,MAAM,SAAS,CAAC;AAEjD,MAAM,OAAgB,mBAAmB;IAK9B,SAAS,CAAC,OAAY;QACzB,MAAM,SAAS,GAAG,IAAI,SAAS,EAAE,CAAC;QAClC,SAAS,CAAC,QAAQ,CAAC,OAAO,EAAE,IAAI,CAAC,MAAM,CAAC,CAAC;QACzC,OAAO,SAAS,CAAC,KAAK,EAAE,CAAC;IAC7B,CAAC;CACJ"}

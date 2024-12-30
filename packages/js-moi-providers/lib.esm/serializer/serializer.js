@@ -1,5 +1,4 @@
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { ParticipantCreateSerializer } from "./participant-create-serializer";
 export class InteractionSerializer {
     static serializers = new Map();
     static IX_POLO_SCHEMA = {
@@ -78,7 +77,7 @@ export class InteractionSerializer {
     }
     static {
         // Register all serializers
-        this.register(new ParticipantCreateSerializer());
+        // this.register(new ParticipantCreateSerializer());
     }
 }
 //# sourceMappingURL=serializer.js.map
