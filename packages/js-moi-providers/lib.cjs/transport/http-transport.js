@@ -21,13 +21,15 @@ class HttpTransport {
         let result;
         try {
             const content = JSON.stringify(request);
+            const headers = new Headers({
+                "Content-Type": "application/json",
+                "Content-Length": content.length.toString(),
+                Accept: "application/json",
+            });
             const response = await fetch(this.host, {
                 method: "POST",
                 body: content,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Content-Length": content.length.toString(),
-                },
+                headers: headers,
             });
             if (!response.ok) {
                 result = {
