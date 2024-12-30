@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionSerializer = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const asset_create_serializer_1 = require("./asset-create-serializer");
+const participant_create_serializer_1 = require("./participant-create-serializer");
 class InteractionSerializer {
     static serializers = new Map();
     static IX_POLO_SCHEMA = {
@@ -80,7 +82,8 @@ class InteractionSerializer {
     }
     static {
         // Register all serializers
-        // this.register(new ParticipantCreateSerializer());
+        this.register(new participant_create_serializer_1.ParticipantCreateSerializer());
+        this.register(new asset_create_serializer_1.AssetCreateSerializer());
     }
 }
 exports.InteractionSerializer = InteractionSerializer;

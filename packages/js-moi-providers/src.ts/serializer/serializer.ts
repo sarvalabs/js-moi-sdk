@@ -1,6 +1,8 @@
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import type { InteractionRequest, Operation } from "../types/moi-rpc-method";
+import { AssetCreateSerializer } from "./asset-create-serializer";
 import type { OperationSerializer } from "./op-serializer";
+import { ParticipantCreateSerializer } from "./participant-create-serializer";
 
 export class InteractionSerializer {
     private static serializers: Map<OpType, OperationSerializer> = new Map();
@@ -90,6 +92,7 @@ export class InteractionSerializer {
 
     static {
         // Register all serializers
-        // this.register(new ParticipantCreateSerializer());
+        this.register(new ParticipantCreateSerializer());
+        this.register(new AssetCreateSerializer());
     }
 }
