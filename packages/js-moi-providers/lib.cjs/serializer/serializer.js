@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionSerializer = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
 const asset_create_serializer_1 = require("./asset-create-serializer");
 const participant_create_serializer_1 = require("./participant-create-serializer");
 class InteractionSerializer {
@@ -67,7 +68,16 @@ class InteractionSerializer {
         return serializer.serialize(operation.payload);
     }
     serialize(interaction) {
-        return InteractionSerializer.IX_POLO_SCHEMA;
+        const polorizer = new js_polo_1.Polorizer();
+        const payload = {
+            ...interaction,
+            operations: interaction.operations.map((op) => ({
+                type: op.type,
+                payload: this.serializeOperation(op),
+            })),
+        };
+        polorizer.polorize(payload, InteractionSerializer.IX_POLO_SCHEMA);
+        return polorizer.bytes();
     }
     /**
      * Register a serializer for a given operation type

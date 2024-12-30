@@ -1,4 +1,5 @@
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
+import { Polorizer } from "js-polo";
 import type { InteractionRequest, Operation } from "../types/moi-rpc-method";
 import { AssetCreateSerializer } from "./asset-create-serializer";
 import type { OperationSerializer } from "./op-serializer";
@@ -75,7 +76,16 @@ export class InteractionSerializer {
     }
 
     public serialize(interaction: InteractionRequest) {
-        return InteractionSerializer.IX_POLO_SCHEMA;
+        const polorizer = new Polorizer();
+        const payload = {
+            ...interaction,
+            operations: interaction.operations.map((op) => ({
+                type: op.type,
+                payload: this.serializeOperation(op),
+            })),
+        };
+        polorizer.polorize(payload, InteractionSerializer.IX_POLO_SCHEMA);
+        return polorizer.bytes();
     }
 
     /**

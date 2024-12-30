@@ -29,11 +29,13 @@ export class HttpTransport implements Transport {
         let result: JsonRpcResponse<TResult>;
 
         try {
+            const content = JSON.stringify(request);
             const response = await fetch(this.host, {
                 method: "POST",
-                body: JSON.stringify(request),
+                body: content,
                 headers: {
                     "Content-Type": "application/json",
+                    "Content-Length": content.length.toString(),
                 },
             });
 
