@@ -52,8 +52,8 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    async getProtocol(modifier) {
-        return await this.call("moi.Protocol", { modifier });
+    async getProtocol(option) {
+        return await this.call("moi.Protocol", option ?? {});
     }
     async getTesseractByReference(reference, include = []) {
         return await this.call("moi.Tesseract", { reference, include });
@@ -85,8 +85,8 @@ export class Provider extends EventEmitter {
      * @param hash - The hash of the interaction to retrieve.
      * @returns A promise that resolves to the interaction.
      */
-    async getInteraction(hash) {
-        return await this.call("moi.Interaction", { hash });
+    async getInteraction(hash, options) {
+        return await this.call("moi.Interaction", { hash, ...options });
     }
     /**
      * Retrieves information about an account.

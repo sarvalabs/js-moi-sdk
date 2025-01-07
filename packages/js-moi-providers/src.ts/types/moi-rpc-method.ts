@@ -1,5 +1,15 @@
 import { Hex, OpType } from "js-moi-utils";
-import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, ResponseModifierParam, SignedInteraction, TesseractReferenceParam } from "./shared";
+import type {
+    AccountParam,
+    AssetParam,
+    IncludesParam,
+    InteractionParam,
+    LogicParam,
+    MoiClientInfo,
+    ResponseModifierParam,
+    SignedInteraction,
+    TesseractReferenceParam,
+} from "./shared";
 
 interface Account {
     address: Hex;
@@ -206,7 +216,7 @@ interface MOIExecutionApi {
         response: Tesseract;
     };
     "moi.Interaction": {
-        params: [InteractionParam];
+        params: [InteractionParam & ResponseModifierParam];
         response: Interaction;
     };
     "moi.Account": {

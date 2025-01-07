@@ -3,7 +3,7 @@ import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils"
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, ResponseModifier, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
+import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -67,8 +67,8 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    public async getProtocol(modifier?: ResponseModifier): Promise<MoiClientInfo> {
-        return await this.call("moi.Protocol", { modifier });
+    public async getProtocol(option?: ResponseModifierParam): Promise<MoiClientInfo> {
+        return await this.call("moi.Protocol", option ?? {});
     }
 
     private async getTesseractByReference(reference: TesseractReference, include: TesseractIncludeFields = []): Promise<Tesseract> {
@@ -140,8 +140,8 @@ export class Provider extends EventEmitter {
      * @param hash - The hash of the interaction to retrieve.
      * @returns A promise that resolves to the interaction.
      */
-    public async getInteraction(hash: Hex): Promise<Interaction> {
-        return await this.call("moi.Interaction", { hash });
+    public async getInteraction(hash: Hex, options?: ResponseModifierParam): Promise<Partial<Interaction>> {
+        return await this.call("moi.Interaction", { hash, ...options });
     }
 
     /**

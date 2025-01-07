@@ -180,7 +180,7 @@ interface MOIExecutionApi {
         response: Tesseract;
     };
     "moi.Interaction": {
-        params: [InteractionParam];
+        params: [InteractionParam & ResponseModifierParam];
         response: Interaction;
     };
     "moi.Account": {

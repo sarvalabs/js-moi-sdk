@@ -2,7 +2,7 @@ import { type Hex } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, ResponseModifier, SignedInteraction, TesseractIncludeFields } from "./types/shared";
+import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter {
@@ -44,7 +44,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    getProtocol(modifier?: ResponseModifier): Promise<MoiClientInfo>;
+    getProtocol(option?: ResponseModifierParam): Promise<MoiClientInfo>;
     private getTesseractByReference;
     private getTesseractByHash;
     private getTesseractByAddressAndHeight;
@@ -81,7 +81,7 @@ export declare class Provider extends EventEmitter {
      * @param hash - The hash of the interaction to retrieve.
      * @returns A promise that resolves to the interaction.
      */
-    getInteraction(hash: Hex): Promise<Interaction>;
+    getInteraction(hash: Hex, options?: ResponseModifierParam): Promise<Partial<Interaction>>;
     /**
      * Retrieves information about an account.
      *
