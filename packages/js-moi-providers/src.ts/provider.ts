@@ -3,7 +3,7 @@ import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils"
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
+import type { MoiClientInfo, RelativeTesseractOption, ResponseModifier, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -25,7 +25,7 @@ export class Provider extends EventEmitter {
         return this._transport;
     }
 
-    protected async execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
+    protected async call<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
         const response = await this._transport.request<RpcMethodResponse<T>>(method, params);
         return this.processJsonRpcResponse(response);
     }
@@ -39,12 +39,12 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    public async getVersion(): Promise<MoiClientInfo> {
-        return await this.execute("moi.Version");
+    public async getProtocol(modifier?: ResponseModifier): Promise<MoiClientInfo> {
+        return await this.call("moi.Protocol", { modifier });
     }
 
     private async getTesseractByReference(reference: TesseractReference, include: TesseractIncludeFields = []): Promise<Tesseract> {
-        return await this.execute("moi.Tesseract", { reference, include });
+        return await this.call("moi.Tesseract", { reference, include });
     }
 
     private async getTesseractByHash(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract> {
@@ -113,7 +113,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the interaction.
      */
     public async getInteraction(hash: Hex): Promise<Interaction> {
-        return await this.execute("moi.Interaction", { hash });
+        return await this.call("moi.Interaction", { hash });
     }
 
     /**
@@ -124,7 +124,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the account information
      */
     public async getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "address">): Promise<unknown> {
-        return await this.execute("moi.Account", { address, ...option });
+        return await this.call("moi.Account", { address, ...option });
     }
 
     /**
@@ -137,7 +137,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the account information for the provided key id
      */
     public async getAccountKey(address: Hex, keyId: number, pending?: boolean) {
-        return await this.execute("moi.AccountKey", {
+        return await this.call("moi.AccountKey", {
             address,
             key_id: keyId,
             pending,
@@ -154,7 +154,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the account asset information
      */
     public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]> {
-        return await this.execute("moi.AccountAsset", {
+        return await this.call("moi.AccountAsset", {
             address,
             asset_id: assetId,
             ...option,
@@ -168,7 +168,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to object containing the confirmation information.
      */
     public async getConfirmation(hash: Hex): Promise<Confirmation> {
-        return await this.execute("moi.Confirmation", { hash });
+        return await this.call("moi.Confirmation", { hash });
     }
 
     /**
@@ -180,7 +180,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the asset information
      */
     public async getAsset(assetId: Hex, option?: Omit<RpcMethodParams<"moi.Asset">[0], "asset_id">): Promise<unknown> {
-        return await this.execute("moi.Asset", { asset_id: assetId, ...option });
+        return await this.call("moi.Asset", { asset_id: assetId, ...option });
     }
 
     /**
@@ -192,7 +192,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the logic information
      */
     public async getLogic(logicId: Hex, option?: Omit<RpcMethodParams<"moi.Logic">[0], "logic_id">): Promise<unknown> {
-        return await this.execute("moi.Logic", { logic_id: logicId, ...option });
+        return await this.call("moi.Logic", { logic_id: logicId, ...option });
     }
 
     /**
@@ -238,7 +238,7 @@ export class Provider extends EventEmitter {
             ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
         }
 
-        return await this.execute("moi.LogicStorage", ...params);
+        return await this.call("moi.LogicStorage", ...params);
     }
 
     private static isSignedInteraction(ix: unknown): ix is SignedInteraction {
@@ -286,14 +286,14 @@ export class Provider extends EventEmitter {
             ErrorUtils.throwError("Interaction must be have at least one signature", ErrorCode.INVALID_SIGNATURE);
         }
 
-        return await this.execute("moi.Submit", {
+        return await this.call("moi.Submit", {
             interaction: ix.interaction,
             signatures: ix.signatures,
         });
     }
 
     public async subscribe(event: string, ...params: unknown[]): Promise<string> {
-        return await this.execute("moi.Subscribe", [event, ...params]);
+        return await this.call("moi.Subscribe", [event, ...params]);
     }
 
     /**

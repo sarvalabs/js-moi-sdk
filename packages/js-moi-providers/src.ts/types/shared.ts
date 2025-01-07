@@ -100,3 +100,40 @@ export interface SignedInteraction {
      */
     signatures: Hex[];
 }
+
+interface IncludeResponseModifier {
+    /**
+     * A list of fields keys to include in the response. The given field keys
+     * must be unique and one of the fields that are supported by the response object.
+     * If a field that is already returned by default is mentioned, it is ignored.
+     */
+    include: string[];
+    /**
+     * It should not be used in conjunction with the include field.
+     */
+    isolate?: undefined;
+}
+
+interface IsolateResponseModifier {
+    /**
+     * It should not be used in conjunction with the isolate field.
+     */
+    include?: undefined;
+    /**
+     * A singular field key to return instead of the entire response object.
+     * This must be one of the fields supported by the response object. This can
+     * also be a field that is not returned by default.
+     */
+    isolate: string;
+}
+
+export type ResponseModifier = IncludeResponseModifier | IsolateResponseModifier;
+
+export interface ResponseModifierParam {
+    /**
+     * It can be used to modify the API response by including additional fields OR extracting a specific field.
+     *
+     * The modifier is invalid if both the include and extract fields are used in the same object.
+     */
+    modifier?: ResponseModifier;
+}
