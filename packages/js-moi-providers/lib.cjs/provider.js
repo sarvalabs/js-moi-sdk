@@ -5,6 +5,11 @@ const js_moi_utils_1 = require("js-moi-utils");
 const events_1 = require("events");
 class Provider extends events_1.EventEmitter {
     _transport;
+    /**
+     * Creates a new instance of the provider.
+     *
+     * @param transport - The transport to use for communication with the network.
+     */
     constructor(transport) {
         super();
         if (transport == null) {
@@ -12,26 +17,49 @@ class Provider extends events_1.EventEmitter {
         }
         this._transport = transport;
     }
+    /**
+     * The transport used to communicate with the network.
+     */
     get transport() {
         return this._transport;
     }
-    async execute(method, ...params) {
-        const response = await this._transport.request(method, params);
+    /**
+     * Calls a JSON-RPC method on the network using the `request` method and processes the response.
+     *
+     * @param method - The name of the method to invoke.
+     * @param params - The parameters to pass to the method.
+     *
+     * @returns A promise that resolves processed result from the JSON-RPC response.
+     *
+     * @throws Will throw an error if the response contains an error.
+     */
+    async call(method, ...params) {
+        const response = await this.request(method, params);
         return this.processJsonRpcResponse(response);
     }
+    /**
+     * Sends a JSON-RPC request to the network.
+     *
+     * @param method - name of the method to invoke.
+     * @param params - parameters to pass to the method.
+     *
+     * @returns A promise that resolves to the JSON-RPC response.
+     *
+     * @throws Will throw an error if the response contains an error.
+     */
     async request(method, params = []) {
-        return await this._transport.request(method, params);
+        return await this.transport.request(method, params);
     }
     /**
      * Retrieves the version and chain id of the MOI protocol network.
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    async getVersion() {
-        return await this.execute("moi.Version");
+    async getProtocol(modifier) {
+        return await this.call("moi.Protocol", { modifier });
     }
     async getTesseractByReference(reference, include = []) {
-        return await this.execute("moi.Tesseract", { reference, include });
+        return await this.call("moi.Tesseract", { reference, include });
     }
     async getTesseractByHash(hash, include) {
         return await this.getTesseractByReference({ absolute: hash }, include);
@@ -61,7 +89,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to the interaction.
      */
     async getInteraction(hash) {
-        return await this.execute("moi.Interaction", { hash });
+        return await this.call("moi.Interaction", { hash });
     }
     /**
      * Retrieves information about an account.
@@ -71,7 +99,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to the account information
      */
     async getAccount(address, option) {
-        return await this.execute("moi.Account", { address, ...option });
+        return await this.call("moi.Account", { address, ...option });
     }
     /**
      * Retrieves the account key for an account.
@@ -83,7 +111,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to the account information for the provided key id
      */
     async getAccountKey(address, keyId, pending) {
-        return await this.execute("moi.AccountKey", {
+        return await this.call("moi.AccountKey", {
             address,
             key_id: keyId,
             pending,
@@ -99,7 +127,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to the account asset information
      */
     async getAccountAsset(address, assetId, option) {
-        return await this.execute("moi.AccountAsset", {
+        return await this.call("moi.AccountAsset", {
             address,
             asset_id: assetId,
             ...option,
@@ -112,7 +140,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to object containing the confirmation information.
      */
     async getConfirmation(hash) {
-        return await this.execute("moi.Confirmation", { hash });
+        return await this.call("moi.Confirmation", { hash });
     }
     /**
      * Retrieves information about an asset
@@ -123,7 +151,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to the asset information
      */
     async getAsset(assetId, option) {
-        return await this.execute("moi.Asset", { asset_id: assetId, ...option });
+        return await this.call("moi.Asset", { asset_id: assetId, ...option });
     }
     /**
      * Retrieves information about a logic
@@ -134,7 +162,7 @@ class Provider extends events_1.EventEmitter {
      * @returns A promise that resolves to the logic information
      */
     async getLogic(logicId, option) {
-        return await this.execute("moi.Logic", { logic_id: logicId, ...option });
+        return await this.call("moi.Logic", { logic_id: logicId, ...option });
     }
     async getLogicStorage(logicId, key, addressOrOption, option) {
         let params;
@@ -154,7 +182,7 @@ class Provider extends events_1.EventEmitter {
         if (params == null) {
             js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        return await this.execute("moi.LogicStorage", ...params);
+        return await this.call("moi.LogicStorage", ...params);
     }
     static isSignedInteraction(ix) {
         if (typeof ix !== "object" || ix == null) {
@@ -191,13 +219,13 @@ class Provider extends events_1.EventEmitter {
         if (ix.signatures.length === 0) {
             js_moi_utils_1.ErrorUtils.throwError("Interaction must be have at least one signature", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
         }
-        return await this.execute("moi.Submit", {
+        return await this.call("moi.Submit", {
             interaction: ix.interaction,
             signatures: ix.signatures,
         });
     }
     async subscribe(event, ...params) {
-        return await this.execute("moi.Subscribe", [event, ...params]);
+        return await this.call("moi.Subscribe", [event, ...params]);
     }
     /**
      * Processes a JSON-RPC response and returns the result.
@@ -206,6 +234,7 @@ class Provider extends events_1.EventEmitter {
      * @template T - The type of the result expected from the JSON-RPC response.
      * @param {JsonRpcResponse<T>} response - The JSON-RPC response to process.
      * @returns {T} - The result from the JSON-RPC response.
+     *
      * @throws Will throw an error if the response contains an error.
      */
     processJsonRpcResponse(response) {

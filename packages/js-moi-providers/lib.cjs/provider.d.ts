@@ -2,21 +2,49 @@ import { type Hex } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "./types/shared";
+import type { MoiClientInfo, RelativeTesseractOption, ResponseModifier, SignedInteraction, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter {
     private readonly _transport;
+    /**
+     * Creates a new instance of the provider.
+     *
+     * @param transport - The transport to use for communication with the network.
+     */
     constructor(transport: Transport);
+    /**
+     * The transport used to communicate with the network.
+     */
     get transport(): Transport;
-    protected execute<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;
+    /**
+     * Calls a JSON-RPC method on the network using the `request` method and processes the response.
+     *
+     * @param method - The name of the method to invoke.
+     * @param params - The parameters to pass to the method.
+     *
+     * @returns A promise that resolves processed result from the JSON-RPC response.
+     *
+     * @throws Will throw an error if the response contains an error.
+     */
+    protected call<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;
+    /**
+     * Sends a JSON-RPC request to the network.
+     *
+     * @param method - name of the method to invoke.
+     * @param params - parameters to pass to the method.
+     *
+     * @returns A promise that resolves to the JSON-RPC response.
+     *
+     * @throws Will throw an error if the response contains an error.
+     */
     request<T>(method: string, params?: unknown[]): Promise<JsonRpcResponse<T>>;
     /**
      * Retrieves the version and chain id of the MOI protocol network.
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    getVersion(): Promise<MoiClientInfo>;
+    getProtocol(modifier?: ResponseModifier): Promise<MoiClientInfo>;
     private getTesseractByReference;
     private getTesseractByHash;
     private getTesseractByAddressAndHeight;
@@ -145,6 +173,7 @@ export declare class Provider extends EventEmitter {
      * @template T - The type of the result expected from the JSON-RPC response.
      * @param {JsonRpcResponse<T>} response - The JSON-RPC response to process.
      * @returns {T} - The result from the JSON-RPC response.
+     *
      * @throws Will throw an error if the response contains an error.
      */
     processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;

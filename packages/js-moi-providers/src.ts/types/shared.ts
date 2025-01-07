@@ -2,11 +2,11 @@ import type { Address, Hex } from "js-moi-utils";
 
 export interface MoiClientInfo {
     /**
-     * The networks protocol version
+     * The network's protocol version
      */
     version: string;
     /**
-     * The networks chain ID
+     * The network's chain ID
      */
     chain_id: number;
 }

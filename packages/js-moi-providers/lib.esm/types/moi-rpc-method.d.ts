@@ -1,5 +1,5 @@
 import { Hex, OpType } from "js-moi-utils";
-import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, SignedInteraction, TesseractReferenceParam } from "./shared";
+import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, ResponseModifierParam, SignedInteraction, TesseractReferenceParam } from "./shared";
 interface Account {
     address: Hex;
     sequence: number;
@@ -167,8 +167,8 @@ export interface AccountAsset {
     deposits: Deposit[];
 }
 interface MOIExecutionApi {
-    "moi.Version": {
-        params: [];
+    "moi.Protocol": {
+        params: [ResponseModifierParam];
         response: MoiClientInfo;
     };
     "moi.Confirmation": {

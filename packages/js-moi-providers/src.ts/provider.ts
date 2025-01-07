@@ -11,6 +11,11 @@ type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id
 export class Provider extends EventEmitter {
     private readonly _transport: Transport;
 
+    /**
+     * Creates a new instance of the provider.
+     *
+     * @param transport - The transport to use for communication with the network.
+     */
     public constructor(transport: Transport) {
         super();
 
@@ -21,17 +26,40 @@ export class Provider extends EventEmitter {
         this._transport = transport;
     }
 
+    /**
+     * The transport used to communicate with the network.
+     */
     public get transport(): Transport {
         return this._transport;
     }
 
+    /**
+     * Calls a JSON-RPC method on the network using the `request` method and processes the response.
+     *
+     * @param method - The name of the method to invoke.
+     * @param params - The parameters to pass to the method.
+     *
+     * @returns A promise that resolves processed result from the JSON-RPC response.
+     *
+     * @throws Will throw an error if the response contains an error.
+     */
     protected async call<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
-        const response = await this._transport.request<RpcMethodResponse<T>>(method, params);
+        const response = await this.request<RpcMethodResponse<T>>(method, params);
         return this.processJsonRpcResponse(response);
     }
 
+    /**
+     * Sends a JSON-RPC request to the network.
+     *
+     * @param method - name of the method to invoke.
+     * @param params - parameters to pass to the method.
+     *
+     * @returns A promise that resolves to the JSON-RPC response.
+     *
+     * @throws Will throw an error if the response contains an error.
+     */
     public async request<T>(method: string, params: unknown[] = []): Promise<JsonRpcResponse<T>> {
-        return await this._transport.request<T>(method, params);
+        return await this.transport.request<T>(method, params);
     }
 
     /**
@@ -303,6 +331,7 @@ export class Provider extends EventEmitter {
      * @template T - The type of the result expected from the JSON-RPC response.
      * @param {JsonRpcResponse<T>} response - The JSON-RPC response to process.
      * @returns {T} - The result from the JSON-RPC response.
+     *
      * @throws Will throw an error if the response contains an error.
      */
     public processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
