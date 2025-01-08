@@ -71,20 +71,20 @@ export class Provider extends EventEmitter {
         return await this.call("moi.Protocol", option ?? {});
     }
 
-    private async getTesseractByReference(reference: TesseractReference, include: TesseractIncludeFields = []): Promise<Tesseract> {
-        return await this.call("moi.Tesseract", { reference, include });
+    private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {
+        return await this.call("moi.Tesseract", { reference });
     }
 
-    private async getTesseractByHash(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract> {
-        return await this.getTesseractByReference({ absolute: hash }, include);
+    private async getTesseractByHash(hash: Hex): Promise<Tesseract> {
+        return await this.getTesseractByReference({ absolute: hash });
     }
 
-    private async getTesseractByAddressAndHeight(address: Hex, height: number, include?: TesseractIncludeFields): Promise<Tesseract> {
+    private async getTesseractByAddressAndHeight(address: Hex, height: number): Promise<Tesseract> {
         if (height < -1) {
             ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
         }
 
-        return await this.getTesseractByReference({ relative: { address, height } }, include);
+        return await this.getTesseractByReference({ relative: { identifier: address, height } });
     }
 
     /**
@@ -120,15 +120,15 @@ export class Provider extends EventEmitter {
         include?: TesseractIncludeFields
     ): Promise<Tesseract> {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
-            return await this.getTesseractByAddressAndHeight(hashOrAddress.address, hashOrAddress.height, heightOrInclude);
+            return await this.getTesseractByAddressAndHeight(hashOrAddress.identifier, hashOrAddress.height);
         }
 
         if (isAddress(hashOrAddress) && typeof heightOrInclude === "number") {
-            return await this.getTesseractByAddressAndHeight(hashOrAddress, heightOrInclude, include);
+            return await this.getTesseractByAddressAndHeight(hashOrAddress, heightOrInclude);
         }
 
         if (isHex(hashOrAddress) && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
-            return await this.getTesseractByHash(hashOrAddress, heightOrInclude);
+            return await this.getTesseractByHash(hashOrAddress);
         }
 
         ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);

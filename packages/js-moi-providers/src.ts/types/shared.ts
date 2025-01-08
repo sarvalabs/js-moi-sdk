@@ -35,7 +35,7 @@ export interface RelativeTesseractOption {
     /**
      * A 32-byte address that describes an account that the tesseract is a part of.
      */
-    address: Address;
+    identifier: Address;
     /**
      * The height of the tesseract on the given account.
      * The 0 & -1 values can be used be used to retrieve the oldest and
