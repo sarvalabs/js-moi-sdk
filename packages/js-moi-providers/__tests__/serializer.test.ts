@@ -12,7 +12,7 @@ interface TestCase {
 describe("Serialization of ix operation payload", () => {
     const tests: TestCase[] = [
         {
-            name: "should serialize a participant create operation payload",
+            name: "should serialize a asset create operation payload",
             payload: {
                 type: OpType.ASSET_CREATE,
                 payload: {
