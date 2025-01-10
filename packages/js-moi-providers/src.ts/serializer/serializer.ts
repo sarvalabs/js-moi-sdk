@@ -2,10 +2,14 @@ import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import type { BaseInteractionRequest, Operation } from "../types/moi-rpc-method";
-import { AssetCreateSerializer } from "./asset-create-serializer";
-import { AssetBurnSerializer, AssetMintSerializer } from "./asset-supply-serializer";
-import type { OperationSerializer } from "./op-serializer";
-import { ParticipantCreateSerializer } from "./participant-create-serializer";
+import {
+    AssetActionSerializer,
+    AssetBurnSerializer,
+    AssetCreateSerializer,
+    AssetMintSerializer,
+    ParticipantCreateSerializer,
+    type OperationSerializer,
+} from "./operation-serializer";
 
 export class InteractionSerializer {
     private static serializers: Map<OpType, OperationSerializer> = new Map();
@@ -70,5 +74,6 @@ export class InteractionSerializer {
         this.register(new AssetCreateSerializer());
         this.register(new AssetBurnSerializer());
         this.register(new AssetMintSerializer());
+        this.register(new AssetActionSerializer());
     }
 }

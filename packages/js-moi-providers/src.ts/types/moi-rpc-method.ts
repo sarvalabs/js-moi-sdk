@@ -82,12 +82,22 @@ interface AssetSupplyPayload {
     amount: number;
 }
 
+interface AssetActionPayload {
+    asset_id: Hex;
+    beneficiary: Address;
+    benefactor: Address;
+    amount: number;
+    timestamp: number;
+}
+
 export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE
     ? ParticipantCreatePayload
     : T extends OpType.ASSET_CREATE
     ? AssetCreatePayload
     : T extends OpType.ASSET_BURN | OpType.ASSET_MINT
     ? AssetSupplyPayload
+    : T extends OpType.ASSET_TRANSFER
+    ? AssetActionPayload
     : never;
 
 export interface Operation<TOpType extends OpType> {
@@ -95,7 +105,12 @@ export interface Operation<TOpType extends OpType> {
     payload: OperationPayload<TOpType>;
 }
 
-export type IxOperation = Operation<OpType.PARTICIPANT_CREATE> | Operation<OpType.ASSET_CREATE> | Operation<OpType.ASSET_BURN> | Operation<OpType.ASSET_MINT>;
+export type IxOperation =
+    | Operation<OpType.PARTICIPANT_CREATE>
+    | Operation<OpType.ASSET_CREATE>
+    | Operation<OpType.ASSET_BURN>
+    | Operation<OpType.ASSET_MINT>
+    | Operation<OpType.ASSET_TRANSFER>;
 
 export interface InteractionShared {
     sender: Account;
