@@ -33,7 +33,7 @@ describe("Serialization of ix operation payload", () => {
                     keys_payload: [],
                 },
             },
-            expected: "0x0e5f068004830428027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d6464",
+            expected: "0x0e5f068e04930428027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d640f64",
         },
     ];
 
