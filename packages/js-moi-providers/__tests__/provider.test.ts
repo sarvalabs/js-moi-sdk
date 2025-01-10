@@ -58,4 +58,21 @@ describe("Provider", () => {
             expect(account.metadata.address).toEqual(ADDRESS);
         });
     });
+
+    describe(provider.simulate, () => {
+        it.concurrent("should return the simulation result", async () => {
+            const result = await provider.simulate({
+                sender: {
+                    address: ADDRESS,
+                    key_id: 0,
+                    sequence: 0,
+                },
+                fuel_price: 1,
+                fuel_limit: 200,
+                ix_operations: [],
+            });
+
+            expect(result).toBeDefined();
+        });
+    });
 });

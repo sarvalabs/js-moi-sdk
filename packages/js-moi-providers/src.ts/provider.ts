@@ -1,8 +1,21 @@
-import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils";
+import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, hexToBytes, isAddress, isHex, type Hex } from "js-moi-utils";
 
 import { EventEmitter } from "events";
+import { InteractionSerializer } from "./serializer/serializer";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { AccountAsset, AccountInfo, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
+import {
+    MutateLock,
+    type AccountAsset,
+    type AccountInfo,
+    type BaseInteractionRequest,
+    type Confirmation,
+    type Interaction,
+    type InteractionRequest,
+    type RpcMethod,
+    type RpcMethodParams,
+    type RpcMethodResponse,
+    type Tesseract,
+} from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
@@ -285,8 +298,37 @@ export class Provider extends EventEmitter {
         return true;
     }
 
+    private getInteractionParticipants(interaction: InteractionRequest) {
+        const participants: InteractionRequest["participants"] = [
+            {
+                address: interaction.sender.address,
+                lock: MutateLock.MutateLock,
+                notary: false,
+            },
+        ];
+
+        return participants;
+    }
+
     public async simulate(interaction: InteractionRequest) {
-        throw new Error("Method not implemented.");
+        const serializer = new InteractionSerializer();
+
+        const ix: BaseInteractionRequest = {
+            ...interaction,
+            sender: {
+                ...interaction.sender,
+                address: hexToBytes(interaction.sender.address),
+            },
+            funds: interaction.funds ?? null,
+            payer: hexToBytes(interaction.payer ?? ensureHexPrefix("00".repeat(32))),
+            participants: interaction.participants ?? this.getInteractionParticipants(interaction),
+            perception: interaction.perception ?? null,
+            preferences: interaction.preferences ?? null,
+        };
+        console.log(ix);
+        const args = serializer.serialize(ix);
+
+        return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }
 
     /**

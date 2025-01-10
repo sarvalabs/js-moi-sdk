@@ -1,6 +1,7 @@
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { Polorizer } from "js-polo";
-import type { InteractionRequest, Operation } from "../types/moi-rpc-method";
+import { polo } from "polo-schema";
+import type { BaseInteractionRequest, Operation } from "../types/moi-rpc-method";
 import { AssetCreateSerializer } from "./asset-create-serializer";
 import type { OperationSerializer } from "./op-serializer";
 import { ParticipantCreateSerializer } from "./participant-create-serializer";
@@ -11,54 +12,16 @@ export class InteractionSerializer {
     private static IX_POLO_SCHEMA = {
         kind: "struct",
         fields: {
-            sender: {
-                kind: "struct",
-                fields: {
-                    address: {
-                        kind: "bytes",
-                    },
-                    sequence: {
-                        kind: "integer",
-                    },
-                    key_id: {
-                        kind: "integer",
-                    },
-                },
-            },
-            payer: {
-                kind: "struct",
-                fields: {
-                    address: {
-                        kind: "bytes",
-                    },
-                    sequence: {
-                        kind: "integer",
-                    },
-                    key_id: {
-                        kind: "integer",
-                    },
-                },
-            },
-            fuel_limit: {
-                kind: "integer",
-            },
-            fuel_tip: {
-                kind: "integer",
-            },
-            operations: {
-                kind: "array",
-                fields: {
-                    kind: "struct",
-                    fields: {
-                        type: {
-                            kind: "integer",
-                        },
-                        payload: {
-                            kind: "bytes",
-                        },
-                    },
-                },
-            },
+            sender: polo.struct({ address: polo.bytes, sequence: polo.integer, key_id: polo.integer }),
+            payer: polo.string,
+            fuel_limit: polo.integer,
+            fuel_price: polo.integer,
+            ix_operations: polo.arrayOf(
+                polo.struct({
+                    type: polo.integer,
+                    payload: polo.bytes,
+                })
+            ),
         },
     };
 
@@ -75,11 +38,11 @@ export class InteractionSerializer {
         return serializer.serialize(operation.payload);
     }
 
-    public serialize(interaction: InteractionRequest) {
+    public serialize(interaction: BaseInteractionRequest) {
         const polorizer = new Polorizer();
         const payload = {
             ...interaction,
-            operations: interaction.operations.map((op) => ({
+            operations: interaction.ix_operations.map((op) => ({
                 type: op.type,
                 payload: this.serializeOperation(op),
             })),

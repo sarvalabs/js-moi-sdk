@@ -29,10 +29,16 @@ interface ParticipantContext {
     delta: ParticipantContextDelta;
 }
 
+export enum MutateLock {
+    MutateLock = 0,
+    ReadLock = 1,
+    NoLock = 2,
+}
+
 export interface Participant {
     address: Hex;
     height: number;
-    lock: string;
+    lock: MutateLock;
     notary: boolean;
     transition: Hex;
     state: Hex;
@@ -73,12 +79,12 @@ export interface Operation<TOpType extends OpType> {
 
 export type IxOperation = Operation<OpType.PARTICIPANT_CREATE> | Operation<OpType.ASSET_CREATE>;
 
-interface InteractionShared {
+export interface InteractionShared {
     sender: Account;
-    payer: Account;
+    payer: Address;
     fuel_limit: number;
-    fuel_tip: number;
-    operations: IxOperation[];
+    fuel_price: number;
+    ix_operations: IxOperation[];
 }
 
 interface Fund {
@@ -95,12 +101,20 @@ interface InteractionPreference {
     };
 }
 
-export interface InteractionRequest extends InteractionShared {
-    funds: Fund[];
+export interface BaseInteractionRequest extends Omit<InteractionShared, "sender" | "payer"> {
+    payer: Uint8Array;
+    sender: Omit<Account, "address"> & { address: Uint8Array };
+    funds: Fund[] | null;
     participants: Pick<Participant, "address" | "lock" | "notary">[];
-    preferences: InteractionPreference;
-    perception: Hex;
+    preferences: InteractionPreference | null;
+    perception: Hex | null;
 }
+
+export type InteractionRequest = Partial<Omit<BaseInteractionRequest, keyof InteractionShared>> &
+    Omit<InteractionShared, "payer" | "sender"> & {
+        sender: Account;
+        payer?: InteractionShared["payer"];
+    };
 
 interface InteractionTesseract {
     hash: Hex;
@@ -267,6 +281,10 @@ interface MOIExecutionApi {
     };
     "moi.Submit": {
         params: [ix: SignedInteraction];
+        response: Hex;
+    };
+    "moi.Simulate": {
+        params: [ix: Pick<SignedInteraction, "interaction">];
         response: Hex;
     };
     "moi.Subscribe": {

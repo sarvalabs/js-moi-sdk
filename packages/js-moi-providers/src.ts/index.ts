@@ -6,10 +6,12 @@ export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type {
     AccountAsset,
+    AccountInfo,
     AccountKey,
+    AccountMetadata,
+    BaseInteractionRequest,
     Confirmation,
     Interaction,
-    InteractionRequest,
     IxOperation,
     Operation,
     OperationPayload,
@@ -33,3 +35,5 @@ export type {
 } from "./types/shared";
 export type { Transport } from "./types/transport";
 export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./websocket-provider";
+
+export { AccountType, MutateLock } from "./types/moi-rpc-method";
