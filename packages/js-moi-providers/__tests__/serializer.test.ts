@@ -1,5 +1,6 @@
 import { AssetStandard, bytesToHex, OpType } from "js-moi-utils";
-import { InteractionSerializer, type IxOperation } from "../src.ts";
+import { InteractionSerializer, MutateLock, type IxOperation } from "../src.ts";
+import type { BaseInteractionRequest } from "../src.ts/types/moi-rpc-method.ts";
 
 const serializer = new InteractionSerializer();
 
@@ -150,4 +151,42 @@ describe("Polo serialization of ix operation payload", () => {
             expect(bytesToHex(serialized)).toEqual(test.expected);
         });
     }
+});
+
+describe("Polo serialization of interaction", () => {
+    const interaction: BaseInteractionRequest = {
+        sender: {
+            address: "0x4860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae",
+            key_id: 0,
+            sequence: 0,
+        },
+        funds: [],
+        fuel_price: 1,
+        fuel_limit: 200,
+        ix_operations: [
+            {
+                type: OpType.LOGIC_INVOKE,
+                payload: {
+                    logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    callsite: "AnyCallsite",
+                    calldata: "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49",
+                },
+            },
+        ],
+        participants: [
+            {
+                address: "0x4860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae",
+                lock: MutateLock.MutateLock,
+                notary: false,
+            },
+        ],
+    };
+
+    test("should serialize an interaction", () => {
+        const serialized = serializer.serialize(interaction);
+        const expected =
+            "0x0e9f020ee604e308f30880098e099e19901e901e5f06830483044860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae000000000000000000000000000000000000000000000000000000000000000001c81f0e2f03160d0e8f0100068609b60a800e307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832416e7943616c6c736974650d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f491f0e5f06830481044860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae";
+
+        expect(bytesToHex(serialized)).toEqual(expected);
+    });
 });

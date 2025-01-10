@@ -153,20 +153,13 @@ interface InteractionPreference {
     };
 }
 
-export interface BaseInteractionRequest extends Omit<InteractionShared, "sender" | "payer"> {
-    payer: Uint8Array;
-    sender: Omit<Account, "address"> & { address: Uint8Array };
-    funds: Fund[] | null;
+export interface BaseInteractionRequest extends Omit<InteractionShared, "payer"> {
+    payer?: Hex;
+    funds: Fund[];
     participants: Pick<Participant, "address" | "lock" | "notary">[];
-    preferences: InteractionPreference | null;
-    perception: Hex | null;
+    preferences?: InteractionPreference;
+    perception?: Hex;
 }
-
-export type InteractionRequest = Partial<Omit<BaseInteractionRequest, keyof InteractionShared>> &
-    Omit<InteractionShared, "payer" | "sender"> & {
-        sender: Account;
-        payer?: InteractionShared["payer"];
-    };
 
 interface InteractionTesseract {
     hash: Hex;
