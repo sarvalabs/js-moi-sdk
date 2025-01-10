@@ -103,7 +103,44 @@ describe("Polo serialization of ix operation payload", () => {
                     },
                 },
             },
-            expected: "",
+            expected:
+                "0x0e9f0106b604b604e005ee05080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782416e7943616c6c736974652f065668656c6c6f307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832",
+        },
+        {
+            name: "should serialize a logic deploy operation payload when interfaces is not provided",
+            payload: {
+                type: OpType.LOGIC_DEPLOY,
+                payload: {
+                    manifest: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    callsite: "AnyCallsite",
+                },
+            },
+            expected: "0x0e9f0106b604b604e005e005080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782416e7943616c6c73697465",
+        },
+        {
+            name: "should serialize a logic enlist operation payload",
+            payload: {
+                type: OpType.LOGIC_ENLIST,
+                payload: {
+                    logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    callsite: "AnyCallsite",
+                },
+            },
+            expected:
+                "0x0e8f0100068609b00ab00a307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832416e7943616c6c73697465",
+        },
+        {
+            name: "should serialize a logic invoke operation payload",
+            payload: {
+                type: OpType.LOGIC_INVOKE,
+                payload: {
+                    logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    callsite: "AnyCallsite",
+                    calldata: "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49",
+                },
+            },
+            expected:
+                "0x0e8f0100068609b60a800e307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832416e7943616c6c736974650d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49",
         },
     ];
 

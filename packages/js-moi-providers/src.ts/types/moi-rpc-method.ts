@@ -113,11 +113,11 @@ interface LogicPayload {
     manifest: Hex;
     logic_id: Hex;
     callsite: string;
-    calldata: Hex;
-    interfaces: Record<string, Hex>;
+    calldata?: Hex;
+    interfaces?: Record<string, Hex>;
 }
 
-export type LogicDeployPayload = Omit<LogicPayload, "logic_id" | "calldata"> & Partial<Pick<LogicPayload, "calldata">>;
+export type LogicDeployPayload = Omit<LogicPayload, "logic_id">;
 
 export type LogicCallPayload = Omit<LogicPayload, "manifest">;
 

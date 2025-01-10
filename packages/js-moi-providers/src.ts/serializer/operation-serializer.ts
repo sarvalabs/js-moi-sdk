@@ -114,9 +114,9 @@ const createLogicActionSerializer = (type: OpType) => {
         override serialize(payload: OperationPayload<OpType.LOGIC_DEPLOY | OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST>): Uint8Array {
             return super.serialize({
                 ...payload,
-                manifest: "manifest" in payload ? hexToBytes(payload.manifest) : undefined,
-                calldata: "calldata" in payload ? hexToBytes(payload.calldata) : undefined,
-                interfaces: "interfaces" in payload ? new Map(Object.entries(payload.interfaces)) : new Map(),
+                manifest: "manifest" in payload && payload.manifest != null ? hexToBytes(payload.manifest) : undefined,
+                calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
+                interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             });
         }
     };
