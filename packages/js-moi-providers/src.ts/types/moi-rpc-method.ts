@@ -1,4 +1,4 @@
-import { Hex, OpType } from "js-moi-utils";
+import { Hex, OpType, type Address } from "js-moi-utils";
 import type {
     AccountParam,
     AssetParam,
@@ -202,6 +202,24 @@ export interface AccountAsset {
     deposits: Deposit[];
 }
 
+export enum AccountType {
+    SargaAccount = 0,
+    LogicAccount = 2,
+    AssetAccount = 3,
+    RegularAccount = 4,
+}
+
+export type AccountMetadata = {
+    type: AccountType;
+    address: Address;
+    height: number;
+    tesseract: Hex;
+};
+
+export interface AccountInfo {
+    metadata: AccountMetadata;
+}
+
 interface MOIExecutionApi {
     "moi.Protocol": {
         params: [ResponseModifierParam];
@@ -212,7 +230,7 @@ interface MOIExecutionApi {
         response: Confirmation;
     };
     "moi.Tesseract": {
-        params: [Required<TesseractReferenceParam> & IncludesParam<"moi.Tesseract">];
+        params: [Required<TesseractReferenceParam>];
         response: Tesseract;
     };
     "moi.Interaction": {
@@ -220,8 +238,8 @@ interface MOIExecutionApi {
         response: Interaction;
     };
     "moi.Account": {
-        params: [AccountParam & TesseractReferenceParam & IncludesParam<"moi.Account">];
-        response: { account_data: unknown };
+        params: [option: AccountParam & TesseractReferenceParam & ResponseModifierParam];
+        response: AccountInfo;
     };
     "moi.AccountKey": {
         params: [AccountParam & { key_id: number; pending?: boolean }];

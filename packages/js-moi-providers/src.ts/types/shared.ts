@@ -72,7 +72,7 @@ export interface AccountParam {
     /**
      * The unique identifier of the account
      */
-    address: Address;
+    identifier: Address;
 }
 
 export interface AssetParam {

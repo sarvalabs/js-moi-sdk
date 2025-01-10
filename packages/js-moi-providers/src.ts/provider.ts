@@ -2,7 +2,7 @@ import { ErrorCode, ErrorUtils, isAddress, isHex, type Hex } from "js-moi-utils"
 
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
+import type { AccountAsset, AccountInfo, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
 import type { Transport } from "./types/transport";
 
@@ -151,8 +151,8 @@ export class Provider extends EventEmitter {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    public async getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "address">): Promise<unknown> {
-        return await this.call("moi.Account", { address, ...option });
+    public async getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo> {
+        return await this.call("moi.Account", { identifier: address, ...option });
     }
 
     /**
@@ -166,7 +166,7 @@ export class Provider extends EventEmitter {
      */
     public async getAccountKey(address: Hex, keyId: number, pending?: boolean) {
         return await this.call("moi.AccountKey", {
-            address,
+            identifier: address,
             key_id: keyId,
             pending,
         });
@@ -183,7 +183,7 @@ export class Provider extends EventEmitter {
      */
     public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]> {
         return await this.call("moi.AccountAsset", {
-            address,
+            identifier: address,
             asset_id: assetId,
             ...option,
         });
@@ -256,7 +256,7 @@ export class Provider extends EventEmitter {
                 {
                     logic_id: logicId,
                     storage_key: key,
-                    address: addressOrOption,
+                    identifier: addressOrOption,
                     ...option,
                 },
             ];

@@ -1,6 +1,8 @@
 import {} from "jest";
+import type { Address } from "js-moi-utils";
 import { JsonRpcProvider } from "../src.ts";
 
+const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
 const HOST = "http://localhost:1600";
 
 describe("Provider", () => {
@@ -18,28 +20,25 @@ describe("Provider", () => {
 
     describe(provider.getTesseract, () => {
         it.concurrent("should return tesseract when retrieved using address and height", async () => {
-            const address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
             const height = 0;
-            const tesseract = await provider.getTesseract(address, height);
+            const tesseract = await provider.getTesseract(ADDRESS, height);
 
             expect(tesseract).toBeDefined();
             expect(tesseract.hash).toBeDefined();
         });
 
         it.concurrent("should return tesseract when retrieved using address and height", async () => {
-            const address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
             const height = -1;
-            const tesseract = await provider.getTesseract({ identifier: address, height });
+            const tesseract = await provider.getTesseract({ identifier: ADDRESS, height });
 
             expect(tesseract).toBeDefined();
             expect(tesseract.hash).toBeDefined();
         });
 
         it.concurrent("should throw error when tesseract retrieved using address and height where height is less than -1", async () => {
-            const address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
             const height = Math.floor(Math.random() * -1000);
 
-            await expect(provider.getTesseract(address, height)).rejects.toThrow();
+            await expect(provider.getTesseract(ADDRESS, height)).rejects.toThrow();
         });
 
         it.concurrent("should return tesseract when retrieved using absolute reference", async () => {
@@ -48,6 +47,15 @@ describe("Provider", () => {
 
             expect(tesseract).toBeDefined();
             expect(tesseract.hash).toBeDefined();
+        });
+    });
+
+    describe(provider.getAccount, () => {
+        it.concurrent("should return account when retrieved using address", async () => {
+            const account = await provider.getAccount(ADDRESS);
+
+            expect(account).toBeDefined();
+            expect(account.metadata.address).toEqual(ADDRESS);
         });
     });
 });
