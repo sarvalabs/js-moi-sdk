@@ -51,23 +51,10 @@ interface ParticipantCreatePayload {
     keys: unknown[];
 }
 
-interface LogicCall {
-    callsite: string;
-    calldata: Hex;
-    interfaces: {
-        name: string;
-        logic_id: Hex;
-    }[];
-}
-
 interface AssetCreatePayload {
     symbol: string;
     standard: number;
     supply: number;
-    logic: {
-        manifest: Hex;
-        call: LogicCall;
-    };
 }
 
 export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE ? ParticipantCreatePayload : T extends OpType.ASSET_CREATE ? AssetCreatePayload : never;
