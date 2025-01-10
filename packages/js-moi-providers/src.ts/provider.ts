@@ -4,13 +4,11 @@ import { EventEmitter } from "events";
 import { InteractionSerializer } from "./serializer/serializer";
 import type { JsonRpcResponse } from "./types/json-rpc";
 import {
-    MutateLock,
     type AccountAsset,
     type AccountInfo,
     type BaseInteractionRequest,
     type Confirmation,
     type Interaction,
-    type InteractionRequest,
     type RpcMethod,
     type RpcMethodParams,
     type RpcMethodResponse,
@@ -298,19 +296,19 @@ export class Provider extends EventEmitter {
         return true;
     }
 
-    private getInteractionParticipants(interaction: InteractionRequest) {
-        const participants: InteractionRequest["participants"] = [
-            {
-                address: interaction.sender.address,
-                lock: MutateLock.MutateLock,
-                notary: false,
-            },
-        ];
+    // private getInteractionParticipants(interaction: InteractionRequest) {
+    //     const participants: InteractionRequest["participants"] = [
+    //         {
+    //             address: interaction.sender.address,
+    //             lock: MutateLock.MutateLock,
+    //             notary: false,
+    //         },
+    //     ];
 
-        return participants;
-    }
+    //     return participants;
+    // }
 
-    public async simulate(interaction: InteractionRequest) {
+    public async simulate(interaction: any) {
         const serializer = new InteractionSerializer();
 
         const ix: BaseInteractionRequest = {
@@ -321,7 +319,7 @@ export class Provider extends EventEmitter {
             },
             funds: interaction.funds ?? null,
             payer: hexToBytes(interaction.payer ?? ensureHexPrefix("00".repeat(32))),
-            participants: interaction.participants ?? this.getInteractionParticipants(interaction),
+            // participants: interaction.participants ?? this.getInteractionParticipants(interaction),
             perception: interaction.perception ?? null,
             preferences: interaction.preferences ?? null,
         };

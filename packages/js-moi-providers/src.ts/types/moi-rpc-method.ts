@@ -13,7 +13,7 @@ import type {
 
 interface Account {
     address: Hex;
-    sequence: number;
+    sequence_id: number;
     key_id: number;
 }
 
@@ -38,7 +38,7 @@ export enum MutateLock {
 export interface Participant {
     address: Hex;
     height: number;
-    lock: MutateLock;
+    lock_type: MutateLock;
     notary: boolean;
     transition: Hex;
     state: Hex;
@@ -149,14 +149,13 @@ interface InteractionPreference {
     compute: Hex;
     consensus: {
         mtq: Hex;
-        nodes: Hex[];
+        trust_nodes: Hex[];
     };
 }
 
-export interface BaseInteractionRequest extends Omit<InteractionShared, "payer"> {
-    payer?: Hex;
+export interface BaseInteractionRequest extends InteractionShared {
     funds: Fund[];
-    participants: Pick<Participant, "address" | "lock" | "notary">[];
+    participants: Pick<Participant, "address" | "lock_type" | "notary">[];
     preferences?: InteractionPreference;
     perception?: Hex;
 }
