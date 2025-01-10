@@ -35,6 +35,30 @@ describe("Serialization of ix operation payload", () => {
             },
             expected: "0x0e5f068e04930428027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d640f64",
         },
+        {
+            name: "should serialize a asset mint operation payload",
+            payload: {
+                type: OpType.ASSET_MINT,
+                payload: {
+                    asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc668",
+                    amount: 100,
+                },
+            },
+            expected:
+                "0x0e3f06a309307830303030303030306139663565383436336261626331393732353264653333613236356565666337316333343937343430633036666161323333626461393431323564626336363864",
+        },
+        {
+            name: "should serialize a asset burn operation payload",
+            payload: {
+                type: OpType.ASSET_BURN,
+                payload: {
+                    asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc661",
+                    amount: 100,
+                },
+            },
+            expected:
+                "0x0e3f06a309307830303030303030306139663565383436336261626331393732353264653333613236356565666337316333343937343430633036666161323333626461393431323564626336363164",
+        },
     ];
 
     for (const test of tests) {

@@ -3,6 +3,7 @@ import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import type { BaseInteractionRequest, Operation } from "../types/moi-rpc-method";
 import { AssetCreateSerializer } from "./asset-create-serializer";
+import { AssetBurnSerializer, AssetMintSerializer } from "./asset-supply-serializer";
 import type { OperationSerializer } from "./op-serializer";
 import { ParticipantCreateSerializer } from "./participant-create-serializer";
 
@@ -67,5 +68,7 @@ export class InteractionSerializer {
         // Register all serializers
         this.register(new ParticipantCreateSerializer());
         this.register(new AssetCreateSerializer());
+        this.register(new AssetBurnSerializer());
+        this.register(new AssetMintSerializer());
     }
 }

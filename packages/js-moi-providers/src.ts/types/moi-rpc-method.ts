@@ -77,14 +77,25 @@ interface AssetCreatePayload {
     };
 }
 
-export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE ? ParticipantCreatePayload : T extends OpType.ASSET_CREATE ? AssetCreatePayload : never;
+interface AssetSupplyPayload {
+    asset_id: Hex;
+    amount: number;
+}
+
+export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE
+    ? ParticipantCreatePayload
+    : T extends OpType.ASSET_CREATE
+    ? AssetCreatePayload
+    : T extends OpType.ASSET_BURN | OpType.ASSET_MINT
+    ? AssetSupplyPayload
+    : never;
 
 export interface Operation<TOpType extends OpType> {
     type: TOpType;
     payload: OperationPayload<TOpType>;
 }
 
-export type IxOperation = Operation<OpType.PARTICIPANT_CREATE> | Operation<OpType.ASSET_CREATE>;
+export type IxOperation = Operation<OpType.PARTICIPANT_CREATE> | Operation<OpType.ASSET_CREATE> | Operation<OpType.ASSET_BURN> | Operation<OpType.ASSET_MINT>;
 
 export interface InteractionShared {
     sender: Account;
