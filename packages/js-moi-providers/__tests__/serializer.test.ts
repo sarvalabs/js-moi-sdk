@@ -9,7 +9,7 @@ interface TestCase {
     expected: string;
 }
 
-describe("Serialization of ix operation payload", () => {
+describe("Polo serialization of ix operation payload", () => {
     const tests: TestCase[] = [
         {
             name: "should serialize a asset create operation payload",
