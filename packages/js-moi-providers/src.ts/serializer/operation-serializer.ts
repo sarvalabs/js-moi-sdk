@@ -95,3 +95,35 @@ export class AssetActionSerializer extends OperationSerializer {
         });
     }
 }
+
+const createLogicActionSerializer = (type: OpType) => {
+    return class LogicActionSerializer extends OperationSerializer {
+        public readonly type = type;
+
+        public readonly schema: Schema = polo.struct({
+            manifest: polo.bytes,
+            logic_id: polo.string,
+            callsite: polo.string,
+            calldata: polo.bytes,
+            interfaces: polo.map({
+                keys: polo.string,
+                values: polo.string,
+            }),
+        });
+
+        override serialize(payload: OperationPayload<OpType.LOGIC_DEPLOY | OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST>): Uint8Array {
+            return super.serialize({
+                ...payload,
+                manifest: "manifest" in payload ? hexToBytes(payload.manifest) : undefined,
+                calldata: "calldata" in payload ? hexToBytes(payload.calldata) : undefined,
+                interfaces: "interfaces" in payload ? new Map(Object.entries(payload.interfaces)) : new Map(),
+            });
+        }
+    };
+};
+
+export const LogicDeploySerializer = createLogicActionSerializer(OpType.LOGIC_DEPLOY);
+
+export const LogicInvokeSerializer = createLogicActionSerializer(OpType.LOGIC_INVOKE);
+
+export const LogicEnlistSerializer = createLogicActionSerializer(OpType.LOGIC_ENLIST);

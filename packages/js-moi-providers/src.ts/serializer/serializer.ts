@@ -7,6 +7,9 @@ import {
     AssetBurnSerializer,
     AssetCreateSerializer,
     AssetMintSerializer,
+    LogicDeploySerializer,
+    LogicEnlistSerializer,
+    LogicInvokeSerializer,
     ParticipantCreateSerializer,
     type OperationSerializer,
 } from "./operation-serializer";
@@ -71,9 +74,14 @@ export class InteractionSerializer {
     static {
         // Register all serializers
         this.register(new ParticipantCreateSerializer());
+
         this.register(new AssetCreateSerializer());
         this.register(new AssetBurnSerializer());
         this.register(new AssetMintSerializer());
         this.register(new AssetActionSerializer());
+
+        this.register(new LogicDeploySerializer());
+        this.register(new LogicEnlistSerializer());
+        this.register(new LogicInvokeSerializer());
     }
 }

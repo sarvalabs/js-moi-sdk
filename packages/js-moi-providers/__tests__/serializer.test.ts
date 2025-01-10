@@ -74,6 +74,37 @@ describe("Polo serialization of ix operation payload", () => {
             expected:
                 "0x0e9f010686048608a311b31194c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c875786d8826ac7dc4ffb73fae39dedf72958a405b878f25ed362f2f496c60a4604f43078303030303030303034636439373363346562383363646238383730633064653230393733363237303439316237616363393938373364613165646463656435383236633362353438646781188d",
         },
+        {
+            name: "should serialize a logic deploy operation payload",
+            payload: {
+                type: OpType.LOGIC_DEPLOY,
+                payload: {
+                    manifest: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    callsite: "AnyCallsite",
+                    calldata: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    interfaces: {
+                        ["hello"]: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    },
+                },
+            },
+            expected:
+                "0x0e9f0106b604b604e6059e0a080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782416e7943616c6c73697465080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b7822f065668656c6c6f307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832",
+        },
+
+        {
+            name: "should serialize a logic deploy operation payload when calldata is not provided",
+            payload: {
+                type: OpType.LOGIC_DEPLOY,
+                payload: {
+                    manifest: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    callsite: "AnyCallsite",
+                    interfaces: {
+                        ["hello"]: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
+                    },
+                },
+            },
+            expected: "",
+        },
     ];
 
     for (const test of tests) {

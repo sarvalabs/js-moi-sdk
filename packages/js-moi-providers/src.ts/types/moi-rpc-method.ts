@@ -98,6 +98,10 @@ export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CR
     ? AssetSupplyPayload
     : T extends OpType.ASSET_TRANSFER
     ? AssetActionPayload
+    : T extends OpType.LOGIC_DEPLOY
+    ? LogicDeployPayload
+    : T extends OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST
+    ? LogicCallPayload
     : never;
 
 export interface Operation<TOpType extends OpType> {
@@ -105,12 +109,27 @@ export interface Operation<TOpType extends OpType> {
     payload: OperationPayload<TOpType>;
 }
 
+interface LogicPayload {
+    manifest: Hex;
+    logic_id: Hex;
+    callsite: string;
+    calldata: Hex;
+    interfaces: Record<string, Hex>;
+}
+
+export type LogicDeployPayload = Omit<LogicPayload, "logic_id" | "calldata"> & Partial<Pick<LogicPayload, "calldata">>;
+
+export type LogicCallPayload = Omit<LogicPayload, "manifest">;
+
 export type IxOperation =
     | Operation<OpType.PARTICIPANT_CREATE>
     | Operation<OpType.ASSET_CREATE>
     | Operation<OpType.ASSET_BURN>
     | Operation<OpType.ASSET_MINT>
-    | Operation<OpType.ASSET_TRANSFER>;
+    | Operation<OpType.ASSET_TRANSFER>
+    | Operation<OpType.LOGIC_DEPLOY>
+    | Operation<OpType.LOGIC_INVOKE>
+    | Operation<OpType.LOGIC_ENLIST>;
 
 export interface InteractionShared {
     sender: Account;
