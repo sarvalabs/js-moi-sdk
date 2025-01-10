@@ -48,7 +48,11 @@ export interface Participant {
 interface ParticipantCreatePayload {
     address: Hex;
     amount: number;
-    keys: unknown[];
+    keys_payload: {
+        public_key: Uint8Array;
+        weight: number;
+        signature_algorithm: number;
+    }[];
 }
 
 interface LogicCall {
