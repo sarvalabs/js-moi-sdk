@@ -1,4 +1,4 @@
-import { Hex, OpType, type AccountType, type Address, type LockType, type OperationStatus, type ReceiptStatus } from "js-moi-utils";
+import { Hex, OpType, type AccountType, type Address, type IxOperation, type LockType, type OperationStatus, type ReceiptStatus } from "js-moi-utils";
 import type {
     AccountParam,
     AssetParam,
@@ -39,70 +39,6 @@ export interface Participant {
     context: ParticipantContext;
 }
 
-interface ParticipantCreatePayload {
-    address: Hex;
-    amount: number;
-    keys_payload: {
-        public_key: Uint8Array;
-        weight: number;
-        signature_algorithm: number;
-    }[];
-}
-
-interface LogicCall {
-    callsite: string;
-    calldata: Hex;
-    interfaces: {
-        name: string;
-        logic_id: Hex;
-    }[];
-}
-
-interface AssetCreatePayload {
-    symbol: string;
-    standard: number;
-    supply: number;
-    dimension?: number;
-    is_stateful?: boolean;
-    is_logical?: boolean;
-    logic?: {
-        manifest: Hex;
-        call: LogicCall;
-    };
-}
-
-interface AssetSupplyPayload {
-    asset_id: Hex;
-    amount: number;
-}
-
-interface AssetActionPayload {
-    asset_id: Hex;
-    beneficiary: Address;
-    benefactor: Address;
-    amount: number;
-    timestamp: number;
-}
-
-export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
-    ? ParticipantCreatePayload
-    : T extends OpType.AssetCreate
-    ? AssetCreatePayload
-    : T extends OpType.AssetBurn | OpType.AssetMint
-    ? AssetSupplyPayload
-    : T extends OpType.AssetTransfer
-    ? AssetActionPayload
-    : T extends OpType.LogicDeploy
-    ? LogicDeployPayload
-    : T extends OpType.LogicInvoke | OpType.LogicEnlist
-    ? LogicCallPayload
-    : never;
-
-export interface Operation<TOpType extends OpType> {
-    type: TOpType;
-    payload: OperationPayload<TOpType>;
-}
-
 interface LogicPayload {
     manifest: Hex;
     logic_id: Hex;
@@ -114,16 +50,6 @@ interface LogicPayload {
 export type LogicDeployPayload = Omit<LogicPayload, "logic_id">;
 
 export type LogicCallPayload = Omit<LogicPayload, "manifest">;
-
-export type IxOperation =
-    | Operation<OpType.ParticipantCreate>
-    | Operation<OpType.AssetCreate>
-    | Operation<OpType.AssetBurn>
-    | Operation<OpType.AssetMint>
-    | Operation<OpType.AssetTransfer>
-    | Operation<OpType.LogicDeploy>
-    | Operation<OpType.LogicInvoke>
-    | Operation<OpType.LogicEnlist>;
 
 export interface InteractionShared {
     sender: Account;

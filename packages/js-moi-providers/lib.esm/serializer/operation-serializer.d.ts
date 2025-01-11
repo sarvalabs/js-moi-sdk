@@ -1,6 +1,5 @@
-import { OpType } from "js-moi-utils";
+import { OpType, type OperationPayload } from "js-moi-utils";
 import { type Schema } from "js-polo";
-import type { OperationPayload } from "../types/moi-rpc-method";
 export declare abstract class OperationSerializer {
     abstract readonly type: number;
     abstract readonly schema: Schema;

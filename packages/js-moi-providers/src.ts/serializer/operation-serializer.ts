@@ -1,7 +1,6 @@
-import { ErrorUtils, hexToBytes, isValidAddress, OpType } from "js-moi-utils";
+import { ErrorUtils, hexToBytes, isValidAddress, OpType, type OperationPayload } from "js-moi-utils";
 import { Polorizer, type Schema } from "js-polo";
 import { polo } from "polo-schema";
-import type { OperationPayload } from "../types/moi-rpc-method";
 
 export abstract class OperationSerializer {
     public abstract readonly type: number;
