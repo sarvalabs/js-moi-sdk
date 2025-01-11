@@ -56,7 +56,7 @@ const transformInteraction = (ix) => {
         ...ix,
         sender: { ...ix.sender, address: (0, hex_1.hexToBytes)(ix.sender.address) },
         payer: ix.payer ? (0, hex_1.hexToBytes)(ix.payer) : undefined,
-        ix_operations: ix.operations.map((op) => ({ ...op, payload: (0, operations_1.encodeIxOperationToPolo)(op) })),
+        ix_operations: ix.operations.map((op) => ({ ...op, payload: (0, operations_1.encodeOperationPayload)(op) })),
         participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,

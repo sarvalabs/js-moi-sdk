@@ -236,14 +236,14 @@ export const transformPayload = <TOpType extends OpType>(type: TOpType, payload:
 };
 
 /**
- * Encodes an operation to a POLO byte array.
+ * Encodes an operation payload to a POLO byte array.
  *
  * @param operation Operation to encode
- * @returns Returns the encoded operation as a POLO byte array.
+ * @returns Returns the encoded payload as a POLO byte array.
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export const encodeIxOperationToPolo = <TOpType extends OpType>(operation: Operation<TOpType>): Uint8Array => {
+export const encodeOperationPayload = <TOpType extends OpType>(operation: Operation<TOpType>): Uint8Array => {
     const descriptor = ixOpDescriptor[operation.type];
 
     if (descriptor == null) {

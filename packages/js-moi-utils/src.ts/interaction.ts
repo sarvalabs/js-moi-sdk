@@ -1,7 +1,7 @@
 import { Polorizer, type Schema } from "js-polo";
 import { polo } from "polo-schema";
 import { hexToBytes } from "./hex";
-import { encodeIxOperationToPolo } from "./operations";
+import { encodeOperationPayload } from "./operations";
 import type { InteractionRequest, RawInteractionRequest } from "./types/interaction";
 
 /**
@@ -60,7 +60,7 @@ export const transformInteraction = (ix: InteractionRequest): RawInteractionRequ
         ...ix,
         sender: { ...ix.sender, address: hexToBytes(ix.sender.address) },
         payer: ix.payer ? hexToBytes(ix.payer) : undefined,
-        ix_operations: ix.operations.map((op) => ({ ...op, payload: encodeIxOperationToPolo(op) })),
+        ix_operations: ix.operations.map((op) => ({ ...op, payload: encodeOperationPayload(op) })),
         participants: ix.participants?.map((participant) => ({ ...participant, address: hexToBytes(participant.address) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: hexToBytes(ix.preferences.compute) } : undefined,

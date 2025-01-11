@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encodeIxOperationToPolo = exports.transformPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
+exports.encodeOperationPayload = exports.transformPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
@@ -172,14 +172,14 @@ const transformPayload = (type, payload) => {
 };
 exports.transformPayload = transformPayload;
 /**
- * Encodes an operation to a POLO byte array.
+ * Encodes an operation payload to a POLO byte array.
  *
  * @param operation Operation to encode
- * @returns Returns the encoded operation as a POLO byte array.
+ * @returns Returns the encoded payload as a POLO byte array.
  *
  * @throws Throws an error if the operation type is not registered.
  */
-const encodeIxOperationToPolo = (operation) => {
+const encodeOperationPayload = (operation) => {
     const descriptor = ixOpDescriptor[operation.type];
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
@@ -189,5 +189,5 @@ const encodeIxOperationToPolo = (operation) => {
     polorizer.polorize(data, descriptor.schema());
     return polorizer.bytes();
 };
-exports.encodeIxOperationToPolo = encodeIxOperationToPolo;
+exports.encodeOperationPayload = encodeOperationPayload;
 //# sourceMappingURL=operations.js.map

@@ -166,14 +166,14 @@ export const transformPayload = (type, payload) => {
     return descriptor.transform?.(payload) ?? payload;
 };
 /**
- * Encodes an operation to a POLO byte array.
+ * Encodes an operation payload to a POLO byte array.
  *
  * @param operation Operation to encode
- * @returns Returns the encoded operation as a POLO byte array.
+ * @returns Returns the encoded payload as a POLO byte array.
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export const encodeIxOperationToPolo = (operation) => {
+export const encodeOperationPayload = (operation) => {
     const descriptor = ixOpDescriptor[operation.type];
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);

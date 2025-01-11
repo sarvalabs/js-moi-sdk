@@ -7,7 +7,7 @@ export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, num
 export { encodeInteraction, getInteractionRequestSchema, transformInteraction } from "./interaction";
 export { deepCopy } from "./object";
 export {
-    encodeIxOperationToPolo,
+    encodeOperationPayload,
     getIxOperationDescriptor,
     listIxOperationDescriptors,
     transformPayload,

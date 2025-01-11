@@ -55,13 +55,13 @@ export declare const getIxOperationDescriptor: <TOpType extends OpType>(type: TO
  */
 export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 /**
- * Encodes an operation to a POLO byte array.
+ * Encodes an operation payload to a POLO byte array.
  *
  * @param operation Operation to encode
- * @returns Returns the encoded operation as a POLO byte array.
+ * @returns Returns the encoded payload as a POLO byte array.
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export declare const encodeIxOperationToPolo: <TOpType extends OpType>(operation: Operation<TOpType>) => Uint8Array;
+export declare const encodeOperationPayload: <TOpType extends OpType>(operation: Operation<TOpType>) => Uint8Array;
 export {};
 //# sourceMappingURL=operations.d.ts.map
