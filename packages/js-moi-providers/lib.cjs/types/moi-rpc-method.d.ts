@@ -86,7 +86,7 @@ export interface InteractionShared {
     fuel_price: number;
     ix_operations: IxOperation[];
 }
-interface Fund {
+export interface Fund {
     asset_id: Hex;
     amount: number;
 }

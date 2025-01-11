@@ -159,6 +159,7 @@ export declare class Provider extends EventEmitter {
     private static isSignedInteraction;
     private ensureValidInteraction;
     private getInteractionParticipants;
+    private getInteractionFunds;
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.

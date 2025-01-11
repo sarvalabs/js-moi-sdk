@@ -63,6 +63,7 @@ export class InteractionSerializer {
     }
     serialize(interaction) {
         const polorizer = new Polorizer();
+        console.log(JSON.stringify(interaction, null, 2));
         polorizer.polorize(this.getSerializationPayload(interaction), InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();
     }

@@ -285,6 +285,25 @@ export class Provider extends EventEmitter {
         }
         return Array.from(participants.values());
     }
+    getInteractionFunds(interaction) {
+        const funds = new Map();
+        for (const { type, payload } of interaction.ix_operations) {
+            switch (type) {
+                case OpType.AssetTransfer:
+                case OpType.AssetMint:
+                case OpType.AssetBurn: {
+                    funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount });
+                }
+            }
+        }
+        for (const { asset_id, amount } of interaction.funds ?? []) {
+            if (funds.has(asset_id)) {
+                continue;
+            }
+            funds.set(asset_id, { asset_id, amount });
+        }
+        return Array.from(funds.values());
+    }
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.
@@ -306,9 +325,8 @@ export class Provider extends EventEmitter {
             }
             case typeof ix === "object": {
                 this.ensureValidInteraction(ix);
-                if (ix.participants == null) {
-                    ix.participants = this.getInteractionParticipants(ix);
-                }
+                ix.participants = this.getInteractionParticipants(ix);
+                ix.funds = this.getInteractionFunds(ix);
                 args = new InteractionSerializer().serialize(ix);
                 break;
             }

@@ -133,7 +133,7 @@ export interface InteractionShared {
     ix_operations: IxOperation[];
 }
 
-interface Fund {
+export interface Fund {
     asset_id: Hex;
     amount: number;
 }
