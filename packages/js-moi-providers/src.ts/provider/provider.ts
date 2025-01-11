@@ -374,10 +374,10 @@ export class Provider extends EventEmitter {
      * This call does not require participating accounts to notarize the interaction,
      * and no signatures are verified while executing the interaction.
      *
-     * @param ix - The POLO encoded interaction submission
+     * @param ix - The interaction object
      * @returns A promise that resolves to the result of the simulation.
      */
-    public async simulate(serializedIx: Uint8Array): Promise<SimulateResult>;
+    public async simulate(ix: BaseInteractionRequest): Promise<SimulateResult>;
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.
@@ -387,10 +387,10 @@ export class Provider extends EventEmitter {
      * This call does not require participating accounts to notarize the interaction,
      * and no signatures are verified while executing the interaction.
      *
-     * @param ix - The interaction object
+     * @param ix - The POLO encoded interaction submission
      * @returns A promise that resolves to the result of the simulation.
      */
-    public async simulate(ix: BaseInteractionRequest): Promise<SimulateResult>;
+    public async simulate(serializedIx: Uint8Array): Promise<SimulateResult>;
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.
