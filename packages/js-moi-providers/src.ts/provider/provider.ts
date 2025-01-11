@@ -497,6 +497,7 @@ export class Provider extends EventEmitter {
                 args = encodeInteraction(ix);
                 break;
             }
+
             default: {
                 ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
             }
