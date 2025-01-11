@@ -1,5 +1,5 @@
+import { HttpTransport, type HttpTransportOption } from "../transport/http-transport";
 import { Provider } from "./provider";
-import { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
 
 export interface JsonRpcProviderOption extends HttpTransportOption {}
 

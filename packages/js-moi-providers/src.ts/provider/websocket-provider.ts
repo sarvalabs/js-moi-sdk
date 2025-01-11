@@ -1,6 +1,6 @@
 import type { Hex } from "js-moi-utils";
+import { WebsocketTransport, type WebsocketTransportOptions } from "../transport/ws-transport";
 import { Provider } from "./provider";
-import { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
 
 export enum WebsocketEvent {
     Error = "error",

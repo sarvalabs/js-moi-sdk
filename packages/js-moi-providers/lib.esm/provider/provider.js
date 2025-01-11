@@ -1,50 +1,26 @@
-import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType, type Hex } from "js-moi-utils";
-
+import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType } from "js-moi-utils";
 import { EventEmitter } from "events";
-import { InteractionSerializer } from "./serializer/serializer";
-import type { JsonRpcResponse } from "./types/json-rpc";
-import {
-    type AccountAsset,
-    type AccountInfo,
-    type BaseInteractionRequest,
-    type Confirmation,
-    type Interaction,
-    type RpcMethod,
-    type RpcMethodParams,
-    type RpcMethodResponse,
-    type SimulateResult,
-    type Tesseract,
-} from "./types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields, TesseractReference } from "./types/shared";
-import type { Transport } from "./types/transport";
-
-type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
-
+import { InteractionSerializer } from "../serializer/serializer";
 export class Provider extends EventEmitter {
-    private readonly _transport: Transport;
-
+    _transport;
     /**
      * Creates a new instance of the provider.
      *
      * @param transport - The transport to use for communication with the network.
      */
-    public constructor(transport: Transport) {
+    constructor(transport) {
         super();
-
         if (transport == null) {
             ErrorUtils.throwError("Transport is required", ErrorCode.INVALID_ARGUMENT);
         }
-
         this._transport = transport;
     }
-
     /**
      * The transport used to communicate with the network.
      */
-    public get transport(): Transport {
+    get transport() {
         return this._transport;
     }
-
     /**
      * Calls a JSON-RPC method on the network using the `request` method and processes the response.
      *
@@ -55,11 +31,10 @@ export class Provider extends EventEmitter {
      *
      * @throws Will throw an error if the response contains an error.
      */
-    protected async call<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
-        const response = await this.request<RpcMethodResponse<T>>(method, params);
+    async call(method, ...params) {
+        const response = await this.request(method, params);
         return this.processJsonRpcResponse(response);
     }
-
     /**
      * Sends a JSON-RPC request to the network.
      *
@@ -70,92 +45,50 @@ export class Provider extends EventEmitter {
      *
      * @throws Will throw an error if the response contains an error.
      */
-    public async request<T>(method: string, params: unknown[] = []): Promise<JsonRpcResponse<T>> {
-        return await this.transport.request<T>(method, params);
+    async request(method, params = []) {
+        return await this.transport.request(method, params);
     }
-
     /**
      * Retrieves the version and chain id of the MOI protocol network.
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    public async getProtocol(option?: ResponseModifierParam): Promise<MoiClientInfo> {
+    async getProtocol(option) {
         return await this.call("moi.Protocol", option ?? {});
     }
-
-    private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {
+    async getTesseractByReference(reference) {
         return await this.call("moi.Tesseract", { reference });
     }
-
-    private async getTesseractByHash(hash: Hex): Promise<Tesseract> {
+    async getTesseractByHash(hash) {
         return await this.getTesseractByReference({ absolute: hash });
     }
-
-    private async getTesseractByAddressAndHeight(address: Hex, height: number): Promise<Tesseract> {
+    async getTesseractByAddressAndHeight(address, height) {
         if (height < -1) {
             ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
         }
-
         return await this.getTesseractByReference({ relative: { identifier: address, height } });
     }
-
-    /**
-     * Retrieves a tesseract by its hash
-     *
-     * @param hash - The hash of the tesseract to retrieve.
-     * @param include - The fields to include in the response.
-     * @returns A promise that resolves to the tesseract.
-     */
-    public getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract>;
-    /**
-     * Retrieves a tesseract by its address and height
-     *
-     * @param address - The address of the account that the tesseract is a part of.
-     * @param height - The height of the tesseract on the account. The 0 & -1 values can be used to retrieve the oldest and latest tesseracts for the account respectively.
-     * @param include - The fields to include in the response.
-     *
-     * @returns A promise that resolves to the tesseract.
-     */
-    public getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<Tesseract>;
-    /**
-     * Retrieves a tesseract by its relative reference
-     *
-     * @param relativeRef - The relative reference of the tesseract to retrieve.
-     * @param include - The fields to include in the response.
-     *
-     * @returns A promise that resolves to the tesseract.
-     */
-    public getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<Tesseract>;
-    public async getTesseract(
-        hashOrAddress: Hex | RelativeTesseractOption,
-        heightOrInclude?: number | TesseractIncludeFields,
-        include?: TesseractIncludeFields
-    ): Promise<Tesseract> {
+    async getTesseract(hashOrAddress, heightOrInclude, include) {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
             return await this.getTesseractByAddressAndHeight(hashOrAddress.identifier, hashOrAddress.height);
         }
-
         if (isAddress(hashOrAddress) && typeof heightOrInclude === "number") {
             return await this.getTesseractByAddressAndHeight(hashOrAddress, heightOrInclude);
         }
-
         if (isHex(hashOrAddress) && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
             return await this.getTesseractByHash(hashOrAddress);
         }
-
         ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
     }
-
     /**
      * Retrieves an interaction by its hash.
      *
      * @param hash - The hash of the interaction to retrieve.
      * @returns A promise that resolves to the interaction.
      */
-    public async getInteraction(hash: Hex, options?: ResponseModifierParam): Promise<Partial<Interaction>> {
+    async getInteraction(hash, options) {
         return await this.call("moi.Interaction", { hash, ...options });
     }
-
     /**
      * Retrieves information about an account.
      *
@@ -163,10 +96,9 @@ export class Provider extends EventEmitter {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    public async getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo> {
+    async getAccount(address, option) {
         return await this.call("moi.Account", { identifier: address, ...option });
     }
-
     /**
      * Retrieves the account key for an account.
      *
@@ -176,14 +108,13 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account information for the provided key id
      */
-    public async getAccountKey(address: Hex, keyId: number, pending?: boolean) {
+    async getAccountKey(address, keyId, pending) {
         return await this.call("moi.AccountKey", {
             identifier: address,
             key_id: keyId,
             pending,
         });
     }
-
     /**
      * Retrieves the balances, mandates and deposits for a specific asset on an account
      *
@@ -193,24 +124,22 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account asset information
      */
-    public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]> {
+    async getAccountAsset(address, assetId, option) {
         return await this.call("moi.AccountAsset", {
             identifier: address,
             asset_id: assetId,
             ...option,
         });
     }
-
     /**
      * Retrieves the interaction confirmation
      *
      * @param hash The hash of the interaction to retrieve the confirmation.
      * @returns A promise that resolves to object containing the confirmation information.
      */
-    public async getConfirmation(hash: Hex): Promise<Confirmation> {
+    async getConfirmation(hash) {
         return await this.call("moi.Confirmation", { hash });
     }
-
     /**
      * Retrieves information about an asset
      *
@@ -219,10 +148,9 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the asset information
      */
-    public async getAsset(assetId: Hex, option?: Omit<RpcMethodParams<"moi.Asset">[0], "asset_id">): Promise<unknown> {
+    async getAsset(assetId, option) {
         return await this.call("moi.Asset", { asset_id: assetId, ...option });
     }
-
     /**
      * Retrieves information about a logic
      *
@@ -231,38 +159,14 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the logic information
      */
-    public async getLogic(logicId: Hex, option?: Omit<RpcMethodParams<"moi.Logic">[0], "logic_id">): Promise<unknown> {
+    async getLogic(logicId, option) {
         return await this.call("moi.Logic", { logic_id: logicId, ...option });
     }
-
-    /**
-     * Retrieves the value of a storage key for a logic from persistent storage
-     *
-     * @param logicId The unique identifier for the logic
-     * @param key The storage key to retrieve
-     * @param option The options for the tesseract reference
-     *
-     * @returns A promise that resolves to the value of the storage key
-     */
-    public async getLogicStorage(logicId: Hex, key: Hex, option?: LogicStorageOption): Promise<Hex>;
-    /**
-     * Retrieves the value of a storage key for a logic from ephemeral storage
-     *
-     * @param logicId The unique identifier for the logic
-     * @param key The storage key to retrieve
-     * @param address The address of the account to retrieve the storage key from
-     * @param option The options for the tesseract reference
-     *
-     * @returns A promise that resolves to the value of the storage key
-     */
-    public async getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
-    public async getLogicStorage(logicId: Hex, key: Hex, addressOrOption?: Hex | LogicStorageOption, option?: LogicStorageOption): Promise<Hex> {
-        let params: RpcMethodParams<"moi.LogicStorage"> | undefined;
-
+    async getLogicStorage(logicId, key, addressOrOption, option) {
+        let params;
         if (addressOrOption == null || typeof addressOrOption === "object") {
             params = [{ logic_id: logicId, storage_key: key, ...addressOrOption }];
         }
-
         if (isAddress(addressOrOption)) {
             params = [
                 {
@@ -273,88 +177,69 @@ export class Provider extends EventEmitter {
                 },
             ];
         }
-
         if (params == null) {
             ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
         }
-
         return await this.call("moi.LogicStorage", ...params);
     }
-
-    private static isSignedInteraction(ix: unknown): ix is SignedInteraction {
+    static isSignedInteraction(ix) {
         if (typeof ix !== "object" || ix == null) {
             return false;
         }
-
         if (!("interaction" in ix) || typeof ix.interaction !== "string") {
             return false;
         }
-
         if (!("signatures" in ix) || !Array.isArray(ix.signatures)) {
             return false;
         }
-
         return true;
     }
-
-    private getInteractionParticipants(interaction: BaseInteractionRequest) {
-        const participants: NonNullable<BaseInteractionRequest["participants"]> = [
+    getInteractionParticipants(interaction) {
+        const participants = [
             {
                 address: interaction.sender.address,
                 lock_type: LockType.NoLock,
                 notary: false,
             },
         ];
-
         return participants;
     }
-
-    public async simulate(ix: BaseInteractionRequest): Promise<SimulateResult> {
+    async simulate(ix) {
         const serializer = new InteractionSerializer();
-
         if (ix.participants == null) {
             ix.participants = this.getInteractionParticipants(ix);
         }
-
         const args = serializer.serialize(ix);
         return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }
-
     /**
      * Submits a signed interaction to the MOI protocol network.
      *
      * @param interaction - The signed interaction to submit.
      * @returns A promise that resolves to the hash of the submitted interaction.
      */
-    public async submit(interaction: SignedInteraction): Promise<Hex> {
-        let ix: SignedInteraction | undefined;
-
+    async submit(interaction) {
+        let ix;
         if (Provider.isSignedInteraction(interaction)) {
             ix = interaction;
         }
-
         if (ix == null) {
             ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
         }
-
         if (!isHex(ix.interaction)) {
             ErrorUtils.throwArgumentError("Must be a valid hex string", "interaction", ix.interaction);
         }
-
         if (ix.signatures.length === 0) {
             ErrorUtils.throwError("Interaction must be have at least one signature", ErrorCode.INVALID_SIGNATURE);
         }
-
         return await this.call("moi.Submit", {
             interaction: ix.interaction,
             signatures: ix.signatures,
         });
     }
-
-    public async subscribe(event: string, ...params: unknown[]): Promise<string> {
+    async subscribe(event, ...params) {
         return await this.call("moi.Subscribe", [event, ...params]);
     }
-
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
@@ -365,13 +250,13 @@ export class Provider extends EventEmitter {
      *
      * @throws Will throw an error if the response contains an error.
      */
-    public processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
+    processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
             const params = data ? (typeof data === "object" ? data : { data }) : {};
             ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
-
         return response.result;
     }
 }
+//# sourceMappingURL=provider.js.map
