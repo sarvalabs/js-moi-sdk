@@ -198,21 +198,94 @@ class Provider extends events_1.EventEmitter {
         return true;
     }
     getInteractionParticipants(interaction) {
-        const participants = [
-            {
-                address: interaction.sender.address,
-                lock_type: js_moi_utils_1.LockType.NoLock,
+        const participants = new Map([
+            [interaction.sender.address, { address: interaction.sender.address, lock_type: js_moi_utils_1.LockType.MutateLock, notary: false }],
+        ]);
+        if (interaction.payer != null) {
+            participants.set(interaction.payer, {
+                address: interaction.payer,
+                lock_type: js_moi_utils_1.LockType.MutateLock,
                 notary: false,
-            },
-        ];
-        return participants;
-    }
-    async simulate(ix) {
-        const serializer = new serializer_1.InteractionSerializer();
-        if (ix.participants == null) {
-            ix.participants = this.getInteractionParticipants(ix);
+            });
         }
-        const args = serializer.serialize(ix);
+        for (const { type, payload } of interaction.ix_operations) {
+            switch (type) {
+                case js_moi_utils_1.OpType.ParticipantCreate: {
+                    participants.set(payload.address, {
+                        address: payload.address,
+                        lock_type: js_moi_utils_1.LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+                case js_moi_utils_1.OpType.AssetMint:
+                case js_moi_utils_1.OpType.AssetBurn: {
+                    const address = (0, js_moi_utils_1.ensureHexPrefix)((0, js_moi_utils_1.trimHexPrefix)(payload.asset_id).slice(8));
+                    participants.set(address, {
+                        address,
+                        lock_type: js_moi_utils_1.LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+                case js_moi_utils_1.OpType.AssetTransfer: {
+                    participants.set(payload.beneficiary, {
+                        address: payload.beneficiary,
+                        lock_type: js_moi_utils_1.LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+                case js_moi_utils_1.OpType.LogicInvoke:
+                case js_moi_utils_1.OpType.LogicEnlist: {
+                    const address = (0, js_moi_utils_1.ensureHexPrefix)((0, js_moi_utils_1.trimHexPrefix)(payload.logic_id).slice(6));
+                    participants.set(address, {
+                        address,
+                        lock_type: js_moi_utils_1.LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+            }
+        }
+        for (const participant of interaction.participants ?? []) {
+            if (participants.has(participant.address)) {
+                continue;
+            }
+            participants.set(participant.address, participant);
+        }
+        return Array.from(participants.values());
+    }
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The raw interaction object or serialized interaction submission
+     * @returns A promise that resolves to the result of the simulation.
+     */
+    async simulate(ix) {
+        let args;
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                args = ix;
+                break;
+            }
+            case typeof ix === "object": {
+                if (ix.participants == null) {
+                    ix.participants = this.getInteractionParticipants(ix);
+                }
+                args = new serializer_1.InteractionSerializer().serialize(ix);
+                break;
+            }
+            default: {
+                js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+        }
         return await this.call("moi.Simulate", { interaction: (0, js_moi_utils_1.bytesToHex)(args) });
     }
     /**

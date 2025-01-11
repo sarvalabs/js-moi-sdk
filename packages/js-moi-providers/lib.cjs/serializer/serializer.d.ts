@@ -6,6 +6,7 @@ export declare class InteractionSerializer {
     private static IX_POLO_SCHEMA;
     serializeOperation<T extends OpType>(operation: Operation<T>): Uint8Array;
     private getSerializationPayload;
+    private ensureValidInteraction;
     serialize(interaction: BaseInteractionRequest): Uint8Array;
     /**
      * Register a serializer for a given operation type

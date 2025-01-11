@@ -1,7 +1,7 @@
 import { Hex, OpType, type AccountType, type Address, type LockType, type OperationStatus, type ReceiptStatus } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, ResponseModifierParam, SignedInteraction, TesseractReferenceParam } from "./shared";
 interface Account {
-    address: Hex;
+    address: Address;
     sequence_id: number;
     key_id: number;
 }

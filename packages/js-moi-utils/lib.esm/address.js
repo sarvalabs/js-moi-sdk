@@ -5,7 +5,7 @@
  * @returns {boolean} Returns true if the address is valid, otherwise false.
  */
 export const isValidAddress = (address) => {
-    if (typeof address !== 'string')
+    if (typeof address !== "string")
         return false;
     if (!/^0x[0-9a-fA-F]{64}$/.test(address))
         return false;

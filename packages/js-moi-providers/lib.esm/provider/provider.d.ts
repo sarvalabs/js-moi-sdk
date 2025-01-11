@@ -1,4 +1,4 @@
-import { type Hex } from "js-moi-utils";
+import { type Address, type Hex } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "../types/json-rpc";
 import { type AccountAsset, type AccountInfo, type BaseInteractionRequest, type Confirmation, type Interaction, type RpcMethod, type RpcMethodParams, type RpcMethodResponse, type SimulateResult, type Tesseract } from "../types/moi-rpc-method";
@@ -89,7 +89,7 @@ export declare class Provider extends EventEmitter {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo>;
+    getAccount(address: Address, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo>;
     /**
      * Retrieves the account key for an account.
      *
@@ -99,7 +99,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account information for the provided key id
      */
-    getAccountKey(address: Hex, keyId: number, pending?: boolean): Promise<import("..").AccountKey>;
+    getAccountKey(address: Address, keyId: number, pending?: boolean): Promise<import("..").AccountKey>;
     /**
      * Retrieves the balances, mandates and deposits for a specific asset on an account
      *
@@ -109,7 +109,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account asset information
      */
-    getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]>;
+    getAccountAsset(address: Address, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]>;
     /**
      * Retrieves the interaction confirmation
      *
@@ -158,6 +158,31 @@ export declare class Provider extends EventEmitter {
     getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
     private static isSignedInteraction;
     private getInteractionParticipants;
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The POLO encoded interaction submission
+     * @returns A promise that resolves to the result of the simulation.
+     */
+    simulate(serializedIx: Uint8Array): Promise<SimulateResult>;
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The interaction object
+     * @returns A promise that resolves to the result of the simulation.
+     */
     simulate(ix: BaseInteractionRequest): Promise<SimulateResult>;
     /**
      * Submits a signed interaction to the MOI protocol network.

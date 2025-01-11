@@ -88,7 +88,46 @@ export class InteractionSerializer {
         };
     }
 
+    private ensureValidInteraction(interaction: BaseInteractionRequest) {
+        if (interaction.sender == null) {
+            ErrorUtils.throwError("Sender is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
+                field: "sender",
+            });
+        }
+
+        if (interaction.fuel_price == null) {
+            ErrorUtils.throwError("Fuel price is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_price",
+            });
+        }
+
+        if (interaction.fuel_limit == null) {
+            ErrorUtils.throwError("Fuel limit is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_limit",
+            });
+        }
+
+        if (interaction.fuel_price < 0) {
+            ErrorUtils.throwError("Fuel price must be a unsigned number", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_price",
+                value: interaction.fuel_price,
+            });
+        }
+
+        if (interaction.fuel_limit < 0) {
+            ErrorUtils.throwError("Fuel limit must be a unsigned number", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_limit",
+                value: interaction.fuel_limit,
+            });
+        }
+
+        if (interaction.ix_operations == null || interaction.ix_operations.length === 0) {
+            ErrorUtils.throwError("At least one operation is required in the interaction", ErrorCode.INVALID_ARGUMENT);
+        }
+    }
+
     public serialize(interaction: BaseInteractionRequest) {
+        this.ensureValidInteraction(interaction);
         const polorizer = new Polorizer();
         polorizer.polorize(this.getSerializationPayload(interaction), InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();

@@ -1,4 +1,4 @@
-import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType, type Address, type Hex } from "js-moi-utils";
+import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
 
 import { EventEmitter } from "events";
 import { InteractionSerializer } from "../serializer/serializer";
@@ -298,15 +298,71 @@ export class Provider extends EventEmitter {
     }
 
     private getInteractionParticipants(interaction: BaseInteractionRequest) {
-        const participants: NonNullable<BaseInteractionRequest["participants"]> = [
-            {
-                address: interaction.sender.address,
-                lock_type: LockType.NoLock,
-                notary: false,
-            },
-        ];
+        const participants = new Map<Address, NonNullable<BaseInteractionRequest["participants"]>[number]>([
+            [interaction.sender.address, { address: interaction.sender.address, lock_type: LockType.MutateLock, notary: false }],
+        ]);
 
-        return participants;
+        if (interaction.payer != null) {
+            participants.set(interaction.payer, {
+                address: interaction.payer,
+                lock_type: LockType.MutateLock,
+                notary: false,
+            });
+        }
+
+        for (const { type, payload } of interaction.ix_operations) {
+            switch (type) {
+                case OpType.ParticipantCreate: {
+                    participants.set(payload.address, {
+                        address: payload.address,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+
+                case OpType.AssetMint:
+                case OpType.AssetBurn: {
+                    const address = ensureHexPrefix(trimHexPrefix(payload.asset_id).slice(8));
+                    participants.set(address, {
+                        address,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+
+                case OpType.AssetTransfer: {
+                    participants.set(payload.beneficiary, {
+                        address: payload.beneficiary,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+
+                case OpType.LogicInvoke:
+                case OpType.LogicEnlist: {
+                    const address = ensureHexPrefix(trimHexPrefix(payload.logic_id).slice(6));
+                    participants.set(address, {
+                        address,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+            }
+        }
+
+        for (const participant of interaction.participants ?? []) {
+            if (participants.has(participant.address)) {
+                continue;
+            }
+
+            participants.set(participant.address, participant);
+        }
+
+        return Array.from(participants.values());
     }
 
     /**

@@ -1,4 +1,4 @@
-import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType } from "js-moi-utils";
+import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix } from "js-moi-utils";
 import { EventEmitter } from "events";
 import { InteractionSerializer } from "../serializer/serializer";
 export class Provider extends EventEmitter {
@@ -195,21 +195,94 @@ export class Provider extends EventEmitter {
         return true;
     }
     getInteractionParticipants(interaction) {
-        const participants = [
-            {
-                address: interaction.sender.address,
-                lock_type: LockType.NoLock,
+        const participants = new Map([
+            [interaction.sender.address, { address: interaction.sender.address, lock_type: LockType.MutateLock, notary: false }],
+        ]);
+        if (interaction.payer != null) {
+            participants.set(interaction.payer, {
+                address: interaction.payer,
+                lock_type: LockType.MutateLock,
                 notary: false,
-            },
-        ];
-        return participants;
-    }
-    async simulate(ix) {
-        const serializer = new InteractionSerializer();
-        if (ix.participants == null) {
-            ix.participants = this.getInteractionParticipants(ix);
+            });
         }
-        const args = serializer.serialize(ix);
+        for (const { type, payload } of interaction.ix_operations) {
+            switch (type) {
+                case OpType.ParticipantCreate: {
+                    participants.set(payload.address, {
+                        address: payload.address,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+                case OpType.AssetMint:
+                case OpType.AssetBurn: {
+                    const address = ensureHexPrefix(trimHexPrefix(payload.asset_id).slice(8));
+                    participants.set(address, {
+                        address,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+                case OpType.AssetTransfer: {
+                    participants.set(payload.beneficiary, {
+                        address: payload.beneficiary,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+                case OpType.LogicInvoke:
+                case OpType.LogicEnlist: {
+                    const address = ensureHexPrefix(trimHexPrefix(payload.logic_id).slice(6));
+                    participants.set(address, {
+                        address,
+                        lock_type: LockType.MutateLock,
+                        notary: false, // TODO: Check what should be value of this or can be left blank
+                    });
+                    break;
+                }
+            }
+        }
+        for (const participant of interaction.participants ?? []) {
+            if (participants.has(participant.address)) {
+                continue;
+            }
+            participants.set(participant.address, participant);
+        }
+        return Array.from(participants.values());
+    }
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The raw interaction object or serialized interaction submission
+     * @returns A promise that resolves to the result of the simulation.
+     */
+    async simulate(ix) {
+        let args;
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                args = ix;
+                break;
+            }
+            case typeof ix === "object": {
+                if (ix.participants == null) {
+                    ix.participants = this.getInteractionParticipants(ix);
+                }
+                args = new InteractionSerializer().serialize(ix);
+                break;
+            }
+            default: {
+                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
         return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }
     /**

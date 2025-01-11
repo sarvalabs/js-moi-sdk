@@ -47,19 +47,22 @@ exports.AssetMintSerializer = createAssetSupplySerializer(js_moi_utils_1.OpType.
 exports.AssetBurnSerializer = createAssetSupplySerializer(js_moi_utils_1.OpType.AssetBurn);
 class ParticipantCreateSerializer extends OperationSerializer {
     type = js_moi_utils_1.OpType.ParticipantCreate;
-    schema = {
-        kind: "struct",
-        fields: {
-            address: polo_schema_1.polo.bytes,
-            keys_payload: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-                public_key: polo_schema_1.polo.bytes,
-                weight: polo_schema_1.polo.integer,
-                signature_algorithm: polo_schema_1.polo.integer,
-            })),
-            amount: polo_schema_1.polo.integer,
-        },
-    };
+    schema = polo_schema_1.polo.struct({
+        address: polo_schema_1.polo.bytes,
+        keys_payload: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
+            public_key: polo_schema_1.polo.bytes,
+            weight: polo_schema_1.polo.integer,
+            signature_algorithm: polo_schema_1.polo.integer,
+        })),
+        amount: polo_schema_1.polo.integer,
+    });
     serialize(payload) {
+        if (payload.address == null) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("'address' is required for participant create operation", "address", payload.address);
+        }
+        if ((0, js_moi_utils_1.isValidAddress)(payload.address) === false) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address", "address", payload.address);
+        }
         return super.serialize({ ...payload, address: (0, js_moi_utils_1.hexToBytes)(payload.address) });
     }
 }
@@ -74,6 +77,21 @@ class AssetActionSerializer extends OperationSerializer {
         timestamp: polo_schema_1.polo.integer,
     });
     serialize(payload) {
+        if (payload.beneficiary == null) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`'beneficiary' is required for ${this.type} operation`, "beneficiary", payload.beneficiary);
+        }
+        if ((0, js_moi_utils_1.isValidAddress)(payload.beneficiary) === false) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid beneficiary address", "beneficiary", payload.beneficiary);
+        }
+        if (payload.amount == null) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`'amount' is required for ${this.type} operation`, "amount", payload.amount);
+        }
+        if (payload.amount < 0) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Amount must be greater than or equal to zero", "amount", payload.amount);
+        }
+        if (payload.asset_id == null) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`'asset_id' is required for ${this.type} operation`, "asset_id", payload.asset_id);
+        }
         return super.serialize({
             ...payload,
             benefactor: (0, js_moi_utils_1.hexToBytes)(payload.benefactor),
@@ -96,6 +114,19 @@ const createLogicActionSerializer = (type) => {
             }),
         });
         serialize(payload) {
+            if (this.type === js_moi_utils_1.OpType.LogicDeploy) {
+                if ("manifest" in payload && payload.manifest == null) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError(`'manifest' is required for ${this.type} operation`, "manifest", payload.manifest);
+                }
+            }
+            if (this.type === js_moi_utils_1.OpType.LogicInvoke || this.type === js_moi_utils_1.OpType.LogicEnlist) {
+                if ("logic_id" in payload && payload.logic_id == null) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError(`'logic_id' is required for ${this.type} operation`, "logic_id", payload.logic_id);
+                }
+            }
+            if ("callsite" in payload && payload.callsite == null) {
+                js_moi_utils_1.ErrorUtils.throwArgumentError("'callsite' is required for logic operation", "callsite", payload.callsite);
+            }
             return super.serialize({
                 ...payload,
                 manifest: "manifest" in payload && payload.manifest != null ? (0, js_moi_utils_1.hexToBytes)(payload.manifest) : undefined,
