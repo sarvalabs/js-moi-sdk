@@ -188,7 +188,7 @@ const gatherIxFunds = (interaction: InteractionRequest) => {
 };
 
 /**
- * Creates a POLO bytes from an raw interaction request.
+ * Creates a POLO bytes from an interaction request.
  *
  * It smartly gathers the participants and funds from the interaction request and then encodes the interaction request.
  *
