@@ -24,15 +24,6 @@ export interface Participant {
     state: Hex;
     context: ParticipantContext;
 }
-interface LogicPayload {
-    manifest: Hex;
-    logic_id: Hex;
-    callsite: string;
-    calldata?: Hex;
-    interfaces?: Record<string, Hex>;
-}
-export type LogicDeployPayload = Omit<LogicPayload, "logic_id">;
-export type LogicCallPayload = Omit<LogicPayload, "manifest">;
 export interface InteractionShared {
     sender: Account;
     payer: Address;
