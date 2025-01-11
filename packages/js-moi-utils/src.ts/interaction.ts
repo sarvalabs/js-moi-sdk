@@ -196,8 +196,9 @@ const gatherIxFunds = (interaction: InteractionRequest) => {
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export const createIx = (ix: InteractionRequest): Uint8Array => {
-    ix.participants = gatherIxParticipants(ix);
-    ix.funds = gatherIxFunds(ix);
-
-    return encodeInteraction(ix);
+    return encodeInteraction({
+        ...ix,
+        participants: gatherIxParticipants(ix),
+        funds: gatherIxFunds(ix),
+    });
 };

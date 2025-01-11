@@ -170,8 +170,10 @@ const gatherIxFunds = (interaction) => {
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export const createIx = (ix) => {
-    ix.participants = gatherIxParticipants(ix);
-    ix.funds = gatherIxFunds(ix);
-    return encodeInteraction(ix);
+    return encodeInteraction({
+        ...ix,
+        participants: gatherIxParticipants(ix),
+        funds: gatherIxFunds(ix),
+    });
 };
 //# sourceMappingURL=interaction.js.map
