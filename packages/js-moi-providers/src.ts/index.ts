@@ -1,7 +1,6 @@
 export { JsonRpcProvider, type JsonRpcProviderOption } from "./provider/json-rpc-provider";
 export { Provider } from "./provider/provider";
 export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./provider/websocket-provider";
-export { InteractionSerializer } from "./serializer/serializer";
 export { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
 export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
 export type {

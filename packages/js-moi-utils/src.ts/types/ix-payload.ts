@@ -31,7 +31,7 @@ export interface LogicPayload {
      *
      * It may be required for `LogicInvoke`, `LogicEnlist` and `LogicDeploy` operations.
      */
-    interfaces: Record<string, Hex>;
+    interfaces?: Record<string, Hex>;
 }
 
 /**
@@ -68,6 +68,12 @@ export interface AssetCreatePayload {
     logic?: LogicPayload;
 }
 
+export interface KeyAddPayload {
+    public_key: Hex;
+    weight: number;
+    signature_algorithm: number;
+}
+
 /**
  * `ParticipantCreatePayload` holds the data for creating a new participant account
  */
@@ -82,6 +88,10 @@ export interface ParticipantCreatePayload {
      * Note: It should be more or equal to zero.
      */
     amount: number;
+    /**
+     * The keys_payload is used to specify the keys for the participant.
+     */
+    keys_payload: KeyAddPayload[];
 }
 
 /**

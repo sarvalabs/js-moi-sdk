@@ -1,22 +1,9 @@
-import { ErrorCode, ErrorUtils, hexToBytes, OpType, type Operation } from "js-moi-utils";
+import { encodeIxOperationToPolo, hexToBytes } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import type { BaseInteractionRequest } from "../types/moi-rpc-method";
-import {
-    AssetActionSerializer,
-    AssetBurnSerializer,
-    AssetCreateSerializer,
-    AssetMintSerializer,
-    LogicDeploySerializer,
-    LogicEnlistSerializer,
-    LogicInvokeSerializer,
-    ParticipantCreateSerializer,
-    type OperationSerializer,
-} from "./operation-serializer";
 
 export class InteractionSerializer {
-    private static serializers: Map<OpType, OperationSerializer> = new Map();
-
     private static IX_POLO_SCHEMA = polo.struct({
         sender: polo.struct({
             address: polo.bytes,
@@ -55,19 +42,6 @@ export class InteractionSerializer {
         perception: polo.bytes,
     });
 
-    public serializeOperation<T extends OpType>(operation: Operation<T>): Uint8Array {
-        const serializer = InteractionSerializer.serializers.get(operation.type);
-
-        if (serializer == null) {
-            ErrorUtils.throwError(
-                `Serializer for operation type "${operation.type}" is not registered. Please pass the correct operation type or register a serializer for the given operation type.`,
-                ErrorCode.NOT_INITIALIZED
-            );
-        }
-
-        return serializer.serialize(operation.payload);
-    }
-
     private getSerializationPayload(interaction: BaseInteractionRequest) {
         return {
             ...interaction,
@@ -77,7 +51,7 @@ export class InteractionSerializer {
             },
             ix_operations: interaction.ix_operations.map((op) => ({
                 type: op.type,
-                payload: this.serializeOperation(op),
+                payload: encodeIxOperationToPolo(op),
             })),
             payer: interaction.payer != null ? hexToBytes(interaction.payer) : undefined,
             participants: interaction.participants?.map((participant) => ({
@@ -93,31 +67,5 @@ export class InteractionSerializer {
         console.log(JSON.stringify(interaction, null, 2));
         polorizer.polorize(this.getSerializationPayload(interaction), InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();
-    }
-
-    /**
-     * Register a serializer for a given operation type
-     *
-     * If a serializer is already registered for the given operation type, it will be overwritten
-     *
-     * @param serializer The serializer to register
-     * @returns void
-     */
-    static register(serializer: OperationSerializer) {
-        this.serializers.set(serializer.type, serializer);
-    }
-
-    static {
-        // Register all serializers
-        this.register(new ParticipantCreateSerializer());
-
-        this.register(new AssetCreateSerializer());
-        this.register(new AssetBurnSerializer());
-        this.register(new AssetMintSerializer());
-        this.register(new AssetActionSerializer());
-
-        this.register(new LogicDeploySerializer());
-        this.register(new LogicEnlistSerializer());
-        this.register(new LogicInvokeSerializer());
     }
 }
