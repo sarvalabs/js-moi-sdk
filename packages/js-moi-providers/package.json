@@ -5,8 +5,8 @@
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
   "browser": {
-    "./lib.cjs/ws/ws.js": "./lib.cjs/ws/ws-browser.js",
-    "./lib.esm/ws/ws.js": "./lib.esm/ws/ws-browser.js"
+    "./lib.cjs/ws/ws.js": "./lib.cjs/provider/ws/ws-browser.js",
+    "./lib.esm/ws/ws.js": "./lib.esm/provider/ws/ws-browser.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

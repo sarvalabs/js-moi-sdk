@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketTransport = void 0;
 const events_1 = __importDefault(require("events"));
-const ws_1 = require("../ws/ws");
+const ws_1 = require("../provider/ws/ws");
 class WebsocketTransport extends events_1.default {
     options;
     address;

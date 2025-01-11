@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Websocket } from "../ws/ws";
+import { Websocket } from "../provider/ws/ws";
 export class WebsocketTransport extends EventEmitter {
     options;
     address;
