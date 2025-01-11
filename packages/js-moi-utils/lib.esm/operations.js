@@ -174,12 +174,13 @@ export const getIxOperationDescriptor = (type) => ixOpDescriptor[type] ?? null;
  * @throws Throws an error if the operation type is not registered.
  */
 export const encodeIxOperationToPolo = (operation) => {
-    const schema = ixOpDescriptor[operation.type]?.schema();
-    if (schema == null) {
-        throw new Error(`Schema for operation type "${operation.type}" is not registered`);
+    const descriptor = ixOpDescriptor[operation.type];
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
     const polorizer = new Polorizer();
-    polorizer.polorize(transformPayload(operation.type, operation.payload), schema);
+    const data = transformPayload(operation.type, operation.payload);
+    polorizer.polorize(data, descriptor.schema());
     return polorizer.bytes();
 };
 //# sourceMappingURL=operations.js.map

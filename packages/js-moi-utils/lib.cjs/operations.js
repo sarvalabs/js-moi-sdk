@@ -180,12 +180,13 @@ exports.getIxOperationDescriptor = getIxOperationDescriptor;
  * @throws Throws an error if the operation type is not registered.
  */
 const encodeIxOperationToPolo = (operation) => {
-    const schema = ixOpDescriptor[operation.type]?.schema();
-    if (schema == null) {
-        throw new Error(`Schema for operation type "${operation.type}" is not registered`);
+    const descriptor = ixOpDescriptor[operation.type];
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
     const polorizer = new js_polo_1.Polorizer();
-    polorizer.polorize((0, exports.transformPayload)(operation.type, operation.payload), schema);
+    const data = (0, exports.transformPayload)(operation.type, operation.payload);
+    polorizer.polorize(data, descriptor.schema());
     return polorizer.bytes();
 };
 exports.encodeIxOperationToPolo = encodeIxOperationToPolo;

@@ -227,15 +227,16 @@ export const getIxOperationDescriptor = <TOpType extends OpType>(type: TOpType):
  * @throws Throws an error if the operation type is not registered.
  */
 export const encodeIxOperationToPolo = <TOpType extends OpType>(operation: Operation<TOpType>): Uint8Array => {
-    const schema = ixOpDescriptor[operation.type]?.schema();
+    const descriptor = ixOpDescriptor[operation.type];
 
-    if (schema == null) {
-        throw new Error(`Schema for operation type "${operation.type}" is not registered`);
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
 
     const polorizer = new Polorizer();
+    const data = transformPayload(operation.type, operation.payload);
 
-    polorizer.polorize(transformPayload(operation.type, operation.payload), schema);
+    polorizer.polorize(data, descriptor.schema());
 
     return polorizer.bytes();
 };
