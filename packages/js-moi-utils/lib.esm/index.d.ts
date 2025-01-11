@@ -4,11 +4,11 @@ export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger, type Byt
 export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptStatus } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike } from "./hex";
-export { encodeInteraction, getInteractionRequestSchema, transformInteraction } from "./interaction";
+export { createIx, encodeInteraction, getInteractionRequestSchema, transformInteraction } from "./interaction";
 export { deepCopy } from "./object";
 export { encodeOperationPayload, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload, type IxOperationDescriptor, type IxOperationValidationResult, } from "./operations";
 export { defineReadOnly } from "./properties";
-export type { ConsensusPreference, InteractionRequest, IxFund, IxParticipants, Preference, RawInteractionRequest, RawParticipants, RawPreference, RawSender, Sender, } from "./types/interaction";
+export type { ConsensusPreference, InteractionRequest, IxFund, IxParticipant, Preference, RawInteractionRequest, RawParticipants, RawPreference, RawSender, Sender, } from "./types/interaction";
 export type { IxOperation, IxRawOperation, Operation } from "./types/ix-operation";
 export type { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, KeyAddPayload, LogicActionPayload, LogicDeployPayload, LogicPayload, OperationPayload, ParticipantCreatePayload, PoloAssetActionPayload, PoloLogicActionPayload, PoloLogicDeployPayload, PoloLogicPayload, PoloOperationPayload, PoloParticipantCreatePayload, } from "./types/ix-payload";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";

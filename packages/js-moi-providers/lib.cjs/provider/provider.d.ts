@@ -156,8 +156,6 @@ export declare class Provider extends EventEmitter {
     getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
     private static isSignedInteraction;
     private ensureValidInteraction;
-    private getInteractionParticipants;
-    private getInteractionFunds;
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.

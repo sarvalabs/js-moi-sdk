@@ -1,4 +1,4 @@
-import { bytesToHex, encodeInteraction, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix, } from "js-moi-utils";
+import { bytesToHex, createIx, ErrorCode, ErrorUtils, isAddress, isHex } from "js-moi-utils";
 import { EventEmitter } from "events";
 export class Provider extends EventEmitter {
     _transport;
@@ -225,84 +225,6 @@ export class Provider extends EventEmitter {
             ErrorUtils.throwError("At least one operation is required in the interaction", ErrorCode.INVALID_ARGUMENT);
         }
     }
-    getInteractionParticipants(interaction) {
-        const participants = new Map([
-            [interaction.sender.address, { address: interaction.sender.address, lock_type: LockType.MutateLock, notary: false }],
-        ]);
-        if (interaction.payer != null) {
-            participants.set(interaction.payer, {
-                address: interaction.payer,
-                lock_type: LockType.MutateLock,
-                notary: false,
-            });
-        }
-        for (const { type, payload } of interaction.operations) {
-            switch (type) {
-                case OpType.ParticipantCreate: {
-                    participants.set(payload.address, {
-                        address: payload.address,
-                        lock_type: LockType.MutateLock,
-                        notary: false, // TODO: Check what should be value of this or can be left blank
-                    });
-                    break;
-                }
-                case OpType.AssetMint:
-                case OpType.AssetBurn: {
-                    const address = ensureHexPrefix(trimHexPrefix(payload.asset_id).slice(8));
-                    participants.set(address, {
-                        address,
-                        lock_type: LockType.MutateLock,
-                        notary: false, // TODO: Check what should be value of this or can be left blank
-                    });
-                    break;
-                }
-                case OpType.AssetTransfer: {
-                    participants.set(payload.beneficiary, {
-                        address: payload.beneficiary,
-                        lock_type: LockType.MutateLock,
-                        notary: false, // TODO: Check what should be value of this or can be left blank
-                    });
-                    break;
-                }
-                case OpType.LogicInvoke:
-                case OpType.LogicEnlist: {
-                    const address = ensureHexPrefix(trimHexPrefix(payload.logic_id).slice(6));
-                    participants.set(address, {
-                        address,
-                        lock_type: LockType.MutateLock,
-                        notary: false, // TODO: Check what should be value of this or can be left blank
-                    });
-                    break;
-                }
-            }
-        }
-        for (const participant of interaction.participants ?? []) {
-            if (participants.has(participant.address)) {
-                continue;
-            }
-            participants.set(participant.address, participant);
-        }
-        return Array.from(participants.values());
-    }
-    getInteractionFunds(interaction) {
-        const funds = new Map();
-        for (const { type, payload } of interaction.operations) {
-            switch (type) {
-                case OpType.AssetTransfer:
-                case OpType.AssetMint:
-                case OpType.AssetBurn: {
-                    funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount });
-                }
-            }
-        }
-        for (const { asset_id, amount } of interaction.funds ?? []) {
-            if (funds.has(asset_id)) {
-                continue;
-            }
-            funds.set(asset_id, { asset_id, amount });
-        }
-        return Array.from(funds.values());
-    }
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.
@@ -324,9 +246,7 @@ export class Provider extends EventEmitter {
             }
             case typeof ix === "object": {
                 this.ensureValidInteraction(ix);
-                ix.participants = this.getInteractionParticipants(ix);
-                ix.funds = this.getInteractionFunds(ix);
-                args = encodeInteraction(ix);
+                args = createIx(ix);
                 break;
             }
             default: {

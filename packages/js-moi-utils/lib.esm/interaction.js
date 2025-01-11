@@ -1,6 +1,7 @@
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
-import { hexToBytes } from "./hex";
+import { LockType, OpType } from "./enums";
+import { ensureHexPrefix, hexToBytes, trimHexPrefix } from "./hex";
 import { encodeOperationPayload } from "./operations";
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -75,4 +76,102 @@ export function encodeInteraction(ix) {
     polorizer.polorize(data, getInteractionRequestSchema());
     return polorizer.bytes();
 }
+const gatherIxParticipants = (interaction) => {
+    const participants = new Map([
+        [
+            interaction.sender.address,
+            {
+                address: interaction.sender.address,
+                lock_type: LockType.MutateLock,
+                notary: false,
+            },
+        ],
+    ]);
+    if (interaction.payer != null) {
+        participants.set(interaction.payer, {
+            address: interaction.payer,
+            lock_type: LockType.MutateLock,
+            notary: false,
+        });
+    }
+    for (const { type, payload } of interaction.operations) {
+        switch (type) {
+            case OpType.ParticipantCreate: {
+                participants.set(payload.address, {
+                    address: payload.address,
+                    lock_type: LockType.MutateLock,
+                    notary: false, // TODO: Check what should be value of this or can be left blank
+                });
+                break;
+            }
+            case OpType.AssetMint:
+            case OpType.AssetBurn: {
+                const address = ensureHexPrefix(trimHexPrefix(payload.asset_id).slice(8));
+                participants.set(address, {
+                    address,
+                    lock_type: LockType.MutateLock,
+                    notary: false, // TODO: Check what should be value of this or can be left blank
+                });
+                break;
+            }
+            case OpType.AssetTransfer: {
+                participants.set(payload.beneficiary, {
+                    address: payload.beneficiary,
+                    lock_type: LockType.MutateLock,
+                    notary: false, // TODO: Check what should be value of this or can be left blank
+                });
+                break;
+            }
+            case OpType.LogicInvoke:
+            case OpType.LogicEnlist: {
+                const address = ensureHexPrefix(trimHexPrefix(payload.logic_id).slice(6));
+                participants.set(address, {
+                    address,
+                    lock_type: LockType.MutateLock,
+                    notary: false, // TODO: Check what should be value of this or can be left blank
+                });
+                break;
+            }
+        }
+    }
+    for (const participant of interaction.participants ?? []) {
+        if (participants.has(participant.address)) {
+            continue;
+        }
+        participants.set(participant.address, participant);
+    }
+    return Array.from(participants.values());
+};
+const gatherIxFunds = (interaction) => {
+    const funds = new Map();
+    for (const { type, payload } of interaction.operations) {
+        switch (type) {
+            case OpType.AssetTransfer:
+            case OpType.AssetMint:
+            case OpType.AssetBurn: {
+                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount });
+            }
+        }
+    }
+    for (const { asset_id, amount } of interaction.funds ?? []) {
+        if (funds.has(asset_id)) {
+            continue;
+        }
+        funds.set(asset_id, { asset_id, amount });
+    }
+    return Array.from(funds.values());
+};
+/**
+ * Creates a POLO bytes from an raw interaction request.
+ *
+ * It smartly gathers the participants and funds from the interaction request and then encodes the interaction request.
+ *
+ * @param ix - The interaction request to encode.
+ * @returns A POLO bytes representing the encoded interaction request.
+ */
+export const createIx = (ix) => {
+    ix.participants = gatherIxParticipants(ix);
+    ix.funds = gatherIxFunds(ix);
+    return encodeInteraction(ix);
+};
 //# sourceMappingURL=interaction.js.map

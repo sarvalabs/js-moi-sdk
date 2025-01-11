@@ -26,4 +26,13 @@ export declare const transformInteraction: (ix: InteractionRequest) => RawIntera
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export declare function encodeInteraction(ix: InteractionRequest | RawInteractionRequest): Uint8Array;
+/**
+ * Creates a POLO bytes from an raw interaction request.
+ *
+ * It smartly gathers the participants and funds from the interaction request and then encodes the interaction request.
+ *
+ * @param ix - The interaction request to encode.
+ * @returns A POLO bytes representing the encoded interaction request.
+ */
+export declare const createIx: (ix: InteractionRequest) => Uint8Array;
 //# sourceMappingURL=interaction.d.ts.map

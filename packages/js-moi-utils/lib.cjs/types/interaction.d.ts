@@ -20,7 +20,7 @@ export interface RawParticipants {
     lock_type: LockType;
     notary: boolean;
 }
-export interface IxParticipants {
+export interface IxParticipant {
     address: Hex;
     lock_type: LockType;
     notary: boolean;
@@ -76,7 +76,7 @@ export interface InteractionRequest {
     /**
      * It represents a participant with an addresses and their lock type.
      */
-    participants?: IxParticipants[];
+    participants?: IxParticipant[];
     /**
      * It represents compute and consensus preferences for the interaction.
      */
