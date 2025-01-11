@@ -1,4 +1,4 @@
-import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, hexToBytes, isAddress, isHex } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType } from "js-moi-utils";
 import { EventEmitter } from "events";
 import { InteractionSerializer } from "./serializer/serializer";
 export class Provider extends EventEmitter {
@@ -194,31 +194,21 @@ export class Provider extends EventEmitter {
         }
         return true;
     }
-    // private getInteractionParticipants(interaction: InteractionRequest) {
-    //     const participants: InteractionRequest["participants"] = [
-    //         {
-    //             address: interaction.sender.address,
-    //             lock: MutateLock.MutateLock,
-    //             notary: false,
-    //         },
-    //     ];
-    //     return participants;
-    // }
-    async simulate(interaction) {
-        const serializer = new InteractionSerializer();
-        const ix = {
-            ...interaction,
-            sender: {
-                ...interaction.sender,
-                address: hexToBytes(interaction.sender.address),
+    getInteractionParticipants(interaction) {
+        const participants = [
+            {
+                address: interaction.sender.address,
+                lock_type: LockType.NoLock,
+                notary: false,
             },
-            funds: interaction.funds ?? null,
-            payer: hexToBytes(interaction.payer ?? ensureHexPrefix("00".repeat(32))),
-            // participants: interaction.participants ?? this.getInteractionParticipants(interaction),
-            perception: interaction.perception ?? null,
-            preferences: interaction.preferences ?? null,
-        };
-        console.log(ix);
+        ];
+        return participants;
+    }
+    async simulate(ix) {
+        const serializer = new InteractionSerializer();
+        if (ix.participants == null) {
+            ix.participants = this.getInteractionParticipants(ix);
+        }
         const args = serializer.serialize(ix);
         return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }

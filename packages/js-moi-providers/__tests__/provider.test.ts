@@ -1,5 +1,5 @@
 import {} from "jest";
-import type { Address } from "js-moi-utils";
+import { AssetStandard, OpType, ReceiptStatus, type Address } from "js-moi-utils";
 import { JsonRpcProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
@@ -65,14 +65,25 @@ describe("Provider", () => {
                 sender: {
                     address: ADDRESS,
                     key_id: 0,
-                    sequence: 0,
+                    sequence_id: 0,
                 },
                 fuel_price: 1,
-                fuel_limit: 200,
-                ix_operations: [],
+                fuel_limit: 100000,
+                ix_operations: [
+                    {
+                        type: OpType.AssetCreate,
+                        payload: {
+                            symbol: "TST",
+                            standard: AssetStandard.MAS0,
+                            supply: 1000000,
+                        },
+                    },
+                ],
             });
 
             expect(result).toBeDefined();
+            expect(result.status).toBe(ReceiptStatus.Ok);
+            expect(result.hash).toEqual(expect.any(String));
         });
     });
 });

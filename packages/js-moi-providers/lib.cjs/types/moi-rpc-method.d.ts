@@ -1,4 +1,4 @@
-import { Hex, OpType, type AccountType, type Address, type LockType } from "js-moi-utils";
+import { Hex, OpType, type AccountType, type Address, type LockType, type OperationStatus, type ReceiptStatus } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, ResponseModifierParam, SignedInteraction, TesseractReferenceParam } from "./shared";
 interface Account {
     address: Hex;
@@ -97,9 +97,10 @@ interface InteractionPreference {
         trust_nodes: Hex[];
     };
 }
-export interface BaseInteractionRequest extends InteractionShared {
-    funds: Fund[];
-    participants: Pick<Participant, "address" | "lock_type" | "notary">[];
+export interface BaseInteractionRequest extends Omit<InteractionShared, "payer"> {
+    payer?: Address;
+    funds?: Fund[];
+    participants?: Pick<Participant, "address" | "lock_type" | "notary">[];
     preferences?: InteractionPreference;
     perception?: Hex;
 }
@@ -201,6 +202,22 @@ export type AccountMetadata = {
 export interface AccountInfo {
     metadata: AccountMetadata;
 }
+export interface SimulationResult {
+    op_type: OpType;
+    op_status: OperationStatus;
+    data: unknown;
+}
+export interface SimulationEffect {
+    events: any[];
+    balanceChanges: any;
+}
+export interface SimulateResult {
+    hash: Hex;
+    status: ReceiptStatus;
+    effort: number;
+    result: SimulationResult[];
+    effects: SimulationEffect[] | null;
+}
 interface MOIExecutionApi {
     "moi.Protocol": {
         params: [ResponseModifierParam];
@@ -261,7 +278,7 @@ interface MOIExecutionApi {
     };
     "moi.Simulate": {
         params: [ix: Pick<SignedInteraction, "interaction">];
-        response: Hex;
+        response: SimulateResult;
     };
     "moi.Subscribe": {
         params: unknown[];

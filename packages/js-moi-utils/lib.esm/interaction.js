@@ -40,4 +40,17 @@ export var AccountType;
     AccountType[AccountType["AssetAccount"] = 3] = "AssetAccount";
     AccountType[AccountType["RegularAccount"] = 4] = "RegularAccount";
 })(AccountType || (AccountType = {}));
+export var ReceiptStatus;
+(function (ReceiptStatus) {
+    ReceiptStatus[ReceiptStatus["Ok"] = 0] = "Ok";
+    ReceiptStatus[ReceiptStatus["StateReverted"] = 1] = "StateReverted";
+    ReceiptStatus[ReceiptStatus["InsufficientFuel"] = 2] = "InsufficientFuel";
+})(ReceiptStatus || (ReceiptStatus = {}));
+export var OperationStatus;
+(function (OperationStatus) {
+    OperationStatus[OperationStatus["Ok"] = 0] = "Ok";
+    OperationStatus[OperationStatus["ExceptionRaised"] = 1] = "ExceptionRaised";
+    OperationStatus[OperationStatus["StateReverted"] = 2] = "StateReverted";
+    OperationStatus[OperationStatus["FuelExhausted"] = 3] = "FuelExhausted";
+})(OperationStatus || (OperationStatus = {}));
 //# sourceMappingURL=interaction.js.map

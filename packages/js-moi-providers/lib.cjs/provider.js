@@ -197,31 +197,21 @@ class Provider extends events_1.EventEmitter {
         }
         return true;
     }
-    // private getInteractionParticipants(interaction: InteractionRequest) {
-    //     const participants: InteractionRequest["participants"] = [
-    //         {
-    //             address: interaction.sender.address,
-    //             lock: MutateLock.MutateLock,
-    //             notary: false,
-    //         },
-    //     ];
-    //     return participants;
-    // }
-    async simulate(interaction) {
-        const serializer = new serializer_1.InteractionSerializer();
-        const ix = {
-            ...interaction,
-            sender: {
-                ...interaction.sender,
-                address: (0, js_moi_utils_1.hexToBytes)(interaction.sender.address),
+    getInteractionParticipants(interaction) {
+        const participants = [
+            {
+                address: interaction.sender.address,
+                lock_type: js_moi_utils_1.LockType.NoLock,
+                notary: false,
             },
-            funds: interaction.funds ?? null,
-            payer: (0, js_moi_utils_1.hexToBytes)(interaction.payer ?? (0, js_moi_utils_1.ensureHexPrefix)("00".repeat(32))),
-            // participants: interaction.participants ?? this.getInteractionParticipants(interaction),
-            perception: interaction.perception ?? null,
-            preferences: interaction.preferences ?? null,
-        };
-        console.log(ix);
+        ];
+        return participants;
+    }
+    async simulate(ix) {
+        const serializer = new serializer_1.InteractionSerializer();
+        if (ix.participants == null) {
+            ix.participants = this.getInteractionParticipants(ix);
+        }
         const args = serializer.serialize(ix);
         return await this.call("moi.Simulate", { interaction: (0, js_moi_utils_1.bytesToHex)(args) });
     }

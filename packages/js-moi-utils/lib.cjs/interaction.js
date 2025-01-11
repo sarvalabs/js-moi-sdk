@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AccountType = exports.LockType = exports.OpType = void 0;
+exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = void 0;
 /**
  * Enumerates the types of Operations in the system.
  */
@@ -43,4 +43,17 @@ var AccountType;
     AccountType[AccountType["AssetAccount"] = 3] = "AssetAccount";
     AccountType[AccountType["RegularAccount"] = 4] = "RegularAccount";
 })(AccountType || (exports.AccountType = AccountType = {}));
+var ReceiptStatus;
+(function (ReceiptStatus) {
+    ReceiptStatus[ReceiptStatus["Ok"] = 0] = "Ok";
+    ReceiptStatus[ReceiptStatus["StateReverted"] = 1] = "StateReverted";
+    ReceiptStatus[ReceiptStatus["InsufficientFuel"] = 2] = "InsufficientFuel";
+})(ReceiptStatus || (exports.ReceiptStatus = ReceiptStatus = {}));
+var OperationStatus;
+(function (OperationStatus) {
+    OperationStatus[OperationStatus["Ok"] = 0] = "Ok";
+    OperationStatus[OperationStatus["ExceptionRaised"] = 1] = "ExceptionRaised";
+    OperationStatus[OperationStatus["StateReverted"] = 2] = "StateReverted";
+    OperationStatus[OperationStatus["FuelExhausted"] = 3] = "FuelExhausted";
+})(OperationStatus || (exports.OperationStatus = OperationStatus = {}));
 //# sourceMappingURL=interaction.js.map

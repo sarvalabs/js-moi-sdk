@@ -37,4 +37,15 @@ export declare enum AccountType {
     AssetAccount = 3,
     RegularAccount = 4
 }
+export declare enum ReceiptStatus {
+    Ok = 0,
+    StateReverted = 1,
+    InsufficientFuel = 2
+}
+export declare enum OperationStatus {
+    Ok = 0,
+    ExceptionRaised = 1,
+    StateReverted = 2,
+    FuelExhausted = 3
+}
 //# sourceMappingURL=interaction.d.ts.map

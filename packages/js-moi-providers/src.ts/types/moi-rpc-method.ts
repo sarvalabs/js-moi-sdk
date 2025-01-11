@@ -1,4 +1,4 @@
-import { Hex, OpType, type AccountType, type Address, type LockType } from "js-moi-utils";
+import { Hex, OpType, type AccountType, type Address, type LockType, type OperationStatus, type ReceiptStatus } from "js-moi-utils";
 import type {
     AccountParam,
     AssetParam,
@@ -265,6 +265,25 @@ export interface AccountInfo {
     metadata: AccountMetadata;
 }
 
+export interface SimulationResult {
+    op_type: OpType;
+    op_status: OperationStatus;
+    data: unknown;
+}
+
+export interface SimulationEffect {
+    events: any[];
+    balanceChanges: any;
+}
+
+export interface SimulateResult {
+    hash: Hex;
+    status: ReceiptStatus;
+    effort: number;
+    result: SimulationResult[];
+    effects: SimulationEffect[] | null;
+}
+
 interface MOIExecutionApi {
     "moi.Protocol": {
         params: [ResponseModifierParam];
@@ -316,7 +335,7 @@ interface MOIExecutionApi {
     };
     "moi.Simulate": {
         params: [ix: Pick<SignedInteraction, "interaction">];
-        response: Hex;
+        response: SimulateResult;
     };
     "moi.Subscribe": {
         params: unknown[];

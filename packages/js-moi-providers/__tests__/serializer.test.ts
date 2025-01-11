@@ -154,7 +154,6 @@ describe("Polo serialization of ix operation payload", () => {
 });
 
 describe("Polo serialization of interaction", () => {
-    // @ts-ignore
     const interaction: BaseInteractionRequest = {
         sender: {
             address: "0xb15d30b2e885efb1b45bd64db1d5adc231eaf5188bdff72013416deb75bf313e",
