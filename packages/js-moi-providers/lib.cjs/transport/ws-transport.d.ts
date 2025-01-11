@@ -1,6 +1,5 @@
 import EventEmitter from "events";
-import type { JsonRpcResponse } from "../types/json-rpc";
-import type { Transport } from "../types/transport";
+import type { JsonRpcResponse, Transport } from "js-moi-utils";
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }

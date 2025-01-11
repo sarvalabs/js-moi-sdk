@@ -4,7 +4,6 @@ export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./provide
 export { InteractionSerializer } from "./serializer/serializer";
 export { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
 export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
-export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type {
     AccountAsset,
     AccountInfo,
@@ -13,9 +12,6 @@ export type {
     BaseInteractionRequest,
     Confirmation,
     Interaction,
-    IxOperation,
-    Operation,
-    OperationPayload,
     OperationPayloadConfirmation,
     Participant,
     RpcMethodParams,
@@ -34,4 +30,3 @@ export type {
     TesseractReference,
     TesseractReferenceParam,
 } from "./types/shared";
-export type { Transport } from "./types/transport";

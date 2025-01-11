@@ -1,5 +1,4 @@
-import type { JsonRpcRequest, JsonRpcResponse } from "../types/json-rpc";
-import type { Transport } from "../types/transport";
+import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
 
 export interface HttpTransportOption {
     debug?: (request: JsonRpcRequest, result: { success: boolean; cause?: unknown }) => void;

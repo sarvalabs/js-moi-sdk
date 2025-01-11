@@ -1,8 +1,7 @@
-import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
+import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix, type Address, type Hex, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
 import { EventEmitter } from "events";
 import { InteractionSerializer } from "../serializer/serializer";
-import type { JsonRpcResponse } from "../types/json-rpc";
 import {
     type AccountAsset,
     type AccountInfo,
@@ -17,7 +16,6 @@ import {
     type Tesseract,
 } from "../types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields, TesseractReference } from "../types/shared";
-import type { Transport } from "../types/transport";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 
