@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, encodeIxOperationToPolo, OpType, type IxOperation } from "../src.ts";
+import { AssetStandard, bytesToHex, encodeIxOperationToPolo, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOperation } from "../src.ts";
 
 interface TestCase {
     name: string;
@@ -6,7 +6,7 @@ interface TestCase {
     expected: string;
 }
 
-describe("Polo serialization of ix operation payload", () => {
+describe(encodeIxOperationToPolo, () => {
     const tests: TestCase[] = [
         {
             name: "should serialize a asset create operation payload",
@@ -147,4 +147,28 @@ describe("Polo serialization of ix operation payload", () => {
             expect(bytesToHex(serialized)).toEqual(test.expected);
         });
     }
+
+    it("should throw an error when an unknown operation type is provided", () => {
+        const operation = {
+            type: 0x0f,
+            payload: {},
+        };
+
+        expect(() => encodeIxOperationToPolo(operation as IxOperation)).toThrow();
+    });
+});
+
+describe(listIxOperationDescriptors, () => {
+    it("should list all operation descriptors", () => {
+        const descriptors = listIxOperationDescriptors();
+        expect(descriptors.length).toBeGreaterThan(0);
+    });
+});
+
+describe(getIxOperationDescriptor, () => {
+    it("should return a logic deploy operation descriptor", () => {
+        const record = listIxOperationDescriptors().find((record) => record.type === OpType.LogicDeploy);
+
+        expect(getIxOperationDescriptor(OpType.LogicDeploy)).toBe(record?.descriptor);
+    });
 });

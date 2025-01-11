@@ -5,6 +5,6 @@ export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptS
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";
 export { deepCopy } from "./object";
-export { encodeIxOperationToPolo, getIxOperationDescriptor } from "./operations";
+export { encodeIxOperationToPolo, getIxOperationDescriptor, listIxOperationDescriptors } from "./operations";
 export { defineReadOnly } from "./properties";
 //# sourceMappingURL=index.js.map

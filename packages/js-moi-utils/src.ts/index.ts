@@ -5,7 +5,7 @@ export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptS
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike } from "./hex";
 export { deepCopy } from "./object";
-export { encodeIxOperationToPolo, getIxOperationDescriptor, IxOperationDescriptor, IxOperationValidationResult } from "./operations";
+export { encodeIxOperationToPolo, getIxOperationDescriptor, listIxOperationDescriptors, type IxOperationDescriptor, type IxOperationValidationResult } from "./operations";
 export { defineReadOnly } from "./properties";
 export type { IxOperation, IxRawOperation, Operation } from "./types/ix-operation";
 export type {
