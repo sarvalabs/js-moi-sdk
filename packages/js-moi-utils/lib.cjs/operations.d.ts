@@ -8,8 +8,25 @@ export type IxOperationValidationResult = {
     value: any;
 } | null;
 export interface IxOperationDescriptor<TOpType extends OpType> {
+    /**
+     * Returns the POLO schema for the operation payload.
+     *
+     * @returns Returns the POLO schema for the operation payload.
+     */
     schema: () => PoloSchema;
+    /**
+     * Validates the operation payload.
+     *
+     * @param payload Operation payload
+     * @returns Returns the validation result.
+     */
     validator: (payload: OperationPayload<TOpType>) => IxOperationValidationResult;
+    /**
+     * Transforms the operation payload to a format that can be serialized to POLO.
+     *
+     * @param payload Operation payload
+     * @returns Returns the transformed operation payload.
+     */
     transform?: (payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 }
 type OperationDescriptorRecord<T extends OpType = OpType> = {
