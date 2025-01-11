@@ -7,6 +7,15 @@ export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, num
 export { deepCopy } from "./object";
 export { defineReadOnly } from "./properties";
 export type { IxOperation, IxRawOperation, Operation } from "./types/ix-operation";
-export type { AssetActionPayload, AssetCreatePayload, LogicActionPayload, LogicDeployPayload, LogicPayload, OperationPayload, ParticipantCreatePayload } from "./types/ix-payload";
+export type {
+    AssetActionPayload,
+    AssetCreatePayload,
+    AssetSupplyPayload,
+    LogicActionPayload,
+    LogicDeployPayload,
+    LogicPayload,
+    OperationPayload,
+    ParticipantCreatePayload,
+} from "./types/ix-payload";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type { Transport } from "./types/transport";

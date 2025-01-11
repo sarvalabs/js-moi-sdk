@@ -15,26 +15,26 @@ export interface IxRawOperation {
     payload: Uint8Array;
 }
 
-export interface Operation<T extends OpType> {
+export interface Operation<TOpType extends OpType> {
     /**
      * The type of the operation.
      */
-    type: OpType;
+    type: TOpType;
     /**
      * The payload of the operation.
      */
-    payload: OperationPayload<T>;
+    payload: OperationPayload<TOpType>;
 }
 
 /**
  * `IxOperation` is a union type that holds all the operations.
  */
 export type IxOperation =
-    | Operation<OpType.AssetCreate>
     | Operation<OpType.AssetBurn>
+    | Operation<OpType.AssetCreate>
     | Operation<OpType.AssetMint>
     | Operation<OpType.AssetTransfer>
     | Operation<OpType.LogicDeploy>
-    | Operation<OpType.LogicInvoke>
     | Operation<OpType.LogicEnlist>
+    | Operation<OpType.LogicInvoke>
     | Operation<OpType.ParticipantCreate>;

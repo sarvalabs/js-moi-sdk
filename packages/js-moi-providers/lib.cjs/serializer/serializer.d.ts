@@ -1,5 +1,5 @@
-import { OpType } from "js-moi-utils";
-import type { BaseInteractionRequest, Operation } from "../types/moi-rpc-method";
+import { OpType, type Operation } from "js-moi-utils";
+import type { BaseInteractionRequest } from "../types/moi-rpc-method";
 import { type OperationSerializer } from "./operation-serializer";
 export declare class InteractionSerializer {
     private static serializers;

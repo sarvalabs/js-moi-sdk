@@ -1,7 +1,7 @@
-import { ErrorCode, ErrorUtils, hexToBytes, OpType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, OpType, type Operation } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
-import type { BaseInteractionRequest, Operation } from "../types/moi-rpc-method";
+import type { BaseInteractionRequest } from "../types/moi-rpc-method";
 import {
     AssetActionSerializer,
     AssetBurnSerializer,

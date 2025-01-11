@@ -1,4 +1,4 @@
-import type { AssetStandard, OpType } from "../enums";
+import { OpType, type AssetStandard } from "../enums";
 import type { Address, Hex } from "../hex";
 
 export interface LogicPayload {
@@ -110,6 +110,17 @@ export interface AssetActionPayload {
     timestamp: number;
 }
 
+export interface AssetSupplyPayload {
+    /**
+     * The asset id that is used to mint or burn an asset.
+     */
+    asset_id: Hex;
+    /**
+     * The amount that is used to mint or burn an asset.
+     */
+    amount: number;
+}
+
 /**
  * `LogicDeployPayload` holds the data for deploying a new logic.
  */
@@ -133,11 +144,11 @@ export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCre
     : T extends OpType.AssetCreate
     ? AssetCreatePayload
     : T extends OpType.AssetBurn | OpType.AssetMint
-    ? AssetActionPayload
+    ? AssetSupplyPayload
     : T extends OpType.AssetTransfer
     ? AssetActionPayload
     : T extends OpType.LogicDeploy
     ? LogicDeployPayload
     : T extends OpType.LogicInvoke | OpType.LogicEnlist
     ? LogicActionPayload
-    : any;
+    : never;
