@@ -4,6 +4,7 @@ export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger } from ".
 export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptStatus } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";
+export { encodeInteraction, getInteractionRequestSchema, transformInteraction } from "./interaction";
 export { deepCopy } from "./object";
 export { encodeIxOperationToPolo, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload, } from "./operations";
 export { defineReadOnly } from "./properties";

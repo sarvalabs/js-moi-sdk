@@ -1,7 +1,22 @@
-import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix, type Address, type Hex, type JsonRpcResponse, type Transport } from "js-moi-utils";
+import {
+    bytesToHex,
+    encodeInteraction,
+    ensureHexPrefix,
+    ErrorCode,
+    ErrorUtils,
+    isAddress,
+    isHex,
+    LockType,
+    OpType,
+    trimHexPrefix,
+    type Address,
+    type Hex,
+    type InteractionRequest,
+    type JsonRpcResponse,
+    type Transport,
+} from "js-moi-utils";
 
 import { EventEmitter } from "events";
-import { InteractionSerializer } from "../serializer/serializer";
 import {
     type AccountAsset,
     type AccountInfo,
@@ -296,7 +311,7 @@ export class Provider extends EventEmitter {
         return true;
     }
 
-    private ensureValidInteraction(interaction: BaseInteractionRequest) {
+    private ensureValidInteraction(interaction: InteractionRequest) {
         if (interaction.sender == null) {
             ErrorUtils.throwError("Sender is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
                 field: "sender",
@@ -329,12 +344,12 @@ export class Provider extends EventEmitter {
             });
         }
 
-        if (interaction.ix_operations == null || interaction.ix_operations.length === 0) {
+        if (interaction.operations == null || interaction.operations.length === 0) {
             ErrorUtils.throwError("At least one operation is required in the interaction", ErrorCode.INVALID_ARGUMENT);
         }
     }
 
-    private getInteractionParticipants(interaction: BaseInteractionRequest) {
+    private getInteractionParticipants(interaction: InteractionRequest) {
         const participants = new Map<Address, NonNullable<BaseInteractionRequest["participants"]>[number]>([
             [interaction.sender.address, { address: interaction.sender.address, lock_type: LockType.MutateLock, notary: false }],
         ]);
@@ -347,7 +362,7 @@ export class Provider extends EventEmitter {
             });
         }
 
-        for (const { type, payload } of interaction.ix_operations) {
+        for (const { type, payload } of interaction.operations) {
             switch (type) {
                 case OpType.ParticipantCreate: {
                     participants.set(payload.address, {
@@ -402,10 +417,10 @@ export class Provider extends EventEmitter {
         return Array.from(participants.values());
     }
 
-    private getInteractionFunds(interaction: BaseInteractionRequest) {
+    private getInteractionFunds(interaction: InteractionRequest) {
         const funds = new Map<Hex, Fund>();
 
-        for (const { type, payload } of interaction.ix_operations) {
+        for (const { type, payload } of interaction.operations) {
             switch (type) {
                 case OpType.AssetTransfer:
                 case OpType.AssetMint:
@@ -438,7 +453,7 @@ export class Provider extends EventEmitter {
      * @param ix - The interaction object
      * @returns A promise that resolves to the result of the simulation.
      */
-    public async simulate(ix: BaseInteractionRequest): Promise<SimulateResult>;
+    public async simulate(ix: InteractionRequest): Promise<SimulateResult>;
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.
@@ -464,7 +479,7 @@ export class Provider extends EventEmitter {
      * @param ix - The raw interaction object or serialized interaction submission
      * @returns A promise that resolves to the result of the simulation.
      */
-    public async simulate(ix: BaseInteractionRequest | Uint8Array): Promise<SimulateResult> {
+    public async simulate(ix: InteractionRequest | Uint8Array): Promise<SimulateResult> {
         let args: Uint8Array;
 
         switch (true) {
@@ -479,7 +494,7 @@ export class Provider extends EventEmitter {
                 ix.participants = this.getInteractionParticipants(ix);
                 ix.funds = this.getInteractionFunds(ix);
 
-                args = new InteractionSerializer().serialize(ix);
+                args = encodeInteraction(ix);
                 break;
             }
             default: {

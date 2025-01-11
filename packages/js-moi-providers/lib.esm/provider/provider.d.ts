@@ -1,6 +1,6 @@
-import { type Address, type Hex, type JsonRpcResponse, type Transport } from "js-moi-utils";
+import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
-import { type AccountAsset, type AccountInfo, type BaseInteractionRequest, type Confirmation, type Interaction, type RpcMethod, type RpcMethodParams, type RpcMethodResponse, type SimulateResult, type Tesseract } from "../types/moi-rpc-method";
+import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethod, type RpcMethodParams, type RpcMethodResponse, type SimulateResult, type Tesseract } from "../types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter {
@@ -170,7 +170,7 @@ export declare class Provider extends EventEmitter {
      * @param ix - The interaction object
      * @returns A promise that resolves to the result of the simulation.
      */
-    simulate(ix: BaseInteractionRequest): Promise<SimulateResult>;
+    simulate(ix: InteractionRequest): Promise<SimulateResult>;
     /**
      * Simulates an interaction call without committing it to the chain. This method can be
      * used to dry run an interaction to test its validity and estimate its execution effort.

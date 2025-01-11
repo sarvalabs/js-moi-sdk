@@ -1,6 +1,5 @@
-import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix } from "js-moi-utils";
+import { bytesToHex, encodeInteraction, ensureHexPrefix, ErrorCode, ErrorUtils, isAddress, isHex, LockType, OpType, trimHexPrefix, } from "js-moi-utils";
 import { EventEmitter } from "events";
-import { InteractionSerializer } from "../serializer/serializer";
 export class Provider extends EventEmitter {
     _transport;
     /**
@@ -222,7 +221,7 @@ export class Provider extends EventEmitter {
                 value: interaction.fuel_limit,
             });
         }
-        if (interaction.ix_operations == null || interaction.ix_operations.length === 0) {
+        if (interaction.operations == null || interaction.operations.length === 0) {
             ErrorUtils.throwError("At least one operation is required in the interaction", ErrorCode.INVALID_ARGUMENT);
         }
     }
@@ -237,7 +236,7 @@ export class Provider extends EventEmitter {
                 notary: false,
             });
         }
-        for (const { type, payload } of interaction.ix_operations) {
+        for (const { type, payload } of interaction.operations) {
             switch (type) {
                 case OpType.ParticipantCreate: {
                     participants.set(payload.address, {
@@ -287,7 +286,7 @@ export class Provider extends EventEmitter {
     }
     getInteractionFunds(interaction) {
         const funds = new Map();
-        for (const { type, payload } of interaction.ix_operations) {
+        for (const { type, payload } of interaction.operations) {
             switch (type) {
                 case OpType.AssetTransfer:
                 case OpType.AssetMint:
@@ -327,7 +326,7 @@ export class Provider extends EventEmitter {
                 this.ensureValidInteraction(ix);
                 ix.participants = this.getInteractionParticipants(ix);
                 ix.funds = this.getInteractionFunds(ix);
-                args = new InteractionSerializer().serialize(ix);
+                args = encodeInteraction(ix);
                 break;
             }
             default: {

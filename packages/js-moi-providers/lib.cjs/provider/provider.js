@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Provider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const events_1 = require("events");
-const serializer_1 = require("../serializer/serializer");
 class Provider extends events_1.EventEmitter {
     _transport;
     /**
@@ -225,7 +224,7 @@ class Provider extends events_1.EventEmitter {
                 value: interaction.fuel_limit,
             });
         }
-        if (interaction.ix_operations == null || interaction.ix_operations.length === 0) {
+        if (interaction.operations == null || interaction.operations.length === 0) {
             js_moi_utils_1.ErrorUtils.throwError("At least one operation is required in the interaction", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
     }
@@ -240,7 +239,7 @@ class Provider extends events_1.EventEmitter {
                 notary: false,
             });
         }
-        for (const { type, payload } of interaction.ix_operations) {
+        for (const { type, payload } of interaction.operations) {
             switch (type) {
                 case js_moi_utils_1.OpType.ParticipantCreate: {
                     participants.set(payload.address, {
@@ -290,7 +289,7 @@ class Provider extends events_1.EventEmitter {
     }
     getInteractionFunds(interaction) {
         const funds = new Map();
-        for (const { type, payload } of interaction.ix_operations) {
+        for (const { type, payload } of interaction.operations) {
             switch (type) {
                 case js_moi_utils_1.OpType.AssetTransfer:
                 case js_moi_utils_1.OpType.AssetMint:
@@ -330,7 +329,7 @@ class Provider extends events_1.EventEmitter {
                 this.ensureValidInteraction(ix);
                 ix.participants = this.getInteractionParticipants(ix);
                 ix.funds = this.getInteractionFunds(ix);
-                args = new serializer_1.InteractionSerializer().serialize(ix);
+                args = (0, js_moi_utils_1.encodeInteraction)(ix);
                 break;
             }
             default: {
