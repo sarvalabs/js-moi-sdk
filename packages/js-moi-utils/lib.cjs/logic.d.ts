@@ -5,4 +5,4 @@
  * @returns {string} a hash of the topic
  */
 export declare const topicHash: (topic: string) => string;
-//# sourceMappingURL=logic-events.d.ts.map
+//# sourceMappingURL=logic.d.ts.map

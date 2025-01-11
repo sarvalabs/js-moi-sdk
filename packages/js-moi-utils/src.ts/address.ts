@@ -1,4 +1,4 @@
-import type { Address } from "../types/hex";
+import type { Address } from "./hex";
 
 /**
  * Checks if the given address is a valid address.

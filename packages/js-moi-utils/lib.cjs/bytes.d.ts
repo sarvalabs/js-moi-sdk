@@ -6,8 +6,8 @@ export type Bytes = ArrayLike<number>;
 /**
  * Checks if the given value is an integer.
  *
- * @param {number} value - The value to check.
- * @returns {boolean} - Returns true if the value is an integer, otherwise false.
+ * @param value - The value to check.
+ * @returns Returns true if the value is an integer, otherwise false.
  */
 export declare const isInteger: (value: number) => boolean;
 /**

@@ -16,4 +16,4 @@ const topicHash = (topic) => {
     return (0, hex_1.encodeToString)((0, blake2b_1.blake2b)(polorizer.bytes(), { dkLen: 32 }));
 };
 exports.topicHash = topicHash;
-//# sourceMappingURL=logic-events.js.map
+//# sourceMappingURL=logic.js.map

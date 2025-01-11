@@ -1,4 +1,13 @@
 /**
+ * Enumerates the standard of assets in the system.
+ * MAS is moi asset standard.
+ */
+export var AssetStandard;
+(function (AssetStandard) {
+    AssetStandard[AssetStandard["MAS0"] = 0] = "MAS0";
+    AssetStandard[AssetStandard["MAS1"] = 1] = "MAS1";
+})(AssetStandard || (AssetStandard = {}));
+/**
  * Enumerates the types of Operations in the system.
  */
 export var OpType;
@@ -22,7 +31,7 @@ export var OpType;
     OpType[OpType["LogicUpgrade"] = 16] = "LogicUpgrade";
 })(OpType || (OpType = {}));
 /**
- * Enumerates the types of particpant locks in the system.
+ * Enumerates the types of participant locks in the system.
  */
 export var LockType;
 (function (LockType) {
@@ -53,4 +62,4 @@ export var OperationStatus;
     OperationStatus[OperationStatus["StateReverted"] = 2] = "StateReverted";
     OperationStatus[OperationStatus["FuelExhausted"] = 3] = "FuelExhausted";
 })(OperationStatus || (OperationStatus = {}));
-//# sourceMappingURL=interaction.js.map
+//# sourceMappingURL=enums.js.map

@@ -1,4 +1,13 @@
 /**
+ * Enumerates the standard of assets in the system.
+ * MAS is moi asset standard.
+ */
+export enum AssetStandard {
+    MAS0 = 0,
+    MAS1 = 1,
+}
+
+/**
  * Enumerates the types of Operations in the system.
  */
 export enum OpType {
@@ -23,7 +32,7 @@ export enum OpType {
 }
 
 /**
- * Enumerates the types of particpant locks in the system.
+ * Enumerates the types of participant locks in the system.
  */
 export enum LockType {
     MutateLock,

@@ -1,4 +1,12 @@
 /**
+ * Enumerates the standard of assets in the system.
+ * MAS is moi asset standard.
+ */
+export declare enum AssetStandard {
+    MAS0 = 0,
+    MAS1 = 1
+}
+/**
  * Enumerates the types of Operations in the system.
  */
 export declare enum OpType {
@@ -21,7 +29,7 @@ export declare enum OpType {
     LogicUpgrade = 16
 }
 /**
- * Enumerates the types of particpant locks in the system.
+ * Enumerates the types of participant locks in the system.
  */
 export declare enum LockType {
     MutateLock = 0,
@@ -48,4 +56,4 @@ export declare enum OperationStatus {
     StateReverted = 2,
     FuelExhausted = 3
 }
-//# sourceMappingURL=interaction.d.ts.map
+//# sourceMappingURL=enums.d.ts.map

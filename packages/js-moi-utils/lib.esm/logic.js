@@ -12,4 +12,4 @@ export const topicHash = (topic) => {
     polorizer.polorizeString(topic);
     return encodeToString(blake2b(polorizer.bytes(), { dkLen: 32 }));
 };
-//# sourceMappingURL=logic-events.js.map
+//# sourceMappingURL=logic.js.map

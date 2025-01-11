@@ -1,11 +1,11 @@
 /**
  * Checks if the given value is an integer.
  *
- * @param {number} value - The value to check.
- * @returns {boolean} - Returns true if the value is an integer, otherwise false.
+ * @param value - The value to check.
+ * @returns Returns true if the value is an integer, otherwise false.
  */
 export const isInteger = (value) => {
-    return (typeof (value) === "number" && value === value && (value % 1) === 0);
+    return typeof value === "number" && value === value && value % 1 === 0;
 };
 /**
  * Checks if the given value is a valid byte array.
@@ -20,7 +20,7 @@ export const isBytes = (value) => {
     if (value.constructor === Uint8Array) {
         return true;
     }
-    if (typeof (value) === "string") {
+    if (typeof value === "string") {
         return false;
     }
     if (!isInteger(value.length) || value.length < 0) {
@@ -43,7 +43,7 @@ export const isBytes = (value) => {
  */
 export const hexDataLength = (data) => {
     // Check if the input is a valid hexadecimal string and has an even length
-    if (!isHexString(data) || (data.length % 2)) {
+    if (!isHexString(data) || data.length % 2) {
         return null;
     }
     // Calculate the length of the data excluding the "0x" prefix
@@ -57,7 +57,7 @@ export const hexDataLength = (data) => {
  * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
  */
 export const isHexString = (value, length) => {
-    if (typeof (value) !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
+    if (typeof value !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
         return false;
     }
     if (length && value.length !== 2 + 2 * length) {

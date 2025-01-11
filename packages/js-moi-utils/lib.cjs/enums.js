@@ -1,6 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = void 0;
+exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
+/**
+ * Enumerates the standard of assets in the system.
+ * MAS is moi asset standard.
+ */
+var AssetStandard;
+(function (AssetStandard) {
+    AssetStandard[AssetStandard["MAS0"] = 0] = "MAS0";
+    AssetStandard[AssetStandard["MAS1"] = 1] = "MAS1";
+})(AssetStandard || (exports.AssetStandard = AssetStandard = {}));
 /**
  * Enumerates the types of Operations in the system.
  */
@@ -25,7 +34,7 @@ var OpType;
     OpType[OpType["LogicUpgrade"] = 16] = "LogicUpgrade";
 })(OpType || (exports.OpType = OpType = {}));
 /**
- * Enumerates the types of particpant locks in the system.
+ * Enumerates the types of participant locks in the system.
  */
 var LockType;
 (function (LockType) {
@@ -56,4 +65,4 @@ var OperationStatus;
     OperationStatus[OperationStatus["StateReverted"] = 2] = "StateReverted";
     OperationStatus[OperationStatus["FuelExhausted"] = 3] = "FuelExhausted";
 })(OperationStatus || (exports.OperationStatus = OperationStatus = {}));
-//# sourceMappingURL=interaction.js.map
+//# sourceMappingURL=enums.js.map

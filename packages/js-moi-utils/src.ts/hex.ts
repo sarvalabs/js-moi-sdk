@@ -1,7 +1,10 @@
 import BN from "bn.js";
 import { Buffer } from "buffer";
-import type { Address, Hex } from "../types/hex";
 import { ErrorUtils } from "./errors";
+
+export type Hex = `0x${string}`;
+
+export type Address = Hex;
 
 export type NumberLike =
     | string
