@@ -1,26 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encodeIxOperationToPolo = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = exports.transformPayload = void 0;
+exports.encodeIxOperationToPolo = exports.transformPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
 const errors_1 = require("./errors");
 const hex_1 = require("./hex");
-/**
- * Transforms the operation payload to a format that can be serialized to POLO.
- *
- * @param type Operation type
- * @param payload Operation payload
- * @returns Returns the transformed operation payload.
- */
-const transformPayload = (type, payload) => {
-    const descriptor = (0, exports.getIxOperationDescriptor)(type);
-    if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${type}" is not supported`);
-    }
-    return descriptor.transform?.(payload) ?? payload;
-};
-exports.transformPayload = transformPayload;
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
         schema: () => {
@@ -171,6 +156,21 @@ exports.listIxOperationDescriptors = listIxOperationDescriptors;
  */
 const getIxOperationDescriptor = (type) => ixOpDescriptor[type] ?? null;
 exports.getIxOperationDescriptor = getIxOperationDescriptor;
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+const transformPayload = (type, payload) => {
+    const descriptor = (0, exports.getIxOperationDescriptor)(type);
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${type}" is not supported`);
+    }
+    return descriptor.transform?.(payload) ?? payload;
+};
+exports.transformPayload = transformPayload;
 /**
  * Encodes an operation to a POLO byte array.
  *

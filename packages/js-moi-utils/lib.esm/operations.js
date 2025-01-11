@@ -3,20 +3,6 @@ import { polo } from "polo-schema";
 import { OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes } from "./hex";
-/**
- * Transforms the operation payload to a format that can be serialized to POLO.
- *
- * @param type Operation type
- * @param payload Operation payload
- * @returns Returns the transformed operation payload.
- */
-export const transformPayload = (type, payload) => {
-    const descriptor = getIxOperationDescriptor(type);
-    if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${type}" is not supported`);
-    }
-    return descriptor.transform?.(payload) ?? payload;
-};
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
         schema: () => {
@@ -165,6 +151,20 @@ export const listIxOperationDescriptors = () => {
  * @returns Returns the operation descriptor for the given operation type.
  */
 export const getIxOperationDescriptor = (type) => ixOpDescriptor[type] ?? null;
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+export const transformPayload = (type, payload) => {
+    const descriptor = getIxOperationDescriptor(type);
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${type}" is not supported`);
+    }
+    return descriptor.transform?.(payload) ?? payload;
+};
 /**
  * Encodes an operation to a POLO byte array.
  *

@@ -12,14 +12,6 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
     validator: (payload: OperationPayload<TOpType>) => IxOperationValidationResult;
     transform?: (payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 }
-/**
- * Transforms the operation payload to a format that can be serialized to POLO.
- *
- * @param type Operation type
- * @param payload Operation payload
- * @returns Returns the transformed operation payload.
- */
-export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 type OperationDescriptorRecord<T extends OpType = OpType> = {
     type: T;
     descriptor: IxOperationDescriptor<T>;
@@ -37,6 +29,14 @@ export declare const listIxOperationDescriptors: () => OperationDescriptorRecord
  * @returns Returns the operation descriptor for the given operation type.
  */
 export declare const getIxOperationDescriptor: <TOpType extends OpType>(type: TOpType) => IxOperationDescriptor<TOpType> | null;
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 /**
  * Encodes an operation to a POLO byte array.
  *

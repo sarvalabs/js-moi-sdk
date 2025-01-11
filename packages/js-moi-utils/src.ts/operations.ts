@@ -20,23 +20,6 @@ type IxOperationDescriptorLookup = {
 
 type AssetSupplyOpType = OpType.AssetMint | OpType.AssetBurn;
 
-/**
- * Transforms the operation payload to a format that can be serialized to POLO.
- *
- * @param type Operation type
- * @param payload Operation payload
- * @returns Returns the transformed operation payload.
- */
-export const transformPayload = <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>): PoloOperationPayload<TOpType> => {
-    const descriptor = getIxOperationDescriptor(type);
-
-    if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${type}" is not supported`);
-    }
-
-    return descriptor.transform?.(payload) ?? (payload as unknown as PoloOperationPayload<TOpType>);
-};
-
 const createParticipantCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.ParticipantCreate>>({
         schema: () => {
@@ -217,6 +200,23 @@ export const listIxOperationDescriptors = (): OperationDescriptorRecord[] => {
  * @returns Returns the operation descriptor for the given operation type.
  */
 export const getIxOperationDescriptor = <TOpType extends OpType>(type: TOpType): IxOperationDescriptor<TOpType> | null => ixOpDescriptor[type] ?? null;
+
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+export const transformPayload = <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>): PoloOperationPayload<TOpType> => {
+    const descriptor = getIxOperationDescriptor(type);
+
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${type}" is not supported`);
+    }
+
+    return descriptor.transform?.(payload) ?? (payload as unknown as PoloOperationPayload<TOpType>);
+};
 
 /**
  * Encodes an operation to a POLO byte array.
