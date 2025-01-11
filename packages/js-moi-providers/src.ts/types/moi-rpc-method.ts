@@ -146,9 +146,10 @@ interface InteractionPreference {
     };
 }
 
-export interface BaseInteractionRequest extends InteractionShared {
-    funds: Fund[];
-    participants: Pick<Participant, "address" | "lock_type" | "notary">[];
+export interface BaseInteractionRequest extends Omit<InteractionShared, "payer"> {
+    payer?: Address;
+    funds?: Fund[];
+    participants?: Pick<Participant, "address" | "lock_type" | "notary">[];
     preferences?: InteractionPreference;
     perception?: Hex;
 }

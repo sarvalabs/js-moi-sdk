@@ -68,9 +68,8 @@ export class InteractionSerializer {
         return serializer.serialize(operation.payload);
     }
 
-    public serialize(interaction: BaseInteractionRequest) {
-        const polorizer = new Polorizer();
-        const payload = {
+    private getSerializationPayload(interaction: BaseInteractionRequest) {
+        return {
             ...interaction,
             sender: {
                 ...interaction.sender,
@@ -81,14 +80,17 @@ export class InteractionSerializer {
                 payload: this.serializeOperation(op),
             })),
             payer: interaction.payer != null ? hexToBytes(interaction.payer) : undefined,
-            participants: interaction.participants.map((participant) => ({
+            participants: interaction.participants?.map((participant) => ({
                 ...participant,
                 address: hexToBytes(participant.address),
             })),
             perception: interaction.perception != null ? hexToBytes(interaction.perception) : undefined,
         };
+    }
 
-        polorizer.polorize(payload, InteractionSerializer.IX_POLO_SCHEMA);
+    public serialize(interaction: BaseInteractionRequest) {
+        const polorizer = new Polorizer();
+        polorizer.polorize(this.getSerializationPayload(interaction), InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();
     }
 
