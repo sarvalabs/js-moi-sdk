@@ -1,5 +1,5 @@
 import {} from "jest";
-import { AssetStandard, OpType, ReceiptStatus, type Address } from "js-moi-utils";
+import { AssetStandard, hexToBytes, OpType, ReceiptStatus, type Address } from "js-moi-utils";
 import { JsonRpcProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
@@ -60,7 +60,7 @@ describe("Provider", () => {
     });
 
     describe(provider.simulate, () => {
-        it.concurrent("should return the simulation result", async () => {
+        it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
             const result = await provider.simulate({
                 sender: {
                     address: ADDRESS,
@@ -80,6 +80,20 @@ describe("Provider", () => {
                     },
                 ],
             });
+
+            expect(result).toBeDefined();
+            expect(result.status).toBe(ReceiptStatus.Ok);
+            expect(result.hash).toEqual(expect.any(String));
+        });
+
+        it.skip.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
+            const args = hexToBytes(
+                "0x0e9f020ee004e304f304a005ae05fe07800d800d5f06830483043dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21010186a01f0e2f0316050e7f063363636161605453540f42401f0e5f06830491043dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf2102"
+            );
+
+            // This can fail as contains sender address, at moment of testing address may not
+            // be created.
+            const result = await provider.simulate(args);
 
             expect(result).toBeDefined();
             expect(result.status).toBe(ReceiptStatus.Ok);

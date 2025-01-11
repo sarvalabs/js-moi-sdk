@@ -309,14 +309,65 @@ export class Provider extends EventEmitter {
         return participants;
     }
 
-    public async simulate(ix: BaseInteractionRequest): Promise<SimulateResult> {
-        const serializer = new InteractionSerializer();
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The POLO encoded interaction submission
+     * @returns A promise that resolves to the result of the simulation.
+     */
+    public async simulate(serializedIx: Uint8Array): Promise<SimulateResult>;
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The interaction object
+     * @returns A promise that resolves to the result of the simulation.
+     */
+    public async simulate(ix: BaseInteractionRequest): Promise<SimulateResult>;
+    /**
+     * Simulates an interaction call without committing it to the chain. This method can be
+     * used to dry run an interaction to test its validity and estimate its execution effort.
+     * It is also a cost effective way to perform read-only logic calls without submitting an
+     * interaction.
+     *
+     * This call does not require participating accounts to notarize the interaction,
+     * and no signatures are verified while executing the interaction.
+     *
+     * @param ix - The raw interaction object or serialized interaction submission
+     * @returns A promise that resolves to the result of the simulation.
+     */
+    public async simulate(ix: BaseInteractionRequest | Uint8Array): Promise<SimulateResult> {
+        let args: Uint8Array;
 
-        if (ix.participants == null) {
-            ix.participants = this.getInteractionParticipants(ix);
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                args = ix;
+                break;
+            }
+
+            case typeof ix === "object": {
+                if (ix.participants == null) {
+                    ix.participants = this.getInteractionParticipants(ix);
+                }
+                args = new InteractionSerializer().serialize(ix);
+                break;
+            }
+            default: {
+                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+            }
         }
 
-        const args = serializer.serialize(ix);
         return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }
 
