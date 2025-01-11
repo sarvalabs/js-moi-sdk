@@ -297,6 +297,44 @@ export class Provider extends EventEmitter {
         return true;
     }
 
+    private ensureValidInteraction(interaction: BaseInteractionRequest) {
+        if (interaction.sender == null) {
+            ErrorUtils.throwError("Sender is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
+                field: "sender",
+            });
+        }
+
+        if (interaction.fuel_price == null) {
+            ErrorUtils.throwError("Fuel price is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_price",
+            });
+        }
+
+        if (interaction.fuel_limit == null) {
+            ErrorUtils.throwError("Fuel limit is required in the interaction", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_limit",
+            });
+        }
+
+        if (interaction.fuel_price < 0) {
+            ErrorUtils.throwError("Fuel price must be a unsigned number", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_price",
+                value: interaction.fuel_price,
+            });
+        }
+
+        if (interaction.fuel_limit < 0) {
+            ErrorUtils.throwError("Fuel limit must be a unsigned number", ErrorCode.INVALID_ARGUMENT, {
+                field: "fuel_limit",
+                value: interaction.fuel_limit,
+            });
+        }
+
+        if (interaction.ix_operations == null || interaction.ix_operations.length === 0) {
+            ErrorUtils.throwError("At least one operation is required in the interaction", ErrorCode.INVALID_ARGUMENT);
+        }
+    }
+
     private getInteractionParticipants(interaction: BaseInteractionRequest) {
         const participants = new Map<Address, NonNullable<BaseInteractionRequest["participants"]>[number]>([
             [interaction.sender.address, { address: interaction.sender.address, lock_type: LockType.MutateLock, notary: false }],
@@ -413,9 +451,12 @@ export class Provider extends EventEmitter {
             }
 
             case typeof ix === "object": {
+                this.ensureValidInteraction(ix);
+
                 if (ix.participants == null) {
                     ix.participants = this.getInteractionParticipants(ix);
                 }
+
                 args = new InteractionSerializer().serialize(ix);
                 break;
             }

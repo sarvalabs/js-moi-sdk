@@ -64,40 +64,7 @@ class InteractionSerializer {
             perception: interaction.perception != null ? (0, js_moi_utils_1.hexToBytes)(interaction.perception) : undefined,
         };
     }
-    ensureValidInteraction(interaction) {
-        if (interaction.sender == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Sender is required in the interaction", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
-                field: "sender",
-            });
-        }
-        if (interaction.fuel_price == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Fuel price is required in the interaction", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
-                field: "fuel_price",
-            });
-        }
-        if (interaction.fuel_limit == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Fuel limit is required in the interaction", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
-                field: "fuel_limit",
-            });
-        }
-        if (interaction.fuel_price < 0) {
-            js_moi_utils_1.ErrorUtils.throwError("Fuel price must be a unsigned number", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
-                field: "fuel_price",
-                value: interaction.fuel_price,
-            });
-        }
-        if (interaction.fuel_limit < 0) {
-            js_moi_utils_1.ErrorUtils.throwError("Fuel limit must be a unsigned number", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
-                field: "fuel_limit",
-                value: interaction.fuel_limit,
-            });
-        }
-        if (interaction.ix_operations == null || interaction.ix_operations.length === 0) {
-            js_moi_utils_1.ErrorUtils.throwError("At least one operation is required in the interaction", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-        }
-    }
     serialize(interaction) {
-        this.ensureValidInteraction(interaction);
         const polorizer = new js_polo_1.Polorizer();
         polorizer.polorize(this.getSerializationPayload(interaction), InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();
