@@ -1,7 +1,7 @@
 import { type PoloSchema } from "polo-schema";
 import { OpType } from "./enums";
 import type { Operation } from "./types/ix-operation";
-import type { OperationPayload } from "./types/ix-payload";
+import type { OperationPayload, PoloOperationPayload } from "./types/ix-payload";
 export type IxOperationValidationResult = {
     reason: string;
     field: string;
@@ -9,9 +9,17 @@ export type IxOperationValidationResult = {
 } | null;
 export interface IxOperationDescriptor<TOpType extends OpType> {
     schema: () => PoloSchema;
-    serializer: (payload: OperationPayload<TOpType>) => Uint8Array;
     validator: (payload: OperationPayload<TOpType>) => IxOperationValidationResult;
+    transform?: (payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 }
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 type OperationDescriptorRecord<T extends OpType = OpType> = {
     type: T;
     descriptor: IxOperationDescriptor<T>;

@@ -1,19 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encodeIxOperationToPolo = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
+exports.encodeIxOperationToPolo = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = exports.transformPayload = void 0;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
+const errors_1 = require("./errors");
 const hex_1 = require("./hex");
-const encodeToPolo = (type, data) => {
-    const schema = ixOpDescriptor[type]?.schema();
-    if (schema == null) {
-        throw new Error(`Schema for operation type "${type}" is not registered`);
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+const transformPayload = (type, payload) => {
+    const descriptor = (0, exports.getIxOperationDescriptor)(type);
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${type}" is not supported`);
     }
-    const polorizer = new js_polo_1.Polorizer();
-    polorizer.polorize(data, schema);
-    return polorizer.bytes();
+    return descriptor.transform?.(payload) ?? payload;
 };
+exports.transformPayload = transformPayload;
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
         schema: () => {
@@ -27,9 +34,7 @@ const createParticipantCreateDescriptor = () => {
                 amount: polo_schema_1.polo.integer,
             });
         },
-        serializer: (payload) => {
-            return encodeToPolo(enums_1.OpType.ParticipantCreate, { ...payload, address: (0, hex_1.hexToBytes)(payload.address) });
-        },
+        transform: (payload) => ({ ...payload, address: (0, hex_1.hexToBytes)(payload.address) }),
         validator: (payload) => {
             return null;
         },
@@ -55,7 +60,6 @@ const createAssetCreateDescriptor = () => {
                 logic_payload: logicPayloadSchema,
             });
         },
-        serializer: (payload) => encodeToPolo(enums_1.OpType.AssetCreate, payload),
         validator: (payload) => {
             return null;
         },
@@ -69,7 +73,6 @@ const createAssetSupplyDescriptorFor = (type) => {
                 amount: polo_schema_1.polo.integer,
             });
         },
-        serializer: (payload) => encodeToPolo(type, payload),
         validator: (payload) => {
             return null;
         },
@@ -86,13 +89,11 @@ const createAssetActionDescriptor = () => {
                 timestamp: polo_schema_1.polo.integer,
             });
         },
-        serializer: (payload) => {
-            return encodeToPolo(enums_1.OpType.AssetTransfer, {
-                ...payload,
-                benefactor: (0, hex_1.hexToBytes)(payload.benefactor),
-                beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
-            });
-        },
+        transform: (payload) => ({
+            ...payload,
+            benefactor: (0, hex_1.hexToBytes)(payload.benefactor),
+            beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
+        }),
         validator: (payload) => {
             return null;
         },
@@ -112,13 +113,29 @@ const createLogicActionDescriptor = (type) => {
                 }),
             });
         },
-        serializer: (payload) => {
-            return encodeToPolo(type, {
+        transform: (payload) => {
+            if (type === enums_1.OpType.LogicDeploy) {
+                if (!("manifest" in payload)) {
+                    errors_1.ErrorUtils.throwError("Manifest is required for LogicDeploy operation", errors_1.ErrorCode.INVALID_ARGUMENT);
+                }
+                const raw = {
+                    ...payload,
+                    manifest: (0, hex_1.hexToBytes)(payload.manifest),
+                    calldata: payload.calldata != null ? (0, hex_1.hexToBytes)(payload.calldata) : undefined,
+                    interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
+                };
+                return raw;
+            }
+            if (!("logic_id" in payload)) {
+                errors_1.ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", errors_1.ErrorCode.INVALID_ARGUMENT);
+            }
+            const raw = {
                 ...payload,
-                manifest: "manifest" in payload && payload.manifest != null ? (0, hex_1.hexToBytes)(payload.manifest) : undefined,
+                logic_id: payload.logic_id,
                 calldata: payload.calldata != null ? (0, hex_1.hexToBytes)(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
-            });
+            };
+            return raw;
         },
         validator: (payload) => {
             return null;
@@ -163,11 +180,13 @@ exports.getIxOperationDescriptor = getIxOperationDescriptor;
  * @throws Throws an error if the operation type is not registered.
  */
 const encodeIxOperationToPolo = (operation) => {
-    const descriptor = (0, exports.getIxOperationDescriptor)(operation.type);
-    if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
+    const schema = ixOpDescriptor[operation.type]?.schema();
+    if (schema == null) {
+        throw new Error(`Schema for operation type "${operation.type}" is not registered`);
     }
-    return descriptor.serializer(operation.payload);
+    const polorizer = new js_polo_1.Polorizer();
+    polorizer.polorize((0, exports.transformPayload)(operation.type, operation.payload), schema);
+    return polorizer.bytes();
 };
 exports.encodeIxOperationToPolo = encodeIxOperationToPolo;
 //# sourceMappingURL=operations.js.map

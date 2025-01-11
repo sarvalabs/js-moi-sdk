@@ -1,16 +1,17 @@
 import { Polorizer } from "js-polo";
 import { polo, type PoloSchema } from "polo-schema";
 import { OpType } from "./enums";
+import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes } from "./hex";
 import type { Operation } from "./types/ix-operation";
-import type { OperationPayload } from "./types/ix-payload";
+import type { OperationPayload, PoloOperationPayload } from "./types/ix-payload";
 
 export type IxOperationValidationResult = { reason: string; field: string; value: any } | null;
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
     schema: () => PoloSchema;
-    serializer: (payload: OperationPayload<TOpType>) => Uint8Array;
     validator: (payload: OperationPayload<TOpType>) => IxOperationValidationResult;
+    transform?: (payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
 }
 
 type IxOperationDescriptorLookup = {
@@ -19,17 +20,21 @@ type IxOperationDescriptorLookup = {
 
 type AssetSupplyOpType = OpType.AssetMint | OpType.AssetBurn;
 
-const encodeToPolo = (type: OpType, data: any): Uint8Array => {
-    const schema = ixOpDescriptor[type]?.schema();
+/**
+ * Transforms the operation payload to a format that can be serialized to POLO.
+ *
+ * @param type Operation type
+ * @param payload Operation payload
+ * @returns Returns the transformed operation payload.
+ */
+export const transformPayload = <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>): PoloOperationPayload<TOpType> => {
+    const descriptor = getIxOperationDescriptor(type);
 
-    if (schema == null) {
-        throw new Error(`Schema for operation type "${type}" is not registered`);
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${type}" is not supported`);
     }
 
-    const polorizer = new Polorizer();
-    polorizer.polorize(data, schema);
-
-    return polorizer.bytes();
+    return descriptor.transform?.(payload) ?? (payload as unknown as PoloOperationPayload<TOpType>);
 };
 
 const createParticipantCreateDescriptor = () => {
@@ -48,9 +53,7 @@ const createParticipantCreateDescriptor = () => {
             });
         },
 
-        serializer: (payload) => {
-            return encodeToPolo(OpType.ParticipantCreate, { ...payload, address: hexToBytes(payload.address) });
-        },
+        transform: (payload) => ({ ...payload, address: hexToBytes(payload.address) }),
 
         validator: (payload) => {
             return null;
@@ -80,8 +83,6 @@ const createAssetCreateDescriptor = () => {
             });
         },
 
-        serializer: (payload) => encodeToPolo(OpType.AssetCreate, payload),
-
         validator: (payload) => {
             return null;
         },
@@ -96,8 +97,6 @@ const createAssetSupplyDescriptorFor = (type: AssetSupplyOpType) => {
                 amount: polo.integer,
             });
         },
-
-        serializer: (payload) => encodeToPolo(type, payload),
 
         validator: (payload) => {
             return null;
@@ -117,13 +116,11 @@ const createAssetActionDescriptor = () => {
             });
         },
 
-        serializer: (payload) => {
-            return encodeToPolo(OpType.AssetTransfer, {
-                ...payload,
-                benefactor: hexToBytes(payload.benefactor),
-                beneficiary: hexToBytes(payload.beneficiary),
-            });
-        },
+        transform: (payload) => ({
+            ...payload,
+            benefactor: hexToBytes(payload.benefactor),
+            beneficiary: hexToBytes(payload.beneficiary),
+        }),
 
         validator: (payload) => {
             return null;
@@ -133,8 +130,8 @@ const createAssetActionDescriptor = () => {
 
 type LogicActionOpType = OpType.LogicDeploy | OpType.LogicInvoke | OpType.LogicEnlist;
 
-const createLogicActionDescriptor = (type: LogicActionOpType) => {
-    return Object.freeze<IxOperationDescriptor<LogicActionOpType>>({
+const createLogicActionDescriptor = <T extends LogicActionOpType>(type: T) => {
+    return Object.freeze<IxOperationDescriptor<T>>({
         schema: () => {
             return polo.struct({
                 manifest: polo.bytes,
@@ -148,13 +145,34 @@ const createLogicActionDescriptor = (type: LogicActionOpType) => {
             });
         },
 
-        serializer: (payload) => {
-            return encodeToPolo(type, {
+        transform: (payload) => {
+            if (type === OpType.LogicDeploy) {
+                if (!("manifest" in payload)) {
+                    ErrorUtils.throwError("Manifest is required for LogicDeploy operation", ErrorCode.INVALID_ARGUMENT);
+                }
+
+                const raw: PoloOperationPayload<OpType.LogicDeploy> = {
+                    ...payload,
+                    manifest: hexToBytes(payload.manifest),
+                    calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
+                    interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
+                };
+
+                return raw as PoloOperationPayload<T>;
+            }
+
+            if (!("logic_id" in payload)) {
+                ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", ErrorCode.INVALID_ARGUMENT);
+            }
+
+            const raw: PoloOperationPayload<OpType.LogicEnlist | OpType.LogicInvoke> = {
                 ...payload,
-                manifest: "manifest" in payload && payload.manifest != null ? hexToBytes(payload.manifest) : undefined,
+                logic_id: payload.logic_id,
                 calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
-            });
+            };
+
+            return raw as PoloOperationPayload<T>;
         },
 
         validator: (payload) => {
@@ -209,11 +227,15 @@ export const getIxOperationDescriptor = <TOpType extends OpType>(type: TOpType):
  * @throws Throws an error if the operation type is not registered.
  */
 export const encodeIxOperationToPolo = <TOpType extends OpType>(operation: Operation<TOpType>): Uint8Array => {
-    const descriptor = getIxOperationDescriptor(operation.type);
+    const schema = ixOpDescriptor[operation.type]?.schema();
 
-    if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
+    if (schema == null) {
+        throw new Error(`Schema for operation type "${operation.type}" is not registered`);
     }
 
-    return descriptor.serializer(operation.payload);
+    const polorizer = new Polorizer();
+
+    polorizer.polorize(transformPayload(operation.type, operation.payload), schema);
+
+    return polorizer.bytes();
 };

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineReadOnly = exports.listIxOperationDescriptors = exports.getIxOperationDescriptor = exports.encodeIxOperationToPolo = exports.deepCopy = exports.trimHexPrefix = exports.numToHex = exports.isHex = exports.isAddress = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LockType = exports.AssetStandard = exports.AccountType = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.bufferToUint8 = exports.encodeBase64 = exports.decodeBase64 = exports.isValidAddress = void 0;
+exports.defineReadOnly = exports.transformPayload = exports.listIxOperationDescriptors = exports.getIxOperationDescriptor = exports.encodeIxOperationToPolo = exports.deepCopy = exports.trimHexPrefix = exports.numToHex = exports.isHex = exports.isAddress = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LockType = exports.AssetStandard = exports.AccountType = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.bufferToUint8 = exports.encodeBase64 = exports.decodeBase64 = exports.isValidAddress = void 0;
 var address_1 = require("./address");
 Object.defineProperty(exports, "isValidAddress", { enumerable: true, get: function () { return address_1.isValidAddress; } });
 var base64_1 = require("./base64");
@@ -38,6 +38,7 @@ var operations_1 = require("./operations");
 Object.defineProperty(exports, "encodeIxOperationToPolo", { enumerable: true, get: function () { return operations_1.encodeIxOperationToPolo; } });
 Object.defineProperty(exports, "getIxOperationDescriptor", { enumerable: true, get: function () { return operations_1.getIxOperationDescriptor; } });
 Object.defineProperty(exports, "listIxOperationDescriptors", { enumerable: true, get: function () { return operations_1.listIxOperationDescriptors; } });
+Object.defineProperty(exports, "transformPayload", { enumerable: true, get: function () { return operations_1.transformPayload; } });
 var properties_1 = require("./properties");
 Object.defineProperty(exports, "defineReadOnly", { enumerable: true, get: function () { return properties_1.defineReadOnly; } });
 //# sourceMappingURL=index.js.map

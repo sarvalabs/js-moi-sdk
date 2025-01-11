@@ -5,10 +5,10 @@ export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptS
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike } from "./hex";
 export { deepCopy } from "./object";
-export { encodeIxOperationToPolo, getIxOperationDescriptor, listIxOperationDescriptors, type IxOperationDescriptor, type IxOperationValidationResult } from "./operations";
+export { encodeIxOperationToPolo, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload, type IxOperationDescriptor, type IxOperationValidationResult, } from "./operations";
 export { defineReadOnly } from "./properties";
 export type { IxOperation, IxRawOperation, Operation } from "./types/ix-operation";
-export type { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, KeyAddPayload, LogicActionPayload, LogicDeployPayload, LogicPayload, OperationPayload, ParticipantCreatePayload, } from "./types/ix-payload";
+export type { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, KeyAddPayload, LogicActionPayload, LogicDeployPayload, LogicPayload, OperationPayload, ParticipantCreatePayload, PoloAssetActionPayload, PoloLogicActionPayload, PoloLogicDeployPayload, PoloLogicPayload, PoloOperationPayload, PoloParticipantCreatePayload, } from "./types/ix-payload";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
 export type { Transport } from "./types/transport";
 //# sourceMappingURL=index.d.ts.map

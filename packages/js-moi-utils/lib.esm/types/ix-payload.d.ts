@@ -1,5 +1,12 @@
 import { OpType, type AssetStandard } from "../enums";
 import type { Address, Hex } from "../hex";
+export interface PoloLogicPayload {
+    manifest: Uint8Array;
+    logic_id: Hex;
+    callsite: string;
+    calldata?: Uint8Array;
+    interfaces?: Map<string, Hex>;
+}
 export interface LogicPayload {
     /**
      * The manifest of the logic contract.
@@ -70,6 +77,11 @@ export interface KeyAddPayload {
     weight: number;
     signature_algorithm: number;
 }
+export interface PoloParticipantCreatePayload {
+    address: Uint8Array;
+    amount: number;
+    keys_payload: KeyAddPayload[];
+}
 /**
  * `ParticipantCreatePayload` holds the data for creating a new participant account
  */
@@ -88,6 +100,13 @@ export interface ParticipantCreatePayload {
      * The keys_payload is used to specify the keys for the participant.
      */
     keys_payload: KeyAddPayload[];
+}
+export interface PoloAssetActionPayload {
+    asset_id: Hex;
+    beneficiary: Uint8Array;
+    benefactor: Uint8Array;
+    amount: number;
+    timestamp: number;
 }
 /**
  * `AssetActionPayload` holds data for transferring, approving, or revoking an asset.
@@ -124,10 +143,14 @@ export interface AssetSupplyPayload {
      */
     amount: number;
 }
+export interface PoloLogicDeployPayload extends Omit<PoloLogicPayload, "logic_id"> {
+}
 /**
  * `LogicDeployPayload` holds the data for deploying a new logic.
  */
 export interface LogicDeployPayload extends Omit<LogicPayload, "logic_id"> {
+}
+export interface PoloLogicActionPayload extends Omit<PoloLogicPayload, "manifest"> {
 }
 /**
  * `LogicActionPayload` holds the data for invoking or enlisting a logic.
@@ -143,4 +166,5 @@ export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {
  * ```
  */
 export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetActionPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : never;
+export type PoloOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? PoloAssetActionPayload : T extends OpType.LogicDeploy ? PoloLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload : never;
 //# sourceMappingURL=ix-payload.d.ts.map
