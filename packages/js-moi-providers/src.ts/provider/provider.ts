@@ -1,4 +1,4 @@
-import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType, type Hex } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, isAddress, isHex, LockType, type Address, type Hex } from "js-moi-utils";
 
 import { EventEmitter } from "events";
 import { InteractionSerializer } from "../serializer/serializer";
@@ -91,7 +91,7 @@ export class Provider extends EventEmitter {
         return await this.getTesseractByReference({ absolute: hash });
     }
 
-    private async getTesseractByAddressAndHeight(address: Hex, height: number): Promise<Tesseract> {
+    private async getTesseractByAddressAndHeight(address: Address, height: number): Promise<Tesseract> {
         if (height < -1) {
             ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
         }
@@ -163,7 +163,7 @@ export class Provider extends EventEmitter {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    public async getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo> {
+    public async getAccount(address: Address, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo> {
         return await this.call("moi.Account", { identifier: address, ...option });
     }
 
@@ -176,7 +176,7 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account information for the provided key id
      */
-    public async getAccountKey(address: Hex, keyId: number, pending?: boolean) {
+    public async getAccountKey(address: Address, keyId: number, pending?: boolean) {
         return await this.call("moi.AccountKey", {
             identifier: address,
             key_id: keyId,
@@ -193,7 +193,7 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account asset information
      */
-    public async getAccountAsset(address: Hex, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]> {
+    public async getAccountAsset(address: Address, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]> {
         return await this.call("moi.AccountAsset", {
             identifier: address,
             asset_id: assetId,

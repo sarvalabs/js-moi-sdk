@@ -12,7 +12,7 @@ import type {
 } from "./shared";
 
 interface Account {
-    address: Hex;
+    address: Address;
     sequence_id: number;
     key_id: number;
 }
