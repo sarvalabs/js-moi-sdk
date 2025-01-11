@@ -1,8 +1,8 @@
-import { Hex, OpType } from "js-moi-utils";
+import { Hex, OpType, type AccountType, type Address, type LockType } from "js-moi-utils";
 import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, ResponseModifierParam, SignedInteraction, TesseractReferenceParam } from "./shared";
 interface Account {
     address: Hex;
-    sequence: number;
+    sequence_id: number;
     key_id: number;
 }
 interface ParticipantContextDelta {
@@ -18,7 +18,7 @@ interface ParticipantContext {
 export interface Participant {
     address: Hex;
     height: number;
-    lock: string;
+    lock_type: LockType;
     notary: boolean;
     transition: Hex;
     state: Hex;
@@ -27,7 +27,11 @@ export interface Participant {
 interface ParticipantCreatePayload {
     address: Hex;
     amount: number;
-    keys: unknown[];
+    keys_payload: {
+        public_key: Uint8Array;
+        weight: number;
+        signature_algorithm: number;
+    }[];
 }
 interface LogicCall {
     callsite: string;
@@ -41,41 +45,63 @@ interface AssetCreatePayload {
     symbol: string;
     standard: number;
     supply: number;
-    logic: {
+    dimension?: number;
+    is_stateful?: boolean;
+    is_logical?: boolean;
+    logic?: {
         manifest: Hex;
         call: LogicCall;
     };
 }
-export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE ? ParticipantCreatePayload : T extends OpType.ASSET_CREATE ? AssetCreatePayload : never;
+interface AssetSupplyPayload {
+    asset_id: Hex;
+    amount: number;
+}
+interface AssetActionPayload {
+    asset_id: Hex;
+    beneficiary: Address;
+    benefactor: Address;
+    amount: number;
+    timestamp: number;
+}
+export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetActionPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicCallPayload : never;
 export interface Operation<TOpType extends OpType> {
     type: TOpType;
     payload: OperationPayload<TOpType>;
 }
-export type IxOperation = Operation<OpType.PARTICIPANT_CREATE> | Operation<OpType.ASSET_CREATE>;
-interface InteractionShared {
+interface LogicPayload {
+    manifest: Hex;
+    logic_id: Hex;
+    callsite: string;
+    calldata?: Hex;
+    interfaces?: Record<string, Hex>;
+}
+export type LogicDeployPayload = Omit<LogicPayload, "logic_id">;
+export type LogicCallPayload = Omit<LogicPayload, "manifest">;
+export type IxOperation = Operation<OpType.ParticipantCreate> | Operation<OpType.AssetCreate> | Operation<OpType.AssetBurn> | Operation<OpType.AssetMint> | Operation<OpType.AssetTransfer> | Operation<OpType.LogicDeploy> | Operation<OpType.LogicInvoke> | Operation<OpType.LogicEnlist>;
+export interface InteractionShared {
     sender: Account;
-    payer: Account;
+    payer: Address;
     fuel_limit: number;
-    fuel_tip: number;
-    operations: IxOperation[];
+    fuel_price: number;
+    ix_operations: IxOperation[];
 }
 interface Fund {
-    asset: Hex;
-    label: string;
-    type: string;
+    asset_id: Hex;
+    amount: number;
 }
 interface InteractionPreference {
     compute: Hex;
     consensus: {
         mtq: Hex;
-        nodes: Hex[];
+        trust_nodes: Hex[];
     };
 }
-export interface InteractionRequest extends InteractionShared {
+export interface BaseInteractionRequest extends InteractionShared {
     funds: Fund[];
-    participants: Pick<Participant, "address" | "lock" | "notary">[];
-    preferences: InteractionPreference;
-    perception: Hex;
+    participants: Pick<Participant, "address" | "lock_type" | "notary">[];
+    preferences?: InteractionPreference;
+    perception?: Hex;
 }
 interface InteractionTesseract {
     hash: Hex;
@@ -166,6 +192,15 @@ export interface AccountAsset {
     mandates: Mandate[];
     deposits: Deposit[];
 }
+export type AccountMetadata = {
+    type: AccountType;
+    address: Address;
+    height: number;
+    tesseract: Hex;
+};
+export interface AccountInfo {
+    metadata: AccountMetadata;
+}
 interface MOIExecutionApi {
     "moi.Protocol": {
         params: [ResponseModifierParam];
@@ -176,7 +211,7 @@ interface MOIExecutionApi {
         response: Confirmation;
     };
     "moi.Tesseract": {
-        params: [Required<TesseractReferenceParam> & IncludesParam<"moi.Tesseract">];
+        params: [Required<TesseractReferenceParam>];
         response: Tesseract;
     };
     "moi.Interaction": {
@@ -184,10 +219,8 @@ interface MOIExecutionApi {
         response: Interaction;
     };
     "moi.Account": {
-        params: [AccountParam & TesseractReferenceParam & IncludesParam<"moi.Account">];
-        response: {
-            account_data: unknown;
-        };
+        params: [option: AccountParam & TesseractReferenceParam & ResponseModifierParam];
+        response: AccountInfo;
     };
     "moi.AccountKey": {
         params: [AccountParam & {
@@ -224,6 +257,10 @@ interface MOIExecutionApi {
     };
     "moi.Submit": {
         params: [ix: SignedInteraction];
+        response: Hex;
+    };
+    "moi.Simulate": {
+        params: [ix: Pick<SignedInteraction, "interaction">];
         response: Hex;
     };
     "moi.Subscribe": {

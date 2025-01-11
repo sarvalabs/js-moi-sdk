@@ -1,5 +1,6 @@
-import { ErrorCode, ErrorUtils, isAddress, isHex } from "js-moi-utils";
+import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, hexToBytes, isAddress, isHex } from "js-moi-utils";
 import { EventEmitter } from "events";
+import { InteractionSerializer } from "./serializer/serializer";
 export class Provider extends EventEmitter {
     _transport;
     /**
@@ -55,27 +56,27 @@ export class Provider extends EventEmitter {
     async getProtocol(option) {
         return await this.call("moi.Protocol", option ?? {});
     }
-    async getTesseractByReference(reference, include = []) {
-        return await this.call("moi.Tesseract", { reference, include });
+    async getTesseractByReference(reference) {
+        return await this.call("moi.Tesseract", { reference });
     }
-    async getTesseractByHash(hash, include) {
-        return await this.getTesseractByReference({ absolute: hash }, include);
+    async getTesseractByHash(hash) {
+        return await this.getTesseractByReference({ absolute: hash });
     }
-    async getTesseractByAddressAndHeight(address, height, include) {
+    async getTesseractByAddressAndHeight(address, height) {
         if (height < -1) {
             ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
         }
-        return await this.getTesseractByReference({ relative: { address, height } }, include);
+        return await this.getTesseractByReference({ relative: { identifier: address, height } });
     }
     async getTesseract(hashOrAddress, heightOrInclude, include) {
         if (typeof hashOrAddress === "object" && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
-            return await this.getTesseractByAddressAndHeight(hashOrAddress.address, hashOrAddress.height, heightOrInclude);
+            return await this.getTesseractByAddressAndHeight(hashOrAddress.identifier, hashOrAddress.height);
         }
         if (isAddress(hashOrAddress) && typeof heightOrInclude === "number") {
-            return await this.getTesseractByAddressAndHeight(hashOrAddress, heightOrInclude, include);
+            return await this.getTesseractByAddressAndHeight(hashOrAddress, heightOrInclude);
         }
         if (isHex(hashOrAddress) && (heightOrInclude == null || Array.isArray(heightOrInclude))) {
-            return await this.getTesseractByHash(hashOrAddress, heightOrInclude);
+            return await this.getTesseractByHash(hashOrAddress);
         }
         ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
     }
@@ -96,7 +97,7 @@ export class Provider extends EventEmitter {
      * @returns A promise that resolves to the account information
      */
     async getAccount(address, option) {
-        return await this.call("moi.Account", { address, ...option });
+        return await this.call("moi.Account", { identifier: address, ...option });
     }
     /**
      * Retrieves the account key for an account.
@@ -109,7 +110,7 @@ export class Provider extends EventEmitter {
      */
     async getAccountKey(address, keyId, pending) {
         return await this.call("moi.AccountKey", {
-            address,
+            identifier: address,
             key_id: keyId,
             pending,
         });
@@ -125,7 +126,7 @@ export class Provider extends EventEmitter {
      */
     async getAccountAsset(address, assetId, option) {
         return await this.call("moi.AccountAsset", {
-            address,
+            identifier: address,
             asset_id: assetId,
             ...option,
         });
@@ -171,7 +172,7 @@ export class Provider extends EventEmitter {
                 {
                     logic_id: logicId,
                     storage_key: key,
-                    address: addressOrOption,
+                    identifier: addressOrOption,
                     ...option,
                 },
             ];
@@ -193,8 +194,33 @@ export class Provider extends EventEmitter {
         }
         return true;
     }
+    // private getInteractionParticipants(interaction: InteractionRequest) {
+    //     const participants: InteractionRequest["participants"] = [
+    //         {
+    //             address: interaction.sender.address,
+    //             lock: MutateLock.MutateLock,
+    //             notary: false,
+    //         },
+    //     ];
+    //     return participants;
+    // }
     async simulate(interaction) {
-        throw new Error("Method not implemented.");
+        const serializer = new InteractionSerializer();
+        const ix = {
+            ...interaction,
+            sender: {
+                ...interaction.sender,
+                address: hexToBytes(interaction.sender.address),
+            },
+            funds: interaction.funds ?? null,
+            payer: hexToBytes(interaction.payer ?? ensureHexPrefix("00".repeat(32))),
+            // participants: interaction.participants ?? this.getInteractionParticipants(interaction),
+            perception: interaction.perception ?? null,
+            preferences: interaction.preferences ?? null,
+        };
+        console.log(ix);
+        const args = serializer.serialize(ix);
+        return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }
     /**
      * Submits a signed interaction to the MOI protocol network.

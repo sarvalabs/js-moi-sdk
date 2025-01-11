@@ -1,11 +1,11 @@
 import { OpType } from "js-moi-utils";
-import type { InteractionRequest, Operation } from "../types/moi-rpc-method";
-import type { OperationSerializer } from "./op-serializer";
+import type { BaseInteractionRequest, Operation } from "../types/moi-rpc-method";
+import { type OperationSerializer } from "./operation-serializer";
 export declare class InteractionSerializer {
     private static serializers;
     private static IX_POLO_SCHEMA;
     serializeOperation<T extends OpType>(operation: Operation<T>): Uint8Array;
-    serialize(interaction: InteractionRequest): Uint8Array;
+    serialize(interaction: BaseInteractionRequest): Uint8Array;
     /**
      * Register a serializer for a given operation type
      *

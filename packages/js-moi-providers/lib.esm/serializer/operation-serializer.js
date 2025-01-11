@@ -1,24 +1,16 @@
 import { hexToBytes, OpType } from "js-moi-utils";
-import { Polorizer, type Schema } from "js-polo";
+import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
-import type { OperationPayload } from "../types/moi-rpc-method";
-
-export abstract class OperationSerializer {
-    public abstract readonly type: number;
-
-    public abstract readonly schema: Schema;
-
-    public serialize(payload: any): Uint8Array {
+export class OperationSerializer {
+    serialize(payload) {
         const polorizer = new Polorizer();
         polorizer.polorize(payload, this.schema);
         return polorizer.bytes();
     }
 }
-
 export class AssetCreateSerializer extends OperationSerializer {
-    public readonly type: OpType = OpType.AssetCreate;
-
-    public readonly schema: Schema = polo.struct({
+    type = OpType.AssetCreate;
+    schema = polo.struct({
         symbol: polo.string,
         supply: polo.integer,
         standard: polo.integer,
@@ -37,57 +29,45 @@ export class AssetCreateSerializer extends OperationSerializer {
         }),
     });
 }
-
-const createAssetSupplySerializer = (type: OpType) => {
+const createAssetSupplySerializer = (type) => {
     return class AssetSupplySerializer extends OperationSerializer {
-        public readonly type = type;
-
-        public readonly schema: Schema = polo.struct({
+        type = type;
+        schema = polo.struct({
             asset_id: polo.string,
             amount: polo.integer,
         });
     };
 };
-
 export const AssetMintSerializer = createAssetSupplySerializer(OpType.AssetMint);
-
 export const AssetBurnSerializer = createAssetSupplySerializer(OpType.AssetBurn);
-
 export class ParticipantCreateSerializer extends OperationSerializer {
-    public readonly type = OpType.ParticipantCreate;
-
-    public readonly schema: Schema = {
+    type = OpType.ParticipantCreate;
+    schema = {
         kind: "struct",
         fields: {
             address: polo.bytes,
-            keys_payload: polo.arrayOf(
-                polo.struct({
-                    public_key: polo.bytes,
-                    weight: polo.integer,
-                    signature_algorithm: polo.integer,
-                })
-            ),
+            keys_payload: polo.arrayOf(polo.struct({
+                public_key: polo.bytes,
+                weight: polo.integer,
+                signature_algorithm: polo.integer,
+            })),
             amount: polo.integer,
         },
     };
-
-    override serialize(payload: OperationPayload<OpType.ParticipantCreate>): Uint8Array {
+    serialize(payload) {
         return super.serialize({ ...payload, address: hexToBytes(payload.address) });
     }
 }
-
 export class AssetActionSerializer extends OperationSerializer {
-    public readonly type = OpType.AssetTransfer;
-
-    public readonly schema: Schema = polo.struct({
+    type = OpType.AssetTransfer;
+    schema = polo.struct({
         benefactor: polo.bytes,
         beneficiary: polo.bytes,
         asset_id: polo.string,
         amount: polo.integer,
         timestamp: polo.integer,
     });
-
-    public override serialize(payload: OperationPayload<OpType.AssetTransfer>): Uint8Array {
+    serialize(payload) {
         return super.serialize({
             ...payload,
             benefactor: hexToBytes(payload.benefactor),
@@ -95,12 +75,10 @@ export class AssetActionSerializer extends OperationSerializer {
         });
     }
 }
-
-const createLogicActionSerializer = (type: OpType) => {
+const createLogicActionSerializer = (type) => {
     return class LogicActionSerializer extends OperationSerializer {
-        public readonly type = type;
-
-        public readonly schema: Schema = polo.struct({
+        type = type;
+        schema = polo.struct({
             manifest: polo.bytes,
             logic_id: polo.string,
             callsite: polo.string,
@@ -110,8 +88,7 @@ const createLogicActionSerializer = (type: OpType) => {
                 values: polo.string,
             }),
         });
-
-        override serialize(payload: OperationPayload<OpType.LogicDeploy | OpType.LogicEnlist | OpType.LogicInvoke>): Uint8Array {
+        serialize(payload) {
             return super.serialize({
                 ...payload,
                 manifest: "manifest" in payload && payload.manifest != null ? hexToBytes(payload.manifest) : undefined,
@@ -121,9 +98,7 @@ const createLogicActionSerializer = (type: OpType) => {
         }
     };
 };
-
 export const LogicDeploySerializer = createLogicActionSerializer(OpType.LogicDeploy);
-
 export const LogicInvokeSerializer = createLogicActionSerializer(OpType.LogicInvoke);
-
 export const LogicEnlistSerializer = createLogicActionSerializer(OpType.LogicEnlist);
+//# sourceMappingURL=operation-serializer.js.map

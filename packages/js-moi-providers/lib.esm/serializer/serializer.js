@@ -1,62 +1,40 @@
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { Polorizer } from "js-polo";
-import { AssetCreateSerializer } from "./asset-create-serializer";
-import { ParticipantCreateSerializer } from "./participant-create-serializer";
+import { polo } from "polo-schema";
+import { AssetActionSerializer, AssetBurnSerializer, AssetCreateSerializer, AssetMintSerializer, LogicDeploySerializer, LogicEnlistSerializer, LogicInvokeSerializer, ParticipantCreateSerializer, } from "./operation-serializer";
 export class InteractionSerializer {
     static serializers = new Map();
-    static IX_POLO_SCHEMA = {
-        kind: "struct",
-        fields: {
-            sender: {
-                kind: "struct",
-                fields: {
-                    address: {
-                        kind: "bytes",
-                    },
-                    sequence: {
-                        kind: "integer",
-                    },
-                    key_id: {
-                        kind: "integer",
-                    },
-                },
-            },
-            payer: {
-                kind: "struct",
-                fields: {
-                    address: {
-                        kind: "bytes",
-                    },
-                    sequence: {
-                        kind: "integer",
-                    },
-                    key_id: {
-                        kind: "integer",
-                    },
-                },
-            },
-            fuel_limit: {
-                kind: "integer",
-            },
-            fuel_tip: {
-                kind: "integer",
-            },
-            operations: {
-                kind: "array",
-                fields: {
-                    kind: "struct",
-                    fields: {
-                        type: {
-                            kind: "integer",
-                        },
-                        payload: {
-                            kind: "bytes",
-                        },
-                    },
-                },
-            },
-        },
-    };
+    static IX_POLO_SCHEMA = polo.struct({
+        sender: polo.struct({
+            address: polo.bytes,
+            sequence_id: polo.integer,
+            key_id: polo.integer,
+        }),
+        payer: polo.bytes,
+        fuel_price: polo.integer,
+        fuel_limit: polo.integer,
+        funds: polo.arrayOf(polo.struct({
+            asset_id: polo.string,
+            amount: polo.integer,
+        })),
+        ix_operations: polo.arrayOf(polo.struct({
+            type: polo.integer,
+            payload: polo.bytes,
+        })),
+        participants: polo.arrayOf(polo.struct({
+            address: polo.bytes,
+            lock_type: polo.integer,
+            notary: polo.boolean,
+        })),
+        preferences: polo.struct({
+            compute: polo.bytes,
+            consensus: polo.struct({
+                mtq: polo.integer,
+                trust_nodes: polo.arrayOf(polo.string),
+            }),
+        }),
+        perception: polo.bytes,
+    });
     serializeOperation(operation) {
         const serializer = InteractionSerializer.serializers.get(operation.type);
         if (serializer == null) {
@@ -68,10 +46,20 @@ export class InteractionSerializer {
         const polorizer = new Polorizer();
         const payload = {
             ...interaction,
-            operations: interaction.operations.map((op) => ({
+            sender: {
+                ...interaction.sender,
+                address: hexToBytes(interaction.sender.address),
+            },
+            ix_operations: interaction.ix_operations.map((op) => ({
                 type: op.type,
                 payload: this.serializeOperation(op),
             })),
+            payer: interaction.payer != null ? hexToBytes(interaction.payer) : undefined,
+            participants: interaction.participants.map((participant) => ({
+                ...participant,
+                address: hexToBytes(participant.address),
+            })),
+            perception: interaction.perception != null ? hexToBytes(interaction.perception) : undefined,
         };
         polorizer.polorize(payload, InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();
@@ -91,6 +79,12 @@ export class InteractionSerializer {
         // Register all serializers
         this.register(new ParticipantCreateSerializer());
         this.register(new AssetCreateSerializer());
+        this.register(new AssetBurnSerializer());
+        this.register(new AssetMintSerializer());
+        this.register(new AssetActionSerializer());
+        this.register(new LogicDeploySerializer());
+        this.register(new LogicEnlistSerializer());
+        this.register(new LogicInvokeSerializer());
     }
 }
 //# sourceMappingURL=serializer.js.map

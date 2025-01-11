@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, OpType } from "js-moi-utils";
+import { AssetStandard, bytesToHex, LockType, OpType } from "js-moi-utils";
 import { InteractionSerializer, type IxOperation } from "../src.ts";
 import type { BaseInteractionRequest } from "../src.ts/types/moi-rpc-method.ts";
 
@@ -15,7 +15,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a asset create operation payload",
             payload: {
-                type: OpType.ASSET_CREATE,
+                type: OpType.AssetCreate,
                 payload: {
                     symbol: "MOI",
                     supply: 500,
@@ -27,7 +27,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a participant create operation payload",
             payload: {
-                type: OpType.PARTICIPANT_CREATE,
+                type: OpType.ParticipantCreate,
                 payload: {
                     address: "0x28027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d64",
                     amount: 100,
@@ -39,7 +39,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a asset mint operation payload",
             payload: {
-                type: OpType.ASSET_MINT,
+                type: OpType.AssetMint,
                 payload: {
                     asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc668",
                     amount: 100,
@@ -51,7 +51,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a asset burn operation payload",
             payload: {
-                type: OpType.ASSET_BURN,
+                type: OpType.AssetBurn,
                 payload: {
                     asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc661",
                     amount: 100,
@@ -63,7 +63,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a asset transfer operation payload",
             payload: {
-                type: OpType.ASSET_TRANSFER,
+                type: OpType.AssetTransfer,
                 payload: {
                     benefactor: "0x94c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c8757",
                     beneficiary: "0x86d8826ac7dc4ffb73fae39dedf72958a405b878f25ed362f2f496c60a4604f4",
@@ -78,7 +78,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a logic deploy operation payload",
             payload: {
-                type: OpType.LOGIC_DEPLOY,
+                type: OpType.LogicDeploy,
                 payload: {
                     manifest: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
                     callsite: "AnyCallsite",
@@ -95,7 +95,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a logic deploy operation payload when calldata is not provided",
             payload: {
-                type: OpType.LOGIC_DEPLOY,
+                type: OpType.LogicDeploy,
                 payload: {
                     manifest: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
                     callsite: "AnyCallsite",
@@ -110,7 +110,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a logic deploy operation payload when interfaces is not provided",
             payload: {
-                type: OpType.LOGIC_DEPLOY,
+                type: OpType.LogicDeploy,
                 payload: {
                     manifest: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
                     callsite: "AnyCallsite",
@@ -121,7 +121,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a logic enlist operation payload",
             payload: {
-                type: OpType.LOGIC_ENLIST,
+                type: OpType.LogicEnlist,
                 payload: {
                     logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
                     callsite: "AnyCallsite",
@@ -133,7 +133,7 @@ describe("Polo serialization of ix operation payload", () => {
         {
             name: "should serialize a logic invoke operation payload",
             payload: {
-                type: OpType.LOGIC_INVOKE,
+                type: OpType.LogicInvoke,
                 payload: {
                     logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
                     callsite: "AnyCallsite",
@@ -154,42 +154,44 @@ describe("Polo serialization of ix operation payload", () => {
 });
 
 describe("Polo serialization of interaction", () => {
-    // @ts-ignore
     const interaction: BaseInteractionRequest = {
         sender: {
-            address: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            address: "0xb15d30b2e885efb1b45bd64db1d5adc231eaf5188bdff72013416deb75bf313e",
             key_id: 0,
             sequence_id: 0,
         },
         payer: "0x0000000000000000000000000000000000000000000000000000000000000000",
-        funds: [],
-        fuel_price: 0,
-        fuel_limit: 0,
-        ix_operations: [],
-        participants: [],
-        // ix_operations: [
-        //     {
-        //         type: OpType.LOGIC_INVOKE,
-        //         payload: {
-        //             logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782",
-        //             callsite: "AnyCallsite",
-        //             calldata: "0x0d6f0665b6019502737570706c790305f5e10073796d626f6c064d4f49",
-        //         },
-        //     },
-        // ],
-        // participants: [
-        //     {
-        //         address: "0x4860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae",
-        //         lock_type: MutateLock.MutateLock,
-        //         notary: false,
-        //     },
-        // ],
+        funds: [
+            {
+                asset_id: "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548",
+                amount: 100,
+            },
+        ],
+        fuel_price: 1,
+        fuel_limit: 200,
+        ix_operations: [
+            {
+                type: OpType.AssetCreate,
+                payload: {
+                    symbol: "MOI",
+                    supply: 500,
+                    standard: AssetStandard.MAS0,
+                },
+            },
+        ],
+        participants: [
+            {
+                address: "0xb15d30b2e885efb1b45bd64db1d5adc231eaf5188bdff72013416deb75bf313e",
+                lock_type: LockType.MutateLock,
+                notary: false,
+            },
+        ],
     };
 
     test("should serialize an interaction", () => {
         const serialized = serializer.serialize(interaction);
         const expected =
-            "0x0e7f0ee604e308e3085f068304830400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+            "0x0e9f020ee604e308f3088e099e13de15d01ad01a5f0683048304b15d30b2e885efb1b45bd64db1d5adc231eaf5188bdff72013416deb75bf313e000000000000000000000000000000000000000000000000000000000000000001c81f0e3f06a3093078303030303030303034636439373363346562383363646238383730633064653230393733363237303439316237616363393938373364613165646463656435383236633362353438641f0e2f0316050e7f063353535151504d4f4901f41f0e5f0683048104b15d30b2e885efb1b45bd64db1d5adc231eaf5188bdff72013416deb75bf313e";
 
         expect(bytesToHex(serialized)).toEqual(expected);
     });

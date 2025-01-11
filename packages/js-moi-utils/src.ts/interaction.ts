@@ -2,40 +2,41 @@
  * Enumerates the types of Operations in the system.
  */
 export enum OpType {
-    INVALID_IX,
-    PARTICIPANT_CREATE,
-    ASSET_TRANSFER,
-    FUEL_SUPPLY,
+    Invalid,
+    ParticipantCreate,
+    AccountConfigure,
+    AssetTransfer,
+    FuelSupply, // TODO: Remove this
+    AssetCreate,
+    AssetApprove,
+    AssetRevoke,
+    AssetMint,
+    AssetBurn,
+    AssetLockup,
+    AssetRelease,
 
-    ASSET_CREATE,
-    ASSET_APPROVE,
-    ASSET_REVOKE,
-    ASSET_MINT,
-    ASSET_BURN,
-
-    LOGIC_DEPLOY,
-    LOGIC_INVOKE,
-    LOGIC_ENLIST,
-    LOGIC_INTERACT,
-    LOGIC_UPGRADE,
-
-    FILE_CREATE,
-    FILE_UPDATE,
-
-    PARTICIPANT_REGISTER,
-    VALIDATOR_REGISTER,
-    VALIDATOR_UNREGISTER,
-
-    STAKE_BOND,
-    STAKE_UNBOND,
-    STAKE_TRANSFER
+    LogicDeploy,
+    LogicInvoke,
+    LogicEnlist,
+    LogicInteract,
+    LogicUpgrade,
 }
 
 /**
  * Enumerates the types of particpant locks in the system.
  */
 export enum LockType {
-    MUTATE_LOCK,
-    READ_LOCK,
-    NO_LOCK
+    MutateLock,
+    ReadLock,
+    NoLock,
+}
+
+/**
+ * Enumerates the types of participant keys in the system.
+ */
+export enum AccountType {
+    SargaAccount = 0,
+    LogicAccount = 2,
+    AssetAccount = 3,
+    RegularAccount = 4,
 }

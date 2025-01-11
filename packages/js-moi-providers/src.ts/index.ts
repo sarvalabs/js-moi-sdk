@@ -35,5 +35,3 @@ export type {
 } from "./types/shared";
 export type { Transport } from "./types/transport";
 export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./websocket-provider";
-
-export { AccountType, MutateLock } from "./types/moi-rpc-method";

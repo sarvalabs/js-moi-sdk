@@ -1,4 +1,4 @@
-import { Hex, OpType, type Address } from "js-moi-utils";
+import { Hex, OpType, type AccountType, type Address, type LockType } from "js-moi-utils";
 import type {
     AccountParam,
     AssetParam,
@@ -29,16 +29,10 @@ interface ParticipantContext {
     delta: ParticipantContextDelta;
 }
 
-export enum MutateLock {
-    MutateLock = 0,
-    ReadLock = 1,
-    NoLock = 2,
-}
-
 export interface Participant {
     address: Hex;
     height: number;
-    lock_type: MutateLock;
+    lock_type: LockType;
     notary: boolean;
     transition: Hex;
     state: Hex;
@@ -90,17 +84,17 @@ interface AssetActionPayload {
     timestamp: number;
 }
 
-export type OperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE
+export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
     ? ParticipantCreatePayload
-    : T extends OpType.ASSET_CREATE
+    : T extends OpType.AssetCreate
     ? AssetCreatePayload
-    : T extends OpType.ASSET_BURN | OpType.ASSET_MINT
+    : T extends OpType.AssetBurn | OpType.AssetMint
     ? AssetSupplyPayload
-    : T extends OpType.ASSET_TRANSFER
+    : T extends OpType.AssetTransfer
     ? AssetActionPayload
-    : T extends OpType.LOGIC_DEPLOY
+    : T extends OpType.LogicDeploy
     ? LogicDeployPayload
-    : T extends OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST
+    : T extends OpType.LogicInvoke | OpType.LogicEnlist
     ? LogicCallPayload
     : never;
 
@@ -122,14 +116,14 @@ export type LogicDeployPayload = Omit<LogicPayload, "logic_id">;
 export type LogicCallPayload = Omit<LogicPayload, "manifest">;
 
 export type IxOperation =
-    | Operation<OpType.PARTICIPANT_CREATE>
-    | Operation<OpType.ASSET_CREATE>
-    | Operation<OpType.ASSET_BURN>
-    | Operation<OpType.ASSET_MINT>
-    | Operation<OpType.ASSET_TRANSFER>
-    | Operation<OpType.LOGIC_DEPLOY>
-    | Operation<OpType.LOGIC_INVOKE>
-    | Operation<OpType.LOGIC_ENLIST>;
+    | Operation<OpType.ParticipantCreate>
+    | Operation<OpType.AssetCreate>
+    | Operation<OpType.AssetBurn>
+    | Operation<OpType.AssetMint>
+    | Operation<OpType.AssetTransfer>
+    | Operation<OpType.LogicDeploy>
+    | Operation<OpType.LogicInvoke>
+    | Operation<OpType.LogicEnlist>;
 
 export interface InteractionShared {
     sender: Account;
@@ -140,9 +134,8 @@ export interface InteractionShared {
 }
 
 interface Fund {
-    asset: Hex;
-    label: string;
-    type: string;
+    asset_id: Hex;
+    amount: number;
 }
 
 interface InteractionPreference {
@@ -258,13 +251,6 @@ export interface AccountAsset {
     balance: number;
     mandates: Mandate[];
     deposits: Deposit[];
-}
-
-export enum AccountType {
-    SargaAccount = 0,
-    LogicAccount = 2,
-    AssetAccount = 3,
-    RegularAccount = 4,
 }
 
 export type AccountMetadata = {

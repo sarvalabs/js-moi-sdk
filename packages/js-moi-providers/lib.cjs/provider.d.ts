@@ -1,7 +1,7 @@
 import { type Hex } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { JsonRpcResponse } from "./types/json-rpc";
-import type { AccountAsset, Confirmation, Interaction, InteractionRequest, RpcMethod, RpcMethodParams, RpcMethodResponse, Tesseract } from "./types/moi-rpc-method";
+import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethod, type RpcMethodParams, type RpcMethodResponse, type Tesseract } from "./types/moi-rpc-method";
 import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields } from "./types/shared";
 import type { Transport } from "./types/transport";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -89,7 +89,7 @@ export declare class Provider extends EventEmitter {
      * @param option The options to include and reference
      * @returns A promise that resolves to the account information
      */
-    getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "address">): Promise<unknown>;
+    getAccount(address: Hex, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo>;
     /**
      * Retrieves the account key for an account.
      *
@@ -157,7 +157,7 @@ export declare class Provider extends EventEmitter {
      */
     getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
     private static isSignedInteraction;
-    simulate(interaction: InteractionRequest): Promise<void>;
+    simulate(interaction: any): Promise<`0x${string}`>;
     /**
      * Submits a signed interaction to the MOI protocol network.
      *

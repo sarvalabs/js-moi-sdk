@@ -24,37 +24,35 @@ export class InteractionSerializer {
             key_id: polo.integer,
         }),
         payer: polo.bytes,
-
         fuel_price: polo.integer,
         fuel_limit: polo.integer,
-
-        // funds: polo.arrayOf(
-        //     polo.struct({
-        //         asset_id: polo.string,
-        //         amount: polo.integer,
-        //     })
-        // ),
-        // ix_operations: polo.arrayOf(
-        //     polo.struct({
-        //         type: polo.integer,
-        //         payload: polo.bytes,
-        //     })
-        // ),
-        // participants: polo.arrayOf(
-        //     polo.struct({
-        //         address: polo.bytes,
-        //         lock_type: polo.integer,
-        //         notary: polo.boolean,
-        //     })
-        // ),
-        // preferences: polo.struct({
-        //     compute: polo.bytes,
-        //     consensus: polo.struct({
-        //         mtq: polo.integer,
-        //         trust_nodes: polo.arrayOf(polo.string),
-        //     }),
-        // }),
-        // perception: polo.bytes,
+        funds: polo.arrayOf(
+            polo.struct({
+                asset_id: polo.string,
+                amount: polo.integer,
+            })
+        ),
+        ix_operations: polo.arrayOf(
+            polo.struct({
+                type: polo.integer,
+                payload: polo.bytes,
+            })
+        ),
+        participants: polo.arrayOf(
+            polo.struct({
+                address: polo.bytes,
+                lock_type: polo.integer,
+                notary: polo.boolean,
+            })
+        ),
+        preferences: polo.struct({
+            compute: polo.bytes,
+            consensus: polo.struct({
+                mtq: polo.integer,
+                trust_nodes: polo.arrayOf(polo.string),
+            }),
+        }),
+        perception: polo.bytes,
     });
 
     public serializeOperation<T extends OpType>(operation: Operation<T>): Uint8Array {
@@ -90,7 +88,6 @@ export class InteractionSerializer {
             perception: interaction.perception != null ? hexToBytes(interaction.perception) : undefined,
         };
 
-        console.log(payload);
         polorizer.polorize(payload, InteractionSerializer.IX_POLO_SCHEMA);
         return polorizer.bytes();
     }
