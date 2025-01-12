@@ -12,7 +12,17 @@ export interface NetworkInfo {
     version: string;
 }
 
+export interface SimulationResult {}
+
+export interface SimulationEffects {
+    events: unknown[];
+    BalanceChanges: unknown;
+}
+
 export interface Simulate {
     hash: Hex;
     status: ReceiptStatus;
+    result: SimulationResult[];
+    effort: number;
+    effects: SimulationEffects[];
 }
