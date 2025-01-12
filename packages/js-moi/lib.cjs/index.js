@@ -18,7 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // export * from "js-moi-constants";
 // export * from "js-moi-hdnode";
 // export * from "js-moi-logic";
-// export * from "js-moi-manifest";
+__exportStar(require("js-moi-manifest"), exports);
 __exportStar(require("js-moi-providers"), exports);
 // export * from "js-moi-signer";
 __exportStar(require("js-moi-utils"), exports);

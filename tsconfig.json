@@ -38,12 +38,12 @@
         {
             "path": "./packages/js-moi-utils/tsconfig.esm.json"
         },
-        // {
-        //     "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
-        // },
-        // {
-        //     "path": "./packages/js-moi-manifest/tsconfig.esm.json"
-        // },
+        {
+            "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-manifest/tsconfig.esm.json"
+        },
         {
             "path": "./packages/js-moi-providers/tsconfig.cjs.json"
         },

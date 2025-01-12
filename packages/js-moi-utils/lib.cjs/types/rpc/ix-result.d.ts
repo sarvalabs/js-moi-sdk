@@ -4,6 +4,13 @@ export interface AssetCreateResult {
     asset_id: Hex;
     address: Hex;
 }
+export interface LogicResult {
+    logic_id: Hex;
+    outputs: Hex;
+    error: Hex;
+}
+export type LogicActionResult = Omit<LogicResult, "logic_id">;
+export type LogicDeployResult = Pick<LogicResult, "logic_id"> | Pick<LogicResult, "error">;
 export type AssetSupplyResult = null;
-export type OperationResult<TOpType extends OpType> = TOpType extends OpType.AssetCreate ? AssetCreateResult : TOpType extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyResult : unknown;
+export type OperationResult<TOpType extends OpType> = TOpType extends OpType.AssetCreate ? AssetCreateResult : TOpType extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyResult : TOpType extends OpType.LogicDeploy ? LogicDeployResult : TOpType extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionResult : null;
 //# sourceMappingURL=ix-result.d.ts.map
