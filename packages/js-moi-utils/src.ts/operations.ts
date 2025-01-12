@@ -227,19 +227,27 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>(type: T) => {
         },
 
         validator: (payload) => {
-            if ("manifest" in payload && !isHex(payload.manifest)) {
-                return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+            if (type === OpType.LogicDeploy) {
+                if (!("manifest" in payload)) {
+                    return createInvalidResult(payload, "manifest" as keyof typeof payload, "Manifest is required for logic deploy operation");
+                }
+
+                if (!isHex(payload.manifest)) {
+                    return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+                }
+            }
+
+            if (type !== OpType.LogicDeploy || type === OpType.LogicEnlist) {
+                if (!("logic_id" in payload)) {
+                    return createInvalidResult(payload, "logic_id" as keyof typeof payload, "Logic ID is required");
+                }
             }
 
             if ("calldata" in payload && !isHex(payload.calldata)) {
                 return createInvalidResult(payload, "calldata", "Calldata must be a hex string");
             }
 
-            if ("logic_id" in payload && !isHex(payload.logic_id)) {
-                return createInvalidResult(payload, "logic_id", "Logic ID must be a hex string");
-            }
-
-            if (payload.callsite == null) {
+            if (payload.callsite == null || payload.callsite === "") {
                 return createInvalidResult(payload, "callsite", "Callsite is required");
             }
 
