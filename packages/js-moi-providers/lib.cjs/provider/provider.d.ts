@@ -45,8 +45,8 @@ export declare class Provider extends EventEmitter implements IProviderActions {
      * @returns A promise that resolves to the Moi client version.
      */
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
-    simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
-    simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
+    simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
+    simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
     private getTesseractByReference;
     private getTesseractByHash;
     private getTesseractByAddressAndHeight;

@@ -22,8 +22,8 @@ export interface GetNetworkInfoRequest {
 export type SimulateOption = TesseractReferenceParam;
 
 export interface Simulate {
-    simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
-    simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
+    simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
+    simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
 }
 
 export interface IProviderActions extends GetNetworkInfoRequest, Simulate {}

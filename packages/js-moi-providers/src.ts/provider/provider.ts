@@ -85,9 +85,9 @@ export class Provider extends EventEmitter implements IProviderActions {
         return await this.call<"moi.Protocol", SelectFromResponseModifier<NetworkInfo, TOption>>("moi.Protocol", option);
     }
 
-    public async simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: InteractionRequest | Uint8Array | Hex, option: SimulateOption): Promise<Simulate> {
+    public async simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: InteractionRequest | Uint8Array | Hex, option?: SimulateOption): Promise<Simulate> {
         let encodedIxArgs: Hex;
 
         switch (true) {
