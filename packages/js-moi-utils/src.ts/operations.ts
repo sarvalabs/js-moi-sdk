@@ -1,12 +1,11 @@
 import { Polorizer } from "js-polo";
 import { polo, type PoloSchema } from "polo-schema";
-import { OpType } from "./enums";
+import { isValidAddress } from "./address";
+import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
-import { hexToBytes } from "./hex";
-import type { Operation } from "./types/ix-operation";
+import { hexToBytes, isHex } from "./hex";
+import type { IxRawOperation, Operation } from "./types/ix-operation";
 import type { OperationPayload, PoloOperationPayload } from "./types/ix-payload";
-
-export type IxOperationValidationResult = { reason: string; field: string; value: any } | null;
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
@@ -21,7 +20,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (payload: OperationPayload<TOpType>) => IxOperationValidationResult;
+    validator: (payload: OperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *
@@ -36,6 +35,10 @@ type IxOperationDescriptorLookup = {
 };
 
 type AssetSupplyOpType = OpType.AssetMint | OpType.AssetBurn;
+
+const createInvalidResult = <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
+    return { field, message, value: value[field] };
+};
 
 const createParticipantCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.ParticipantCreate>>({
@@ -56,6 +59,14 @@ const createParticipantCreateDescriptor = () => {
         transform: (payload) => ({ ...payload, address: hexToBytes(payload.address) }),
 
         validator: (payload) => {
+            if (!isValidAddress(payload.address)) {
+                return createInvalidResult(payload, "address", "Invalid address");
+            }
+
+            if (payload.amount < 0) {
+                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            }
+
             return null;
         },
     });
@@ -84,6 +95,18 @@ const createAssetCreateDescriptor = () => {
         },
 
         validator: (payload) => {
+            if (payload.supply < 0) {
+                return createInvalidResult(payload, "supply", "Supply cannot be negative");
+            }
+
+            if (payload.standard in AssetStandard) {
+                return createInvalidResult(payload, "standard", "Invalid asset standard");
+            }
+
+            if (payload.dimension && payload.dimension < 0) {
+                return createInvalidResult(payload, "dimension", "Dimension cannot be negative");
+            }
+
             return null;
         },
     });
@@ -99,6 +122,14 @@ const createAssetSupplyDescriptorFor = (type: AssetSupplyOpType) => {
         },
 
         validator: (payload) => {
+            if (payload.amount < 0) {
+                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            }
+
+            if (!isHex(payload.asset_id)) {
+                return createInvalidResult(payload, "asset_id", "Invalid asset ID");
+            }
+
             return null;
         },
     });
@@ -123,6 +154,26 @@ const createAssetActionDescriptor = () => {
         }),
 
         validator: (payload) => {
+            if (payload.benefactor && !isValidAddress(payload.benefactor)) {
+                return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
+            }
+
+            if (!isValidAddress(payload.beneficiary)) {
+                return createInvalidResult(payload, "beneficiary", "Invalid beneficiary address");
+            }
+
+            if (payload.amount < 0) {
+                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            }
+
+            if (!isHex(payload.asset_id)) {
+                return createInvalidResult(payload, "asset_id", "Invalid asset ID");
+            }
+
+            if (payload.timestamp < 0) {
+                return createInvalidResult(payload, "timestamp", "Timestamp cannot be negative");
+            }
+
             return null;
         },
     });
@@ -176,6 +227,22 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>(type: T) => {
         },
 
         validator: (payload) => {
+            if ("manifest" in payload && !isHex(payload.manifest)) {
+                return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+            }
+
+            if ("calldata" in payload && !isHex(payload.calldata)) {
+                return createInvalidResult(payload, "calldata", "Calldata must be a hex string");
+            }
+
+            if ("logic_id" in payload && !isHex(payload.logic_id)) {
+                return createInvalidResult(payload, "logic_id", "Logic ID must be a hex string");
+            }
+
+            if (payload.callsite == null) {
+                return createInvalidResult(payload, "callsite", "Callsite is required");
+            }
+
             return null;
         },
     });
@@ -243,7 +310,7 @@ export const transformPayload = <TOpType extends OpType>(type: TOpType, payload:
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export const encodeOperationPayload = <TOpType extends OpType>(operation: Operation<TOpType>): Uint8Array => {
+export const encodeOperation = <TOpType extends OpType>(operation: Operation<TOpType>): IxRawOperation => {
     const descriptor = ixOpDescriptor[operation.type];
 
     if (descriptor == null) {
@@ -255,5 +322,33 @@ export const encodeOperationPayload = <TOpType extends OpType>(operation: Operat
 
     polorizer.polorize(data, descriptor.schema());
 
-    return polorizer.bytes();
+    return { type: operation.type, payload: polorizer.bytes() };
+};
+
+/**
+ * Checks if the given operation is valid.
+ *
+ * @template TOpType - The type of the operation.
+ * @param {Operation<TOpType>} operation - The operation to validate.
+ * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
+ */
+export const isValidOperation = <TOpType extends OpType>(operation: Operation<TOpType>): boolean => {
+    return validateOperation(operation) == null;
+};
+
+/**
+ * Validates the payload of a given operation.
+ *
+ * @template TOpType - The type of the operation.
+ * @param operation - The operation to validate.
+ * @returns The result of the validation.
+ */
+export const validateOperation = <TOpType extends OpType>(operation: Operation<TOpType>): ReturnType<IxOperationDescriptor<TOpType>["validator"]> => {
+    const descriptor = ixOpDescriptor[operation.type];
+
+    if (descriptor == null) {
+        throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
+    }
+
+    return descriptor.validator(operation.payload);
 };

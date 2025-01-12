@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
+exports.isValidIxRequest = exports.validateIxRequest = exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
+const address_1 = require("./address");
 const enums_1 = require("./enums");
 const hex_1 = require("./hex");
 const operations_1 = require("./operations");
@@ -57,7 +58,7 @@ const transformInteraction = (ix) => {
         ...ix,
         sender: { ...ix.sender, address: (0, hex_1.hexToBytes)(ix.sender.address) },
         payer: ix.payer ? (0, hex_1.hexToBytes)(ix.payer) : undefined,
-        ix_operations: ix.operations.map((op) => ({ ...op, payload: (0, operations_1.encodeOperationPayload)(op) })),
+        ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,
@@ -183,4 +184,106 @@ const interaction = (ix) => {
     });
 };
 exports.interaction = interaction;
+const createInvalidResult = (value, field, message) => {
+    return { field, message, value: value[field] };
+};
+/**
+ * Validates an InteractionRequest object.
+ *
+ * @param ix - The InteractionRequest object to validate.
+ * @returns A result from `createInvalidResult` if the validation fails, or `null` if the validation passes.
+ *
+ * The function performs the following validations:
+ * - Checks if the sender is present and has a valid address.
+ * - Checks if the fuel price and fuel limit are present and non-negative.
+ * - Checks if the payer, if present, has a valid address.
+ * - Checks if the participants, if present, is an array and each participant has a valid address.
+ * - Checks if the operations are present, is an array, and contains at least one operation.
+ * - Checks each operation to ensure it has a type and payload, and validates the operation.
+ */
+const validateIxRequest = (ix) => {
+    if (ix.sender == null) {
+        return createInvalidResult(ix, "sender", "Sender is required");
+    }
+    if (!(0, address_1.isValidAddress)(ix.sender.address)) {
+        return createInvalidResult(ix.sender, "address", "Invalid sender address");
+    }
+    if (ix.fuel_price == null) {
+        return createInvalidResult(ix, "fuel_price", "Fuel price is required");
+    }
+    if (ix.fuel_limit == null) {
+        return createInvalidResult(ix, "fuel_limit", "Fuel limit is required");
+    }
+    if (ix.fuel_price < 0) {
+        return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
+    }
+    if (ix.fuel_limit < 0) {
+        return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
+    }
+    if (ix.payer != null && !(0, address_1.isValidAddress)(ix.payer)) {
+        return createInvalidResult(ix, "payer", "Invalid payer address");
+    }
+    if (ix.participants != null) {
+        if (!Array.isArray(ix.participants)) {
+            return createInvalidResult(ix, "participants", "Participants must be an array");
+        }
+        let error = null;
+        for (const participant of ix.participants) {
+            if (error != null) {
+                return error;
+            }
+            if (!(0, address_1.isValidAddress)(participant.address)) {
+                error = createInvalidResult(participant, "address", "Invalid participant address");
+                break;
+            }
+        }
+    }
+    if (ix.operations == null) {
+        return createInvalidResult(ix, "operations", "Operations are required");
+    }
+    if (!Array.isArray(ix.operations)) {
+        return createInvalidResult(ix, "operations", "Operations must be an array");
+    }
+    if (ix.operations.length === 0) {
+        return createInvalidResult(ix, "operations", "Operations must have at least one operation");
+    }
+    let error = null;
+    for (let i = 0; i < ix.operations.length; i++) {
+        const operation = ix.operations[i];
+        if (error != null) {
+            return error;
+        }
+        if (operation.type == null) {
+            error = createInvalidResult(operation, "type", "Operation type is required");
+            break;
+        }
+        if (operation.payload == null) {
+            error = createInvalidResult(operation, "payload", "Operation payload is required");
+            break;
+        }
+        const result = (0, operations_1.validateOperation)(operation);
+        if (result == null) {
+            continue;
+        }
+        error = {
+            field: `operations[${i}].${result.field}`,
+            message: `Invalid operation payload at index ${i}: ${result.message}`,
+            value: operation,
+        };
+    }
+    return null;
+};
+exports.validateIxRequest = validateIxRequest;
+const isValidIxRequest = (ix) => {
+    try {
+        if (typeof ix !== "object" || ix === null) {
+            return false;
+        }
+        return (0, exports.validateIxRequest)(ix) == null;
+    }
+    catch (error) {
+        return false;
+    }
+};
+exports.isValidIxRequest = isValidIxRequest;
 //# sourceMappingURL=interaction.js.map

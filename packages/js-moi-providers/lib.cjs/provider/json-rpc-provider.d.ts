@@ -1,10 +1,7 @@
-import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type Transport } from "js-moi-utils";
+import { type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type Simulate, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Simulate, type Tesseract } from "../types/moi-rpc-method";
 import type { GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";
-import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
-type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
@@ -47,127 +44,6 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
     simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
-    private getTesseractByReference;
-    private getTesseractByHash;
-    private getTesseractByAddressAndHeight;
-    /**
-     * Retrieves a tesseract by its hash
-     *
-     * @param hash - The hash of the tesseract to retrieve.
-     * @param include - The fields to include in the response.
-     * @returns A promise that resolves to the tesseract.
-     */
-    getTesseract(hash: Hex, include?: TesseractIncludeFields): Promise<Tesseract>;
-    /**
-     * Retrieves a tesseract by its address and height
-     *
-     * @param address - The address of the account that the tesseract is a part of.
-     * @param height - The height of the tesseract on the account. The 0 & -1 values can be used to retrieve the oldest and latest tesseracts for the account respectively.
-     * @param include - The fields to include in the response.
-     *
-     * @returns A promise that resolves to the tesseract.
-     */
-    getTesseract(address: Hex, height: number, include?: TesseractIncludeFields): Promise<Tesseract>;
-    /**
-     * Retrieves a tesseract by its relative reference
-     *
-     * @param relativeRef - The relative reference of the tesseract to retrieve.
-     * @param include - The fields to include in the response.
-     *
-     * @returns A promise that resolves to the tesseract.
-     */
-    getTesseract(relativeRef: RelativeTesseractOption, include?: TesseractIncludeFields): Promise<Tesseract>;
-    /**
-     * Retrieves an interaction by its hash.
-     *
-     * @param hash - The hash of the interaction to retrieve.
-     * @returns A promise that resolves to the interaction.
-     */
-    getInteraction(hash: Hex, options?: ResponseModifierParam): Promise<Partial<Interaction>>;
-    /**
-     * Retrieves information about an account.
-     *
-     * @param address The address that uniquely identifies the account
-     * @param option The options to include and reference
-     * @returns A promise that resolves to the account information
-     */
-    getAccount(address: Address, option?: Omit<RpcMethodParams<"moi.Account">[0], "identifier">): Promise<AccountInfo>;
-    /**
-     * Retrieves the account key for an account.
-     *
-     * @param address The address that uniquely identifies the account
-     * @param keyId The key id that uniquely identifies the account key
-     * @param pending Whether to include pending account keys
-     *
-     * @returns A promise that resolves to the account information for the provided key id
-     */
-    getAccountKey(address: Address, keyId: number, pending?: boolean): Promise<any>;
-    /**
-     * Retrieves the balances, mandates and deposits for a specific asset on an account
-     *
-     * @param address The address that uniquely identifies the account
-     * @param assetId The asset id that uniquely identifies the asset
-     * @param option The options to include and reference
-     *
-     * @returns A promise that resolves to the account asset information
-     */
-    getAccountAsset(address: Address, assetId: Hex, option?: Omit<RpcMethodParams<"moi.AccountAsset">[0], "asset_id">): Promise<AccountAsset[]>;
-    /**
-     * Retrieves the interaction confirmation
-     *
-     * @param hash The hash of the interaction to retrieve the confirmation.
-     * @returns A promise that resolves to object containing the confirmation information.
-     */
-    getConfirmation(hash: Hex): Promise<Confirmation>;
-    /**
-     * Retrieves information about an asset
-     *
-     * @param assetId The asset id that uniquely identifies the asset
-     * @param option The options to include and reference
-     *
-     * @returns A promise that resolves to the asset information
-     */
-    getAsset(assetId: Hex, option?: Omit<RpcMethodParams<"moi.Asset">[0], "asset_id">): Promise<unknown>;
-    /**
-     * Retrieves information about a logic
-     *
-     * @param logicId A unique identifier for the logic
-     * @param option The options for the tesseract reference
-     *
-     * @returns A promise that resolves to the logic information
-     */
-    getLogic(logicId: Hex, option?: Omit<RpcMethodParams<"moi.Logic">[0], "logic_id">): Promise<unknown>;
-    /**
-     * Retrieves the value of a storage key for a logic from persistent storage
-     *
-     * @param logicId The unique identifier for the logic
-     * @param key The storage key to retrieve
-     * @param option The options for the tesseract reference
-     *
-     * @returns A promise that resolves to the value of the storage key
-     */
-    getLogicStorage(logicId: Hex, key: Hex, option?: LogicStorageOption): Promise<Hex>;
-    /**
-     * Retrieves the value of a storage key for a logic from ephemeral storage
-     *
-     * @param logicId The unique identifier for the logic
-     * @param key The storage key to retrieve
-     * @param address The address of the account to retrieve the storage key from
-     * @param option The options for the tesseract reference
-     *
-     * @returns A promise that resolves to the value of the storage key
-     */
-    getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
-    private static isSignedInteraction;
-    private ensureValidInteraction;
-    /**
-     * Submits a signed interaction to the MOI protocol network.
-     *
-     * @param interaction - The signed interaction to submit.
-     * @returns A promise that resolves to the hash of the submitted interaction.
-     */
-    submit(interaction: SignedInteraction): Promise<Hex>;
-    subscribe(event: string, ...params: unknown[]): Promise<string>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
@@ -180,5 +56,4 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      */
     processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T;
 }
-export {};
 //# sourceMappingURL=json-rpc-provider.d.ts.map

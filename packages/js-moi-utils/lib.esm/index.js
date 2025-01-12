@@ -6,6 +6,6 @@ export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";
 export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction } from "./interaction";
 export { deepCopy } from "./object";
-export { encodeOperationPayload, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload, } from "./operations";
+export { encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload } from "./operations";
 export { defineReadOnly } from "./properties";
 //# sourceMappingURL=index.js.map

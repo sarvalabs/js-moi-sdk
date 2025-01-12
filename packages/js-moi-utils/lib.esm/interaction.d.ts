@@ -35,4 +35,26 @@ export declare function encodeInteraction(ix: InteractionRequest | RawInteractio
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export declare const interaction: (ix: InteractionRequest) => Uint8Array;
+declare const createInvalidResult: <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
+    field: keyof T;
+    message: string;
+    value: T[keyof T];
+};
+/**
+ * Validates an InteractionRequest object.
+ *
+ * @param ix - The InteractionRequest object to validate.
+ * @returns A result from `createInvalidResult` if the validation fails, or `null` if the validation passes.
+ *
+ * The function performs the following validations:
+ * - Checks if the sender is present and has a valid address.
+ * - Checks if the fuel price and fuel limit are present and non-negative.
+ * - Checks if the payer, if present, has a valid address.
+ * - Checks if the participants, if present, is an array and each participant has a valid address.
+ * - Checks if the operations are present, is an array, and contains at least one operation.
+ * - Checks each operation to ensure it has a type and payload, and validates the operation.
+ */
+export declare const validateIxRequest: (ix: InteractionRequest) => ReturnType<typeof createInvalidResult> | null;
+export declare const isValidIxRequest: (ix: unknown) => ix is InteractionRequest;
+export {};
 //# sourceMappingURL=interaction.d.ts.map

@@ -6,14 +6,7 @@ export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike } from "./hex";
 export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction } from "./interaction";
 export { deepCopy } from "./object";
-export {
-    encodeOperationPayload,
-    getIxOperationDescriptor,
-    listIxOperationDescriptors,
-    transformPayload,
-    type IxOperationDescriptor,
-    type IxOperationValidationResult,
-} from "./operations";
+export { encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload, type IxOperationDescriptor } from "./operations";
 export { defineReadOnly } from "./properties";
 export type {
     ConsensusPreference,

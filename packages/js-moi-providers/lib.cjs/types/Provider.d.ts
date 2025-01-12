@@ -1,4 +1,4 @@
-import type { ExtractModifier, Hex, IncludeModifier, InteractionRequest, NetworkInfo, ResponseModifierParam, TesseractReferenceParam } from "js-moi-utils";
+import type { ExtractModifier, Hex, IncludeModifier, InteractionRequest, NetworkInfo, ResponseModifierParam, Simulate, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "stream";
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends ResponseModifierParam<infer K> ? K extends keyof TObject ? TModifier extends {
     modifier: ExtractModifier<infer E>;
@@ -13,10 +13,10 @@ export interface GetNetworkInfoRequest {
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
 }
 export type SimulateOption = TesseractReferenceParam;
-export interface Simulate {
+export interface SimulateRequest {
     simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
 }
-export interface Provider extends EventEmitter, GetNetworkInfoRequest, Simulate {
+export interface Provider extends EventEmitter, GetNetworkInfoRequest, SimulateRequest {
 }
 //# sourceMappingURL=provider.d.ts.map
