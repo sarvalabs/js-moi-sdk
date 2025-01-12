@@ -96,7 +96,7 @@ export declare class ManifestCoder {
      * @returns The encoded manifest as a hexadecimal string prefixed with "0x".
      * @throws Will throw an error if the manifest type is unsupported.
      */
-    static encodeManifest(manifest: string | LogicManifest.Manifest): Hex;
+    static encodeManifest(manifest: string | LogicManifest): Hex;
     /**
      * Decodes a given manifest in either JSON format.
      *
@@ -107,7 +107,7 @@ export declare class ManifestCoder {
      *
      * @throws Throws an error if the format is unsupported.
      */
-    static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.JSON): LogicManifest.Manifest;
+    static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.JSON): LogicManifest;
     /**
      * Decodes a given manifest in either YAML format.
      *

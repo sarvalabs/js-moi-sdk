@@ -112,7 +112,9 @@ class ManifestCoder {
         const element = this.elementDescriptor.getRoutineElement(routine).data;
         const schema = this.schema.parseFields(element.accepts ?? []);
         const calldata = Object.values(element.accepts).reduce((acc, field) => {
-            acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+            if (schema.fields) {
+                acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+            }
             return acc;
         }, {});
         return (0, js_moi_utils_1.bytesToHex)((0, js_polo_1.documentEncode)(calldata, schema).bytes());

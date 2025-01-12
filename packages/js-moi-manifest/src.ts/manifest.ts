@@ -290,7 +290,7 @@ export class ManifestCoder {
      *
      * @throws Throws an error if the format is unsupported.
      */
-    public static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.JSON): LogicManifest.Manifest;
+    public static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.JSON): LogicManifest;
     /**
      * Decodes a given manifest in either YAML format.
      *
