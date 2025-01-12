@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const events_1 = require("events");
-const interaction_1 = require("js-moi-utils/lib.cjs/interaction");
 class JsonRpcProvider extends events_1.EventEmitter {
     _transport;
     /**
@@ -67,7 +66,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
                 break;
             }
             case typeof ix === "object": {
-                const result = (0, interaction_1.validateIxRequest)(ix);
+                const result = (0, js_moi_utils_1.validateIxRequest)(ix);
                 if (result != null) {
                     js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: Reason ${result}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, result);
                 }

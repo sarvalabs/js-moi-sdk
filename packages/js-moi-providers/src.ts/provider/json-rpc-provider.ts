@@ -1,7 +1,19 @@
-import { bytesToHex, ErrorCode, ErrorUtils, interaction, isHex, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type Simulate, type Transport } from "js-moi-utils";
+import {
+    bytesToHex,
+    ErrorCode,
+    ErrorUtils,
+    interaction,
+    isHex,
+    validateIxRequest,
+    type Hex,
+    type InteractionRequest,
+    type JsonRpcResponse,
+    type NetworkInfo,
+    type Simulate,
+    type Transport,
+} from "js-moi-utils";
 
 import { EventEmitter } from "events";
-import { validateIxRequest } from "js-moi-utils/lib.cjs/interaction";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import { type RpcMethodParams } from "../types/moi-rpc-method";
 import type { GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";

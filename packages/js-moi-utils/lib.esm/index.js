@@ -4,8 +4,8 @@ export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger } from ".
 export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptStatus } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";
-export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction } from "./interaction";
+export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
-export { encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload } from "./operations";
+export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformPayload, validateOperation, } from "./operations";
 export { defineReadOnly } from "./properties";
 //# sourceMappingURL=index.js.map

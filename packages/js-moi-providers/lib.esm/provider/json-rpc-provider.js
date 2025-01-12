@@ -1,6 +1,5 @@
-import { bytesToHex, ErrorCode, ErrorUtils, interaction, isHex } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, interaction, isHex, validateIxRequest, } from "js-moi-utils";
 import { EventEmitter } from "events";
-import { validateIxRequest } from "js-moi-utils/lib.cjs/interaction";
 export class JsonRpcProvider extends EventEmitter {
     _transport;
     /**

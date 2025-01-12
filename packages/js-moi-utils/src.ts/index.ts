@@ -4,9 +4,17 @@ export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger, type Byt
 export { AccountType, AssetStandard, LockType, OperationStatus, OpType, ReceiptStatus } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike } from "./hex";
-export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction } from "./interaction";
+export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
-export { encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, transformPayload, type IxOperationDescriptor } from "./operations";
+export {
+    encodeOperation,
+    getIxOperationDescriptor,
+    isValidOperation,
+    listIxOperationDescriptors,
+    transformPayload,
+    validateOperation,
+    type IxOperationDescriptor,
+} from "./operations";
 export { defineReadOnly } from "./properties";
 export type {
     ConsensusPreference,
