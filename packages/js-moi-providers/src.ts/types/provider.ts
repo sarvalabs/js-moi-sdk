@@ -6,7 +6,7 @@ export type SelectFromResponseModifier<TObject extends Record<string, any>, TMod
             ? TObject[E]
             : TModifier extends { modifier: IncludeModifier<infer E> }
             ? Pick<TObject, E>
-            : unknown
+            : TObject
         : TObject
     : TObject;
 

@@ -3,7 +3,7 @@ export type SelectFromResponseModifier<TObject extends Record<string, any>, TMod
     modifier: ExtractModifier<infer E>;
 } ? TObject[E] : TModifier extends {
     modifier: IncludeModifier<infer E>;
-} ? Pick<TObject, E> : unknown : TObject : TObject;
+} ? Pick<TObject, E> : TObject : TObject : TObject;
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
 /**
  * Structure for `moi.Protocol` to get network information.

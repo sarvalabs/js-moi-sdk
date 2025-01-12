@@ -7,6 +7,6 @@ export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>], any>;
 }
 export type NetworkMethod = keyof NetworkActionApi;
-export type MethodParams<T extends string> = T extends NetworkMethod ? NetworkActionApi[T]["params"] : any[];
+export type MethodParams<T extends NetworkMethod> = NetworkMethod extends T ? NetworkActionApi[T]["params"] : any[];
 export type MethodResponse<T extends string> = T extends NetworkMethod ? NetworkActionApi[T]["response"] : any;
 //# sourceMappingURL=moi-execution-api.d.ts.map
