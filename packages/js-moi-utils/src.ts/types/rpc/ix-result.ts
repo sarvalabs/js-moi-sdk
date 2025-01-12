@@ -18,6 +18,8 @@ export type LogicDeployResult = Pick<LogicResult, "logic_id"> | Pick<LogicResult
 
 export type AssetSupplyResult = null;
 
+export type NoOperationResult = null;
+
 export type OperationResult<TOpType extends OpType> = TOpType extends OpType.AssetCreate
     ? AssetCreateResult
     : TOpType extends OpType.AssetBurn | OpType.AssetMint
@@ -26,4 +28,6 @@ export type OperationResult<TOpType extends OpType> = TOpType extends OpType.Ass
     ? LogicDeployResult
     : TOpType extends OpType.LogicInvoke | OpType.LogicEnlist
     ? LogicActionResult
-    : null;
+    : TOpType extends OpType.ParticipantCreate | OpType.AssetTransfer
+    ? NoOperationResult
+    : unknown;
