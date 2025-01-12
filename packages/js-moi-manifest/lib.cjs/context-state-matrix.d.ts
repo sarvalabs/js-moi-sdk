@@ -1,4 +1,4 @@
-import type { LogicManifest } from "../types/manifest";
+import { LogicState, type LogicElement } from "js-moi-utils";
 export declare enum ContextStateKind {
     PersistentState = 0,
     EphemeralState = 1
@@ -10,7 +10,7 @@ export declare enum ContextStateKind {
  */
 export declare class ContextStateMatrix {
     private matrix;
-    constructor(elements: LogicManifest.Element[]);
+    constructor(elements: LogicElement[]);
     /**
      * Checks if the matrix contains the pointer for persistent state.
      *
@@ -26,9 +26,9 @@ export declare class ContextStateMatrix {
     /**
      * Retrieves the element pointer for the specified context state kind.
      *
-     * @param {ContextStateKind} key - The context state kind.
+     * @param key - The context state kind.
      * @returns {number | undefined} The element pointer if found, otherwise undefined.
      */
-    get(key: ContextStateKind): number | undefined;
+    get(key: LogicState): number | undefined;
 }
 //# sourceMappingURL=context-state-matrix.d.ts.map

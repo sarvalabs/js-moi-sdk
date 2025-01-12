@@ -1,5 +1,4 @@
-import { type Hex } from "js-moi-utils";
-import { LogicManifest } from "../types/manifest";
+import { type Hex, type LogicManifest } from "js-moi-utils";
 import { Exception } from "../types/response";
 import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
 /**
@@ -18,7 +17,7 @@ export declare class ManifestCoder {
      * @param {LogicManifest.Manifest} manifest - The logic manifest.
      * @constructor
      */
-    constructor(manifest: LogicManifest.Manifest);
+    constructor(manifest: LogicManifest);
     private get schema();
     /**
      * Parses the calldata arguments based on the provided POLO Schema.

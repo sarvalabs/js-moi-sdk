@@ -72,11 +72,11 @@ export var LogicState;
     LogicState["Persistent"] = "persistent";
     LogicState["Ephemeral"] = "ephemeral";
 })(LogicState || (LogicState = {}));
-export var CallsiteKind;
-(function (CallsiteKind) {
-    CallsiteKind["Invoke"] = "invoke";
-    CallsiteKind["Deploy"] = "deploy";
-})(CallsiteKind || (CallsiteKind = {}));
+export var RoutineType;
+(function (RoutineType) {
+    RoutineType["Invoke"] = "invoke";
+    RoutineType["Deploy"] = "deploy";
+})(RoutineType || (RoutineType = {}));
 export var ElementType;
 (function (ElementType) {
     ElementType["Constant"] = "constant";

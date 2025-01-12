@@ -40,11 +40,11 @@ class ManifestCoder {
     parseCalldata(schema, arg, updateType = true) {
         const parsableKinds = ["bytes", "array", "map", "struct"];
         const reconstructSchema = (schema) => {
-            Object.keys(schema.fields).forEach((key) => {
-                if (schema.fields[key].kind === "struct") {
+            for (const key in schema.fields ?? {}) {
+                if (schema.fields?.[key].kind === "struct") {
                     schema.fields[key].kind = "document";
                 }
-            });
+            }
             return schema;
         };
         const parseArray = (schema, arg) => {
@@ -56,12 +56,17 @@ class ManifestCoder {
             // Loop through the entries of the Map
             entries.forEach((entry, index) => {
                 const [key, value] = entry;
-                map.set(this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index), this.parseCalldata(schema.fields.values, value, entries.length - 1 === index));
+                if (schema.fields) {
+                    map.set(this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index), this.parseCalldata(schema.fields.values, value, entries.length - 1 === index));
+                }
             });
             return map;
         };
         const parseStruct = (schema, arg, updateType) => {
             Object.keys(arg).forEach((key) => {
+                if (schema.fields?.[key] == null) {
+                    return;
+                }
                 arg[key] = this.parseCalldata(schema.fields[key], arg[key], false);
             });
             const doc = (0, js_polo_1.documentEncode)(arg, reconstructSchema((0, js_moi_utils_1.deepCopy)(schema)));
@@ -80,12 +85,12 @@ class ManifestCoder {
                 }
                 break;
             case "array":
-                if (parsableKinds.includes(schema.fields.values.kind)) {
-                    return parseArray(schema.fields.values, arg);
+                if (parsableKinds.includes(schema.fields?.values.kind)) {
+                    return parseArray(schema.fields?.values, arg);
                 }
                 break;
             case "map":
-                if (parsableKinds.includes(schema.fields.keys.kind) || parsableKinds.includes(schema.fields.values.kind)) {
+                if (parsableKinds.includes(schema.fields?.keys.kind) || parsableKinds.includes(schema.fields?.values.kind)) {
                     return parseMap(schema, arg);
                 }
                 break;

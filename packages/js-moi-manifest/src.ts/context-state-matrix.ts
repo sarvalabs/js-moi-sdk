@@ -1,4 +1,4 @@
-import type { LogicManifest } from "../types/manifest";
+import { ElementType, LogicState, type LogicElement } from "js-moi-utils";
 
 export enum ContextStateKind {
     PersistentState,
@@ -13,27 +13,10 @@ type ElementPtr = number;
  ephemeral) and their element pointers.
  */
 export class ContextStateMatrix {
-    private matrix: Map<ContextStateKind, ElementPtr>;
+    private matrix: Map<LogicState, ElementPtr>;
 
-    constructor(elements: LogicManifest.Element[]) {
-        this.matrix = new Map();
-        const stateElements = elements.filter((element) => element.kind === "state");
-
-        for (let i = 0; i < stateElements.length; i++) {
-            const stateElement = stateElements[i];
-            stateElement.data = stateElement.data as LogicManifest.State;
-
-            switch (stateElement.data.mode) {
-                case "persistent":
-                    this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
-                    break;
-                case "ephemeral":
-                    this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
-                    break;
-                default:
-                    break;
-            }
-        }
+    constructor(elements: LogicElement[]) {
+        this.matrix = new Map(elements.filter((elm) => elm.kind === ElementType.State).map((element) => [element.data.mode, element.ptr]));
     }
 
     /**
@@ -42,7 +25,7 @@ export class ContextStateMatrix {
      * @returns {boolean} A boolean indicating if persistent state is present.
      */
     public persistent(): boolean {
-        return this.matrix.has(ContextStateKind.PersistentState);
+        return this.matrix.has(LogicState.Persistent);
     }
 
     /**
@@ -51,16 +34,16 @@ export class ContextStateMatrix {
      * @returns {boolean} A boolean indicating if ephemeral state is present.
      */
     public ephemeral(): boolean {
-        return this.matrix.has(ContextStateKind.EphemeralState);
+        return this.matrix.has(LogicState.Ephemeral);
     }
 
     /**
      * Retrieves the element pointer for the specified context state kind.
      *
-     * @param {ContextStateKind} key - The context state kind.
+     * @param key - The context state kind.
      * @returns {number | undefined} The element pointer if found, otherwise undefined.
      */
-    public get(key: ContextStateKind): number | undefined {
+    public get(key: LogicState): number | undefined {
         return this.matrix.get(key);
     }
 }

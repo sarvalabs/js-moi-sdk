@@ -1,3 +1,4 @@
+import { ElementType, LogicState } from "js-moi-utils";
 export var ContextStateKind;
 (function (ContextStateKind) {
     ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
@@ -11,22 +12,7 @@ export var ContextStateKind;
 export class ContextStateMatrix {
     matrix;
     constructor(elements) {
-        this.matrix = new Map();
-        const stateElements = elements.filter((element) => element.kind === "state");
-        for (let i = 0; i < stateElements.length; i++) {
-            const stateElement = stateElements[i];
-            stateElement.data = stateElement.data;
-            switch (stateElement.data.mode) {
-                case "persistent":
-                    this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
-                    break;
-                case "ephemeral":
-                    this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
-                    break;
-                default:
-                    break;
-            }
-        }
+        this.matrix = new Map(elements.filter((elm) => elm.kind === ElementType.State).map((element) => [element.data.mode, element.ptr]));
     }
     /**
      * Checks if the matrix contains the pointer for persistent state.
@@ -34,7 +20,7 @@ export class ContextStateMatrix {
      * @returns {boolean} A boolean indicating if persistent state is present.
      */
     persistent() {
-        return this.matrix.has(ContextStateKind.PersistentState);
+        return this.matrix.has(LogicState.Persistent);
     }
     /**
      * Checks if the matrix contains the pointer for ephemeral state.
@@ -42,12 +28,12 @@ export class ContextStateMatrix {
      * @returns {boolean} A boolean indicating if ephemeral state is present.
      */
     ephemeral() {
-        return this.matrix.has(ContextStateKind.EphemeralState);
+        return this.matrix.has(LogicState.Ephemeral);
     }
     /**
      * Retrieves the element pointer for the specified context state kind.
      *
-     * @param {ContextStateKind} key - The context state kind.
+     * @param key - The context state kind.
      * @returns {number | undefined} The element pointer if found, otherwise undefined.
      */
     get(key) {

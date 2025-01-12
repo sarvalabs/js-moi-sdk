@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContextStateMatrix = exports.ContextStateKind = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 var ContextStateKind;
 (function (ContextStateKind) {
     ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
@@ -14,22 +15,7 @@ var ContextStateKind;
 class ContextStateMatrix {
     matrix;
     constructor(elements) {
-        this.matrix = new Map();
-        const stateElements = elements.filter((element) => element.kind === "state");
-        for (let i = 0; i < stateElements.length; i++) {
-            const stateElement = stateElements[i];
-            stateElement.data = stateElement.data;
-            switch (stateElement.data.mode) {
-                case "persistent":
-                    this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
-                    break;
-                case "ephemeral":
-                    this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
-                    break;
-                default:
-                    break;
-            }
-        }
+        this.matrix = new Map(elements.filter((elm) => elm.kind === js_moi_utils_1.ElementType.State).map((element) => [element.data.mode, element.ptr]));
     }
     /**
      * Checks if the matrix contains the pointer for persistent state.
@@ -37,7 +23,7 @@ class ContextStateMatrix {
      * @returns {boolean} A boolean indicating if persistent state is present.
      */
     persistent() {
-        return this.matrix.has(ContextStateKind.PersistentState);
+        return this.matrix.has(js_moi_utils_1.LogicState.Persistent);
     }
     /**
      * Checks if the matrix contains the pointer for ephemeral state.
@@ -45,12 +31,12 @@ class ContextStateMatrix {
      * @returns {boolean} A boolean indicating if ephemeral state is present.
      */
     ephemeral() {
-        return this.matrix.has(ContextStateKind.EphemeralState);
+        return this.matrix.has(js_moi_utils_1.LogicState.Ephemeral);
     }
     /**
      * Retrieves the element pointer for the specified context state kind.
      *
-     * @param {ContextStateKind} key - The context state kind.
+     * @param key - The context state kind.
      * @returns {number | undefined} The element pointer if found, otherwise undefined.
      */
     get(key) {

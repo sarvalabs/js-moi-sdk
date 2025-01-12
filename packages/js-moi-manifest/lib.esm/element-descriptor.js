@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils } from "js-moi-utils";
 import { ContextStateMatrix } from "./context-state-matrix";
 /**
  * This class represents a descriptor for elements in the logic manifest.
@@ -16,29 +16,26 @@ export class ElementDescriptor {
         for (const element of elements) {
             this.elements.set(element.ptr, element);
             switch (element.kind) {
-                case "class":
-                    const classData = element.data;
-                    this.classDefs.set("class." + classData.name, element.ptr);
+                case ElementType.Class:
+                    this.classDefs.set("class." + element.data.name, element.ptr);
                     break;
-                case "method":
-                    const methodData = element.data;
-                    const methodDef = {
+                case ElementType.Method:
+                    this.methodDefs.set(element.data.name, {
                         ptr: element.ptr,
-                        class: methodData.class,
-                    };
-                    this.methodDefs.set(methodData.name, methodDef);
+                        class: element.data.class,
+                    });
                     break;
-                case "routine":
-                    const routineData = element.data;
-                    const callsite = {
+                case ElementType.Routine:
+                    this.callSites.set(element.data.name, {
                         ptr: element.ptr,
-                        kind: routineData.kind,
-                    };
-                    this.callSites.set(routineData.name, callsite);
+                        kind: element.data.kind,
+                    });
                     break;
                 case "event":
-                    const eventData = element.data;
-                    this.eventsDefs.set(eventData.name, { ptr: element.ptr, topics: eventData.topics });
+                    this.eventsDefs.set(element.data.name, {
+                        ptr: element.ptr,
+                        topics: element.data.topics,
+                    });
                     break;
                 default:
                     break;
@@ -104,6 +101,9 @@ export class ElementDescriptor {
         this.methodDefs.forEach((method, methodName) => {
             if (method.class === className) {
                 const element = this.elements.get(method.ptr);
+                if (element == null || element.kind !== ElementType.Method) {
+                    return;
+                }
                 classMethods.set(methodName, element.data);
             }
         });
@@ -114,15 +114,19 @@ export class ElementDescriptor {
      * routine name.
      *
      * @param {string} routineName - The name of the routine.
-     * @returns {LogicManifest.Element} The routine element.
+     * @returns The routine element.
      * @throws {Error} if the routine name is invalid.
      */
     getRoutineElement(routineName) {
         const callsite = this.callSites.get(routineName);
         if (!callsite) {
+            ErrorUtils.throwError(`Invalid routine name: ${routineName}`, ErrorCode.INVALID_ARGUMENT);
+        }
+        const element = this.elements.get(callsite.ptr);
+        if (element == null || element.kind !== ElementType.Routine) {
             return ErrorUtils.throwError(`Invalid routine name: ${routineName}`, ErrorCode.INVALID_ARGUMENT);
         }
-        return this.elements.get(callsite.ptr);
+        return element;
     }
     /**
      * Retrieves the element from the logic manifest based on the given
@@ -136,7 +140,11 @@ export class ElementDescriptor {
         if (ptr === undefined) {
             return ErrorUtils.throwError(`Invalid routine name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
-        return this.elements.get(ptr);
+        const element = this.elements.get(ptr);
+        if (element == null || element.kind !== ElementType.Class) {
+            return ErrorUtils.throwError(`Invalid routine name: ${className}`, ErrorCode.INVALID_ARGUMENT);
+        }
+        return element;
     }
     /**
      * Retrieves the element from the logic manifest based on the given
@@ -149,9 +157,13 @@ export class ElementDescriptor {
     getMethodElement(methodName) {
         const methodDef = this.methodDefs.get(methodName);
         if (!methodDef) {
-            return ErrorUtils.throwError(`Invalid routine name: ${methodName}`, ErrorCode.INVALID_ARGUMENT);
+            return ErrorUtils.throwError(`Invalid method name: ${methodName}`, ErrorCode.INVALID_ARGUMENT);
         }
-        return this.elements.get(methodDef.ptr);
+        const element = this.elements.get(methodDef.ptr);
+        if (element == null || element.kind !== ElementType.Method) {
+            return ErrorUtils.throwError(`Invalid method name: ${methodName}`, ErrorCode.INVALID_ARGUMENT);
+        }
+        return element;
     }
     /**
      * Retrieves the element from the logic manifest based on the given
@@ -167,7 +179,11 @@ export class ElementDescriptor {
         if (!eventDef) {
             return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);
         }
-        return this.elements.get(eventDef.ptr);
+        const element = this.elements.get(eventDef.ptr);
+        if (element == null || element.kind !== ElementType.Event) {
+            return ErrorUtils.throwError(`Invalid event name: ${eventName}`, ErrorCode.INVALID_ARGUMENT);
+        }
+        return element;
     }
 }
 //# sourceMappingURL=element-descriptor.js.map

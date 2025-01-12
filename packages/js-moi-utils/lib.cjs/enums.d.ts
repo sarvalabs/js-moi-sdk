@@ -64,7 +64,7 @@ export declare enum LogicState {
     Persistent = "persistent",
     Ephemeral = "ephemeral"
 }
-export declare enum CallsiteKind {
+export declare enum RoutineType {
     Invoke = "invoke",
     Deploy = "deploy"
 }

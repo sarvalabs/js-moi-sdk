@@ -1,11 +1,12 @@
-import { ContextStateKind, LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
+import { LogicState } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
 
 export enum EngineKind {
     PISA = "PISA",
-    MERU = "MERU"
+    MERU = "MERU",
 }
 
 /**
@@ -21,7 +22,7 @@ export abstract class LogicDescriptor extends LogicBase {
     protected assetLogic: boolean;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
-        super(manifest, signer)
+        super(manifest, signer);
         this.logicId = new LogicId(logicId);
         this.manifest = manifest;
         this.encodedManifest = ManifestCoder.encodeManifest(this.manifest);
@@ -32,7 +33,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Returns the logic id of the logic.
-     * 
+     *
      * @returns {string} The logic id.
      */
     public getLogicId(): LogicId {
@@ -41,7 +42,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Returns the logic execution engine type.
-     * 
+     *
      * @returns {EngineKind} The engine type.
      */
     public getEngine(): EngineKind {
@@ -50,7 +51,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Returns the logic manifest.
-     * 
+     *
      * @returns {LogicManifest.Manifest} The logic manifest.
      */
     public getManifest(): LogicManifest.Manifest {
@@ -59,7 +60,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Returns the POLO encoded logic manifest.
-     * 
+     *
      * @returns {string} The POLO encoded logic manifest.
      */
     public getEncodedManifest(): string {
@@ -68,7 +69,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Checks if the logic is sealed.
-     * 
+     *
      * @returns {boolean} True if the logic is sealed, false otherwise.
      */
     public isSealed(): boolean {
@@ -77,7 +78,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Checks if the logic represents an asset logic.
-     * 
+     *
      * @returns {boolean} True if the logic is an representation of asset logic, false otherwise.
      */
     public isAssetLogic(): boolean {
@@ -86,7 +87,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Checks if the logic allows interactions.
-     * 
+     *
      * @returns {boolean} True if the logic allows interactions, false otherwise.
      */
     public allowsInteractions(): boolean {
@@ -95,7 +96,7 @@ export abstract class LogicDescriptor extends LogicBase {
 
     /**
      * Checks if the logic is stateful.
-     * 
+     *
      * @returns {boolean} True if the logic is stateful, false otherwise.
      */
     public isStateful(): boolean {
@@ -110,9 +111,9 @@ export abstract class LogicDescriptor extends LogicBase {
      * const [ptr, exists] = logic.hasPersistentState();
      */
     public hasPersistentState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(ContextStateKind.PersistentState);
+        const ptr = this.stateMatrix.get(LogicState.Persistent);
 
-        if(ptr !== undefined) {
+        if (ptr !== undefined) {
             return [ptr, true];
         }
 
@@ -122,14 +123,14 @@ export abstract class LogicDescriptor extends LogicBase {
     /**
      * Checks if the logic has ephemeral state.
      * @returns A tuple containing the pointer to the ephemeral state and a flag indicating if it exists.
-     * 
+     *
      * @example
      * const [ptr, exists] = logic.hasEphemeralState();
      */
     public hasEphemeralState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(ContextStateKind.EphemeralState);
-        
-        if(ptr !== undefined) {
+        const ptr = this.stateMatrix.get(LogicState.Ephemeral);
+
+        if (ptr !== undefined) {
             return [ptr, true];
         }
 

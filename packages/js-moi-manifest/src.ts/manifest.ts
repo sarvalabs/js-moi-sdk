@@ -1,6 +1,5 @@
-import { builtInLogEventSchema, bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix, type Hex } from "js-moi-utils";
+import { builtInLogEventSchema, bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix, type Hex, type LogicManifest } from "js-moi-utils";
 import { Depolorizer, documentEncode, Schema as PoloSchema } from "js-polo";
-import { LogicManifest } from "../types/manifest";
 import { Exception } from "../types/response";
 import { ElementDescriptor } from "./element-descriptor";
 import { JsonManifestCoder } from "./manifest-coder/json-manifest-coder";
@@ -25,11 +24,11 @@ export class ManifestCoder {
      * @param {LogicManifest.Manifest} manifest - The logic manifest.
      * @constructor
      */
-    constructor(manifest: LogicManifest.Manifest);
+    constructor(manifest: LogicManifest);
     /**
      * Creates an instance of ManifestCoder.
      */
-    constructor(manifest: LogicManifest.Manifest) {
+    constructor(manifest: LogicManifest) {
         this.elementDescriptor = new ElementDescriptor(manifest.elements);
     }
 
@@ -51,11 +50,11 @@ export class ManifestCoder {
         const parsableKinds = ["bytes", "array", "map", "struct"];
 
         const reconstructSchema = (schema: PoloSchema): PoloSchema => {
-            Object.keys(schema.fields).forEach((key) => {
-                if (schema.fields[key].kind === "struct") {
+            for (const key in schema.fields ?? {}) {
+                if (schema.fields?.[key].kind === "struct") {
                     schema.fields[key].kind = "document";
                 }
-            });
+            }
 
             return schema;
         };
@@ -72,10 +71,12 @@ export class ManifestCoder {
             entries.forEach((entry: [any, any], index: number) => {
                 const [key, value] = entry;
 
-                map.set(
-                    this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index),
-                    this.parseCalldata(schema.fields.values, value, entries.length - 1 === index)
-                );
+                if (schema.fields) {
+                    map.set(
+                        this.parseCalldata(schema.fields.keys, key, entries.length - 1 === index),
+                        this.parseCalldata(schema.fields.values, value, entries.length - 1 === index)
+                    );
+                }
             });
 
             return map;
@@ -83,6 +84,9 @@ export class ManifestCoder {
 
         const parseStruct = (schema: PoloSchema, arg: any, updateType: boolean) => {
             Object.keys(arg).forEach((key) => {
+                if (schema.fields?.[key] == null) {
+                    return;
+                }
                 arg[key] = this.parseCalldata(schema.fields[key], arg[key], false);
             });
 
@@ -107,13 +111,13 @@ export class ManifestCoder {
                 break;
 
             case "array":
-                if (parsableKinds.includes(schema.fields.values.kind)) {
-                    return parseArray(schema.fields.values, arg);
+                if (parsableKinds.includes(schema.fields?.values.kind)) {
+                    return parseArray(schema.fields?.values, arg);
                 }
                 break;
 
             case "map":
-                if (parsableKinds.includes(schema.fields.keys.kind) || parsableKinds.includes(schema.fields.values.kind)) {
+                if (parsableKinds.includes(schema.fields?.keys.kind) || parsableKinds.includes(schema.fields?.values.kind)) {
                     return parseMap(schema, arg);
                 }
                 break;
