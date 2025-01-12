@@ -18,7 +18,7 @@ import {
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Tesseract } from "../types/moi-rpc-method";
-import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, Simulate, SimulateOption } from "../types/Provider";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, Simulate, SimulateOption } from "../types/provider";
 import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
