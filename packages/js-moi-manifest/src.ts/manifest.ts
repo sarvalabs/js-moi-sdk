@@ -140,10 +140,13 @@ export class ManifestCoder {
      * @returns A hexadecimal string representing the encoded arguments.
      */
     public encodeArguments(routine: string, ...args: any[]): Hex {
-        const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine;
+        const element = this.elementDescriptor.getRoutineElement(routine).data;
         const schema = this.schema.parseFields(element.accepts ?? []);
-        const calldata = Object.values(element.accepts).reduce((acc, field: LogicManifest.TypeField) => {
-            acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+        const calldata = Object.values(element.accepts).reduce((acc, field) => {
+            if (schema.fields) {
+                acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+            }
+
             return acc;
         }, {});
 
@@ -159,15 +162,15 @@ export class ManifestCoder {
      * @returns {T | null} - The decoded arguments as an object of type T, or null if the routine accepts no arguments.
      */
     public decodeArguments<T>(routine: string, calldata: string): T | null {
-        const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine;
+        const element = this.elementDescriptor.getRoutineElement(routine).data;
 
         if (element && element.accepts.length === 0) {
             return null;
         }
 
         const schema = this.schema.parseFields(element.accepts ?? []);
-        const decodedCalldata = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
-        return element.accepts.map((field: LogicManifest.TypeField) => decodedCalldata[field.label]) as T;
+        const decodedCalldata: any = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
+        return element.accepts.map((field) => decodedCalldata[field.label]) as T;
     }
 
     /**
@@ -179,7 +182,7 @@ export class ManifestCoder {
      * @returns {T | null} - The decoded output as type T, or null if the output is invalid or the routine has no return schema.
      */
     public decodeOutput<T>(routine: string, output: string): T | null {
-        const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine;
+        const element = this.elementDescriptor.getRoutineElement(routine).data;
 
         if (output && output != "0x" && element.returns && element.returns.length) {
             const schema = this.schema.parseFields(element.returns);
@@ -263,7 +266,7 @@ export class ManifestCoder {
      * @returns The encoded manifest as a hexadecimal string prefixed with "0x".
      * @throws Will throw an error if the manifest type is unsupported.
      */
-    public static encodeManifest(manifest: string | LogicManifest.Manifest): Hex {
+    public static encodeManifest(manifest: string | LogicManifest): Hex {
         if (typeof manifest === "object" && manifest !== null) {
             const serializer = new JsonManifestCoder();
             return bytesToHex(serializer.encode(manifest));
@@ -309,7 +312,7 @@ export class ManifestCoder {
      *
      * @throws {Error} - Throws an error if the format is unsupported.
      */
-    public static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat): LogicManifest.Manifest | string {
+    public static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat): LogicManifest | string {
         if (format === ManifestCoderFormat.JSON) {
             const serializer = new JsonManifestCoder();
             return serializer.decode(manifest);
