@@ -243,7 +243,7 @@ export const validateIxRequest = (ix: InteractionRequest): ReturnType<typeof cre
         return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
     }
 
-    if (ix.fuel_limit < 0) {
+    if (ix.fuel_limit <= 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
 

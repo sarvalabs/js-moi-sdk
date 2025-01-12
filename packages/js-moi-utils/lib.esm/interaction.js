@@ -210,7 +210,7 @@ export const validateIxRequest = (ix) => {
     if (ix.fuel_price < 0) {
         return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
     }
-    if (ix.fuel_limit < 0) {
+    if (ix.fuel_limit <= 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
     if (ix.payer != null && !isValidAddress(ix.payer)) {

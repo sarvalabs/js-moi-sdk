@@ -68,7 +68,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
             case typeof ix === "object": {
                 const result = (0, js_moi_utils_1.validateIxRequest)(ix);
                 if (result != null) {
-                    js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: Reason ${result}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, result);
+                    js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, { ...result });
                 }
                 encodedIxArgs = (0, js_moi_utils_1.bytesToHex)((0, js_moi_utils_1.interaction)(ix));
                 break;

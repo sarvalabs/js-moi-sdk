@@ -95,7 +95,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
                 const result = validateIxRequest(ix);
 
                 if (result != null) {
-                    ErrorUtils.throwError(`Invalid interaction request: Reason ${result}`, ErrorCode.INVALID_ARGUMENT, result);
+                    ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, ErrorCode.INVALID_ARGUMENT, { ...result });
                 }
 
                 encodedIxArgs = bytesToHex(interaction(<InteractionRequest>ix));

@@ -59,5 +59,5 @@ export type {
     TesseractReference,
     TesseractReferenceParam,
 } from "./types/rpc/common-entities";
-export type { NetworkInfo, Simulate } from "./types/rpc/responses";
+export type { NetworkInfo, Simulate, SimulationEffects, SimulationResult } from "./types/rpc/responses";
 export type { Transport } from "./types/transport";
