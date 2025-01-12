@@ -1,9 +1,4 @@
 import { ElementType, LogicState } from "js-moi-utils";
-export var ContextStateKind;
-(function (ContextStateKind) {
-    ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
-    ContextStateKind[ContextStateKind["EphemeralState"] = 1] = "EphemeralState";
-})(ContextStateKind || (ContextStateKind = {}));
 /**
  * Represents a matrix of context states defined in the logic manifest.
  * The matrix stores the mapping between context state kinds (persistent and

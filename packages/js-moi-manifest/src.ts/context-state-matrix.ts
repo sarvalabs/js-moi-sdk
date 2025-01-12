@@ -1,10 +1,5 @@
 import { ElementType, LogicState, type LogicElement } from "js-moi-utils";
 
-export enum ContextStateKind {
-    PersistentState,
-    EphemeralState,
-}
-
 type ElementPtr = number;
 
 /**

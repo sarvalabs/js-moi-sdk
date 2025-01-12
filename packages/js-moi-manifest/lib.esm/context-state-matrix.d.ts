@@ -1,8 +1,4 @@
 import { LogicState, type LogicElement } from "js-moi-utils";
-export declare enum ContextStateKind {
-    PersistentState = 0,
-    EphemeralState = 1
-}
 /**
  * Represents a matrix of context states defined in the logic manifest.
  * The matrix stores the mapping between context state kinds (persistent and

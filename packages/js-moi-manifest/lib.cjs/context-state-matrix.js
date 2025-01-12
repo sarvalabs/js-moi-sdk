@@ -1,12 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContextStateMatrix = exports.ContextStateKind = void 0;
+exports.ContextStateMatrix = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-var ContextStateKind;
-(function (ContextStateKind) {
-    ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
-    ContextStateKind[ContextStateKind["EphemeralState"] = 1] = "EphemeralState";
-})(ContextStateKind || (exports.ContextStateKind = ContextStateKind = {}));
 /**
  * Represents a matrix of context states defined in the logic manifest.
  * The matrix stores the mapping between context state kinds (persistent and
