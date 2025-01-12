@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, encodeOperationPayload, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOperation } from "../src.ts";
+import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOperation } from "../src.ts";
 
 interface TestCase {
     name: string;
@@ -6,7 +6,7 @@ interface TestCase {
     expected: string;
 }
 
-describe(encodeOperationPayload, () => {
+describe(encodeOperation, () => {
     const tests: TestCase[] = [
         {
             name: "should serialize a asset create operation payload",
@@ -143,8 +143,8 @@ describe(encodeOperationPayload, () => {
 
     for (const test of tests) {
         it(test.name, () => {
-            const serialized = encodeOperationPayload(test.operation);
-            expect(bytesToHex(serialized)).toEqual(test.expected);
+            const { payload } = encodeOperation(test.operation);
+            expect(bytesToHex(payload)).toEqual(test.expected);
         });
     }
 
@@ -154,7 +154,7 @@ describe(encodeOperationPayload, () => {
             payload: {},
         };
 
-        expect(() => encodeOperationPayload(operation as IxOperation)).toThrow();
+        expect(() => encodeOperation(operation as IxOperation)).toThrow();
     });
 });
 

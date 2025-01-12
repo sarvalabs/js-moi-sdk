@@ -1,17 +1,16 @@
-import { type LogicManifest } from "../lib.cjs";
+import type { LogicManifest } from "js-moi-utils";
 import { ManifestCoder } from "../src.ts/manifest";
 import { ManifestCoderFormat } from "../src.ts/manifest-coder/serialization-format";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
 describe("Test ManifestCoder", () => {
-    let manifest: LogicManifest.Manifest;
+    let manifest: LogicManifest;
     let manifestCoder: ManifestCoder;
 
     beforeAll(async () => {
-        manifest = await loadManifestFromFile("../../manifests/tokenledger.json") as LogicManifest.Manifest
+        manifest = (await loadManifestFromFile("../../manifests/tokenledger.json")) as LogicManifest;
         manifestCoder = new ManifestCoder(manifest);
     });
-
 
     test("Encode ABI/Manifest into polo format", async () => {
         const testcases = [
@@ -30,19 +29,17 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/lock-ledger.json",
                 expected: "../../manifests/lock-ledger.polo",
-            }
-        ]
+            },
+        ];
 
+        await Promise.all(
+            testcases.map(async (testCase) => {
+                const [manifest, expected] = await Promise.all([loadManifestFromFile(testCase.manifest), loadFile(testCase.expected)]);
+                const polo = ManifestCoder.encodeManifest(manifest);
 
-        await Promise.all(testcases.map(async (testCase) => {
-            const [manifest, expected] = await Promise.all([
-                loadManifestFromFile(testCase.manifest),
-                loadFile(testCase.expected),
-            ]);
-            const polo = ManifestCoder.encodeManifest(manifest);
-
-            expect(polo).toBe(expected);
-        }));
+                expect(polo).toBe(expected);
+            })
+        );
     });
 
     describe("Encode arguments into polo format", () => {
@@ -64,7 +61,6 @@ describe("Test ManifestCoder", () => {
                     expect(decoded[i]).toEqual(args[i]);
                 }
             }
-
         });
     });
 
@@ -94,30 +90,30 @@ describe("Test ManifestCoder", () => {
     });
 
     test("Decode polo encoded event log", () => {
-      const testTable = [
-        {
-          event: "builtin.Log",
-          log: "0x0d2f065576616c756506736565646564206239306633396663663334366261333236303531383636393439356635643336386138643162623830323335383466363765386135363731636633633536636520776974682031303030303030302044554d4d",
-          expected: {
-            value: expect.any(String),
-          },
-        },
-        {
-            event: "Transfer",
-            log: "0x0daf010665860185029606f506616d6f756e740364726563656976657206190f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce73656e64657206b90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce",
-            expected: {
-              amount: expect.any(Number),
-              receiver: expect.any(Uint8Array),
-              sender: expect.any(Uint8Array),
+        const testTable = [
+            {
+                event: "builtin.Log",
+                log: "0x0d2f065576616c756506736565646564206239306633396663663334366261333236303531383636393439356635643336386138643162623830323335383466363765386135363731636633633536636520776974682031303030303030302044554d4d",
+                expected: {
+                    value: expect.any(String),
+                },
             },
-          },
-      ];
+            {
+                event: "Transfer",
+                log: "0x0daf010665860185029606f506616d6f756e740364726563656976657206190f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce73656e64657206b90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce",
+                expected: {
+                    amount: expect.any(Number),
+                    receiver: expect.any(Uint8Array),
+                    sender: expect.any(Uint8Array),
+                },
+            },
+        ];
 
-      for (const test of testTable) {
-        const decoded = manifestCoder.decodeEventOutput(test.event, test.log);
-        expect(decoded).not.toBeNull();
-        expect(decoded).toEqual(test.expected);
-      }
+        for (const test of testTable) {
+            const decoded = manifestCoder.decodeEventOutput(test.event, test.log);
+            expect(decoded).not.toBeNull();
+            expect(decoded).toEqual(test.expected);
+        }
     });
 
     test("Decode polo-encoded manifest", async () => {
@@ -137,18 +133,17 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/lock-ledger.polo",
                 expected: "../../manifests/lock-ledger.json",
-            }
+            },
         ];
 
-        await Promise.all(testCases.map(async (testCase) => {
-            const [polo, expected] = await Promise.all([
-                loadFile(testCase.manifest),
-                loadManifestFromFile(testCase.expected),
-            ]);
+        await Promise.all(
+            testCases.map(async (testCase) => {
+                const [polo, expected] = await Promise.all([loadFile(testCase.manifest), loadManifestFromFile(testCase.expected)]);
 
-            const manifest = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.JSON);
-            expect(manifest).toEqual(expected);
-        }));
+                const manifest = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.JSON);
+                expect(manifest).toEqual(expected);
+            })
+        );
     });
 
     test("Encoding JSON into YAML", async () => {
@@ -168,15 +163,17 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/lock-ledger.polo",
                 expected: "../../manifests/lock-ledger.json",
-            }
+            },
         ];
 
-        await Promise.all(testCases.map(async (testCase) => {
-            const polo= await loadFile(testCase.manifest)
-            const yaml = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML);
-            
-            expect(ManifestCoder.encodeManifest(yaml)).toBe(polo);
-            expect(ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML)).toEqual(yaml);
-        }));
+        await Promise.all(
+            testCases.map(async (testCase) => {
+                const polo = await loadFile(testCase.manifest);
+                const yaml = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML);
+
+                expect(ManifestCoder.encodeManifest(yaml)).toBe(polo);
+                expect(ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML)).toEqual(yaml);
+            })
+        );
     });
 });
