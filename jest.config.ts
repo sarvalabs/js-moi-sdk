@@ -2,23 +2,23 @@ import { Config } from "jest";
 
 const configuration: Config = {
     projects: [
-        // {
-        //     displayName: "js-moi-bip39",
-        //     testEnvironment: "ts-node",
-        //     testMatch: ["<rootDir>/packages/js-moi-bip39/__tests__/*.test.ts"],
-        //     transform: {
-        //         "^.+\\.tsx?$": "ts-jest",
-        //     },
-        //     moduleFileExtensions: ["js", "ts", "d.ts"],
-        // },
-        // {
-        //     displayName: "js-moi-hdnode",
-        //     testEnvironment: "ts-node",
-        //     testMatch: ["<rootDir>/packages/js-moi-hdnode/__tests__/*.test.ts"],
-        //     transform: {
-        //         "^.+\\.tsx?$": "ts-jest",
-        //     },
-        // },
+        {
+            displayName: "js-moi-bip39",
+            testEnvironment: "ts-node",
+            testMatch: ["<rootDir>/packages/js-moi-bip39/__tests__/*.test.ts"],
+            transform: {
+                "^.+\\.tsx?$": "ts-jest",
+            },
+            moduleFileExtensions: ["js", "ts", "d.ts"],
+        },
+        {
+            displayName: "js-moi-hdnode",
+            testEnvironment: "ts-node",
+            testMatch: ["<rootDir>/packages/js-moi-hdnode/__tests__/*.test.ts"],
+            transform: {
+                "^.+\\.tsx?$": "ts-jest",
+            },
+        },
         // {
         //     displayName: "js-moi-wallet",
         //     testEnvironment: "ts-node",
@@ -43,14 +43,14 @@ const configuration: Config = {
                 "^.+\\.tsx?$": "ts-jest",
             },
         },
-        // {
-        //     displayName: "js-moi-providers",
-        //     testEnvironment: "ts-node",
-        //     testMatch: ["<rootDir>/packages/js-moi-providers/__tests__/*.test.ts"],
-        //     transform: {
-        //         "^.+\\.tsx?$": "ts-jest",
-        //     },
-        // },
+        {
+            displayName: "js-moi-providers",
+            testEnvironment: "ts-node",
+            testMatch: ["<rootDir>/packages/js-moi-providers/__tests__/*.test.ts"],
+            transform: {
+                "^.+\\.tsx?$": "ts-jest",
+            },
+        },
         // {
         //     displayName: 'js-moi-logic',
         //     testEnvironment: 'ts-node',

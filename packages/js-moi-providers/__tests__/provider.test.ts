@@ -1,4 +1,3 @@
-import {} from "jest";
 import { AssetStandard, hexToBytes, OpType, ReceiptStatus, type Address } from "js-moi-utils";
 import { HttpProvider } from "../src.ts";
 

@@ -1,28 +1,27 @@
 /**
  * This code is based on the bitcoinjs/bip39 by Wei Lu and Danieal Cousens
- * Modifications have been made to adapt it to the needs of js-moi-bip39 
+ * Modifications have been made to adapt it to the needs of js-moi-bip39
  * including enhancements for browser compatibility and TypeScript conversion.
- * 
+ *
  * Original module available at: https://github.com/bitcoinjs/bip39
  * Modified version available at: https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-bip39
- * 
+ *
  * Copyright (c) 2014, Wei Lu <luwei.here@gmail.com> and Daniel Cousens <email@dcousens.com>
  * Repository ISC license details can be found at https://github.com/bitcoinjs/bip39/blob/master/LICENSE
- * 
+ *
  **/
-import { Buffer } from "buffer";
+import { pbkdf2, pbkdf2Async } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha256";
 import { sha512 } from "@noble/hashes/sha512";
 import { randomBytes } from "@noble/hashes/utils";
-import { pbkdf2, pbkdf2Async } from "@noble/hashes/pbkdf2";
-import { wordlists, _default } from "./_wordlists";
+import { Buffer } from "buffer";
+import { _default, wordlists } from "./_wordlists";
 
 let DEFAULT_WORDLIST = _default;
-const INVALID_MNEMONIC = 'Invalid mnemonic';
-const INVALID_ENTROPY = 'Invalid entropy';
-const INVALID_CHECKSUM = 'Invalid mnemonic checksum';
-const WORDLIST_REQUIRED = 'A wordlist is required but a default could not be found.\n' +
-    'Please pass a 2048 word array explicitly.';
+const INVALID_MNEMONIC = "Invalid mnemonic";
+const INVALID_ENTROPY = "Invalid entropy";
+const INVALID_CHECKSUM = "Invalid mnemonic checksum";
+const WORDLIST_REQUIRED = "A wordlist is required but a default could not be found.\n" + "Please pass a 2048 word array explicitly.";
 
 /**
  * Normalizes a string by converting it to Unicode Normalization Form KD (NFKD).
@@ -31,8 +30,8 @@ const WORDLIST_REQUIRED = 'A wordlist is required but a default could not be fou
  * @returns {string} The normalized string.
  */
 const normalize = (str: string): string => {
-    return (str || '').normalize('NFKD');
-}
+    return (str || "").normalize("NFKD");
+};
 
 /**
  * Left pad a string with a padString to a specific length.
@@ -47,8 +46,7 @@ const lpad = (str: string, padString: string, length: number): string => {
         str = padString + str;
     }
     return str;
-}
-
+};
 
 /**
  * Convert a binary string to a byte (number).
@@ -58,7 +56,7 @@ const lpad = (str: string, padString: string, length: number): string => {
  */
 const binaryToByte = (bin: string): number => {
     return parseInt(bin, 2);
-}
+};
 
 /**
  * Convert an array of bytes to a binary string.
@@ -67,8 +65,8 @@ const binaryToByte = (bin: string): number => {
  * @returns {string} The converted binary string.
  */
 const bytesToBinary = (bytes: number[]): string => {
-    return bytes.map((x) => lpad(x.toString(2), '0', 8)).join('');
-}
+    return bytes.map((x) => lpad(x.toString(2), "0", 8)).join("");
+};
 
 /**
  * Derive the checksum bits from an entropy buffer.
@@ -81,7 +79,7 @@ const deriveChecksumBits = (entropyBuffer: Uint8Array): string => {
     const CS = ENT / 32;
     const hash = sha256(Uint8Array.from(entropyBuffer));
     return bytesToBinary(Array.from(hash)).slice(0, CS);
-}
+};
 
 /**
  * Generate a salt for PBKDF2 using a password.
@@ -90,8 +88,8 @@ const deriveChecksumBits = (entropyBuffer: Uint8Array): string => {
  * @returns {string} The generated salt.
  */
 const salt = (password: string): string => {
-    return 'mnemonic' + (password || '');
-}
+    return "mnemonic" + (password || "");
+};
 
 /**
  * Synchronously convert a mnemonic to a seed.
@@ -101,14 +99,14 @@ const salt = (password: string): string => {
  * @returns {Buffer} The generated seed.
  */
 export const mnemonicToSeedSync = (mnemonic: string, password?: string): Buffer => {
-    const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), 'utf8'));
-    const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password as string)), 'utf8'));
+    const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), "utf8"));
+    const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password as string)), "utf8"));
     const res = pbkdf2(sha512, mnemonicBuffer, saltBuffer, {
         c: 2048,
         dkLen: 64,
     });
     return Buffer.from(res);
-}
+};
 
 /**
  * Asynchronously convert a mnemonic to a seed.
@@ -118,20 +116,20 @@ export const mnemonicToSeedSync = (mnemonic: string, password?: string): Buffer 
  * @returns {Promise<Buffer>} The generated seed.
  * @throws {Error} If an error occurs during the conversion.
  */
-export const mnemonicToSeed = async(mnemonic: string, password?: string): Promise<Buffer> => {
+export const mnemonicToSeed = async (mnemonic: string, password?: string): Promise<Buffer> => {
     try {
-        const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), 'utf8'));
-        const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password as string)), 'utf8'));
+        const mnemonicBuffer = Uint8Array.from(Buffer.from(normalize(mnemonic), "utf8"));
+        const saltBuffer = Uint8Array.from(Buffer.from(salt(normalize(password as string)), "utf8"));
         const res = await pbkdf2Async(sha512, mnemonicBuffer, saltBuffer, {
-          c: 2048,
-          dkLen: 64,
+            c: 2048,
+            dkLen: 64,
         });
-        
-        return Buffer.from(res)
-    }catch(e) {
-        throw new Error(e.message)
+
+        return Buffer.from(res);
+    } catch (e) {
+        throw new Error("Failed to generate seed from mnemonic", { cause: e });
     }
-}
+};
 
 /**
  * Convert a mnemonic to its corresponding entropy value.
@@ -147,21 +145,21 @@ export const mnemonicToEntropy = (mnemonic: string, wordlist?: string[]): string
         throw new Error(WORDLIST_REQUIRED);
     }
 
-    const words = normalize(mnemonic).split(' ');
+    const words = normalize(mnemonic).split(" ");
     if (words.length % 3 !== 0) {
         throw new Error(INVALID_MNEMONIC);
     }
 
     // convert word indices to 11 bit binary strings
     const bits = words
-    .map((word) => {
-        const index = wordlist!.indexOf(word);
-        if (index === -1) {
-            throw new Error(INVALID_MNEMONIC);
-        }
-        return lpad(index.toString(2), '0', 11);
-    })
-    .join('');
+        .map((word) => {
+            const index = wordlist!.indexOf(word);
+            if (index === -1) {
+                throw new Error(INVALID_MNEMONIC);
+            }
+            return lpad(index.toString(2), "0", 11);
+        })
+        .join("");
 
     const dividerIndex = Math.floor(bits.length / 33) * 32;
     const entropyBits = bits.slice(0, dividerIndex);
@@ -182,8 +180,8 @@ export const mnemonicToEntropy = (mnemonic: string, wordlist?: string[]): string
         throw new Error(INVALID_CHECKSUM);
     }
 
-    return entropy.toString('hex');
-}
+    return entropy.toString("hex");
+};
 
 /**
  * Convert entropy to its corresponding mnemonic.
@@ -195,7 +193,7 @@ export const mnemonicToEntropy = (mnemonic: string, wordlist?: string[]): string
  */
 export const entropyToMnemonic = (entropy: Buffer | string, wordlist?: string[]): string => {
     if (!Buffer.isBuffer(entropy)) {
-        entropy = Buffer.from(entropy, 'hex');
+        entropy = Buffer.from(entropy, "hex");
     }
 
     wordlist = wordlist || DEFAULT_WORDLIST;
@@ -221,10 +219,10 @@ export const entropyToMnemonic = (entropy: Buffer | string, wordlist?: string[])
         return wordlist![index];
     });
 
-    return wordlist![0] === '\u3042\u3044\u3053\u304f\u3057\u3093' // Japanese wordlist
-    ? words.join('\u3000')
-    : words.join(' ');
-}
+    return wordlist![0] === "\u3042\u3044\u3053\u304f\u3057\u3093" // Japanese wordlist
+        ? words.join("\u3000")
+        : words.join(" ");
+};
 
 /**
  * Generate a mnemonic phrase with the specified strength (in bits).
@@ -235,18 +233,14 @@ export const entropyToMnemonic = (entropy: Buffer | string, wordlist?: string[])
  * @returns {string} The generated mnemonic phrase.
  * @throws {TypeError} If the strength is not divisible by 32.
  */
-export const generateMnemonic = (
-    strength?: number,
-    rng?: (size: number) => Buffer,
-    wordlist?: string[]
-): string => {
+export const generateMnemonic = (strength?: number, rng?: (size: number) => Buffer, wordlist?: string[]): string => {
     strength = strength || 128;
     if (strength % 32 !== 0) {
         throw new TypeError(INVALID_ENTROPY);
     }
     rng = rng || ((size) => Buffer.from(randomBytes(size)));
     return entropyToMnemonic(rng(strength / 8), wordlist);
-}
+};
 
 /**
  * Validate a mnemonic phrase.
@@ -262,7 +256,7 @@ export const validateMnemonic = (mnemonic: string, wordlist?: string[]): boolean
         return false;
     }
     return true;
-}
+};
 
 /**
  * Get the currently set default wordlist.
@@ -272,13 +266,13 @@ export const validateMnemonic = (mnemonic: string, wordlist?: string[]): boolean
  */
 export const getDefaultWordlist = (): string => {
     if (!DEFAULT_WORDLIST) {
-        throw new Error('No Default Wordlist set');
+        throw new Error("No Default Wordlist set");
     }
 
     return Object.keys(wordlists).filter((lang) => {
-        if (lang === 'JA' || lang === 'EN') {
-        return false;
+        if (lang === "JA" || lang === "EN") {
+            return false;
         }
         return wordlists[lang].every((word, index) => word === DEFAULT_WORDLIST[index]);
     })[0];
-}
+};
