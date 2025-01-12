@@ -60,8 +60,9 @@ const configuration: Config = {
         //     },
         // }
     ],
+    modulePathIgnorePatterns: ["packages/.*/build"],
     testTimeout: 700000,
-    maxConcurrency: 1,
+    maxConcurrency: 3,
 };
 
 export default configuration;

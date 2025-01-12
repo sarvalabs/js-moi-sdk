@@ -85,7 +85,7 @@ describe("Provider", () => {
             expect(result.hash).toEqual(expect.any(String));
         });
 
-        it.skip.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
+        it.skip("should return the simulation result when POLO encoded interaction is passed", async () => {
             const args = hexToBytes(
                 "0x0e9f020ee004e304f304a005ae05fe07800d800d5f06830483043dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21010186a01f0e2f0316050e7f063363636161605453540f42401f0e5f06830491043dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf2102"
             );
