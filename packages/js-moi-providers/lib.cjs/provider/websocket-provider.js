@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketProvider = exports.WebsocketEvent = void 0;
 const ws_transport_1 = require("../transport/ws-transport");
-const provider_1 = require("./provider");
+const json_rpc_provider_1 = require("./json-rpc-provider");
 var WebsocketEvent;
 (function (WebsocketEvent) {
     WebsocketEvent["Error"] = "error";
@@ -15,7 +15,7 @@ var WebsocketEvent;
     WebsocketEvent["NewTesseractsByAccount"] = "newTesseractsByAccount";
     WebsocketEvent["NewLogs"] = "newLogs";
 })(WebsocketEvent || (exports.WebsocketEvent = WebsocketEvent = {}));
-class WebsocketProvider extends provider_1.Provider {
+class WebsocketProvider extends json_rpc_provider_1.JsonRpcProvider {
     static events = {
         client: new Set(["error", "open", "close", "reconnect"]),
         internal: new Set(["message"]),

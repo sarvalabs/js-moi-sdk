@@ -1,6 +1,6 @@
 import type { Hex } from "js-moi-utils";
 import { WebsocketTransport, type WebsocketTransportOptions } from "../transport/ws-transport";
-import { Provider } from "./provider";
+import { JsonRpcProvider } from "./json-rpc-provider";
 
 export enum WebsocketEvent {
     Error = "error",
@@ -62,7 +62,7 @@ type WebsocketEmittedResponse = {
     };
 };
 
-export class WebsocketProvider extends Provider {
+export class WebsocketProvider extends JsonRpcProvider {
     private static events: Record<string, Set<string | symbol>> = {
         client: new Set(["error", "open", "close", "reconnect"]),
         internal: new Set(["message"]),

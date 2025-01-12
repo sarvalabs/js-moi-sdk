@@ -1,6 +1,6 @@
 import type { Hex } from "js-moi-utils";
 import { type WebsocketTransportOptions } from "../transport/ws-transport";
-import { Provider } from "./provider";
+import { JsonRpcProvider } from "./json-rpc-provider";
 export declare enum WebsocketEvent {
     Error = "error",
     Open = "open",
@@ -31,7 +31,7 @@ type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends Webs
 type ProviderEventListener<TEvent extends ProviderEvent> = TEvent extends string ? TEvent extends WebsocketEvent ? WebsocketEventListener<TEvent> : BaseListener : TEvent extends symbol ? BaseListener : TEvent extends {
     event: infer TEventType;
 } ? TEventType extends WebsocketEvent ? WebsocketEventListener<TEventType> : never : never;
-export declare class WebsocketProvider extends Provider {
+export declare class WebsocketProvider extends JsonRpcProvider {
     private static events;
     private readonly subscriptions;
     constructor(address: string, options?: WebsocketTransportOptions);

@@ -1,5 +1,5 @@
 import { WebsocketTransport } from "../transport/ws-transport";
-import { Provider } from "./provider";
+import { JsonRpcProvider } from "./json-rpc-provider";
 export var WebsocketEvent;
 (function (WebsocketEvent) {
     WebsocketEvent["Error"] = "error";
@@ -12,7 +12,7 @@ export var WebsocketEvent;
     WebsocketEvent["NewTesseractsByAccount"] = "newTesseractsByAccount";
     WebsocketEvent["NewLogs"] = "newLogs";
 })(WebsocketEvent || (WebsocketEvent = {}));
-export class WebsocketProvider extends Provider {
+export class WebsocketProvider extends JsonRpcProvider {
     static events = {
         client: new Set(["error", "open", "close", "reconnect"]),
         internal: new Set(["message"]),
