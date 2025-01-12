@@ -10,15 +10,14 @@ import {
     type InteractionRequest,
     type JsonRpcResponse,
     type NetworkInfo,
-    type ResponseModifierParam,
     type TesseractReference,
     type Transport,
 } from "js-moi-utils";
 
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Tesseract } from "../types/moi-rpc-method";
-import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, Simulate, SimulateOption } from "../types/provider";
+import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Simulate, type Tesseract } from "../types/moi-rpc-method";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, SimulateOption } from "../types/provider";
 import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -86,9 +85,9 @@ export class Provider extends EventEmitter implements IProviderActions {
         return await this.call<"moi.Protocol", SelectFromResponseModifier<NetworkInfo, TOption>>("moi.Protocol", option);
     }
 
-    public simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
-    public simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
-    public simulate(ix: InteractionRequest | Uint8Array | Hex, option: SimulateOption): Promise<Simulate> {
+    public async simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: InteractionRequest | Uint8Array | Hex, option: SimulateOption): Promise<Simulate> {
         let encodedIxArgs: Hex;
 
         switch (true) {
@@ -117,7 +116,7 @@ export class Provider extends EventEmitter implements IProviderActions {
             }
         }
 
-        return this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
+        return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
     }
 
     private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {

@@ -1,8 +1,8 @@
-import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type ResponseModifierParam, type Transport } from "js-moi-utils";
+import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Tesseract } from "../types/moi-rpc-method";
-import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, Simulate, SimulateOption } from "../types/provider";
+import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Simulate, type Tesseract } from "../types/moi-rpc-method";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, SimulateOption } from "../types/provider";
 import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter implements IProviderActions {

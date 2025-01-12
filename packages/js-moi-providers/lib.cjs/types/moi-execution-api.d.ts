@@ -1,5 +1,4 @@
-import type { Hex, NetworkInfo, ResponseModifierParam, TesseractReferenceParam } from "js-moi-utils";
-import type { Simulate } from "js-moi-utils";
+import type { Hex, NetworkInfo, ResponseModifierParam, Simulate, TesseractReferenceParam } from "js-moi-utils";
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;

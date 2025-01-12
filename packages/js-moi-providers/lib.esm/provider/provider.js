@@ -55,7 +55,7 @@ export class Provider extends EventEmitter {
     async getNetworkInfo(option) {
         return await this.call("moi.Protocol", option);
     }
-    simulate(ix, option) {
+    async simulate(ix, option) {
         let encodedIxArgs;
         switch (true) {
             case ix instanceof Uint8Array: {
@@ -78,7 +78,7 @@ export class Provider extends EventEmitter {
                 ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
             }
         }
-        return this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
+        return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
     }
     async getTesseractByReference(reference) {
         return await this.call("moi.Tesseract", { reference });
