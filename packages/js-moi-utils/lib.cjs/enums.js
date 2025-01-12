@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
+exports.ElementType = exports.CallsiteKind = exports.LogicState = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
 /**
  * Enumerates the standard of assets in the system.
  * MAS is moi asset standard.
@@ -65,4 +65,29 @@ var OperationStatus;
     OperationStatus[OperationStatus["StateReverted"] = 2] = "StateReverted";
     OperationStatus[OperationStatus["FuelExhausted"] = 3] = "FuelExhausted";
 })(OperationStatus || (exports.OperationStatus = OperationStatus = {}));
+var EngineKind;
+(function (EngineKind) {
+    EngineKind["PISA"] = "PISA";
+    EngineKind["MERU"] = "MERU";
+})(EngineKind || (exports.EngineKind = EngineKind = {}));
+var LogicState;
+(function (LogicState) {
+    LogicState["Persistent"] = "persistent";
+    LogicState["Ephemeral"] = "ephemeral";
+})(LogicState || (exports.LogicState = LogicState = {}));
+var CallsiteKind;
+(function (CallsiteKind) {
+    CallsiteKind["Invoke"] = "invoke";
+    CallsiteKind["Deploy"] = "deploy";
+})(CallsiteKind || (exports.CallsiteKind = CallsiteKind = {}));
+var ElementType;
+(function (ElementType) {
+    ElementType["Constant"] = "constant";
+    ElementType["Typedef"] = "typedef";
+    ElementType["Class"] = "class";
+    ElementType["State"] = "state";
+    ElementType["Routine"] = "routine";
+    ElementType["Method"] = "method";
+    ElementType["Event"] = "event";
+})(ElementType || (exports.ElementType = ElementType = {}));
 //# sourceMappingURL=enums.js.map

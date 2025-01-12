@@ -62,4 +62,29 @@ export var OperationStatus;
     OperationStatus[OperationStatus["StateReverted"] = 2] = "StateReverted";
     OperationStatus[OperationStatus["FuelExhausted"] = 3] = "FuelExhausted";
 })(OperationStatus || (OperationStatus = {}));
+export var EngineKind;
+(function (EngineKind) {
+    EngineKind["PISA"] = "PISA";
+    EngineKind["MERU"] = "MERU";
+})(EngineKind || (EngineKind = {}));
+export var LogicState;
+(function (LogicState) {
+    LogicState["Persistent"] = "persistent";
+    LogicState["Ephemeral"] = "ephemeral";
+})(LogicState || (LogicState = {}));
+export var CallsiteKind;
+(function (CallsiteKind) {
+    CallsiteKind["Invoke"] = "invoke";
+    CallsiteKind["Deploy"] = "deploy";
+})(CallsiteKind || (CallsiteKind = {}));
+export var ElementType;
+(function (ElementType) {
+    ElementType["Constant"] = "constant";
+    ElementType["Typedef"] = "typedef";
+    ElementType["Class"] = "class";
+    ElementType["State"] = "state";
+    ElementType["Routine"] = "routine";
+    ElementType["Method"] = "method";
+    ElementType["Event"] = "event";
+})(ElementType || (ElementType = {}));
 //# sourceMappingURL=enums.js.map

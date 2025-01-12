@@ -62,3 +62,28 @@ export enum OperationStatus {
     StateReverted = 2,
     FuelExhausted = 3,
 }
+
+export enum EngineKind {
+    PISA = "PISA",
+    MERU = "MERU",
+}
+
+export enum LogicState {
+    Persistent = "persistent",
+    Ephemeral = "ephemeral",
+}
+
+export enum CallsiteKind {
+    Invoke = "invoke",
+    Deploy = "deploy",
+}
+
+export enum ElementType {
+    Constant = "constant",
+    Typedef = "typedef",
+    Class = "class",
+    State = "state",
+    Routine = "routine",
+    Method = "method",
+    Event = "event",
+}

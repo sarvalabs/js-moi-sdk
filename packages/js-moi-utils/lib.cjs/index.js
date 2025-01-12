@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineReadOnly = exports.validateOperation = exports.transformPayload = exports.listIxOperationDescriptors = exports.isValidOperation = exports.getIxOperationDescriptor = exports.encodeOperation = exports.deepCopy = exports.validateIxRequest = exports.transformInteraction = exports.isValidIxRequest = exports.interaction = exports.getInteractionRequestSchema = exports.encodeInteraction = exports.trimHexPrefix = exports.numToHex = exports.isHex = exports.isAddress = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LockType = exports.AssetStandard = exports.AccountType = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.bufferToUint8 = exports.encodeBase64 = exports.decodeBase64 = exports.isValidAddress = void 0;
+exports.defineReadOnly = exports.validateOperation = exports.transformPayload = exports.listIxOperationDescriptors = exports.isValidOperation = exports.getIxOperationDescriptor = exports.encodeOperation = exports.deepCopy = exports.validateIxRequest = exports.transformInteraction = exports.isValidIxRequest = exports.interaction = exports.getInteractionRequestSchema = exports.encodeInteraction = exports.trimHexPrefix = exports.numToHex = exports.isHex = exports.isAddress = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LogicState = exports.LockType = exports.EngineKind = exports.ElementType = exports.CallsiteKind = exports.AssetStandard = exports.AccountType = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.bufferToUint8 = exports.encodeBase64 = exports.decodeBase64 = exports.isValidAddress = void 0;
 var address_1 = require("./address");
 Object.defineProperty(exports, "isValidAddress", { enumerable: true, get: function () { return address_1.isValidAddress; } });
 var base64_1 = require("./base64");
@@ -15,7 +15,11 @@ Object.defineProperty(exports, "isInteger", { enumerable: true, get: function ()
 var enums_1 = require("./enums");
 Object.defineProperty(exports, "AccountType", { enumerable: true, get: function () { return enums_1.AccountType; } });
 Object.defineProperty(exports, "AssetStandard", { enumerable: true, get: function () { return enums_1.AssetStandard; } });
+Object.defineProperty(exports, "CallsiteKind", { enumerable: true, get: function () { return enums_1.CallsiteKind; } });
+Object.defineProperty(exports, "ElementType", { enumerable: true, get: function () { return enums_1.ElementType; } });
+Object.defineProperty(exports, "EngineKind", { enumerable: true, get: function () { return enums_1.EngineKind; } });
 Object.defineProperty(exports, "LockType", { enumerable: true, get: function () { return enums_1.LockType; } });
+Object.defineProperty(exports, "LogicState", { enumerable: true, get: function () { return enums_1.LogicState; } });
 Object.defineProperty(exports, "OperationStatus", { enumerable: true, get: function () { return enums_1.OperationStatus; } });
 Object.defineProperty(exports, "OpType", { enumerable: true, get: function () { return enums_1.OpType; } });
 Object.defineProperty(exports, "ReceiptStatus", { enumerable: true, get: function () { return enums_1.ReceiptStatus; } });

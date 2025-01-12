@@ -1,15 +1,7 @@
 import { isPrimitiveType, Schema, type ElementDescriptor, type LogicManifest } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 
-import {
-    ArrayIndexAccessor,
-    ClassFieldAccessor,
-    LengthAccessor,
-    PropertyAccessor,
-    type Accessor,
-    type AccessorProvider,
-    type StorageTypeProvider,
-} from "./accessor";
+import { ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, type Accessor, type AccessorProvider, type StorageTypeProvider } from "./accessor";
 
 const VALUE_TYPE_INDEX = 1;
 
@@ -92,10 +84,7 @@ export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, S
 
     public length(): void {
         if (isPrimitiveType(this.slotType)) {
-            ErrorUtils.throwError(
-                `Attempting to access the length of primitive on type "${this.slotType}"`,
-                ErrorCode.UNEXPECTED_ARGUMENT
-            );
+            ErrorUtils.throwError(`Attempting to access the length of primitive on type "${this.slotType}"`, ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
         this.slotType = "u64";
@@ -118,10 +107,7 @@ export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, S
 
     public field(fieldName: string): SlotAccessorBuilder {
         if (!this.elementDescriptor.getClassDefs().has(this.slotType)) {
-            ErrorUtils.throwError(
-                `Attempting to access a field '${fieldName}' in ${this.slotType}, which is not a recognized class.`,
-                ErrorCode.UNEXPECTED_ARGUMENT
-            );
+            ErrorUtils.throwError(`Attempting to access a field '${fieldName}' in ${this.slotType}, which is not a recognized class.`, ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
         const element = this.elementDescriptor.getClassElement(this.slotType);

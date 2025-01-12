@@ -56,4 +56,25 @@ export declare enum OperationStatus {
     StateReverted = 2,
     FuelExhausted = 3
 }
+export declare enum EngineKind {
+    PISA = "PISA",
+    MERU = "MERU"
+}
+export declare enum LogicState {
+    Persistent = "persistent",
+    Ephemeral = "ephemeral"
+}
+export declare enum CallsiteKind {
+    Invoke = "invoke",
+    Deploy = "deploy"
+}
+export declare enum ElementType {
+    Constant = "constant",
+    Typedef = "typedef",
+    Class = "class",
+    State = "state",
+    Routine = "routine",
+    Method = "method",
+    Event = "event"
+}
 //# sourceMappingURL=enums.d.ts.map
