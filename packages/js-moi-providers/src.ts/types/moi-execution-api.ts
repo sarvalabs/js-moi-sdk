@@ -11,6 +11,6 @@ export interface NetworkActionApi {
 
 export type NetworkMethod = keyof NetworkActionApi;
 
-export type MethodParams<T extends NetworkMethod> = NetworkMethod extends T ? NetworkActionApi[T]["params"] : any[];
+export type MethodParams<T extends NetworkMethod> = T extends NetworkMethod ? NetworkActionApi[T]["params"] : any[];
 
 export type MethodResponse<T extends string> = T extends NetworkMethod ? NetworkActionApi[T]["response"] : any;
