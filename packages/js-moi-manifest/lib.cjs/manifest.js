@@ -161,7 +161,7 @@ class ManifestCoder {
      */
     decodeEventOutput(event, logData) {
         if (event === "builtin.Log") {
-            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(js_moi_utils_1.builtInLogEventSchema);
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(logData)).depolorize(schema_1.Schema.PISA_BUILT_IN_LOG_SCHEMA);
         }
         const element = this.elementDescriptor.getEventElement(event);
         if (element == null) {

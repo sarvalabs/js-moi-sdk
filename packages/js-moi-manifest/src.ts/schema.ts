@@ -279,6 +279,15 @@ export class Schema {
         },
     };
 
+    public static PISA_BUILT_IN_LOG_SCHEMA = {
+        kind: "struct",
+        fields: {
+            value: {
+                kind: "string",
+            },
+        },
+    };
+
     /**
      * Extracts the array data type from the provided data type string.
      *

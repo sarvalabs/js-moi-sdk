@@ -400,6 +400,14 @@ export declare class Schema {
             };
         };
     };
+    static PISA_BUILT_IN_LOG_SCHEMA: {
+        kind: string;
+        fields: {
+            value: {
+                kind: string;
+            };
+        };
+    };
     /**
      * Extracts the array data type from the provided data type string.
      *
