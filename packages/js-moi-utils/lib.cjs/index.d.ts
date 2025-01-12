@@ -8,6 +8,7 @@ export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxR
 export { deepCopy } from "./object";
 export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformPayload, validateOperation, type IxOperationDescriptor, } from "./operations";
 export { defineReadOnly } from "./properties";
+export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey, type Accessor } from "./storage-key";
 export type { ConsensusPreference, InteractionRequest, IxFund, IxParticipant, Preference, RawInteractionRequest, RawParticipants, RawPreference, RawSender, Sender, } from "./types/interaction";
 export type { IxOperation, IxRawOperation, Operation } from "./types/ix-operation";
 export type { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, KeyAddPayload, LogicActionPayload, LogicDeployPayload, LogicPayload, OperationPayload, ParticipantCreatePayload, PoloAssetActionPayload, PoloLogicActionPayload, PoloLogicDeployPayload, PoloLogicPayload, PoloOperationPayload, PoloParticipantCreatePayload, } from "./types/ix-payload";

@@ -16,6 +16,7 @@ export {
     type IxOperationDescriptor,
 } from "./operations";
 export { defineReadOnly } from "./properties";
+export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey, type Accessor } from "./storage-key";
 export type {
     ConsensusPreference,
     InteractionRequest,

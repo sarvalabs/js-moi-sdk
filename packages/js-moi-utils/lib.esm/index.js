@@ -8,4 +8,5 @@ export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxR
 export { deepCopy } from "./object";
 export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformPayload, validateOperation, } from "./operations";
 export { defineReadOnly } from "./properties";
+export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "./storage-key";
 //# sourceMappingURL=index.js.map

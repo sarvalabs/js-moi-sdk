@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineReadOnly = exports.validateOperation = exports.transformPayload = exports.listIxOperationDescriptors = exports.isValidOperation = exports.getIxOperationDescriptor = exports.encodeOperation = exports.deepCopy = exports.validateIxRequest = exports.transformInteraction = exports.isValidIxRequest = exports.interaction = exports.getInteractionRequestSchema = exports.encodeInteraction = exports.trimHexPrefix = exports.numToHex = exports.isHex = exports.isAddress = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.RoutineType = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LogicState = exports.LockType = exports.EngineKind = exports.ElementType = exports.AssetStandard = exports.AccountType = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.bufferToUint8 = exports.encodeBase64 = exports.decodeBase64 = exports.isValidAddress = void 0;
+exports.StorageKey = exports.PropertyAccessor = exports.LengthAccessor = exports.generateStorageKey = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.AbstractAccessor = exports.defineReadOnly = exports.validateOperation = exports.transformPayload = exports.listIxOperationDescriptors = exports.isValidOperation = exports.getIxOperationDescriptor = exports.encodeOperation = exports.deepCopy = exports.validateIxRequest = exports.transformInteraction = exports.isValidIxRequest = exports.interaction = exports.getInteractionRequestSchema = exports.encodeInteraction = exports.trimHexPrefix = exports.numToHex = exports.isHex = exports.isAddress = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.RoutineType = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LogicState = exports.LockType = exports.EngineKind = exports.ElementType = exports.AssetStandard = exports.AccountType = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.bufferToUint8 = exports.encodeBase64 = exports.decodeBase64 = exports.isValidAddress = void 0;
 var address_1 = require("./address");
 Object.defineProperty(exports, "isValidAddress", { enumerable: true, get: function () { return address_1.isValidAddress; } });
 var base64_1 = require("./base64");
@@ -54,4 +54,12 @@ Object.defineProperty(exports, "transformPayload", { enumerable: true, get: func
 Object.defineProperty(exports, "validateOperation", { enumerable: true, get: function () { return operations_1.validateOperation; } });
 var properties_1 = require("./properties");
 Object.defineProperty(exports, "defineReadOnly", { enumerable: true, get: function () { return properties_1.defineReadOnly; } });
+var storage_key_1 = require("./storage-key");
+Object.defineProperty(exports, "AbstractAccessor", { enumerable: true, get: function () { return storage_key_1.AbstractAccessor; } });
+Object.defineProperty(exports, "ArrayIndexAccessor", { enumerable: true, get: function () { return storage_key_1.ArrayIndexAccessor; } });
+Object.defineProperty(exports, "ClassFieldAccessor", { enumerable: true, get: function () { return storage_key_1.ClassFieldAccessor; } });
+Object.defineProperty(exports, "generateStorageKey", { enumerable: true, get: function () { return storage_key_1.generateStorageKey; } });
+Object.defineProperty(exports, "LengthAccessor", { enumerable: true, get: function () { return storage_key_1.LengthAccessor; } });
+Object.defineProperty(exports, "PropertyAccessor", { enumerable: true, get: function () { return storage_key_1.PropertyAccessor; } });
+Object.defineProperty(exports, "StorageKey", { enumerable: true, get: function () { return storage_key_1.StorageKey; } });
 //# sourceMappingURL=index.js.map
