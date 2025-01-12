@@ -1,3 +1,28 @@
+SHOULD_TEST=false
+
+# Check if there is a test flag
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+    --test)
+        SHOULD_TEST=true
+        ;;
+    *)
+        echo "Invalid option: $1" >&2
+        ;;
+    esac
+    shift
+done
+
+echo $SHOULD_TEST
+
+# Check test flag and run tests if needed
+
+if [ "$SHOULD_TEST" = true ]; then
+    echo "🧪 Running tests"
+    npm run test
+fi
+
 # Clean all lib.* directories in packages/*/ and dist in root directory
 
 echo "🧹 Cleaning all previous distribution"
