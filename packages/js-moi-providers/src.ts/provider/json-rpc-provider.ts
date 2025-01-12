@@ -15,10 +15,7 @@ import {
 
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import { type RpcMethodParams } from "../types/moi-rpc-method";
 import type { GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";
-
-type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 
 export class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport: Transport;
