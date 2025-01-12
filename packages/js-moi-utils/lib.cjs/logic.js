@@ -13,7 +13,7 @@ const hex_1 = require("./hex");
 const topicHash = (topic) => {
     const polorizer = new js_polo_1.Polorizer();
     polorizer.polorizeString(topic);
-    return (0, hex_1.encodeToString)((0, blake2b_1.blake2b)(polorizer.bytes(), { dkLen: 32 }));
+    return (0, hex_1.bytesToHex)((0, blake2b_1.blake2b)(polorizer.bytes(), { dkLen: 32 }));
 };
 exports.topicHash = topicHash;
 //# sourceMappingURL=logic.js.map

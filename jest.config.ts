@@ -60,7 +60,9 @@ const configuration: Config = {
         //     },
         // }
     ],
-    modulePathIgnorePatterns: ["packages/.*/build"],
+    // preset: "ts-jest",
+    modulePathIgnorePatterns: ["packages/**/lib.*"],
+    collectCoverageFrom: ["packages/**/src.ts/**/*.ts"],
     testTimeout: 700000,
     maxConcurrency: 3,
 };

@@ -1,6 +1,6 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import { Polorizer } from "js-polo";
-import { encodeToString } from "./hex";
+import { bytesToHex } from "./hex";
 /**
  * Hashes a topic string
  *
@@ -10,6 +10,6 @@ import { encodeToString } from "./hex";
 export const topicHash = (topic) => {
     const polorizer = new Polorizer();
     polorizer.polorizeString(topic);
-    return encodeToString(blake2b(polorizer.bytes(), { dkLen: 32 }));
+    return bytesToHex(blake2b(polorizer.bytes(), { dkLen: 32 }));
 };
 //# sourceMappingURL=logic.js.map
