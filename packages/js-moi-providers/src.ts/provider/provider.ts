@@ -16,18 +16,9 @@ import {
 } from "js-moi-utils";
 
 import { EventEmitter } from "events";
-import {
-    type AccountAsset,
-    type AccountInfo,
-    type Confirmation,
-    type Interaction,
-    type RpcMethod,
-    type RpcMethodParams,
-    type RpcMethodResponse,
-    type SimulateResult,
-    type Tesseract,
-} from "../types/moi-rpc-method";
-import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier } from "../types/Provider";
+import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
+import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Tesseract } from "../types/moi-rpc-method";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, Simulate, SimulateOption } from "../types/Provider";
 import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
@@ -67,8 +58,8 @@ export class Provider extends EventEmitter implements IProviderActions {
      *
      * @throws Will throw an error if the response contains an error.
      */
-    protected async call<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>> {
-        const response = await this.request<RpcMethodResponse<T>>(method, params);
+    protected async call<TMethod extends NetworkMethod, TResponse extends any = MethodResponse<TMethod>>(method: TMethod, ...params: MethodParams<TMethod>): Promise<TResponse> {
+        const response = await this.request<TResponse>(method, params);
         return this.processJsonRpcResponse(response);
     }
 
@@ -91,8 +82,42 @@ export class Provider extends EventEmitter implements IProviderActions {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    async getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>> {
-        return await this.call("moi.Protocol", option);
+    public async getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>> {
+        return await this.call<"moi.Protocol", SelectFromResponseModifier<NetworkInfo, TOption>>("moi.Protocol", option);
+    }
+
+    public simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
+    public simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
+    public simulate(ix: InteractionRequest | Uint8Array | Hex, option: SimulateOption): Promise<Simulate> {
+        let encodedIxArgs: Hex;
+
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                encodedIxArgs = bytesToHex(ix);
+                break;
+            }
+
+            case typeof ix === "object": {
+                this.ensureValidInteraction(ix);
+                encodedIxArgs = bytesToHex(interaction(<InteractionRequest>ix));
+                break;
+            }
+
+            case typeof ix === "string": {
+                if (!isHex(ix)) {
+                    ErrorUtils.throwArgumentError("Must be a valid hex string", "interaction", ix);
+                }
+
+                encodedIxArgs = ix;
+                break;
+            }
+
+            default: {
+                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+
+        return this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
     }
 
     private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {
@@ -345,67 +370,6 @@ export class Provider extends EventEmitter implements IProviderActions {
         if (interaction.operations == null || interaction.operations.length === 0) {
             ErrorUtils.throwError("At least one operation is required in the interaction", ErrorCode.INVALID_ARGUMENT);
         }
-    }
-
-    /**
-     * Simulates an interaction call without committing it to the chain. This method can be
-     * used to dry run an interaction to test its validity and estimate its execution effort.
-     * It is also a cost effective way to perform read-only logic calls without submitting an
-     * interaction.
-     *
-     * This call does not require participating accounts to notarize the interaction,
-     * and no signatures are verified while executing the interaction.
-     *
-     * @param ix - The interaction object
-     * @returns A promise that resolves to the result of the simulation.
-     */
-    public async simulate(ix: InteractionRequest): Promise<SimulateResult>;
-    /**
-     * Simulates an interaction call without committing it to the chain. This method can be
-     * used to dry run an interaction to test its validity and estimate its execution effort.
-     * It is also a cost effective way to perform read-only logic calls without submitting an
-     * interaction.
-     *
-     * This call does not require participating accounts to notarize the interaction,
-     * and no signatures are verified while executing the interaction.
-     *
-     * @param ix - The POLO encoded interaction submission
-     * @returns A promise that resolves to the result of the simulation.
-     */
-    public async simulate(serializedIx: Uint8Array): Promise<SimulateResult>;
-    /**
-     * Simulates an interaction call without committing it to the chain. This method can be
-     * used to dry run an interaction to test its validity and estimate its execution effort.
-     * It is also a cost effective way to perform read-only logic calls without submitting an
-     * interaction.
-     *
-     * This call does not require participating accounts to notarize the interaction,
-     * and no signatures are verified while executing the interaction.
-     *
-     * @param ix - The raw interaction object or serialized interaction submission
-     * @returns A promise that resolves to the result of the simulation.
-     */
-    public async simulate(ix: InteractionRequest | Uint8Array): Promise<SimulateResult> {
-        let args: Uint8Array;
-
-        switch (true) {
-            case ix instanceof Uint8Array: {
-                args = ix;
-                break;
-            }
-
-            case typeof ix === "object": {
-                this.ensureValidInteraction(ix);
-                args = interaction(ix);
-                break;
-            }
-
-            default: {
-                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
-            }
-        }
-
-        return await this.call("moi.Simulate", { interaction: bytesToHex(args) });
     }
 
     /**

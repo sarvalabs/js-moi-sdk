@@ -58,6 +58,31 @@ class Provider extends events_1.EventEmitter {
     async getNetworkInfo(option) {
         return await this.call("moi.Protocol", option);
     }
+    simulate(ix, option) {
+        let encodedIxArgs;
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                encodedIxArgs = (0, js_moi_utils_1.bytesToHex)(ix);
+                break;
+            }
+            case typeof ix === "object": {
+                this.ensureValidInteraction(ix);
+                encodedIxArgs = (0, js_moi_utils_1.bytesToHex)((0, js_moi_utils_1.interaction)(ix));
+                break;
+            }
+            case typeof ix === "string": {
+                if (!(0, js_moi_utils_1.isHex)(ix)) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid hex string", "interaction", ix);
+                }
+                encodedIxArgs = ix;
+                break;
+            }
+            default: {
+                js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+        return this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
+    }
     async getTesseractByReference(reference) {
         return await this.call("moi.Tesseract", { reference });
     }
@@ -227,36 +252,6 @@ class Provider extends events_1.EventEmitter {
         if (interaction.operations == null || interaction.operations.length === 0) {
             js_moi_utils_1.ErrorUtils.throwError("At least one operation is required in the interaction", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-    }
-    /**
-     * Simulates an interaction call without committing it to the chain. This method can be
-     * used to dry run an interaction to test its validity and estimate its execution effort.
-     * It is also a cost effective way to perform read-only logic calls without submitting an
-     * interaction.
-     *
-     * This call does not require participating accounts to notarize the interaction,
-     * and no signatures are verified while executing the interaction.
-     *
-     * @param ix - The raw interaction object or serialized interaction submission
-     * @returns A promise that resolves to the result of the simulation.
-     */
-    async simulate(ix) {
-        let args;
-        switch (true) {
-            case ix instanceof Uint8Array: {
-                args = ix;
-                break;
-            }
-            case typeof ix === "object": {
-                this.ensureValidInteraction(ix);
-                args = (0, js_moi_utils_1.interaction)(ix);
-                break;
-            }
-            default: {
-                js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-            }
-        }
-        return await this.call("moi.Simulate", { interaction: (0, js_moi_utils_1.bytesToHex)(args) });
     }
     /**
      * Submits a signed interaction to the MOI protocol network.

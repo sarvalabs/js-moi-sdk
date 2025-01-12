@@ -8,3 +8,5 @@ export interface NetworkInfo {
      */
     version: string;
 }
+
+export interface Simulate {}

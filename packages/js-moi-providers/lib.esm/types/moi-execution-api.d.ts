@@ -1,10 +1,14 @@
-import type { NetworkInfo, ResponseModifierParam } from "js-moi-utils";
-export type ApiMethod<TParams extends any[], TResponse> = {
+import type { Hex, NetworkInfo, ResponseModifierParam, TesseractReferenceParam } from "js-moi-utils";
+import type { Simulate } from "js-moi-utils";
+export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
 };
 export interface NetworkActionApi {
-    "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>], any>;
+    "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
+    "moi.Simulate": ApiMethod<[param: {
+        interaction: Hex;
+    } & TesseractReferenceParam], Simulate>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

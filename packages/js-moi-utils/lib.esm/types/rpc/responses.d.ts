@@ -8,4 +8,6 @@ export interface NetworkInfo {
      */
     version: string;
 }
+export interface Simulate {
+}
 //# sourceMappingURL=responses.d.ts.map

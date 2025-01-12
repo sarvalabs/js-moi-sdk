@@ -1,7 +1,8 @@
 import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type ResponseModifierParam, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
-import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethod, type RpcMethodParams, type RpcMethodResponse, type SimulateResult, type Tesseract } from "../types/moi-rpc-method";
-import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier } from "../types/Provider";
+import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
+import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethodParams, type Tesseract } from "../types/moi-rpc-method";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier, Simulate, SimulateOption } from "../types/Provider";
 import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 export declare class Provider extends EventEmitter implements IProviderActions {
@@ -26,7 +27,7 @@ export declare class Provider extends EventEmitter implements IProviderActions {
      *
      * @throws Will throw an error if the response contains an error.
      */
-    protected call<T extends RpcMethod>(method: T, ...params: RpcMethodParams<T>): Promise<RpcMethodResponse<T>>;
+    protected call<TMethod extends NetworkMethod, TResponse extends any = MethodResponse<TMethod>>(method: TMethod, ...params: MethodParams<TMethod>): Promise<TResponse>;
     /**
      * Sends a JSON-RPC request to the network.
      *
@@ -44,6 +45,8 @@ export declare class Provider extends EventEmitter implements IProviderActions {
      * @returns A promise that resolves to the Moi client version.
      */
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
+    simulate(interaction: Uint8Array | Hex, option: SimulateOption): Promise<Simulate>;
+    simulate(ix: InteractionRequest, option: SimulateOption): Promise<Simulate>;
     private getTesseractByReference;
     private getTesseractByHash;
     private getTesseractByAddressAndHeight;
@@ -157,32 +160,6 @@ export declare class Provider extends EventEmitter implements IProviderActions {
     getLogicStorage(logicId: Hex, key: Hex, address: Hex, option?: LogicStorageOption): Promise<Hex>;
     private static isSignedInteraction;
     private ensureValidInteraction;
-    /**
-     * Simulates an interaction call without committing it to the chain. This method can be
-     * used to dry run an interaction to test its validity and estimate its execution effort.
-     * It is also a cost effective way to perform read-only logic calls without submitting an
-     * interaction.
-     *
-     * This call does not require participating accounts to notarize the interaction,
-     * and no signatures are verified while executing the interaction.
-     *
-     * @param ix - The interaction object
-     * @returns A promise that resolves to the result of the simulation.
-     */
-    simulate(ix: InteractionRequest): Promise<SimulateResult>;
-    /**
-     * Simulates an interaction call without committing it to the chain. This method can be
-     * used to dry run an interaction to test its validity and estimate its execution effort.
-     * It is also a cost effective way to perform read-only logic calls without submitting an
-     * interaction.
-     *
-     * This call does not require participating accounts to notarize the interaction,
-     * and no signatures are verified while executing the interaction.
-     *
-     * @param ix - The POLO encoded interaction submission
-     * @returns A promise that resolves to the result of the simulation.
-     */
-    simulate(serializedIx: Uint8Array): Promise<SimulateResult>;
     /**
      * Submits a signed interaction to the MOI protocol network.
      *
