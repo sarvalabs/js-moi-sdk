@@ -1,13 +1,8 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { LogicState } from "js-moi-utils";
+import { LogicState, type EngineKind } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
 import { LogicId } from "./logic-id";
-
-export enum EngineKind {
-    PISA = "PISA",
-    MERU = "MERU",
-}
 
 /**
  * Abstract class representing a logic descriptor, which provides information 
