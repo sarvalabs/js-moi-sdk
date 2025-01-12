@@ -16,13 +16,13 @@ export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
 /**
  * Structure for `moi.Protocol` to get network information.
  */
-export interface GetNetworkInfoRequest {
+interface GetNetworkInfoRequest {
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
 }
 
 export type SimulateOption = TesseractReferenceParam;
 
-export interface SimulateRequest {
+interface SimulateRequest {
     simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
 }

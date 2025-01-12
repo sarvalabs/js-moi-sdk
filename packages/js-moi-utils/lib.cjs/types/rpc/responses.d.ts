@@ -1,3 +1,5 @@
+import type { ReceiptStatus } from "../../enums";
+import type { Hex } from "../../hex";
 export interface NetworkInfo {
     /**
      * The chain ID of the network.
@@ -9,5 +11,7 @@ export interface NetworkInfo {
     version: string;
 }
 export interface Simulate {
+    hash: Hex;
+    status: ReceiptStatus;
 }
 //# sourceMappingURL=responses.d.ts.map
