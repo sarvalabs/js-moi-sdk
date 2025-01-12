@@ -65,6 +65,6 @@ export type TesseractReference = AbsoluteTesseractReference | RelativeTesseractR
  */
 export type ParamField<TName extends string, TType> = Record<TName, TType>;
 
-export type ResponseModifierParam<T extends string = string> = ParamField<"modifier", ResponseModifier<T>>;
+export type ResponseModifierParam<T extends string = string> = Partial<ParamField<"modifier", ResponseModifier<T>>>;
 
-export type TesseractReferenceParam = ParamField<"reference", TesseractReference>;
+export type TesseractReferenceParam = Partial<ParamField<"reference", TesseractReference | undefined>>;

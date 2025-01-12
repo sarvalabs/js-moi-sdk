@@ -56,6 +56,6 @@ export type TesseractReference = AbsoluteTesseractReference | RelativeTesseractR
  * A utility type to extract create a object of type and value
  */
 export type ParamField<TName extends string, TType> = Record<TName, TType>;
-export type ResponseModifierParam<T extends string = string> = ParamField<"modifier", ResponseModifier<T>>;
-export type TesseractReferenceParam = ParamField<"reference", TesseractReference>;
+export type ResponseModifierParam<T extends string = string> = Partial<ParamField<"modifier", ResponseModifier<T>>>;
+export type TesseractReferenceParam = Partial<ParamField<"reference", TesseractReference | undefined>>;
 //# sourceMappingURL=common-entities.d.ts.map

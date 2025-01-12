@@ -46,4 +46,17 @@ export type {
     PoloParticipantCreatePayload,
 } from "./types/ix-payload";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
+export type {
+    AbsoluteTesseractReference,
+    ExtractModifier,
+    IncludeModifier,
+    ParamField,
+    RelativeReference,
+    RelativeTesseractReference,
+    ResponseModifier,
+    ResponseModifierParam,
+    TesseractReference,
+    TesseractReferenceParam,
+} from "./types/rpc/common-entities";
+export type { NetworkInfo } from "./types/rpc/responses";
 export type { Transport } from "./types/transport";

@@ -9,6 +9,9 @@ import {
     type Hex,
     type InteractionRequest,
     type JsonRpcResponse,
+    type NetworkInfo,
+    type ResponseModifierParam,
+    type TesseractReference,
     type Transport,
 } from "js-moi-utils";
 
@@ -24,11 +27,12 @@ import {
     type SimulateResult,
     type Tesseract,
 } from "../types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields, TesseractReference } from "../types/shared";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier } from "../types/Provider";
+import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
 
-export class Provider extends EventEmitter {
+export class Provider extends EventEmitter implements IProviderActions {
     private readonly _transport: Transport;
 
     /**
@@ -87,8 +91,8 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    public async getProtocol(option?: ResponseModifierParam): Promise<MoiClientInfo> {
-        return await this.call("moi.Protocol", option ?? {});
+    async getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>> {
+        return await this.call("moi.Protocol", option);
     }
 
     private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {

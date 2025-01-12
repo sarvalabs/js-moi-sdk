@@ -1,5 +1,5 @@
-import { Hex, OpType, type AccountType, type Address, type IxOperation, type LockType, type OperationStatus, type ReceiptStatus } from "js-moi-utils";
-import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, MoiClientInfo, ResponseModifierParam, SignedInteraction, TesseractReferenceParam } from "./shared";
+import { Hex, OpType, type AccountType, type Address, type IxOperation, type LockType, type NetworkInfo, type OperationStatus, type ReceiptStatus, type ResponseModifierParam } from "js-moi-utils";
+import type { AccountParam, AssetParam, IncludesParam, InteractionParam, LogicParam, SignedInteraction, TesseractReferenceParam } from "./shared";
 interface Account {
     address: Address;
     sequence_id: number;
@@ -165,65 +165,61 @@ export interface SimulateResult {
 }
 interface MOIExecutionApi {
     "moi.Protocol": {
-        params: [ResponseModifierParam];
-        response: MoiClientInfo;
+        params: [option?: ResponseModifierParam<keyof NetworkInfo>];
+        response: any;
     };
     "moi.Confirmation": {
         params: [InteractionParam];
-        response: Confirmation;
+        response: any;
     };
     "moi.Tesseract": {
         params: [Required<TesseractReferenceParam>];
-        response: Tesseract;
+        response: any;
     };
     "moi.Interaction": {
         params: [InteractionParam & ResponseModifierParam];
-        response: Interaction;
+        response: any;
     };
     "moi.Account": {
         params: [option: AccountParam & TesseractReferenceParam & ResponseModifierParam];
-        response: AccountInfo;
+        response: any;
     };
     "moi.AccountKey": {
         params: [AccountParam & {
             key_id: number;
             pending?: boolean;
         }];
-        response: AccountKey;
+        response: any;
     };
     "moi.AccountAsset": {
         params: [AccountParam & AssetParam & TesseractReferenceParam & IncludesParam<"moi.AccountAsset">];
-        response: AccountAsset[];
+        response: any;
     };
     "moi.Asset": {
         params: [AssetParam & TesseractReferenceParam];
-        response: {
-            asset_data: unknown;
-        };
+        response: any;
     };
     "moi.Logic": {
         params: [LogicParam & TesseractReferenceParam];
-        response: {
-            logic_data: unknown;
-        };
+        response: any;
     };
     "moi.LogicStorage": {
         params: [LogicParam & Partial<AccountParam> & TesseractReferenceParam & {
             storage_key: Hex;
         }];
-        response: Hex;
+        response: any;
     };
     "moi.LogicEvents": {
         params: [];
-        response: unknown;
+        response: any;
     };
     "moi.Submit": {
         params: [ix: SignedInteraction];
-        response: Hex;
+        response: any;
     };
     "moi.Simulate": {
         params: [ix: Pick<SignedInteraction, "interaction">];
-        response: SimulateResult;
+        response: any;
     };
     "moi.Subscribe": {
         params: unknown[];

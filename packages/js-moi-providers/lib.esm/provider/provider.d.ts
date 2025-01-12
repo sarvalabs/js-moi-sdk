@@ -1,9 +1,10 @@
-import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
+import { type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type ResponseModifierParam, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import { type AccountAsset, type AccountInfo, type Confirmation, type Interaction, type RpcMethod, type RpcMethodParams, type RpcMethodResponse, type SimulateResult, type Tesseract } from "../types/moi-rpc-method";
-import type { MoiClientInfo, RelativeTesseractOption, ResponseModifierParam, SignedInteraction, TesseractIncludeFields } from "../types/shared";
+import type { GetNetworkInfoOption, IProviderActions, SelectFromResponseModifier } from "../types/Provider";
+import type { RelativeTesseractOption, SignedInteraction, TesseractIncludeFields } from "../types/shared";
 type LogicStorageOption = Omit<RpcMethodParams<"moi.LogicStorage">[0], "logic_id" | "storage_key" | "address">;
-export declare class Provider extends EventEmitter {
+export declare class Provider extends EventEmitter implements IProviderActions {
     private readonly _transport;
     /**
      * Creates a new instance of the provider.
@@ -42,7 +43,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    getProtocol(option?: ResponseModifierParam): Promise<MoiClientInfo>;
+    getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
     private getTesseractByReference;
     private getTesseractByHash;
     private getTesseractByAddressAndHeight;
@@ -97,7 +98,7 @@ export declare class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the account information for the provided key id
      */
-    getAccountKey(address: Address, keyId: number, pending?: boolean): Promise<import("..").AccountKey>;
+    getAccountKey(address: Address, keyId: number, pending?: boolean): Promise<any>;
     /**
      * Retrieves the balances, mandates and deposits for a specific asset on an account
      *

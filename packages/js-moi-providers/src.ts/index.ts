@@ -24,7 +24,6 @@ export type {
     IncludesParam,
     InteractionParam,
     LogicParam,
-    MoiClientInfo,
     RelativeTesseractOption,
     TesseractReference,
     TesseractReferenceParam,

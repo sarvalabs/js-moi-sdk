@@ -10,9 +10,9 @@ describe("Provider", () => {
         debug: (request) => console.log(JSON.stringify(request)),
     });
 
-    describe(provider.getProtocol, () => {
+    describe(provider.getNetworkInfo, () => {
         it.concurrent("should return the protocol version and chain id", async () => {
-            const protocol = await provider.getProtocol();
+            const protocol = await provider.getNetworkInfo();
 
             expect(protocol).toEqual({ chain_id: expect.any(Number), version: expect.any(String) });
         });

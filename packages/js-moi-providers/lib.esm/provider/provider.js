@@ -52,8 +52,8 @@ export class Provider extends EventEmitter {
      *
      * @returns A promise that resolves to the Moi client version.
      */
-    async getProtocol(option) {
-        return await this.call("moi.Protocol", option ?? {});
+    async getNetworkInfo(option) {
+        return await this.call("moi.Protocol", option);
     }
     async getTesseractByReference(reference) {
         return await this.call("moi.Tesseract", { reference });
