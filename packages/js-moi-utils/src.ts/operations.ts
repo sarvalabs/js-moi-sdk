@@ -99,7 +99,7 @@ const createAssetCreateDescriptor = () => {
                 return createInvalidResult(payload, "supply", "Supply cannot be negative");
             }
 
-            if (payload.standard in AssetStandard) {
+            if (!(payload.standard in AssetStandard)) {
                 return createInvalidResult(payload, "standard", "Invalid asset standard");
             }
 

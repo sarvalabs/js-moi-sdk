@@ -59,7 +59,7 @@ const createAssetCreateDescriptor = () => {
             if (payload.supply < 0) {
                 return createInvalidResult(payload, "supply", "Supply cannot be negative");
             }
-            if (payload.standard in enums_1.AssetStandard) {
+            if (!(payload.standard in enums_1.AssetStandard)) {
                 return createInvalidResult(payload, "standard", "Invalid asset standard");
             }
             if (payload.dimension && payload.dimension < 0) {

@@ -242,10 +242,10 @@ export const validateIxRequest = (ix) => {
     }
     let error = null;
     for (let i = 0; i < ix.operations.length; i++) {
-        const operation = ix.operations[i];
         if (error != null) {
-            return error;
+            break;
         }
+        const operation = ix.operations[i];
         if (operation.type == null) {
             error = createInvalidResult(operation, "type", "Operation type is required");
             break;
@@ -263,6 +263,9 @@ export const validateIxRequest = (ix) => {
             message: `Invalid operation payload at index ${i}: ${result.message}`,
             value: operation,
         };
+    }
+    if (error != null) {
+        return error;
     }
     return null;
 };
