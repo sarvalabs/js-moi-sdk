@@ -1,6 +1,6 @@
 # Clean all lib.* directories in packages/*/ and dist in root directory
 
-echo "Cleaning all lib.* directories in packages/ and dist in root directory"
+echo "🧹 Cleaning all previous distribution"
 
 rm -rf packages/*/lib.*
 rm -rf dist
@@ -9,11 +9,11 @@ rm -rf dist
 # if directory is `lib.esm` then file package.json will be created with
 # content `{"type": "module"}`
 
-echo "Building project distribution"
+echo "👷 Building project distribution"
 
 for dir in packages/*; do
     if [ -d "$dir" ]; then
-        echo "Building $dir"
+        echo " => Building $dir"
 
         mkdir -p $dir/lib.esm
         echo '{"type": "module"}' >$dir/lib.esm/package.json
@@ -28,4 +28,4 @@ done
 
 tsc -b
 
-echo "Project distribution built successfully 🎉"
+echo "\n\n✅ Project distribution built successfully 🎉"
