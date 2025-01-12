@@ -17,14 +17,4 @@ export type {
     RpcMethodResponse,
     Tesseract,
 } from "./types/moi-rpc-method";
-export type {
-    AccountParam,
-    AssetParam,
-    IncludeFieldsFor,
-    IncludesParam,
-    InteractionParam,
-    LogicParam,
-    RelativeTesseractOption,
-    TesseractReference,
-    TesseractReferenceParam,
-} from "./types/shared";
+export type { AccountParam, AssetParam, IncludeFieldsFor, IncludesParam, InteractionParam, LogicParam } from "./types/shared";

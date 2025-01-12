@@ -1,1 +1,0 @@
-{"version":3,"file":"IProvider.d.ts","sourceRoot":"","sources":["../../src.ts/types/IProvider.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,qBAAqB,EAAE,MAAM,cAAc,CAAC;AAEvE;;GAEG;AACH,UAAU,qBAAqB;IAC3B,cAAc,CAAC,MAAM,EAAE,qBAAqB,CAAC,MAAM,WAAW,CAAC,GAAG,WAAW,CAAC;CACjF;AAED,MAAM,WAAW,eAAgB,SAAQ,qBAAqB;CAAG"}
