@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createIx = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
+exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
@@ -175,10 +175,12 @@ const gatherIxFunds = (interaction) => {
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-const createIx = (ix) => {
+const interaction = (ix) => {
     return encodeInteraction({
-        ...ix, participants: gatherIxParticipants(ix), funds: gatherIxFunds(ix)
+        ...ix,
+        participants: gatherIxParticipants(ix),
+        funds: gatherIxFunds(ix),
     });
 };
-exports.createIx = createIx;
+exports.interaction = interaction;
 //# sourceMappingURL=interaction.js.map

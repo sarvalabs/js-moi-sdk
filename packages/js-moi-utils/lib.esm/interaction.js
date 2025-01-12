@@ -169,7 +169,7 @@ const gatherIxFunds = (interaction) => {
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export const createIx = (ix) => {
+export const interaction = (ix) => {
     return encodeInteraction({
         ...ix,
         participants: gatherIxParticipants(ix),

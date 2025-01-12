@@ -1,4 +1,4 @@
-import { bytesToHex, createIx, ErrorCode, ErrorUtils, isAddress, isHex } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, interaction, isAddress, isHex, } from "js-moi-utils";
 import { EventEmitter } from "events";
 export class Provider extends EventEmitter {
     _transport;
@@ -246,7 +246,7 @@ export class Provider extends EventEmitter {
             }
             case typeof ix === "object": {
                 this.ensureValidInteraction(ix);
-                args = createIx(ix);
+                args = interaction(ix);
                 break;
             }
             default: {

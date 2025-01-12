@@ -249,7 +249,7 @@ class Provider extends events_1.EventEmitter {
             }
             case typeof ix === "object": {
                 this.ensureValidInteraction(ix);
-                args = (0, js_moi_utils_1.createIx)(ix);
+                args = (0, js_moi_utils_1.interaction)(ix);
                 break;
             }
             default: {

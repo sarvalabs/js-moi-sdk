@@ -34,5 +34,5 @@ export declare function encodeInteraction(ix: InteractionRequest | RawInteractio
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export declare const createIx: (ix: InteractionRequest) => Uint8Array;
+export declare const interaction: (ix: InteractionRequest) => Uint8Array;
 //# sourceMappingURL=interaction.d.ts.map
