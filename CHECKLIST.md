@@ -8,7 +8,7 @@
 - [] `moi.AccountKey`
 - [] `moi.AccountAsset`
 - [] `moi.Asset`
-- [] `moi.Logic`
+- [x] `moi.Logic`
 - [] `moi.LogicStorage`
 - [] `moi.LogicMessage`
 - [] `moi.Subscribe`
