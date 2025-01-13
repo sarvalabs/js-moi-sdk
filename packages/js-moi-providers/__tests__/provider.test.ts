@@ -99,4 +99,40 @@ describe("Provider", () => {
             expect(result.hash).toEqual(expect.any(String));
         });
     });
+
+    describe(provider.getAccount, () => {
+        it("should return the account when retrieved using address", async () => {
+            const account = await provider.getAccount(ADDRESS);
+
+            expect(account).toBeDefined();
+            expect(account.metadata.address).toEqual(ADDRESS);
+        });
+
+        it("should able to get account using reference", async () => {
+            const height = 0;
+            const account = await provider.getAccount(ADDRESS, {
+                reference: { relative: { height, identifier: ADDRESS } },
+                modifier: { include: ["balances", "state"] },
+            });
+
+            expect(account).toBeDefined();
+            expect(account.metadata.height).toBe(height);
+            expect(account.state).toBeDefined();
+            expect(account.balances).toBeDefined();
+        });
+
+        it("should return the account with included fields", async () => {
+            const account = await provider.getAccount(ADDRESS, { modifier: { include: ["balances"] } });
+
+            expect(account).toBeDefined();
+            expect(account.balances).toBeDefined();
+        });
+
+        it("should return the object with the extracted fields", async () => {
+            const account = await provider.getAccount(ADDRESS, { modifier: { extract: "balances" } });
+
+            expect(account).toBeDefined();
+            expect(account.balances).toBeDefined();
+        });
+    });
 });

@@ -11,7 +11,7 @@ export interface NetworkActionApi {
     "moi.Simulate": ApiMethod<[param: {
         interaction: Hex;
     } & TesseractReferenceParam], Simulate>;
-    "moi.Account": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Account, "metadata">>]>;
+    "moi.Account": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam]>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

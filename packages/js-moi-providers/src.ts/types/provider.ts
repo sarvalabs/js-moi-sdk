@@ -19,7 +19,7 @@ type NonOptionKeys<T extends Record<string, any>> = {
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>>
     ? K extends keyof TObject
         ? TModifier extends { modifier: ExtractModifier<infer E> }
-            ? TObject[E]
+            ? Required<Pick<TObject, E>>
             : TModifier extends { modifier: IncludeModifier<infer E> }
             ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>>
             : never
@@ -42,7 +42,7 @@ interface SimulateRequest {
     simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
 }
 
-export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">>;
+export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam;
 
 interface AccountRequest {
     getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
