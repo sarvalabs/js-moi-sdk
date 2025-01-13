@@ -77,4 +77,9 @@ export declare enum ElementType {
     Method = "method",
     Event = "event"
 }
+export declare enum InteractionStatus {
+    Queued = 0,
+    Pending = 1,
+    Finalized = 2
+}
 //# sourceMappingURL=enums.d.ts.map

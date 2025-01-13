@@ -87,4 +87,10 @@ export var ElementType;
     ElementType["Method"] = "method";
     ElementType["Event"] = "event";
 })(ElementType || (ElementType = {}));
+export var InteractionStatus;
+(function (InteractionStatus) {
+    InteractionStatus[InteractionStatus["Queued"] = 0] = "Queued";
+    InteractionStatus[InteractionStatus["Pending"] = 1] = "Pending";
+    InteractionStatus[InteractionStatus["Finalized"] = 2] = "Finalized";
+})(InteractionStatus || (InteractionStatus = {}));
 //# sourceMappingURL=enums.js.map

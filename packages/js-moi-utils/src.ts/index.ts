@@ -1,7 +1,7 @@
 export { isValidAddress } from "./address";
 export { decodeBase64, encodeBase64 } from "./base64";
 export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger, type Bytes } from "./bytes";
-export { AccountType, AssetStandard, ElementType, EngineKind, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineType } from "./enums";
+export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineType } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike, type Quantity } from "./hex";
 export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
@@ -69,14 +69,27 @@ export type {
     AccountMandate,
     AccountMetaData,
     AccountState,
+    Commits,
+    ConsensusInfo,
     Controls,
     Enlisted,
+    FuelInfo,
     Guardians,
+    ICS,
+    Interaction,
+    InteractionConfirmation,
+    InteractionInfo,
+    IxAccount,
     IxOperationResult,
     KramaID,
     NetworkInfo,
+    PreviousICS,
     Simulate,
     SimulationEffects,
     SimulationResult,
+    Stochastic,
+    Tesseract,
+    TesseractData,
+    TesseractInfo,
 } from "./types/rpc/responses";
 export type { Transport } from "./types/transport";

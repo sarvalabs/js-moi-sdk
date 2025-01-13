@@ -87,3 +87,9 @@ export enum ElementType {
     Method = "method",
     Event = "event",
 }
+
+export enum InteractionStatus {
+    Queued = 0,
+    Pending = 1,
+    Finalized = 2,
+}
