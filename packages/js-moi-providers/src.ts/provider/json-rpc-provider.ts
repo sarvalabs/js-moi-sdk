@@ -5,6 +5,8 @@ import {
     interaction,
     isHex,
     validateIxRequest,
+    type Account,
+    type Address,
     type Hex,
     type InteractionRequest,
     type JsonRpcResponse,
@@ -15,7 +17,7 @@ import {
 
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";
+import type { AccountRequestOption, GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";
 
 export class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport: Transport;
@@ -117,6 +119,10 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         }
 
         return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
+    }
+
+    async getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
+        return await this.call("moi.Account", { identifier: address, ...option });
     }
 
     // private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {

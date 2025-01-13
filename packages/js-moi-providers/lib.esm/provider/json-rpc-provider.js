@@ -83,6 +83,9 @@ export class JsonRpcProvider extends EventEmitter {
         }
         return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
     }
+    async getAccount(address, option) {
+        return await this.call("moi.Account", { identifier: address, ...option });
+    }
     // private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {
     //     return await this.call("moi.Tesseract", { reference });
     // }

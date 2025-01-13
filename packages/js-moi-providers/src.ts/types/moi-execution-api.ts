@@ -1,13 +1,18 @@
-import type { Hex, NetworkInfo, ResponseModifierParam, Simulate, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, Address, Hex, NetworkInfo, ResponseModifierParam, Simulate, TesseractReferenceParam } from "js-moi-utils";
 
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
 };
 
+interface IdentifierParam<TValue> {
+    identifier: TValue;
+}
+
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
     "moi.Simulate": ApiMethod<[param: { interaction: Hex } & TesseractReferenceParam], Simulate>;
+    "moi.Account": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Account, "metadata">>]>;
 }
 
 /**

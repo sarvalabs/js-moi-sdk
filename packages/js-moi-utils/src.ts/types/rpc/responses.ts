@@ -1,5 +1,5 @@
-import type { OperationStatus, OpType, ReceiptStatus } from "../../enums";
-import type { Hex } from "../../hex";
+import type { AccountType, OperationStatus, OpType, ReceiptStatus } from "../../enums";
+import type { Address, Hex, Quantity } from "../../hex";
 import type { OperationResult } from "./ix-result";
 
 export interface NetworkInfo {
@@ -32,4 +32,67 @@ export interface Simulate {
     result: IxOperationResult[];
     effort: number;
     effects: SimulationEffects[] | null;
+}
+
+export interface AccountMetaData {
+    type: AccountType;
+    address: Hex;
+    height: number;
+    tesseract: Hex;
+}
+
+export interface AccountState {
+    guardians: Hex;
+    controls: Hex;
+    assets: Hex;
+    logics: Hex;
+    storage: Hex;
+}
+
+export interface AccountKey {
+    key_idx: number;
+    weight: number;
+    revoked: boolean;
+    public_key: Hex;
+    sequence: number;
+    algorithm: number;
+}
+
+export interface AccountBalance {
+    asset_id: Hex;
+    amount: Quantity;
+}
+
+export interface AccountMandate {
+    asset_id: Hex;
+    spender: Address;
+    amount: Quantity;
+}
+
+export interface AccountLockup {
+    asset_id: Hex;
+    locker: Address;
+    amount: Quantity;
+}
+
+export type KramaID = string;
+
+export interface Guardians {
+    behavior: KramaID[];
+    stochastic: KramaID[];
+}
+
+export interface Controls {}
+
+export interface Enlisted {}
+
+export interface Account {
+    metadata: AccountMetaData;
+    state?: AccountState;
+    keys?: AccountKey[];
+    balances?: AccountBalance[];
+    mandates?: AccountMandate[];
+    lockups?: AccountLockup[];
+    guardians?: Guardians;
+    enlisted?: Enlisted;
 }

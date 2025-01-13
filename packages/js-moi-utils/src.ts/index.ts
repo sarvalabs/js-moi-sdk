@@ -3,7 +3,7 @@ export { decodeBase64, encodeBase64 } from "./base64";
 export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger, type Bytes } from "./bytes";
 export { AccountType, AssetStandard, ElementType, EngineKind, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineType } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
-export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike } from "./hex";
+export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike, type Quantity } from "./hex";
 export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export {
@@ -61,5 +61,22 @@ export type {
     TesseractReference,
     TesseractReferenceParam,
 } from "./types/rpc/common-entities";
-export type { NetworkInfo, Simulate, SimulationEffects, SimulationResult } from "./types/rpc/responses";
+export type {
+    Account,
+    AccountBalance,
+    AccountKey,
+    AccountLockup,
+    AccountMandate,
+    AccountMetaData,
+    AccountState,
+    Controls,
+    Enlisted,
+    Guardians,
+    IxOperationResult,
+    KramaID,
+    NetworkInfo,
+    Simulate,
+    SimulationEffects,
+    SimulationResult,
+} from "./types/rpc/responses";
 export type { Transport } from "./types/transport";

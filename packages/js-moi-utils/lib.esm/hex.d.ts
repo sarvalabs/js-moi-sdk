@@ -1,6 +1,10 @@
 import BN from "bn.js";
 import { Buffer } from "buffer";
 export type Hex = `0x${string}`;
+/**
+ * A type representing a number in hexadecimal format.
+ */
+export type Quantity = Hex;
 export type Address = Hex;
 export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];
 /**
