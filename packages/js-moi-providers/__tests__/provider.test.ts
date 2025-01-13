@@ -161,5 +161,25 @@ describe("Provider", () => {
             expect(logic).toBeDefined();
             expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ADDRESS))).toBeTruthy();
         });
+
+        it.concurrent("should return the logic with included fields", async () => {
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS, {
+                modifier: { include: ["manifest", "controller", "edition"] },
+            });
+
+            expect(logic).toBeDefined();
+            expect(logic.manifest).toBeDefined();
+            expect(logic.controller).toBeDefined();
+            expect(logic.edition).toBeDefined();
+        });
+
+        it.concurrent("should return the logic with extracted fields", async () => {
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS, {
+                modifier: { extract: "manifest" },
+            });
+
+            expect(logic).toBeDefined();
+            expect(logic.manifest).toBeDefined();
+        });
     });
 });

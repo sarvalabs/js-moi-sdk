@@ -185,7 +185,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
     }
 
-    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: LogicRequestOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
+    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
         if (!isValidAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
