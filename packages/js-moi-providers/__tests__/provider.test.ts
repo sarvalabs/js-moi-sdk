@@ -1,11 +1,11 @@
-import { AssetStandard, hexToBytes, OpType, ReceiptStatus, trimHexPrefix, type Address } from "js-moi-utils";
-import { HttpProvider } from "../src.ts";
+import { AssetStandard, hexToBytes, LogicId, OpType, ReceiptStatus, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
+import { HttpProvider, JsonRpcProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
-const GUARDIAN_LOGIC_ADDRESS = "0x5edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
+const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
 const HOST = "http://localhost:1600";
 
-describe("Provider", () => {
+describe(JsonRpcProvider, () => {
     const provider = new HttpProvider(HOST, {
         debug: (request) => console.log(JSON.stringify(request)),
     });
@@ -146,24 +146,31 @@ describe("Provider", () => {
     });
 
     describe(provider.getLogic, () => {
-        it.concurrent("should return the logic when retrieved using address", async () => {
-            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS);
+        it.concurrent("should return the logic when retrieved using logic id", async () => {
+            const logic = await provider.getLogic(new LogicId(GUARDIAN_LOGIC_ID));
 
             expect(logic).toBeDefined();
-            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ADDRESS))).toBeTruthy();
+            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ID))).toBeTruthy();
+        });
+
+        it.concurrent("should return the logic when retrieved using address", async () => {
+            const logic = await provider.getLogic(new LogicId(GUARDIAN_LOGIC_ID).getAddress());
+
+            expect(logic).toBeDefined();
+            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ID))).toBeTruthy();
         });
 
         it.concurrent("should return the logic with reference", async () => {
-            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS, {
-                reference: { relative: { identifier: GUARDIAN_LOGIC_ADDRESS, height: 0 } },
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ID, {
+                reference: { relative: { identifier: GUARDIAN_LOGIC_ID, height: 0 } },
             });
 
             expect(logic).toBeDefined();
-            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ADDRESS))).toBeTruthy();
+            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ID))).toBeTruthy();
         });
 
         it.concurrent("should return the logic with included fields", async () => {
-            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS, {
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ID, {
                 modifier: { include: ["manifest", "controller", "edition"] },
             });
 
@@ -174,7 +181,7 @@ describe("Provider", () => {
         });
 
         it.concurrent("should return the logic with extracted fields", async () => {
-            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS, {
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ID, {
                 modifier: { extract: "manifest" },
             });
 
