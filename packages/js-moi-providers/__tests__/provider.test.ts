@@ -1,7 +1,8 @@
-import { AssetStandard, hexToBytes, OpType, ReceiptStatus, type Address } from "js-moi-utils";
+import { AssetStandard, hexToBytes, OpType, ReceiptStatus, trimHexPrefix, type Address } from "js-moi-utils";
 import { HttpProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
+const GUARDIAN_LOGIC_ADDRESS = "0x5edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
 const HOST = "http://localhost:1600";
 
 describe("Provider", () => {
@@ -145,6 +146,20 @@ describe("Provider", () => {
     });
 
     describe(provider.getLogic, () => {
-        it.concurrent("should return the logic when retrieved using address", async () => {});
+        it.concurrent("should return the logic when retrieved using address", async () => {
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS);
+
+            expect(logic).toBeDefined();
+            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ADDRESS))).toBeTruthy();
+        });
+
+        it.concurrent("should return the logic with reference", async () => {
+            const logic = await provider.getLogic(GUARDIAN_LOGIC_ADDRESS, {
+                reference: { relative: { identifier: GUARDIAN_LOGIC_ADDRESS, height: 0 } },
+            });
+
+            expect(logic).toBeDefined();
+            expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ADDRESS))).toBeTruthy();
+        });
     });
 });
