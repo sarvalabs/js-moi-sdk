@@ -86,32 +86,41 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
     }
-    async getAccount(address, option) {
-        return await this.call("moi.Account", { identifier: address, ...option });
+    async getAccount(identifier, option) {
+        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        return await this.call("moi.Account", { identifier, ...option });
     }
     async getTesseractByReference(reference, option) {
         return await this.call("moi.Tesseract", { reference: reference, ...option });
     }
-    async getTesseract(address, height, option) {
+    async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
-            case (0, js_moi_utils_1.isValidAddress)(address) && typeof height === "number" && isValidOption(option): {
+            case (0, js_moi_utils_1.isValidAddress)(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
-                return await this.getTesseractByReference({ relative: { identifier: address, height } }, option);
+                return await this.getTesseractByReference({ relative: { identifier: identifier, height } }, option);
             }
-            case typeof address === "object" && isValidOption(height): {
+            case typeof identifier === "object" && isValidOption(height): {
                 // Getting tesseract by reference
-                return await this.getTesseractByReference(address, height);
+                return await this.getTesseractByReference(identifier, height);
             }
-            case typeof address === "string" && isValidOption(height): {
+            case typeof identifier === "string" && isValidOption(height): {
                 // Getting tesseract by hash
-                return await this.getTesseractByReference({ absolute: address }, height);
+                return await this.getTesseractByReference({ absolute: identifier }, height);
             }
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid arguments passed to get correct method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    }
+    getLogic(identifier, option) {
+        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        return this.call("moi.Logic", { identifier, ...option });
     }
     /**
      * Processes a JSON-RPC response and returns the result.

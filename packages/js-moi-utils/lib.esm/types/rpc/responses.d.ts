@@ -166,4 +166,18 @@ export interface Tesseract {
     interactions?: Interaction[];
     confirmations?: InteractionConfirmation[];
 }
+export interface LogicMetadata {
+    logic_id: Hex;
+    runtime: number;
+    persistent: boolean;
+    ephemeral: boolean;
+}
+export interface LogicController {
+}
+export interface Logic {
+    metadata: LogicMetadata;
+    manifest?: Hex;
+    controller?: LogicController;
+    edition?: string[];
+}
 //# sourceMappingURL=responses.d.ts.map

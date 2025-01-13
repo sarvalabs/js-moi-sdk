@@ -11,6 +11,7 @@ import {
     type Hex,
     type InteractionRequest,
     type JsonRpcResponse,
+    type Logic,
     type NetworkInfo,
     type Simulate,
     type Tesseract,
@@ -20,7 +21,15 @@ import {
 
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountRequestOption, GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption, TesseractRequestOption } from "../types/provider";
+import type {
+    AccountRequestOption,
+    GetNetworkInfoOption,
+    LogicRequestOption,
+    Provider,
+    SelectFromResponseModifier,
+    SimulateOption,
+    TesseractRequestOption,
+} from "../types/provider";
 
 export class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport: Transport;
@@ -124,8 +133,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
     }
 
-    async getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
-        return await this.call("moi.Account", { identifier: address, ...option });
+    async getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
+        if (!isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+
+        return await this.call("moi.Account", { identifier, ...option });
     }
 
     private async getTesseractByReference<TOption extends TesseractRequestOption>(
@@ -135,41 +148,49 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.Tesseract", { reference: reference, ...option });
     }
 
-    public getTesseract<TOption extends TesseractRequestOption>(address: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    public getTesseract<TOption extends TesseractRequestOption>(identifier: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     public getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     public getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     public async getTesseract<TOption extends TesseractRequestOption>(
-        address: Hex | TesseractReference,
+        identifier: Hex | TesseractReference,
         height?: number | TOption,
         option?: TOption
     ): Promise<SelectFromResponseModifier<Tesseract, TOption>> {
         const isValidOption = (option: unknown): option is TOption => typeof option === "undefined" || typeof option === "object";
 
         switch (true) {
-            case isValidAddress(address) && typeof height === "number" && isValidOption(option): {
+            case isValidAddress(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
 
                 if (Number.isNaN(height) || height < -1) {
                     ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
                 }
 
-                return await this.getTesseractByReference({ relative: { identifier: address, height } }, option);
+                return await this.getTesseractByReference({ relative: { identifier: identifier, height } }, option);
             }
 
-            case typeof address === "object" && isValidOption(height): {
+            case typeof identifier === "object" && isValidOption(height): {
                 // Getting tesseract by reference
 
-                return await this.getTesseractByReference(address, height);
+                return await this.getTesseractByReference(identifier, height);
             }
 
-            case typeof address === "string" && isValidOption(height): {
+            case typeof identifier === "string" && isValidOption(height): {
                 // Getting tesseract by hash
 
-                return await this.getTesseractByReference({ absolute: address }, height);
+                return await this.getTesseractByReference({ absolute: identifier }, height);
             }
         }
 
         ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
+    }
+
+    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: LogicRequestOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
+        if (!isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+
+        return this.call("moi.Logic", { identifier, ...option });
     }
 
     /**

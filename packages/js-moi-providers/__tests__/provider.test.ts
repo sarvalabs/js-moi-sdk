@@ -143,4 +143,8 @@ describe("Provider", () => {
             expect(tesseract.interactions).toBeDefined();
         });
     });
+
+    describe(provider.getLogic, () => {
+        it.concurrent("should return the logic when retrieved using address", async () => {});
+    });
 });
