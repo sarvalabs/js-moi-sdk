@@ -9,12 +9,19 @@ interface IdentifierParam<TValue> {
     identifier: TValue;
 }
 
+interface LogicStorageParam {
+    logic_id: Hex;
+    storage_id: Hex;
+    address?: Address;
+}
+
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
     "moi.Simulate": ApiMethod<[param: { interaction: Hex } & TesseractReferenceParam], Simulate>;
     "moi.Account": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam]>;
     "moi.Tesseract": ApiMethod<[param: Required<TesseractReferenceParam> & ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>]>;
     "moi.Logic": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Logic, "metadata">>]>;
+    "moi.LogicStorage": ApiMethod<[param: LogicStorageParam & TesseractReferenceParam], Hex>;
 }
 
 /**

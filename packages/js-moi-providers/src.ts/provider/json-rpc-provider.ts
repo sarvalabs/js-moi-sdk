@@ -1,10 +1,13 @@
 import {
     bytesToHex,
+    ensureHexPrefix,
     ErrorCode,
     ErrorUtils,
     interaction,
     isHex,
     isValidAddress,
+    LogicId,
+    StorageKey,
     validateIxRequest,
     type Account,
     type Address,
@@ -12,7 +15,6 @@ import {
     type InteractionRequest,
     type JsonRpcResponse,
     type Logic,
-    type LogicId,
     type NetworkInfo,
     type Simulate,
     type Tesseract,
@@ -26,6 +28,7 @@ import type {
     AccountRequestOption,
     GetNetworkInfoOption,
     LogicRequestOption,
+    LogicStorageRequestOption,
     Provider,
     SelectFromResponseModifier,
     SimulateOption,
@@ -131,7 +134,10 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             }
         }
 
-        return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
+        return await this.call("moi.Simulate", {
+            interaction: encodedIxArgs,
+            ...option,
+        });
     }
 
     async getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
@@ -146,7 +152,10 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         reference: TesseractReference,
         option?: TOption
     ): Promise<SelectFromResponseModifier<Tesseract, TOption>> {
-        return await this.call("moi.Tesseract", { reference: reference, ...option });
+        return await this.call("moi.Tesseract", {
+            reference: reference,
+            ...option,
+        });
     }
 
     public getTesseract<TOption extends TesseractRequestOption>(identifier: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
@@ -196,6 +205,48 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         }
 
         return this.call("moi.Logic", { identifier, ...option });
+    }
+
+    async getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    async getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    async getLogicStorage(
+        logicId: Hex | LogicId,
+        address: Hex | Address | StorageKey,
+        storageId?: Hex | StorageKey | LogicStorageRequestOption,
+        option?: LogicStorageRequestOption
+    ): Promise<Hex> {
+        const logicID = typeof logicId === "string" ? new LogicId(logicId) : logicId;
+
+        let params: MethodParams<"moi.LogicStorage">;
+
+        switch (true) {
+            case typeof storageId === "undefined" || (typeof storageId === "object" && !(storageId instanceof StorageKey)): {
+                // Getting logic storage by logic id and storage key
+                const id: Hex = typeof address === "string" ? address : address.hex();
+
+                params = [{ storage_id: id, logic_id: logicID.value, ...storageId }];
+                break;
+            }
+
+            case typeof storageId === "string":
+            case storageId instanceof StorageKey: {
+                // Getting logic storage by logic id, address, and storage key
+
+                if (!isValidAddress(address)) {
+                    ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
+                }
+                const id: Hex = typeof storageId === "string" ? storageId : storageId.hex();
+
+                params = [{ storage_id: id, logic_id: logicID.value, address, ...option }];
+                break;
+            }
+
+            default: {
+                ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+
+        return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
     }
 
     /**

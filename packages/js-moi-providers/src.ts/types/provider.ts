@@ -10,6 +10,7 @@ import type {
     NetworkInfo,
     ResponseModifierParam,
     Simulate,
+    StorageKey,
     Tesseract,
     TesseractReference,
     TesseractReferenceParam,
@@ -65,7 +66,13 @@ export type LogicRequestOption = TesseractReferenceParam & ResponseModifierParam
 interface LogicRequest {
     getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
     getLogic<TOption extends LogicRequestOption>(logicId: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-
 }
 
-export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest {}
+export type LogicStorageRequestOption = TesseractReferenceParam;
+
+interface LogicStorageRequest {
+    getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+}
+
+export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest, LogicStorageRequest {}

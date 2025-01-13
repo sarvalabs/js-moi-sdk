@@ -1,4 +1,4 @@
-import { bytesToHex, ErrorCode, ErrorUtils, interaction, isHex, isValidAddress, validateIxRequest, } from "js-moi-utils";
+import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isHex, isValidAddress, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { EventEmitter } from "events";
 export class JsonRpcProvider extends EventEmitter {
     _transport;
@@ -81,7 +81,10 @@ export class JsonRpcProvider extends EventEmitter {
                 ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
             }
         }
-        return await this.call("moi.Simulate", { interaction: encodedIxArgs, ...option });
+        return await this.call("moi.Simulate", {
+            interaction: encodedIxArgs,
+            ...option,
+        });
     }
     async getAccount(identifier, option) {
         if (!isValidAddress(identifier)) {
@@ -90,7 +93,10 @@ export class JsonRpcProvider extends EventEmitter {
         return await this.call("moi.Account", { identifier, ...option });
     }
     async getTesseractByReference(reference, option) {
-        return await this.call("moi.Tesseract", { reference: reference, ...option });
+        return await this.call("moi.Tesseract", {
+            reference: reference,
+            ...option,
+        });
     }
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
@@ -119,6 +125,32 @@ export class JsonRpcProvider extends EventEmitter {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         return this.call("moi.Logic", { identifier, ...option });
+    }
+    async getLogicStorage(logicId, address, storageId, option) {
+        const logicID = typeof logicId === "string" ? new LogicId(logicId) : logicId;
+        let params;
+        switch (true) {
+            case typeof storageId === "undefined" || (typeof storageId === "object" && !(storageId instanceof StorageKey)): {
+                // Getting logic storage by logic id and storage key
+                const id = typeof address === "string" ? address : address.hex();
+                params = [{ storage_id: id, logic_id: logicID.value, ...storageId }];
+                break;
+            }
+            case typeof storageId === "string":
+            case storageId instanceof StorageKey: {
+                // Getting logic storage by logic id, address, and storage key
+                if (!isValidAddress(address)) {
+                    ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
+                }
+                const id = typeof storageId === "string" ? storageId : storageId.hex();
+                params = [{ storage_id: id, logic_id: logicID.value, address, ...option }];
+                break;
+            }
+            default: {
+                ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+        return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
     }
     /**
      * Processes a JSON-RPC response and returns the result.

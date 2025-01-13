@@ -1,8 +1,9 @@
 import BN from "bn.js";
+import { type Hex } from "./hex";
 export declare class StorageKey {
     private value;
     constructor(value: number | string | Buffer | Uint8Array | BN);
-    hex(): string;
+    hex(): Hex;
     toBuffer(): Buffer;
 }
 /**

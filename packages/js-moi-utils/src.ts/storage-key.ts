@@ -1,7 +1,7 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import BN from "bn.js";
 import { Polorizer } from "js-polo";
-import { bytesToHex } from "./hex";
+import { bytesToHex, type Hex } from "./hex";
 
 export class StorageKey {
     private value: BN;
@@ -10,7 +10,7 @@ export class StorageKey {
         this.value = new BN(value);
     }
 
-    hex(): string {
+    hex(): Hex {
         return bytesToHex(this.toBuffer());
     }
 

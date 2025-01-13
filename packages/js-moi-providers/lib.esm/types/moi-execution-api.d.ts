@@ -6,6 +6,11 @@ export type ApiMethod<TParams extends any[], TResponse = any> = {
 interface IdentifierParam<TValue> {
     identifier: TValue;
 }
+interface LogicStorageParam {
+    logic_id: Hex;
+    storage_id: Hex;
+    address?: Address;
+}
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
     "moi.Simulate": ApiMethod<[param: {
@@ -14,6 +19,7 @@ export interface NetworkActionApi {
     "moi.Account": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam]>;
     "moi.Tesseract": ApiMethod<[param: Required<TesseractReferenceParam> & ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>]>;
     "moi.Logic": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Logic, "metadata">>]>;
+    "moi.LogicStorage": ApiMethod<[param: LogicStorageParam & TesseractReferenceParam], Hex>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

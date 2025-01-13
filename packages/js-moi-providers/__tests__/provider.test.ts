@@ -1,4 +1,4 @@
-import { AssetStandard, hexToBytes, LogicId, OpType, ReceiptStatus, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
+import { ArrayIndexAccessor, AssetStandard, generateStorageKey, hexToBytes, LogicId, OpType, ReceiptStatus, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
 import { HttpProvider, JsonRpcProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
@@ -187,6 +187,24 @@ describe(JsonRpcProvider, () => {
 
             expect(logic).toBeDefined();
             expect(logic.manifest).toBeDefined();
+        });
+    });
+
+    describe(provider.getLogicStorage, () => {
+        it.concurrent("should return the logic storage when retrieved using logic id and storage id", async () => {
+            const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
+            const storage = await provider.getLogicStorage(GUARDIAN_LOGIC_ID, storageId);
+
+            expect(storage).toBeDefined();
+            expect(storage).toEqual("0x");
+        });
+
+        it.concurrent("should return the logic storage when retrieved using logic id and address", async () => {
+            const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
+            const storage = await provider.getLogicStorage(GUARDIAN_LOGIC_ID, ADDRESS, "0x00");
+
+            expect(storage).toBeDefined();
+            expect(storage).toEqual("0x");
         });
     });
 });

@@ -1,4 +1,4 @@
-import type { Account, Address, ExtractModifier, Hex, IncludeModifier, InteractionRequest, Logic, LogicId, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, Address, ExtractModifier, Hex, IncludeModifier, InteractionRequest, Logic, LogicId, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "stream";
 type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
@@ -35,7 +35,12 @@ interface LogicRequest {
     getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
     getLogic<TOption extends LogicRequestOption>(logicId: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
 }
-export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest {
+export type LogicStorageRequestOption = TesseractReferenceParam;
+interface LogicStorageRequest {
+    getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+}
+export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest, LogicStorageRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map
