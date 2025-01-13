@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LogicId = void 0;
+exports.AssetId = exports.LogicId = void 0;
 const errors_1 = require("./errors");
 const hex_1 = require("./hex");
+const LOGIC_V0_LEN = 35;
+const ASSET_V0_LEN = 36;
 class LogicId {
     value;
     constructor(value) {
@@ -54,7 +56,7 @@ class LogicId {
         const version = bytes[0] & 0xf0;
         switch (version) {
             case 0: {
-                return bytes.length === 35;
+                return bytes.length === LOGIC_V0_LEN;
             }
             default: {
                 return false;
@@ -63,4 +65,58 @@ class LogicId {
     }
 }
 exports.LogicId = LogicId;
+class AssetId {
+    value;
+    constructor(value) {
+        if (!AssetId.isValid(value)) {
+            errors_1.ErrorUtils.throwArgumentError("Invalid AssetId", "value", value);
+        }
+        this.value = (0, hex_1.ensureHexPrefix)(value);
+    }
+    getBytes() {
+        return (0, hex_1.hexToBytes)(this.value);
+    }
+    getVersion() {
+        return 0;
+    }
+    isLogical() {
+        const bit = (this.getBytes()?.[0] >> 3) & 0x1;
+        return bit != 0;
+    }
+    isStateful() {
+        const bit = (this.getBytes()?.[0] >> 2) & 0x1;
+        return bit != 0;
+    }
+    getDimension() {
+        return this.getBytes()?.[1];
+    }
+    getStandard() {
+        const buff = this.getBytes().slice(2, 4);
+        const standard = new DataView(buff.buffer).getUint16(0, false);
+        return standard;
+    }
+    getAddress() {
+        return (0, hex_1.ensureHexPrefix)(this.value.slice(this.value.length - 64));
+    }
+    static isValid(value) {
+        if (!(0, hex_1.isHex)(value) || value.length % 2 !== 0) {
+            return false;
+        }
+        const buff = (0, hex_1.hexToBytes)(value);
+        if (buff.length < 1) {
+            return false;
+        }
+        const version = buff[0] & 0xf0;
+        console.log(version);
+        switch (version) {
+            case 0: {
+                return buff.length === ASSET_V0_LEN;
+            }
+            default: {
+                return false;
+            }
+        }
+    }
+}
+exports.AssetId = AssetId;
 //# sourceMappingURL=identifier.js.map
