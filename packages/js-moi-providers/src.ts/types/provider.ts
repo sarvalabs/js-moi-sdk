@@ -6,6 +6,7 @@ import type {
     IncludeModifier,
     InteractionRequest,
     Logic,
+    LogicId,
     NetworkInfo,
     ResponseModifierParam,
     Simulate,
@@ -63,6 +64,8 @@ export type LogicRequestOption = TesseractReferenceParam & ResponseModifierParam
 
 interface LogicRequest {
     getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+    getLogic<TOption extends LogicRequestOption>(logicId: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+
 }
 
 export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest {}

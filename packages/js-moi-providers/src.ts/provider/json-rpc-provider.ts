@@ -12,6 +12,7 @@ import {
     type InteractionRequest,
     type JsonRpcResponse,
     type Logic,
+    type LogicId,
     type NetworkInfo,
     type Simulate,
     type Tesseract,
@@ -185,7 +186,11 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
     }
 
-    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
+    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+    getLogic<TOption extends LogicRequestOption>(identifier: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+    getLogic<TOption extends LogicRequestOption>(value: Address | LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
+        const identifier = typeof value === "string" ? value : value.getAddress();
+
         if (!isValidAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
