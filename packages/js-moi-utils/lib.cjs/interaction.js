@@ -114,9 +114,9 @@ const gatherIxParticipants = (interaction) => {
             }
             case enums_1.OpType.AssetMint:
             case enums_1.OpType.AssetBurn: {
-                const address = (0, hex_1.ensureHexPrefix)((0, hex_1.trimHexPrefix)(payload.asset_id).slice(8));
-                participants.set(address, {
-                    address,
+                const assetId = new identifier_1.AssetId(payload.asset_id);
+                participants.set(assetId.getAddress(), {
+                    address: assetId.getAddress(),
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });

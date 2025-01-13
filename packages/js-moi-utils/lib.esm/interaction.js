@@ -2,8 +2,8 @@ import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { isValidAddress } from "./address";
 import { LockType, OpType } from "./enums";
-import { ensureHexPrefix, hexToBytes, trimHexPrefix } from "./hex";
-import { LogicId } from "./identifier";
+import { hexToBytes } from "./hex";
+import { AssetId, LogicId } from "./identifier";
 import { encodeOperation, validateOperation } from "./operations";
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -108,9 +108,9 @@ const gatherIxParticipants = (interaction) => {
             }
             case OpType.AssetMint:
             case OpType.AssetBurn: {
-                const address = ensureHexPrefix(trimHexPrefix(payload.asset_id).slice(8));
-                participants.set(address, {
-                    address,
+                const assetId = new AssetId(payload.asset_id);
+                participants.set(assetId.getAddress(), {
+                    address: assetId.getAddress(),
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });

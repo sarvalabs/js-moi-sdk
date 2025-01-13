@@ -3,7 +3,7 @@ import { AssetId, ensureHexPrefix, LogicId, type Hex } from "../src.ts";
 interface TestCase<TVal, TExpected> {
     value: TVal;
     expected: TExpected;
-}
+}``
 
 const logicId = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
 const assetId = "0x08020001cb1dc89688d0eb37bfde940341a476a8912cc4555e778f3483724fd9afac0190";

@@ -2,8 +2,8 @@ import { Polorizer, type Schema } from "js-polo";
 import { polo } from "polo-schema";
 import { isValidAddress } from "./address";
 import { LockType, OpType } from "./enums";
-import { ensureHexPrefix, hexToBytes, trimHexPrefix, type Address, type Hex } from "./hex";
-import { LogicId } from "./identifier";
+import { hexToBytes, type Address, type Hex } from "./hex";
+import { AssetId, LogicId } from "./identifier";
 import { encodeOperation, validateOperation } from "./operations";
 import type { InteractionRequest, IxFund, IxParticipant, RawInteractionRequest } from "./types/interaction";
 
@@ -123,9 +123,9 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
 
             case OpType.AssetMint:
             case OpType.AssetBurn: {
-                const address = ensureHexPrefix(trimHexPrefix(payload.asset_id).slice(8));
-                participants.set(address, {
-                    address,
+                const assetId = new AssetId(payload.asset_id);
+                participants.set(assetId.getAddress(), {
+                    address: assetId.getAddress(),
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
