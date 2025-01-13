@@ -99,7 +99,7 @@ describe(AssetId, () => {
 
     it.concurrent("should create an asset id", () => {
         const id = new AssetId(assetId);
-        expect(id.toString()).toBe(assetId);
+        expect(id.value).toBe(assetId);
     });
 
     test.each([
