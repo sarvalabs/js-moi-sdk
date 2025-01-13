@@ -109,9 +109,6 @@ describe("Provider", () => {
             expect(tesseract).toBeDefined();
             expect(tesseract.hash).toBeDefined();
             expect(tesseract.tesseract).toBeDefined();
-            expect(tesseract.confirmations).toBeDefined();
-            expect(tesseract.consensus).toBeDefined();
-            expect(tesseract.interactions).toBeDefined();
         });
 
         it.concurrent("should return the tesseract when retrieved using tesseract hash", async () => {
@@ -132,6 +129,18 @@ describe("Provider", () => {
             expect(tesseract).toBeDefined();
             expect(tesseract.hash).toBeDefined();
             expect(tesseract.hash).toBe(currentTesseract.hash);
+        });
+
+        it.concurrent("should return the tesseract with included fields", async () => {
+            const tesseract = await provider.getTesseract(ADDRESS, 0, {
+                modifier: { include: ["confirmations", "consensus", "interactions"] },
+            });
+
+            expect(tesseract).toBeDefined();
+            expect(tesseract.interactions).toBeDefined();
+            expect(tesseract.confirmations).toBeDefined();
+            expect(tesseract.consensus).toBeDefined();
+            expect(tesseract.interactions).toBeDefined();
         });
     });
 });
