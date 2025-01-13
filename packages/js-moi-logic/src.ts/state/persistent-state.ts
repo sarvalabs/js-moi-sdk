@@ -32,7 +32,7 @@ export class PersistentState {
 
     /**
      * Returns an accessor builder for the specified slot.
-     * 
+     *
      * @param slot - The slot number.
      * @param createAccessorBuilder - The function to create the accessor builder.
      * @returns The accessor builder for the specified slot.
@@ -45,7 +45,7 @@ export class PersistentState {
 
     /**
      * Retrieves the value from the persistent state.
-     * 
+     *
      * @param createAccessorBuilder - The function that creates the accessor builder.
      * @returns A promise that resolves to the retrieved value.
      * @throws An error if the persistent state is not present or if the accessor builder is invalid.
@@ -54,7 +54,7 @@ export class PersistentState {
         const [ptr, hasPersistentState] = this.driver.hasPersistentState();
 
         if (!hasPersistentState) {
-            ErrorUtils.throwError("Persistent state is not present");
+            ErrorUtils.throwError("Persistent state is not present", ErrorCode.INVALID_ARGUMENT);
         }
 
         const builder = this.getBuilder(ptr, createAccessorBuilder);

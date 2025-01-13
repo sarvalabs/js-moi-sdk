@@ -1,21 +1,4 @@
-import { bytesToHex } from "@noble/hashes/utils";
-import BN from "bn.js";
-
-export class StorageKey {
-    private value: BN;
-
-    constructor(value: number | string | Buffer | Uint8Array | BN) {
-        this.value = new BN(value);
-    }
-
-    hex(): string {
-        return bytesToHex(this.toBuffer());
-    }
-
-    toBuffer(): Buffer {
-        return this.value.toBuffer("be", 32);
-    }
-}
+import type { StorageKey } from "js-moi-utils";
 
 /**
  * Represents an accessor that provides access to a slot hash.
