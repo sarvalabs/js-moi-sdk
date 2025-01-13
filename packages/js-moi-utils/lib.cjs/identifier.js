@@ -6,7 +6,7 @@ const hex_1 = require("./hex");
 class LogicId {
     value;
     constructor(value) {
-        if ((0, hex_1.trimHexPrefix)(value).length < 64) {
+        if (!LogicId.isValid(value)) {
             errors_1.ErrorUtils.throwArgumentError("Invalid LogicId", "value", value);
         }
         this.value = (0, hex_1.ensureHexPrefix)(value);
@@ -44,7 +44,7 @@ class LogicId {
         return 0;
     }
     static isValid(value) {
-        if (!(0, hex_1.isHex)(value)) {
+        if (!(0, hex_1.isHex)(value) || value.length % 2 !== 0) {
             return false;
         }
         const bytes = (0, hex_1.hexToBytes)(value);

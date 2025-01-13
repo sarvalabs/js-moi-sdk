@@ -7,6 +7,7 @@ const polo_schema_1 = require("polo-schema");
 const address_1 = require("./address");
 const enums_1 = require("./enums");
 const hex_1 = require("./hex");
+const identifier_1 = require("./identifier");
 const operations_1 = require("./operations");
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -107,7 +108,7 @@ const gatherIxParticipants = (interaction) => {
                 participants.set(payload.address, {
                     address: payload.address,
                     lock_type: enums_1.LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
@@ -117,7 +118,7 @@ const gatherIxParticipants = (interaction) => {
                 participants.set(address, {
                     address,
                     lock_type: enums_1.LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
@@ -125,17 +126,17 @@ const gatherIxParticipants = (interaction) => {
                 participants.set(payload.beneficiary, {
                     address: payload.beneficiary,
                     lock_type: enums_1.LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
             case enums_1.OpType.LogicInvoke:
             case enums_1.OpType.LogicEnlist: {
-                const address = (0, hex_1.ensureHexPrefix)((0, hex_1.trimHexPrefix)(payload.logic_id).slice(6));
-                participants.set(address, {
-                    address,
+                const logicId = new identifier_1.LogicId(payload.logic_id);
+                participants.set(logicId.getAddress(), {
+                    address: logicId.getAddress(),
                     lock_type: enums_1.LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }

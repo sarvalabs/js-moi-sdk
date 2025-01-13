@@ -113,7 +113,8 @@ export class JsonRpcProvider extends EventEmitter {
         }
         ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
     }
-    getLogic(identifier, option) {
+    getLogic(value, option) {
+        const identifier = typeof value === "string" ? value : value.getAddress();
         if (!isValidAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }

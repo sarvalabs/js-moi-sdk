@@ -1,9 +1,9 @@
 import { ErrorUtils } from "./errors";
-import { ensureHexPrefix, hexToBytes, isHex, trimHexPrefix } from "./hex";
+import { ensureHexPrefix, hexToBytes, isHex } from "./hex";
 export class LogicId {
     value;
     constructor(value) {
-        if (trimHexPrefix(value).length < 64) {
+        if (!LogicId.isValid(value)) {
             ErrorUtils.throwArgumentError("Invalid LogicId", "value", value);
         }
         this.value = ensureHexPrefix(value);
@@ -41,7 +41,7 @@ export class LogicId {
         return 0;
     }
     static isValid(value) {
-        if (!isHex(value)) {
+        if (!isHex(value) || value.length % 2 !== 0) {
             return false;
         }
         const bytes = hexToBytes(value);

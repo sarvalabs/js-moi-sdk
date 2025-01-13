@@ -3,6 +3,7 @@ import { polo } from "polo-schema";
 import { isValidAddress } from "./address";
 import { LockType, OpType } from "./enums";
 import { ensureHexPrefix, hexToBytes, trimHexPrefix, type Address, type Hex } from "./hex";
+import { LogicId } from "./identifier";
 import { encodeOperation, validateOperation } from "./operations";
 import type { InteractionRequest, IxFund, IxParticipant, RawInteractionRequest } from "./types/interaction";
 
@@ -115,7 +116,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
                 participants.set(payload.address, {
                     address: payload.address,
                     lock_type: LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
@@ -126,7 +127,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
                 participants.set(address, {
                     address,
                     lock_type: LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
@@ -135,18 +136,18 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
                 participants.set(payload.beneficiary, {
                     address: payload.beneficiary,
                     lock_type: LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
 
             case OpType.LogicInvoke:
             case OpType.LogicEnlist: {
-                const address = ensureHexPrefix(trimHexPrefix(payload.logic_id).slice(6));
-                participants.set(address, {
-                    address,
+                const logicId = new LogicId(payload.logic_id);
+                participants.set(logicId.getAddress(), {
+                    address: logicId.getAddress(),
                     lock_type: LockType.MutateLock,
-                    notary: false, // TODO: Check what should be value of this or can be left blank
+                    notary: false,
                 });
                 break;
             }
