@@ -1,7 +1,7 @@
-import { type Account, type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type Simulate, type Transport } from "js-moi-utils";
+import { type Account, type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountRequestOption, GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";
+import type { AccountRequestOption, GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption, TesseractRequestOption } from "../types/provider";
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
@@ -45,6 +45,10 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
     getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
+    private getTesseractByReference;
+    getTesseract<TOption extends TesseractRequestOption>(address: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

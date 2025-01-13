@@ -1,4 +1,4 @@
-import type { Account, Address, ExtractModifier, Hex, IncludeModifier, InteractionRequest, NetworkInfo, ResponseModifierParam, Simulate, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, Address, ExtractModifier, Hex, IncludeModifier, InteractionRequest, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "stream";
 type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
@@ -24,7 +24,13 @@ export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, 
 interface AccountRequest {
     getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
 }
-export interface Provider extends EventEmitter, GetNetworkInfoRequest, SimulateRequest, AccountRequest {
+export type TesseractRequestOption = ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>;
+interface TesseractRequest {
+    getTesseract<TOption extends TesseractRequestOption>(address: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+}
+export interface Provider extends EventEmitter, GetNetworkInfoRequest, SimulateRequest, AccountRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

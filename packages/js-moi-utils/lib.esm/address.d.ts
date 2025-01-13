@@ -5,5 +5,5 @@ import type { Address } from "./hex";
  * @param {string} address - The address to validate.
  * @returns {boolean} Returns true if the address is valid, otherwise false.
  */
-export declare const isValidAddress: (address: string) => address is Address;
+export declare const isValidAddress: (address: unknown) => address is Address;
 //# sourceMappingURL=address.d.ts.map

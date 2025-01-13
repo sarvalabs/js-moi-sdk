@@ -4,6 +4,7 @@ import {
     ErrorUtils,
     interaction,
     isHex,
+    isValidAddress,
     validateIxRequest,
     type Account,
     type Address,
@@ -12,12 +13,14 @@ import {
     type JsonRpcResponse,
     type NetworkInfo,
     type Simulate,
+    type Tesseract,
+    type TesseractReference,
     type Transport,
 } from "js-moi-utils";
 
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountRequestOption, GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "../types/provider";
+import type { AccountRequestOption, GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption, TesseractRequestOption } from "../types/provider";
 
 export class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport: Transport;
@@ -123,6 +126,50 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
 
     async getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
         return await this.call("moi.Account", { identifier: address, ...option });
+    }
+
+    private async getTesseractByReference<TOption extends TesseractRequestOption>(
+        reference: TesseractReference,
+        option?: TOption
+    ): Promise<SelectFromResponseModifier<Tesseract, TOption>> {
+        return await this.call("moi.Tesseract", { reference: reference, ...option });
+    }
+
+    public getTesseract<TOption extends TesseractRequestOption>(address: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    public getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    public getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    public async getTesseract<TOption extends TesseractRequestOption>(
+        address: Hex | TesseractReference,
+        height?: number | TOption,
+        option?: TOption
+    ): Promise<SelectFromResponseModifier<Tesseract, TOption>> {
+        const isValidOption = (option: unknown): option is TOption => typeof option === "undefined" || typeof option === "object";
+
+        switch (true) {
+            case isValidAddress(address) && typeof height === "number" && isValidOption(option): {
+                // Getting tesseract by address and height
+
+                if (Number.isNaN(height) || height < -1) {
+                    ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
+                }
+
+                return await this.getTesseractByReference({ relative: { identifier: address, height } }, option);
+            }
+
+            case typeof address === "object" && isValidOption(height): {
+                // Getting tesseract by reference
+
+                return await this.getTesseractByReference(address, height);
+            }
+
+            case typeof address === "string" && isValidOption(height): {
+                // Getting tesseract by hash
+
+                return await this.getTesseractByReference({ absolute: address }, height);
+            }
+        }
+
+        ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
     }
 
     // private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {

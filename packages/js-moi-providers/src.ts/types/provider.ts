@@ -8,6 +8,8 @@ import type {
     NetworkInfo,
     ResponseModifierParam,
     Simulate,
+    Tesseract,
+    TesseractReference,
     TesseractReferenceParam,
 } from "js-moi-utils";
 import type { EventEmitter } from "stream";
@@ -48,4 +50,12 @@ interface AccountRequest {
     getAccount<TOption extends AccountRequestOption>(address: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
 }
 
-export interface Provider extends EventEmitter, GetNetworkInfoRequest, SimulateRequest, AccountRequest {}
+export type TesseractRequestOption = ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>;
+
+interface TesseractRequest {
+    getTesseract<TOption extends TesseractRequestOption>(address: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+}
+
+export interface Provider extends EventEmitter, GetNetworkInfoRequest, SimulateRequest, AccountRequest, TesseractRequest {}

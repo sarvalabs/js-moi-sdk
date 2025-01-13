@@ -1,4 +1,4 @@
-import { bytesToHex, ErrorCode, ErrorUtils, interaction, isHex, validateIxRequest, } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, interaction, isHex, isValidAddress, validateIxRequest, } from "js-moi-utils";
 import { EventEmitter } from "events";
 export class JsonRpcProvider extends EventEmitter {
     _transport;
@@ -85,6 +85,30 @@ export class JsonRpcProvider extends EventEmitter {
     }
     async getAccount(address, option) {
         return await this.call("moi.Account", { identifier: address, ...option });
+    }
+    async getTesseractByReference(reference, option) {
+        return await this.call("moi.Tesseract", { reference: reference, ...option });
+    }
+    async getTesseract(address, height, option) {
+        const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
+        switch (true) {
+            case isValidAddress(address) && typeof height === "number" && isValidOption(option): {
+                // Getting tesseract by address and height
+                if (Number.isNaN(height) || height < -1) {
+                    ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
+                }
+                return await this.getTesseractByReference({ relative: { identifier: address, height } }, option);
+            }
+            case typeof address === "object" && isValidOption(height): {
+                // Getting tesseract by reference
+                return await this.getTesseractByReference(address, height);
+            }
+            case typeof address === "string" && isValidOption(height): {
+                // Getting tesseract by hash
+                return await this.getTesseractByReference({ absolute: address }, height);
+            }
+        }
+        ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
     }
     // private async getTesseractByReference(reference: TesseractReference): Promise<Tesseract> {
     //     return await this.call("moi.Tesseract", { reference });

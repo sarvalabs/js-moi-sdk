@@ -17,47 +17,6 @@ describe("Provider", () => {
         });
     });
 
-    // describe(provider.getTesseract, () => {
-    //     it.concurrent("should return tesseract when retrieved using address and height", async () => {
-    //         const height = 0;
-    //         const tesseract = await provider.getTesseract(ADDRESS, height);
-
-    //         expect(tesseract).toBeDefined();
-    //         expect(tesseract.hash).toBeDefined();
-    //     });
-
-    //     it.concurrent("should return tesseract when retrieved using address and height", async () => {
-    //         const height = -1;
-    //         const tesseract = await provider.getTesseract({ identifier: ADDRESS, height });
-
-    //         expect(tesseract).toBeDefined();
-    //         expect(tesseract.hash).toBeDefined();
-    //     });
-
-    //     it.concurrent("should throw error when tesseract retrieved using address and height where height is less than -1", async () => {
-    //         const height = Math.floor(Math.random() * -1000);
-
-    //         await expect(provider.getTesseract(ADDRESS, height)).rejects.toThrow();
-    //     });
-
-    //     it.concurrent("should return tesseract when retrieved using absolute reference", async () => {
-    //         const tsHash = "0xf283dc52e1ba682e18a7de7d3ffe68111f38eb3cfbf9cbc79477474677e3ca7b";
-    //         const tesseract = await provider.getTesseract(tsHash);
-
-    //         expect(tesseract).toBeDefined();
-    //         expect(tesseract.hash).toBeDefined();
-    //     });
-    // });
-
-    // describe(provider.getAccount, () => {
-    //     it.concurrent("should return account when retrieved using address", async () => {
-    //         const account = await provider.getAccount(ADDRESS);
-
-    //         expect(account).toBeDefined();
-    //         expect(account.metadata.address).toEqual(ADDRESS);
-    //     });
-    // });
-
     describe(provider.simulate, () => {
         it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
             const result = await provider.simulate({
@@ -101,38 +60,78 @@ describe("Provider", () => {
     });
 
     describe(provider.getAccount, () => {
-        it("should return the account when retrieved using address", async () => {
+        it.concurrent("should return the account when retrieved using address", async () => {
             const account = await provider.getAccount(ADDRESS);
 
             expect(account).toBeDefined();
             expect(account.metadata.address).toEqual(ADDRESS);
         });
 
-        it("should able to get account using reference", async () => {
+        it.concurrent("should able to get account using reference", async () => {
             const height = 0;
             const account = await provider.getAccount(ADDRESS, {
                 reference: { relative: { height, identifier: ADDRESS } },
-                modifier: { include: ["balances", "state"] },
+                modifier: { include: ["balances", "state", "enlisted", "guardians", "keys", "lockups", "mandates"] },
             });
 
             expect(account).toBeDefined();
             expect(account.metadata.height).toBe(height);
             expect(account.state).toBeDefined();
             expect(account.balances).toBeDefined();
+            expect(account.enlisted).toBeDefined();
+            expect(account.guardians).toBeDefined();
+            expect(account.keys).toBeDefined();
+            expect(account.lockups).toBeDefined();
         });
 
-        it("should return the account with included fields", async () => {
+        it.concurrent("should return the account with included fields", async () => {
             const account = await provider.getAccount(ADDRESS, { modifier: { include: ["balances"] } });
 
             expect(account).toBeDefined();
             expect(account.balances).toBeDefined();
         });
 
-        it("should return the object with the extracted fields", async () => {
+        it.concurrent("should return the object with the extracted fields", async () => {
             const account = await provider.getAccount(ADDRESS, { modifier: { extract: "balances" } });
 
             expect(account).toBeDefined();
             expect(account.balances).toBeDefined();
+        });
+    });
+
+    describe(provider.getTesseract, () => {
+        it.concurrent("should return the tesseract when retrieved using address and height", async () => {
+            const height = 0;
+            const tesseract = await provider.getTesseract(ADDRESS, height, {
+                modifier: { include: ["confirmations", "consensus", "interactions"] },
+            });
+
+            expect(tesseract).toBeDefined();
+            expect(tesseract.hash).toBeDefined();
+            expect(tesseract.tesseract).toBeDefined();
+            expect(tesseract.confirmations).toBeDefined();
+            expect(tesseract.consensus).toBeDefined();
+            expect(tesseract.interactions).toBeDefined();
+        });
+
+        it.concurrent("should return the tesseract when retrieved using tesseract hash", async () => {
+            const height = 0;
+            const currentTesseract = await provider.getTesseract(ADDRESS, height);
+            const tesseract = await provider.getTesseract(currentTesseract.hash);
+
+            expect(tesseract).toBeDefined();
+            expect(tesseract.hash).toBeDefined();
+            expect(tesseract.hash).toBe(currentTesseract.hash);
+        });
+
+        it.concurrent("should return the tesseract when retrieved using tesseract reference", async () => {
+            const height = 0;
+            const currentTesseract = await provider.getTesseract(ADDRESS, height);
+            const tesseract = await provider.getTesseract({ relative: { height, identifier: ADDRESS } });
+
+            expect(tesseract).toBeDefined();
+            expect(tesseract.hash).toBeDefined();
+            expect(tesseract.hash).toBe(currentTesseract.hash);
         });
     });
 });
