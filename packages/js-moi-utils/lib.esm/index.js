@@ -4,6 +4,7 @@ export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger } from ".
 export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineType } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";
+export { LogicId } from "./identifier";
 export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformPayload, validateOperation, } from "./operations";

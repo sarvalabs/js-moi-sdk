@@ -120,6 +120,9 @@ export const isHex = (value, byteLength) => {
     if (typeof value !== "string" || value === "0x") {
         return false;
     }
+    if (value.length % 2 !== 0) {
+        return false;
+    }
     let rgx = /^0x[0-9a-fA-F]*$/;
     if (byteLength != null) {
         if (byteLength <= 0) {

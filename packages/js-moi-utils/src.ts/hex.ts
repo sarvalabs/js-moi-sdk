@@ -11,14 +11,7 @@ export type Quantity = Hex;
 
 export type Address = Hex;
 
-export type NumberLike =
-    | string
-    | number
-    | bigint
-    | BN
-    | Buffer
-    | Uint8Array
-    | number[];
+export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];
 
 /**
  * Ensures that a given string has the '0x' prefix.
@@ -161,11 +154,7 @@ export const isHex = (value: unknown, byteLength?: number): value is Hex => {
 
     if (byteLength != null) {
         if (byteLength <= 0) {
-            ErrorUtils.throwArgumentError(
-                "Invalid length, must be a non zero positive number",
-                "length",
-                byteLength
-            );
+            ErrorUtils.throwArgumentError("Invalid length, must be a non zero positive number", "length", byteLength);
         }
 
         rgx = new RegExp(`^0x[0-9a-fA-F]{${byteLength * 2}}$`);
