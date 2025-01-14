@@ -1,7 +1,6 @@
 import { type PoloSchema } from "polo-schema";
 import { OpType } from "./enums";
-import type { IxRawOperation, Operation } from "./types/ix-operation";
-import type { OperationPayload, PoloOperationPayload } from "./types/ix-payload";
+import type { IxOperation, IxOperationPayload, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
      * Returns the POLO schema for the operation payload.
@@ -15,14 +14,14 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (payload: OperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
+    validator: (payload: IxOperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *
      * @param payload Operation payload
      * @returns Returns the transformed operation payload.
      */
-    transform?: (payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
+    transform?: (payload: IxOperationPayload<TOpType>) => PoloIxOperationPayload<TOpType>;
 }
 declare const createInvalidResult: <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     field: keyof T;
@@ -53,7 +52,7 @@ export declare const getIxOperationDescriptor: <TOpType extends OpType>(type: TO
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
+export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: IxOperationPayload<TOpType>) => PoloIxOperationPayload<TOpType>;
 /**
  * Encodes an operation payload to a POLO byte array.
  *
@@ -62,15 +61,15 @@ export declare const transformPayload: <TOpType extends OpType>(type: TOpType, p
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export declare const encodeOperation: <TOpType extends OpType>(operation: Operation<TOpType>) => IxRawOperation;
+export declare const encodeOperation: <TOpType extends OpType>(operation: IxOperation<TOpType>) => IxRawOperation;
 /**
  * Checks if the given operation is valid.
  *
  * @template TOpType - The type of the operation.
- * @param {Operation<TOpType>} operation - The operation to validate.
+ * @param {IxOperation<TOpType>} operation - The operation to validate.
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
-export declare const isValidOperation: <TOpType extends OpType>(operation: Operation<TOpType>) => boolean;
+export declare const isValidOperation: <TOpType extends OpType>(operation: IxOperation<TOpType>) => boolean;
 /**
  * Validates the payload of a given operation.
  *
@@ -78,6 +77,6 @@ export declare const isValidOperation: <TOpType extends OpType>(operation: Opera
  * @param operation - The operation to validate.
  * @returns The result of the validation.
  */
-export declare const validateOperation: <TOpType extends OpType>(operation: Operation<TOpType>) => ReturnType<IxOperationDescriptor<TOpType>["validator"]>;
+export declare const validateOperation: <TOpType extends OpType>(operation: IxOperation<TOpType>) => ReturnType<IxOperationDescriptor<TOpType>["validator"]>;
 export {};
 //# sourceMappingURL=operations.d.ts.map

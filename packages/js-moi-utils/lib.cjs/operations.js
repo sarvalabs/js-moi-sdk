@@ -253,7 +253,7 @@ exports.encodeOperation = encodeOperation;
  * Checks if the given operation is valid.
  *
  * @template TOpType - The type of the operation.
- * @param {Operation<TOpType>} operation - The operation to validate.
+ * @param {IxOperation<TOpType>} operation - The operation to validate.
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
 const isValidOperation = (operation) => {

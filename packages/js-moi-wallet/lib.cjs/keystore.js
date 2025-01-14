@@ -30,9 +30,9 @@ exports.aesCTRWithXOR = aesCTRWithXOR;
  */
 const getKDFKeyForKeystore = (keystore, password) => {
     const pwBuf = buffer_1.Buffer.from(password);
-    const salt = buffer_1.Buffer.from(keystore.kdfparams.salt, 'hex');
+    const salt = buffer_1.Buffer.from(keystore.kdfparams.salt, "hex");
     const dkLen = keystore.kdfparams.dklen;
-    if (keystore.kdf === 'scrypt') {
+    if (keystore.kdf === "scrypt") {
         const n = keystore.kdfparams.n;
         const r = keystore.kdfparams.r;
         const p = keystore.kdfparams.p;
@@ -62,12 +62,12 @@ const encryptKeystoreData = (data, password) => {
     const cipherText = (0, exports.aesCTRWithXOR)(encryptKey, data, iv);
     const mac = (0, sha3_1.keccak_256)(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     return {
-        cipher: 'aes-128-ctr',
+        cipher: "aes-128-ctr",
         ciphertext: (0, js_moi_utils_1.bytesToHex)(cipherText),
         cipherparams: {
             IV: (0, js_moi_utils_1.bytesToHex)(iv),
         },
-        kdf: 'scrypt',
+        kdf: "scrypt",
         kdfparams: {
             n: 4096,
             r: 8,
@@ -88,17 +88,17 @@ exports.encryptKeystoreData = encryptKeystoreData;
  * @throws {Error} If the cipher is not supported or the password is incorrect.
  */
 const decryptKeystoreData = (keystore, password) => {
-    if (keystore.cipher !== 'aes-128-ctr') {
+    if (keystore.cipher !== "aes-128-ctr") {
         js_moi_utils_1.ErrorUtils.throwError(`Cipher not supported: ${keystore.cipher}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
-    const mac = buffer_1.Buffer.from(keystore.mac, 'hex');
-    const iv = buffer_1.Buffer.from(keystore.cipherparams.IV, 'hex');
-    const cipherText = buffer_1.Buffer.from(keystore.ciphertext, 'hex');
+    const mac = buffer_1.Buffer.from(keystore.mac, "hex");
+    const iv = buffer_1.Buffer.from(keystore.cipherparams.IV, "hex");
+    const cipherText = buffer_1.Buffer.from(keystore.ciphertext, "hex");
     const derivedKey = (0, exports.getKDFKeyForKeystore)(keystore, password);
     const hash = (0, sha3_1.keccak_256)(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     const calculatedMAC = buffer_1.Buffer.from(hash);
     if (!calculatedMAC.equals(mac)) {
-        js_moi_utils_1.ErrorUtils.throwError("Could not decrypt key with the given password");
+        js_moi_utils_1.ErrorUtils.throwError("Could not decrypt key with the given password", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     return buffer_1.Buffer.from((0, exports.aesCTRWithXOR)(derivedKey.slice(0, 16), cipherText, iv));
 };

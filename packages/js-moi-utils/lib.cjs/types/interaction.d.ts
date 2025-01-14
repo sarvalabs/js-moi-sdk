@@ -1,6 +1,6 @@
 import type { LockType } from "../enums";
 import type { Hex } from "../hex";
-import type { IxOperation, IxRawOperation } from "./ix-operation";
+import type { IxOp, IxRawOperation } from "./ix-operation";
 export interface RawSender {
     address: Uint8Array;
     sequence_id: number;
@@ -33,7 +33,7 @@ export interface RawPreference {
     compute: Uint8Array;
     consensus: IxConsensusPreference;
 }
-export interface Preference {
+export interface IxPreference {
     compute: Hex;
     consensus: IxConsensusPreference;
 }
@@ -72,7 +72,7 @@ export interface InteractionRequest {
     /**
      * Represents an array of raw operations to be executed in the interaction
      */
-    operations: IxOperation[];
+    operations: IxOp[];
     /**
      * It represents a participant with an addresses and their lock type.
      */
@@ -80,7 +80,7 @@ export interface InteractionRequest {
     /**
      * It represents compute and consensus preferences for the interaction.
      */
-    preferences?: Preference;
+    preferences?: IxPreference;
     /**
      * The perception data for the interaction.
      */

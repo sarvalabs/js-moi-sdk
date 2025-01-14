@@ -1,7 +1,7 @@
 import type { AccountType, AssetStandard, InteractionStatus, LockType, OperationStatus, OpType, ReceiptStatus } from "../../enums";
 import type { Address, Hex, Quantity } from "../../hex";
 import type { IxParticipant } from "../interaction";
-import type { IxOp } from "../ix-operation";
+import type { LogicActionPayload, LogicDeployPayload, LogicPayload } from "../ix-operation";
 import type { OperationResult } from "./ix-result";
 
 export interface NetworkInfo {
@@ -160,10 +160,66 @@ export interface Consensus {
     nodes: KramaID[] | null;
 }
 
-interface Preference {
+export interface Preference {
     compute: Hex;
     consensus: Consensus;
 }
+
+export interface ParticipantCreateOperation {
+    address: Address;
+    amount: Quantity;
+}
+
+export interface AssetCreateOperation {
+    symbol: string;
+    supply: Quantity;
+    dimension: Quantity;
+    standard: Quantity;
+    is_logical: boolean;
+    is_stateful: boolean;
+    logic?: LogicPayload;
+}
+
+export interface AssetActionOperation {
+    benefactor: Address;
+    beneficiary: Address;
+    asset_id: Hex;
+    amount: Quantity;
+    timestamp: Hex;
+}
+
+export interface AssetSupplyOperation {
+    asset_id: Hex;
+    amount: Quantity;
+}
+
+export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
+    ? ParticipantCreateOperation
+    : T extends OpType.AssetCreate
+    ? AssetCreateOperation
+    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
+    ? AssetActionOperation
+    : T extends OpType.LogicDeploy
+    ? LogicDeployPayload
+    : T extends OpType.LogicEnlist | OpType.LogicInvoke
+    ? LogicActionPayload
+    : never;
+
+export interface Operation<T extends OpType> {
+    type: T;
+    payload: OperationPayload<T>;
+}
+
+export type OperationItem =
+    | Operation<OpType.AssetCreate>
+    | Operation<OpType.AssetTransfer>
+    | Operation<OpType.AssetApprove>
+    | Operation<OpType.AssetRevoke>
+    | Operation<OpType.AssetLockup>
+    | Operation<OpType.AssetRelease>
+    | Operation<OpType.LogicDeploy>
+    | Operation<OpType.LogicEnlist>
+    | Operation<OpType.LogicInvoke>;
 
 export interface InteractionInfo {
     sender: Hex;
@@ -172,7 +228,7 @@ export interface InteractionInfo {
     fuel_bonus: number;
     // TODO: There is difference between the protocol response and protocol response
     // for example, supply in request is numerical value but in response it is Quantity(HEX string)
-    operations: IxOp[];
+    operations: OperationItem[];
     accounts: IxParticipant[];
     metadata: Hex;
     preference: Preference;
@@ -187,7 +243,7 @@ export interface TesseractInfo {
 export interface InteractionConfirmation {
     status: ReceiptStatus;
     tesseract: TesseractInfo;
-    operations: IxOp[];
+    operations: OperationItem[];
     fuel_spent: number;
 }
 

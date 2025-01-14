@@ -26,9 +26,9 @@ export const aesCTRWithXOR = (key, input, iv) => {
  */
 export const getKDFKeyForKeystore = (keystore, password) => {
     const pwBuf = Buffer.from(password);
-    const salt = Buffer.from(keystore.kdfparams.salt, 'hex');
+    const salt = Buffer.from(keystore.kdfparams.salt, "hex");
     const dkLen = keystore.kdfparams.dklen;
-    if (keystore.kdf === 'scrypt') {
+    if (keystore.kdf === "scrypt") {
         const n = keystore.kdfparams.n;
         const r = keystore.kdfparams.r;
         const p = keystore.kdfparams.p;
@@ -57,12 +57,12 @@ export const encryptKeystoreData = (data, password) => {
     const cipherText = aesCTRWithXOR(encryptKey, data, iv);
     const mac = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     return {
-        cipher: 'aes-128-ctr',
+        cipher: "aes-128-ctr",
         ciphertext: bytesToHex(cipherText),
         cipherparams: {
             IV: bytesToHex(iv),
         },
-        kdf: 'scrypt',
+        kdf: "scrypt",
         kdfparams: {
             n: 4096,
             r: 8,
@@ -82,17 +82,17 @@ export const encryptKeystoreData = (data, password) => {
  * @throws {Error} If the cipher is not supported or the password is incorrect.
  */
 export const decryptKeystoreData = (keystore, password) => {
-    if (keystore.cipher !== 'aes-128-ctr') {
+    if (keystore.cipher !== "aes-128-ctr") {
         ErrorUtils.throwError(`Cipher not supported: ${keystore.cipher}`, ErrorCode.UNSUPPORTED_OPERATION);
     }
-    const mac = Buffer.from(keystore.mac, 'hex');
-    const iv = Buffer.from(keystore.cipherparams.IV, 'hex');
-    const cipherText = Buffer.from(keystore.ciphertext, 'hex');
+    const mac = Buffer.from(keystore.mac, "hex");
+    const iv = Buffer.from(keystore.cipherparams.IV, "hex");
+    const cipherText = Buffer.from(keystore.ciphertext, "hex");
     const derivedKey = getKDFKeyForKeystore(keystore, password);
     const hash = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     const calculatedMAC = Buffer.from(hash);
     if (!calculatedMAC.equals(mac)) {
-        ErrorUtils.throwError("Could not decrypt key with the given password");
+        ErrorUtils.throwError("Could not decrypt key with the given password", ErrorCode.INVALID_ARGUMENT);
     }
     return Buffer.from(aesCTRWithXOR(derivedKey.slice(0, 16), cipherText, iv));
 };

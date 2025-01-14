@@ -4,8 +4,7 @@ import { isValidAddress } from "./address";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isHex } from "./hex";
-import type { IxOperation, IxRawOperation } from "./types/ix-operation";
-import type { OperationPayload, PoloOperationPayload } from "./types/ix-payload";
+import type { IxOperation, IxOperationPayload, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
@@ -20,14 +19,14 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (payload: OperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
+    validator: (payload: IxOperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *
      * @param payload Operation payload
      * @returns Returns the transformed operation payload.
      */
-    transform?: (payload: OperationPayload<TOpType>) => PoloOperationPayload<TOpType>;
+    transform?: (payload: IxOperationPayload<TOpType>) => PoloIxOperationPayload<TOpType>;
 }
 
 type IxOperationDescriptorLookup = {
@@ -202,28 +201,28 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>(type: T) => {
                     ErrorUtils.throwError("Manifest is required for LogicDeploy operation", ErrorCode.INVALID_ARGUMENT);
                 }
 
-                const raw: PoloOperationPayload<OpType.LogicDeploy> = {
+                const raw: PoloIxOperationPayload<OpType.LogicDeploy> = {
                     ...payload,
                     manifest: hexToBytes(payload.manifest),
                     calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                     interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
                 };
 
-                return raw as PoloOperationPayload<T>;
+                return raw as PoloIxOperationPayload<T>;
             }
 
             if (!("logic_id" in payload)) {
                 ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", ErrorCode.INVALID_ARGUMENT);
             }
 
-            const raw: PoloOperationPayload<OpType.LogicEnlist | OpType.LogicInvoke> = {
+            const raw: PoloIxOperationPayload<OpType.LogicEnlist | OpType.LogicInvoke> = {
                 ...payload,
                 logic_id: payload.logic_id,
                 calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             };
 
-            return raw as PoloOperationPayload<T>;
+            return raw as PoloIxOperationPayload<T>;
         },
 
         validator: (payload) => {
@@ -300,14 +299,14 @@ export const getIxOperationDescriptor = <TOpType extends OpType>(type: TOpType):
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export const transformPayload = <TOpType extends OpType>(type: TOpType, payload: OperationPayload<TOpType>): PoloOperationPayload<TOpType> => {
+export const transformPayload = <TOpType extends OpType>(type: TOpType, payload: IxOperationPayload<TOpType>): PoloIxOperationPayload<TOpType> => {
     const descriptor = getIxOperationDescriptor(type);
 
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${type}" is not supported`);
     }
 
-    return descriptor.transform?.(payload) ?? (payload as unknown as PoloOperationPayload<TOpType>);
+    return descriptor.transform?.(payload) ?? (payload as unknown as PoloIxOperationPayload<TOpType>);
 };
 
 /**

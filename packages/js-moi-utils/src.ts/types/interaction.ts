@@ -41,7 +41,7 @@ export interface RawPreference {
     consensus: IxConsensusPreference;
 }
 
-export interface Preference {
+export interface IxPreference {
     compute: Hex;
     consensus: IxConsensusPreference;
 }
@@ -90,7 +90,7 @@ export interface InteractionRequest {
     /**
      * It represents compute and consensus preferences for the interaction.
      */
-    preferences?: Preference;
+    preferences?: IxPreference;
     /**
      * The perception data for the interaction.
      */
