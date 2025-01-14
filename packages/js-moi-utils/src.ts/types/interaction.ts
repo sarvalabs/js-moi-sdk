@@ -31,19 +31,19 @@ export interface IxParticipant {
     notary: boolean;
 }
 
-export interface ConsensusPreference {
+export interface IxConsensusPreference {
     mtq: number;
     trust_nodes: string[];
 }
 
 export interface RawPreference {
     compute: Uint8Array;
-    consensus: ConsensusPreference;
+    consensus: IxConsensusPreference;
 }
 
 export interface Preference {
     compute: Hex;
-    consensus: ConsensusPreference;
+    consensus: IxConsensusPreference;
 }
 
 export interface RawInteractionRequest {

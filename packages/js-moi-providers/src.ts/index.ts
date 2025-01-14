@@ -13,6 +13,7 @@ export type {
     AssetRequestOption,
     ExecuteIx,
     GetNetworkInfoOption,
+    InteractionRequestOption,
     LogicMessageRequestOption,
     LogicRequestOption,
     LogicStorageRequestOption,

@@ -132,6 +132,14 @@ export interface IxAccount {
     lock_type: LockType;
     notary: Address;
 }
+export interface Consensus {
+    mtq: number;
+    nodes: KramaID[] | null;
+}
+interface Preference {
+    compute: Hex;
+    consensus: Consensus;
+}
 export interface InteractionInfo {
     sender: Hex;
     sponsor: Hex;
@@ -225,4 +233,5 @@ export interface AccountAsset {
     mandate?: Mandate[];
     lockup?: Lockup[];
 }
+export {};
 //# sourceMappingURL=responses.d.ts.map

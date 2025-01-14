@@ -19,8 +19,8 @@ export {
 export { defineReadOnly } from "./properties";
 export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey, type Accessor } from "./storage-key";
 export type {
-    ConsensusPreference,
     InteractionRequest,
+    IxConsensusPreference,
     IxFund,
     IxParticipant,
     Preference,
@@ -76,6 +76,7 @@ export type {
     AssetCreator,
     AssetMetadata,
     Commits,
+    Consensus,
     ConsensusInfo,
     Controls,
     Enlisted,

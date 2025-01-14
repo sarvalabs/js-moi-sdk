@@ -70,7 +70,7 @@ export interface AssetCreatePayload {
     /**
      * The logic of the asset.
      */
-    logic?: LogicPayload;
+    logic_code?: LogicPayload;
 }
 export interface KeyAddPayload {
     public_key: Hex;
