@@ -75,7 +75,7 @@ class ECDSA_S256 {
         const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false });
         const digest = {
             _r: (0, utils_1.toDER)(sigParts.slice(0, 32)),
-            _s: (0, utils_1.toDER)(sigParts.slice(32, 64))
+            _s: (0, utils_1.toDER)(sigParts.slice(32, 64)),
         };
         const signature = (0, utils_1.bip66Encode)(digest);
         const prefixArray = new Uint8Array(2);
@@ -99,17 +99,17 @@ class ECDSA_S256 {
      * @returns boolean, to determine whether verification is success/failure
      */
     verify(message, signature, publicKey) {
-        let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
-        verificationKey.set(signature.Extra());
-        verificationKey.set(publicKey, signature.Extra().length);
-        let derSignature = signature.Digest();
+        let verificationKey = new Uint8Array(signature.extra().length + publicKey.length);
+        verificationKey.set(signature.extra());
+        verificationKey.set(publicKey, signature.extra().length);
+        let derSignature = signature.digest();
         const messageHash = (0, blake2b_1.blake2b)(message, {
             dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
         });
         const _digest = (0, utils_1.bip66Decode)(derSignature);
         const sigDigest = {
             _r: (0, utils_1.fromDER)(_digest._r),
-            _s: (0, utils_1.fromDER)(_digest._s)
+            _s: (0, utils_1.fromDER)(_digest._s),
         };
         return nobleECC.verify((0, utils_1.JoinSignature)(sigDigest), messageHash, verificationKey, { strict: true });
     }

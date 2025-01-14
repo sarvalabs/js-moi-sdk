@@ -72,12 +72,12 @@ const __vault = new WeakMap();
  * // creating a wallet from mnemonic
  * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
  *
- * @example 
+ * @example
  * // creating a wallet from keystore
  * const keystore = { ... }
  * const wallet = Wallet.fromKeystore(keystore, "password");
  *
- * @example 
+ * @example
  * // Connecting a wallet to a provider
  * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
  * const provider = new VoyagerProvider("babylon");
@@ -145,10 +145,7 @@ export class Wallet extends Signer {
      */
     public generateKeystore(password: string): Keystore {
         if (!this.isInitialized()) {
-            ErrorUtils.throwError(
-                "Keystore not found. The wallet has not been loaded or initialized.",
-                ErrorCode.NOT_INITIALIZED
-            );
+            ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
         }
 
         try {
@@ -170,10 +167,7 @@ export class Wallet extends Signer {
             return privateMapGet(this, __vault)._key;
         }
 
-        ErrorUtils.throwError(
-            "Private key not found. The wallet has not been loaded or initialized.",
-            ErrorCode.NOT_INITIALIZED
-        );
+        ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
 
     /**
@@ -187,15 +181,12 @@ export class Wallet extends Signer {
             return privateMapGet(this, __vault)._mnemonic;
         }
 
-        ErrorUtils.throwError(
-            "Mnemonic not found. The wallet has not been loaded or initialized.",
-            ErrorCode.NOT_INITIALIZED
-        );
+        ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
 
     /**
      * Public key associated with the wallet.
-     * 
+     *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
@@ -204,15 +195,12 @@ export class Wallet extends Signer {
             return privateMapGet(this, __vault)._public;
         }
 
-        ErrorUtils.throwError(
-            "Public key not found. The wallet has not been loaded or initialized.",
-            ErrorCode.NOT_INITIALIZED
-        );
+        ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
 
     /**
      * Curve associated with the wallet.
-     * 
+     *
      * @readonly
      */
     public get curve(): string {
@@ -220,10 +208,7 @@ export class Wallet extends Signer {
             return privateMapGet(this, __vault)._curve;
         }
 
-        ErrorUtils.throwError(
-            "Curve not found. The wallet has not been loaded or initialized.",
-            ErrorCode.NOT_INITIALIZED
-        );
+        ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
 
     /**
@@ -237,7 +222,7 @@ export class Wallet extends Signer {
 
     /**
      * Address associated with the wallet.
-     * 
+     *
      * @readonly
      */
     public get address(): string {
@@ -279,7 +264,6 @@ export class Wallet extends Signer {
                 ErrorUtils.throwError("Unsupported signature type", ErrorCode.UNSUPPORTED_OPERATION);
             }
         }
-
     }
 
     /**
@@ -321,7 +305,7 @@ export class Wallet extends Signer {
      * const mnemonic = "hollow appear story text start mask salt social child ..."
      * const wallet = await Wallet.fromMnemonic(mnemonic);
      *
-     * @example 
+     * @example
      * // Initializing a wallet from mnemonic with custom path
      * const mnemonic = "hollow appear story text start mask salt social child ...";
      * const path = "m/44'/60'/0'/0/0";
@@ -339,9 +323,9 @@ export class Wallet extends Signer {
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
-            })
+            });
 
-            return wallet
+            return wallet;
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
                 originalError: error,
@@ -359,7 +343,7 @@ export class Wallet extends Signer {
      * @returns {Promise<Wallet>} a promise that resolves to a `Wallet` instance.
      * @throws {Error} if there is an error during initialization.
      *
-     * @example 
+     * @example
      * // Initializing a wallet from mnemonic
      * const mnemonic = "hollow appear story text start mask salt social child ..."
      * const wallet = Wallet.fromMnemonicSync();
@@ -384,7 +368,7 @@ export class Wallet extends Signer {
                 _mnemonic: mnemonic,
             });
 
-            return wallet
+            return wallet;
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
                 originalError: error,
@@ -397,7 +381,7 @@ export class Wallet extends Signer {
      *
      * @param {string} keystore - The keystore to initialize the wallet with.
      * @param {string} password - The password used to decrypt the keystore.
-     * 
+     *
      * @returns {Wallet} a instance of `Wallet`.
      * @throws {Error} if there is an error during initialization.
      */

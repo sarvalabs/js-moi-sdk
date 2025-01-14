@@ -29,7 +29,7 @@ export default class Signature implements ISignature {
         this.name = this.getSignatureName(sig[0]);
     }
 
-    public Digest(): Uint8Array | undefined {
+    public digest(): Uint8Array | undefined {
         return this.digest;
     }
 
@@ -60,7 +60,7 @@ export default class Signature implements ISignature {
         return this.name;
     }
 
-    public Extra(): Uint8Array {
+    public extra(): Uint8Array {
         return this.extraData;
     }
 

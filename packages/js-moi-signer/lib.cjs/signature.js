@@ -26,7 +26,7 @@ class Signature {
         this.extraData = sig.subarray(2 + sigLen);
         this.name = this.getSignatureName(sig[0]);
     }
-    Digest() {
+    digest() {
         return this.digest;
     }
     /**
@@ -53,7 +53,7 @@ class Signature {
     getName() {
         return this.name;
     }
-    Extra() {
+    extra() {
         return this.extraData;
     }
     serialize() {

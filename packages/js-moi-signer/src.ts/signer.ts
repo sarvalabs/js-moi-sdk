@@ -1,6 +1,6 @@
 import type { Provider, SimulateOption } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes, type InteractionRequest } from "js-moi-utils";
-import { SigType, SigningAlgorithms } from "../types";
+import { bytesToHex, ErrorCode, ErrorUtils, hexToBytes, interaction, type Hex, type InteractionRequest } from "js-moi-utils";
+import { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
@@ -10,17 +10,18 @@ import Signature from "./signature";
  */
 export abstract class Signer {
     public provider?: Provider;
-    public signingAlgorithms: SigningAlgorithms = {
-        ecdsa_secp256k1: new ECDSA_S256(),
-    };
+    public signingAlgorithms: SigningAlgorithms;
 
-    constructor(provider?: Provider) {
+    constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
         this.provider = provider;
+        this.signingAlgorithms = signingAlgorithms ?? {
+            ecdsa_secp256k1: new ECDSA_S256(),
+        };
     }
 
     abstract getAddress(): string;
 
-    abstract sign(message: Uint8Array, sigAlgo: SigType): string;
+    abstract sign(message: Hex): Hex;
 
     abstract isInitialized(): boolean;
 
@@ -46,6 +47,14 @@ export abstract class Signer {
 
     public async simulate(ix: InteractionRequest, option?: SimulateOption) {
         return await this.getProvider().simulate(ix, option);
+    }
+
+    public async signInteraction(ix: InteractionRequest) {
+        return this.sign(bytesToHex(interaction(ix)));
+    }
+
+    public async execute(ix: InteractionRequest) {
+        const signature = this.signInteraction(ix);
     }
 
     /**

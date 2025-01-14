@@ -110,10 +110,10 @@ interface AccountKeyRequest {
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }
 
-export type IxSignature = MethodParams<"moi.Execute">[0]["signatures"][number];
+export type Signature = MethodParams<"moi.Execute">[0]["signatures"][number];
 
 interface ExecuteRequest {
-    execute(ix: Uint8Array | Hex, signatures: IxSignature[]): Promise<Hex>;
+    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
 }
 
 export interface Provider

@@ -1,7 +1,7 @@
 import { blake2b } from "@noble/hashes/blake2b";
-import { hmac } from '@noble/hashes/hmac';
-import { sha256 } from '@noble/hashes/sha256';
-import * as nobleECC from '@noble/secp256k1';
+import { hmac } from "@noble/hashes/hmac";
+import { sha256 } from "@noble/hashes/sha256";
+import * as nobleECC from "@noble/secp256k1";
 import { hexToBytes } from "js-moi-utils";
 import Signature from "./signature";
 import { JoinSignature, bip66Decode, bip66Encode, fromDER, toDER } from "./utils";
@@ -47,7 +47,7 @@ export default class ECDSA_S256 {
         const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false });
         const digest = {
             _r: toDER(sigParts.slice(0, 32)),
-            _s: toDER(sigParts.slice(32, 64))
+            _s: toDER(sigParts.slice(32, 64)),
         };
         const signature = bip66Encode(digest);
         const prefixArray = new Uint8Array(2);
@@ -71,17 +71,17 @@ export default class ECDSA_S256 {
      * @returns boolean, to determine whether verification is success/failure
      */
     verify(message, signature, publicKey) {
-        let verificationKey = new Uint8Array(signature.Extra().length + publicKey.length);
-        verificationKey.set(signature.Extra());
-        verificationKey.set(publicKey, signature.Extra().length);
-        let derSignature = signature.Digest();
+        let verificationKey = new Uint8Array(signature.extra().length + publicKey.length);
+        verificationKey.set(signature.extra());
+        verificationKey.set(publicKey, signature.extra().length);
+        let derSignature = signature.digest();
         const messageHash = blake2b(message, {
             dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
         });
         const _digest = bip66Decode(derSignature);
         const sigDigest = {
             _r: fromDER(_digest._r),
-            _s: fromDER(_digest._s)
+            _s: fromDER(_digest._s),
         };
         return nobleECC.verify(JoinSignature(sigDigest), messageHash, verificationKey, { strict: true });
     }

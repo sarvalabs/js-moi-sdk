@@ -13,11 +13,12 @@ const signature_1 = __importDefault(require("./signature"));
  */
 class Signer {
     provider;
-    signingAlgorithms = {
-        ecdsa_secp256k1: new ecdsa_1.default(),
-    };
-    constructor(provider) {
+    signingAlgorithms;
+    constructor(provider, signingAlgorithms) {
         this.provider = provider;
+        this.signingAlgorithms = signingAlgorithms ?? {
+            ecdsa_secp256k1: new ecdsa_1.default(),
+        };
     }
     connect(provider) {
         this.provider = provider;
@@ -36,6 +37,12 @@ class Signer {
     }
     async simulate(ix, option) {
         return await this.getProvider().simulate(ix, option);
+    }
+    async signInteraction(ix) {
+        return this.sign((0, js_moi_utils_1.bytesToHex)((0, js_moi_utils_1.interaction)(ix)));
+    }
+    async execute(ix) {
+        const signature = this.signInteraction(ix);
     }
     /**
      * Verifies the authenticity of a signature by performing signature verification

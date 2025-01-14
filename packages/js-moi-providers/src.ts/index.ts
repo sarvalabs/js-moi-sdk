@@ -12,12 +12,12 @@ export type {
     AccountRequestOption,
     AssetRequestOption,
     GetNetworkInfoOption,
-    IxSignature,
     LogicMessageRequestOption,
     LogicRequestOption,
     LogicStorageRequestOption,
     Provider,
     SelectFromResponseModifier,
+    Signature,
     SimulateOption,
     TesseractRequestOption,
 } from "./types/provider";

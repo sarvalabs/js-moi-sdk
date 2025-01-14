@@ -35,12 +35,12 @@ import type {
     AccountRequestOption,
     AssetRequestOption,
     GetNetworkInfoOption,
-    IxSignature,
     LogicMessageRequestOption,
     LogicRequestOption,
     LogicStorageRequestOption,
     Provider,
     SelectFromResponseModifier,
+    Signature,
     SimulateOption,
     TesseractRequestOption,
 } from "../types/provider";
@@ -301,7 +301,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
 
-    execute(encodeIx: Uint8Array | Hex, signatures: IxSignature[]): Promise<Hex> {
+    execute(encodeIx: Uint8Array | Hex, signatures: Signature[]): Promise<Hex> {
         const interaction = encodeIx instanceof Uint8Array ? bytesToHex(encodeIx) : encodeIx;
         return this.call("moi.Execute", { interaction, signatures });
     }

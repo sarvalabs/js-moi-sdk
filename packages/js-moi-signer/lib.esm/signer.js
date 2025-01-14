@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, hexToBytes, interaction } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 /**
@@ -7,11 +7,12 @@ import Signature from "./signature";
  */
 export class Signer {
     provider;
-    signingAlgorithms = {
-        ecdsa_secp256k1: new ECDSA_S256(),
-    };
-    constructor(provider) {
+    signingAlgorithms;
+    constructor(provider, signingAlgorithms) {
         this.provider = provider;
+        this.signingAlgorithms = signingAlgorithms ?? {
+            ecdsa_secp256k1: new ECDSA_S256(),
+        };
     }
     connect(provider) {
         this.provider = provider;
@@ -30,6 +31,12 @@ export class Signer {
     }
     async simulate(ix, option) {
         return await this.getProvider().simulate(ix, option);
+    }
+    async signInteraction(ix) {
+        return this.sign(bytesToHex(interaction(ix)));
+    }
+    async execute(ix) {
+        const signature = this.signInteraction(ix);
     }
     /**
      * Verifies the authenticity of a signature by performing signature verification

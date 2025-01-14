@@ -1,7 +1,7 @@
 import { AssetId, LogicId, StorageKey, type Account, type AccountAsset, type AccountKey, type Address, type Asset, type Hex, type InteractionRequest, type JsonRpcResponse, type Logic, type LogicMessage, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, GetNetworkInfoOption, IxSignature, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, SimulateOption, TesseractRequestOption } from "../types/provider";
+import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, GetNetworkInfoOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateOption, TesseractRequestOption } from "../types/provider";
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
@@ -58,7 +58,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
     getAccountAsset<TOption extends AccountAssetRequestOption>(identifier: Address, assetId: Hex | AssetId, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
-    execute(encodeIx: Uint8Array | Hex, signatures: IxSignature[]): Promise<Hex>;
+    execute(encodeIx: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
