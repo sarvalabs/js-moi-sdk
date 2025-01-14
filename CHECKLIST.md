@@ -9,6 +9,6 @@
 - [] `moi.AccountAsset`
 - [] `moi.Asset`
 - [x] `moi.Logic`
-- [] `moi.LogicStorage`
+- [x] `moi.LogicStorage`
 - [] `moi.LogicMessage`
 - [] `moi.Subscribe`
