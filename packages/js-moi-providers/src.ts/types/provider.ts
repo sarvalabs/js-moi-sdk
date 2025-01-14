@@ -1,6 +1,7 @@
 import type {
     Account,
     AccountAsset,
+    AccountKey,
     Address,
     Asset,
     AssetId,
@@ -103,14 +104,21 @@ interface AccountAssetRequest {
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
 }
 
+export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "identifier" | "key_idx">;
+
+interface AccountKeyRequest {
+    getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
+}
+
 export interface Provider
     extends EventEmitter,
-        ProtocolRequest,
-        SimulateRequest,
+        AccountAssetRequest,
+        AccountKeyRequest,
         AccountRequest,
-        TesseractRequest,
-        LogicRequest,
-        LogicStorageRequest,
         AssetRequest,
         LogicMessageRequest,
-        AccountAssetRequest {}
+        LogicRequest,
+        LogicStorageRequest,
+        ProtocolRequest,
+        SimulateRequest,
+        TesseractRequest {}

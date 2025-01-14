@@ -1,4 +1,4 @@
-import type { Account, AccountAsset, Address, Asset, Hex, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, AccountAsset, AccountKey, Address, Asset, Hex, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
@@ -6,12 +6,25 @@ export type ApiMethod<TParams extends any[], TResponse = any> = {
 interface IdentifierParam<TValue> {
     identifier: TValue;
 }
-interface LogicStorageParam {
+interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> {
+}
+interface SimulateRequestParam extends TesseractReferenceParam {
+    interaction: Hex;
+}
+interface AccountRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {
+}
+interface TesseractRequestParam extends Required<TesseractReferenceParam>, ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">> {
+}
+interface LogicRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Logic, "metadata">> {
+}
+interface LogicStorageRequestParam extends TesseractReferenceParam {
     logic_id: Hex;
     storage_id: Hex;
     address?: Address;
 }
-interface LogicMessageParam {
+interface AssetRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Asset, "metadata">>, TesseractReferenceParam {
+}
+interface LogicMessageRequestParam {
     logic_id: Hex;
     address?: Address;
     topics?: Hex[];
@@ -20,21 +33,24 @@ interface LogicMessageParam {
         stop: number;
     };
 }
-interface AccountAssetParam {
+interface AccountAssetRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof AccountAsset, "balance">>, TesseractReferenceParam {
     asset_id: Hex;
 }
+interface AccountKeyRequestParam extends IdentifierParam<Address>, TesseractReferenceParam {
+    key_idx: number;
+    pending?: boolean;
+}
 export interface NetworkActionApi {
-    "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
-    "moi.Simulate": ApiMethod<[param: {
-        interaction: Hex;
-    } & TesseractReferenceParam], Simulate>;
-    "moi.Account": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam]>;
-    "moi.Tesseract": ApiMethod<[param: Required<TesseractReferenceParam> & ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>]>;
-    "moi.Logic": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Logic, "metadata">>]>;
-    "moi.LogicStorage": ApiMethod<[param: LogicStorageParam & TesseractReferenceParam], Hex>;
-    "moi.Asset": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Asset, "metadata">> & TesseractReferenceParam]>;
-    "moi.LogicMessage": ApiMethod<[param: LogicMessageParam], LogicMessage[]>;
-    "moi.AccountAsset": ApiMethod<[param: IdentifierParam<Address> & AccountAssetParam & ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam]>;
+    "moi.Protocol": ApiMethod<[option?: ProtocolRequestParam]>;
+    "moi.Simulate": ApiMethod<[param: SimulateRequestParam], Simulate>;
+    "moi.Account": ApiMethod<[param: AccountRequestParam]>;
+    "moi.Tesseract": ApiMethod<[param: TesseractRequestParam]>;
+    "moi.Logic": ApiMethod<[param: LogicRequestParam]>;
+    "moi.LogicStorage": ApiMethod<[param: LogicStorageRequestParam], Hex>;
+    "moi.Asset": ApiMethod<[param: AssetRequestParam]>;
+    "moi.LogicMessage": ApiMethod<[param: LogicMessageRequestParam], LogicMessage[]>;
+    "moi.AccountAsset": ApiMethod<[param: AccountAssetRequestParam]>;
+    "moi.AccountKey": ApiMethod<[param: AccountKeyRequestParam], AccountKey>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

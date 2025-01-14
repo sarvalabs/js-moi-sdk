@@ -423,4 +423,39 @@ describe(JsonRpcProvider, () => {
             expect(accountAsset.mandate).toBeDefined();
         });
     });
+
+    describe(provider.getAccountKey, () => {
+        it.concurrent("should return the account key when retrieved using address and key index", async () => {
+            const accountKey = await provider.getAccountKey(ADDRESS, 0);
+
+            expect(accountKey).toBeDefined();
+            expect(accountKey.key_idx).toBe(0);
+            expect(accountKey.public_key).toBeDefined();
+            expect(accountKey.weight).toBeDefined();
+            expect(accountKey.revoked).toBeDefined();
+        });
+
+        it.concurrent("should return the account key with reference", async () => {
+            const accountKey = await provider.getAccountKey(ADDRESS, 0, {
+                reference: { relative: { identifier: ADDRESS, height: 0 } },
+            });
+
+            expect(accountKey).toBeDefined();
+            expect(accountKey.key_idx).toBe(0);
+            expect(accountKey.public_key).toBeDefined();
+            expect(accountKey.weight).toBeDefined();
+            expect(accountKey.revoked).toBeDefined();
+        });
+
+        it.concurrent("should return the account key with pending true", async () => {
+            const accountKey = await provider.getAccountKey(ADDRESS, 0, { pending: true });
+
+            expect(accountKey).toBeDefined();
+            expect(accountKey.key_idx).toBe(0);
+            expect(accountKey.public_key).toBeDefined();
+            expect(accountKey.weight).toBeDefined();
+            expect(accountKey.revoked).toBeDefined();
+            expect(accountKey.sequence).toBeDefined();
+        });
+    });
 });

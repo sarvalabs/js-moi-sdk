@@ -170,6 +170,15 @@ export class JsonRpcProvider extends EventEmitter {
         const { value } = typeof assetId === "string" ? new AssetId(assetId) : assetId;
         return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
     }
+    async getAccountKey(identifier, index, option) {
+        if (!isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        if (Number.isNaN(index) || index < 0) {
+            ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
+        }
+        return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

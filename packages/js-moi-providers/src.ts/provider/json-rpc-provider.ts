@@ -12,6 +12,7 @@ import {
     validateIxRequest,
     type Account,
     type AccountAsset,
+    type AccountKey,
     type Address,
     type Asset,
     type Hex,
@@ -30,6 +31,7 @@ import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import type {
     AccountAssetRequestOption,
+    AccountKeyRequestOption,
     AccountRequestOption,
     AssetRequestOption,
     GetNetworkInfoOption,
@@ -284,6 +286,18 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         const { value } = typeof assetId === "string" ? new AssetId(assetId) : assetId;
 
         return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
+    }
+
+    async getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
+        if (!isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+
+        if (Number.isNaN(index) || index < 0) {
+            ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
+        }
+
+        return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
 
     /**
