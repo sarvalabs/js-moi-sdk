@@ -38,7 +38,7 @@ class Signature {
      * @throws Error if the signature byte is invalid.
      */
     getSigByte() {
-        if (typeof this.prefix[0] !== "number") {
+        if (typeof this.prefix?.[0] !== "number") {
             js_moi_utils_1.ErrorUtils.throwError("Invalid signature byte.", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
         }
         return this.prefix[0];

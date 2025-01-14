@@ -2,12 +2,12 @@ import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { ISignature } from "../types";
 
 export default class Signature implements ISignature {
-    private prefix: Uint8Array;
-    private digest: Uint8Array;
-    private extraData: Uint8Array;
-    private name: string;
+    private prefix?: Uint8Array;
+    private digest?: Uint8Array;
+    private extraData?: Uint8Array;
+    private name?: string;
 
-    constructor(prefix: Uint8Array, digest: Uint8Array, extraData: Uint8Array, signatureName: string) {
+    constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: string) {
         this.prefix = prefix;
         this.digest = digest;
         this.extraData = extraData;
@@ -29,7 +29,7 @@ export default class Signature implements ISignature {
         this.name = this.getSignatureName(sig[0]);
     }
 
-    public Digest(): Uint8Array {
+    public Digest(): Uint8Array | undefined {
         return this.digest;
     }
 
@@ -42,7 +42,7 @@ export default class Signature implements ISignature {
      * @throws Error if the signature byte is invalid.
      */
     public getSigByte(): number {
-        if (typeof this.prefix[0] !== "number") {
+        if (typeof this.prefix?.[0] !== "number") {
             ErrorUtils.throwError("Invalid signature byte.", ErrorCode.INVALID_SIGNATURE);
         }
 
@@ -56,7 +56,7 @@ export default class Signature implements ISignature {
      *
      * @returns The name of the signature algorithm as a string.
      */
-    public getName(): string {
+    public getName() {
         return this.name;
     }
 

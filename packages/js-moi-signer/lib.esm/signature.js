@@ -36,7 +36,7 @@ export default class Signature {
      * @throws Error if the signature byte is invalid.
      */
     getSigByte() {
-        if (typeof this.prefix[0] !== "number") {
+        if (typeof this.prefix?.[0] !== "number") {
             ErrorUtils.throwError("Invalid signature byte.", ErrorCode.INVALID_SIGNATURE);
         }
         return this.prefix[0];

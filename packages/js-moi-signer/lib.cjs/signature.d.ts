@@ -1,12 +1,12 @@
 import { ISignature } from "../types";
 export default class Signature implements ISignature {
-    private prefix;
-    private digest;
-    private extraData;
-    private name;
-    constructor(prefix: Uint8Array, digest: Uint8Array, extraData: Uint8Array, signatureName: string);
+    private prefix?;
+    private digest?;
+    private extraData?;
+    private name?;
+    constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: string);
     unmarshall(signature: Uint8Array | String): void;
-    Digest(): Uint8Array;
+    Digest(): Uint8Array | undefined;
     /**
      * getSigByte
      *
@@ -23,7 +23,7 @@ export default class Signature implements ISignature {
      *
      * @returns The name of the signature algorithm as a string.
      */
-    getName(): string;
+    getName(): string | undefined;
     Extra(): Uint8Array;
     serialize(): Uint8Array;
     /**
