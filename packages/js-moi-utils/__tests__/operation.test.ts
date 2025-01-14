@@ -1,15 +1,13 @@
 import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOperation } from "../src.ts";
 
 interface TestCase {
-    name: string;
     operation: IxOperation;
     expected: string;
 }
 
 describe(encodeOperation, () => {
-    const tests: TestCase[] = [
+    const cases: TestCase[] = [
         {
-            name: "should serialize a asset create operation payload",
             operation: {
                 type: OpType.AssetCreate,
                 payload: {
@@ -21,7 +19,6 @@ describe(encodeOperation, () => {
             expected: "0x0e7f063353535151504d4f4901f4",
         },
         {
-            name: "should serialize a participant create operation payload",
             operation: {
                 type: OpType.ParticipantCreate,
                 payload: {
@@ -33,7 +30,6 @@ describe(encodeOperation, () => {
             expected: "0x0e5f068e04930428027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d640f64",
         },
         {
-            name: "should serialize a asset mint operation payload",
             operation: {
                 type: OpType.AssetMint,
                 payload: {
@@ -45,7 +41,6 @@ describe(encodeOperation, () => {
                 "0x0e3f06a309307830303030303030306139663565383436336261626331393732353264653333613236356565666337316333343937343430633036666161323333626461393431323564626336363864",
         },
         {
-            name: "should serialize a asset burn operation payload",
             operation: {
                 type: OpType.AssetBurn,
                 payload: {
@@ -57,7 +52,6 @@ describe(encodeOperation, () => {
                 "0x0e3f06a309307830303030303030306139663565383436336261626331393732353264653333613236356565666337316333343937343430633036666161323333626461393431323564626336363164",
         },
         {
-            name: "should serialize a asset transfer operation payload",
             operation: {
                 type: OpType.AssetTransfer,
                 payload: {
@@ -72,7 +66,6 @@ describe(encodeOperation, () => {
                 "0x0e9f010686048608a311b31194c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c875786d8826ac7dc4ffb73fae39dedf72958a405b878f25ed362f2f496c60a4604f43078303030303030303034636439373363346562383363646238383730633064653230393733363237303439316237616363393938373364613165646463656435383236633362353438646781188d",
         },
         {
-            name: "should serialize a logic deploy operation payload",
             operation: {
                 type: OpType.LogicDeploy,
                 payload: {
@@ -89,7 +82,6 @@ describe(encodeOperation, () => {
         },
 
         {
-            name: "should serialize a logic deploy operation payload when calldata is not provided",
             operation: {
                 type: OpType.LogicDeploy,
                 payload: {
@@ -104,7 +96,6 @@ describe(encodeOperation, () => {
                 "0x0e9f0106b604b604e005ee05080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782416e7943616c6c736974652f065668656c6c6f307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832",
         },
         {
-            name: "should serialize a logic deploy operation payload when interfaces is not provided",
             operation: {
                 type: OpType.LogicDeploy,
                 payload: {
@@ -115,7 +106,6 @@ describe(encodeOperation, () => {
             expected: "0x0e9f0106b604b604e005e005080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782416e7943616c6c73697465",
         },
         {
-            name: "should serialize a logic enlist operation payload",
             operation: {
                 type: OpType.LogicEnlist,
                 payload: {
@@ -127,7 +117,6 @@ describe(encodeOperation, () => {
                 "0x0e8f0100068609b00ab00a307830383030303066633631643439323636353931653263366661323766363039373365303835353836643236616361623063376630643335346266396336316166653762373832416e7943616c6c73697465",
         },
         {
-            name: "should serialize a logic invoke operation payload",
             operation: {
                 type: OpType.LogicInvoke,
                 payload: {
@@ -141,12 +130,12 @@ describe(encodeOperation, () => {
         },
     ];
 
-    for (const test of tests) {
-        it(test.name, () => {
-            const { payload } = encodeOperation(test.operation);
-            expect(bytesToHex(payload)).toEqual(test.expected);
-        });
-    }
+    it.each(cases.map((v) => ({ ...v, name: OpType[v.operation.type] })))("should encodes $name operation with correct payload and type matching", ({ operation, expected }) => {
+        const { payload, type } = encodeOperation(operation);
+
+        expect(type).toBe(operation.type);
+        expect(bytesToHex(payload)).toEqual(expected);
+    });
 
     it("should throw an error when an unknown operation type is provided", () => {
         const operation = {
