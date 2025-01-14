@@ -1,4 +1,4 @@
-import { ArrayIndexAccessor, AssetStandard, generateStorageKey, hexToBytes, LogicId, OpType, ReceiptStatus, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
+import { ArrayIndexAccessor, AssetStandard, generateStorageKey, hexToBytes, isHex, LogicId, OpType, ReceiptStatus, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
 import { HttpProvider, JsonRpcProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
@@ -193,18 +193,29 @@ describe(JsonRpcProvider, () => {
     describe(provider.getLogicStorage, () => {
         it.concurrent("should return the logic storage when retrieved using logic id and storage id", async () => {
             const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
-            const storage = await provider.getLogicStorage(GUARDIAN_LOGIC_ID, storageId);
+            const value = await provider.getLogicStorage(GUARDIAN_LOGIC_ID, storageId);
 
-            expect(storage).toBeDefined();
-            expect(storage).toEqual("0x");
+            expect(value).toBeDefined();
+            expect(isHex(value)).toBeTruthy();
         });
 
-        it.concurrent("should return the logic storage when retrieved using logic id and address", async () => {
+        it.concurrent("should return the logic storage when retrieved using logic id and storage id", async () => {
             const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
-            const storage = await provider.getLogicStorage(GUARDIAN_LOGIC_ID, ADDRESS, "0x00");
+            const value = await provider.getLogicStorage(new LogicId(GUARDIAN_LOGIC_ID), storageId.hex());
 
-            expect(storage).toBeDefined();
-            expect(storage).toEqual("0x");
+            expect(value).toBeDefined();
+            expect(isHex(value)).toBeTruthy();
+        });
+
+        it.concurrent("should return the logic storage using reference", async () => {
+            const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
+            const logicId = new LogicId(GUARDIAN_LOGIC_ID);
+            const value = await provider.getLogicStorage(logicId, storageId, {
+                reference: { relative: { identifier: logicId.getAddress(), height: 0 } },
+            });
+
+            expect(value).toBeDefined();
+            expect(isHex(value)).toBeTruthy();
         });
     });
 });
