@@ -1,4 +1,17 @@
-import type { Account, Address, Asset, Hex, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
+import type {
+    Account,
+    AccountAsset,
+    Address,
+    Asset,
+    Hex,
+    Logic,
+    LogicMessage,
+    NetworkInfo,
+    ResponseModifierParam,
+    Simulate,
+    Tesseract,
+    TesseractReferenceParam,
+} from "js-moi-utils";
 
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
@@ -22,6 +35,10 @@ interface LogicMessageParam {
     range?: { start: number; stop: number };
 }
 
+interface AccountAssetParam {
+    asset_id: Hex;
+}
+
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
     "moi.Simulate": ApiMethod<[param: { interaction: Hex } & TesseractReferenceParam], Simulate>;
@@ -31,6 +48,7 @@ export interface NetworkActionApi {
     "moi.LogicStorage": ApiMethod<[param: LogicStorageParam & TesseractReferenceParam], Hex>;
     "moi.Asset": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Asset, "metadata">> & TesseractReferenceParam]>;
     "moi.LogicMessage": ApiMethod<[param: LogicMessageParam], LogicMessage[]>;
+    "moi.AccountAsset": ApiMethod<[param: IdentifierParam<Address> & AccountAssetParam & ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam]>;
 }
 
 /**

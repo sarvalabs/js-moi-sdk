@@ -166,6 +166,13 @@ class JsonRpcProvider extends events_1.EventEmitter {
         const id = typeof logicId === "string" ? new js_moi_utils_1.LogicId(logicId) : logicId;
         return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
     }
+    async getAccountAsset(identifier, assetId, option) {
+        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        const { value } = typeof assetId === "string" ? new js_moi_utils_1.AssetId(assetId) : assetId;
+        return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

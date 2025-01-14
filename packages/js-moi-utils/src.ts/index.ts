@@ -64,6 +64,7 @@ export type {
 } from "./types/rpc/common-entities";
 export type {
     Account,
+    AccountAsset,
     AccountBalance,
     AccountKey,
     AccountLockup,
@@ -87,12 +88,14 @@ export type {
     IxAccount,
     IxOperationResult,
     KramaID,
+    Lockup,
     Logic,
     LogicController,
     LogicEvent,
     LogicMessage,
     LogicMetadata,
     LogicSource,
+    Mandate,
     NetworkInfo,
     PreviousICS,
     Simulate,

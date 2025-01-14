@@ -1,4 +1,4 @@
-import { bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isHex, isValidAddress, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
+import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isHex, isValidAddress, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { EventEmitter } from "events";
 export class JsonRpcProvider extends EventEmitter {
     _transport;
@@ -162,6 +162,13 @@ export class JsonRpcProvider extends EventEmitter {
     async getLogicMessage(logicId, options) {
         const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
         return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
+    }
+    async getAccountAsset(identifier, assetId, option) {
+        if (!isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        const { value } = typeof assetId === "string" ? new AssetId(assetId) : assetId;
+        return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
     }
     /**
      * Processes a JSON-RPC response and returns the result.

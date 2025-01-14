@@ -1,5 +1,6 @@
 import type {
     Account,
+    AccountAsset,
     Address,
     Asset,
     AssetId,
@@ -92,6 +93,16 @@ interface LogicMessageRequest {
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
 }
 
+export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam;
+
+interface AccountAssetRequest {
+    getAccountAsset<TOption extends AccountAssetRequestOption>(
+        identifier: Address,
+        assetId: Hex | AssetId,
+        option?: TOption
+    ): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
+}
+
 export interface Provider
     extends EventEmitter,
         ProtocolRequest,
@@ -101,4 +112,5 @@ export interface Provider
         LogicRequest,
         LogicStorageRequest,
         AssetRequest,
-        LogicMessageRequest {}
+        LogicMessageRequest,
+        AccountAssetRequest {}

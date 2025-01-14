@@ -15,7 +15,7 @@ import {
 import { HttpProvider, JsonRpcProvider } from "../src.ts";
 import type { LogicMessageRequestOption } from "../src.ts/types/provider.ts";
 
-const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
+const ADDRESS: Address = "0x4860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae";
 const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
 const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548";
 
@@ -371,6 +371,56 @@ describe(JsonRpcProvider, () => {
                 expect(message.source).toBeDefined();
                 expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
             }
+        });
+    });
+
+    describe(provider.getAccountAsset, () => {
+        it.concurrent("should return the account asset when retrieved using address and asset id", async () => {
+            const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID);
+
+            expect(accountAsset).toBeDefined();
+            expect(isHex(accountAsset.balance)).toBeTruthy();
+        });
+
+        it.concurrent("should return the account asset with reference", async () => {
+            const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                reference: { relative: { identifier: ADDRESS, height: 0 } },
+            });
+
+            expect(accountAsset).toBeDefined();
+            expect(isHex(accountAsset.balance)).toBeTruthy();
+        });
+
+        it.concurrent("should return the account asset with included fields", async () => {
+            const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                modifier: { include: ["lockup", "mandate"] },
+            });
+
+            expect(accountAsset).toBeDefined();
+            expect(isHex(accountAsset.balance)).toBeTruthy();
+            expect(accountAsset.lockup).toBeDefined();
+            expect(accountAsset.mandate).toBeDefined();
+        });
+
+        it.concurrent("should return the account asset with extracted fields", async () => {
+            const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                modifier: { extract: "lockup" },
+            });
+
+            expect(accountAsset).toBeDefined();
+            expect(accountAsset.lockup).toBeDefined();
+        });
+
+        it.concurrent("should return the account asset with modifier and reference", async () => {
+            const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                modifier: { include: ["lockup", "mandate"] },
+                reference: { relative: { identifier: ADDRESS, height: 0 } },
+            });
+
+            expect(accountAsset).toBeDefined();
+            expect(isHex(accountAsset.balance)).toBeTruthy();
+            expect(accountAsset.lockup).toBeDefined();
+            expect(accountAsset.mandate).toBeDefined();
         });
     });
 });

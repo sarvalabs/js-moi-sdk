@@ -212,4 +212,17 @@ export interface LogicMessage {
     event: LogicEvent;
     source: LogicSource;
 }
+export interface Mandate {
+    spender: Address;
+    amount: Quantity;
+}
+export interface Lockup {
+    locker: Address;
+    amount: Quantity;
+}
+export interface AccountAsset {
+    balance: Quantity;
+    mandate?: Mandate[];
+    lockup?: Lockup[];
+}
 //# sourceMappingURL=responses.d.ts.map
