@@ -1,29 +1,20 @@
-import type { Provider, SimulateOption } from "js-moi-providers";
-import { type Hex, type InteractionRequest } from "js-moi-utils";
-import { SigningAlgorithms, SigType } from "../types";
-/**
- * An abstract class representing a signer responsible for cryptographic
- * activities like signing and verification.
- */
+import type { ExecuteIx, Provider } from "js-moi-providers";
+import { type Hex, type InteractionRequest, type Sender } from "js-moi-utils";
+import type { SigningAlgorithms, SigType } from "../types";
 export declare abstract class Signer {
-    provider?: Provider;
+    private provider?;
     signingAlgorithms: SigningAlgorithms;
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms);
-    abstract getAddress(): string;
-    abstract sign(message: Hex): Hex;
+    abstract getKeyIndex(): Promise<number>;
+    abstract getAddress(): Promise<Hex>;
+    abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
+    abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
     abstract isInitialized(): boolean;
-    abstract signIx(ix: InteractionRequest, sigAlgo: SigType): unknown;
     connect(provider: Provider): void;
-    /**
-     * Retrieves the connected provider instance.
-     *
-     * @returns The connected provider instance.
-     * @throws {Error} if the provider is not initialized.
-     */
     getProvider(): Provider;
-    simulate(ix: InteractionRequest, option?: SimulateOption): Promise<import("js-moi-utils").Simulate>;
-    signInteraction(ix: InteractionRequest): Promise<`0x${string}`>;
-    execute(ix: InteractionRequest): Promise<void>;
+    getLatestSequence(): Promise<number>;
+    protected getSender(sequence?: number): Promise<Sender>;
+    execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<Hex>;
     /**
      * Verifies the authenticity of a signature by performing signature verification
      * using the provided parameters.

@@ -3,13 +3,13 @@ import { ISignature } from "../types";
 
 export default class Signature implements ISignature {
     private prefix?: Uint8Array;
-    private digest?: Uint8Array;
+    private _digest?: Uint8Array;
     private extraData?: Uint8Array;
     private name?: string;
 
     constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: string) {
         this.prefix = prefix;
-        this.digest = digest;
+        this._digest = digest;
         this.extraData = extraData;
         this.name = signatureName;
     }
@@ -24,13 +24,13 @@ export default class Signature implements ISignature {
 
         const sigLen = sig[1];
         this.prefix = sig.subarray(0, 2);
-        this.digest = sig.subarray(2, 2 + sigLen);
+        this._digest = sig.subarray(2, 2 + sigLen);
         this.extraData = sig.subarray(2 + sigLen);
         this.name = this.getSignatureName(sig[0]);
     }
 
-    public digest(): Uint8Array | undefined {
-        return this.digest;
+    public digest(): Uint8Array {
+        return this._digest!;
     }
 
     /**
@@ -57,11 +57,11 @@ export default class Signature implements ISignature {
      * @returns The name of the signature algorithm as a string.
      */
     public getName() {
-        return this.name;
+        return this.name!;
     }
 
     public extra(): Uint8Array {
-        return this.extraData;
+        return this.extraData!;
     }
 
     public serialize(): Uint8Array {
@@ -69,8 +69,8 @@ export default class Signature implements ISignature {
             ErrorUtils.throwError("Signature is not initialized", ErrorCode.NOT_INITIALIZED);
         }
 
-        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
-        const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);
+        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix!, ...this._digest!]);
+        const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData!]);
 
         return finalSigBytes;
     }

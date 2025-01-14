@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidIxRequest = exports.validateIxRequest = exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
+const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const address_1 = require("./address");
@@ -58,7 +59,7 @@ const transformInteraction = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, address: (0, hex_1.hexToBytes)(ix.sender.address) },
-        payer: ix.payer ? (0, hex_1.hexToBytes)(ix.payer) : undefined,
+        payer: (0, hex_1.hexToBytes)(ix.payer ?? js_moi_constants_1.ZERO_ADDRESS),
         ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
@@ -178,11 +179,12 @@ const gatherIxFunds = (interaction) => {
  * @returns A POLO bytes representing the encoded interaction request.
  */
 const interaction = (ix) => {
-    return encodeInteraction({
+    const interaction = {
         ...ix,
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
-    });
+    };
+    return encodeInteraction(interaction);
 };
 exports.interaction = interaction;
 const createInvalidResult = (value, field, message) => {

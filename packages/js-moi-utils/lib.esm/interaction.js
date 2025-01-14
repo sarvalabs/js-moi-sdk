@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { isValidAddress } from "./address";
@@ -53,7 +54,7 @@ export const transformInteraction = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, address: hexToBytes(ix.sender.address) },
-        payer: ix.payer ? hexToBytes(ix.payer) : undefined,
+        payer: hexToBytes(ix.payer ?? ZERO_ADDRESS),
         ix_operations: ix.operations.map(encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: hexToBytes(participant.address) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
@@ -172,11 +173,12 @@ const gatherIxFunds = (interaction) => {
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export const interaction = (ix) => {
-    return encodeInteraction({
+    const interaction = {
         ...ix,
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
-    });
+    };
+    return encodeInteraction(interaction);
 };
 const createInvalidResult = (value, field, message) => {
     return { field, message, value: value[field] };

@@ -1,43 +1,91 @@
-import type { Provider, SimulateOption } from "js-moi-providers";
-import { bytesToHex, ErrorCode, ErrorUtils, hexToBytes, interaction, type Hex, type InteractionRequest } from "js-moi-utils";
-import { SigningAlgorithms, SigType } from "../types";
+import type { ExecuteIx, Provider } from "js-moi-providers";
+import { ErrorCode, ErrorUtils, hexToBytes, type Hex, type InteractionRequest, type Sender } from "js-moi-utils";
+import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
-/**
- * An abstract class representing a signer responsible for cryptographic
- * activities like signing and verification.
- */
+// /**
+//  * An abstract class representing a signer responsible for cryptographic
+//  * activities like signing and verification.
+//  */
+// export abstract class Signer {
+//     public provider?: Provider;
+//     public signingAlgorithms: SigningAlgorithms;
+
+//     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
+//         this.provider = provider;
+//         this.signingAlgorithms = signingAlgorithms ?? {
+//             ecdsa_secp256k1: new ECDSA_S256(),
+//         };
+//     }
+
+//     abstract getAddress(): string;
+
+//     abstract sign(message: Hex): Hex;
+
+//     abstract isInitialized(): boolean;
+
+//     abstract signIx(ix: InteractionRequest, sigAlgo: SigType): unknown;
+
+//     connect(provider: Provider): void {
+//         this.provider = provider;
+//     }
+
+//     /**
+//      * Retrieves the connected provider instance.
+//      *
+//      * @returns The connected provider instance.
+//      * @throws {Error} if the provider is not initialized.
+//      */
+//     public getProvider() {
+//         if (this.provider) {
+//             return this.provider;
+//         }
+
+//         ErrorUtils.throwError("Provider is not initialized!", ErrorCode.NOT_INITIALIZED);
+//     }
+
+//     public async simulate(ix: InteractionRequest, option?: SimulateOption) {
+//         return await this.getProvider().simulate(ix, option);
+//     }
+
+//     public async signInteraction(ix: InteractionRequest) {
+//         return this.sign(bytesToHex(interaction(ix)));
+//     }
+
+//     public async execute(ix: InteractionRequest) {
+//         const signature = this.signInteraction(ix);
+//     }
+// }
+
 export abstract class Signer {
-    public provider?: Provider;
+    private provider?: Provider;
+
     public signingAlgorithms: SigningAlgorithms;
 
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
         this.provider = provider;
+
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
     }
 
-    abstract getAddress(): string;
+    public abstract getKeyIndex(): Promise<number>;
 
-    abstract sign(message: Hex): Hex;
+    public abstract getAddress(): Promise<Hex>;
 
-    abstract isInitialized(): boolean;
+    public abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
 
-    abstract signIx(ix: InteractionRequest, sigAlgo: SigType): unknown;
+    public abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
 
-    connect(provider: Provider): void {
+    public abstract isInitialized(): boolean;
+
+    public connect(provider: Provider): void {
         this.provider = provider;
     }
 
-    /**
-     * Retrieves the connected provider instance.
-     *
-     * @returns The connected provider instance.
-     * @throws {Error} if the provider is not initialized.
-     */
-    public getProvider() {
+    public getProvider(): Provider {
         if (this.provider) {
             return this.provider;
         }
@@ -45,16 +93,40 @@ export abstract class Signer {
         ErrorUtils.throwError("Provider is not initialized!", ErrorCode.NOT_INITIALIZED);
     }
 
-    public async simulate(ix: InteractionRequest, option?: SimulateOption) {
-        return await this.getProvider().simulate(ix, option);
+    public async getLatestSequence() {
+        // TODO: Check whether it is correct way to get latest sequence
+
+        const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
+        const { sequence } = await this.getProvider().getAccountKey(address, index, { pending: false });
+        return sequence;
     }
 
-    public async signInteraction(ix: InteractionRequest) {
-        return this.sign(bytesToHex(interaction(ix)));
+    protected async getSender(sequence?: number): Promise<Sender> {
+        if (sequence != null) {
+            const latest = await this.getLatestSequence();
+
+            if (sequence < latest) {
+                ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
+            }
+        }
+
+        if (sequence == null) {
+            sequence = await this.getLatestSequence();
+        }
+
+        const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
+
+        return { address, key_id: index, sequence_id: sequence };
     }
 
-    public async execute(ix: InteractionRequest) {
-        const signature = this.signInteraction(ix);
+    public async execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<Hex> {
+        const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
+        const interaction = { ...ix, sender: await this.getSender(sequence) };
+        const signedIx = await this.signInteraction(interaction, algorithm);
+
+        console.log(interaction)
+
+        return await this.getProvider().execute(signedIx);
     }
 
     /**

@@ -3,12 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const js_moi_utils_1 = require("js-moi-utils");
 class Signature {
     prefix;
-    digest;
+    _digest;
     extraData;
     name;
     constructor(prefix, digest, extraData, signatureName) {
         this.prefix = prefix;
-        this.digest = digest;
+        this._digest = digest;
         this.extraData = extraData;
         this.name = signatureName;
     }
@@ -22,12 +22,12 @@ class Signature {
         }
         const sigLen = sig[1];
         this.prefix = sig.subarray(0, 2);
-        this.digest = sig.subarray(2, 2 + sigLen);
+        this._digest = sig.subarray(2, 2 + sigLen);
         this.extraData = sig.subarray(2 + sigLen);
         this.name = this.getSignatureName(sig[0]);
     }
     digest() {
-        return this.digest;
+        return this._digest;
     }
     /**
      * getSigByte
@@ -60,7 +60,7 @@ class Signature {
         if (this.name === "") {
             js_moi_utils_1.ErrorUtils.throwError("Signature is not initialized", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
-        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
+        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this._digest]);
         const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);
         return finalSigBytes;
     }

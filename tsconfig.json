@@ -68,12 +68,12 @@
         {
             "path": "./packages/js-moi-bip39/tsconfig.esm.json"
         },
-        // {
-        //     "path": "./packages/js-moi-wallet/tsconfig.cjs.json"
-        // },
-        // {
-        //     "path": "./packages/js-moi-wallet/tsconfig.esm.json"
-        // },
+        {
+            "path": "./packages/js-moi-wallet/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-wallet/tsconfig.esm.json"
+        },
         // {
         //     "path": "./packages/js-moi-logic/tsconfig.cjs.json"
         // },

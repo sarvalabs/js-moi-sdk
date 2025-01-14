@@ -1,12 +1,12 @@
 import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
 export default class Signature {
     prefix;
-    digest;
+    _digest;
     extraData;
     name;
     constructor(prefix, digest, extraData, signatureName) {
         this.prefix = prefix;
-        this.digest = digest;
+        this._digest = digest;
         this.extraData = extraData;
         this.name = signatureName;
     }
@@ -20,12 +20,12 @@ export default class Signature {
         }
         const sigLen = sig[1];
         this.prefix = sig.subarray(0, 2);
-        this.digest = sig.subarray(2, 2 + sigLen);
+        this._digest = sig.subarray(2, 2 + sigLen);
         this.extraData = sig.subarray(2 + sigLen);
         this.name = this.getSignatureName(sig[0]);
     }
     digest() {
-        return this.digest;
+        return this._digest;
     }
     /**
      * getSigByte
@@ -58,7 +58,7 @@ export default class Signature {
         if (this.name === "") {
             ErrorUtils.throwError("Signature is not initialized", ErrorCode.NOT_INITIALIZED);
         }
-        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
+        const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this._digest]);
         const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);
         return finalSigBytes;
     }

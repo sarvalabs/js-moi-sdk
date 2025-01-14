@@ -45,12 +45,8 @@ nobleECC.utils.hmacSha256Sync = (key, ...msgs) => (0, hmac_1.hmac)(sha256_1.sha2
  * Represents the ECDSA_S256 signature type.
  */
 class ECDSA_S256 {
-    prefix;
-    sigName;
-    constructor() {
-        this.prefix = 1;
-        this.sigName = "ECDSA_S256";
-    }
+    prefix = 1;
+    sigName = "ECDSA_S256";
     /**
      * sign
      *

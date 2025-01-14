@@ -4,14 +4,13 @@ import elliptic from "elliptic";
 import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
-import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
+import { type ExecuteIx, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex, ensureHexPrefix, interaction, type Hex, type InteractionRequest } from "js-moi-utils";
 
 import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
-import { serializeIxObject } from "./serializer";
 
 export enum CURVE {
     SECP256K1 = "secp256k1",
@@ -87,6 +86,8 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export class Wallet extends Signer {
+    private readonly key_index: number = 0;
+
     constructor(key: Buffer | string, curve: string) {
         try {
             super();
@@ -216,26 +217,12 @@ export class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    public getAddress(): string {
-        return "0x" + this.publicKey.slice(2);
+    public async getAddress(): Promise<Hex> {
+        return ensureHexPrefix(this.publicKey.slice(2));
     }
 
-    /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    public get address(): string {
-        return this.getAddress();
-    }
-
-    /**
-     * Connects the wallet to the given provider.
-     *
-     * @param {AbstractProvider} provider - The provider to connect.
-     */
-    public connect(provider: AbstractProvider): void {
-        this.provider = provider;
+    public getKeyIndex(): Promise<number> {
+        return Promise.resolve(this.key_index);
     }
 
     /**
@@ -248,21 +235,37 @@ export class Wallet extends Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    public sign(message: Uint8Array, sigAlgo: SigType): string {
-        if (sigAlgo == null) {
+
+    public sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex> {
+        if (sig == null) {
             ErrorUtils.throwError("Signature type cannot be undefined", ErrorCode.INVALID_ARGUMENT);
         }
 
-        switch (sigAlgo.sigName) {
+        switch (sig.sigName) {
             case "ECDSA_S256": {
                 const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
                 const sig = _sigAlgo.sign(Buffer.from(message), this.privateKey);
                 const sigBytes = sig.serialize();
-                return bytesToHex(sigBytes);
+                return Promise.resolve(bytesToHex(sigBytes));
             }
             default: {
                 ErrorUtils.throwError("Unsupported signature type", ErrorCode.UNSUPPORTED_OPERATION);
             }
+        }
+    }
+
+    async signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx> {
+        try {
+            const encoded = interaction(ix);
+            const signatures: Signature = {
+                identifier: ix.sender.address,
+                key_idx: ix.sender.key_id,
+                signature: await this.sign(encoded, sig),
+            };
+
+            return { interaction: bytesToHex(encoded), signatures: [signatures] };
+        } catch (err) {
+            ErrorUtils.throwError("Failed to sign interaction", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
 
@@ -277,18 +280,18 @@ export class Wallet extends Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
-        try {
-            const ixData = serializeIxObject(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
-            return {
-                ix_args: bytesToHex(ixData),
-                signature: signature,
-            };
-        } catch (err) {
-            ErrorUtils.throwError("Failed to sign interaction", ErrorCode.UNKNOWN_ERROR, { originalError: err });
-        }
-    }
+    // public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
+    //     try {
+    //         const ixData = serializeIxObject(ixObject);
+    //         const signature = this.sign(ixData, sigAlgo);
+    //         return {
+    //             ix_args: bytesToHex(ixData),
+    //             signature: signature,
+    //         };
+    //     } catch (err) {
+    //         ErrorUtils.throwError("Failed to sign interaction", ErrorCode.UNKNOWN_ERROR, { originalError: err });
+    //     }
+    // }
 
     /**
      * Initializes the wallet from a provided mnemonic.

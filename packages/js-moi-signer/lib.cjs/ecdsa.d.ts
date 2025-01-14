@@ -7,9 +7,8 @@ import Signature from "./signature";
  * Represents the ECDSA_S256 signature type.
  */
 export default class ECDSA_S256 implements SigType {
-    prefix: number;
-    sigName: string;
-    constructor();
+    readonly prefix: number;
+    readonly sigName: string;
     /**
      * sign
      *
