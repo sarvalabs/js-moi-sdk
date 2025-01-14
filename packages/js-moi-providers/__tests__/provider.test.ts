@@ -1,8 +1,23 @@
-import { ArrayIndexAccessor, AssetStandard, generateStorageKey, hexToBytes, isHex, LogicId, OpType, ReceiptStatus, trimHexPrefix, type Address, type Hex } from "js-moi-utils";
+import {
+    ArrayIndexAccessor,
+    AssetId,
+    AssetStandard,
+    generateStorageKey,
+    hexToBytes,
+    isHex,
+    LogicId,
+    OpType,
+    ReceiptStatus,
+    trimHexPrefix,
+    type Address,
+    type Hex,
+} from "js-moi-utils";
 import { HttpProvider, JsonRpcProvider } from "../src.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
 const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
+const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548";
+
 const HOST = "http://localhost:1600";
 
 describe(JsonRpcProvider, () => {
@@ -216,6 +231,69 @@ describe(JsonRpcProvider, () => {
 
             expect(value).toBeDefined();
             expect(isHex(value)).toBeTruthy();
+        });
+    });
+
+    describe(provider.getAsset, () => {
+        const assetId = new AssetId(FAUCET_ASSET_ID);
+
+        it.concurrent("should return the asset when retrieved using asset address", async () => {
+            const asset = await provider.getAsset(assetId.getAddress());
+
+            expect(asset).toBeDefined();
+            expect(asset.metadata.asset_id).toBe(FAUCET_ASSET_ID);
+            expect(asset.metadata.standard).toBe(assetId.getStandard());
+        });
+
+        it.concurrent("should return the asset when retrieved using asset id", async () => {
+            const asset = await provider.getAsset(assetId);
+
+            expect(asset).toBeDefined();
+            expect(asset.metadata.asset_id).toBe(FAUCET_ASSET_ID);
+            expect(asset.metadata.logical).toBe(assetId.isLogical());
+        });
+
+        it.concurrent("should return the asset with reference", async () => {
+            const asset = await provider.getAsset(assetId, {
+                reference: { relative: { identifier: assetId.getAddress(), height: 0 } },
+            });
+
+            expect(asset).toBeDefined();
+            expect(asset.metadata.asset_id).toBe(FAUCET_ASSET_ID);
+            expect(asset.metadata.supply).toBe(expect.any(String));
+        });
+
+        it.concurrent("should return the asset with included fields", async () => {
+            const asset = await provider.getAsset(assetId, {
+                modifier: { include: ["controller", "creator", "edition"] },
+            });
+
+            expect(asset).toBeDefined();
+            expect(asset.metadata).toBeDefined();
+            expect(asset.controller).toBeDefined();
+            expect(asset.edition).toBeDefined();
+        });
+
+        it.concurrent("should return the asset with extracted fields", async () => {
+            const asset = await provider.getAsset(assetId, {
+                modifier: { extract: "controller" },
+            });
+
+            expect(asset).toBeDefined();
+            // TODO: We can check by number of fields too.
+            expect(asset.controller).toBeDefined();
+        });
+
+        it.concurrent("should return the asset with modifier and reference", async () => {
+            const asset = await provider.getAsset(assetId, {
+                modifier: { include: ["controller", "creator", "edition"] },
+                reference: { relative: { identifier: assetId.getAddress(), height: 0 } },
+            });
+
+            expect(asset).toBeDefined();
+            expect(asset.metadata).toBeDefined();
+            expect(asset.controller).toBeDefined();
+            expect(asset.edition).toBeDefined();
         });
     });
 });

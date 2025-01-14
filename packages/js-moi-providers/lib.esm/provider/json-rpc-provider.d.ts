@@ -1,7 +1,7 @@
-import { LogicId, StorageKey, type Account, type Address, type Hex, type InteractionRequest, type JsonRpcResponse, type Logic, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
+import { AssetId, LogicId, StorageKey, type Account, type Address, type Asset, type Hex, type InteractionRequest, type JsonRpcResponse, type Logic, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountRequestOption, GetNetworkInfoOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, SimulateOption, TesseractRequestOption } from "../types/provider";
+import type { AccountRequestOption, AssetRequestOption, GetNetworkInfoOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, SimulateOption, TesseractRequestOption } from "../types/provider";
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
@@ -53,6 +53,8 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getLogic<TOption extends LogicRequestOption>(identifier: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
     getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

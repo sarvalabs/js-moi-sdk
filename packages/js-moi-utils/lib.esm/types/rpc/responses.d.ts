@@ -1,4 +1,4 @@
-import type { AccountType, InteractionStatus, LockType, OperationStatus, OpType, ReceiptStatus } from "../../enums";
+import type { AccountType, AssetStandard, InteractionStatus, LockType, OperationStatus, OpType, ReceiptStatus } from "../../enums";
 import type { Address, Hex, Quantity } from "../../hex";
 import type { IxParticipant, Preference } from "../interaction";
 import type { IxOperation } from "../ix-operation";
@@ -178,6 +178,24 @@ export interface Logic {
     metadata: LogicMetadata;
     manifest?: Hex;
     controller?: LogicController;
+    edition?: string[];
+}
+export interface AssetMetadata {
+    asset_id: Hex;
+    standard: AssetStandard;
+    logical: boolean;
+    supply: Quantity;
+}
+export interface AssetController {
+}
+export interface AssetCreator {
+    address: Address;
+    balance: Quantity;
+}
+export interface Asset {
+    metadata: AssetMetadata;
+    controller?: AssetController;
+    creator?: AssetCreator;
     edition?: string[];
 }
 //# sourceMappingURL=responses.d.ts.map

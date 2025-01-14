@@ -1,4 +1,5 @@
 import {
+    AssetId,
     bytesToHex,
     ensureHexPrefix,
     ErrorCode,
@@ -11,6 +12,7 @@ import {
     validateIxRequest,
     type Account,
     type Address,
+    type Asset,
     type Hex,
     type InteractionRequest,
     type JsonRpcResponse,
@@ -26,6 +28,7 @@ import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import type {
     AccountRequestOption,
+    AssetRequestOption,
     GetNetworkInfoOption,
     LogicRequestOption,
     LogicStorageRequestOption,
@@ -247,6 +250,16 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         }
 
         return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
+    }
+
+    async getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    async getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    async getAsset<TOption extends AssetRequestOption>(identifier: Address | AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
+        if (typeof identifier === "string" && !isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        const address = typeof identifier === "string" ? identifier : identifier.getAddress();
+        return await this.call("moi.Asset", { identifier: address, ...option });
     }
 
     /**

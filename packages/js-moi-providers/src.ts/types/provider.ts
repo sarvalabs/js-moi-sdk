@@ -1,6 +1,8 @@
 import type {
     Account,
     Address,
+    Asset,
+    AssetId,
     ExtractModifier,
     Hex,
     IncludeModifier,
@@ -75,4 +77,11 @@ interface LogicStorageRequest {
     getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
 }
 
-export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest, LogicStorageRequest {}
+export type AssetRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Asset, "metadata">>;
+
+interface AssetRequest {
+    getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+}
+
+export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest, LogicStorageRequest, AssetRequest {}

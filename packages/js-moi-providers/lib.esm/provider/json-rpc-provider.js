@@ -152,6 +152,13 @@ export class JsonRpcProvider extends EventEmitter {
         }
         return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
     }
+    async getAsset(identifier, option) {
+        if (typeof identifier === "string" && !isValidAddress(identifier)) {
+            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
+        }
+        const address = typeof identifier === "string" ? identifier : identifier.getAddress();
+        return await this.call("moi.Asset", { identifier: address, ...option });
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
