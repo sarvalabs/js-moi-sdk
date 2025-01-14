@@ -10,5 +10,5 @@
 - [x] `moi.Asset`
 - [x] `moi.Logic`
 - [x] `moi.LogicStorage`
-- [] `moi.LogicMessage`
+- [x] `moi.LogicMessage`
 - [] `moi.Subscribe`

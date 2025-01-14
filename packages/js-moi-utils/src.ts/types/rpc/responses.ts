@@ -230,3 +230,20 @@ export interface Asset {
     creator?: AssetCreator;
     edition?: string[];
 }
+
+export interface LogicEvent {
+    logic_id: Hex;
+    address: Address;
+    topics: Hex[];
+    data: Hex;
+}
+
+export interface LogicSource {
+    interaction: Hex;
+    tesseract: Hex;
+}
+
+export interface LogicMessage {
+    event: LogicEvent;
+    source: LogicSource;
+}

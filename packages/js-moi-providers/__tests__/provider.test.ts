@@ -13,6 +13,7 @@ import {
     type Hex,
 } from "js-moi-utils";
 import { HttpProvider, JsonRpcProvider } from "../src.ts";
+import type { LogicMessageRequestOption } from "../src.ts/types/provider.ts";
 
 const ADDRESS: Address = "0x3dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21";
 const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
@@ -294,6 +295,82 @@ describe(JsonRpcProvider, () => {
             expect(asset.metadata).toBeDefined();
             expect(asset.controller).toBeDefined();
             expect(asset.edition).toBeDefined();
+        });
+    });
+
+    describe(provider.getLogicMessage, () => {
+        it.concurrent("should return the logic message when retrieved using logic id", async () => {
+            const messages = await provider.getLogicMessage(GUARDIAN_LOGIC_ID);
+
+            expect(messages).toBeDefined();
+            expect(Array.isArray(messages)).toBeTruthy();
+
+            const message = messages[0];
+
+            if (message != null) {
+                expect(message.event).toBeDefined();
+                expect(message.source).toBeDefined();
+                expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
+            }
+        });
+
+        it.concurrent("should return the logic message when address is passed", async () => {
+            const messages = await provider.getLogicMessage(GUARDIAN_LOGIC_ID, {
+                address: new LogicId(GUARDIAN_LOGIC_ID).getAddress(),
+            });
+
+            expect(messages).toBeDefined();
+            expect(Array.isArray(messages)).toBeTruthy();
+
+            const message = messages[0];
+
+            if (message != null) {
+                expect(message.event).toBeDefined();
+                expect(message.source).toBeDefined();
+                expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
+            }
+        });
+
+        it.concurrent.each<LogicMessageRequestOption & { case: string }>([
+            {
+                case: "when address is passed",
+                address: ADDRESS,
+            },
+            {
+                case: "when range is passed",
+                range: { start: 0, stop: 10 },
+            },
+            {
+                case: "when invalid range is passed",
+                range: { start: -100, stop: 10 },
+            },
+            {
+                case: "when invalid topics are passed",
+                topics: ["0x01", "0x02"],
+            },
+            {
+                case: "when topics are passed",
+                topics: ["0x5edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a"],
+            },
+            {
+                case: "when all options are passed",
+                address: "0x5fc0247c18448e91d15542ffb7a0956b6d5f1a19bdd11a36e6a1f7369288f886",
+                topics: ["0x5edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a"],
+                range: { start: 0, stop: 9 },
+            },
+        ])("should return the logic message $case", async ({ case: name, ...option }) => {
+            const messages = await provider.getLogicMessage(GUARDIAN_LOGIC_ID, option);
+            console.log();
+            expect(messages).toBeDefined();
+            expect(Array.isArray(messages)).toBeTruthy();
+
+            const message = messages[0];
+
+            if (message != null) {
+                expect(message.event).toBeDefined();
+                expect(message.source).toBeDefined();
+                expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
+            }
         });
     });
 });

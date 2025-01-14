@@ -17,6 +17,7 @@ import {
     type InteractionRequest,
     type JsonRpcResponse,
     type Logic,
+    type LogicMessage,
     type NetworkInfo,
     type Simulate,
     type Tesseract,
@@ -30,6 +31,7 @@ import type {
     AccountRequestOption,
     AssetRequestOption,
     GetNetworkInfoOption,
+    LogicMessageRequestOption,
     LogicRequestOption,
     LogicStorageRequestOption,
     Provider,
@@ -260,6 +262,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         }
         const address = typeof identifier === "string" ? identifier : identifier.getAddress();
         return await this.call("moi.Asset", { identifier: address, ...option });
+    }
+
+    async getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
+        const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
+
+        return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
     }
 
     /**

@@ -1,4 +1,4 @@
-import type { Account, Address, Asset, Hex, Logic, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, Address, Asset, Hex, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
@@ -11,6 +11,15 @@ interface LogicStorageParam {
     storage_id: Hex;
     address?: Address;
 }
+interface LogicMessageParam {
+    logic_id: Hex;
+    address?: Address;
+    topics?: Hex[];
+    range?: {
+        start: number;
+        stop: number;
+    };
+}
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ResponseModifierParam<keyof NetworkInfo>]>;
     "moi.Simulate": ApiMethod<[param: {
@@ -20,7 +29,8 @@ export interface NetworkActionApi {
     "moi.Tesseract": ApiMethod<[param: Required<TesseractReferenceParam> & ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>]>;
     "moi.Logic": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Logic, "metadata">>]>;
     "moi.LogicStorage": ApiMethod<[param: LogicStorageParam & TesseractReferenceParam], Hex>;
-    "moi.Asset": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Asset, 'metadata'>> & TesseractReferenceParam]>;
+    "moi.Asset": ApiMethod<[param: IdentifierParam<Address> & ResponseModifierParam<Exclude<keyof Asset, "metadata">> & TesseractReferenceParam]>;
+    "moi.LogicMessage": ApiMethod<[param: LogicMessageParam], LogicMessage[]>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

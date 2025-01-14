@@ -159,6 +159,10 @@ export class JsonRpcProvider extends EventEmitter {
         const address = typeof identifier === "string" ? identifier : identifier.getAddress();
         return await this.call("moi.Asset", { identifier: address, ...option });
     }
+    async getLogicMessage(logicId, options) {
+        const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
+        return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

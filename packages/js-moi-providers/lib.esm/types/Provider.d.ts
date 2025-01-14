@@ -1,5 +1,6 @@
-import type { Account, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, InteractionRequest, Logic, LogicId, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "stream";
+import type { MethodParams } from "./moi-execution-api";
 type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
 }[keyof T];
@@ -45,7 +46,11 @@ interface AssetRequest {
     getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
 }
-export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest, LogicStorageRequest, AssetRequest {
+export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id">;
+interface LogicMessageRequest {
+    getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
+}
+export interface Provider extends EventEmitter, ProtocolRequest, SimulateRequest, AccountRequest, TesseractRequest, LogicRequest, LogicStorageRequest, AssetRequest, LogicMessageRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map
