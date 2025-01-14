@@ -179,6 +179,10 @@ export class JsonRpcProvider extends EventEmitter {
         }
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
+    execute(encodeIx, signatures) {
+        const interaction = encodeIx instanceof Uint8Array ? bytesToHex(encodeIx) : encodeIx;
+        return this.call("moi.Execute", { interaction, signatures });
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

@@ -110,12 +110,19 @@ interface AccountKeyRequest {
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }
 
+export type IxSignature = MethodParams<"moi.Execute">[0]["signatures"][number];
+
+interface ExecuteRequest {
+    execute(ix: Uint8Array | Hex, signatures: IxSignature[]): Promise<Hex>;
+}
+
 export interface Provider
     extends EventEmitter,
         AccountAssetRequest,
         AccountKeyRequest,
         AccountRequest,
         AssetRequest,
+        ExecuteRequest,
         LogicMessageRequest,
         LogicRequest,
         LogicStorageRequest,

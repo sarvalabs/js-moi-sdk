@@ -59,6 +59,16 @@ interface AccountKeyRequestParam extends IdentifierParam<Address>, TesseractRefe
     pending?: boolean;
 }
 
+interface InteractionSignature extends IdentifierParam<Address> {
+    signature: Hex;
+    key_idx: number;
+}
+
+interface ExecuteRequestParam {
+    interaction: Hex;
+    signatures: InteractionSignature[];
+}
+
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ProtocolRequestParam]>;
     "moi.Simulate": ApiMethod<[param: SimulateRequestParam], Simulate>;
@@ -70,6 +80,7 @@ export interface NetworkActionApi {
     "moi.LogicMessage": ApiMethod<[param: LogicMessageRequestParam], LogicMessage[]>;
     "moi.AccountAsset": ApiMethod<[param: AccountAssetRequestParam]>;
     "moi.AccountKey": ApiMethod<[param: AccountKeyRequestParam], AccountKey>;
+    "moi.Execute": ApiMethod<[param: ExecuteRequestParam], Hex>;
 }
 
 /**
