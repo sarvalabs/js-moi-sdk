@@ -4,8 +4,6 @@ import { SigType, SigningAlgorithms } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
-type InteractionMethod = "call" | "send" | "estimateFuel";
-
 /**
  * An abstract class representing a signer responsible for cryptographic
  * activities like signing and verification.
@@ -49,7 +47,6 @@ export abstract class Signer {
     public async simulate(ix: InteractionRequest, option?: SimulateOption) {
         return await this.getProvider().simulate(ix, option);
     }
-
 
     /**
      * Verifies the authenticity of a signature by performing signature verification
