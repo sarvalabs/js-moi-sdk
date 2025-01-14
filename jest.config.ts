@@ -64,7 +64,7 @@ const configuration: Config = {
     modulePathIgnorePatterns: ["packages/**/lib.*"],
     collectCoverageFrom: ["packages/**/src.ts/**/*.ts"],
     testTimeout: 700000,
-    maxConcurrency: 3,
+    maxConcurrency: 10,
 };
 
 export default configuration;
