@@ -6,7 +6,7 @@
 - [x] `moi.Tesseract`
 - [x] `moi.Account`
 - [] `moi.AccountKey`
-- [] `moi.AccountAsset`
+- [x] `moi.AccountAsset`
 - [x] `moi.Asset`
 - [x] `moi.Logic`
 - [x] `moi.LogicStorage`
