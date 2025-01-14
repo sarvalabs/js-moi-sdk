@@ -23,3 +23,5 @@ export type {
     SimulateOption,
     TesseractRequestOption,
 } from "./types/provider";
+
+export { InteractionResponse } from "./utils/interaction-response";

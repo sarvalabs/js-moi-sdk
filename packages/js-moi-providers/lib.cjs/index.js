@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebsocketTransport = exports.HttpTransport = exports.WebsocketProvider = exports.WebsocketEvent = exports.JsonRpcProvider = exports.HttpProvider = void 0;
+exports.InteractionResponse = exports.WebsocketTransport = exports.HttpTransport = exports.WebsocketProvider = exports.WebsocketEvent = exports.JsonRpcProvider = exports.HttpProvider = void 0;
 var http_provider_1 = require("./provider/http-provider");
 Object.defineProperty(exports, "HttpProvider", { enumerable: true, get: function () { return http_provider_1.HttpProvider; } });
 var json_rpc_provider_1 = require("./provider/json-rpc-provider");
@@ -12,4 +12,6 @@ var http_transport_1 = require("./transport/http-transport");
 Object.defineProperty(exports, "HttpTransport", { enumerable: true, get: function () { return http_transport_1.HttpTransport; } });
 var ws_transport_1 = require("./transport/ws-transport");
 Object.defineProperty(exports, "WebsocketTransport", { enumerable: true, get: function () { return ws_transport_1.WebsocketTransport; } });
+var interaction_response_1 = require("./utils/interaction-response");
+Object.defineProperty(exports, "InteractionResponse", { enumerable: true, get: function () { return interaction_response_1.InteractionResponse; } });
 //# sourceMappingURL=index.js.map
