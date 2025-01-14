@@ -179,9 +179,31 @@ export class JsonRpcProvider extends EventEmitter {
         }
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
-    execute(encodeIx, signatures) {
-        const interaction = encodeIx instanceof Uint8Array ? bytesToHex(encodeIx) : encodeIx;
-        return this.call("moi.Execute", { interaction, signatures });
+    execute(ix, signatures) {
+        let params;
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                if (!signatures || !Array.isArray(signatures)) {
+                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
+                }
+                params = [{ interaction: bytesToHex(ix), signatures }];
+                break;
+            }
+            case typeof ix === "object": {
+                if (ix.interaction == null) {
+                    ErrorUtils.throwError("No interaction provided", ErrorCode.INVALID_ARGUMENT);
+                }
+                if (!ix.signatures || !Array.isArray(ix.signatures)) {
+                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
+                }
+                params = [ix];
+                break;
+            }
+            default: {
+                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+        return this.call("moi.Execute", ...params);
     }
     /**
      * Processes a JSON-RPC response and returns the result.

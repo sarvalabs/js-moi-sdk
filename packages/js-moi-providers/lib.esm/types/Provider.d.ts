@@ -58,9 +58,11 @@ export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "i
 interface AccountKeyRequest {
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }
-export type Signature = MethodParams<"moi.Execute">[0]["signatures"][number];
+export type ExecuteIx = MethodParams<"moi.Execute">[0];
+export type Signature = ExecuteIx['signatures'][number];
 interface ExecuteRequest {
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
+    execute(ix: ExecuteIx): Promise<Hex>;
 }
 export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, TesseractRequest {
 }

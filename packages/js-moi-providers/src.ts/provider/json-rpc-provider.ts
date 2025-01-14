@@ -34,6 +34,7 @@ import type {
     AccountKeyRequestOption,
     AccountRequestOption,
     AssetRequestOption,
+    ExecuteIx,
     GetNetworkInfoOption,
     LogicMessageRequestOption,
     LogicRequestOption,
@@ -301,9 +302,45 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
 
-    execute(encodeIx: Uint8Array | Hex, signatures: Signature[]): Promise<Hex> {
-        const interaction = encodeIx instanceof Uint8Array ? bytesToHex(encodeIx) : encodeIx;
-        return this.call("moi.Execute", { interaction, signatures });
+    // execute(encodeIx: Uint8Array | Hex, signatures: Signature[]): Promise<Hex> {
+    //     const interaction = encodeIx instanceof Uint8Array ? bytesToHex(encodeIx) : encodeIx;
+    //     return this.call("moi.Execute", { interaction, signatures });
+    // }
+
+    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
+    execute(ix: ExecuteIx): Promise<Hex>;
+    execute(ix: Uint8Array | Hex | ExecuteIx, signatures?: Signature[]): Promise<Hex> {
+        let params: MethodParams<"moi.Execute">;
+
+        switch (true) {
+            case ix instanceof Uint8Array: {
+                if (!signatures || !Array.isArray(signatures)) {
+                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
+                }
+
+                params = [{ interaction: bytesToHex(ix), signatures }];
+                break;
+            }
+
+            case typeof ix === "object": {
+                if (ix.interaction == null) {
+                    ErrorUtils.throwError("No interaction provided", ErrorCode.INVALID_ARGUMENT);
+                }
+
+                if (!ix.signatures || !Array.isArray(ix.signatures)) {
+                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
+                }
+
+                params = [ix];
+                break;
+            }
+
+            default: {
+                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
+            }
+        }
+
+        return this.call("moi.Execute", ...params);
     }
 
     /**
