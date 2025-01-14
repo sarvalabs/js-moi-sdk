@@ -1,7 +1,7 @@
 import type { AccountType, AssetStandard, InteractionStatus, LockType, OperationStatus, OpType, ReceiptStatus } from "../../enums";
 import type { Address, Hex, Quantity } from "../../hex";
-import type { IxParticipant, Preference } from "../interaction";
-import type { IxOperation } from "../ix-operation";
+import type { IxParticipant } from "../interaction";
+import type { IxOp } from "../ix-operation";
 import type { OperationResult } from "./ix-result";
 
 export interface NetworkInfo {
@@ -172,7 +172,7 @@ export interface InteractionInfo {
     fuel_bonus: number;
     // TODO: There is difference between the protocol response and protocol response
     // for example, supply in request is numerical value but in response it is Quantity(HEX string)
-    operations: IxOperation[];
+    operations: IxOp[];
     accounts: IxParticipant[];
     metadata: Hex;
     preference: Preference;
@@ -187,7 +187,7 @@ export interface TesseractInfo {
 export interface InteractionConfirmation {
     status: ReceiptStatus;
     tesseract: TesseractInfo;
-    operations: IxOperation[];
+    operations: IxOp[];
     fuel_spent: number;
 }
 

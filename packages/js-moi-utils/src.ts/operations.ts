@@ -4,7 +4,7 @@ import { isValidAddress } from "./address";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isHex } from "./hex";
-import type { IxRawOperation, Operation } from "./types/ix-operation";
+import type { IxOperation, IxRawOperation } from "./types/ix-operation";
 import type { OperationPayload, PoloOperationPayload } from "./types/ix-payload";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
@@ -318,7 +318,7 @@ export const transformPayload = <TOpType extends OpType>(type: TOpType, payload:
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export const encodeOperation = <TOpType extends OpType>(operation: Operation<TOpType>): IxRawOperation => {
+export const encodeOperation = <TOpType extends OpType>(operation: IxOperation<TOpType>): IxRawOperation => {
     const descriptor = ixOpDescriptor[operation.type];
 
     if (descriptor == null) {
@@ -337,10 +337,10 @@ export const encodeOperation = <TOpType extends OpType>(operation: Operation<TOp
  * Checks if the given operation is valid.
  *
  * @template TOpType - The type of the operation.
- * @param {Operation<TOpType>} operation - The operation to validate.
+ * @param {IxOperation<TOpType>} operation - The operation to validate.
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
-export const isValidOperation = <TOpType extends OpType>(operation: Operation<TOpType>): boolean => {
+export const isValidOperation = <TOpType extends OpType>(operation: IxOperation<TOpType>): boolean => {
     return validateOperation(operation) == null;
 };
 
@@ -351,7 +351,7 @@ export const isValidOperation = <TOpType extends OpType>(operation: Operation<TO
  * @param operation - The operation to validate.
  * @returns The result of the validation.
  */
-export const validateOperation = <TOpType extends OpType>(operation: Operation<TOpType>): ReturnType<IxOperationDescriptor<TOpType>["validator"]> => {
+export const validateOperation = <TOpType extends OpType>(operation: IxOperation<TOpType>): ReturnType<IxOperationDescriptor<TOpType>["validator"]> => {
     const descriptor = ixOpDescriptor[operation.type];
 
     if (descriptor == null) {

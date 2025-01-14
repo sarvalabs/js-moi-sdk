@@ -30,7 +30,7 @@ export type {
     RawSender,
     Sender,
 } from "./types/interaction";
-export type { IxOperation, IxRawOperation, Operation } from "./types/ix-operation";
+export type { IxOp, IxOperation, IxRawOperation } from "./types/ix-operation";
 export type {
     AssetActionPayload,
     AssetCreatePayload,
