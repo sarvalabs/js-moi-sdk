@@ -1,4 +1,4 @@
-import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "stream";
 import type { MethodParams } from "./moi-execution-api";
 type NonOptionKeys<T extends Record<string, any>> = {
@@ -64,7 +64,11 @@ interface ExecuteRequest {
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
     execute(ix: ExecuteIx): Promise<Hex>;
 }
-export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, TesseractRequest {
+export type InteractionRequestOption = ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">>;
+interface InteractionRequestMethod {
+    getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
+}
+export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

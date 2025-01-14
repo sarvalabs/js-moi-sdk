@@ -8,6 +8,7 @@ import type {
     ExtractModifier,
     Hex,
     IncludeModifier,
+    Interaction,
     InteractionRequest,
     Logic,
     LogicId,
@@ -119,6 +120,13 @@ interface ExecuteRequest {
     execute(ix: ExecuteIx): Promise<Hex>;
 }
 
+export type InteractionRequestOption = ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">>;
+
+// Type name colliding with the one from `js-moi-utils`
+interface InteractionRequestMethod {
+    getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
+}
+
 export interface Provider
     extends EventEmitter,
         AccountAssetRequest,
@@ -126,6 +134,7 @@ export interface Provider
         AccountRequest,
         AssetRequest,
         ExecuteRequest,
+        InteractionRequestMethod,
         LogicMessageRequest,
         LogicRequest,
         LogicStorageRequest,

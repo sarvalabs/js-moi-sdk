@@ -205,6 +205,9 @@ export class JsonRpcProvider extends EventEmitter {
         }
         return this.call("moi.Execute", ...params);
     }
+    getInteraction(hash, option) {
+        return this.call("moi.Interaction", { hash, ...option });
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

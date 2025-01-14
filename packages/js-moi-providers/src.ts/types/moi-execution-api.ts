@@ -5,6 +5,7 @@ import type {
     Address,
     Asset,
     Hex,
+    Interaction,
     Logic,
     LogicMessage,
     NetworkInfo,
@@ -69,6 +70,10 @@ interface ExecuteRequestParam {
     signatures: InteractionSignature[];
 }
 
+interface InteractionRequestParam extends ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">> {
+    hash: Hex;
+}
+
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ProtocolRequestParam]>;
     "moi.Simulate": ApiMethod<[param: SimulateRequestParam], Simulate>;
@@ -81,6 +86,7 @@ export interface NetworkActionApi {
     "moi.AccountAsset": ApiMethod<[param: AccountAssetRequestParam]>;
     "moi.AccountKey": ApiMethod<[param: AccountKeyRequestParam], AccountKey>;
     "moi.Execute": ApiMethod<[param: ExecuteRequestParam], Hex>;
+    "moi.Interaction": ApiMethod<[param: InteractionRequestParam]>;
 }
 
 /**

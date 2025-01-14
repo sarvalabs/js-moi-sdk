@@ -1,4 +1,4 @@
-import type { Account, AccountAsset, AccountKey, Address, Asset, Hex, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, AccountAsset, AccountKey, Address, Asset, Hex, Interaction, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
@@ -48,6 +48,9 @@ interface ExecuteRequestParam {
     interaction: Hex;
     signatures: InteractionSignature[];
 }
+interface InteractionRequestParam extends ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">> {
+    hash: Hex;
+}
 export interface NetworkActionApi {
     "moi.Protocol": ApiMethod<[option?: ProtocolRequestParam]>;
     "moi.Simulate": ApiMethod<[param: SimulateRequestParam], Simulate>;
@@ -60,6 +63,7 @@ export interface NetworkActionApi {
     "moi.AccountAsset": ApiMethod<[param: AccountAssetRequestParam]>;
     "moi.AccountKey": ApiMethod<[param: AccountKeyRequestParam], AccountKey>;
     "moi.Execute": ApiMethod<[param: ExecuteRequestParam], Hex>;
+    "moi.Interaction": ApiMethod<[param: InteractionRequestParam]>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

@@ -1,7 +1,7 @@
-import { AssetId, LogicId, StorageKey, type Account, type AccountAsset, type AccountKey, type Address, type Asset, type Hex, type InteractionRequest, type JsonRpcResponse, type Logic, type LogicMessage, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
+import { AssetId, LogicId, StorageKey, type Account, type AccountAsset, type AccountKey, type Address, type Asset, type Hex, type Interaction, type InteractionRequest, type JsonRpcResponse, type Logic, type LogicMessage, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateOption, TesseractRequestOption } from "../types/provider";
+import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateOption, TesseractRequestOption } from "../types/provider";
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
@@ -60,6 +60,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
     execute(ix: ExecuteIx): Promise<Hex>;
+    getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

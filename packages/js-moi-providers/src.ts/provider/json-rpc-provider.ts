@@ -16,6 +16,7 @@ import {
     type Address,
     type Asset,
     type Hex,
+    type Interaction,
     type InteractionRequest,
     type JsonRpcResponse,
     type Logic,
@@ -36,6 +37,7 @@ import type {
     AssetRequestOption,
     ExecuteIx,
     GetNetworkInfoOption,
+    InteractionRequestOption,
     LogicMessageRequestOption,
     LogicRequestOption,
     LogicStorageRequestOption,
@@ -302,11 +304,6 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
 
-    // execute(encodeIx: Uint8Array | Hex, signatures: Signature[]): Promise<Hex> {
-    //     const interaction = encodeIx instanceof Uint8Array ? bytesToHex(encodeIx) : encodeIx;
-    //     return this.call("moi.Execute", { interaction, signatures });
-    // }
-
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
     execute(ix: ExecuteIx): Promise<Hex>;
     execute(ix: Uint8Array | Hex | ExecuteIx, signatures?: Signature[]): Promise<Hex> {
@@ -341,6 +338,10 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         }
 
         return this.call("moi.Execute", ...params);
+    }
+
+    getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {
+        return this.call("moi.Interaction", { hash, ...option });
     }
 
     /**
