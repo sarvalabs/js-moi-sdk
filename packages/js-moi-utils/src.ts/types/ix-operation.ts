@@ -61,15 +61,15 @@ export interface AssetCreatePayload {
     /**
      * The dimension of the asset.
      */
-    dimension: number;
+    dimension?: number;
     /**
      * The stateful flag of the asset.
      */
-    is_stateful: boolean;
+    is_stateful?: boolean;
     /**
      * The logical flag of the asset.
      */
-    is_logical: boolean;
+    is_logical?: boolean;
     /**
      * The logic of the asset.
      */

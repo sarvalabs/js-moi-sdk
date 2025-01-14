@@ -97,7 +97,7 @@ export abstract class Signer {
         // TODO: Check whether it is correct way to get latest sequence
 
         const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
-        const { sequence } = await this.getProvider().getAccountKey(address, index, { pending: true });
+        const { sequence } = await this.getProvider().getAccountKey(address, index);
         return sequence;
     }
 
@@ -111,7 +111,7 @@ export abstract class Signer {
         }
 
         if (sequence == null) {
-            sequence = await this.getLatestSequence();
+            sequence = (await this.getLatestSequence()) + 1;
         }
 
         const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
@@ -123,8 +123,6 @@ export abstract class Signer {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
         const interaction = { ...ix, sender: await this.getSender(sequence) };
         const signedIx = await this.signInteraction(interaction, algorithm);
-
-        console.log(interaction);
 
         return await this.getProvider().execute(signedIx);
     }
