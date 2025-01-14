@@ -11,6 +11,7 @@ export type {
     AccountKeyRequestOption,
     AccountRequestOption,
     AssetRequestOption,
+    ExecuteIx,
     GetNetworkInfoOption,
     LogicMessageRequestOption,
     LogicRequestOption,
