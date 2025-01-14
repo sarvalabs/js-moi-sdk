@@ -70,7 +70,7 @@ class Signer {
     async getLatestSequence() {
         // TODO: Check whether it is correct way to get latest sequence
         const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
-        const { sequence } = await this.getProvider().getAccountKey(address, index, { pending: false });
+        const { sequence } = await this.getProvider().getAccountKey(address, index, { pending: true });
         return sequence;
     }
     async getSender(sequence) {
