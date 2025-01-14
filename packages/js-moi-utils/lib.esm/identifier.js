@@ -103,7 +103,6 @@ export class AssetId {
             return false;
         }
         const version = buff[0] & 0xf0;
-        console.log(version);
         switch (version) {
             case 0: {
                 return buff.length === ASSET_V0_LEN;

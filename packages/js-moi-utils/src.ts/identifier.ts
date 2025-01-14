@@ -137,7 +137,6 @@ export class AssetId {
         }
 
         const version = buff[0] & 0xf0;
-        console.log(version);
 
         switch (version) {
             case 0: {
