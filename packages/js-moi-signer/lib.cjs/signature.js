@@ -1,38 +1,34 @@
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
-import { ISignature } from "../types";
-
-export default class Signature implements ISignature {
-    private prefix: Uint8Array;
-    private digest: Uint8Array;
-    private extraData: Uint8Array;
-    private name: string;
-
-    constructor(prefix: Uint8Array, digest: Uint8Array, extraData: Uint8Array, signatureName: string) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const js_moi_utils_1 = require("js-moi-utils");
+class Signature {
+    prefix;
+    digest;
+    extraData;
+    name;
+    constructor(prefix, digest, extraData, signatureName) {
         this.prefix = prefix;
         this.digest = digest;
         this.extraData = extraData;
         this.name = signatureName;
     }
-
-    public unmarshall(signature: Uint8Array | String) {
-        let sig: Uint8Array;
+    unmarshall(signature) {
+        let sig;
         if (typeof signature === "string") {
-            sig = hexToBytes(signature);
-        } else {
-            sig = signature as Uint8Array;
+            sig = (0, js_moi_utils_1.hexToBytes)(signature);
         }
-
+        else {
+            sig = signature;
+        }
         const sigLen = sig[1];
         this.prefix = sig.subarray(0, 2);
         this.digest = sig.subarray(2, 2 + sigLen);
         this.extraData = sig.subarray(2 + sigLen);
         this.name = this.getSignatureName(sig[0]);
     }
-
-    public Digest(): Uint8Array {
+    Digest() {
         return this.digest;
     }
-
     /**
      * getSigByte
      *
@@ -41,14 +37,12 @@ export default class Signature implements ISignature {
      * @returns The signature byte as a number.
      * @throws Error if the signature byte is invalid.
      */
-    public getSigByte(): number {
+    getSigByte() {
         if (typeof this.prefix[0] !== "number") {
-            ErrorUtils.throwError("Invalid signature byte.", ErrorCode.INVALID_SIGNATURE);
+            js_moi_utils_1.ErrorUtils.throwError("Invalid signature byte.", js_moi_utils_1.ErrorCode.INVALID_SIGNATURE);
         }
-
         return this.prefix[0];
     }
-
     /**
      * getName
      *
@@ -56,25 +50,20 @@ export default class Signature implements ISignature {
      *
      * @returns The name of the signature algorithm as a string.
      */
-    public getName(): string {
+    getName() {
         return this.name;
     }
-
-    public Extra(): Uint8Array {
+    Extra() {
         return this.extraData;
     }
-
-    public serialize(): Uint8Array {
+    serialize() {
         if (this.name === "") {
-            ErrorUtils.throwError("Signature is not initialized", ErrorCode.NOT_INITIALIZED);
+            js_moi_utils_1.ErrorUtils.throwError("Signature is not initialized", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
-
         const finalSigBytesWithoutExtra = new Uint8Array([...this.prefix, ...this.digest]);
         const finalSigBytes = new Uint8Array([...finalSigBytesWithoutExtra, ...this.extraData]);
-
         return finalSigBytes;
     }
-
     /**
      * getSignatureName
      *
@@ -83,7 +72,7 @@ export default class Signature implements ISignature {
      * @param sigIndex - The signature index used to determine the signature algorithm name.
      * @returns The name of the signature algorithm as a string.
      */
-    private getSignatureName(sigIndex: number): string {
+    getSignatureName(sigIndex) {
         switch (sigIndex) {
             case 1:
                 return "ECDSA_S256";
@@ -92,3 +81,5 @@ export default class Signature implements ISignature {
         }
     }
 }
+exports.default = Signature;
+//# sourceMappingURL=signature.js.map

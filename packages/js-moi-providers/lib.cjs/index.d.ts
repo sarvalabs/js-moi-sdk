@@ -4,5 +4,5 @@ export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./provide
 export { HttpTransport, type HttpTransportOption } from "./transport/http-transport";
 export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
 export type { ApiMethod, MethodParams, MethodResponse, NetworkActionApi, NetworkMethod } from "./types/moi-execution-api";
-export type { GetNetworkInfoOption, Provider, SelectFromResponseModifier, SimulateOption } from "./types/provider";
+export type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, GetNetworkInfoOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, SimulateOption, } from "./types/provider";
 //# sourceMappingURL=index.d.ts.map

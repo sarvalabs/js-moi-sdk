@@ -56,12 +56,12 @@
         {
             "path": "./packages/js-moi-hdnode/tsconfig.esm.json"
         },
-        // {
-        //     "path": "./packages/js-moi-signer/tsconfig.cjs.json"
-        // },
-        // {
-        //     "path": "./packages/js-moi-signer/tsconfig.esm.json"
-        // },
+        {
+            "path": "./packages/js-moi-signer/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-signer/tsconfig.esm.json"
+        },
         {
             "path": "./packages/js-moi-bip39/tsconfig.cjs.json"
         },
