@@ -39,7 +39,7 @@ export interface Preference {
 }
 export interface RawInteractionRequest {
     sender: RawSender;
-    payer?: Uint8Array;
+    payer: Uint8Array;
     fuel_price: number;
     fuel_limit: number;
     funds?: IxFund[];
