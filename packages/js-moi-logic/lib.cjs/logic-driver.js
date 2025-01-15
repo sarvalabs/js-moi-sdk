@@ -47,7 +47,6 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         const metadata = {
             kind: data.kind,
             mode: data.mode,
-            isMutating: this.isMutableRoutine(data),
             accepts: data.accepts,
             returns: data.returns,
             catches: data.catches,
@@ -60,8 +59,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 const sign = `${data.name}(${metadata.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
                 js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
-            const calldata = this.manifestCoder.encodeArguments(data.name, ...args);
-            return await this.triggerCallsite(routine, args);
+            return await this.triggerCallsite(data.name, args, option);
         };
         return Object.freeze(Object.assign(callback, metadata));
     }
@@ -77,15 +75,6 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             (0, js_moi_utils_1.defineReadOnly)(routines, element.data.name, this.newRoutine(element.data));
         }
         return routines;
-    }
-    /**
-     * Checks if a routine is mutable based on its name.
-     *
-     * @param {string} routineName - The name of the routine.
-     * @returns {boolean} True if the routine is mutable, false otherwise.
-     */
-    isMutableRoutine(routine) {
-        return [js_moi_utils_1.LogicState.Ephemeral, js_moi_utils_1.LogicState.Persistent].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.

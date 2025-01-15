@@ -21,7 +21,16 @@ export interface SimulationResult<TOpType extends OpType> {
     data: OperationResult<TOpType>;
 }
 
-export type IxOperationResult = SimulationResult<OpType.AssetCreate>;
+export type IxOperationResult =
+    | SimulationResult<OpType.AssetCreate>
+    | SimulationResult<OpType.AssetTransfer>
+    | SimulationResult<OpType.AssetApprove>
+    | SimulationResult<OpType.AssetRevoke>
+    | SimulationResult<OpType.AssetLockup>
+    | SimulationResult<OpType.AssetRelease>
+    | SimulationResult<OpType.LogicDeploy>
+    | SimulationResult<OpType.LogicEnlist>
+    | SimulationResult<OpType.LogicInvoke>;
 
 export interface SimulationEffects {
     events: unknown[];

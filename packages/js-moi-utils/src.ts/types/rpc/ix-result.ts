@@ -28,6 +28,6 @@ export type OperationResult<TOpType extends OpType> = TOpType extends OpType.Ass
     ? LogicDeployResult
     : TOpType extends OpType.LogicInvoke | OpType.LogicEnlist
     ? LogicActionResult
-    : TOpType extends OpType.ParticipantCreate | OpType.AssetTransfer
+    : TOpType extends OpType.ParticipantCreate | OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
     ? NoOperationResult
     : unknown;

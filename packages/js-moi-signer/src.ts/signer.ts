@@ -101,7 +101,7 @@ export abstract class Signer {
         return sequence;
     }
 
-    protected async getSender(sequence?: number): Promise<Sender> {
+    public async getSender(sequence?: number): Promise<Sender> {
         if (sequence != null) {
             const latest = await this.getLatestSequence();
 

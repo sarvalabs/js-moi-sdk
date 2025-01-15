@@ -6,7 +6,6 @@ export interface Routine {
     readonly name: string;
     readonly kind: RoutineType;
     readonly mode: LogicState;
-    readonly isMutating: boolean;
     readonly accepts: Element<ElementType.Routine>["data"]["accepts"];
     readonly returns: Element<ElementType.Routine>["data"]["returns"];
     readonly catches: Element<ElementType.Routine>["data"]["catches"];

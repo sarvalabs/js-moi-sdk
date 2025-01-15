@@ -25,13 +25,6 @@ export declare class LogicDriver extends LogicDescriptor {
      */
     private createRoutines;
     /**
-     * Checks if a routine is mutable based on its name.
-     *
-     * @param {string} routineName - The name of the routine.
-     * @returns {boolean} True if the routine is mutable, false otherwise.
-     */
-    private isMutableRoutine;
-    /**
      * Creates the logic payload from the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.

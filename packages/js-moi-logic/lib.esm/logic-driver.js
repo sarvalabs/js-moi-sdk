@@ -1,5 +1,5 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ElementType, ErrorCode, ErrorUtils, LogicId, LogicState, OpType, defineReadOnly } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicId, OpType, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
@@ -44,7 +44,6 @@ export class LogicDriver extends LogicDescriptor {
         const metadata = {
             kind: data.kind,
             mode: data.mode,
-            isMutating: this.isMutableRoutine(data),
             accepts: data.accepts,
             returns: data.returns,
             catches: data.catches,
@@ -57,8 +56,7 @@ export class LogicDriver extends LogicDescriptor {
                 const sign = `${data.name}(${metadata.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
                 ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", ErrorCode.INVALID_ARGUMENT);
             }
-            const calldata = this.manifestCoder.encodeArguments(data.name, ...args);
-            return await this.triggerCallsite(routine, args);
+            return await this.triggerCallsite(data.name, args, option);
         };
         return Object.freeze(Object.assign(callback, metadata));
     }
@@ -74,15 +72,6 @@ export class LogicDriver extends LogicDescriptor {
             defineReadOnly(routines, element.data.name, this.newRoutine(element.data));
         }
         return routines;
-    }
-    /**
-     * Checks if a routine is mutable based on its name.
-     *
-     * @param {string} routineName - The name of the routine.
-     * @returns {boolean} True if the routine is mutable, false otherwise.
-     */
-    isMutableRoutine(routine) {
-        return [LogicState.Ephemeral, LogicState.Persistent].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.

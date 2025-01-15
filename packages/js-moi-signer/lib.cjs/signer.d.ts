@@ -13,7 +13,7 @@ export declare abstract class Signer {
     connect(provider: Provider): void;
     getProvider(): Provider;
     getLatestSequence(): Promise<number>;
-    protected getSender(sequence?: number): Promise<Sender>;
+    getSender(sequence?: number): Promise<Sender>;
     execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionResponse>;
     /**
      * Verifies the authenticity of a signature by performing signature verification
