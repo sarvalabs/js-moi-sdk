@@ -1,6 +1,6 @@
 import { isPrimitiveType, Schema } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, type LogicId } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 
 import type { LogicDriver } from "../logic-driver";
@@ -20,19 +20,19 @@ type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder | voi
  * Does not support retrieval of ephemeral state elements.
  */
 export class EphemeralState {
-    private logicId: string;
+    private logicId: LogicId;
     private provider: AbstractProvider;
     private driver: LogicDriver;
 
     constructor(logic: LogicDriver, provider: AbstractProvider) {
-        this.logicId = logic.getLogicId().hex();
+        this.logicId = logic.getLogicId();
         this.provider = provider;
         this.driver = logic;
     }
 
     /**
      * Returns an accessor builder for the specified slot.
-     * 
+     *
      * @param slot - The slot number.
      * @param createAccessorBuilder - The function to create the accessor builder.
      * @returns The accessor builder for the specified slot.
@@ -45,7 +45,7 @@ export class EphemeralState {
 
     /**
      * Retrieves the value from the ephemeral state.
-     * 
+     *
      * @param createAccessorBuilder - The function that creates the accessor builder.
      * @returns A promise that resolves to the retrieved value.
      * @throws An error if the ephemeral state is not present or if the accessor builder is invalid.

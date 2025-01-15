@@ -13,7 +13,7 @@ export class EphemeralState {
     provider;
     driver;
     constructor(logic, provider) {
-        this.logicId = logic.getLogicId().hex();
+        this.logicId = logic.getLogicId();
         this.provider = provider;
         this.driver = logic;
     }

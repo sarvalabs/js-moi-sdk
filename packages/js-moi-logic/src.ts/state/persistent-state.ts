@@ -1,6 +1,6 @@
 import { isPrimitiveType, Schema } from "js-moi-manifest";
 import type { AbstractProvider } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, type LogicId } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 
 import type { LogicDriver } from "../logic-driver";
@@ -20,12 +20,12 @@ type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder | voi
  * Manages slots, types, and retrieval of persistent state values.
  */
 export class PersistentState {
-    private logicId: string;
+    private logicId: LogicId;
     private provider: AbstractProvider;
     private driver: LogicDriver;
 
     constructor(logic: LogicDriver, provider: AbstractProvider) {
-        this.logicId = logic.getLogicId().hex();
+        this.logicId = logic.getLogicId();
         this.provider = provider;
         this.driver = logic;
     }
@@ -67,7 +67,7 @@ export class PersistentState {
         }
 
         const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
-        const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const result = await this.provider.getStorageAt(this.logicId.getAddress(), slot.hex());
         const depolorizer = new Depolorizer(hexToBytes(result));
 
         if (!isPrimitiveType(builder.getStorageType())) {

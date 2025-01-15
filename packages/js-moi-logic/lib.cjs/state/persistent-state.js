@@ -16,7 +16,7 @@ class PersistentState {
     provider;
     driver;
     constructor(logic, provider) {
-        this.logicId = logic.getLogicId().hex();
+        this.logicId = logic.getLogicId();
         this.provider = provider;
         this.driver = logic;
     }
@@ -52,7 +52,7 @@ class PersistentState {
             });
         }
         const slot = (0, accessor_1.generateStorageKey)(builder.getBaseSlot(), builder.getAccessors());
-        const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const result = await this.provider.getStorageAt(this.logicId.getAddress(), slot.hex());
         const depolorizer = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result));
         if (!(0, js_moi_manifest_1.isPrimitiveType)(builder.getStorageType())) {
             return depolorizer.depolorizeInteger();

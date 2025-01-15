@@ -4,11 +4,12 @@ import { LogicId, type Hex, type LogicManifest } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
+import type { Routine } from "./types/logic";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export declare class LogicDriver extends LogicDescriptor {
-    readonly routines: Record<string, unknown>;
+    routines: Record<string, Routine>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
     constructor(logicId: Hex | LogicId, manifest: LogicManifest, arg: Signer);
@@ -17,6 +18,7 @@ export declare class LogicDriver extends LogicDescriptor {
      if available in logic manifest.
      */
     private createState;
+    private newRoutine;
     /**
      * Creates an interface for executing routines defined in the logic manifest.
      */

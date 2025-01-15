@@ -13,7 +13,7 @@ export class PersistentState {
     provider;
     driver;
     constructor(logic, provider) {
-        this.logicId = logic.getLogicId().hex();
+        this.logicId = logic.getLogicId();
         this.provider = provider;
         this.driver = logic;
     }
@@ -49,7 +49,7 @@ export class PersistentState {
             });
         }
         const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
-        const result = await this.provider.getStorageAt(this.logicId, slot.hex());
+        const result = await this.provider.getStorageAt(this.logicId.getAddress(), slot.hex());
         const depolorizer = new Depolorizer(hexToBytes(result));
         if (!isPrimitiveType(builder.getStorageType())) {
             return depolorizer.depolorizeInteger();

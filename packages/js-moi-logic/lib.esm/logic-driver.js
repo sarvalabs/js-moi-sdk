@@ -1,5 +1,5 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, LogicId, defineReadOnly } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicId, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
@@ -7,13 +7,14 @@ import { EphemeralState, PersistentState } from "./state";
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export class LogicDriver extends LogicDescriptor {
-    routines = {};
+    routines;
     persistentState;
     ephemeralState;
     constructor(logicId, manifest, arg) {
         super(logicId, manifest, arg);
         this.createState();
-        this.createRoutines();
+        this.routines = this.createRoutines();
+        Object.defineProperty(this, "routines", { writable: false });
     }
     /**
      * Creates the persistent and ephemeral states for the logic driver,
@@ -23,49 +24,49 @@ export class LogicDriver extends LogicDescriptor {
         const hasPersistance = this.stateMatrix.persistent();
         const hasEphemeral = this.stateMatrix.ephemeral();
         if (hasPersistance) {
-            const persistentState = new PersistentState(this, this.provider);
+            const persistentState = new PersistentState(this, this.signer.getProvider());
             defineReadOnly(this, "persistentState", persistentState);
         }
         if (hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.provider);
+            const ephemeralState = new EphemeralState(this, this.signer.getProvider());
             defineReadOnly(this, "ephemeralState", ephemeralState);
         }
+    }
+    newRoutine(data) {
+        const metadata = {
+            kind: data.kind,
+            mode: data.mode,
+            isMutating: this.isMutableRoutine(data),
+            accepts: data.accepts,
+            returns: data.returns,
+            catches: data.catches,
+        };
+        const callback = async (...params) => {
+            const hasOption = params.at(-1) instanceof RoutineOption;
+            const args = hasOption ? params.slice(0, -1) : params;
+            const option = hasOption ? params.at(-1) : undefined;
+            console.log("args", args);
+            console.log("options", option);
+            if (args.length !== metadata.accepts.length) {
+                const sign = `${data.name}(${metadata.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
+                ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", ErrorCode.INVALID_ARGUMENT);
+            }
+            return null;
+        };
+        return Object.freeze(Object.assign(callback, metadata));
     }
     /**
      * Creates an interface for executing routines defined in the logic manifest.
      */
     createRoutines() {
         const routines = {};
-        this.manifest.elements.forEach((element) => {
-            if (element.kind !== "routine") {
-                return;
+        for (const element of this.getElements().values()) {
+            if (element.kind !== ElementType.Routine) {
+                continue;
             }
-            const routine = element.data;
-            if (!["invoke", "enlist"].includes(routine.kind)) {
-                return;
-            }
-            routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && params.at(-1) instanceof RoutineOption ? params.length - 1 : params.length;
-                if (routine.accepts && argsLen < routine.accepts.length) {
-                    ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.INVALID_ARGUMENT);
-                }
-                const ixObject = this.createIxObject(routine, ...params);
-                if (!this.isMutableRoutine(routine)) {
-                    return await ixObject.unwrap();
-                }
-                return await ixObject.send();
-            };
-            routines[routine.name].isMutable = () => {
-                return this.isMutableRoutine(routine);
-            };
-            routines[routine.name].accepts = () => {
-                return routine.accepts ? routine.accepts : null;
-            };
-            routines[routine.name].returns = () => {
-                return routine.returns ? routine.returns : null;
-            };
-        });
-        defineReadOnly(this, "routines", routines);
+            defineReadOnly(routines, element.data.name, this.newRoutine(element.data));
+        }
+        return routines;
     }
     /**
      * Checks if a routine is mutable based on its name.
@@ -126,7 +127,7 @@ export class LogicDriver extends LogicDescriptor {
 export const getLogicDriver = async (logicId, signer) => {
     const id = logicId instanceof LogicId ? logicId : new LogicId(logicId);
     const { manifest: blob } = await signer.getProvider().getLogic(id, {
-        modifier: { extract: "manifest" },
+        modifier: { include: ["manifest"] },
     });
     const manifest = ManifestCoder.decodeManifest(blob, ManifestCoderFormat.JSON);
     return new LogicDriver(id, manifest, signer);
