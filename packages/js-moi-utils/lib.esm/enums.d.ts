@@ -62,7 +62,8 @@ export declare enum EngineKind {
 }
 export declare enum LogicState {
     Persistent = "persistent",
-    Ephemeral = "ephemeral"
+    Ephemeral = "ephemeral",
+    ReadOnly = "readonly"
 }
 export declare enum RoutineType {
     Invoke = "invoke",

@@ -1,8 +1,7 @@
 export class RoutineOption {
-    nonce;
-    sender;
-    fuelLimit;
-    fuelPrice;
+    sequence;
+    fuel_limit;
+    fuel_price;
     constructor(options = {}) {
         const keys = Object.keys(options);
         for (const key of keys) {

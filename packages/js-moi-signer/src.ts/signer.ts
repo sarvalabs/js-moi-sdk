@@ -122,6 +122,7 @@ export abstract class Signer {
     public async execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
         const interaction = { ...ix, sender: await this.getSender(sequence) };
+        console.log(JSON.stringify(interaction, null, 2));
         const signedIx = await this.signInteraction(interaction, algorithm);
 
         return await this.getProvider().execute(signedIx);

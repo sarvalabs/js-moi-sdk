@@ -1,5 +1,5 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ElementType, ErrorCode, ErrorUtils, LogicId, defineReadOnly } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicId, LogicState, OpType, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
@@ -15,6 +15,14 @@ export class LogicDriver extends LogicDescriptor {
         this.createState();
         this.routines = this.createRoutines();
         Object.defineProperty(this, "routines", { writable: false });
+    }
+    createOperationPayload(callsite, args) {
+        const calldata = this.manifestCoder.encodeArguments(callsite, ...args);
+        const { value } = this.getLogicId();
+        return {
+            type: OpType.LogicInvoke,
+            payload: { callsite, calldata, logic_id: value },
+        };
     }
     /**
      * Creates the persistent and ephemeral states for the logic driver,
@@ -45,13 +53,12 @@ export class LogicDriver extends LogicDescriptor {
             const hasOption = params.at(-1) instanceof RoutineOption;
             const args = hasOption ? params.slice(0, -1) : params;
             const option = hasOption ? params.at(-1) : undefined;
-            console.log("args", args);
-            console.log("options", option);
             if (args.length !== metadata.accepts.length) {
                 const sign = `${data.name}(${metadata.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
                 ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", ErrorCode.INVALID_ARGUMENT);
             }
-            return null;
+            const calldata = this.manifestCoder.encodeArguments(data.name, ...args);
+            return await this.triggerCallsite(routine, args);
         };
         return Object.freeze(Object.assign(callback, metadata));
     }
@@ -75,7 +82,7 @@ export class LogicDriver extends LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return ["persistent", "ephemeral"].includes(routine.mode);
+        return [LogicState.Ephemeral, LogicState.Persistent].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.

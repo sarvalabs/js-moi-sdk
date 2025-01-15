@@ -1,7 +1,7 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import { LogicActionPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ElementType, ErrorCode, ErrorUtils, LogicId, defineReadOnly, type ElementData, type Hex, type LogicManifest } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicId, LogicState, OpType, defineReadOnly, type ElementData, type Hex, type IxOperation, type LogicManifest } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
@@ -21,6 +21,16 @@ export class LogicDriver extends LogicDescriptor {
         this.createState();
         this.routines = this.createRoutines();
         Object.defineProperty(this, "routines", { writable: false });
+    }
+
+    protected createOperationPayload(callsite: string, args: unknown[]): IxOperation<OpType.LogicInvoke> {
+        const calldata = this.manifestCoder.encodeArguments(callsite, ...args);
+        const { value } = this.getLogicId();
+
+        return {
+            type: OpType.LogicInvoke,
+            payload: { callsite, calldata, logic_id: value },
+        };
     }
 
     /**
@@ -57,15 +67,13 @@ export class LogicDriver extends LogicDescriptor {
             const args = hasOption ? params.slice(0, -1) : params;
             const option = hasOption ? params.at(-1) : undefined;
 
-            console.log("args", args);
-            console.log("options", option);
-
             if (args.length !== metadata.accepts.length) {
                 const sign = `${data.name}(${metadata.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
                 ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", ErrorCode.INVALID_ARGUMENT);
             }
 
-            return null;
+            const calldata: Hex = this.manifestCoder.encodeArguments(data.name, ...args);
+            return await this.triggerCallsite(routine, args);
         };
 
         return Object.freeze(Object.assign(callback, metadata));
@@ -95,7 +103,7 @@ export class LogicDriver extends LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: ElementData<ElementType.Routine>): boolean {
-        return ["persistent", "ephemeral"].includes(routine.mode);
+        return [LogicState.Ephemeral, LogicState.Persistent].includes(routine.mode);
     }
 
     /**

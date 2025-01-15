@@ -1,14 +1,12 @@
 interface IRoutineOption {
-    nonce?: number;
-    sender?: string;
-    fuelLimit?: number;
-    fuelPrice?: number;
+    sequence?: number;
+    fuel_limit?: number;
+    fuel_price?: number;
 }
 export declare class RoutineOption implements IRoutineOption {
-    nonce?: number;
-    sender?: string;
-    fuelLimit?: number;
-    fuelPrice?: number;
+    readonly sequence?: number;
+    readonly fuel_limit?: number;
+    readonly fuel_price?: number;
     constructor(options?: IRoutineOption);
 }
 /**

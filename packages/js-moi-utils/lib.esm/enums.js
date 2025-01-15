@@ -71,6 +71,7 @@ export var LogicState;
 (function (LogicState) {
     LogicState["Persistent"] = "persistent";
     LogicState["Ephemeral"] = "ephemeral";
+    LogicState["ReadOnly"] = "readonly";
 })(LogicState || (LogicState = {}));
 export var RoutineType;
 (function (RoutineType) {

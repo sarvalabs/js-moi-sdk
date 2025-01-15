@@ -74,6 +74,7 @@ var LogicState;
 (function (LogicState) {
     LogicState["Persistent"] = "persistent";
     LogicState["Ephemeral"] = "ephemeral";
+    LogicState["ReadOnly"] = "readonly";
 })(LogicState || (exports.LogicState = LogicState = {}));
 var RoutineType;
 (function (RoutineType) {

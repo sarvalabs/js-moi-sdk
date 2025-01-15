@@ -19,6 +19,14 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         this.routines = this.createRoutines();
         Object.defineProperty(this, "routines", { writable: false });
     }
+    createOperationPayload(callsite, args) {
+        const calldata = this.manifestCoder.encodeArguments(callsite, ...args);
+        const { value } = this.getLogicId();
+        return {
+            type: js_moi_utils_1.OpType.LogicInvoke,
+            payload: { callsite, calldata, logic_id: value },
+        };
+    }
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
@@ -48,13 +56,12 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             const hasOption = params.at(-1) instanceof routine_options_1.RoutineOption;
             const args = hasOption ? params.slice(0, -1) : params;
             const option = hasOption ? params.at(-1) : undefined;
-            console.log("args", args);
-            console.log("options", option);
             if (args.length !== metadata.accepts.length) {
                 const sign = `${data.name}(${metadata.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
                 js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
-            return null;
+            const calldata = this.manifestCoder.encodeArguments(data.name, ...args);
+            return await this.triggerCallsite(routine, args);
         };
         return Object.freeze(Object.assign(callback, metadata));
     }
@@ -78,7 +85,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return ["persistent", "ephemeral"].includes(routine.mode);
+        return [js_moi_utils_1.LogicState.Ephemeral, js_moi_utils_1.LogicState.Persistent].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.

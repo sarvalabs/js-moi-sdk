@@ -1,6 +1,6 @@
 import { LogicActionPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { LogicId, type Hex, type LogicManifest } from "js-moi-utils";
+import { LogicId, OpType, type Hex, type IxOperation, type LogicManifest } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
@@ -13,6 +13,7 @@ export declare class LogicDriver extends LogicDescriptor {
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
     constructor(logicId: Hex | LogicId, manifest: LogicManifest, arg: Signer);
+    protected createOperationPayload(callsite: string, args: unknown[]): IxOperation<OpType.LogicInvoke>;
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
