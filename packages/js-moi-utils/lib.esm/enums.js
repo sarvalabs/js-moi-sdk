@@ -76,6 +76,7 @@ export var RoutineType;
 (function (RoutineType) {
     RoutineType["Invoke"] = "invoke";
     RoutineType["Deploy"] = "deploy";
+    RoutineType["Enlist"] = "enlist";
 })(RoutineType || (RoutineType = {}));
 export var ElementType;
 (function (ElementType) {

@@ -79,6 +79,7 @@ var RoutineType;
 (function (RoutineType) {
     RoutineType["Invoke"] = "invoke";
     RoutineType["Deploy"] = "deploy";
+    RoutineType["Enlist"] = "enlist";
 })(RoutineType || (exports.RoutineType = RoutineType = {}));
 var ElementType;
 (function (ElementType) {

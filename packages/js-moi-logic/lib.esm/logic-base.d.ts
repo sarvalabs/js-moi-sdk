@@ -1,6 +1,6 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { OpType } from "js-moi-utils";
+import { Element, OpType, type ElementType, type IxOperationPayload, type LogicManifest, type RoutineType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest } from "../types/logic";
 import { RoutineOption } from "./routine-options";
@@ -10,24 +10,17 @@ import { RoutineOption } from "./routine-options";
  * It defines common properties and abstract methods that subclasses should implement.
  */
 export declare abstract class LogicBase extends ElementDescriptor {
-    protected signer?: Signer;
-    protected provider: AbstractProvider;
-    protected manifestCoder: ManifestCoder;
-    constructor(manifest: LogicManifest.Manifest, signer: Signer);
-    protected abstract createPayload(ixObject: LogicIxObject): LogicDeployPayload | LogicActionPayload;
+    protected signer: Signer;
+    protected readonly manifestCoder: ManifestCoder;
+    constructor(manifest: LogicManifest, signer: Signer);
+    protected abstract createPayload(ixObject: LogicIxObject): IxOperationPayload<OpType.LogicDeploy> | IxOperationPayload<OpType.LogicInvoke> | IxOperationPayload<OpType.LogicEnlist>;
     protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<unknown | null>;
-    /**
-     * Returns the logic ID associated with the LogicBase instance.
-     *
-     * @returns {string} The logic ID.
-     */
-    protected getLogicId(): LogicId;
     /**
      * Returns the interaction type based on the routine kind.
      *
      * @returns {OpType} The interaction type.
      */
-    protected getTxType(kind: string): OpType.LOGIC_DEPLOY | OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST;
+    protected getTxType(kind: RoutineType): OpType.LogicDeploy | OpType.LogicInvoke | OpType.LogicEnlist;
     /**
      * Updates the signer and provider instances for the LogicBase instance.
      *
@@ -69,6 +62,6 @@ export declare abstract class LogicBase extends ElementDescriptor {
      * @param {any[]} args - The arguments for the logic interaction request.
      * @returns {LogicIxRequest} The logic interaction request object.
      */
-    protected createIxObject(routine: LogicManifest.Routine, ...args: any[]): LogicIxRequest;
+    protected createIxObject(routine: Element<ElementType.Routine>, ...args: any[]): LogicIxRequest;
 }
 //# sourceMappingURL=logic-base.d.ts.map

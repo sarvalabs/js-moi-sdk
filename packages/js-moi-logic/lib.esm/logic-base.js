@@ -1,5 +1,4 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
-import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { RoutineOption } from "./routine-options";
 /**
@@ -13,20 +12,11 @@ const DEFAULT_FUEL_PRICE = 1;
  */
 export class LogicBase extends ElementDescriptor {
     signer;
-    provider;
     manifestCoder;
     constructor(manifest, signer) {
         super(manifest.elements);
         this.manifestCoder = new ManifestCoder(manifest);
-        this.connect(signer);
-    }
-    /**
-     * Returns the logic ID associated with the LogicBase instance.
-     *
-     * @returns {string} The logic ID.
-     */
-    getLogicId() {
-        return new LogicId("");
+        this.signer = signer;
     }
     /**
      * Returns the interaction type based on the routine kind.
@@ -36,13 +26,13 @@ export class LogicBase extends ElementDescriptor {
     getTxType(kind) {
         switch (kind) {
             case "deploy":
-                return OpType.LOGIC_DEPLOY;
+                return OpType.LogicDeploy;
             case "invoke":
-                return OpType.LOGIC_INVOKE;
+                return OpType.LogicInvoke;
             case "enlist":
-                return OpType.LOGIC_ENLIST;
+                return OpType.LogicInvoke;
             default:
-                throw new Error("Unsupported routine kind!");
+                ErrorUtils.throwArgumentError("Unsupported routine kind: " + kind, "kind", ErrorCode.INVALID_ARGUMENT);
         }
     }
     /**
@@ -51,12 +41,7 @@ export class LogicBase extends ElementDescriptor {
      * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
     connect(signer) {
-        if (signer instanceof Signer) {
-            this.signer = signer;
-            this.provider = signer.getProvider();
-            return;
-        }
-        this.provider = signer;
+        this.signer = signer;
     }
     /**
      * Executes a routine with the given arguments and returns the interaction response.
@@ -70,9 +55,6 @@ export class LogicBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getTxType(ixObject.routine.kind) !== OpType.LOGIC_DEPLOY && !this.getLogicId()) {
-            ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", ErrorCode.NOT_INITIALIZED);
-        }
         const { type, params } = this.processArguments(ixObject, method, option);
         switch (type) {
             case "call": {
@@ -123,7 +105,7 @@ export class LogicBase extends ElementDescriptor {
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
             nonce: option.nonce,
-            ix_operations: []
+            ix_operations: [],
         };
         const opType = this.getTxType(ixObject.routine.kind);
         const payload = ixObject.createPayload();
@@ -165,7 +147,7 @@ export class LogicBase extends ElementDescriptor {
             unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateFuel: ixObject.estimateFuel.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject),
         };
     }
     /**
@@ -179,13 +161,13 @@ export class LogicBase extends ElementDescriptor {
         const option = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
-            arguments: args
+            arguments: args,
         };
         ixObject.call = async () => {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelLimit = option.fuelLimit ?? (await ixObject.estimateFuel());
             option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };

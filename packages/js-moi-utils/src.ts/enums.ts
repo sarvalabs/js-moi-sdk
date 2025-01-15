@@ -76,6 +76,7 @@ export enum LogicState {
 export enum RoutineType {
     Invoke = "invoke",
     Deploy = "deploy",
+    Enlist = "enlist",
 }
 
 export enum ElementType {

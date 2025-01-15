@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
-const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const routine_options_1 = require("./routine-options");
 /**
@@ -16,20 +15,11 @@ const DEFAULT_FUEL_PRICE = 1;
  */
 class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     signer;
-    provider;
     manifestCoder;
     constructor(manifest, signer) {
         super(manifest.elements);
         this.manifestCoder = new js_moi_manifest_1.ManifestCoder(manifest);
-        this.connect(signer);
-    }
-    /**
-     * Returns the logic ID associated with the LogicBase instance.
-     *
-     * @returns {string} The logic ID.
-     */
-    getLogicId() {
-        return new LogicId("");
+        this.signer = signer;
     }
     /**
      * Returns the interaction type based on the routine kind.
@@ -39,13 +29,13 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     getTxType(kind) {
         switch (kind) {
             case "deploy":
-                return js_moi_utils_1.OpType.LOGIC_DEPLOY;
+                return js_moi_utils_1.OpType.LogicDeploy;
             case "invoke":
-                return js_moi_utils_1.OpType.LOGIC_INVOKE;
+                return js_moi_utils_1.OpType.LogicInvoke;
             case "enlist":
-                return js_moi_utils_1.OpType.LOGIC_ENLIST;
+                return js_moi_utils_1.OpType.LogicInvoke;
             default:
-                throw new Error("Unsupported routine kind!");
+                js_moi_utils_1.ErrorUtils.throwArgumentError("Unsupported routine kind: " + kind, "kind", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
     }
     /**
@@ -54,12 +44,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      * @param {Signer | AbstractProvider} signer -  The signer or provider instance.
      */
     connect(signer) {
-        if (signer instanceof js_moi_signer_1.Signer) {
-            this.signer = signer;
-            this.provider = signer.getProvider();
-            return;
-        }
-        this.provider = signer;
+        this.signer = signer;
     }
     /**
      * Executes a routine with the given arguments and returns the interaction response.
@@ -73,9 +58,6 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getTxType(ixObject.routine.kind) !== js_moi_utils_1.OpType.LOGIC_DEPLOY && !this.getLogicId()) {
-            js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
-        }
         const { type, params } = this.processArguments(ixObject, method, option);
         switch (type) {
             case "call": {
@@ -126,7 +108,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
             nonce: option.nonce,
-            ix_operations: []
+            ix_operations: [],
         };
         const opType = this.getTxType(ixObject.routine.kind);
         const payload = ixObject.createPayload();
@@ -168,7 +150,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateFuel: ixObject.estimateFuel.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject),
         };
     }
     /**
@@ -182,13 +164,13 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
         const option = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
-            arguments: args
+            arguments: args,
         };
         ixObject.call = async () => {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelLimit = option.fuelLimit ?? (await ixObject.estimateFuel());
             option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };
