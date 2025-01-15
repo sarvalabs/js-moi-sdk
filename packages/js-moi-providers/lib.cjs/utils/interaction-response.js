@@ -50,7 +50,9 @@ class InteractionResponse {
             catch (error) {
                 // TODO: Here can be bug, when hash is generated, but maybe if we
                 // immediately call getInteraction, it will may be not found
-                // result in below error, so we need to handle this case
+                // result in below error, so we need to handle this case.
+                // This need to tested in devnet if work as expected.
+                // Then this comment can be removed.
                 if (error instanceof js_moi_utils_1.CustomError && error.message === "error fetching interaction") {
                     js_moi_utils_1.ErrorUtils.throwError("Interaction not found", js_moi_utils_1.ErrorCode.ACTION_REJECTED);
                 }

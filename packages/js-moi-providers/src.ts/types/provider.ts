@@ -23,6 +23,7 @@ import type {
 } from "js-moi-utils";
 import type { EventEmitter } from "stream";
 import type { MethodParams } from "./moi-execution-api";
+import type { InteractionResponse } from "../utils/interaction-response";
 
 type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
@@ -116,8 +117,8 @@ export type Signature = ExecuteIx['signatures'][number];
 
 
 interface ExecuteRequest {
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
-    execute(ix: ExecuteIx): Promise<Hex>;
+    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
+    execute(ix: ExecuteIx): Promise<InteractionResponse>;
 }
 
 export type InteractionRequestOption = ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">>;

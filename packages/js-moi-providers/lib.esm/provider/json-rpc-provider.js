@@ -1,5 +1,6 @@
 import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isHex, isValidAddress, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { EventEmitter } from "events";
+import { InteractionResponse } from "../utils/interaction-response";
 export class JsonRpcProvider extends EventEmitter {
     _transport;
     /**
@@ -179,7 +180,7 @@ export class JsonRpcProvider extends EventEmitter {
         }
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
-    execute(ix, signatures) {
+    async execute(ix, signatures) {
         let params;
         switch (true) {
             case ix instanceof Uint8Array: {
@@ -203,7 +204,8 @@ export class JsonRpcProvider extends EventEmitter {
                 ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
             }
         }
-        return this.call("moi.Execute", ...params);
+        const hash = await this.call("moi.Execute", ...params);
+        return new InteractionResponse(hash, this);
     }
     getInteraction(hash, option) {
         return this.call("moi.Interaction", { hash, ...option });

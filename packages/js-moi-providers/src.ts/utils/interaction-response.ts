@@ -64,7 +64,9 @@ export class InteractionResponse {
             } catch (error) {
                 // TODO: Here can be bug, when hash is generated, but maybe if we
                 // immediately call getInteraction, it will may be not found
-                // result in below error, so we need to handle this case
+                // result in below error, so we need to handle this case.
+                // This need to tested in devnet if work as expected.
+                // Then this comment can be removed.
                 if (error instanceof CustomError && error.message === "error fetching interaction") {
                     ErrorUtils.throwError("Interaction not found", ErrorCode.ACTION_REJECTED);
                 }

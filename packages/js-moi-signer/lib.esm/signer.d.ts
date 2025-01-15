@@ -1,4 +1,4 @@
-import type { ExecuteIx, Provider } from "js-moi-providers";
+import type { ExecuteIx, InteractionResponse, Provider } from "js-moi-providers";
 import { type Hex, type InteractionRequest, type Sender } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 export declare abstract class Signer {
@@ -14,7 +14,7 @@ export declare abstract class Signer {
     getProvider(): Provider;
     getLatestSequence(): Promise<number>;
     protected getSender(sequence?: number): Promise<Sender>;
-    execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<Hex>;
+    execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionResponse>;
     /**
      * Verifies the authenticity of a signature by performing signature verification
      * using the provided parameters.

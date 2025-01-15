@@ -47,6 +47,7 @@ import type {
     SimulateOption,
     TesseractRequestOption,
 } from "../types/provider";
+import { InteractionResponse } from "../utils/interaction-response";
 
 export class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport: Transport;
@@ -304,9 +305,9 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
 
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
-    execute(ix: ExecuteIx): Promise<Hex>;
-    execute(ix: Uint8Array | Hex | ExecuteIx, signatures?: Signature[]): Promise<Hex> {
+    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
+    execute(ix: ExecuteIx): Promise<InteractionResponse>;
+    async execute(ix: Uint8Array | Hex | ExecuteIx, signatures?: Signature[]): Promise<InteractionResponse> {
         let params: MethodParams<"moi.Execute">;
 
         switch (true) {
@@ -337,7 +338,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             }
         }
 
-        return this.call("moi.Execute", ...params);
+        const hash = await this.call("moi.Execute", ...params);
+        return new InteractionResponse(hash, this);
     }
 
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {

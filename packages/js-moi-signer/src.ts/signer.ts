@@ -1,4 +1,4 @@
-import type { ExecuteIx, Provider } from "js-moi-providers";
+import type { ExecuteIx, InteractionResponse, Provider } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, type Hex, type InteractionRequest, type Sender } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
@@ -119,7 +119,7 @@ export abstract class Signer {
         return { address, key_id: index, sequence_id: sequence };
     }
 
-    public async execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<Hex> {
+    public async execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
         const interaction = { ...ix, sender: await this.getSender(sequence) };
         const signedIx = await this.signInteraction(interaction, algorithm);

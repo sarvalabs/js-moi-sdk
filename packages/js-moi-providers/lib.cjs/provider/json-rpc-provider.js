@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const events_1 = require("events");
+const interaction_response_1 = require("../utils/interaction-response");
 class JsonRpcProvider extends events_1.EventEmitter {
     _transport;
     /**
@@ -182,7 +183,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
     }
-    execute(ix, signatures) {
+    async execute(ix, signatures) {
         let params;
         switch (true) {
             case ix instanceof Uint8Array: {
@@ -206,7 +207,8 @@ class JsonRpcProvider extends events_1.EventEmitter {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
         }
-        return this.call("moi.Execute", ...params);
+        const hash = await this.call("moi.Execute", ...params);
+        return new interaction_response_1.InteractionResponse(hash, this);
     }
     getInteraction(hash, option) {
         return this.call("moi.Interaction", { hash, ...option });

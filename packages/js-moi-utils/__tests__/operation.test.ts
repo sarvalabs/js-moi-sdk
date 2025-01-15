@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOp, type IxOperation } from "../src.ts";
+import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOp } from "../src.ts";
 
 interface TestCase {
     operation: IxOp;

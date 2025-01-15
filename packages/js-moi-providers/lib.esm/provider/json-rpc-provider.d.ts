@@ -2,6 +2,7 @@ import { AssetId, LogicId, StorageKey, type Account, type AccountAsset, type Acc
 import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateOption, TesseractRequestOption } from "../types/provider";
+import { InteractionResponse } from "../utils/interaction-response";
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
@@ -58,8 +59,8 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
     getAccountAsset<TOption extends AccountAssetRequestOption>(identifier: Address, assetId: Hex | AssetId, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<Hex>;
-    execute(ix: ExecuteIx): Promise<Hex>;
+    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
+    execute(ix: ExecuteIx): Promise<InteractionResponse>;
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
     /**
      * Processes a JSON-RPC response and returns the result.
