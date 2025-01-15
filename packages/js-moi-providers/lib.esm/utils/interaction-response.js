@@ -1,5 +1,6 @@
 import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
 const INITIAL_NOT_FOUND_RETRIES = 10;
+const ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO = 1500;
 export class InteractionResponse {
     hash;
     interaction;
@@ -55,6 +56,8 @@ export class InteractionResponse {
                         ErrorUtils.throwError("Interaction not found.", ErrorCode.ACTION_REJECTED);
                     }
                     this.notFoundRetries--;
+                    await new Promise((resolve) => setTimeout(resolve, ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO));
+                    continue;
                 }
             }
             timer.retries--;

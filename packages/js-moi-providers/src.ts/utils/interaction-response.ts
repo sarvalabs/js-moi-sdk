@@ -2,6 +2,7 @@ import { CustomError, ErrorCode, ErrorUtils, type Hex, type Interaction, type In
 import type { Provider } from "../types/provider";
 
 const INITIAL_NOT_FOUND_RETRIES = 10;
+const ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO = 1500;
 
 interface TimerOption {
     retries: number;
@@ -53,7 +54,6 @@ export class InteractionResponse {
         }
 
         const delayInMs = timer.delayInSec * 1000;
-
         for (let retries = 0; retries < timer.retries; retries++) {
             try {
                 const ix = await this.provider.getInteraction(this.hash, {
@@ -75,6 +75,8 @@ export class InteractionResponse {
                     }
 
                     this.notFoundRetries--;
+                    await new Promise((resolve) => setTimeout(resolve, ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO));
+                    continue;
                 }
             }
 

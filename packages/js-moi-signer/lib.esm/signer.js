@@ -62,7 +62,6 @@ export class Signer {
         ErrorUtils.throwError("Provider is not initialized!", ErrorCode.NOT_INITIALIZED);
     }
     async getLatestSequence() {
-        // TODO: Check whether it is correct way to get latest sequence
         const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
         const { sequence } = await this.getProvider().getAccountKey(address, index);
         return sequence;
