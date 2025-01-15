@@ -76,7 +76,7 @@ export class ErrorUtils {
      * @param {ErrorParams} params - The parameters of the error.
      * @throws {CustomError} - Throws a CustomError.
      */
-    public static throwError(message: string, code: ErrorCode | string | number, params: ErrorParams = {}): never {
+    public static throwError(message: string, code?: ErrorCode | string | number, params: ErrorParams = {}): never {
         const error = new CustomError(message, code, params);
 
         if (Error.captureStackTrace) {

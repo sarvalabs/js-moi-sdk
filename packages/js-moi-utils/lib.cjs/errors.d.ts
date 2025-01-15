@@ -57,7 +57,7 @@ export declare class ErrorUtils {
      * @param {ErrorParams} params - The parameters of the error.
      * @throws {CustomError} - Throws a CustomError.
      */
-    static throwError(message: string, code: ErrorCode | string | number, params?: ErrorParams): never;
+    static throwError(message: string, code?: ErrorCode | string | number, params?: ErrorParams): never;
     /**
      * Throws a CustomError with the specified argument-related error message,
      * argument name, and value.
