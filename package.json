@@ -9,9 +9,7 @@
     "clean": "find . -path ./node_modules -prune -o -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
     "build": "./scripts/build.sh",
     "watch": "tsc -b -w",
-    "test": "npm run test:node",
-    "test:node": "jest --env=node --colors",
-    "test:browser": "jest --env=jsdom --colors",
+    "test": "jest --env=node --colors",
     "check-types": "tsc --noEmit",
     "test:coverage": "jest --coverage --env=node --colors --verbose",
     "docs": "make -C docs html",
@@ -55,7 +53,6 @@
     "buffer": "^6.0.3",
     "cross-fetch": "^4.0.0",
     "elliptic": "^6.5.4",
-    "jest-environment-jsdom": "^29.7.0",
     "js-polo": "0.1.4",
     "stream": "npm:stream-browserify",
     "websocket": "^1.0.34"
