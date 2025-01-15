@@ -1,5 +1,4 @@
 import type { Accessor } from "js-moi-utils";
-
 /**
  * Represents an accessor provider that provides accessors.
  */
@@ -10,7 +9,6 @@ export interface AccessorProvider {
      */
     getAccessors(): Accessor[];
 }
-
 /**
  * Represents a interface that provides the type of the value present at slot hash.
  */
@@ -21,5 +19,5 @@ export interface StorageTypeProvider {
      */
     getStorageType(): string;
 }
-
 export type AccessorAndStorageProvider = AccessorProvider & StorageTypeProvider;
+//# sourceMappingURL=accessor.d.ts.map
