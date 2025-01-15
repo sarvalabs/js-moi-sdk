@@ -1,5 +1,6 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import BN from "bn.js";
+import { Buffer } from "buffer";
 import { Polorizer } from "js-polo";
 import { bytesToHex } from "./hex";
 export class StorageKey {
@@ -24,7 +25,7 @@ export class AbstractAccessor {
      * @returns The calculated sum256 hash as a Uint8Array.
      */
     sum256(hash) {
-        return blake2b(hash, { dkLen: 32 });
+        return blake2b(Uint8Array.from(hash), { dkLen: 32 });
     }
 }
 /**

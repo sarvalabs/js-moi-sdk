@@ -1,4 +1,5 @@
 import BN from "bn.js";
+import { Buffer } from "buffer";
 import { type Hex } from "./hex";
 export declare class StorageKey {
     private value;

@@ -7,6 +7,7 @@ exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccess
 exports.generateStorageKey = generateStorageKey;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
+const buffer_1 = require("buffer");
 const js_polo_1 = require("js-polo");
 const hex_1 = require("./hex");
 class StorageKey {
@@ -32,7 +33,7 @@ class AbstractAccessor {
      * @returns The calculated sum256 hash as a Uint8Array.
      */
     sum256(hash) {
-        return (0, blake2b_1.blake2b)(hash, { dkLen: 32 });
+        return (0, blake2b_1.blake2b)(Uint8Array.from(hash), { dkLen: 32 });
     }
 }
 exports.AbstractAccessor = AbstractAccessor;
@@ -83,7 +84,7 @@ class PropertyAccessor extends AbstractAccessor {
                 polorizer.polorizeBool(key);
                 break;
             case key instanceof Uint8Array:
-            case key instanceof Buffer:
+            case key instanceof buffer_1.Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
@@ -97,8 +98,8 @@ class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
+        const separator = buffer_1.Buffer.from(".");
+        const buffer = buffer_1.Buffer.concat([hash.toBuffer(), separator, this.key]);
         return new StorageKey(this.sum256(buffer));
     }
 }

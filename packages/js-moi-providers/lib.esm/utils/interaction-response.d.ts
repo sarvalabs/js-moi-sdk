@@ -5,7 +5,7 @@ interface TimerOption {
     delayInSec: number;
 }
 export declare class InteractionResponse {
-    private readonly hash;
+    readonly hash: Hex;
     private interaction?;
     private readonly provider;
     constructor(interaction: Interaction, provider: Provider);
