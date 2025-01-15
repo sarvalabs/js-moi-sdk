@@ -14,7 +14,7 @@ export interface NetworkInfo {
     version: string;
 }
 export interface SimulationResult<TOpType extends OpType> {
-    op_type: OpType;
+    op_type: TOpType;
     op_status: OperationStatus;
     data: OperationResult<TOpType>;
 }

@@ -50,7 +50,7 @@ export class LogicBase extends ElementDescriptor {
             const result = ix.result[0];
             switch (result.op_type) {
                 case OpType.LogicInvoke:
-                case OpType.LogicDeploy: {
+                case OpType.LogicEnlist: {
                     return this.processLogicResult(callsite, result.data);
                 }
                 default: {

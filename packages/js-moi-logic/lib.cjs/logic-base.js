@@ -53,7 +53,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             const result = ix.result[0];
             switch (result.op_type) {
                 case js_moi_utils_1.OpType.LogicInvoke:
-                case js_moi_utils_1.OpType.LogicDeploy: {
+                case js_moi_utils_1.OpType.LogicEnlist: {
                     return this.processLogicResult(callsite, result.data);
                 }
                 default: {

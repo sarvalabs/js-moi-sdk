@@ -10,8 +10,8 @@ import {
     type ElementData,
     type ElementType,
     type IxOperation,
-    type LogicActionResult,
     type LogicManifest,
+    type OperationResult,
 } from "js-moi-utils";
 import type { RoutineOption } from "./routine-options";
 
@@ -41,7 +41,7 @@ export abstract class LogicBase extends ElementDescriptor {
         args: unknown[]
     ): IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke>;
 
-    protected processLogicResult(callsite: string, result: LogicActionResult | InteractionResponse) {
+    protected processLogicResult(callsite: string, result: OperationResult<OpType.LogicEnlist | OpType.LogicInvoke> | InteractionResponse) {
         if (result instanceof InteractionResponse) {
             return result;
         }
@@ -82,8 +82,8 @@ export abstract class LogicBase extends ElementDescriptor {
             const result = ix.result[0];
             switch (result.op_type) {
                 case OpType.LogicInvoke:
-                case OpType.LogicDeploy: {
-                    return this.processLogicResult(callsite, result.data as LogicActionResult);
+                case OpType.LogicEnlist: {
+                    return this.processLogicResult(callsite, result.data);
                 }
                 default: {
                     ErrorUtils.throwError("Expected LogicInvoke or LogicDeploy operation");
