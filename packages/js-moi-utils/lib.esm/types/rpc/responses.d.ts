@@ -214,8 +214,7 @@ export interface LogicController {
 }
 export interface Logic {
     metadata: LogicMetadata;
-    manifest: ?encode;
-    Hex: any;
+    manifest: Hex;
     controller?: LogicController;
     edition?: string[];
 }
