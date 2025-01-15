@@ -48,9 +48,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 return;
             }
             routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && params.at(-1) instanceof routine_options_1.RoutineOption
-                    ? params.length - 1
-                    : params.length;
+                const argsLen = params.at(-1) && params.at(-1) instanceof routine_options_1.RoutineOption ? params.length - 1 : params.length;
                 if (routine.accepts && argsLen < routine.accepts.length) {
                     js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
@@ -92,8 +90,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             logic_id: this.getLogicId().string(),
             callsite: ixObject.routine.name,
         };
-        if (ixObject.routine.accepts &&
-            Object.keys(ixObject.routine.accepts).length > 0) {
+        if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
         }
         return payload;
@@ -112,7 +109,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             const result = await response.result(timeout);
             return {
                 output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
+                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error),
             };
         }
         catch (err) {
@@ -130,12 +127,13 @@ exports.LogicDriver = LogicDriver;
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-const getLogicDriver = async (logicId, signer, options) => {
-    const manifest = await signer.getProvider().getLogicManifest(logicId, "JSON", options);
-    if (typeof manifest !== "object") {
-        js_moi_utils_1.ErrorUtils.throwError("Invalid logic manifest", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-    }
-    return new LogicDriver(logicId, manifest, signer);
+const getLogicDriver = async (logicId, signer) => {
+    const id = logicId instanceof js_moi_utils_1.LogicId ? logicId : new js_moi_utils_1.LogicId(logicId);
+    const { manifest: blob } = await signer.getProvider().getLogic(id, {
+        modifier: { extract: "manifest" },
+    });
+    const manifest = js_moi_manifest_1.ManifestCoder.decodeManifest(blob, js_moi_manifest_1.ManifestCoderFormat.JSON);
+    return new LogicDriver(id, manifest, signer);
 };
 exports.getLogicDriver = getLogicDriver;
 //# sourceMappingURL=logic-driver.js.map

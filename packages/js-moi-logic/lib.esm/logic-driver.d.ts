@@ -1,18 +1,17 @@
-import { LogicManifest } from "js-moi-manifest";
 import { LogicActionPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
+import { LogicId, type Hex, type LogicManifest } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
-import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
-export declare class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
-    readonly routines: Routines<T>;
+export declare class LogicDriver extends LogicDescriptor {
+    readonly routines: Record<string, unknown>;
     readonly persistentState: PersistentState;
     readonly ephemeralState: EphemeralState;
-    constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer);
+    constructor(logicId: Hex | LogicId, manifest: LogicManifest, arg: Signer);
     /**
      * Creates the persistent and ephemeral states for the logic driver,
      if available in logic manifest.
@@ -56,5 +55,5 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
-export declare const getLogicDriver: <T extends Record<string, (...args: any) => any>>(logicId: string, signer: Signer, options?: any) => Promise<LogicDriver<T>>;
+export declare const getLogicDriver: (logicId: Hex | LogicId, signer: Signer) => Promise<LogicDriver>;
 //# sourceMappingURL=logic-driver.d.ts.map

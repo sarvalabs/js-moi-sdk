@@ -22,6 +22,6 @@ export interface Routine<T extends (...args: any[]) => any> {
     returns: () => LogicManifest.TypeField[] | null;
 }
 
-export type Routines<T extends Record<string, (...args: any[]) => any>> = {
-    [K in keyof T]: T[K] extends (...args: any[]) => any ? Routine<T[K]> : never;
-}
+// export type Routines<T extends Record<string, (...args: any[]) => any>> = {
+//     [K in keyof T]: T[K] extends (...args: any[]) => any ? Routine<T[K]> : never;
+// }

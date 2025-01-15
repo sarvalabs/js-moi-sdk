@@ -21,6 +21,7 @@ export abstract class LogicBase extends ElementDescriptor {
 
     constructor(manifest: LogicManifest, signer: Signer) {
         super(manifest.elements);
+
         this.manifestCoder = new ManifestCoder(manifest);
         this.signer = signer;
     }
