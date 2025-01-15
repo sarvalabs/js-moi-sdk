@@ -1,7 +1,6 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { LogicState } from "js-moi-utils";
+import { LogicId, LogicState } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
-import { LogicId } from "./logic-id";
 /**
  * Abstract class representing a logic descriptor, which provides information
  about a logic.
@@ -9,18 +8,10 @@ import { LogicId } from "./logic-id";
 export class LogicDescriptor extends LogicBase {
     logicId;
     manifest;
-    encodedManifest;
-    engine;
-    sealed;
-    assetLogic;
     constructor(logicId, manifest, signer) {
         super(manifest, signer);
-        this.logicId = new LogicId(logicId);
+        this.logicId = logicId instanceof LogicId ? logicId : new LogicId(logicId);
         this.manifest = manifest;
-        this.encodedManifest = ManifestCoder.encodeManifest(this.manifest);
-        this.engine = this.manifest.engine.kind;
-        this.sealed = false;
-        this.assetLogic = false;
     }
     /**
      * Returns the logic id of the logic.
@@ -36,7 +27,7 @@ export class LogicDescriptor extends LogicBase {
      * @returns {EngineKind} The engine type.
      */
     getEngine() {
-        return this.engine;
+        return this.manifest.engine.kind;
     }
     /**
      * Returns the logic manifest.
@@ -52,7 +43,7 @@ export class LogicDescriptor extends LogicBase {
      * @returns {string} The POLO encoded logic manifest.
      */
     getEncodedManifest() {
-        return this.encodedManifest;
+        return ManifestCoder.encodeManifest(this.manifest);
     }
     /**
      * Checks if the logic is sealed.
@@ -60,7 +51,7 @@ export class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic is sealed, false otherwise.
      */
     isSealed() {
-        return this.sealed;
+        return false;
     }
     /**
      * Checks if the logic represents an asset logic.
@@ -68,7 +59,7 @@ export class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic is an representation of asset logic, false otherwise.
      */
     isAssetLogic() {
-        return this.assetLogic;
+        return this.logicId.isAssetLogic();
     }
     /**
      * Checks if the logic allows interactions.
@@ -76,7 +67,7 @@ export class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic allows interactions, false otherwise.
      */
     allowsInteractions() {
-        return this.logicId.isInteractive();
+        return this.logicId.isIntractable();
     }
     /**
      * Checks if the logic is stateful.
@@ -84,7 +75,8 @@ export class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic is stateful, false otherwise.
      */
     isStateful() {
-        return this.logicId.isStateful();
+        // TODO : Implement this method
+        throw new Error("Method not implemented.");
     }
     /**
      * Checks if the logic has persistent state.
@@ -95,10 +87,7 @@ export class LogicDescriptor extends LogicBase {
      */
     hasPersistentState() {
         const ptr = this.stateMatrix.get(LogicState.Persistent);
-        if (ptr !== undefined) {
-            return [ptr, true];
-        }
-        return [0, false];
+        return ptr == null ? [0, false] : [ptr, true];
     }
     /**
      * Checks if the logic has ephemeral state.
@@ -109,10 +98,7 @@ export class LogicDescriptor extends LogicBase {
      */
     hasEphemeralState() {
         const ptr = this.stateMatrix.get(LogicState.Ephemeral);
-        if (ptr !== undefined) {
-            return [ptr, true];
-        }
-        return [0, false];
+        return ptr == null ? [0, false] : [ptr, true];
     }
 }
 //# sourceMappingURL=logic-descriptor.js.map

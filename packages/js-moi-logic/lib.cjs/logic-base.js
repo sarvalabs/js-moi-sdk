@@ -4,7 +4,6 @@ exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
-const logic_id_1 = require("./logic-id");
 const routine_options_1 = require("./routine-options");
 /**
  * The default fuel price used for logic interactions.
@@ -30,7 +29,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      * @returns {string} The logic ID.
      */
     getLogicId() {
-        return new logic_id_1.LogicId("");
+        return new LogicId("");
     }
     /**
      * Returns the interaction type based on the routine kind.

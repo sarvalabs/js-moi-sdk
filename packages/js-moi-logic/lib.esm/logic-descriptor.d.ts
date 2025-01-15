@@ -1,20 +1,14 @@
-import { LogicManifest } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { type EngineKind } from "js-moi-utils";
+import { LogicId, type EngineKind, type Hex, type LogicManifest } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
-import { LogicId } from "./logic-id";
 /**
  * Abstract class representing a logic descriptor, which provides information
  about a logic.
  */
 export declare abstract class LogicDescriptor extends LogicBase {
     protected logicId: LogicId;
-    protected manifest: LogicManifest.Manifest;
-    protected encodedManifest: string;
-    protected engine: EngineKind;
-    protected sealed: boolean;
-    protected assetLogic: boolean;
-    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer);
+    protected manifest: LogicManifest;
+    constructor(logicId: Hex | LogicId, manifest: LogicManifest, signer: Signer);
     /**
      * Returns the logic id of the logic.
      *
@@ -32,7 +26,7 @@ export declare abstract class LogicDescriptor extends LogicBase {
      *
      * @returns {LogicManifest.Manifest} The logic manifest.
      */
-    getManifest(): LogicManifest.Manifest;
+    getManifest(): LogicManifest;
     /**
      * Returns the POLO encoded logic manifest.
      *

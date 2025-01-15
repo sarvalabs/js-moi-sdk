@@ -1,8 +1,7 @@
-import { LogicManifest, ManifestCoder } from "js-moi-manifest";
+import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { LogicState, type EngineKind } from "js-moi-utils";
+import { LogicId, LogicState, type EngineKind, type Hex, type LogicManifest } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
-import { LogicId } from "./logic-id";
 
 /**
  * Abstract class representing a logic descriptor, which provides information 
@@ -10,20 +9,13 @@ import { LogicId } from "./logic-id";
  */
 export abstract class LogicDescriptor extends LogicBase {
     protected logicId: LogicId;
-    protected manifest: LogicManifest.Manifest;
-    protected encodedManifest: string;
-    protected engine: EngineKind;
-    protected sealed: boolean;
-    protected assetLogic: boolean;
+    protected manifest: LogicManifest;
 
-    constructor(logicId: string, manifest: LogicManifest.Manifest, signer: Signer) {
+    constructor(logicId: Hex | LogicId, manifest: LogicManifest, signer: Signer) {
         super(manifest, signer);
-        this.logicId = new LogicId(logicId);
+
+        this.logicId = logicId instanceof LogicId ? logicId : new LogicId(logicId);
         this.manifest = manifest;
-        this.encodedManifest = ManifestCoder.encodeManifest(this.manifest);
-        this.engine = this.manifest.engine.kind as EngineKind;
-        this.sealed = false;
-        this.assetLogic = false;
     }
 
     /**
@@ -41,7 +33,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * @returns {EngineKind} The engine type.
      */
     public getEngine(): EngineKind {
-        return this.engine;
+        return this.manifest.engine.kind;
     }
 
     /**
@@ -49,7 +41,7 @@ export abstract class LogicDescriptor extends LogicBase {
      *
      * @returns {LogicManifest.Manifest} The logic manifest.
      */
-    public getManifest(): LogicManifest.Manifest {
+    public getManifest(): LogicManifest {
         return this.manifest;
     }
 
@@ -59,7 +51,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * @returns {string} The POLO encoded logic manifest.
      */
     public getEncodedManifest(): string {
-        return this.encodedManifest;
+        return ManifestCoder.encodeManifest(this.manifest);
     }
 
     /**
@@ -68,7 +60,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic is sealed, false otherwise.
      */
     public isSealed(): boolean {
-        return this.sealed;
+        return false;
     }
 
     /**
@@ -77,7 +69,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic is an representation of asset logic, false otherwise.
      */
     public isAssetLogic(): boolean {
-        return this.assetLogic;
+        return this.logicId.isAssetLogic();
     }
 
     /**
@@ -86,7 +78,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic allows interactions, false otherwise.
      */
     public allowsInteractions(): boolean {
-        return this.logicId.isInteractive();
+        return this.logicId.isIntractable();
     }
 
     /**
@@ -95,7 +87,8 @@ export abstract class LogicDescriptor extends LogicBase {
      * @returns {boolean} True if the logic is stateful, false otherwise.
      */
     public isStateful(): boolean {
-        return this.logicId.isStateful();
+        // TODO : Implement this method
+        throw new Error("Method not implemented.");
     }
 
     /**
@@ -107,12 +100,7 @@ export abstract class LogicDescriptor extends LogicBase {
      */
     public hasPersistentState(): [number, boolean] {
         const ptr = this.stateMatrix.get(LogicState.Persistent);
-
-        if (ptr !== undefined) {
-            return [ptr, true];
-        }
-
-        return [0, false];
+        return ptr == null ? [0, false] : [ptr, true];
     }
 
     /**
@@ -124,11 +112,6 @@ export abstract class LogicDescriptor extends LogicBase {
      */
     public hasEphemeralState(): [number, boolean] {
         const ptr = this.stateMatrix.get(LogicState.Ephemeral);
-
-        if (ptr !== undefined) {
-            return [ptr, true];
-        }
-
-        return [0, false];
+        return ptr == null ? [0, false] : [ptr, true];
     }
 }

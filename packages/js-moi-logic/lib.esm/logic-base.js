@@ -1,7 +1,6 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
-import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**
  * The default fuel price used for logic interactions.
