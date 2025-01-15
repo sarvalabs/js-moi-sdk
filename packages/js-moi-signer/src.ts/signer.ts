@@ -111,7 +111,7 @@ export abstract class Signer {
         }
 
         if (sequence == null) {
-            sequence = (await this.getLatestSequence()) + 1;
+            sequence = await this.getLatestSequence();
         }
 
         const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);

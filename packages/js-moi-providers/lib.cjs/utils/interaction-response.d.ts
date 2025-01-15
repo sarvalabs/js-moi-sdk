@@ -8,6 +8,7 @@ export declare class InteractionResponse {
     readonly hash: Hex;
     private interaction?;
     private readonly provider;
+    private notFoundRetries;
     constructor(interaction: Interaction, provider: Provider);
     constructor(hash: Hex, provider: Provider);
     private getDefaultTimer;

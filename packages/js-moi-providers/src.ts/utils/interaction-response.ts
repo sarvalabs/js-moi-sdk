@@ -1,5 +1,7 @@
-import { CustomError, ErrorCode, ErrorUtils, InteractionStatus, type Hex, type Interaction, type InteractionConfirmation, type OperationItem } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, type Hex, type Interaction, type InteractionConfirmation, type OperationItem } from "js-moi-utils";
 import type { Provider } from "../types/provider";
+
+const INITIAL_NOT_FOUND_RETRIES = 10;
 
 interface TimerOption {
     retries: number;
@@ -9,6 +11,7 @@ export class InteractionResponse {
     public readonly hash: Hex;
     private interaction?: Interaction;
     private readonly provider: Provider;
+    private notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
 
     constructor(interaction: Interaction, provider: Provider);
     constructor(hash: Hex, provider: Provider);
@@ -57,18 +60,21 @@ export class InteractionResponse {
                     modifier: { include: ["confirmation"] },
                 });
 
-                if (ix.status === InteractionStatus.Finalized) {
+                if (this.notFoundRetries === INITIAL_NOT_FOUND_RETRIES) {
+                    this.notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+                }
+
+                if (ix.confirmation != null) {
                     this.interaction = ix;
                     return ix.confirmation;
                 }
             } catch (error) {
-                // TODO: Here can be bug, when hash is generated, but maybe if we
-                // immediately call getInteraction, it will may be not found
-                // result in below error, so we need to handle this case.
-                // This need to tested in devnet if work as expected.
-                // Then this comment can be removed.
                 if (error instanceof CustomError && error.message === "error fetching interaction") {
-                    ErrorUtils.throwError("Interaction not found", ErrorCode.ACTION_REJECTED);
+                    if (this.notFoundRetries <= 0) {
+                        ErrorUtils.throwError("Interaction not found.", ErrorCode.ACTION_REJECTED);
+                    }
+
+                    this.notFoundRetries--;
                 }
             }
 

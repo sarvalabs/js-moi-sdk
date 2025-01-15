@@ -2,10 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionResponse = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const INITIAL_NOT_FOUND_RETRIES = 10;
 class InteractionResponse {
     hash;
     interaction;
     provider;
+    notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
     constructor(hash, provider) {
         this.provider = provider;
         if (typeof hash === "string") {
@@ -42,19 +44,20 @@ class InteractionResponse {
                 const ix = await this.provider.getInteraction(this.hash, {
                     modifier: { include: ["confirmation"] },
                 });
-                if (ix.status === js_moi_utils_1.InteractionStatus.Finalized) {
+                if (this.notFoundRetries === INITIAL_NOT_FOUND_RETRIES) {
+                    this.notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+                }
+                if (ix.confirmation != null) {
                     this.interaction = ix;
                     return ix.confirmation;
                 }
             }
             catch (error) {
-                // TODO: Here can be bug, when hash is generated, but maybe if we
-                // immediately call getInteraction, it will may be not found
-                // result in below error, so we need to handle this case.
-                // This need to tested in devnet if work as expected.
-                // Then this comment can be removed.
                 if (error instanceof js_moi_utils_1.CustomError && error.message === "error fetching interaction") {
-                    js_moi_utils_1.ErrorUtils.throwError("Interaction not found", js_moi_utils_1.ErrorCode.ACTION_REJECTED);
+                    if (this.notFoundRetries <= 0) {
+                        js_moi_utils_1.ErrorUtils.throwError("Interaction not found.", js_moi_utils_1.ErrorCode.ACTION_REJECTED);
+                    }
+                    this.notFoundRetries--;
                 }
             }
             timer.retries--;

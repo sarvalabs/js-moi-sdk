@@ -1,8 +1,10 @@
-import { CustomError, ErrorCode, ErrorUtils, InteractionStatus } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
+const INITIAL_NOT_FOUND_RETRIES = 10;
 export class InteractionResponse {
     hash;
     interaction;
     provider;
+    notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
     constructor(hash, provider) {
         this.provider = provider;
         if (typeof hash === "string") {
@@ -39,19 +41,20 @@ export class InteractionResponse {
                 const ix = await this.provider.getInteraction(this.hash, {
                     modifier: { include: ["confirmation"] },
                 });
-                if (ix.status === InteractionStatus.Finalized) {
+                if (this.notFoundRetries === INITIAL_NOT_FOUND_RETRIES) {
+                    this.notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+                }
+                if (ix.confirmation != null) {
                     this.interaction = ix;
                     return ix.confirmation;
                 }
             }
             catch (error) {
-                // TODO: Here can be bug, when hash is generated, but maybe if we
-                // immediately call getInteraction, it will may be not found
-                // result in below error, so we need to handle this case.
-                // This need to tested in devnet if work as expected.
-                // Then this comment can be removed.
                 if (error instanceof CustomError && error.message === "error fetching interaction") {
-                    ErrorUtils.throwError("Interaction not found", ErrorCode.ACTION_REJECTED);
+                    if (this.notFoundRetries <= 0) {
+                        ErrorUtils.throwError("Interaction not found.", ErrorCode.ACTION_REJECTED);
+                    }
+                    this.notFoundRetries--;
                 }
             }
             timer.retries--;
