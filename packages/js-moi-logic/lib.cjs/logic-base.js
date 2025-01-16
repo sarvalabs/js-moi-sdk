@@ -42,30 +42,24 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
     }
     async triggerCallsite(callsite, args, option) {
         const routine = this.getRoutineElement(callsite);
+        const request = {
+            fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
+            fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
+            operations: [this.createOperationPayload(callsite, args)],
+        };
         if (this.isMutableRoutine(routine.data) == false) {
-            // TODO - implement simulation in wallet
-            const ix = await this.signer.getProvider().simulate((0, js_moi_utils_1.interaction)({
-                sender: await this.signer.getSender(option?.sequence),
-                fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
-                fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
-                operations: [this.createOperationPayload(callsite, args)],
-            }));
-            const result = ix.result[0];
-            switch (result.op_type) {
+            const { result } = await this.signer.simulate(request, option?.sequence);
+            switch (result[0]?.op_type) {
                 case js_moi_utils_1.OpType.LogicInvoke:
                 case js_moi_utils_1.OpType.LogicEnlist: {
-                    return this.processLogicResult(callsite, result.data);
+                    return this.processLogicResult(callsite, result[0].data);
                 }
                 default: {
                     js_moi_utils_1.ErrorUtils.throwError("Expected LogicInvoke or LogicDeploy operation");
                 }
             }
         }
-        const ix = await this.signer.execute({
-            fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
-            operations: [this.createOperationPayload(callsite, args)],
-        });
+        const ix = await this.signer.execute(request);
         return this.processLogicResult(callsite, ix);
     }
 }

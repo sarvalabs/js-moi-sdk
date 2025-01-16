@@ -1,18 +1,7 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import {
-    ErrorCode,
-    ErrorUtils,
-    interaction,
-    LogicState,
-    OpType,
-    type ElementData,
-    type ElementType,
-    type IxOperation,
-    type LogicManifest,
-    type OperationResult,
-} from "js-moi-utils";
+import { ErrorCode, ErrorUtils, LogicState, OpType, type ElementData, type ElementType, type IxOperation, type LogicManifest, type OperationResult } from "js-moi-utils";
 import type { RoutineOption } from "./routine-options";
 
 /**
@@ -67,23 +56,19 @@ export abstract class LogicBase extends ElementDescriptor {
 
     protected async triggerCallsite(callsite: string, args: unknown[], option?: RoutineOption) {
         const routine = this.getRoutineElement(callsite);
+        const request = {
+            fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
+            fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
+            operations: [this.createOperationPayload(callsite, args)],
+        };
 
         if (this.isMutableRoutine(routine.data) == false) {
-            // TODO - implement simulation in wallet
-            const ix = await this.signer.getProvider().simulate(
-                interaction({
-                    sender: await this.signer.getSender(option?.sequence),
-                    fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
-                    fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
-                    operations: [this.createOperationPayload(callsite, args)],
-                })
-            );
+            const { result } = await this.signer.simulate(request, option?.sequence);
 
-            const result = ix.result[0];
-            switch (result.op_type) {
+            switch (result[0]?.op_type) {
                 case OpType.LogicInvoke:
                 case OpType.LogicEnlist: {
-                    return this.processLogicResult(callsite, result.data);
+                    return this.processLogicResult(callsite, result[0].data);
                 }
                 default: {
                     ErrorUtils.throwError("Expected LogicInvoke or LogicDeploy operation");
@@ -91,12 +76,7 @@ export abstract class LogicBase extends ElementDescriptor {
             }
         }
 
-        const ix = await this.signer.execute({
-            fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
-            operations: [this.createOperationPayload(callsite, args)],
-        });
-
+        const ix = await this.signer.execute(request);
         return this.processLogicResult(callsite, ix);
     }
 
