@@ -1,27 +1,26 @@
-import { ElementDescriptor } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 export class LogicDescriptor extends ElementDescriptor {
     logicId;
-    syntax;
-    engine;
+    manifest;
+    coder;
     constructor(manifest, logicId) {
         super(manifest.elements);
-        this.syntax = manifest.syntax;
-        this.engine = manifest.engine;
+        this.manifest = manifest;
         this.logicId = logicId;
     }
     setLogicId(logicId) {
         this.logicId = logicId;
     }
     getEngine() {
-        return this.engine;
+        return this.manifest.engine;
     }
     getSyntax() {
-        return this.syntax;
+        return this.manifest.syntax;
     }
     getLogicId() {
         if (this.logicId == null) {
-            ErrorUtils.throwError("Logic ID is not set. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
+            ErrorUtils.throwError("Logic id not found. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
         }
         return this.logicId;
     }
@@ -42,6 +41,22 @@ export class LogicDescriptor extends ElementDescriptor {
     }
     isAssetLogic() {
         return this.getLogicId().isAssetLogic();
+    }
+    getManifestCoder() {
+        if (this.coder == null) {
+            this.coder = new ManifestCoder(this.manifest);
+        }
+        return this.coder;
+    }
+    getManifest(format) {
+        switch (format) {
+            case ManifestCoderFormat.JSON:
+                return this.manifest;
+            case ManifestCoderFormat.YAML:
+                return ManifestCoder.toYaml(this.manifest);
+            case ManifestCoderFormat.POLO:
+                return ManifestCoder.encodeManifest(this.manifest);
+        }
     }
 }
 //# sourceMappingURL=logic-descriptor.js.map

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManifestCoder = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
+const yaml_1 = require("yaml");
 const element_descriptor_1 = require("./element-descriptor");
 const json_manifest_coder_1 = require("./manifest-coder/json-manifest-coder");
 const serialization_format_1 = require("./manifest-coder/serialization-format");
@@ -235,6 +236,9 @@ class ManifestCoder {
             return serializer.decode(manifest);
         }
         js_moi_utils_1.ErrorUtils.throwError("Unsupported manifest format", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+    }
+    static toYaml(manifest) {
+        return (0, yaml_1.stringify)(manifest);
     }
 }
 exports.ManifestCoder = ManifestCoder;

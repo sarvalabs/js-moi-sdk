@@ -119,5 +119,6 @@ export declare class ManifestCoder {
      * @throws {Error} Throws an error if the format is unsupported.
      */
     static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.YAML): string;
+    static toYaml(manifest: LogicManifest): string;
 }
 //# sourceMappingURL=manifest-coder.d.ts.map

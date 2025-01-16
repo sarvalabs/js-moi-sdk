@@ -1,5 +1,6 @@
 import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix, type Hex, type LogicManifest } from "js-moi-utils";
 import { Depolorizer, documentEncode, Schema as PoloSchema } from "js-polo";
+import { stringify } from "yaml";
 import { Exception } from "../types/response";
 import { ElementDescriptor } from "./element-descriptor";
 import { JsonManifestCoder } from "./manifest-coder/json-manifest-coder";
@@ -324,5 +325,9 @@ export class ManifestCoder {
         }
 
         ErrorUtils.throwError("Unsupported manifest format", ErrorCode.UNSUPPORTED_OPERATION);
+    }
+
+    public static toYaml(manifest: LogicManifest): string {
+        return stringify(manifest);
     }
 }

@@ -1,1 +1,1 @@
-{"version":3,"file":"logic-base.js","sourceRoot":"","sources":["../src.ts/logic-base.ts"],"names":[],"mappings":""}
+{"version":3,"file":"logic-base.js","sourceRoot":"","sources":["../src.ts/logic-base.ts"],"names":[],"mappings":";;;AAEA,yDAAqD;AAQrD,MAAa,SAAU,SAAQ,kCAAe;IAClC,MAAM,CAAU;IAExB,YAAY,MAAwB;QAChC,KAAK,CAAC,MAAM,CAAC,QAAQ,EAAE,MAAM,CAAC,OAAO,CAAC,CAAC;QACvC,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC,MAAM,CAAC;IAChC,CAAC;IAEO,eAAe,CAAC,OAAqC,IAAG,CAAC;CACpE;AATD,8BASC"}

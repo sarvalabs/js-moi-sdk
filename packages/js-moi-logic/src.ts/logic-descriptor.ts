@@ -1,18 +1,17 @@
-import { ElementDescriptor } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
 
 export class LogicDescriptor extends ElementDescriptor {
     private logicId?: LogicId;
 
-    private readonly syntax: LogicManifest["syntax"];
+    private readonly manifest: LogicManifest;
 
-    private readonly engine: LogicManifest["engine"];
+    private coder?: ManifestCoder;
 
     constructor(manifest: LogicManifest, logicId?: LogicId) {
         super(manifest.elements);
 
-        this.syntax = manifest.syntax;
-        this.engine = manifest.engine;
+        this.manifest = manifest;
         this.logicId = logicId;
     }
 
@@ -21,16 +20,16 @@ export class LogicDescriptor extends ElementDescriptor {
     }
 
     public getEngine(): LogicManifest["engine"] {
-        return this.engine;
+        return this.manifest.engine;
     }
 
     public getSyntax(): LogicManifest["syntax"] {
-        return this.syntax;
+        return this.manifest.syntax;
     }
 
     public getLogicId(): LogicId {
         if (this.logicId == null) {
-            ErrorUtils.throwError("Logic ID is not set. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
+            ErrorUtils.throwError("Logic id not found. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
         }
 
         return this.logicId;
@@ -58,5 +57,27 @@ export class LogicDescriptor extends ElementDescriptor {
 
     public isAssetLogic(): boolean {
         return this.getLogicId().isAssetLogic();
+    }
+
+    public getManifestCoder(): ManifestCoder {
+        if (this.coder == null) {
+            this.coder = new ManifestCoder(this.manifest);
+        }
+
+        return this.coder;
+    }
+
+    public getManifest(format: ManifestCoderFormat.JSON): LogicManifest;
+    public getManifest(format: ManifestCoderFormat.YAML): string;
+    public getManifest(format: ManifestCoderFormat.POLO): Hex;
+    public getManifest(format: ManifestCoderFormat) {
+        switch (format) {
+            case ManifestCoderFormat.JSON:
+                return this.manifest;
+            case ManifestCoderFormat.YAML:
+                return ManifestCoder.toYaml(this.manifest);
+            case ManifestCoderFormat.POLO:
+                return ManifestCoder.encodeManifest(this.manifest);
+        }
     }
 }
