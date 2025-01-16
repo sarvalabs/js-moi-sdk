@@ -55,11 +55,11 @@ export declare class ElementDescriptor {
      * Retrieves the element from the logic manifest based on the given
      * routine name.
      *
-     * @param {string} routineName - The name of the routine.
+     * @param {string} name - The name of the routine.
      * @returns The routine element.
      * @throws {Error} if the routine name is invalid.
      */
-    getRoutineElement(routineName: string): Element<ElementType.Routine>;
+    getRoutineElement(name: string): Element<ElementType.Routine>;
     /**
      * Retrieves the element from the logic manifest based on the given
      * class name.

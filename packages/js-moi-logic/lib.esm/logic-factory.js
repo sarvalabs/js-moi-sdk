@@ -1,16 +1,14 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, RoutineType } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
 import { RoutineOption } from "./routine-options";
 /**
  * This class represents a factory for deploying logic.
  */
 export class LogicFactory extends LogicBase {
-    manifest;
     encodedManifest;
     constructor(manifest, signer) {
         super(manifest, signer);
-        this.manifest = manifest;
         this.encodedManifest = ManifestCoder.encodeManifest(manifest);
     }
     /**
@@ -22,12 +20,16 @@ export class LogicFactory extends LogicBase {
     createPayload(ixObject) {
         const payload = {
             manifest: this.encodedManifest,
-            callsite: ixObject.routine.name
+            callsite: ixObject.routine.name,
+            calldata: "",
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
         }
         return payload;
+    }
+    createOperationPayload(callsite, args) {
+        throw new Error("Method not implemented.");
     }
     /**
      * Processes the result of a logic interaction response.
@@ -41,7 +43,7 @@ export class LogicFactory extends LogicBase {
             const result = await response.result(timeout);
             return {
                 logic_id: result[0].logic_id ? result[0].logic_id : "",
-                error: ManifestCoder.decodeException(result[0].error)
+                error: ManifestCoder.decodeException(result[0].error),
             };
         }
         catch (err) {
@@ -59,30 +61,27 @@ export class LogicFactory extends LogicBase {
     /**
      * Deploys a logic.
      *
-     * @param {string} builderName - The name of the builder routine.
+     * @param {string} callsite - The name of the builder routine.
      * @param {any[]} args - Optional arguments for the deployment.
      * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    deploy(builderName, ...args) {
-        const builder = Object.values(this.manifest.elements)
-            .find(element => {
-            if (element.kind === "routine") {
-                const routine = element.data;
-                return routine.kind === "deploy" &&
-                    builderName === routine.name;
-            }
-            return false;
-        });
-        if (builder) {
-            const builderRoutine = builder.data;
-            const argsLen = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.length - 1 : args.length;
-            if (builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
-                ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.MISSING_ARGUMENT);
-            }
-            return this.createIxObject(builderRoutine, ...args).send();
+    deploy(callsite, ...args) {
+        const element = this.getRoutineElement(callsite);
+        if (element.data.kind !== RoutineType.Deploy) {
+            ErrorUtils.throwError("The specified routine is not a deploy routine.", ErrorCode.INVALID_ARGUMENT);
         }
-        ErrorUtils.throwError("Invalid builder name, builder not found!", ErrorCode.INVALID_ARGUMENT);
+        const hasOption = args.at(-1) instanceof RoutineOption;
+        const callsiteArgs = hasOption ? args.slice(0, -1) : args;
+        const option = hasOption ? args.at(-1) : undefined;
+        if (element.data.accepts.length !== callsiteArgs.length) {
+            const sign = `${element.data.name}(${element.data.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
+            ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", ErrorCode.INVALID_ARGUMENT);
+        }
+        return this.createIxObject(element.data, callsiteArgs, option);
+    }
+    createIxObject(data, arg1, option) {
+        throw new Error("Method not implemented.");
     }
 }
 //# sourceMappingURL=logic-factory.js.map

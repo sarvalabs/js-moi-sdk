@@ -8,5 +8,6 @@
         "**/*.code-search": true,
         "packages/*/lib.*/": true
     },
-    "deno.enable": false
+    "deno.enable": false,
+    "cSpell.words": ["callsite", "POLO", "polorizer"]
 }

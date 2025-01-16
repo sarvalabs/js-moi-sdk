@@ -9,11 +9,9 @@ const routine_options_1 = require("./routine-options");
  * This class represents a factory for deploying logic.
  */
 class LogicFactory extends logic_base_1.LogicBase {
-    manifest;
     encodedManifest;
     constructor(manifest, signer) {
         super(manifest, signer);
-        this.manifest = manifest;
         this.encodedManifest = js_moi_manifest_1.ManifestCoder.encodeManifest(manifest);
     }
     /**
@@ -25,12 +23,16 @@ class LogicFactory extends logic_base_1.LogicBase {
     createPayload(ixObject) {
         const payload = {
             manifest: this.encodedManifest,
-            callsite: ixObject.routine.name
+            callsite: ixObject.routine.name,
+            calldata: "",
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
         }
         return payload;
+    }
+    createOperationPayload(callsite, args) {
+        throw new Error("Method not implemented.");
     }
     /**
      * Processes the result of a logic interaction response.
@@ -44,7 +46,7 @@ class LogicFactory extends logic_base_1.LogicBase {
             const result = await response.result(timeout);
             return {
                 logic_id: result[0].logic_id ? result[0].logic_id : "",
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
+                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error),
             };
         }
         catch (err) {
@@ -62,30 +64,27 @@ class LogicFactory extends logic_base_1.LogicBase {
     /**
      * Deploys a logic.
      *
-     * @param {string} builderName - The name of the builder routine.
+     * @param {string} callsite - The name of the builder routine.
      * @param {any[]} args - Optional arguments for the deployment.
      * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    deploy(builderName, ...args) {
-        const builder = Object.values(this.manifest.elements)
-            .find(element => {
-            if (element.kind === "routine") {
-                const routine = element.data;
-                return routine.kind === "deploy" &&
-                    builderName === routine.name;
-            }
-            return false;
-        });
-        if (builder) {
-            const builderRoutine = builder.data;
-            const argsLen = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.length - 1 : args.length;
-            if (builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
-                js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
-            }
-            return this.createIxObject(builderRoutine, ...args).send();
+    deploy(callsite, ...args) {
+        const element = this.getRoutineElement(callsite);
+        if (element.data.kind !== js_moi_utils_1.RoutineType.Deploy) {
+            js_moi_utils_1.ErrorUtils.throwError("The specified routine is not a deploy routine.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        js_moi_utils_1.ErrorUtils.throwError("Invalid builder name, builder not found!", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        const hasOption = args.at(-1) instanceof routine_options_1.RoutineOption;
+        const callsiteArgs = hasOption ? args.slice(0, -1) : args;
+        const option = hasOption ? args.at(-1) : undefined;
+        if (element.data.accepts.length !== callsiteArgs.length) {
+            const sign = `${element.data.name}(${element.data.accepts.map((arg) => arg.label + ": " + arg.type).join(", ")})`;
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid number of arguments for routine: ${sign}`, "args", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        return this.createIxObject(element.data, callsiteArgs, option);
+    }
+    createIxObject(data, arg1, option) {
+        throw new Error("Method not implemented.");
     }
 }
 exports.LogicFactory = LogicFactory;

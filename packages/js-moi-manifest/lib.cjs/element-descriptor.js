@@ -116,18 +116,18 @@ class ElementDescriptor {
      * Retrieves the element from the logic manifest based on the given
      * routine name.
      *
-     * @param {string} routineName - The name of the routine.
+     * @param {string} name - The name of the routine.
      * @returns The routine element.
      * @throws {Error} if the routine name is invalid.
      */
-    getRoutineElement(routineName) {
-        const callsite = this.callSites.get(routineName);
+    getRoutineElement(name) {
+        const callsite = this.callSites.get(name);
         if (!callsite) {
-            js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${routineName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError(`Routine name "${name}" not found.`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         const element = this.elements.get(callsite.ptr);
         if (element == null || element.kind !== js_moi_utils_1.ElementType.Routine) {
-            return js_moi_utils_1.ErrorUtils.throwError(`Invalid routine name: ${routineName}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            return js_moi_utils_1.ErrorUtils.throwError(`Routine name "${name}" is invalid.`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         return element;
     }
