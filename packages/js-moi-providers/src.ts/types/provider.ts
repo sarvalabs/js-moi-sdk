@@ -22,8 +22,8 @@ import type {
     TesseractReferenceParam,
 } from "js-moi-utils";
 import type { EventEmitter } from "stream";
-import type { MethodParams } from "./moi-execution-api";
 import type { InteractionResponse } from "../utils/interaction-response";
+import type { MethodParams } from "./moi-execution-api";
 
 type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
@@ -32,7 +32,7 @@ type NonOptionKeys<T extends Record<string, any>> = {
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>>
     ? K extends keyof TObject
         ? TModifier extends { modifier: ExtractModifier<infer E> }
-            ? Required<Pick<TObject, E>>
+            ? Required<Pick<TObject, E>>[E]
             : TModifier extends { modifier: IncludeModifier<infer E> }
             ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>>
             : never
@@ -113,8 +113,7 @@ interface AccountKeyRequest {
 }
 
 export type ExecuteIx = MethodParams<"moi.Execute">[0];
-export type Signature = ExecuteIx['signatures'][number];
-
+export type Signature = ExecuteIx["signatures"][number];
 
 interface ExecuteRequest {
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;

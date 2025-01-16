@@ -1,13 +1,13 @@
 import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "stream";
-import type { MethodParams } from "./moi-execution-api";
 import type { InteractionResponse } from "../utils/interaction-response";
+import type { MethodParams } from "./moi-execution-api";
 type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
 }[keyof T];
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>> ? K extends keyof TObject ? TModifier extends {
     modifier: ExtractModifier<infer E>;
-} ? Required<Pick<TObject, E>> : TModifier extends {
+} ? Required<Pick<TObject, E>>[E] : TModifier extends {
     modifier: IncludeModifier<infer E>;
 } ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>> : never : TObject : Pick<TObject, NonOptionKeys<TObject>>;
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
@@ -60,7 +60,7 @@ interface AccountKeyRequest {
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }
 export type ExecuteIx = MethodParams<"moi.Execute">[0];
-export type Signature = ExecuteIx['signatures'][number];
+export type Signature = ExecuteIx["signatures"][number];
 interface ExecuteRequest {
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
     execute(ix: ExecuteIx): Promise<InteractionResponse>;
