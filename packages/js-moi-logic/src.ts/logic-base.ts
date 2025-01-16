@@ -9,6 +9,8 @@ import type { RoutineOption } from "./routine-options";
  */
 const DEFAULT_FUEL_PRICE = 1;
 
+const SIMULATE_DEFAULT_FUEL_LIMIT = 1;
+
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
@@ -58,27 +60,25 @@ export abstract class LogicBase extends ElementDescriptor {
         const routine = this.getRoutineElement(callsite);
         const request = {
             fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
+            fuel_limit: option?.fuel_limit ?? SIMULATE_DEFAULT_FUEL_LIMIT, // TODO: In case when we are simulating, what should be the fuel limit?
             operations: [this.createOperationPayload(callsite, args)],
         };
 
-        if (this.isMutableRoutine(routine.data) == false) {
-            const { result } = await this.signer.simulate(request, option?.sequence);
+        const { result, effort } = await this.signer.simulate(request, option?.sequence);
 
-            switch (result[0]?.op_type) {
-                case OpType.LogicInvoke:
-                case OpType.LogicEnlist: {
-                    return this.processLogicResult(callsite, result[0].data);
-                }
-                default: {
-                    ErrorUtils.throwError("Expected LogicInvoke or LogicDeploy operation");
-                }
-            }
+        if (result[0].op_type !== OpType.LogicInvoke && result[0].op_type !== OpType.LogicEnlist) {
+            ErrorUtils.throwError("Expected LogicInvoke or Logic Enlist operation");
+        }
+
+        if (!this.isMutableRoutine(routine.data)) {
+            return this.processLogicResult(callsite, result[0].data);
+        }
+
+        if (option?.fuel_limit == null) {
+            request.fuel_price = effort;
         }
 
         const ix = await this.signer.execute(request);
         return this.processLogicResult(callsite, ix);
     }
-
-    // abstract methods to be implemented by subclasses
 }

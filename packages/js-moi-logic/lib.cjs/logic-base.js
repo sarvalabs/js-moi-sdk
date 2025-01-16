@@ -8,6 +8,7 @@ const js_moi_utils_1 = require("js-moi-utils");
  * The default fuel price used for logic interactions.
  */
 const DEFAULT_FUEL_PRICE = 1;
+const SIMULATE_DEFAULT_FUEL_LIMIT = 1;
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
@@ -44,20 +45,18 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
         const routine = this.getRoutineElement(callsite);
         const request = {
             fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? 10000, // TODO: remove a hard-coded default value
+            fuel_limit: option?.fuel_limit ?? SIMULATE_DEFAULT_FUEL_LIMIT, // TODO: In case when we are simulating, what should be the fuel limit?
             operations: [this.createOperationPayload(callsite, args)],
         };
-        if (this.isMutableRoutine(routine.data) == false) {
-            const { result } = await this.signer.simulate(request, option?.sequence);
-            switch (result[0]?.op_type) {
-                case js_moi_utils_1.OpType.LogicInvoke:
-                case js_moi_utils_1.OpType.LogicEnlist: {
-                    return this.processLogicResult(callsite, result[0].data);
-                }
-                default: {
-                    js_moi_utils_1.ErrorUtils.throwError("Expected LogicInvoke or LogicDeploy operation");
-                }
-            }
+        const { result, effort } = await this.signer.simulate(request, option?.sequence);
+        if (result[0].op_type !== js_moi_utils_1.OpType.LogicInvoke && result[0].op_type !== js_moi_utils_1.OpType.LogicEnlist) {
+            js_moi_utils_1.ErrorUtils.throwError("Expected LogicInvoke or Logic Enlist operation");
+        }
+        if (!this.isMutableRoutine(routine.data)) {
+            return this.processLogicResult(callsite, result[0].data);
+        }
+        if (option?.fuel_limit == null) {
+            request.fuel_price = effort;
         }
         const ix = await this.signer.execute(request);
         return this.processLogicResult(callsite, ix);

@@ -14,6 +14,7 @@ export declare abstract class Signer {
     getProvider(): Provider;
     private getLatestSequence;
     private getSender;
+    getIxRequest(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionRequest>;
     simulate(ix: Omit<InteractionRequest, "sender">): Promise<Simulate>;
     simulate(ix: Omit<InteractionRequest, "sender">, sequence?: number, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: Omit<InteractionRequest, "sender">, option?: SimulateOption): Promise<Simulate>;
