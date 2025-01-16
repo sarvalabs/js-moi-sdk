@@ -183,7 +183,7 @@ export interface AssetCreateOperation {
     symbol: string;
     supply: Quantity;
     dimension: Quantity;
-    standard: Quantity;
+    standard: AssetStandard;
     is_logical: boolean;
     is_stateful: boolean;
     logic?: LogicPayload;
