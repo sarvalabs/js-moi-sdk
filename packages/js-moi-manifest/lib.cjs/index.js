@@ -15,7 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManifestCoderFormat = void 0;
-__exportStar(require("./manifest"), exports);
+__exportStar(require("./manifest-coder"), exports);
 var serialization_format_1 = require("./manifest-coder/serialization-format");
 Object.defineProperty(exports, "ManifestCoderFormat", { enumerable: true, get: function () { return serialization_format_1.ManifestCoderFormat; } });
 __exportStar(require("./context-state-matrix"), exports);
