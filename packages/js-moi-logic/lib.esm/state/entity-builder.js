@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils } from "js-moi-utils";
 import { SlotAccessorBuilder } from "./accessor-builder";
 export class EntityBuilder {
     slot;
@@ -9,13 +9,18 @@ export class EntityBuilder {
         this.elementDescriptor = elementDescriptor;
     }
     entity(label) {
-        const element = this.elementDescriptor.getElements().get(this.slot)?.data;
+        const element = this.elementDescriptor.getElements().get(this.slot);
         if (element == null) {
             ErrorUtils.throwError("Element not found", ErrorCode.PROPERTY_NOT_DEFINED, {
                 ptr: this.slot,
             });
         }
-        const field = element.fields.find((field) => field.label === label);
+        if (element.kind !== ElementType.State) {
+            ErrorUtils.throwError("Element is not a state", ErrorCode.INVALID_ARGUMENT, {
+                ptr: this.slot,
+            });
+        }
+        const field = element.data.fields.find((field) => field.label === label);
         if (field == null) {
             ErrorUtils.throwError(`'${label}' is not member of persistent state`, ErrorCode.PROPERTY_NOT_DEFINED, {
                 entity: label,

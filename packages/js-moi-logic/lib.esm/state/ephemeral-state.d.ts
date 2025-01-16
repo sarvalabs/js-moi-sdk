@@ -1,4 +1,5 @@
-import type { AbstractProvider } from "js-moi-providers";
+import { type Address } from "js-moi-utils";
+import type { Provider } from "js-moi-providers";
 import type { LogicDriver } from "../logic-driver";
 import { type AccessorBuilder } from "./accessor-builder";
 import { EntityBuilder } from "./entity-builder";
@@ -16,7 +17,7 @@ export declare class EphemeralState {
     private logicId;
     private provider;
     private driver;
-    constructor(logic: LogicDriver, provider: AbstractProvider);
+    constructor(logic: LogicDriver, provider: Provider);
     /**
      * Returns an accessor builder for the specified slot.
      *
@@ -32,7 +33,7 @@ export declare class EphemeralState {
      * @returns A promise that resolves to the retrieved value.
      * @throws An error if the ephemeral state is not present or if the accessor builder is invalid.
      */
-    get<T = any>(address: string, createAccessorBuilder: AccessorBuilderFunction): Promise<T>;
+    get<T = any>(address: Address, createAccessorBuilder: AccessorBuilderFunction): Promise<T>;
 }
 export {};
 //# sourceMappingURL=ephemeral-state.d.ts.map

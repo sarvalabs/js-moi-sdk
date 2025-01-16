@@ -1,7 +1,6 @@
 import { isPrimitiveType, Schema } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, generateStorageKey, hexToBytes } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
-import { generateStorageKey } from "./accessor";
 import { SlotAccessorBuilder } from "./accessor-builder";
 import { EntityBuilder } from "./entity-builder";
 /**
@@ -49,7 +48,7 @@ export class PersistentState {
             });
         }
         const slot = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
-        const result = await this.provider.getStorageAt(this.logicId.getAddress(), slot.hex());
+        const result = await this.provider.getLogicStorage(this.logicId, slot);
         const depolorizer = new Depolorizer(hexToBytes(result));
         if (!isPrimitiveType(builder.getStorageType())) {
             return depolorizer.depolorizeInteger();

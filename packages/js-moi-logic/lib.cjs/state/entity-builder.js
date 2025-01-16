@@ -12,13 +12,18 @@ class EntityBuilder {
         this.elementDescriptor = elementDescriptor;
     }
     entity(label) {
-        const element = this.elementDescriptor.getElements().get(this.slot)?.data;
+        const element = this.elementDescriptor.getElements().get(this.slot);
         if (element == null) {
             js_moi_utils_1.ErrorUtils.throwError("Element not found", js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
                 ptr: this.slot,
             });
         }
-        const field = element.fields.find((field) => field.label === label);
+        if (element.kind !== js_moi_utils_1.ElementType.State) {
+            js_moi_utils_1.ErrorUtils.throwError("Element is not a state", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
+                ptr: this.slot,
+            });
+        }
+        const field = element.data.fields.find((field) => field.label === label);
         if (field == null) {
             js_moi_utils_1.ErrorUtils.throwError(`'${label}' is not member of persistent state`, js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED, {
                 entity: label,

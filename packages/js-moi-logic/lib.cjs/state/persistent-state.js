@@ -4,7 +4,6 @@ exports.PersistentState = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
-const accessor_1 = require("./accessor");
 const accessor_builder_1 = require("./accessor-builder");
 const entity_builder_1 = require("./entity-builder");
 /**
@@ -51,8 +50,8 @@ class PersistentState {
                 got: typeof builder,
             });
         }
-        const slot = (0, accessor_1.generateStorageKey)(builder.getBaseSlot(), builder.getAccessors());
-        const result = await this.provider.getStorageAt(this.logicId.getAddress(), slot.hex());
+        const slot = (0, js_moi_utils_1.generateStorageKey)(builder.getBaseSlot(), builder.getAccessors());
+        const result = await this.provider.getLogicStorage(this.logicId, slot);
         const depolorizer = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result));
         if (!(0, js_moi_manifest_1.isPrimitiveType)(builder.getStorageType())) {
             return depolorizer.depolorizeInteger();

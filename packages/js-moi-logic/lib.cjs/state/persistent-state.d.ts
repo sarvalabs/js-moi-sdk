@@ -1,7 +1,7 @@
-import type { AbstractProvider } from "js-moi-providers";
 import type { LogicDriver } from "../logic-driver";
 import { type AccessorBuilder } from "./accessor-builder";
 import { EntityBuilder } from "./entity-builder";
+import type { Provider } from "js-moi-providers";
 /**
  * Represents a function that builds an accessor.
  * @param builder - The entity builder.
@@ -16,7 +16,7 @@ export declare class PersistentState {
     private logicId;
     private provider;
     private driver;
-    constructor(logic: LogicDriver, provider: AbstractProvider);
+    constructor(logic: LogicDriver, provider: Provider);
     /**
      * Returns an accessor builder for the specified slot.
      *
