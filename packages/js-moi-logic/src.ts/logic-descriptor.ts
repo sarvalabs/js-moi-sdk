@@ -2,7 +2,7 @@ import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-ma
 import { ErrorCode, ErrorUtils, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
 
 export class LogicDescriptor extends ElementDescriptor {
-    private logicId?: LogicId;
+    protected logicId?: LogicId;
 
     private readonly manifest: LogicManifest;
 

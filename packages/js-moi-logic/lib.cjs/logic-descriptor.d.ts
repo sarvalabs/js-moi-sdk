@@ -1,7 +1,7 @@
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import { type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
 export declare class LogicDescriptor extends ElementDescriptor {
-    private logicId?;
+    protected logicId?: LogicId;
     private readonly manifest;
     private coder?;
     constructor(manifest: LogicManifest, logicId?: LogicId);

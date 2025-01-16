@@ -2,9 +2,9 @@ import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import type { Signer } from "js-moi-signer";
 import { LogicId, type Address, type LogicManifest } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
-import type { LogicDriverOption } from "./types";
+import type { LogicCallsites, LogicDriverOption } from "./types";
 
-export class LogicDriver extends LogicBase {
+export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> extends LogicBase<TCallsites> {
     constructor(option: LogicDriverOption) {
         const id = typeof option.logicId === "string" ? new LogicId(option.logicId) : option.logicId;
         super({ ...option, logicId: id });
@@ -20,7 +20,10 @@ export class LogicDriver extends LogicBase {
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export const getLogicDriver = async (logicId: Address | LogicId | LogicManifest, signer: Signer): Promise<LogicDriver> => {
+export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(
+    logicId: Address | LogicId | LogicManifest,
+    signer: Signer
+): Promise<LogicDriver<TCallsites>> => {
     if (typeof logicId === "string" || logicId instanceof LogicId) {
         const provider = signer.getProvider();
         const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
@@ -32,5 +35,5 @@ export const getLogicDriver = async (logicId: Address | LogicId | LogicManifest,
         return new LogicDriver({ manifest, logicId: id, signer });
     }
 
-    return new LogicDriver({ manifest: logicId, signer });
+    return new LogicDriver<TCallsites>({ manifest: logicId, signer });
 };
