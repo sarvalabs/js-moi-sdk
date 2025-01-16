@@ -1,8 +1,6 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { LogicActionPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ElementType, ErrorCode, ErrorUtils, LogicId, OpType, defineReadOnly, type ElementData, type Hex, type IxOperation, type LogicManifest } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
@@ -13,14 +11,20 @@ import type { Routine } from "./types/logic";
  */
 export class LogicDriver extends LogicDescriptor {
     public routines: Record<string, Routine>;
-    public readonly persistentState: PersistentState;
-    public readonly ephemeralState: EphemeralState;
+    public readonly persistentState?: PersistentState;
+    public readonly ephemeralState?: EphemeralState;
 
     constructor(logicId: Hex | LogicId, manifest: LogicManifest, arg: Signer) {
         super(logicId, manifest, arg);
-        this.createState();
+        const states = this.createState();
+
         this.routines = this.createRoutines();
+        this.persistentState = states.persistentState;
+        this.ephemeralState = states.ephemeralState;
+
         Object.defineProperty(this, "routines", { writable: false });
+        Object.defineProperty(this, "persistentState", { writable: false });
+        Object.defineProperty(this, "ephemeralState", { writable: false });
     }
 
     protected createOperationPayload(callsite: string, args: unknown[]): IxOperation<OpType.LogicInvoke> {
@@ -41,15 +45,18 @@ export class LogicDriver extends LogicDescriptor {
         const hasPersistance = this.stateMatrix.persistent();
         const hasEphemeral = this.stateMatrix.ephemeral();
 
+        let persistentState: PersistentState | undefined;
+        let ephemeralState: EphemeralState | undefined;
+
         if (hasPersistance) {
-            const persistentState = new PersistentState(this, this.signer.getProvider());
-            defineReadOnly(this, "persistentState", persistentState);
+            persistentState = new PersistentState(this, this.signer.getProvider());
         }
 
         if (hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.signer.getProvider());
-            defineReadOnly(this, "ephemeralState", ephemeralState);
+            ephemeralState = new EphemeralState(this, this.signer.getProvider());
         }
+
+        return { persistentState, ephemeralState };
     }
 
     private newRoutine(data: ElementData<ElementType.Routine>): Routine {
@@ -93,47 +100,6 @@ export class LogicDriver extends LogicDescriptor {
 
         return routines;
     }
-
-    /**
-     * Creates the logic payload from the given interaction object.
-     *
-     * @param {LogicIxObject} ixObject - The interaction object.
-     * @returns {LogicActionPayload} The logic action payload.
-     */
-    protected createPayload(ixObject: LogicIxObject): LogicActionPayload {
-        const payload = {
-            logic_id: this.getLogicId().string(),
-            callsite: ixObject.routine.name,
-        } as LogicActionPayload;
-
-        if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
-        }
-
-        return payload;
-    }
-
-    /**
-     * Processes the logic interaction result and returns the decoded data or 
-     error, if available.
-     * 
-     * @param {LogicIxResponse} response - The logic interaction response.
-     * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult | null>} A promise that resolves to the 
-     logic interaction result or null.
-     */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
-        try {
-            const result = await response.result(timeout);
-
-            return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
-                error: ManifestCoder.decodeException(result[0].error),
-            };
-        } catch (err) {
-            throw err;
-        }
-    }
 }
 
 /**
@@ -141,7 +107,6 @@ export class LogicDriver extends LogicDescriptor {
  *
  * @param {string} logicId - The logic id of the logic.
  * @param {Signer} signer - The signer instance for the logic driver.
- * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */

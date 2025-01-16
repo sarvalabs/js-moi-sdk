@@ -15,9 +15,13 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     ephemeralState;
     constructor(logicId, manifest, arg) {
         super(logicId, manifest, arg);
-        this.createState();
+        const states = this.createState();
         this.routines = this.createRoutines();
+        this.persistentState = states.persistentState;
+        this.ephemeralState = states.ephemeralState;
         Object.defineProperty(this, "routines", { writable: false });
+        Object.defineProperty(this, "persistentState", { writable: false });
+        Object.defineProperty(this, "ephemeralState", { writable: false });
     }
     createOperationPayload(callsite, args) {
         const calldata = this.manifestCoder.encodeArguments(callsite, ...args);
@@ -34,14 +38,15 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     createState() {
         const hasPersistance = this.stateMatrix.persistent();
         const hasEphemeral = this.stateMatrix.ephemeral();
+        let persistentState;
+        let ephemeralState;
         if (hasPersistance) {
-            const persistentState = new state_1.PersistentState(this, this.signer.getProvider());
-            (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
+            persistentState = new state_1.PersistentState(this, this.signer.getProvider());
         }
         if (hasEphemeral) {
-            const ephemeralState = new state_1.EphemeralState(this, this.signer.getProvider());
-            (0, js_moi_utils_1.defineReadOnly)(this, "ephemeralState", ephemeralState);
+            ephemeralState = new state_1.EphemeralState(this, this.signer.getProvider());
         }
+        return { persistentState, ephemeralState };
     }
     newRoutine(data) {
         const metadata = {
@@ -76,43 +81,6 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         }
         return routines;
     }
-    /**
-     * Creates the logic payload from the given interaction object.
-     *
-     * @param {LogicIxObject} ixObject - The interaction object.
-     * @returns {LogicActionPayload} The logic action payload.
-     */
-    createPayload(ixObject) {
-        const payload = {
-            logic_id: this.getLogicId().string(),
-            callsite: ixObject.routine.name,
-        };
-        if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
-            payload.calldata = this.manifestCoder.encodeArguments(ixObject.routine.name, ...ixObject.arguments);
-        }
-        return payload;
-    }
-    /**
-     * Processes the logic interaction result and returns the decoded data or
-     error, if available.
-     *
-     * @param {LogicIxResponse} response - The logic interaction response.
-     * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult | null>} A promise that resolves to the
-     logic interaction result or null.
-     */
-    async processResult(response, timeout) {
-        try {
-            const result = await response.result(timeout);
-            return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error),
-            };
-        }
-        catch (err) {
-            throw err;
-        }
-    }
 }
 exports.LogicDriver = LogicDriver;
 /**
@@ -120,7 +88,6 @@ exports.LogicDriver = LogicDriver;
  *
  * @param {string} logicId - The logic id of the logic.
  * @param {Signer} signer - The signer instance for the logic driver.
- * @param {Options} options - The custom tesseract options for retrieving
  *
  * @returns {Promise<LogicDriver>} A promise that resolves to a LogicDriver instance.
  */
