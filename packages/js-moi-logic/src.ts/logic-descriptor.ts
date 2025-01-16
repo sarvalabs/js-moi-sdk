@@ -1,117 +1,62 @@
-import { ManifestCoder } from "js-moi-manifest";
-import { Signer } from "js-moi-signer";
-import { LogicId, LogicState, type EngineKind, type Hex, type LogicManifest } from "js-moi-utils";
-import { LogicBase } from "./logic-base";
+import { ElementDescriptor } from "js-moi-manifest";
+import { ErrorCode, ErrorUtils, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
 
-/**
- * Abstract class representing a logic descriptor, which provides information 
- about a logic.
- */
-export abstract class LogicDescriptor extends LogicBase {
-    protected logicId: LogicId;
-    protected manifest: LogicManifest;
+export class LogicDescriptor extends ElementDescriptor {
+    private logicId?: LogicId;
 
-    constructor(logicId: Hex | LogicId, manifest: LogicManifest, signer: Signer) {
-        super(manifest, signer);
+    private readonly syntax: LogicManifest["syntax"];
 
-        this.logicId = logicId instanceof LogicId ? logicId : new LogicId(logicId);
-        this.manifest = manifest;
+    private readonly engine: LogicManifest["engine"];
+
+    constructor(manifest: LogicManifest, logicId?: LogicId) {
+        super(manifest.elements);
+
+        this.syntax = manifest.syntax;
+        this.engine = manifest.engine;
+        this.logicId = logicId;
     }
 
-    /**
-     * Returns the logic id of the logic.
-     *
-     * @returns {string} The logic id.
-     */
+    protected setLogicId(logicId: LogicId) {
+        this.logicId = logicId;
+    }
+
+    public getEngine(): LogicManifest["engine"] {
+        return this.engine;
+    }
+
+    public getSyntax(): LogicManifest["syntax"] {
+        return this.syntax;
+    }
+
     public getLogicId(): LogicId {
+        if (this.logicId == null) {
+            ErrorUtils.throwError("Logic ID is not set. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
+        }
+
         return this.logicId;
     }
 
-    /**
-     * Returns the logic execution engine type.
-     *
-     * @returns {EngineKind} The engine type.
-     */
-    public getEngine(): EngineKind {
-        return this.manifest.engine.kind;
+    public getVersion(): number {
+        return this.getLogicId().getVersion();
     }
 
-    /**
-     * Returns the logic manifest.
-     *
-     * @returns {LogicManifest.Manifest} The logic manifest.
-     */
-    public getManifest(): LogicManifest {
-        return this.manifest;
+    public getEdition(): number {
+        return this.getLogicId().getEdition();
     }
 
-    /**
-     * Returns the POLO encoded logic manifest.
-     *
-     * @returns {string} The POLO encoded logic manifest.
-     */
-    public getEncodedManifest(): string {
-        return ManifestCoder.encodeManifest(this.manifest);
+    public getLogicAddress(): Hex {
+        return this.getLogicId().getAddress();
     }
 
-    /**
-     * Checks if the logic is sealed.
-     *
-     * @returns {boolean} True if the logic is sealed, false otherwise.
-     */
-    public isSealed(): boolean {
-        return false;
+    public isEphemeral(): boolean {
+        return this.getLogicId().isEphemeral();
     }
 
-    /**
-     * Checks if the logic represents an asset logic.
-     *
-     * @returns {boolean} True if the logic is an representation of asset logic, false otherwise.
-     */
+    public isPersistent(): boolean {
+        return this.getLogicId().isPersistent();
+    }
+
     public isAssetLogic(): boolean {
-        return this.logicId.isAssetLogic();
-    }
-
-    /**
-     * Checks if the logic allows interactions.
-     *
-     * @returns {boolean} True if the logic allows interactions, false otherwise.
-     */
-    public allowsInteractions(): boolean {
-        return this.logicId.isIntractable();
-    }
-
-    /**
-     * Checks if the logic is stateful.
-     *
-     * @returns {boolean} True if the logic is stateful, false otherwise.
-     */
-    public isStateful(): boolean {
-        // TODO : Implement this method
-        throw new Error("Method not implemented.");
-    }
-
-    /**
-     * Checks if the logic has persistent state.
-     * @returns A tuple containing the pointer to the persistent state and a flag indicating if it exists.
-     * 
-     @example
-     * const [ptr, exists] = logic.hasPersistentState();
-     */
-    public hasPersistentState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(LogicState.Persistent);
-        return ptr == null ? [0, false] : [ptr, true];
-    }
-
-    /**
-     * Checks if the logic has ephemeral state.
-     * @returns A tuple containing the pointer to the ephemeral state and a flag indicating if it exists.
-     *
-     * @example
-     * const [ptr, exists] = logic.hasEphemeralState();
-     */
-    public hasEphemeralState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(LogicState.Ephemeral);
-        return ptr == null ? [0, false] : [ptr, true];
+        return this.getLogicId().isAssetLogic();
     }
 }

@@ -9,5 +9,5 @@
         "packages/*/lib.*/": true
     },
     "deno.enable": false,
-    "cSpell.words": ["callsite", "POLO", "polorizer"]
+    "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"]
 }
