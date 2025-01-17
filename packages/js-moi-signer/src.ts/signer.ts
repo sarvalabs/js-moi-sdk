@@ -4,7 +4,7 @@ import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
-export type SignerInteractionRequest<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
+export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
 
 export abstract class Signer {
     private provider?: Provider;
@@ -65,16 +65,16 @@ export abstract class Signer {
         return { address, key_id: index, sequence_id: sequence };
     }
 
-    public simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>): Promise<Simulate>;
-    public simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>, sequence?: number, option?: SimulateOption): Promise<Simulate>;
-    public simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
+    public simulate(ix: SignerIx<SimulateInteractionRequest>): Promise<Simulate>;
+    public simulate(ix: SignerIx<SimulateInteractionRequest>, sequence?: number, option?: SimulateOption): Promise<Simulate>;
+    public simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: SignerIx<SimulateInteractionRequest>, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
         const sequence = typeof sequenceOrOption === "number" ? sequenceOrOption : undefined;
         const request = { ...ix, sender: await this.getSender(sequence) };
         return await this.getProvider().simulate(request, option);
     }
 
-    public async execute(ix: SignerInteractionRequest<InteractionRequest>, sequence?: number): Promise<InteractionResponse> {
+    public async execute(ix: SignerIx<InteractionRequest>, sequence?: number): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
         const request = { ...ix, sender: await this.getSender(sequence) };
         const signedIx = await this.signInteraction(request, algorithm);
