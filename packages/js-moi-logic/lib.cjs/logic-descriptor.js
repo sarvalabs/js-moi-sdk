@@ -21,29 +21,35 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
     getSyntax() {
         return this.manifest.syntax;
     }
-    getLogicId() {
+    async getLogicId() {
         if (this.logicId == null) {
             js_moi_utils_1.ErrorUtils.throwError("Logic id not found. This can happen if the logic is not deployed.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         return this.logicId;
     }
-    getVersion() {
-        return this.getLogicId().getVersion();
+    async getVersion() {
+        const id = await this.getLogicId();
+        return id.getVersion();
     }
-    getEdition() {
-        return this.getLogicId().getEdition();
+    async getEdition() {
+        const id = await this.getLogicId();
+        return id.getEdition();
     }
-    getLogicAddress() {
-        return this.getLogicId().getAddress();
+    async getLogicAddress() {
+        const id = await this.getLogicId();
+        return id.getAddress();
     }
-    isEphemeral() {
-        return this.getLogicId().isEphemeral();
+    async isEphemeral() {
+        const id = await this.getLogicId();
+        return id.isEphemeral();
     }
-    isPersistent() {
-        return this.getLogicId().isPersistent();
+    async isPersistent() {
+        const id = await this.getLogicId();
+        return id.isPersistent();
     }
-    isAssetLogic() {
-        return this.getLogicId().isAssetLogic();
+    async isAssetLogic() {
+        const id = await this.getLogicId();
+        return id.isAssetLogic();
     }
     getManifestCoder() {
         if (this.coder == null) {

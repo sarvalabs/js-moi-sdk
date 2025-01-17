@@ -46,11 +46,11 @@ export class LogicBase extends ElementDescriptor {
             operations: [this.createOperationPayload(callsite, args)],
         };
         const { result, effort } = await this.signer.simulate(request, option?.sequence);
-        if (result[0].op_type !== OpType.LogicInvoke && result[0].op_type !== OpType.LogicEnlist) {
+        if (result[0].type !== OpType.LogicInvoke && result[0].type !== OpType.LogicEnlist) {
             ErrorUtils.throwError("Expected LogicInvoke or Logic Enlist operation");
         }
         if (!this.isMutableRoutine(routine.data)) {
-            return this.processLogicResult(callsite, result[0].data);
+            return this.processLogicResult(callsite, result[0].payload);
         }
         if (option?.fuel_limit == null) {
             request.fuel_price = effort;

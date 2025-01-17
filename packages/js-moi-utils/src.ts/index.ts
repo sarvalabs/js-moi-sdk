@@ -64,7 +64,7 @@ export type {
     TesseractReference,
     TesseractReferenceParam,
 } from "./types/rpc/common-entities";
-export type { AssetCreateResult, AssetSupplyResult, LogicActionResult, LogicDeployResult, LogicResult, NoOperationResult, OperationResult } from "./types/rpc/ix-result";
+export type { AssetCreateResult, AssetSupplyResult, IxOpResult, LogicActionResult, LogicDeployResult, LogicResult, NoOperationResult } from "./types/rpc/ix-result";
 export type {
     Account,
     AccountAsset,

@@ -14,13 +14,13 @@ export interface LogicResult {
 
 export type LogicActionResult = Omit<LogicResult, "logic_id">;
 
-export type LogicDeployResult = Pick<LogicResult, "logic_id"> | Pick<LogicResult, "error">;
+export type LogicDeployResult = Pick<LogicResult, "logic_id"> & Pick<LogicResult, "error">;
 
 export type AssetSupplyResult = null;
 
 export type NoOperationResult = null;
 
-export type OperationResult<TOpType extends OpType> = TOpType extends OpType.AssetCreate
+export type IxOpResult<TOpType extends OpType> = TOpType extends OpType.AssetCreate
     ? AssetCreateResult
     : TOpType extends OpType.AssetBurn | OpType.AssetMint
     ? AssetSupplyResult

@@ -1,13 +1,14 @@
-import { CustomError, ErrorCode, ErrorUtils, type Hex, type Interaction, type InteractionConfirmation, type OperationItem } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, type Hex, type Interaction, type InteractionConfirmation, type IxOperationResult } from "js-moi-utils";
 import type { Provider } from "../types/provider";
 
 const INITIAL_NOT_FOUND_RETRIES = 10;
 const ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO = 1500;
 
-interface TimerOption {
+export interface TimerOption {
     retries: number;
     delayInSec: number;
 }
+
 export class InteractionResponse {
     public readonly hash: Hex;
     private interaction?: Interaction;
@@ -93,7 +94,7 @@ export class InteractionResponse {
      * @param {TimerOption} [timer=this.getDefaultTimer()] - The timer option to wait for before retrieving the result. Defaults to the value returned by `getDefaultTimer()`.
      * @returns {Promise<OperationItem[]>} A promise that resolves to an array of `OperationItem` objects representing the operations.
      */
-    async result(timer: TimerOption = this.getDefaultTimer()): Promise<OperationItem[]> {
+    async result(timer: TimerOption = this.getDefaultTimer()): Promise<IxOperationResult[]> {
         const confirmation = await this.wait(timer);
         return confirmation.operations;
     }

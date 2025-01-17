@@ -2,7 +2,7 @@ import type { AccountType, AssetStandard, InteractionStatus, LockType, Operation
 import type { Address, Hex, Quantity } from "../../hex";
 import type { IxParticipant } from "../interaction";
 import type { LogicActionPayload, LogicDeployPayload, LogicPayload } from "../ix-operation";
-import type { OperationResult } from "./ix-result";
+import type { IxOpResult } from "./ix-result";
 export interface NetworkInfo {
     /**
      * The chain ID of the network.
@@ -14,9 +14,9 @@ export interface NetworkInfo {
     version: string;
 }
 export interface SimulationResult<TOpType extends OpType> {
-    op_type: TOpType;
-    op_status: OperationStatus;
-    data: OperationResult<TOpType>;
+    type: TOpType;
+    status: OperationStatus;
+    payload: IxOpResult<TOpType>;
 }
 export type IxOperationResult = SimulationResult<OpType.AssetCreate> | SimulationResult<OpType.AssetTransfer> | SimulationResult<OpType.AssetApprove> | SimulationResult<OpType.AssetRevoke> | SimulationResult<OpType.AssetLockup> | SimulationResult<OpType.AssetRelease> | SimulationResult<OpType.LogicDeploy> | SimulationResult<OpType.LogicEnlist> | SimulationResult<OpType.LogicInvoke>;
 export interface SimulationEffects {
@@ -188,7 +188,7 @@ export interface TesseractInfo {
 export interface InteractionConfirmation {
     status: ReceiptStatus;
     tesseract: TesseractInfo;
-    operations: OperationItem[];
+    operations: IxOperationResult[];
     fuel_spent: number;
 }
 export interface Interaction {

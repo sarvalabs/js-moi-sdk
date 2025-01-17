@@ -20,8 +20,8 @@ export const getLogicDriver = async (logicId, signer) => {
     if (typeof logicId === "string" || logicId instanceof LogicId) {
         const provider = signer.getProvider();
         const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-        const encoded = await provider.getLogic(id, {
-            modifier: { extract: "manifest" },
+        const { manifest: encoded } = await provider.getLogic(id, {
+            modifier: { include: ["manifest"] },
         });
         const manifest = ManifestCoder.decodeManifest(encoded, ManifestCoderFormat.JSON);
         return new LogicDriver({ manifest, logicId: id, signer });

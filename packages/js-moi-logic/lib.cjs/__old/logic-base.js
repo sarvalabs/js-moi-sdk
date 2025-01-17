@@ -49,11 +49,11 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             operations: [this.createOperationPayload(callsite, args)],
         };
         const { result, effort } = await this.signer.simulate(request, option?.sequence);
-        if (result[0].op_type !== js_moi_utils_1.OpType.LogicInvoke && result[0].op_type !== js_moi_utils_1.OpType.LogicEnlist) {
+        if (result[0].type !== js_moi_utils_1.OpType.LogicInvoke && result[0].type !== js_moi_utils_1.OpType.LogicEnlist) {
             js_moi_utils_1.ErrorUtils.throwError("Expected LogicInvoke or Logic Enlist operation");
         }
         if (!this.isMutableRoutine(routine.data)) {
-            return this.processLogicResult(callsite, result[0].data);
+            return this.processLogicResult(callsite, result[0].payload);
         }
         if (option?.fuel_limit == null) {
             request.fuel_price = effort;

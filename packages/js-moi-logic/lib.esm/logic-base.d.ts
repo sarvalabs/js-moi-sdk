@@ -1,9 +1,12 @@
-import { type LogicId } from "js-moi-utils";
+import type { SimulateInteractionRequest, TimerOption } from "js-moi-providers";
+import type { SignerIx } from "js-moi-signer";
+import { LogicId, type InteractionRequest } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import type { CallsiteOption, LogicCallsites, LogicDriverOption } from "./types";
 export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer;
     readonly endpoint: TCallsites;
+    private deployIxResponse?;
     constructor(option: Omit<LogicDriverOption, "logicId"> & {
         logicId?: LogicId;
     });
@@ -13,7 +16,8 @@ export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsite
     validateCallsiteOption(option?: CallsiteOption): Error | null;
     private extractArgsAndOption;
     private createIxOperation;
-    createIxRequest(callsite: string, callsiteArguments: unknown[], option?: CallsiteOption): Promise<import("js-moi-utils").InteractionRequest>;
+    createIxRequest(callsite: string, callsiteArguments: unknown[], option?: CallsiteOption): Promise<SignerIx<SimulateInteractionRequest> | SignerIx<InteractionRequest>>;
+    getLogicId(timer?: TimerOption): Promise<LogicId>;
     private newCallsite;
     private setupEndpoint;
 }

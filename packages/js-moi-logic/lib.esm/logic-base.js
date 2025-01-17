@@ -1,16 +1,18 @@
-import { ManifestCoderFormat } from "js-moi-manifest";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicState, OpType, RoutineType } from "js-moi-utils";
+import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
+import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, LogicState, OpType, RoutineType } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 export class LogicBase extends LogicDescriptor {
     signer;
     endpoint;
+    deployIxResponse;
     constructor(option) {
         super(option.manifest, option.logicId);
         this.signer = option.signer;
         this.endpoint = this.setupEndpoint();
     }
-    isDeployed() {
-        return this.logicId != null;
+    async isDeployed() {
+        const logicId = await this.getLogicId().catch(() => null);
+        return logicId != null;
     }
     getCallsiteType(callsite) {
         return this.getRoutineElement(callsite).data.kind;
@@ -46,7 +48,7 @@ export class LogicBase extends LogicDescriptor {
         }
         return { option, args };
     }
-    createIxOperation(callsite, args) {
+    async createIxOperation(callsite, args) {
         let operation;
         const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
         const callsiteType = this.getCallsiteType(callsite);
@@ -54,11 +56,7 @@ export class LogicBase extends LogicDescriptor {
             case RoutineType.Deploy: {
                 operation = {
                     type: OpType.LogicDeploy,
-                    payload: {
-                        manifest: this.getManifest(ManifestCoderFormat.POLO),
-                        callsite,
-                        calldata,
-                    },
+                    payload: { manifest: this.getManifest(ManifestCoderFormat.POLO), callsite, calldata },
                 };
                 break;
             }
@@ -66,11 +64,7 @@ export class LogicBase extends LogicDescriptor {
             case RoutineType.Enlist: {
                 operation = {
                     type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
-                    payload: {
-                        logic_id: this.getLogicId().value,
-                        callsite,
-                        calldata,
-                    },
+                    payload: { logic_id: (await this.getLogicId()).value, callsite, calldata },
                 };
                 break;
             }
@@ -81,40 +75,78 @@ export class LogicBase extends LogicDescriptor {
         return operation;
     }
     async createIxRequest(callsite, callsiteArguments, option) {
-        const request = {
+        const baseIxRequest = {
             fuel_price: option?.fuel_price ?? 1,
-            operations: [this.createIxOperation(callsite, callsiteArguments)],
+            operations: [await this.createIxOperation(callsite, callsiteArguments)],
         };
-        if (request.fuel_limit == null) {
-            console.warn("Simulating interaction should not take a fuel limit.");
-            console.warn("Fuel limit not provided. Using default value 1.");
-            request.fuel_limit = 1;
+        if (!this.isCallsiteMutable(callsite)) {
+            return baseIxRequest;
         }
-        const simulation = await this.signer.simulate(request, option?.sequence);
-        // request.fuel_limit =
+        const simulation = await this.signer.simulate(baseIxRequest, option?.sequence);
         // TODO: SHOULD SDK handle this? that if fuel limit is provided and it is less than the effort, it should throw an error
         if (option?.fuel_limit != null && option.fuel_limit < simulation.effort) {
             ErrorUtils.throwError(`Minimum fuel limit required for interaction is ${simulation.effort} but got ${option.fuel_limit}.`);
         }
-        if (option?.fuel_limit == null) {
+        const request = {
+            ...baseIxRequest,
+            fuel_limit: option?.fuel_limit ?? simulation.effort,
+        };
+        return request;
+    }
+    async getLogicId(timer) {
+        if (this.logicId != null) {
+            return this.logicId;
         }
-        // if (option?.fuel_limit == null) {
-        //     request.fuel_limit = simulation.effort;
-        // }
-        return await this.signer.getIxRequest(request, option?.sequence);
+        if (this.deployIxResponse != null) {
+            const results = await this.deployIxResponse.result(timer);
+            const result = results.at(0);
+            if (result?.type !== OpType.LogicDeploy) {
+                ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
+            }
+            const exception = ManifestCoder.decodeException(result.payload.error);
+            if (exception != null) {
+                ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
+            }
+            this.setLogicId(new LogicId(result.payload.logic_id));
+        }
+        return super.getLogicId();
     }
     newCallsite(callsite) {
+        const isDeployerCallsite = this.getCallsiteType(callsite) === RoutineType.Deploy;
         const callback = async (...args) => {
-            if (this.getCallsiteType(callsite) === RoutineType.Deploy && this.isDeployed()) {
-                ErrorUtils.throwError(`Logic is already deployed with logic id "${this.getLogicId().value}".`);
+            if (isDeployerCallsite && (await this.isDeployed())) {
+                ErrorUtils.throwError(`Logic is already deployed or deploying".`);
+            }
+            if (!isDeployerCallsite && !this.isDeployed()) {
+                ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
             }
             const { option, args: callsiteArgs } = this.extractArgsAndOption(callsite, args);
             const ixRequest = await this.createIxRequest(callsite, callsiteArgs, option);
-            // const calldata = this.getManifestCoder().encodeArguments(callsite, ...accept);
             if (!this.isCallsiteMutable(callsite)) {
-                return;
+                const simulation = await this.signer.simulate(ixRequest);
+                // TODO: remove any here
+                const result = simulation.result.at(0);
+                console.warn("Still the 'field' is op_type, should be type");
+                // TODO: op_type should be type
+                if (result?.op_type !== OpType.LogicInvoke) {
+                    ErrorUtils.throwError("Expected LogicInvoke operation.", ErrorCode.UNKNOWN_ERROR);
+                }
+                // TODO: payload should be data
+                const { error, outputs } = result.data;
+                const exception = ManifestCoder.decodeException(error);
+                if (exception != null) {
+                    ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
+                }
+                return this.getManifestCoder().decodeOutput(callsite, outputs);
             }
-            ErrorUtils.throwError("Not implemented for mutable callsites.");
+            if (!("fuel_limit" in ixRequest) || typeof ixRequest.fuel_limit !== "number") {
+                ErrorUtils.throwError("Invalid interaction request. Fuel limit must be a number.", ErrorCode.INVALID_ARGUMENT);
+            }
+            const response = await this.signer.execute(ixRequest);
+            if (isDeployerCallsite) {
+                this.deployIxResponse = response;
+            }
+            return response;
         };
         return callback;
     }

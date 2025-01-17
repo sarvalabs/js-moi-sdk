@@ -1,5 +1,5 @@
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, type Address, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
 
 export class LogicDescriptor extends ElementDescriptor {
     protected logicId?: LogicId;
@@ -27,7 +27,7 @@ export class LogicDescriptor extends ElementDescriptor {
         return this.manifest.syntax;
     }
 
-    public getLogicId(): LogicId {
+    public async getLogicId(): Promise<LogicId> {
         if (this.logicId == null) {
             ErrorUtils.throwError("Logic id not found. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
         }
@@ -35,28 +35,34 @@ export class LogicDescriptor extends ElementDescriptor {
         return this.logicId;
     }
 
-    public getVersion(): number {
-        return this.getLogicId().getVersion();
+    public async getVersion(): Promise<number> {
+        const id = await this.getLogicId();
+        return id.getVersion();
     }
 
-    public getEdition(): number {
-        return this.getLogicId().getEdition();
+    public async getEdition(): Promise<number> {
+        const id = await this.getLogicId();
+        return id.getEdition();
     }
 
-    public getLogicAddress(): Hex {
-        return this.getLogicId().getAddress();
+    public async getLogicAddress(): Promise<Address> {
+        const id = await this.getLogicId();
+        return id.getAddress();
     }
 
-    public isEphemeral(): boolean {
-        return this.getLogicId().isEphemeral();
+    public async isEphemeral(): Promise<boolean> {
+        const id = await this.getLogicId();
+        return id.isEphemeral();
     }
 
-    public isPersistent(): boolean {
-        return this.getLogicId().isPersistent();
+    public async isPersistent(): Promise<boolean> {
+        const id = await this.getLogicId();
+        return id.isPersistent();
     }
 
-    public isAssetLogic(): boolean {
-        return this.getLogicId().isAssetLogic();
+    public async isAssetLogic(): Promise<boolean> {
+        const id = await this.getLogicId();
+        return id.isAssetLogic();
     }
 
     public getManifestCoder(): ManifestCoder {

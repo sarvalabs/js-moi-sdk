@@ -1,6 +1,6 @@
-import { type Hex, type Interaction, type InteractionConfirmation, type OperationItem } from "js-moi-utils";
+import { type Hex, type Interaction, type InteractionConfirmation, type IxOperationResult } from "js-moi-utils";
 import type { Provider } from "../types/provider";
-interface TimerOption {
+export interface TimerOption {
     retries: number;
     delayInSec: number;
 }
@@ -27,7 +27,6 @@ export declare class InteractionResponse {
      * @param {TimerOption} [timer=this.getDefaultTimer()] - The timer option to wait for before retrieving the result. Defaults to the value returned by `getDefaultTimer()`.
      * @returns {Promise<OperationItem[]>} A promise that resolves to an array of `OperationItem` objects representing the operations.
      */
-    result(timer?: TimerOption): Promise<OperationItem[]>;
+    result(timer?: TimerOption): Promise<IxOperationResult[]>;
 }
-export {};
 //# sourceMappingURL=interaction-response.d.ts.map
