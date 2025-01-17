@@ -43,16 +43,15 @@ class Signer {
         const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
         return { address, key_id: index, sequence_id: sequence };
     }
-    async getIxRequest(ix, sequence) {
-        return { ...ix, sender: await this.getSender(sequence) };
-    }
     async simulate(ix, sequenceOrOption, option) {
         const sequence = typeof sequenceOrOption === "number" ? sequenceOrOption : undefined;
-        return await this.getProvider().simulate(await this.getIxRequest(ix, sequence), option);
+        const request = { ...ix, sender: await this.getSender(sequence) };
+        return await this.getProvider().simulate(request, option);
     }
     async execute(ix, sequence) {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
-        const signedIx = await this.signInteraction(await this.getIxRequest(ix, sequence), algorithm);
+        const request = { ...ix, sender: await this.getSender(sequence) };
+        const signedIx = await this.signInteraction(request, algorithm);
         return await this.getProvider().execute(signedIx);
     }
     /**

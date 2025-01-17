@@ -4,7 +4,7 @@ import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
-type WalletInteractionRequest<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
+export type SignerInteractionRequest<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
 
 export abstract class Signer {
     private provider?: Provider;
@@ -65,21 +65,19 @@ export abstract class Signer {
         return { address, key_id: index, sequence_id: sequence };
     }
 
-    public async getIxRequest(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionRequest> {
-        return { ...ix, sender: await this.getSender(sequence) };
-    }
-
-    public simulate(ix: Omit<SimulateInteractionRequest, "sender">): Promise<Simulate>;
-    public simulate(ix: Omit<SimulateInteractionRequest, "sender">, sequence?: number, option?: SimulateOption): Promise<Simulate>;
-    public simulate(ix: Omit<SimulateInteractionRequest, "sender">, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: Omit<SimulateInteractionRequest, "sender">, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
+    public simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>): Promise<Simulate>;
+    public simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>, sequence?: number, option?: SimulateOption): Promise<Simulate>;
+    public simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: SignerInteractionRequest<SimulateInteractionRequest>, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
         const sequence = typeof sequenceOrOption === "number" ? sequenceOrOption : undefined;
-        return await this.getProvider().simulate(await this.getIxRequest(ix, sequence), option);
+        const request = { ...ix, sender: await this.getSender(sequence) };
+        return await this.getProvider().simulate(request, option);
     }
 
-    public async execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionResponse> {
+    public async execute(ix: SignerInteractionRequest<InteractionRequest>, sequence?: number): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
-        const signedIx = await this.signInteraction(await this.getIxRequest(ix, sequence), algorithm);
+        const request = { ...ix, sender: await this.getSender(sequence) };
+        const signedIx = await this.signInteraction(request, algorithm);
         return await this.getProvider().execute(signedIx);
     }
 
