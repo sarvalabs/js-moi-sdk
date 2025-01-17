@@ -1,13 +1,19 @@
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils } from "js-moi-utils";
 export class LogicDescriptor extends ElementDescriptor {
     logicId;
     manifest;
     coder;
+    state = new Map();
     constructor(manifest, logicId) {
         super(manifest.elements);
         this.manifest = manifest;
         this.logicId = logicId;
+        for (const element of this.manifest.elements) {
+            if (element.kind === ElementType.State) {
+                this.state.set(element.data.mode, element.ptr);
+            }
+        }
     }
     setLogicId(logicId) {
         this.logicId = logicId;
@@ -63,6 +69,17 @@ export class LogicDescriptor extends ElementDescriptor {
             case ManifestCoderFormat.POLO:
                 return ManifestCoder.encodeManifest(this.manifest);
         }
+    }
+    getStateElement(state) {
+        const ptr = this.state.get(state);
+        if (ptr == null) {
+            ErrorUtils.throwError(`State "${state}" not found in logic.`, ErrorCode.NOT_FOUND);
+        }
+        const element = this.getElement(ptr);
+        if (element.kind !== ElementType.State) {
+            ErrorUtils.throwError(`Element is not a state: ${state}`, ErrorCode.UNKNOWN_ERROR);
+        }
+        return element;
     }
 }
 //# sourceMappingURL=logic-descriptor.js.map

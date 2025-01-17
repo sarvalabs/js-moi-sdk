@@ -7,10 +7,16 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
     logicId;
     manifest;
     coder;
+    state = new Map();
     constructor(manifest, logicId) {
         super(manifest.elements);
         this.manifest = manifest;
         this.logicId = logicId;
+        for (const element of this.manifest.elements) {
+            if (element.kind === js_moi_utils_1.ElementType.State) {
+                this.state.set(element.data.mode, element.ptr);
+            }
+        }
     }
     setLogicId(logicId) {
         this.logicId = logicId;
@@ -66,6 +72,17 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
             case js_moi_manifest_1.ManifestCoderFormat.POLO:
                 return js_moi_manifest_1.ManifestCoder.encodeManifest(this.manifest);
         }
+    }
+    getStateElement(state) {
+        const ptr = this.state.get(state);
+        if (ptr == null) {
+            js_moi_utils_1.ErrorUtils.throwError(`State "${state}" not found in logic.`, js_moi_utils_1.ErrorCode.NOT_FOUND);
+        }
+        const element = this.getElement(ptr);
+        if (element.kind !== js_moi_utils_1.ElementType.State) {
+            js_moi_utils_1.ErrorUtils.throwError(`Element is not a state: ${state}`, js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
+        }
+        return element;
     }
 }
 exports.LogicDescriptor = LogicDescriptor;
