@@ -1,6 +1,6 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, LogicState, OpType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType, RoutineKind } from "js-moi-utils";
 /**
  * The default fuel price used for logic interactions.
  */
@@ -36,7 +36,7 @@ export class LogicBase extends ElementDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return [LogicState.Ephemeral, LogicState.Persistent].includes(routine.mode);
+        return [RoutineKind.Ephemeral, RoutineKind.Persistent].includes(routine.mode);
     }
     async triggerCallsite(callsite, args, option) {
         const routine = this.getRoutineElement(callsite);

@@ -1,7 +1,7 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, LogicState, OpType, type ElementData, type ElementType, type IxOperation, type LogicManifest, type OperationResult } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType, RoutineKind, type ElementData, type ElementType, type IxOperation, type LogicManifest, type OperationResult } from "js-moi-utils";
 import type { RoutineOption } from "./routine-options";
 
 /**
@@ -53,7 +53,7 @@ export abstract class LogicBase extends ElementDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: ElementData<ElementType.Routine>): boolean {
-        return [LogicState.Ephemeral, LogicState.Persistent].includes(routine.mode);
+        return [RoutineKind.Ephemeral, RoutineKind.Persistent].includes(routine.mode);
     }
 
     protected async triggerCallsite(callsite: string, args: unknown[], option?: RoutineOption) {

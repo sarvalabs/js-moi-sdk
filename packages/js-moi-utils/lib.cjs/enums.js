@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InteractionStatus = exports.ElementType = exports.RoutineType = exports.LogicState = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
+exports.InteractionStatus = exports.ElementType = exports.RoutineType = exports.RoutineKind = exports.LogicState = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
 /**
  * Enumerates the standard of assets in the system.
  * MAS is moi asset standard.
@@ -74,8 +74,13 @@ var LogicState;
 (function (LogicState) {
     LogicState["Persistent"] = "persistent";
     LogicState["Ephemeral"] = "ephemeral";
-    LogicState["ReadOnly"] = "readonly";
 })(LogicState || (exports.LogicState = LogicState = {}));
+var RoutineKind;
+(function (RoutineKind) {
+    RoutineKind["Persistent"] = "persistent";
+    RoutineKind["Ephemeral"] = "ephemeral";
+    RoutineKind["ReadOnly"] = "readonly";
+})(RoutineKind || (exports.RoutineKind = RoutineKind = {}));
 var RoutineType;
 (function (RoutineType) {
     RoutineType["Invoke"] = "invoke";

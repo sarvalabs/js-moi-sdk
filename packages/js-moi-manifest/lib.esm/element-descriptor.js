@@ -8,6 +8,7 @@ export class ElementDescriptor {
     classDefs = new Map();
     methodDefs = new Map();
     eventsDefs = new Map();
+    stateDef = new Map();
     constructor(elements) {
         for (const element of elements) {
             this.elements.set(element.ptr, element);
@@ -32,6 +33,9 @@ export class ElementDescriptor {
                         ptr: element.ptr,
                         topics: element.data.topics,
                     });
+                    break;
+                case ElementType.State:
+                    this.stateDef.set(element.data.mode, element.ptr);
                     break;
                 default:
                     break;

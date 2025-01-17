@@ -21,7 +21,7 @@ class LogicBase extends logic_descriptor_1.LogicDescriptor {
         return this.getRoutineElement(callsite).data.kind;
     }
     isCallsiteMutable(callsite) {
-        const kinds = [js_moi_utils_1.LogicState.Ephemeral, js_moi_utils_1.LogicState.Persistent];
+        const kinds = [js_moi_utils_1.RoutineKind.Ephemeral, js_moi_utils_1.RoutineKind.Persistent];
         const element = this.getRoutineElement(callsite);
         return kinds.includes(element.data.mode);
     }
@@ -164,6 +164,7 @@ class LogicBase extends logic_descriptor_1.LogicDescriptor {
         }
         return Object.freeze(endpoint);
     }
+    persistent(accessor) { }
 }
 exports.LogicBase = LogicBase;
 //# sourceMappingURL=logic-base.js.map

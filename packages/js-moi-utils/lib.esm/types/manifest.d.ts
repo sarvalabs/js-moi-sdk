@@ -1,4 +1,4 @@
-import { ElementType, EngineKind, LogicState, type RoutineType } from "../enums";
+import { ElementType, EngineKind, RoutineKind, type RoutineType } from "../enums";
 import type { Hex } from "../hex";
 export interface EngineConfig {
     kind: EngineKind;
@@ -25,7 +25,7 @@ interface Class {
     methods?: MethodField[];
 }
 interface State {
-    mode: LogicState;
+    mode: RoutineKind;
     fields: TypeField[];
 }
 interface Instructions {
@@ -36,7 +36,7 @@ interface Instructions {
 type Catch = string;
 interface Routine {
     name: string;
-    mode: LogicState;
+    mode: RoutineKind;
     kind: RoutineType;
     accepts: TypeField[];
     returns: TypeField[];

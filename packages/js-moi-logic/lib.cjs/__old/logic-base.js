@@ -39,7 +39,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return [js_moi_utils_1.LogicState.Ephemeral, js_moi_utils_1.LogicState.Persistent].includes(routine.mode);
+        return [js_moi_utils_1.RoutineKind.Ephemeral, js_moi_utils_1.RoutineKind.Persistent].includes(routine.mode);
     }
     async triggerCallsite(callsite, args, option) {
         const routine = this.getRoutineElement(callsite);

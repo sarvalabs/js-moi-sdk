@@ -2,7 +2,7 @@ import type { SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { SignerIx } from "js-moi-signer";
 import { LogicId, type InteractionRequest } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import type { CallsiteOption, LogicCallsites, LogicDriverOption } from "./types";
+import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer;
     readonly endpoint: TCallsites;
@@ -20,5 +20,6 @@ export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsite
     getLogicId(timer?: TimerOption): Promise<LogicId>;
     private newCallsite;
     private setupEndpoint;
+    persistent(accessor: StateAccessorFn): void;
 }
 //# sourceMappingURL=logic-base.d.ts.map

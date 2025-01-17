@@ -1,9 +1,9 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import type { InteractionResponse, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, LogicState, OpType, RoutineType, type InteractionRequest, type IxOp } from "js-moi-utils";
+import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, OpType, RoutineKind, RoutineType, type InteractionRequest, type IxOp } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import type { CallsiteCallback, CallsiteOption, LogicCallsites, LogicDriverOption } from "./types";
+import type { CallsiteCallback, CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 
 export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer: Signer;
@@ -29,7 +29,7 @@ export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> exten
     }
 
     public isCallsiteMutable(callsite: string) {
-        const kinds = [LogicState.Ephemeral, LogicState.Persistent];
+        const kinds = [RoutineKind.Ephemeral, RoutineKind.Persistent];
         const element = this.getRoutineElement(callsite);
 
         return kinds.includes(element.data.mode);
@@ -223,4 +223,6 @@ export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> exten
 
         return Object.freeze(endpoint as TCallsites);
     }
+
+    public persistent(accessor: StateAccessorFn) {}
 }

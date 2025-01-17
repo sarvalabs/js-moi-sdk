@@ -1,7 +1,20 @@
 export { isValidAddress } from "./address";
 export { decodeBase64, encodeBase64 } from "./base64";
 export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger, type Bytes } from "./bytes";
-export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineType } from "./enums";
+export {
+    AccountType,
+    AssetStandard,
+    ElementType,
+    EngineKind,
+    InteractionStatus,
+    LockType,
+    LogicState,
+    OperationStatus,
+    OpType,
+    ReceiptStatus,
+    RoutineKind,
+    RoutineType,
+} from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix, type Address, type Hex, type NumberLike, type Quantity } from "./hex";
 export { AssetId, LogicId } from "./identifier";

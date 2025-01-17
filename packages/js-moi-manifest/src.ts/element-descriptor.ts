@@ -10,6 +10,7 @@ export class ElementDescriptor {
     protected classDefs: Map<string, number> = new Map();
     protected methodDefs: Map<string, MethodDef> = new Map();
     protected eventsDefs: Map<string, EventDef> = new Map();
+    protected stateDef: Map<string, number> = new Map();
 
     constructor(elements: LogicElement[]) {
         for (const element of elements) {
@@ -39,6 +40,9 @@ export class ElementDescriptor {
                         ptr: element.ptr,
                         topics: element.data.topics,
                     });
+                    break;
+                case ElementType.State:
+                    this.stateDef.set(element.data.mode, element.ptr);
                     break;
                 default:
                     break;

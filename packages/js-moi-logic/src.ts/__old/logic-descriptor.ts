@@ -1,6 +1,6 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { LogicId, LogicState, type EngineKind, type Hex, type LogicManifest } from "js-moi-utils";
+import { LogicId, RoutineKind, type EngineKind, type Hex, type LogicManifest } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
 
 /**
@@ -99,7 +99,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * const [ptr, exists] = logic.hasPersistentState();
      */
     public hasPersistentState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(LogicState.Persistent);
+        const ptr = this.stateMatrix.get(RoutineKind.Persistent);
         return ptr == null ? [0, false] : [ptr, true];
     }
 
@@ -111,7 +111,7 @@ export abstract class LogicDescriptor extends LogicBase {
      * const [ptr, exists] = logic.hasEphemeralState();
      */
     public hasEphemeralState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(LogicState.Ephemeral);
+        const ptr = this.stateMatrix.get(RoutineKind.Ephemeral);
         return ptr == null ? [0, false] : [ptr, true];
     }
 }

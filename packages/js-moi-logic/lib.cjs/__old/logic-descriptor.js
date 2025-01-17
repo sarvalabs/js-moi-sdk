@@ -89,7 +89,7 @@ class LogicDescriptor extends logic_base_1.LogicBase {
      * const [ptr, exists] = logic.hasPersistentState();
      */
     hasPersistentState() {
-        const ptr = this.stateMatrix.get(js_moi_utils_1.LogicState.Persistent);
+        const ptr = this.stateMatrix.get(js_moi_utils_1.RoutineKind.Persistent);
         return ptr == null ? [0, false] : [ptr, true];
     }
     /**
@@ -100,7 +100,7 @@ class LogicDescriptor extends logic_base_1.LogicBase {
      * const [ptr, exists] = logic.hasEphemeralState();
      */
     hasEphemeralState() {
-        const ptr = this.stateMatrix.get(js_moi_utils_1.LogicState.Ephemeral);
+        const ptr = this.stateMatrix.get(js_moi_utils_1.RoutineKind.Ephemeral);
         return ptr == null ? [0, false] : [ptr, true];
     }
 }

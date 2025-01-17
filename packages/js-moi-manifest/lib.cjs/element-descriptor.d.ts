@@ -9,6 +9,7 @@ export declare class ElementDescriptor {
     protected classDefs: Map<string, number>;
     protected methodDefs: Map<string, MethodDef>;
     protected eventsDefs: Map<string, EventDef>;
+    protected stateDef: Map<string, number>;
     constructor(elements: LogicElement[]);
     /**
      * Retrieves a LogicElement from the elements map using the provided pointer.

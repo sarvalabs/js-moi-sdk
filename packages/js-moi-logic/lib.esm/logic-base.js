@@ -1,5 +1,5 @@
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, LogicState, OpType, RoutineType } from "js-moi-utils";
+import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, OpType, RoutineKind, RoutineType } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 export class LogicBase extends LogicDescriptor {
     signer;
@@ -18,7 +18,7 @@ export class LogicBase extends LogicDescriptor {
         return this.getRoutineElement(callsite).data.kind;
     }
     isCallsiteMutable(callsite) {
-        const kinds = [LogicState.Ephemeral, LogicState.Persistent];
+        const kinds = [RoutineKind.Ephemeral, RoutineKind.Persistent];
         const element = this.getRoutineElement(callsite);
         return kinds.includes(element.data.mode);
     }
@@ -161,5 +161,6 @@ export class LogicBase extends LogicDescriptor {
         }
         return Object.freeze(endpoint);
     }
+    persistent(accessor) { }
 }
 //# sourceMappingURL=logic-base.js.map

@@ -71,8 +71,13 @@ export var LogicState;
 (function (LogicState) {
     LogicState["Persistent"] = "persistent";
     LogicState["Ephemeral"] = "ephemeral";
-    LogicState["ReadOnly"] = "readonly";
 })(LogicState || (LogicState = {}));
+export var RoutineKind;
+(function (RoutineKind) {
+    RoutineKind["Persistent"] = "persistent";
+    RoutineKind["Ephemeral"] = "ephemeral";
+    RoutineKind["ReadOnly"] = "readonly";
+})(RoutineKind || (RoutineKind = {}));
 export var RoutineType;
 (function (RoutineType) {
     RoutineType["Invoke"] = "invoke";
