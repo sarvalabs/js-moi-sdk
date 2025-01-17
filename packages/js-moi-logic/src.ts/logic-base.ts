@@ -61,7 +61,6 @@ export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> exten
 
         const option = <CallsiteOption | undefined>callsiteArguments.at(element.data.accepts.length + 1);
         const args = callsiteArguments.slice(0, element.data.accepts.length);
-
         const error = this.validateCallsiteOption(option);
 
         if (error != null) {
