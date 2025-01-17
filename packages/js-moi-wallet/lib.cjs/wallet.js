@@ -256,6 +256,9 @@ class Wallet extends js_moi_signer_1.Signer {
     }
     async signInteraction(ix, sig) {
         try {
+            if (ix.sender.address !== (await this.getAddress())) {
+                js_moi_utils_1.ErrorUtils.throwError("Sender address does not match wallet address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
             const encoded = (0, js_moi_utils_1.interaction)(ix);
             const signatures = {
                 identifier: ix.sender.address,

@@ -1,6 +1,6 @@
 import { type LogicId } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import type { LogicCallsites, LogicDriverOption } from "./types";
+import type { CallsiteOption, LogicCallsites, LogicDriverOption } from "./types";
 export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer;
     readonly endpoint: TCallsites;
@@ -10,6 +10,10 @@ export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsite
     private isDeployed;
     private getCallsiteType;
     isCallsiteMutable(callsite: string): boolean;
+    validateCallsiteOption(option?: CallsiteOption): Error | null;
+    private extractArgsAndOption;
+    private createIxOperation;
+    createIxRequest(callsite: string, callsiteArguments: unknown[], option?: CallsiteOption): Promise<import("js-moi-utils").InteractionRequest>;
     private newCallsite;
     private setupEndpoint;
 }

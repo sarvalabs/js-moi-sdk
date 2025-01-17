@@ -7,7 +7,10 @@ export interface LogicDriverOption {
     logicId?: Hex | LogicId;
 }
 export type CallsiteOption = {
+    fuel_price?: number;
+    fuel_limit?: number;
     sequence?: number;
+    simulate?: boolean;
 };
 type CallsiteResult = InteractionResponse | Record<any, any>;
 export interface CallsiteCallback {

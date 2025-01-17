@@ -1,4 +1,4 @@
-import { ExecuteIx, InteractionResponse, Provider, SimulateOption } from "js-moi-providers";
+import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
 import { type Hex, type InteractionRequest, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 export declare abstract class Signer {
@@ -15,9 +15,9 @@ export declare abstract class Signer {
     private getLatestSequence;
     private getSender;
     getIxRequest(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionRequest>;
-    simulate(ix: Omit<InteractionRequest, "sender">): Promise<Simulate>;
-    simulate(ix: Omit<InteractionRequest, "sender">, sequence?: number, option?: SimulateOption): Promise<Simulate>;
-    simulate(ix: Omit<InteractionRequest, "sender">, option?: SimulateOption): Promise<Simulate>;
+    simulate(ix: Omit<SimulateInteractionRequest, "sender">): Promise<Simulate>;
+    simulate(ix: Omit<SimulateInteractionRequest, "sender">, sequence?: number, option?: SimulateOption): Promise<Simulate>;
+    simulate(ix: Omit<SimulateInteractionRequest, "sender">, option?: SimulateOption): Promise<Simulate>;
     execute(ix: Omit<InteractionRequest, "sender">, sequence?: number): Promise<InteractionResponse>;
     /**
      * Verifies the authenticity of a signature by performing signature verification

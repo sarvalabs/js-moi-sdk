@@ -20,6 +20,7 @@ export type {
     Provider,
     SelectFromResponseModifier,
     Signature,
+    SimulateInteractionRequest,
     SimulateOption,
     TesseractRequestOption,
 } from "./types/provider";

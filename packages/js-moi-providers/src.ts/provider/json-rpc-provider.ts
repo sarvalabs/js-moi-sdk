@@ -44,6 +44,7 @@ import type {
     Provider,
     SelectFromResponseModifier,
     Signature,
+    SimulateInteractionRequest,
     SimulateOption,
     TesseractRequestOption,
 } from "../types/provider";
@@ -113,8 +114,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     public async simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: InteractionRequest | Uint8Array | Hex, option?: SimulateOption): Promise<Simulate> {
+    public async simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: SimulateInteractionRequest | Uint8Array | Hex, option?: SimulateOption): Promise<Simulate> {
         let encodedIxArgs: Hex;
 
         switch (true) {
@@ -124,7 +125,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             }
 
             case typeof ix === "object": {
-                const result = validateIxRequest(ix);
+                if (!("fuel_limit" in ix)) {
+                    console.warn("Simulating interaction should not take a fuel limit.");
+                    console.warn("For simulation, fuel limit not provided. Using default value 1.");
+                }
+
+                const result = validateIxRequest({ ...ix, fuel_limit: 1 });
 
                 if (result != null) {
                     ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, ErrorCode.INVALID_ARGUMENT, { ...result });

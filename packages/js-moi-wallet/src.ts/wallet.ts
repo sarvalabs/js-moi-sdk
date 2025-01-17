@@ -256,6 +256,10 @@ export class Wallet extends Signer {
 
     async signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx> {
         try {
+            if (ix.sender.address !== (await this.getAddress())) {
+                ErrorUtils.throwError("Sender address does not match wallet address", ErrorCode.INVALID_ARGUMENT);
+            }
+
             const encoded = interaction(ix);
             const signatures: Signature = {
                 identifier: ix.sender.address,

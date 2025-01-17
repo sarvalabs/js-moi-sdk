@@ -1,8 +1,10 @@
-import { ExecuteIx, InteractionResponse, Provider, SimulateOption } from "js-moi-providers";
+import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
+
+type WalletInteractionRequest<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
 
 export abstract class Signer {
     private provider?: Provider;
@@ -67,10 +69,10 @@ export abstract class Signer {
         return { ...ix, sender: await this.getSender(sequence) };
     }
 
-    public simulate(ix: Omit<InteractionRequest, "sender">): Promise<Simulate>;
-    public simulate(ix: Omit<InteractionRequest, "sender">, sequence?: number, option?: SimulateOption): Promise<Simulate>;
-    public simulate(ix: Omit<InteractionRequest, "sender">, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: Omit<InteractionRequest, "sender">, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
+    public simulate(ix: Omit<SimulateInteractionRequest, "sender">): Promise<Simulate>;
+    public simulate(ix: Omit<SimulateInteractionRequest, "sender">, sequence?: number, option?: SimulateOption): Promise<Simulate>;
+    public simulate(ix: Omit<SimulateInteractionRequest, "sender">, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: Omit<SimulateInteractionRequest, "sender">, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
         const sequence = typeof sequenceOrOption === "number" ? sequenceOrOption : undefined;
         return await this.getProvider().simulate(await this.getIxRequest(ix, sequence), option);
     }

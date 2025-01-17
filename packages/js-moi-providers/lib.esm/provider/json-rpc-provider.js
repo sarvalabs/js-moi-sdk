@@ -64,7 +64,11 @@ export class JsonRpcProvider extends EventEmitter {
                 break;
             }
             case typeof ix === "object": {
-                const result = validateIxRequest(ix);
+                if (!("fuel_limit" in ix)) {
+                    console.warn("Simulating interaction should not take a fuel limit.");
+                    console.warn("For simulation, fuel limit not provided. Using default value 1.");
+                }
+                const result = validateIxRequest({ ...ix, fuel_limit: 1 });
                 if (result != null) {
                     ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, ErrorCode.INVALID_ARGUMENT, { ...result });
                 }

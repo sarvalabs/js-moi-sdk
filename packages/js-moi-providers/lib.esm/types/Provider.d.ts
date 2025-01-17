@@ -18,9 +18,10 @@ interface ProtocolRequest {
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
 }
 export type SimulateOption = TesseractReferenceParam;
+export type SimulateInteractionRequest = Omit<InteractionRequest, "fuel_limit">;
 interface SimulateRequest {
     simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
-    simulate(ix: InteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
 }
 export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam;
 interface AccountRequest {
