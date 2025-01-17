@@ -41,9 +41,6 @@ export class ElementDescriptor {
                         topics: element.data.topics,
                     });
                     break;
-                case ElementType.State:
-                    this.stateDef.set(element.data.mode, element.ptr);
-                    break;
                 default:
                     break;
             }

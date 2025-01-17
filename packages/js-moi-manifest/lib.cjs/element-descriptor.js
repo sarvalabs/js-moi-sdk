@@ -37,9 +37,6 @@ class ElementDescriptor {
                         topics: element.data.topics,
                     });
                     break;
-                case js_moi_utils_1.ElementType.State:
-                    this.stateDef.set(element.data.mode, element.ptr);
-                    break;
                 default:
                     break;
             }
