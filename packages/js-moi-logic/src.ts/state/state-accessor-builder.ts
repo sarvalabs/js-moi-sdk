@@ -31,7 +31,7 @@ export class StateAccessorBuilder {
         const field = element.data.fields.find((field) => field.label === name);
 
         if (field == null) {
-            ErrorUtils.throwError(`'${name}' is not member of state`, ErrorCode.PROPERTY_NOT_DEFINED, {
+            ErrorUtils.throwError(`'${name}' is not member of ${element.data.mode} state`, ErrorCode.PROPERTY_NOT_DEFINED, {
                 entity: name,
             });
         }

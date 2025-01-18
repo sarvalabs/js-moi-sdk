@@ -1,4 +1,4 @@
-export { LogicBase } from "./logic-base";
+export { getLogicDriver } from "./getLogicDriver";
 export { LogicDescriptor } from "./logic-descriptor";
-export { getLogicDriver, LogicDriver } from "./logic-driver";
+export { LogicDriver as LogicBase, LogicDriver } from "./logic-driver";
 //# sourceMappingURL=index.js.map
