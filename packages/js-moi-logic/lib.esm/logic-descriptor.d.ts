@@ -13,8 +13,8 @@ export declare class LogicDescriptor extends ElementDescriptor {
     getVersion(): Promise<number>;
     getEdition(): Promise<number>;
     getLogicAddress(): Promise<Address>;
-    isEphemeral(): Promise<boolean>;
-    isPersistent(): Promise<boolean>;
+    isEphemeral(): boolean;
+    isPersistent(): boolean;
     isAssetLogic(): Promise<boolean>;
     getManifestCoder(): ManifestCoder;
     getManifest(format: ManifestCoderFormat.JSON): LogicManifest;

@@ -45,13 +45,11 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
         const id = await this.getLogicId();
         return id.getAddress();
     }
-    async isEphemeral() {
-        const id = await this.getLogicId();
-        return id.isEphemeral();
+    isEphemeral() {
+        return this.state.has(js_moi_utils_1.LogicState.Ephemeral);
     }
-    async isPersistent() {
-        const id = await this.getLogicId();
-        return id.isPersistent();
+    isPersistent() {
+        return this.state.has(js_moi_utils_1.LogicState.Persistent);
     }
     async isAssetLogic() {
         const id = await this.getLogicId();

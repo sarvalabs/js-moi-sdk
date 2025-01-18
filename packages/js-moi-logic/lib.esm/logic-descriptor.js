@@ -1,5 +1,5 @@
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ElementType, ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicState } from "js-moi-utils";
 export class LogicDescriptor extends ElementDescriptor {
     logicId;
     manifest;
@@ -42,13 +42,11 @@ export class LogicDescriptor extends ElementDescriptor {
         const id = await this.getLogicId();
         return id.getAddress();
     }
-    async isEphemeral() {
-        const id = await this.getLogicId();
-        return id.isEphemeral();
+    isEphemeral() {
+        return this.state.has(LogicState.Ephemeral);
     }
-    async isPersistent() {
-        const id = await this.getLogicId();
-        return id.isPersistent();
+    isPersistent() {
+        return this.state.has(LogicState.Persistent);
     }
     async isAssetLogic() {
         const id = await this.getLogicId();

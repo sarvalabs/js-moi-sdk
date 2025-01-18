@@ -58,14 +58,12 @@ export class LogicDescriptor extends ElementDescriptor {
         return id.getAddress();
     }
 
-    public async isEphemeral(): Promise<boolean> {
-        const id = await this.getLogicId();
-        return id.isEphemeral();
+    public isEphemeral(): boolean {
+        return this.state.has(LogicState.Ephemeral);
     }
 
-    public async isPersistent(): Promise<boolean> {
-        const id = await this.getLogicId();
-        return id.isPersistent();
+    public isPersistent(): boolean {
+        return this.state.has(LogicState.Persistent);
     }
 
     public async isAssetLogic(): Promise<boolean> {
