@@ -1,8 +1,8 @@
 import type { InteractionResponse } from "js-moi-providers";
 import type { Signer } from "js-moi-signer";
 import type { Hex, LogicId, LogicManifest } from "js-moi-utils";
-import type { AccessorBuilder } from "../__old/state/accessor-builder";
-import type { EntityBuilder } from "../__old/state/entity-builder";
+import type { AccessorBuilder } from "../state/accessor-builder";
+import type { StateAccessorBuilder } from "../state/state-accessor-builder";
 
 export interface LogicDriverOption {
     manifest: LogicManifest;
@@ -41,4 +41,4 @@ export interface CallsiteCallback {
 
 export type LogicCallsites = Record<string, CallsiteCallback>;
 
-export type StateAccessorFn = (builder: EntityBuilder) => AccessorBuilder | void;
+export type StateAccessorFn = (builder: StateAccessorBuilder) => AccessorBuilder;

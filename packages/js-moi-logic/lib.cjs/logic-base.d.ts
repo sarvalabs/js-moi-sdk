@@ -1,6 +1,6 @@
 import type { SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { SignerIx } from "js-moi-signer";
-import { LogicId, type InteractionRequest } from "js-moi-utils";
+import { LogicId, StorageKey, type Hex, type InteractionRequest } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
@@ -13,13 +13,18 @@ export declare class LogicBase<TCallsites extends LogicCallsites = LogicCallsite
     private isDeployed;
     private getCallsiteType;
     isCallsiteMutable(callsite: string): boolean;
-    validateCallsiteOption(option?: CallsiteOption): Error | null;
+    private validateCallsiteOption;
     private extractArgsAndOption;
     private createIxOperation;
     createIxRequest(callsite: string, callsiteArguments: unknown[], option?: CallsiteOption): Promise<SignerIx<SimulateInteractionRequest> | SignerIx<InteractionRequest>>;
     getLogicId(timer?: TimerOption): Promise<LogicId>;
     private newCallsite;
     private setupEndpoint;
-    persistent(accessor: StateAccessorFn): void;
+    private getLogicStorage;
+    private getLogicStateValue;
+    persistent(accessor: StorageKey | Hex): Promise<Hex>;
+    persistent<T>(accessor: StateAccessorFn): Promise<T>;
+    ephemeral(accessor: StorageKey | Hex): Promise<Hex>;
+    ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
 }
 //# sourceMappingURL=logic-base.d.ts.map

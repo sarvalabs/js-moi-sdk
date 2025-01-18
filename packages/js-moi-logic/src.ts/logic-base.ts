@@ -1,9 +1,29 @@
-import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
+import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import type { InteractionResponse, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, OpType, RoutineKind, RoutineType, type InteractionRequest, type IxOp } from "js-moi-utils";
+import {
+    CustomError,
+    ElementType,
+    ErrorCode,
+    ErrorUtils,
+    generateStorageKey,
+    hexToBytes,
+    isHex,
+    LogicId,
+    LogicState,
+    OpType,
+    RoutineKind,
+    RoutineType,
+    StorageKey,
+    type Hex,
+    type InteractionRequest,
+    type IxOp,
+} from "js-moi-utils";
+import { Depolorizer } from "js-polo";
 import { LogicDescriptor } from "./logic-descriptor";
+import { StateAccessorBuilder } from "./state/state-accessor-builder";
 import type { CallsiteCallback, CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
+import { SlotAccessorBuilder } from "./state/accessor-builder";
 
 export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer: Signer;
@@ -35,7 +55,7 @@ export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> exten
         return kinds.includes(element.data.mode);
     }
 
-    public validateCallsiteOption(option?: CallsiteOption): Error | null {
+    private validateCallsiteOption(option?: CallsiteOption): Error | null {
         if (option == null) {
             return null;
         }
@@ -130,7 +150,7 @@ export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> exten
         return request;
     }
 
-    public override async getLogicId(timer?: TimerOption): Promise<LogicId> {
+    public async getLogicId(timer?: TimerOption): Promise<LogicId> {
         if (this.logicId != null) {
             return this.logicId;
         }
@@ -224,5 +244,63 @@ export class LogicBase<TCallsites extends LogicCallsites = LogicCallsites> exten
         return Object.freeze(endpoint as TCallsites);
     }
 
-    public persistent(accessor: StateAccessorFn) {}
+    private async getLogicStorage(state: LogicState, storageKey: StorageKey | Hex) {
+        const logicId = await this.getLogicId();
+        switch (state) {
+            case LogicState.Persistent: {
+                return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
+            }
+            case LogicState.Ephemeral: {
+                const address = await this.signer.getAddress();
+                return await this.signer.getProvider().getLogicStorage(logicId, address, storageKey);
+            }
+            default:
+                ErrorUtils.throwError("Invalid logic state.", ErrorCode.INVALID_ARGUMENT);
+        }
+    }
+
+    private async getLogicStateValue(state: LogicState, accessor: StorageKey | Hex): Promise<Hex>;
+    private async getLogicStateValue<T>(state: LogicState, accessor: StateAccessorFn): Promise<T>;
+    private async getLogicStateValue<T>(state: LogicState, accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
+        if (accessor instanceof StorageKey || isHex(accessor)) {
+            return await this.getLogicStorage(state, accessor);
+        }
+
+        const element = this.getStateElement(state);
+        const builder = accessor(new StateAccessorBuilder(element.ptr, this));
+
+        if (!(builder instanceof SlotAccessorBuilder)) {
+            ErrorUtils.throwError("Invalid accessor builder.", ErrorCode.UNKNOWN_ERROR);
+        }
+
+        const key = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
+        const value = await this.getLogicStorage(state, key);
+
+        if (!isPrimitiveType(builder.getStorageType())) {
+            return new Depolorizer(hexToBytes(value)).depolorizeInteger() as T;
+        }
+
+        const schema = Schema.parseDataType(builder.getStorageType(), this.getClassDefs(), this.getElements());
+        return new Depolorizer(hexToBytes(value)).depolorize(schema) as T;
+    }
+
+    public async persistent(accessor: StorageKey | Hex): Promise<Hex>;
+    public async persistent<T>(accessor: StateAccessorFn): Promise<T>;
+    public async persistent<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
+        if (typeof accessor === "function") {
+            return await this.getLogicStateValue(LogicState.Persistent, accessor);
+        }
+
+        return await this.getLogicStateValue(LogicState.Persistent, accessor);
+    }
+
+    public async ephemeral(accessor: StorageKey | Hex): Promise<Hex>;
+    public async ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
+    public async ephemeral<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
+        if (typeof accessor === "function") {
+            return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+        }
+
+        return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+    }
 }

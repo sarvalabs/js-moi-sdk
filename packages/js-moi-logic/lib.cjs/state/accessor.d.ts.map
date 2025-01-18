@@ -1,0 +1,1 @@
+{"version":3,"file":"accessor.d.ts","sourceRoot":"","sources":["../../src.ts/state/accessor.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,QAAQ,EAAE,MAAM,cAAc,CAAC;AAE7C;;GAEG;AACH,MAAM,WAAW,gBAAgB;IAC7B;;;OAGG;IACH,YAAY,IAAI,QAAQ,EAAE,CAAC;CAC9B;AAED;;GAEG;AACH,MAAM,WAAW,mBAAmB;IAChC;;;OAGG;IACH,cAAc,IAAI,MAAM,CAAC;CAC5B"}

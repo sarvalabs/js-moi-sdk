@@ -1,6 +1,9 @@
-import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, LogicId, OpType, RoutineKind, RoutineType } from "js-moi-utils";
+import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
+import { CustomError, ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicId, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
+import { Depolorizer } from "js-polo";
 import { LogicDescriptor } from "./logic-descriptor";
+import { StateAccessorBuilder } from "./state/state-accessor-builder";
+import { SlotAccessorBuilder } from "./state/accessor-builder";
 export class LogicBase extends LogicDescriptor {
     signer;
     endpoint;
@@ -161,6 +164,48 @@ export class LogicBase extends LogicDescriptor {
         }
         return Object.freeze(endpoint);
     }
-    persistent(accessor) { }
+    async getLogicStorage(state, storageKey) {
+        const logicId = await this.getLogicId();
+        switch (state) {
+            case LogicState.Persistent: {
+                return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
+            }
+            case LogicState.Ephemeral: {
+                const address = await this.signer.getAddress();
+                return await this.signer.getProvider().getLogicStorage(logicId, address, storageKey);
+            }
+            default:
+                ErrorUtils.throwError("Invalid logic state.", ErrorCode.INVALID_ARGUMENT);
+        }
+    }
+    async getLogicStateValue(state, accessor) {
+        if (accessor instanceof StorageKey || isHex(accessor)) {
+            return await this.getLogicStorage(state, accessor);
+        }
+        const element = this.getStateElement(state);
+        const builder = accessor(new StateAccessorBuilder(element.ptr, this));
+        if (!(builder instanceof SlotAccessorBuilder)) {
+            ErrorUtils.throwError("Invalid accessor builder.", ErrorCode.UNKNOWN_ERROR);
+        }
+        const key = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
+        const value = await this.getLogicStorage(state, key);
+        if (!isPrimitiveType(builder.getStorageType())) {
+            return new Depolorizer(hexToBytes(value)).depolorizeInteger();
+        }
+        const schema = Schema.parseDataType(builder.getStorageType(), this.getClassDefs(), this.getElements());
+        return new Depolorizer(hexToBytes(value)).depolorize(schema);
+    }
+    async persistent(accessor) {
+        if (typeof accessor === "function") {
+            return await this.getLogicStateValue(LogicState.Persistent, accessor);
+        }
+        return await this.getLogicStateValue(LogicState.Persistent, accessor);
+    }
+    async ephemeral(accessor) {
+        if (typeof accessor === "function") {
+            return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+        }
+        return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+    }
 }
 //# sourceMappingURL=logic-base.js.map
