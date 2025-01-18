@@ -99,7 +99,7 @@ const createAssetActionDescriptor = (type) => {
         transform: (payload) => {
             const raw = {
                 ...payload,
-                benefactor: "benefactor" in payload && isHex(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && isValidAddress(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
             return raw;
