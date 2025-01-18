@@ -22,7 +22,9 @@ const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc
 const HOST = "http://localhost:1600";
 
 describe(JsonRpcProvider, () => {
-    const provider = new HttpProvider(HOST);
+    const provider = new HttpProvider(HOST, {
+        debug: (request) => console.log(JSON.stringify(request, null, 2)),
+    });
 
     describe(provider.getNetworkInfo, () => {
         it.concurrent("should return the protocol version and chain id", async () => {
@@ -85,7 +87,7 @@ describe(JsonRpcProvider, () => {
             const height = 0;
             const account = await provider.getAccount(ADDRESS, {
                 reference: { relative: { height, identifier: ADDRESS } },
-                modifier: { include: ["state", "balances", "enlisted", "guardians", "keys", "lockups"] },
+                modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
             });
 
             expect(account).toBeDefined();
@@ -194,12 +196,12 @@ describe(JsonRpcProvider, () => {
         });
 
         it.concurrent("should return the logic with extracted fields", async () => {
-            const logic = await provider.getLogic(GUARDIAN_LOGIC_ID, {
+            const manifest = await provider.getLogic(GUARDIAN_LOGIC_ID, {
                 modifier: { extract: "manifest" },
             });
 
-            expect(logic).toBeDefined();
-            expect(logic.manifest).toBeDefined();
+            expect(manifest).toBeDefined();
+            expect(isHex(manifest)).toBeDefined();
         });
     });
 
@@ -398,12 +400,11 @@ describe(JsonRpcProvider, () => {
         });
 
         it.concurrent("should return the account asset with extracted fields", async () => {
-            const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+            const lockup = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
                 modifier: { extract: "lockup" },
             });
 
-            expect(accountAsset).toBeDefined();
-            expect(accountAsset.lockup).toBeDefined();
+            expect(lockup).toBeDefined();
         });
 
         it.concurrent("should return the account asset with modifier and reference", async () => {
