@@ -1,6 +1,6 @@
 import { type PoloSchema } from "polo-schema";
 import { OpType } from "./enums";
-import type { IxOperation, IxOperationPayload, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
+import type { IxOperation, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
      * Returns the POLO schema for the operation payload.
@@ -21,7 +21,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the transformed operation payload.
      */
-    transform?: (payload: IxOperationPayload<TOpType>) => PoloIxOperationPayload<TOpType>;
+    transform?: (payload: IxOperation<TOpType>) => PoloIxOperationPayload<TOpType>;
 }
 declare const createInvalidResult: <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     field: keyof T;
@@ -52,7 +52,7 @@ export declare const getIxOperationDescriptor: <TOpType extends OpType>(type: TO
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export declare const transformPayload: <TOpType extends OpType>(type: TOpType, payload: IxOperationPayload<TOpType>) => PoloIxOperationPayload<TOpType>;
+export declare const transformOperationPayload: <TOpType extends OpType>(operation: IxOperation<TOpType>) => PoloIxOperationPayload<TOpType>;
 /**
  * Encodes an operation payload to a POLO byte array.
  *

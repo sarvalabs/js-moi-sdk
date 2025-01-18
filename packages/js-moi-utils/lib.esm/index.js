@@ -7,7 +7,7 @@ export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, num
 export { AssetId, LogicId } from "./identifier";
 export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
-export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformPayload, validateOperation, } from "./operations";
+export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformOperationPayload, validateOperation, } from "./operations";
 export { defineReadOnly } from "./properties";
 export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "./storage-key";
 //# sourceMappingURL=index.js.map

@@ -25,7 +25,7 @@ export {
     getIxOperationDescriptor,
     isValidOperation,
     listIxOperationDescriptors,
-    transformPayload,
+    transformOperationPayload,
     validateOperation,
     type IxOperationDescriptor,
 } from "./operations";

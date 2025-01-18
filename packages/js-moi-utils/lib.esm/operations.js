@@ -30,7 +30,7 @@ const createParticipantCreateDescriptor = () => {
                 amount: polo.integer,
             });
         },
-        transform: (payload) => ({ ...payload, address: hexToBytes(payload.address) }),
+        transform: ({ payload }) => ({ ...payload, address: hexToBytes(payload.address) }),
         validator: (operation) => {
             const { payload } = operation;
             if (!isValidAddress(payload.address)) {
@@ -139,7 +139,8 @@ const createAssetActionDescriptor = () => {
                 timestamp: polo.integer,
             });
         },
-        transform: (payload) => {
+        transform: ({ payload }) => {
+            // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
                 benefactor: "benefactor" in payload && isValidAddress(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
@@ -210,16 +211,15 @@ const createLogicActionDescriptor = () => {
                 }),
             });
         },
-        // TODO: Fix the type of the payload
-        // @ts-ignore
-        transform: (payload) => {
+        transform: ({ payload }) => {
             if ("manifest" in payload) {
-                return {
+                const raw = {
                     ...payload,
                     manifest: hexToBytes(payload.manifest),
                     calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                     interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
                 };
+                return raw;
             }
             if (!("logic_id" in payload)) {
                 ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", ErrorCode.INVALID_ARGUMENT);
@@ -289,12 +289,12 @@ export const getIxOperationDescriptor = (type) => ixOpDescriptor[type] ?? null;
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export const transformPayload = (type, payload) => {
-    const descriptor = getIxOperationDescriptor(type);
+export const transformOperationPayload = (operation) => {
+    const descriptor = getIxOperationDescriptor(operation.type);
     if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${type}" is not supported`);
+        throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
     }
-    return descriptor.transform?.(payload) ?? payload;
+    return descriptor.transform?.(operation) ?? operation.payload;
 };
 /**
  * Encodes an operation payload to a POLO byte array.
@@ -310,7 +310,7 @@ export const encodeOperation = (operation) => {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
     const polorizer = new Polorizer();
-    const data = transformPayload(operation.type, operation.payload);
+    const data = transformOperationPayload(operation);
     polorizer.polorize(data, descriptor.schema());
     return { type: operation.type, payload: polorizer.bytes() };
 };

@@ -7,7 +7,7 @@ export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, num
 export { AssetId, LogicId } from "./identifier";
 export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
-export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformPayload, validateOperation, type IxOperationDescriptor, } from "./operations";
+export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformOperationPayload, validateOperation, type IxOperationDescriptor, } from "./operations";
 export { defineReadOnly } from "./properties";
 export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey, type Accessor } from "./storage-key";
 export type { InteractionRequest, IxConsensusPreference, IxFund, IxParticipant, IxPreference, RawInteractionRequest, RawParticipants, RawPreference, RawSender, Sender, } from "./types/interaction";

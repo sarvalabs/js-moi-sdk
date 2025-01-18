@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
+exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const address_1 = require("./address");
@@ -33,7 +33,7 @@ const createParticipantCreateDescriptor = () => {
                 amount: polo_schema_1.polo.integer,
             });
         },
-        transform: (payload) => ({ ...payload, address: (0, hex_1.hexToBytes)(payload.address) }),
+        transform: ({ payload }) => ({ ...payload, address: (0, hex_1.hexToBytes)(payload.address) }),
         validator: (operation) => {
             const { payload } = operation;
             if (!(0, address_1.isValidAddress)(payload.address)) {
@@ -142,7 +142,8 @@ const createAssetActionDescriptor = () => {
                 timestamp: polo_schema_1.polo.integer,
             });
         },
-        transform: (payload) => {
+        transform: ({ payload }) => {
+            // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
                 benefactor: "benefactor" in payload && (0, address_1.isValidAddress)(payload.benefactor) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
@@ -213,16 +214,15 @@ const createLogicActionDescriptor = () => {
                 }),
             });
         },
-        // TODO: Fix the type of the payload
-        // @ts-ignore
-        transform: (payload) => {
+        transform: ({ payload }) => {
             if ("manifest" in payload) {
-                return {
+                const raw = {
                     ...payload,
                     manifest: (0, hex_1.hexToBytes)(payload.manifest),
                     calldata: payload.calldata != null ? (0, hex_1.hexToBytes)(payload.calldata) : undefined,
                     interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
                 };
+                return raw;
             }
             if (!("logic_id" in payload)) {
                 errors_1.ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", errors_1.ErrorCode.INVALID_ARGUMENT);
@@ -294,14 +294,14 @@ exports.getIxOperationDescriptor = getIxOperationDescriptor;
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-const transformPayload = (type, payload) => {
-    const descriptor = (0, exports.getIxOperationDescriptor)(type);
+const transformOperationPayload = (operation) => {
+    const descriptor = (0, exports.getIxOperationDescriptor)(operation.type);
     if (descriptor == null) {
-        throw new Error(`Descriptor for operation type "${type}" is not supported`);
+        throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
     }
-    return descriptor.transform?.(payload) ?? payload;
+    return descriptor.transform?.(operation) ?? operation.payload;
 };
-exports.transformPayload = transformPayload;
+exports.transformOperationPayload = transformOperationPayload;
 /**
  * Encodes an operation payload to a POLO byte array.
  *
@@ -316,7 +316,7 @@ const encodeOperation = (operation) => {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
     const polorizer = new js_polo_1.Polorizer();
-    const data = (0, exports.transformPayload)(operation.type, operation.payload);
+    const data = (0, exports.transformOperationPayload)(operation);
     polorizer.polorize(data, descriptor.schema());
     return { type: operation.type, payload: polorizer.bytes() };
 };
