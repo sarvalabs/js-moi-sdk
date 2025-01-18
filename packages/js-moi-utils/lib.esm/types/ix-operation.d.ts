@@ -133,6 +133,10 @@ export interface AssetActionPayload {
      */
     timestamp: number;
 }
+export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp">;
+export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp">;
+export type PoloAssetApproveOrRevokePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
+export type AssetApproveOrRevokePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
 export interface AssetSupplyPayload {
     /**
      * The asset id that is used to mint or burn an asset.
@@ -165,8 +169,8 @@ export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {
  *  const operation: Operation<OpType.AssetCreate> = { ... }
  * ```
  */
-export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetActionPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : never;
-export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? PoloAssetActionPayload : T extends OpType.LogicDeploy ? PoloLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload : never;
+export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetTransferPayload : T extends OpType.AssetApprove | OpType.AssetRelease ? AssetApproveOrRevokePayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : never;
+export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? PoloAssetTransferPayload : T extends OpType.AssetApprove | OpType.AssetRelease ? PoloAssetApproveOrRevokePayload : T extends OpType.LogicDeploy ? PoloLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload : never;
 /**
  * `IxRawOperation` is a type that holds the raw operation data.
  */
@@ -193,5 +197,5 @@ export interface IxOperation<TOpType extends OpType> {
 /**
  * `IxOperation` is a union type that holds all the operations.
  */
-export type IxOp = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate>;
+export type IxOp = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate>;
 //# sourceMappingURL=ix-operation.d.ts.map

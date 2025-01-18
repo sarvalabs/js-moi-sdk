@@ -142,6 +142,14 @@ export interface AssetActionPayload {
     timestamp: number;
 }
 
+export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp">;
+
+export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp">;
+
+export type PoloAssetApproveOrRevokePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
+
+export type AssetApproveOrRevokePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
+
 export interface AssetSupplyPayload {
     /**
      * The asset id that is used to mint or burn an asset.
@@ -182,7 +190,9 @@ export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantC
     : T extends OpType.AssetBurn | OpType.AssetMint
     ? AssetSupplyPayload
     : T extends OpType.AssetTransfer
-    ? AssetActionPayload
+    ? AssetTransferPayload
+    : T extends OpType.AssetApprove | OpType.AssetRelease
+    ? AssetApproveOrRevokePayload
     : T extends OpType.LogicDeploy
     ? LogicDeployPayload
     : T extends OpType.LogicInvoke | OpType.LogicEnlist
@@ -196,7 +206,9 @@ export type PoloIxOperationPayload<T extends OpType> = T extends OpType.Particip
     : T extends OpType.AssetBurn | OpType.AssetMint
     ? AssetSupplyPayload
     : T extends OpType.AssetTransfer
-    ? PoloAssetActionPayload
+    ? PoloAssetTransferPayload
+    : T extends OpType.AssetApprove | OpType.AssetRelease
+    ? PoloAssetApproveOrRevokePayload
     : T extends OpType.LogicDeploy
     ? PoloLogicDeployPayload
     : T extends OpType.LogicInvoke | OpType.LogicEnlist
@@ -236,6 +248,8 @@ export type IxOp =
     | IxOperation<OpType.AssetCreate>
     | IxOperation<OpType.AssetMint>
     | IxOperation<OpType.AssetTransfer>
+    | IxOperation<OpType.AssetApprove>
+    | IxOperation<OpType.AssetRelease>
     | IxOperation<OpType.LogicDeploy>
     | IxOperation<OpType.LogicEnlist>
     | IxOperation<OpType.LogicInvoke>

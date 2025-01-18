@@ -85,7 +85,7 @@ const createAssetSupplyDescriptorFor = (type) => {
         },
     });
 };
-const createAssetActionDescriptor = () => {
+const createAssetActionDescriptor = (type) => {
     return Object.freeze({
         schema: () => {
             return polo.struct({
@@ -96,13 +96,16 @@ const createAssetActionDescriptor = () => {
                 timestamp: polo.integer,
             });
         },
-        transform: (payload) => ({
-            ...payload,
-            benefactor: hexToBytes(payload.benefactor),
-            beneficiary: hexToBytes(payload.beneficiary),
-        }),
+        transform: (payload) => {
+            const raw = {
+                ...payload,
+                benefactor: "benefactor" in payload ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                beneficiary: hexToBytes(payload.beneficiary),
+            };
+            return raw;
+        },
         validator: (payload) => {
-            if (payload.benefactor && !isValidAddress(payload.benefactor)) {
+            if ("benefactor" in payload && !isValidAddress(payload.benefactor)) {
                 return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
             }
             if (!isValidAddress(payload.beneficiary)) {
@@ -114,8 +117,10 @@ const createAssetActionDescriptor = () => {
             if (!isHex(payload.asset_id)) {
                 return createInvalidResult(payload, "asset_id", "Invalid asset ID");
             }
-            if (payload.timestamp < 0) {
-                return createInvalidResult(payload, "timestamp", "Timestamp cannot be negative");
+            if (type === OpType.AssetApprove) {
+                if (!("timestamp" in payload)) {
+                    return createInvalidResult(payload, "timestamp", "Timestamp is required for approve operation");
+                }
             }
             return null;
         },
@@ -188,7 +193,8 @@ const ixOpDescriptor = {
     [OpType.AssetCreate]: createAssetCreateDescriptor(),
     [OpType.AssetMint]: createAssetSupplyDescriptorFor(OpType.AssetMint),
     [OpType.AssetBurn]: createAssetSupplyDescriptorFor(OpType.AssetBurn),
-    [OpType.AssetTransfer]: createAssetActionDescriptor(),
+    [OpType.AssetTransfer]: createAssetActionDescriptor(OpType.AssetTransfer),
+    [OpType.AssetApprove]: createAssetActionDescriptor(OpType.AssetApprove),
     [OpType.LogicDeploy]: createLogicActionDescriptor(OpType.LogicDeploy),
     [OpType.LogicInvoke]: createLogicActionDescriptor(OpType.LogicInvoke),
     [OpType.LogicEnlist]: createLogicActionDescriptor(OpType.LogicEnlist),

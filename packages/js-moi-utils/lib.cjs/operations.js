@@ -88,7 +88,7 @@ const createAssetSupplyDescriptorFor = (type) => {
         },
     });
 };
-const createAssetActionDescriptor = () => {
+const createAssetActionDescriptor = (type) => {
     return Object.freeze({
         schema: () => {
             return polo_schema_1.polo.struct({
@@ -99,13 +99,16 @@ const createAssetActionDescriptor = () => {
                 timestamp: polo_schema_1.polo.integer,
             });
         },
-        transform: (payload) => ({
-            ...payload,
-            benefactor: (0, hex_1.hexToBytes)(payload.benefactor),
-            beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
-        }),
+        transform: (payload) => {
+            const raw = {
+                ...payload,
+                benefactor: "benefactor" in payload ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
+                beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
+            };
+            return raw;
+        },
         validator: (payload) => {
-            if (payload.benefactor && !(0, address_1.isValidAddress)(payload.benefactor)) {
+            if ("benefactor" in payload && !(0, address_1.isValidAddress)(payload.benefactor)) {
                 return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
             }
             if (!(0, address_1.isValidAddress)(payload.beneficiary)) {
@@ -117,8 +120,10 @@ const createAssetActionDescriptor = () => {
             if (!(0, hex_1.isHex)(payload.asset_id)) {
                 return createInvalidResult(payload, "asset_id", "Invalid asset ID");
             }
-            if (payload.timestamp < 0) {
-                return createInvalidResult(payload, "timestamp", "Timestamp cannot be negative");
+            if (type === enums_1.OpType.AssetApprove) {
+                if (!("timestamp" in payload)) {
+                    return createInvalidResult(payload, "timestamp", "Timestamp is required for approve operation");
+                }
             }
             return null;
         },
@@ -191,7 +196,8 @@ const ixOpDescriptor = {
     [enums_1.OpType.AssetCreate]: createAssetCreateDescriptor(),
     [enums_1.OpType.AssetMint]: createAssetSupplyDescriptorFor(enums_1.OpType.AssetMint),
     [enums_1.OpType.AssetBurn]: createAssetSupplyDescriptorFor(enums_1.OpType.AssetBurn),
-    [enums_1.OpType.AssetTransfer]: createAssetActionDescriptor(),
+    [enums_1.OpType.AssetTransfer]: createAssetActionDescriptor(enums_1.OpType.AssetTransfer),
+    [enums_1.OpType.AssetApprove]: createAssetActionDescriptor(enums_1.OpType.AssetApprove),
     [enums_1.OpType.LogicDeploy]: createLogicActionDescriptor(enums_1.OpType.LogicDeploy),
     [enums_1.OpType.LogicInvoke]: createLogicActionDescriptor(enums_1.OpType.LogicInvoke),
     [enums_1.OpType.LogicEnlist]: createLogicActionDescriptor(enums_1.OpType.LogicEnlist),
