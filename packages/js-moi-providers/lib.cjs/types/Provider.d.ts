@@ -5,9 +5,10 @@ import type { MethodParams } from "./moi-execution-api";
 export type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
 }[keyof T];
+type NonUndefined<T> = T extends undefined ? never : T;
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>> ? K extends keyof TObject ? TModifier extends {
     modifier: ExtractModifier<infer E>;
-} ? Required<Pick<TObject, E>> : TModifier extends {
+} ? NonUndefined<TObject[E]> : TModifier extends {
     modifier: IncludeModifier<infer E>;
 } ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>> : never : TObject : Pick<TObject, NonOptionKeys<TObject>>;
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
