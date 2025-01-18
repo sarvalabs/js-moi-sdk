@@ -1,23 +1,17 @@
 import { randomBytes } from "crypto";
 import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
 import { AssetStandard, isValidAddress, OpType } from "js-moi-utils";
-import { CURVE, Wallet } from "../src.ts/index";
+import { CURVE, Wallet } from "../src.ts/wallet";
 
-const MNEMONIC =
-    "profit behave tribe dash diet stool crawl general country student smooth oxygen";
-const ADDRESS =
-    "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
+const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
-const PRIVATE_KEY =
-    "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
+const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
 
 describe("Wallet", () => {
     describe("constructor", () => {
         test("instance is created with a private key (Buffer type) and a specified curve", async () => {
-            const wallet = new Wallet(
-                Buffer.from(PRIVATE_KEY, "hex"),
-                CURVE.SECP256K1
-            );
+            const wallet = new Wallet(Buffer.from(PRIVATE_KEY, "hex"), CURVE.SECP256K1);
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
@@ -127,49 +121,29 @@ describe("Wallet", () => {
 
         describe("verify", () => {
             test("should return true if the signature is valid", () => {
-                const isVerified = wallet.verify(
-                    Buffer.from(message),
-                    signedMessage,
-                    wallet.publicKey
-                );
+                const isVerified = wallet.verify(Buffer.from(message), signedMessage, wallet.publicKey);
                 expect(isVerified).toBeTruthy();
             });
 
             test("should return false if the signature is invalid", () => {
                 const invalidSignature =
                     "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2s70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726401";
-                const isVerified = wallet.verify(
-                    Buffer.from("Hello, MOI!"),
-                    invalidSignature,
-                    wallet.publicKey
-                );
+                const isVerified = wallet.verify(Buffer.from("Hello, MOI!"), invalidSignature, wallet.publicKey);
                 expect(isVerified).toBeFalsy();
             });
 
             test("should return false if the public key is invalid", () => {
-                const isVerified = wallet.verify(
-                    Buffer.from(message),
-                    signedMessage,
-                    Buffer.from("invalid public key")
-                );
+                const isVerified = wallet.verify(Buffer.from(message), signedMessage, Buffer.from("invalid public key"));
                 expect(isVerified).toBeFalsy();
             });
 
             test("should return false if the message is invalid", () => {
-                const isVerified = wallet.verify(
-                    randomBytes(10),
-                    signedMessage,
-                    wallet.publicKey
-                );
+                const isVerified = wallet.verify(randomBytes(10), signedMessage, wallet.publicKey);
                 expect(isVerified).toBeFalsy();
             });
 
             test("should return false if the public key is wrong", () => {
-                const isVerified = wallet.verify(
-                    Buffer.from(message),
-                    signedMessage,
-                    Wallet.createRandomSync().publicKey
-                );
+                const isVerified = wallet.verify(Buffer.from(message), signedMessage, Wallet.createRandomSync().publicKey);
                 expect(isVerified).toBeFalsy();
             });
         });

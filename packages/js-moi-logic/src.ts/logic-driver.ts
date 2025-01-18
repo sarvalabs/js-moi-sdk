@@ -25,6 +25,11 @@ import { SlotAccessorBuilder } from "./state/accessor-builder";
 import { StateAccessorBuilder } from "./state/state-accessor-builder";
 import type { CallsiteCallback, CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 
+/**
+ * It is class that is used to interact with the logic.
+ *
+ * @class LogicDriver
+ */
 export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer: Signer;
 
@@ -39,15 +44,36 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         this.endpoint = this.setupEndpoint();
     }
 
-    private async isDeployed() {
+    /**
+     * Checks if the logic has been deployed.
+     *
+     * This method attempts to retrieve the logic ID. If the logic ID is successfully
+     * retrieved, it indicates that the logic has been deployed. If an error occurs
+     * during the retrieval, it is assumed that the logic has not been deployed.
+     *
+     * @returns A promise that resolves to `true` if the logic is deployed, otherwise `false`.
+     */
+    public async isDeployed() {
         const logicId = await this.getLogicId().catch(() => null);
         return logicId != null;
     }
 
-    private getCallsiteType(callsite: string) {
+    /**
+     * Retrieves the type of a callsite.
+     *
+     * @param callsite - The name of the callsite.
+     * @returns The type of the specified callsite.
+     */
+    public getCallsiteType(callsite: string) {
         return this.getRoutineElement(callsite).data.kind;
     }
 
+    /**
+     * Determines if the callsite is mutable based on its routine kind.
+     *
+     * @param callsite - The identifier of the callsite to check.
+     * @returns A boolean indicating whether the callsite is mutable.
+     */
     public isCallsiteMutable(callsite: string) {
         const kinds = [RoutineKind.Ephemeral, RoutineKind.Persistent];
         const element = this.getRoutineElement(callsite);
@@ -90,37 +116,51 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         return { option, args };
     }
 
-    private async createIxOperation(callsite: string, args: unknown[]): Promise<IxOp> {
-        let operation: IxOp;
+    /**
+     * Creates an interaction operation for the specified callsite.
+     *
+     * @param callsite - The name of the callsite.
+     * @param args - The arguments to pass to the callsite.
+     * @returns A promise that resolves to an interaction operation.
+     *
+     * @throws an error if the callsite is not present.
+     */
+    public async createIxOperation(callsite: string, args: unknown[]): Promise<IxOp> {
         const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
         const callsiteType = this.getCallsiteType(callsite);
 
         switch (callsiteType) {
             case RoutineType.Deploy: {
-                operation = {
+                return {
                     type: OpType.LogicDeploy,
                     payload: { manifest: this.getManifest(ManifestCoderFormat.POLO), callsite, calldata },
                 };
-                break;
             }
 
             case RoutineType.Invoke:
             case RoutineType.Enlist: {
-                operation = {
+                return {
                     type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
                     payload: { logic_id: (await this.getLogicId()).value, callsite, calldata },
                 };
-                break;
             }
 
             default: {
                 ErrorUtils.throwError("Invalid routine type.", ErrorCode.INVALID_ARGUMENT);
             }
         }
-
-        return operation;
     }
 
+    /**
+     * Creates an interaction request for a given callsite and its arguments.
+     *
+     * @param callsite - The name of the callsite function to be invoked.
+     * @param callsiteArguments - An array of arguments to be passed to the callsite function.
+     * @param option - Optional parameters for the callsite, including fuel price and fuel limit.
+     * @returns A promise that resolves to a SignerIx object, which can be either a SimulateInteractionRequest or an InteractionRequest.
+     *
+     * @throws Will throw an error if the provided fuel limit is less than the required simulation effort.
+     */
     public async createIxRequest(
         callsite: string,
         callsiteArguments: unknown[],
@@ -150,6 +190,18 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         return request;
     }
 
+    /**
+     * Retrieves the logic ID associated with this instance. If the logic ID is already set, it returns the existing logic ID.
+     *
+     * - If the logic ID is not set but a deployment response is available, it processes the deployment response to extract and set the logic ID.
+     * - If the deployment response contains an error or an unexpected result type, it throws an appropriate error.
+     *
+     * @param timer a optional timer to wait for the result.
+     * @returns A promise that resolves to the logic ID.
+     *
+     * @throws If the logic id not deployed.
+     * @throws If error occurs during the deployment process.
+     */
     public async getLogicId(timer?: TimerOption): Promise<LogicId> {
         if (this.logicId != null) {
             return this.logicId;
@@ -244,7 +296,16 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         return Object.freeze(endpoint as TCallsites);
     }
 
-    private async getLogicStorage(state: LogicState, storageKey: StorageKey | Hex) {
+    /**
+     * Retrieves the logic storage based on the provided state and storage key.
+     *
+     * @param state - The state of the logic storage, either Persistent or Ephemeral.
+     * @param storageKey - The key used to access the storage, can be of type StorageKey or Hex.
+     * @returns A promise that resolves to the logic storage data.
+     *
+     * @throws Will throw an error if the logic state is invalid.
+     */
+    public async getLogicStorage(state: LogicState, storageKey: StorageKey | Hex) {
         const logicId = await this.getLogicId();
         switch (state) {
             case LogicState.Persistent: {
@@ -259,7 +320,14 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         }
     }
 
-    getStorageKey(state: LogicState, accessor: StateAccessorFn): StorageKey {
+    /**
+     * Retrieves the storage key for the provided state and accessor.
+     *
+     * @param state - The state of the logic storage, either Persistent or Ephemeral.
+     * @param accessor - The accessor used to generate the storage key.
+     * @returns The storage key for the provided state and accessor.
+     */
+    public getStorageKey(state: LogicState, accessor: StateAccessorFn): StorageKey {
         const element = this.getStateElement(state);
         const builder = accessor(new StateAccessorBuilder(element.ptr, this));
 
@@ -295,8 +363,26 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         return new Depolorizer(hexToBytes(value)).depolorize(schema) as T;
     }
 
-    public async persistent(accessor: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the persistent storage value based on the provided accessor.
+     *
+     * @param storageKey - The storage key used to access the persistent storage.
+     * @returns A promise that resolves to the persistent storage data in POLO encoding.
+     */
+    public async persistent(storageKey: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the persistent storage value based on the provided accessor.
+     *
+     * @param accessor - The accessor used to generate the storage key.
+     * @returns A promise that resolves to the persistent storage decoded value.
+     */
     public async persistent<T>(accessor: StateAccessorFn): Promise<T>;
+    /**
+     * Retrieves the persistent storage value based on the provided accessor or storage key.
+     *
+     * @param accessor - This can storage key or accessor function.
+     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
+     */
     public async persistent<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
         if (typeof accessor === "function") {
             return await this.getLogicStateValue(LogicState.Persistent, accessor);
@@ -305,8 +391,25 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         return await this.getLogicStateValue(LogicState.Persistent, accessor);
     }
 
-    public async ephemeral(accessor: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the ephemeral storage value based on the provided accessor.
+     *
+     * @param storageKey - The storage key used to access the ephemeral storage.
+     * @returns A promise that resolves to the ephemeral storage data in POLO encoding.
+     */
+    public async ephemeral(storageKey: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the ephemeral storage value based on the provided accessor.
+     *
+     * @param accessor - The accessor used to generate the storage key.
+     * @returns A promise that resolves to the ephemeral storage decoded value.
+     */
     public async ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
+    /**
+     * Retrieves the ephemeral storage value based on the provided accessor or storage key.
+     * @param accessor - This can storage key or accessor function.
+     * @returns A promise that resolves to the ephemeral storage data in POLO encoding or decoded value.
+     */
     public async ephemeral<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
         if (typeof accessor === "function") {
             return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
