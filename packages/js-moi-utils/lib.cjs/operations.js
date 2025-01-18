@@ -261,6 +261,8 @@ const ixOpDescriptor = {
     [enums_1.OpType.AssetTransfer]: createAssetActionDescriptor(),
     [enums_1.OpType.AssetApprove]: createAssetActionDescriptor(),
     [enums_1.OpType.AssetRelease]: createAssetActionDescriptor(),
+    [enums_1.OpType.AssetRevoke]: createAssetActionDescriptor(),
+    [enums_1.OpType.AssetLockup]: createAssetActionDescriptor(),
     [enums_1.OpType.LogicDeploy]: createLogicActionDescriptor(),
     [enums_1.OpType.LogicInvoke]: createLogicActionDescriptor(),
     [enums_1.OpType.LogicEnlist]: createLogicActionDescriptor(),
