@@ -25,14 +25,14 @@ import type { EventEmitter } from "stream";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams } from "./moi-execution-api";
 
-type NonOptionKeys<T extends Record<string, any>> = {
+export type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
 }[keyof T];
 
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>>
     ? K extends keyof TObject
         ? TModifier extends { modifier: ExtractModifier<infer E> }
-            ? Required<Pick<TObject, E>>[E]
+            ? Required<Pick<TObject, E>>
             : TModifier extends { modifier: IncludeModifier<infer E> }
             ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>>
             : never

@@ -41,7 +41,6 @@ describe(JsonRpcProvider, () => {
                     sequence_id: 0,
                 },
                 fuel_price: 1,
-                fuel_limit: 100000,
                 operations: [
                     {
                         type: OpType.AssetCreate,
@@ -107,10 +106,10 @@ describe(JsonRpcProvider, () => {
         });
 
         it.concurrent("should return the object with the extracted fields", async () => {
-            const account = await provider.getAccount(ADDRESS, { modifier: { extract: "balances" } });
+            const balances = await provider.getAccount(ADDRESS, { modifier: { extract: "balances" } });
 
-            expect(account).toBeDefined();
-            expect(account.balances).toBeDefined();
+            expect(balances).toBeDefined();
+            expect(Array.isArray(balances)).toBeTruthy();
         });
     });
 
@@ -274,13 +273,11 @@ describe(JsonRpcProvider, () => {
         });
 
         it.concurrent("should return the asset with extracted fields", async () => {
-            const asset = await provider.getAsset(assetId, {
+            const controller = await provider.getAsset(assetId, {
                 modifier: { extract: "controller" },
             });
 
-            expect(asset).toBeDefined();
-            // TODO: We can check by number of fields too.
-            expect(asset.controller).toBeDefined();
+            expect(controller).toBeDefined();
         });
 
         it.concurrent("should return the asset with modifier and reference", async () => {
