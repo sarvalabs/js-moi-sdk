@@ -99,7 +99,7 @@ const createAssetActionDescriptor = (type) => {
         transform: (payload) => {
             const raw = {
                 ...payload,
-                benefactor: "benefactor" in payload ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && isHex(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
             return raw;
@@ -111,8 +111,13 @@ const createAssetActionDescriptor = (type) => {
             if (!isValidAddress(payload.beneficiary)) {
                 return createInvalidResult(payload, "beneficiary", "Invalid beneficiary address");
             }
-            if (payload.amount < 0) {
-                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            if ([OpType.AssetTransfer, OpType.AssetApprove].includes(type)) {
+                if (!("amount" in payload)) {
+                    return createInvalidResult(payload, "amount", "Amount is required for transfer and approve operations");
+                }
+                if (payload.amount < 0) {
+                    return createInvalidResult(payload, "amount", "Amount cannot be negative");
+                }
             }
             if (!isHex(payload.asset_id)) {
                 return createInvalidResult(payload, "asset_id", "Invalid asset ID");
@@ -195,6 +200,7 @@ const ixOpDescriptor = {
     [OpType.AssetBurn]: createAssetSupplyDescriptorFor(OpType.AssetBurn),
     [OpType.AssetTransfer]: createAssetActionDescriptor(OpType.AssetTransfer),
     [OpType.AssetApprove]: createAssetActionDescriptor(OpType.AssetApprove),
+    [OpType.AssetRelease]: createAssetActionDescriptor(OpType.AssetRelease),
     [OpType.LogicDeploy]: createLogicActionDescriptor(OpType.LogicDeploy),
     [OpType.LogicInvoke]: createLogicActionDescriptor(OpType.LogicInvoke),
     [OpType.LogicEnlist]: createLogicActionDescriptor(OpType.LogicEnlist),

@@ -102,7 +102,7 @@ const createAssetActionDescriptor = (type) => {
         transform: (payload) => {
             const raw = {
                 ...payload,
-                benefactor: "benefactor" in payload ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && (0, hex_1.isHex)(payload.benefactor) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
                 beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
             };
             return raw;
@@ -114,8 +114,13 @@ const createAssetActionDescriptor = (type) => {
             if (!(0, address_1.isValidAddress)(payload.beneficiary)) {
                 return createInvalidResult(payload, "beneficiary", "Invalid beneficiary address");
             }
-            if (payload.amount < 0) {
-                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            if ([enums_1.OpType.AssetTransfer, enums_1.OpType.AssetApprove].includes(type)) {
+                if (!("amount" in payload)) {
+                    return createInvalidResult(payload, "amount", "Amount is required for transfer and approve operations");
+                }
+                if (payload.amount < 0) {
+                    return createInvalidResult(payload, "amount", "Amount cannot be negative");
+                }
             }
             if (!(0, hex_1.isHex)(payload.asset_id)) {
                 return createInvalidResult(payload, "asset_id", "Invalid asset ID");
@@ -198,6 +203,7 @@ const ixOpDescriptor = {
     [enums_1.OpType.AssetBurn]: createAssetSupplyDescriptorFor(enums_1.OpType.AssetBurn),
     [enums_1.OpType.AssetTransfer]: createAssetActionDescriptor(enums_1.OpType.AssetTransfer),
     [enums_1.OpType.AssetApprove]: createAssetActionDescriptor(enums_1.OpType.AssetApprove),
+    [enums_1.OpType.AssetRelease]: createAssetActionDescriptor(enums_1.OpType.AssetRelease),
     [enums_1.OpType.LogicDeploy]: createLogicActionDescriptor(enums_1.OpType.LogicDeploy),
     [enums_1.OpType.LogicInvoke]: createLogicActionDescriptor(enums_1.OpType.LogicInvoke),
     [enums_1.OpType.LogicEnlist]: createLogicActionDescriptor(enums_1.OpType.LogicEnlist),
