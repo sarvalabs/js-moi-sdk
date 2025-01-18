@@ -146,12 +146,36 @@ describe(encodeOperation, () => {
             operation: {
                 type: OpType.AssetRelease,
                 payload: {
+                    benefactor: "0x94c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c8757",
                     beneficiary: "0x94c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c8757",
+                    amount: 100,
                     asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc668",
                 },
             },
             expected:
                 "0x0e9f010686048608a311a311000000000000000000000000000000000000000000000000000000000000000094c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c87573078303030303030303061396635653834363362616263313937323532646533336132363565656663373163333439373434306330366661613233336264613934313235646263363638",
+        },
+        {
+            operation: {
+                type: OpType.AssetLockup,
+                payload: {
+                    amount: 100,
+                    asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc668",
+                    beneficiary: "0x94c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c8757",
+                },
+            },
+            // TODO: Update this
+            expected: "0x0e9f010686048608a311a311",
+        },
+        {
+            operation: {
+                type: OpType.AssetRevoke,
+                payload: {
+                    asset_id: "0x00000000a9f5e8463babc197252de33a265eefc71c3497440c06faa233bda94125dbc668",
+                    beneficiary: "0x94c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c8757",
+                },
+            },
+            expected: "0x0e9f010686048608a311a311",
         },
     ];
 

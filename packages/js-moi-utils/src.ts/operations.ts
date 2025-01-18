@@ -3,7 +3,7 @@ import { polo, type PoloSchema } from "polo-schema";
 import { isValidAddress } from "./address";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
-import { hexToBytes, isHex } from "./hex";
+import { hexToBytes, isAddress, isHex } from "./hex";
 import type { IxOperation, IxOperationPayload, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
@@ -19,7 +19,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (payload: IxOperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
+    validator: (operation: IxOperation<TOpType>) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *
@@ -37,6 +37,17 @@ type AssetSupplyOpType = OpType.AssetMint | OpType.AssetBurn;
 
 const createInvalidResult = <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     return { field, message, value: value[field] };
+};
+
+/**
+ * Checks if a given operation is of a specified type.
+ *
+ * @param type - The type to check the operation against.
+ * @param operation - The operation to check.
+ * @returns True if the operation is of the specified type, otherwise false.
+ */
+const isOperationType = <TOpType extends OpType>(type: TOpType, operation: IxOperation<OpType>): operation is IxOperation<TOpType> => {
+    return operation.type === type;
 };
 
 const createParticipantCreateDescriptor = () => {
@@ -57,7 +68,8 @@ const createParticipantCreateDescriptor = () => {
 
         transform: (payload) => ({ ...payload, address: hexToBytes(payload.address) }),
 
-        validator: (payload) => {
+        validator: (operation) => {
+            const { payload } = operation;
             if (!isValidAddress(payload.address)) {
                 return createInvalidResult(payload, "address", "Invalid address");
             }
@@ -93,7 +105,9 @@ const createAssetCreateDescriptor = () => {
             });
         },
 
-        validator: (payload) => {
+        validator: (operation) => {
+            const { payload } = operation;
+
             if (payload.supply < 0) {
                 return createInvalidResult(payload, "supply", "Supply cannot be negative");
             }
@@ -111,7 +125,7 @@ const createAssetCreateDescriptor = () => {
     });
 };
 
-const createAssetSupplyDescriptorFor = (type: AssetSupplyOpType) => {
+const createAssetSupplyDescriptorFor = () => {
     return Object.freeze<IxOperationDescriptor<AssetSupplyOpType>>({
         schema: () => {
             return polo.struct({
@@ -120,7 +134,9 @@ const createAssetSupplyDescriptorFor = (type: AssetSupplyOpType) => {
             });
         },
 
-        validator: (payload) => {
+        validator: (operation) => {
+            const { payload } = operation;
+
             if (payload.amount < 0) {
                 return createInvalidResult(payload, "amount", "Amount cannot be negative");
             }
@@ -134,10 +150,50 @@ const createAssetSupplyDescriptorFor = (type: AssetSupplyOpType) => {
     });
 };
 
-type AssetActionOpType = OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRelease;
+type AssetActionOpType = OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRelease | OpType.AssetLockup | OpType.AssetRevoke;
 
-const createAssetActionDescriptor = <T extends AssetActionOpType>(type: T) => {
-    return Object.freeze<IxOperationDescriptor<T>>({
+const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
+    const validateAmount = (payload: Partial<Record<"amount", number>>) => {
+        if (payload.amount == null) {
+            return createInvalidResult(payload, "amount", "Amount is required for transfer operation");
+        }
+
+        if (typeof payload.amount !== "number" || Number.isNaN(payload.amount)) {
+            return createInvalidResult(payload, "amount", "Amount must be a number");
+        }
+
+        if (payload.amount < 0) {
+            return createInvalidResult(payload, "amount", "Amount cannot be negative");
+        }
+
+        return null;
+    };
+
+    const validateTimestamp = (payload: Partial<Record<"timestamp", number>>) => {
+        if (payload.timestamp == null) {
+            return createInvalidResult(payload, "timestamp", "Timestamp is required for approve operation");
+        }
+
+        if (typeof payload.timestamp !== "number" || Number.isNaN(payload.timestamp)) {
+            return createInvalidResult(payload, "timestamp", "Timestamp must be a number");
+        }
+
+        return null;
+    };
+
+    const validateBenefactor = (payload: Partial<Record<"benefactor", string>>) => {
+        if (payload.benefactor == null) {
+            return createInvalidResult(payload, "benefactor", "Benefactor is required for release operation");
+        }
+
+        if (!isAddress(payload.benefactor)) {
+            return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
+        }
+
+        return null;
+    };
+
+    return Object.freeze<IxOperationDescriptor<TOpType>>({
         schema: () => {
             return polo.struct({
                 benefactor: polo.bytes,
@@ -155,46 +211,75 @@ const createAssetActionDescriptor = <T extends AssetActionOpType>(type: T) => {
                 beneficiary: hexToBytes(payload.beneficiary),
             };
 
-            return raw as PoloIxOperationPayload<T>;
+            return raw as PoloIxOperationPayload<TOpType>;
         },
 
-        validator: (payload) => {
-            if ("benefactor" in payload && !isValidAddress(payload.benefactor)) {
-                return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
+        validator: (operation: IxOperation<AssetActionOpType>) => {
+            if (!operation.payload.asset_id) {
+                return createInvalidResult(operation.payload, "asset_id", "Asset ID is required");
             }
 
-            if (!isValidAddress(payload.beneficiary)) {
-                return createInvalidResult(payload, "beneficiary", "Invalid beneficiary address");
+            if (!isHex(operation.payload.asset_id)) {
+                return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
 
-            if ([OpType.AssetTransfer, OpType.AssetApprove].includes(type)) {
-                if (!("amount" in payload)) {
-                    return createInvalidResult(payload, "amount" as any, "Amount is required for transfer and approve operations");
+            if (!isValidAddress(operation.payload.beneficiary)) {
+                return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
+            }
+
+            switch (true) {
+                case isOperationType(OpType.AssetLockup, operation):
+                case isOperationType(OpType.AssetTransfer, operation): {
+                    return validateAmount(operation.payload);
                 }
 
-                if (payload.amount < 0) {
-                    return createInvalidResult(payload, "amount", "Amount cannot be negative");
+                case isOperationType(OpType.AssetApprove, operation): {
+                    return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
+                }
+
+                case isOperationType(OpType.AssetRelease, operation): {
+                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
+                }
+
+                default: {
+                    ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, ErrorCode.INVALID_ARGUMENT);
                 }
             }
-
-            if (!isHex(payload.asset_id)) {
-                return createInvalidResult(payload, "asset_id", "Invalid asset ID");
-            }
-
-            if (type === OpType.AssetApprove) {
-                if (!("timestamp" in payload)) {
-                    return createInvalidResult(payload, "timestamp" as any, "Timestamp is required for approve operation");
-                }
-            }
-
-            return null;
         },
     });
 };
 
 type LogicActionOpType = OpType.LogicDeploy | OpType.LogicInvoke | OpType.LogicEnlist;
 
-const createLogicActionDescriptor = <T extends LogicActionOpType>(type: T) => {
+const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
+    const validateManifest = (payload: Partial<Record<"manifest", string>>) => {
+        if (!payload.manifest) {
+            return createInvalidResult(payload, "manifest", "Manifest is required");
+        }
+
+        if (!isHex(payload.manifest)) {
+            return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+        }
+
+        return null;
+    };
+
+    const validateCalldata = (payload: Partial<Record<"calldata", string>>) => {
+        if (payload.calldata && !isHex(payload.calldata)) {
+            return createInvalidResult(payload, "calldata", "Calldata must be a hex string");
+        }
+
+        return null;
+    };
+
+    const validateLogicId = (payload: Partial<Record<"logic_id", string>>) => {
+        if (!payload.logic_id) {
+            return createInvalidResult(payload, "logic_id", "Logic ID is required");
+        }
+
+        return null;
+    };
+
     return Object.freeze<IxOperationDescriptor<T>>({
         schema: () => {
             return polo.struct({
@@ -210,61 +295,46 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>(type: T) => {
         },
 
         transform: (payload) => {
-            if (type === OpType.LogicDeploy) {
-                if (!("manifest" in payload)) {
-                    ErrorUtils.throwError("Manifest is required for LogicDeploy operation", ErrorCode.INVALID_ARGUMENT);
-                }
-
-                const raw: PoloIxOperationPayload<OpType.LogicDeploy> = {
+            if ("manifest" in payload) {
+                return {
                     ...payload,
                     manifest: hexToBytes(payload.manifest),
                     calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                     interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
                 };
-
-                return raw as PoloIxOperationPayload<T>;
             }
 
             if (!("logic_id" in payload)) {
                 ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", ErrorCode.INVALID_ARGUMENT);
             }
 
-            const raw: PoloIxOperationPayload<OpType.LogicEnlist | OpType.LogicInvoke> = {
+            return {
                 ...payload,
                 logic_id: payload.logic_id,
                 calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             };
-
-            return raw as PoloIxOperationPayload<T>;
         },
 
-        validator: (payload) => {
-            if (type === OpType.LogicDeploy) {
-                if (!("manifest" in payload)) {
-                    return createInvalidResult(payload, "manifest" as keyof typeof payload, "Manifest is required for logic deploy operation");
+        validator: (operation) => {
+            if (!operation.payload.callsite) {
+                return createInvalidResult(operation.payload, "callsite", "Callsite is required");
+            }
+
+            switch (true) {
+                case isOperationType(OpType.LogicDeploy, operation): {
+                    return validateManifest(operation.payload) ?? validateCalldata(operation.payload);
                 }
 
-                if (!isHex(payload.manifest)) {
-                    return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+                case isOperationType(OpType.LogicInvoke, operation):
+                case isOperationType(OpType.LogicEnlist, operation): {
+                    return validateLogicId(operation.payload) ?? validateCalldata(operation.payload);
+                }
+
+                default: {
+                    ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, ErrorCode.INVALID_ARGUMENT);
                 }
             }
-
-            if (type !== OpType.LogicDeploy || type === OpType.LogicEnlist) {
-                if (!("logic_id" in payload)) {
-                    return createInvalidResult(payload, "logic_id" as keyof typeof payload, "Logic ID is required");
-                }
-            }
-
-            if ("calldata" in payload && !isHex(payload.calldata)) {
-                return createInvalidResult(payload, "calldata", "Calldata must be a hex string");
-            }
-
-            if (payload.callsite == null || payload.callsite === "") {
-                return createInvalidResult(payload, "callsite", "Callsite is required");
-            }
-
-            return null;
         },
     });
 };
@@ -273,15 +343,15 @@ const ixOpDescriptor: IxOperationDescriptorLookup = {
     [OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
 
     [OpType.AssetCreate]: createAssetCreateDescriptor(),
-    [OpType.AssetMint]: createAssetSupplyDescriptorFor(OpType.AssetMint),
-    [OpType.AssetBurn]: createAssetSupplyDescriptorFor(OpType.AssetBurn),
-    [OpType.AssetTransfer]: createAssetActionDescriptor(OpType.AssetTransfer),
-    [OpType.AssetApprove]: createAssetActionDescriptor(OpType.AssetApprove),
-    [OpType.AssetRelease]: createAssetActionDescriptor(OpType.AssetRelease),
+    [OpType.AssetMint]: createAssetSupplyDescriptorFor(),
+    [OpType.AssetBurn]: createAssetSupplyDescriptorFor(),
+    [OpType.AssetTransfer]: createAssetActionDescriptor(),
+    [OpType.AssetApprove]: createAssetActionDescriptor(),
+    [OpType.AssetRelease]: createAssetActionDescriptor(),
 
-    [OpType.LogicDeploy]: createLogicActionDescriptor(OpType.LogicDeploy),
-    [OpType.LogicInvoke]: createLogicActionDescriptor(OpType.LogicInvoke),
-    [OpType.LogicEnlist]: createLogicActionDescriptor(OpType.LogicEnlist),
+    [OpType.LogicDeploy]: createLogicActionDescriptor(),
+    [OpType.LogicInvoke]: createLogicActionDescriptor(),
+    [OpType.LogicEnlist]: createLogicActionDescriptor(),
 };
 
 type OperationDescriptorRecord<T extends OpType = OpType> = {
@@ -373,5 +443,5 @@ export const validateOperation = <TOpType extends OpType>(operation: IxOperation
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
 
-    return descriptor.validator(operation.payload);
+    return descriptor.validator(operation);
 };

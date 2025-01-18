@@ -14,7 +14,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (payload: IxOperationPayload<TOpType>) => ReturnType<typeof createInvalidResult> | null;
+    validator: (operation: IxOperation<TOpType>) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *

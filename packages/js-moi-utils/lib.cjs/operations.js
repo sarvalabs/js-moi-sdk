@@ -10,6 +10,16 @@ const hex_1 = require("./hex");
 const createInvalidResult = (value, field, message) => {
     return { field, message, value: value[field] };
 };
+/**
+ * Checks if a given operation is of a specified type.
+ *
+ * @param type - The type to check the operation against.
+ * @param operation - The operation to check.
+ * @returns True if the operation is of the specified type, otherwise false.
+ */
+const isOperationType = (type, operation) => {
+    return operation.type === type;
+};
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
         schema: () => {
@@ -24,7 +34,8 @@ const createParticipantCreateDescriptor = () => {
             });
         },
         transform: (payload) => ({ ...payload, address: (0, hex_1.hexToBytes)(payload.address) }),
-        validator: (payload) => {
+        validator: (operation) => {
+            const { payload } = operation;
             if (!(0, address_1.isValidAddress)(payload.address)) {
                 return createInvalidResult(payload, "address", "Invalid address");
             }
@@ -55,7 +66,8 @@ const createAssetCreateDescriptor = () => {
                 logic_payload: logicPayloadSchema,
             });
         },
-        validator: (payload) => {
+        validator: (operation) => {
+            const { payload } = operation;
             if (payload.supply < 0) {
                 return createInvalidResult(payload, "supply", "Supply cannot be negative");
             }
@@ -69,7 +81,7 @@ const createAssetCreateDescriptor = () => {
         },
     });
 };
-const createAssetSupplyDescriptorFor = (type) => {
+const createAssetSupplyDescriptorFor = () => {
     return Object.freeze({
         schema: () => {
             return polo_schema_1.polo.struct({
@@ -77,7 +89,8 @@ const createAssetSupplyDescriptorFor = (type) => {
                 amount: polo_schema_1.polo.integer,
             });
         },
-        validator: (payload) => {
+        validator: (operation) => {
+            const { payload } = operation;
             if (payload.amount < 0) {
                 return createInvalidResult(payload, "amount", "Amount cannot be negative");
             }
@@ -88,7 +101,37 @@ const createAssetSupplyDescriptorFor = (type) => {
         },
     });
 };
-const createAssetActionDescriptor = (type) => {
+const createAssetActionDescriptor = () => {
+    const validateAmount = (payload) => {
+        if (payload.amount == null) {
+            return createInvalidResult(payload, "amount", "Amount is required for transfer operation");
+        }
+        if (typeof payload.amount !== "number" || Number.isNaN(payload.amount)) {
+            return createInvalidResult(payload, "amount", "Amount must be a number");
+        }
+        if (payload.amount < 0) {
+            return createInvalidResult(payload, "amount", "Amount cannot be negative");
+        }
+        return null;
+    };
+    const validateTimestamp = (payload) => {
+        if (payload.timestamp == null) {
+            return createInvalidResult(payload, "timestamp", "Timestamp is required for approve operation");
+        }
+        if (typeof payload.timestamp !== "number" || Number.isNaN(payload.timestamp)) {
+            return createInvalidResult(payload, "timestamp", "Timestamp must be a number");
+        }
+        return null;
+    };
+    const validateBenefactor = (payload) => {
+        if (payload.benefactor == null) {
+            return createInvalidResult(payload, "benefactor", "Benefactor is required for release operation");
+        }
+        if (!(0, hex_1.isAddress)(payload.benefactor)) {
+            return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
+        }
+        return null;
+    };
     return Object.freeze({
         schema: () => {
             return polo_schema_1.polo.struct({
@@ -107,34 +150,56 @@ const createAssetActionDescriptor = (type) => {
             };
             return raw;
         },
-        validator: (payload) => {
-            if ("benefactor" in payload && !(0, address_1.isValidAddress)(payload.benefactor)) {
-                return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
+        validator: (operation) => {
+            if (!operation.payload.asset_id) {
+                return createInvalidResult(operation.payload, "asset_id", "Asset ID is required");
             }
-            if (!(0, address_1.isValidAddress)(payload.beneficiary)) {
-                return createInvalidResult(payload, "beneficiary", "Invalid beneficiary address");
+            if (!(0, hex_1.isHex)(operation.payload.asset_id)) {
+                return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
-            if ([enums_1.OpType.AssetTransfer, enums_1.OpType.AssetApprove].includes(type)) {
-                if (!("amount" in payload)) {
-                    return createInvalidResult(payload, "amount", "Amount is required for transfer and approve operations");
+            if (!(0, address_1.isValidAddress)(operation.payload.beneficiary)) {
+                return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
+            }
+            switch (true) {
+                case isOperationType(enums_1.OpType.AssetLockup, operation):
+                case isOperationType(enums_1.OpType.AssetTransfer, operation): {
+                    return validateAmount(operation.payload);
                 }
-                if (payload.amount < 0) {
-                    return createInvalidResult(payload, "amount", "Amount cannot be negative");
+                case isOperationType(enums_1.OpType.AssetApprove, operation): {
+                    return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
+                }
+                case isOperationType(enums_1.OpType.AssetRelease, operation): {
+                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
+                }
+                default: {
+                    errors_1.ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, errors_1.ErrorCode.INVALID_ARGUMENT);
                 }
             }
-            if (!(0, hex_1.isHex)(payload.asset_id)) {
-                return createInvalidResult(payload, "asset_id", "Invalid asset ID");
-            }
-            if (type === enums_1.OpType.AssetApprove) {
-                if (!("timestamp" in payload)) {
-                    return createInvalidResult(payload, "timestamp", "Timestamp is required for approve operation");
-                }
-            }
-            return null;
         },
     });
 };
-const createLogicActionDescriptor = (type) => {
+const createLogicActionDescriptor = () => {
+    const validateManifest = (payload) => {
+        if (!payload.manifest) {
+            return createInvalidResult(payload, "manifest", "Manifest is required");
+        }
+        if (!(0, hex_1.isHex)(payload.manifest)) {
+            return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+        }
+        return null;
+    };
+    const validateCalldata = (payload) => {
+        if (payload.calldata && !(0, hex_1.isHex)(payload.calldata)) {
+            return createInvalidResult(payload, "calldata", "Calldata must be a hex string");
+        }
+        return null;
+    };
+    const validateLogicId = (payload) => {
+        if (!payload.logic_id) {
+            return createInvalidResult(payload, "logic_id", "Logic ID is required");
+        }
+        return null;
+    };
     return Object.freeze({
         schema: () => {
             return polo_schema_1.polo.struct({
@@ -149,64 +214,54 @@ const createLogicActionDescriptor = (type) => {
             });
         },
         transform: (payload) => {
-            if (type === enums_1.OpType.LogicDeploy) {
-                if (!("manifest" in payload)) {
-                    errors_1.ErrorUtils.throwError("Manifest is required for LogicDeploy operation", errors_1.ErrorCode.INVALID_ARGUMENT);
-                }
-                const raw = {
+            if ("manifest" in payload) {
+                return {
                     ...payload,
                     manifest: (0, hex_1.hexToBytes)(payload.manifest),
                     calldata: payload.calldata != null ? (0, hex_1.hexToBytes)(payload.calldata) : undefined,
                     interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
                 };
-                return raw;
             }
             if (!("logic_id" in payload)) {
                 errors_1.ErrorUtils.throwError("Logic ID is required for LogicEnlist and LogicInvoke operations", errors_1.ErrorCode.INVALID_ARGUMENT);
             }
-            const raw = {
+            return {
                 ...payload,
                 logic_id: payload.logic_id,
                 calldata: payload.calldata != null ? (0, hex_1.hexToBytes)(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             };
-            return raw;
         },
-        validator: (payload) => {
-            if (type === enums_1.OpType.LogicDeploy) {
-                if (!("manifest" in payload)) {
-                    return createInvalidResult(payload, "manifest", "Manifest is required for logic deploy operation");
+        validator: (operation) => {
+            if (!operation.payload.callsite) {
+                return createInvalidResult(operation.payload, "callsite", "Callsite is required");
+            }
+            switch (true) {
+                case isOperationType(enums_1.OpType.LogicDeploy, operation): {
+                    return validateManifest(operation.payload) ?? validateCalldata(operation.payload);
                 }
-                if (!(0, hex_1.isHex)(payload.manifest)) {
-                    return createInvalidResult(payload, "manifest", "Manifest must be a hex string");
+                case isOperationType(enums_1.OpType.LogicInvoke, operation):
+                case isOperationType(enums_1.OpType.LogicEnlist, operation): {
+                    return validateLogicId(operation.payload) ?? validateCalldata(operation.payload);
+                }
+                default: {
+                    errors_1.ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, errors_1.ErrorCode.INVALID_ARGUMENT);
                 }
             }
-            if (type !== enums_1.OpType.LogicDeploy || type === enums_1.OpType.LogicEnlist) {
-                if (!("logic_id" in payload)) {
-                    return createInvalidResult(payload, "logic_id", "Logic ID is required");
-                }
-            }
-            if ("calldata" in payload && !(0, hex_1.isHex)(payload.calldata)) {
-                return createInvalidResult(payload, "calldata", "Calldata must be a hex string");
-            }
-            if (payload.callsite == null || payload.callsite === "") {
-                return createInvalidResult(payload, "callsite", "Callsite is required");
-            }
-            return null;
         },
     });
 };
 const ixOpDescriptor = {
     [enums_1.OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
     [enums_1.OpType.AssetCreate]: createAssetCreateDescriptor(),
-    [enums_1.OpType.AssetMint]: createAssetSupplyDescriptorFor(enums_1.OpType.AssetMint),
-    [enums_1.OpType.AssetBurn]: createAssetSupplyDescriptorFor(enums_1.OpType.AssetBurn),
-    [enums_1.OpType.AssetTransfer]: createAssetActionDescriptor(enums_1.OpType.AssetTransfer),
-    [enums_1.OpType.AssetApprove]: createAssetActionDescriptor(enums_1.OpType.AssetApprove),
-    [enums_1.OpType.AssetRelease]: createAssetActionDescriptor(enums_1.OpType.AssetRelease),
-    [enums_1.OpType.LogicDeploy]: createLogicActionDescriptor(enums_1.OpType.LogicDeploy),
-    [enums_1.OpType.LogicInvoke]: createLogicActionDescriptor(enums_1.OpType.LogicInvoke),
-    [enums_1.OpType.LogicEnlist]: createLogicActionDescriptor(enums_1.OpType.LogicEnlist),
+    [enums_1.OpType.AssetMint]: createAssetSupplyDescriptorFor(),
+    [enums_1.OpType.AssetBurn]: createAssetSupplyDescriptorFor(),
+    [enums_1.OpType.AssetTransfer]: createAssetActionDescriptor(),
+    [enums_1.OpType.AssetApprove]: createAssetActionDescriptor(),
+    [enums_1.OpType.AssetRelease]: createAssetActionDescriptor(),
+    [enums_1.OpType.LogicDeploy]: createLogicActionDescriptor(),
+    [enums_1.OpType.LogicInvoke]: createLogicActionDescriptor(),
+    [enums_1.OpType.LogicEnlist]: createLogicActionDescriptor(),
 };
 /**
  * Retrieves all operation descriptors.
@@ -284,7 +339,7 @@ const validateOperation = (operation) => {
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
-    return descriptor.validator(operation.payload);
+    return descriptor.validator(operation);
 };
 exports.validateOperation = validateOperation;
 //# sourceMappingURL=operations.js.map
