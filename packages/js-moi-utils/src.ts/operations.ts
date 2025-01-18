@@ -4,7 +4,7 @@ import { isValidAddress } from "./address";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isAddress, isHex } from "./hex";
-import type { IxOperation, IxOperationPayload, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
+import type { IxOperation, IxOperationPayload, IxRawOperation, PoloIxOperationPayload, PoloLogicDeployPayload } from "./types/ix-operation";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
@@ -294,6 +294,8 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
             });
         },
 
+        // TODO: Fix the type of the payload
+        // @ts-ignore
         transform: (payload) => {
             if ("manifest" in payload) {
                 return {
@@ -301,7 +303,7 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
                     manifest: hexToBytes(payload.manifest),
                     calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                     interfaces: payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
-                };
+                } as PoloLogicDeployPayload;
             }
 
             if (!("logic_id" in payload)) {
@@ -365,9 +367,11 @@ type OperationDescriptorRecord<T extends OpType = OpType> = {
  * @returns Returns an array of operation descriptors.
  */
 export const listIxOperationDescriptors = (): OperationDescriptorRecord[] => {
-    return Object.entries(ixOpDescriptor).map(([type, descriptor]) => {
-        return { type: parseInt(type) as OpType, descriptor };
+    const list: OperationDescriptorRecord[] = Object.entries(ixOpDescriptor).map(([type, descriptor]) => {
+        return { type: parseInt(type) as OpType, descriptor: descriptor as IxOperationDescriptor<OpType> };
     });
+
+    return list;
 };
 
 /**

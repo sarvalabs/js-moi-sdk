@@ -213,6 +213,8 @@ const createLogicActionDescriptor = () => {
                 }),
             });
         },
+        // TODO: Fix the type of the payload
+        // @ts-ignore
         transform: (payload) => {
             if ("manifest" in payload) {
                 return {
@@ -269,9 +271,10 @@ const ixOpDescriptor = {
  * @returns Returns an array of operation descriptors.
  */
 const listIxOperationDescriptors = () => {
-    return Object.entries(ixOpDescriptor).map(([type, descriptor]) => {
-        return { type: parseInt(type), descriptor };
+    const list = Object.entries(ixOpDescriptor).map(([type, descriptor]) => {
+        return { type: parseInt(type), descriptor: descriptor };
     });
+    return list;
 };
 exports.listIxOperationDescriptors = listIxOperationDescriptors;
 /**
