@@ -124,7 +124,7 @@ export class WebsocketTransport extends EventEmitter {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
-        this.ws?.send(JSON.stringify(data));
+        this.ws.send(JSON.stringify(data));
     }
     static validateOptions(options) {
         if (options.reconnect != null && options.reconnect < 0) {

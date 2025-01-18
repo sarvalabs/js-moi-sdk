@@ -217,6 +217,10 @@ export class JsonRpcProvider extends EventEmitter {
     getInteraction(hash, option) {
         return this.call("moi.Interaction", { hash, ...option });
     }
+    async subscribe(event, params) {
+        throw new Error("Method not implemented. Return type needs to be updated");
+        // return await this.call("moi.Subscribe", event, params);
+    }
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

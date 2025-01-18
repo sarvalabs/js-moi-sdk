@@ -70,7 +70,10 @@ export type InteractionRequestOption = ResponseModifierParam<Exclude<keyof Inter
 interface InteractionRequestMethod {
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
 }
-export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, TesseractRequest {
+interface SubscribeRequest {
+    subscribe(event: string, params?: unknown): Promise<void>;
+}
+export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

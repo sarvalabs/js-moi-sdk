@@ -62,6 +62,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
     execute(ix: ExecuteIx): Promise<InteractionResponse>;
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
+    subscribe(event: string, params?: unknown): Promise<void>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

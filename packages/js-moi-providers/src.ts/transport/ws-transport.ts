@@ -167,7 +167,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
             throw new Error("Websocket is not initialized");
         }
 
-        this.ws?.send(JSON.stringify(data));
+        this.ws.send(JSON.stringify(data));
     }
 
     private static validateOptions(options: WebsocketTransportOptions): Error | null {

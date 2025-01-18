@@ -129,6 +129,10 @@ interface InteractionRequestMethod {
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
 }
 
+interface SubscribeRequest {
+    subscribe(event: string, params?: unknown): Promise<void>;
+}
+
 export interface Provider
     extends EventEmitter,
         AccountAssetRequest,
@@ -142,4 +146,5 @@ export interface Provider
         LogicStorageRequest,
         ProtocolRequest,
         SimulateRequest,
+        SubscribeRequest,
         TesseractRequest {}

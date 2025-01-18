@@ -87,6 +87,7 @@ export interface NetworkActionApi {
     "moi.AccountKey": ApiMethod<[param: AccountKeyRequestParam], AccountKey>;
     "moi.Execute": ApiMethod<[param: ExecuteRequestParam], Hex>;
     "moi.Interaction": ApiMethod<[param: InteractionRequestParam]>;
+    "moi.Subscribe": ApiMethod<[event: string, params?: unknown]>;
 }
 
 /**
