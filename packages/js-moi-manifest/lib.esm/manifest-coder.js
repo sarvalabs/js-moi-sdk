@@ -1,6 +1,5 @@
 import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import { Depolorizer, documentEncode } from "js-polo";
-import { stringify } from "yaml";
 import { ElementDescriptor } from "./element-descriptor";
 import { JsonManifestCoder } from "./manifest-coder/json-manifest-coder";
 import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
@@ -233,9 +232,6 @@ export class ManifestCoder {
             return serializer.decode(manifest);
         }
         ErrorUtils.throwError("Unsupported manifest format", ErrorCode.UNSUPPORTED_OPERATION);
-    }
-    static toYaml(manifest) {
-        return stringify(manifest);
     }
 }
 //# sourceMappingURL=manifest-coder.js.map

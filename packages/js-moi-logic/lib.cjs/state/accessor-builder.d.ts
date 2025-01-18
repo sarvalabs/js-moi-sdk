@@ -17,7 +17,7 @@ export interface AccessorBuilder {
      * @param key - The label of the property.
      * @returns The accessor builder instance.
      */
-    property(key: string | number | boolean | Uint8Array | Buffer): AccessorBuilder;
+    property(key: string | number | boolean | Uint8Array): AccessorBuilder;
     /**
      * Adds an accessor for the specified index to the AccessorBuilder.
      *

@@ -1,12 +1,11 @@
 import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix, type Hex, type LogicManifest } from "js-moi-utils";
 import { Depolorizer, documentEncode, Schema as PoloSchema } from "js-polo";
-import { stringify } from "yaml";
-import { Exception } from "../types/response";
 import { ElementDescriptor } from "./element-descriptor";
 import { JsonManifestCoder } from "./manifest-coder/json-manifest-coder";
 import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
 import { YamlManifestCoder } from "./manifest-coder/yaml-manifest-coder";
 import { Schema } from "./schema";
+import type { Exception } from "./types/exception";
 
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
@@ -325,9 +324,5 @@ export class ManifestCoder {
         }
 
         ErrorUtils.throwError("Unsupported manifest format", ErrorCode.UNSUPPORTED_OPERATION);
-    }
-
-    public static toYaml(manifest: LogicManifest): string {
-        return stringify(manifest);
     }
 }

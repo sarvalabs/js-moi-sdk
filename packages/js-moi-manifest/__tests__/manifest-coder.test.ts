@@ -1,9 +1,8 @@
 import type { LogicManifest } from "js-moi-utils";
-import { ManifestCoder } from "../src.ts/manifest";
-import { ManifestCoderFormat } from "../src.ts/manifest-coder/serialization-format";
+import { ManifestCoder, ManifestCoderFormat } from "../src.ts";
 import { loadFile, loadManifestFromFile } from "./utils/helper";
 
-describe("Test ManifestCoder", () => {
+describe(ManifestCoder, () => {
     let manifest: LogicManifest;
     let manifestCoder: ManifestCoder;
 
@@ -12,7 +11,7 @@ describe("Test ManifestCoder", () => {
         manifestCoder = new ManifestCoder(manifest);
     });
 
-    test("Encode ABI/Manifest into polo format", async () => {
+    test("Encode manifest into polo format", async () => {
         const testcases = [
             {
                 manifest: "../../manifests/tokenledger.json",
@@ -166,6 +165,7 @@ describe("Test ManifestCoder", () => {
             },
         ];
 
+        // TODO: Provide a better support to encode manifest to formats
         await Promise.all(
             testCases.map(async (testCase) => {
                 const polo = await loadFile(testCase.manifest);

@@ -1,6 +1,6 @@
 import { type Hex, type LogicManifest } from "js-moi-utils";
-import { Exception } from "../types/response";
 import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
+import type { Exception } from "./types/exception";
 /**
  * ManifestCoder is a class that provides encoding and decoding functionality
  * for Logic Interface.It allows encoding manifests and arguments, as well as
@@ -119,6 +119,5 @@ export declare class ManifestCoder {
      * @throws {Error} Throws an error if the format is unsupported.
      */
     static decodeManifest(manifest: string | Uint8Array, format: ManifestCoderFormat.YAML): string;
-    static toYaml(manifest: LogicManifest): string;
 }
 //# sourceMappingURL=manifest-coder.d.ts.map

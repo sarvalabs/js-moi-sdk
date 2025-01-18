@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicDescriptor = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
+const yaml_1 = require("yaml");
 class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
     logicId;
     manifest;
@@ -66,7 +67,7 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
             case js_moi_manifest_1.ManifestCoderFormat.JSON:
                 return this.manifest;
             case js_moi_manifest_1.ManifestCoderFormat.YAML:
-                return js_moi_manifest_1.ManifestCoder.toYaml(this.manifest);
+                return (0, yaml_1.stringify)(this.manifest);
             case js_moi_manifest_1.ManifestCoderFormat.POLO:
                 return js_moi_manifest_1.ManifestCoder.encodeManifest(this.manifest);
         }

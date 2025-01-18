@@ -1,5 +1,6 @@
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
 import { ElementType, ErrorCode, ErrorUtils, LogicState, type Address, type Element, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
+import { stringify as toYaml } from "yaml";
 
 export class LogicDescriptor extends ElementDescriptor {
     protected logicId?: LogicId;
@@ -87,7 +88,7 @@ export class LogicDescriptor extends ElementDescriptor {
             case ManifestCoderFormat.JSON:
                 return this.manifest;
             case ManifestCoderFormat.YAML:
-                return ManifestCoder.toYaml(this.manifest);
+                return toYaml(this.manifest);
             case ManifestCoderFormat.POLO:
                 return ManifestCoder.encodeManifest(this.manifest);
         }
