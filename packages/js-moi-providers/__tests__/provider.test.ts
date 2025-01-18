@@ -15,7 +15,7 @@ import {
 import { HttpProvider, JsonRpcProvider } from "../src.ts";
 import type { LogicMessageRequestOption } from "../src.ts/types/provider.ts";
 
-const ADDRESS: Address = "0x4860657690bb4518ceea81ec5d465da4071864e8ab277a7636b02f63ce5200ae";
+const ADDRESS: Address = "0x06cae4700aed3168ab5c41cbcd1fe3ad27b1137a3545bc4efc7601b8bc9879f9";
 const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
 const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548";
 
@@ -85,7 +85,7 @@ describe(JsonRpcProvider, () => {
             const height = 0;
             const account = await provider.getAccount(ADDRESS, {
                 reference: { relative: { height, identifier: ADDRESS } },
-                modifier: { include: ["balances", "state", "enlisted", "guardians", "keys", "lockups", "mandates"] },
+                modifier: { include: ["state", "balances", "enlisted", "guardians", "keys", "lockups"] },
             });
 
             expect(account).toBeDefined();
