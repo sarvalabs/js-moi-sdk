@@ -1,3 +1,4 @@
+import { HttpProvider, JsonRpcProvider } from "js-moi-providers";
 import type { SigType } from "js-moi-signer";
 import { AssetStandard, hexToBytes, isHex, OpType, type InteractionRequest } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
@@ -105,6 +106,29 @@ describe(Wallet, () => {
             const keystore = wallet.generateKeystore(password);
 
             expect(keystore).toBeDefined();
+        });
+
+        it.concurrent("should throw an error if password is not provided", async () => {
+            const generate = () => wallet.generateKeystore(null!);
+
+            expect(generate).toThrow();
+        });
+    });
+
+    describe(wallet.getProvider, () => {
+        const wallet = Wallet.createRandomSync();
+
+        it.concurrent("should error if provider is not set", async () => {
+            const getProvider = () => wallet.getProvider();
+
+            expect(getProvider).toThrow();
+        });
+
+        it.concurrent("should return the provider", async () => {
+            const provider = new HttpProvider("http://localhost:8545");
+            wallet.connect(provider);
+
+            expect(wallet.getProvider()).toBeInstanceOf(JsonRpcProvider);
         });
     });
 

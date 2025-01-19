@@ -298,7 +298,6 @@ export class Wallet extends Signer {
             const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
             return new Wallet(privateKey, CURVE.SECP256K1);
         } catch (err) {
-            console.error(err);
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
             });
