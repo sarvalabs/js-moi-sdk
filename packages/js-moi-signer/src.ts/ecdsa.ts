@@ -2,7 +2,6 @@ import { blake2b } from "@noble/hashes/blake2b";
 import { hmac } from "@noble/hashes/hmac";
 import { sha256 } from "@noble/hashes/sha256";
 import * as nobleECC from "@noble/secp256k1";
-import { Buffer } from "buffer";
 import { hexToBytes } from "js-moi-utils";
 
 import { SigType } from "../types";
@@ -26,16 +25,13 @@ export default class ECDSA_S256 implements SigType {
     public readonly sigName: string = "ECDSA_S256";
 
     /**
-     * sign
+     * Signs a message using the provided signing key.
      *
-     * Signs a message using the ECDSA_S256 signature algorithm.
-     *
-     * @param message - The message to be signed, as a Buffer.
-     * @param signingKey - The private key used for signing, either as
-     * a hexadecimal string or a Buffer.
-     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
+     * @param message - The message to be signed as a Uint8Array.
+     * @param signingKey - The signing key, which can be either a Uint8Array or a hexadecimal string.
+     * @returns A Signature object containing the signed message.
      */
-    public sign(message: Buffer, signingKey: Buffer | string): Signature {
+    public sign(message: Uint8Array, signingKey: Uint8Array | string): Signature {
         let _signingKey: Uint8Array;
         if (typeof signingKey === "string") {
             _signingKey = hexToBytes(signingKey);
