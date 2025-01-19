@@ -1,6 +1,6 @@
-import { HttpProvider, JsonRpcProvider, WebsocketProvider, type Provider } from "js-moi-providers";
+import { HttpProvider, InteractionResponse, JsonRpcProvider, WebsocketProvider, type Provider } from "js-moi-providers";
 import type { SigType } from "js-moi-signer";
-import { AssetStandard, ensureHexPrefix, hexToBytes, isHex, OpType, type InteractionRequest } from "js-moi-utils";
+import { AssetStandard, ensureHexPrefix, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
 
 describe(Wallet, () => {
@@ -245,7 +245,7 @@ const initWallet = () => {
         throw new Error("TEST_PRIVATE_KEY is not set");
     }
 
-    return new Wallet(process.env["TEST_PRIVATE_KEY"], CURVE.SECP256K1);
+    return new Wallet(process.env["TEST_PRIVATE_KEY"], CURVE.SECP256K1, getProvider());
 };
 
 const shouldRunProviderIntegrationTests = process.env["CI"] !== "true";
@@ -274,19 +274,52 @@ if (shouldRunProviderIntegrationTests) {
     });
 
     describe("Provider integration test", () => {
-        it.concurrent("should be able to simulate a interaction", async () => {
-            const simulation = await wallet.simulate({
-                fuel_price: 1,
-                operations: [
-                    {
-                        type: OpType.AssetCreate,
-                        payload: { symbol: "MOI", standard: AssetStandard.MAS0, supply: 1000 },
-                    },
-                ],
+        const operations: IxOp[] = [
+            {
+                type: OpType.AssetCreate,
+                payload: { symbol: "MOI", standard: AssetStandard.MAS0, supply: 1000 },
+            },
+        ];
+
+        describe(wallet.simulate, () => {
+            it("should be able to simulate a interaction", async () => {
+                const simulation = await wallet.simulate({
+                    fuel_price: 1,
+                    operations,
+                });
+
+                expect(simulation).toBeDefined();
+                expect(simulation.result).toHaveLength(1);
+            });
+        });
+
+        describe(wallet.execute, () => {
+            let ix: InteractionResponse;
+
+            beforeEach(async () => {
+                ix = await wallet.execute({
+                    fuel_price: 1,
+                    fuel_limit: 100,
+                    operations,
+                });
             });
 
-            expect(simulation).toBeDefined();
-            expect(simulation.result).toHaveLength(1);
+            it("should be able to execute a interaction", async () => {
+                expect(ix).toBeDefined();
+                expect(ix).toBeInstanceOf(InteractionResponse);
+                expect(isHex(ix.hash)).toBeTruthy();
+            });
+
+            it("should be able to get the interaction confirmation", async () => {
+                const confirmation = await ix.wait();
+
+                expect(confirmation).toBeDefined();
+                expect(confirmation.status).toEqual(ReceiptStatus.Ok);
+
+                for (const operation of operations) {
+                    expect(confirmation.operations.some((op) => op.type === operation.type)).toBeTruthy();
+                }
+            });
         });
     });
 }
