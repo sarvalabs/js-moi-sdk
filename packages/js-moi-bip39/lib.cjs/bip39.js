@@ -183,7 +183,7 @@ exports.mnemonicToEntropy = mnemonicToEntropy;
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
  */
 const entropyToMnemonic = (entropy, wordlist) => {
-    if (!buffer_1.Buffer.isBuffer(entropy)) {
+    if (typeof entropy === "string") {
         entropy = buffer_1.Buffer.from(entropy, "hex");
     }
     wordlist = wordlist || DEFAULT_WORDLIST;

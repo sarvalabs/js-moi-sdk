@@ -1,4 +1,3 @@
-import { Buffer } from "buffer";
 import { type ExecuteIx, type Provider } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { type Hex, type InteractionRequest } from "js-moi-utils";
@@ -33,7 +32,7 @@ export declare enum CURVE {
  */
 export declare class Wallet extends Signer {
     private readonly key_index;
-    constructor(key: Buffer | string, curve: string, provider?: Provider);
+    constructor(pKey: Uint8Array | string, curve: CURVE, provider?: Provider);
     /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
@@ -56,7 +55,7 @@ export declare class Wallet extends Signer {
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    get mnemonic(): string;
+    get mnemonic(): string | undefined;
     /**
      * Public key associated with the wallet.
      *

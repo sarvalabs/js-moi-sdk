@@ -1,5 +1,3 @@
-import { Buffer } from "buffer";
-
 export interface ISignature {
     digest(): Uint8Array;
 
@@ -17,7 +15,7 @@ export interface ISignature {
 export interface SigType {
     prefix: number;
     sigName: String;
-    sign(message: Buffer, signingKey: string | Buffer): ISignature;
+    sign(message: Uint8Array, signingKey: string | Uint8Array): ISignature;
     verify(message: Uint8Array, signature: ISignature, publicKey: Uint8Array): boolean;
 }
 

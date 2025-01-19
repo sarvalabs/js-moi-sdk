@@ -27,8 +27,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = exports.CURVE = void 0;
-const utils_1 = require("@noble/hashes/utils");
-const buffer_1 = require("buffer");
 const elliptic_1 = __importDefault(require("elliptic"));
 const bip39 = __importStar(require("js-moi-bip39"));
 const js_moi_constants_1 = require("js-moi-constants");
@@ -110,32 +108,31 @@ const __vault = new WeakMap();
  */
 class Wallet extends js_moi_signer_1.Signer {
     key_index = 0;
-    constructor(key, curve, provider) {
+    constructor(pKey, curve, provider) {
         try {
+            if (!pKey || !(pKey instanceof Uint8Array || typeof pKey === "string")) {
+                js_moi_utils_1.ErrorUtils.throwError("Key must be a Uint8Array or a string", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+            if (!Object.values(CURVE).includes(curve)) {
+                js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
+            }
             super(provider);
+            if (typeof pKey === "string") {
+                pKey = (0, js_moi_utils_1.hexToBytes)(pKey);
+            }
             __vault.set(this, {
                 value: void 0,
             });
-            let privKey, pubKey;
-            if (!key) {
-                js_moi_utils_1.ErrorUtils.throwError("Key is required, cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-            }
-            if (curve !== CURVE.SECP256K1) {
-                js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
-            }
             const ecPrivKey = new elliptic_1.default.ec(curve);
-            const keyBuffer = typeof key === "string" ? buffer_1.Buffer.from(key, "hex") : key;
-            const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
-            const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
-            privKey = keyPair.getPrivate("hex");
-            pubKey = keyPair.getPublic(true, "hex");
+            const keyPair = ecPrivKey.keyFromPrivate(pKey);
             privateMapSet(this, __vault, {
-                _key: privKey,
-                _public: pubKey,
+                _key: keyPair.getPrivate("hex"),
+                _public: keyPair.getPublic(true, "hex"),
                 _curve: curve,
             });
         }
         catch (error) {
+            console.log(error);
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
     }
@@ -149,7 +146,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     generateKeystore(password) {
         try {
-            const data = buffer_1.Buffer.from(this.privateKey, "hex");
+            const data = (0, js_moi_utils_1.hexToBytes)(this.privateKey);
             return (0, keystore_1.encryptKeystoreData)(data, password);
         }
         catch (err) {
@@ -212,16 +209,22 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message, sig) {
+    async sign(message, sig) {
+        if (!message || !((0, js_moi_utils_1.isHex)(message) || message instanceof Uint8Array)) {
+            js_moi_utils_1.ErrorUtils.throwError("Message must be a hex string or Uint8Array", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
         if (sig == null) {
             js_moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
+        if (typeof message === "string") {
+            message = (0, js_moi_utils_1.hexToBytes)(message);
+        }
         switch (sig.sigName) {
             case "ECDSA_S256": {
-                const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-                const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), this.privateKey);
+                const _sigAlgo = this.signingAlgorithms.ecdsa_secp256k1;
+                const sig = _sigAlgo.sign(message, this.privateKey);
                 const sigBytes = sig.serialize();
-                return Promise.resolve((0, js_moi_utils_1.bytesToHex)(sigBytes));
+                return (0, js_moi_utils_1.bytesToHex)(sigBytes);
             }
             default: {
                 js_moi_utils_1.ErrorUtils.throwError("Unsupported signature type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
@@ -251,7 +254,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(options?.path ?? js_moi_constants_1.MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, options?.provider);
+            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, options?.provider);
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -270,7 +273,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(option?.path ?? js_moi_constants_1.MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -295,7 +298,7 @@ class Wallet extends js_moi_signer_1.Signer {
     static fromKeystore(keystore, password, provider) {
         try {
             const privateKey = (0, keystore_1.decryptKeystoreData)(JSON.parse(keystore), password);
-            return new Wallet(privateKey, CURVE.SECP256K1);
+            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
@@ -312,8 +315,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static async createRandom(provider) {
         try {
-            const _random16Bytes = buffer_1.Buffer.from((0, utils_1.randomBytes)(16));
-            var mnemonic = bip39.entropyToMnemonic(_random16Bytes);
+            var mnemonic = bip39.entropyToMnemonic((0, js_moi_utils_1.randomBytes)(16));
             return await Wallet.fromMnemonic(mnemonic, { provider });
         }
         catch (err) {
@@ -329,8 +331,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static createRandomSync(provider) {
         try {
-            const _random16Bytes = buffer_1.Buffer.from((0, utils_1.randomBytes)(16));
-            var mnemonic = bip39.entropyToMnemonic(_random16Bytes);
+            const mnemonic = bip39.entropyToMnemonic((0, js_moi_utils_1.randomBytes)(16));
             return Wallet.fromMnemonicSync(mnemonic, { provider });
         }
         catch (err) {

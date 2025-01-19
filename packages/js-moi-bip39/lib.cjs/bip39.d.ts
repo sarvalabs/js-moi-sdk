@@ -33,7 +33,7 @@ export declare const mnemonicToEntropy: (mnemonic: string, wordlist?: string[]) 
  * @returns {string} The corresponding mnemonic phrase.
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
  */
-export declare const entropyToMnemonic: (entropy: Buffer | string, wordlist?: string[]) => string;
+export declare const entropyToMnemonic: (entropy: Buffer | Uint8Array | string, wordlist?: string[]) => string;
 /**
  * Generate a mnemonic phrase with the specified strength (in bits).
  *

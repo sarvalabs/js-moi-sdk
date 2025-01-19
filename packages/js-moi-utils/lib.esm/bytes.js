@@ -74,4 +74,13 @@ export const isHexString = (value, length) => {
 export const bufferToUint8 = (target) => {
     return new Uint8Array(target);
 };
+/**
+ * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
+ *
+ * @param size - The number of random bytes to generate.
+ * @returns A Uint8Array containing the generated random bytes.
+ */
+export const randomBytes = (size) => {
+    return globalThis.crypto.getRandomValues(new Uint8Array(size));
+};
 //# sourceMappingURL=bytes.js.map

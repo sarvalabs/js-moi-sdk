@@ -40,4 +40,11 @@ export declare const isHexString: (value: any, length?: number) => boolean;
  * @returns {Uint8Array} The Uint8Array representation of the Buffer.
  */
 export declare const bufferToUint8: (target: Buffer) => Uint8Array;
+/**
+ * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
+ *
+ * @param size - The number of random bytes to generate.
+ * @returns A Uint8Array containing the generated random bytes.
+ */
+export declare const randomBytes: (size: number) => Uint8Array;
 //# sourceMappingURL=bytes.d.ts.map

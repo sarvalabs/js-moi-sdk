@@ -191,8 +191,8 @@ export const mnemonicToEntropy = (mnemonic: string, wordlist?: string[]): string
  * @returns {string} The corresponding mnemonic phrase.
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
  */
-export const entropyToMnemonic = (entropy: Buffer | string, wordlist?: string[]): string => {
-    if (!Buffer.isBuffer(entropy)) {
+export const entropyToMnemonic = (entropy: Buffer | Uint8Array | string, wordlist?: string[]): string => {
+    if (typeof entropy === "string") {
         entropy = Buffer.from(entropy, "hex");
     }
 

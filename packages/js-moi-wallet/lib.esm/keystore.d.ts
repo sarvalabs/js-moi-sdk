@@ -1,12 +1,11 @@
-import { Buffer } from "buffer";
 import { Keystore } from "../types/keystore";
 /**
- * Encrypts input data using AES-128-CTR mode with XOR encryption.
+ * Encrypts the input data using AES in CTR mode with XOR.
  *
- * @param {Buffer} key - Encryption key.
- * @param {Buffer} input - Input data to encrypt.
- * @param {Buffer} iv - Initialization vector.
- * @returns {Buffer} Encrypted data.
+ * @param key - The encryption key as a Uint8Array.
+ * @param input - The input data to be encrypted as a Uint8Array.
+ * @param iv - The initialization vector as a Uint8Array.
+ * @returns The encrypted data as a Uint8Array.
  */
 export declare const aesCTRWithXOR: (key: Uint8Array, input: Uint8Array, iv: Uint8Array) => Uint8Array;
 /**
@@ -18,16 +17,8 @@ export declare const aesCTRWithXOR: (key: Uint8Array, input: Uint8Array, iv: Uin
  * @returns {Buffer} Derived key.
  * @throws {Error} If the KDF is unsupported.
  */
-export declare const getKDFKeyForKeystore: (keystore: Keystore, password: string) => Buffer;
-/**
- * Encrypts the input data using AES-128-CTR mode with XOR encryption and
- * creates a keystore object.
- *
- * @param {Buffer} data - Data to be encrypted.
- * @param {string} password - Password for encryption.
- * @returns {Keystore} Encrypted keystore object.
- */
-export declare const encryptKeystoreData: (data: Buffer | Uint8Array, password: string) => Keystore;
+export declare const getKDFKeyForKeystore: (keystore: Keystore, password: string) => Uint8Array;
+export declare const encryptKeystoreData: (data: Uint8Array, password: string) => Keystore;
 /**
  * Decrypts the keystore data using the provided password.
  *

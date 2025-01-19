@@ -223,7 +223,9 @@ const getProvider = (): Provider => {
                 throw new Error("PROVIDER_URL is not set");
             }
 
-            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"]);
+            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"], {
+                debug: (request) => console.log(`Request: ${JSON.stringify(request)}`),
+            });
         }
 
         case "ws": {
@@ -245,35 +247,35 @@ const initWallet = () => {
         throw new Error("TEST_PRIVATE_KEY is not set");
     }
 
-    return new Wallet(process.env["TEST_PRIVATE_KEY"], CURVE.SECP256K1, getProvider());
+    return new Wallet(ensureHexPrefix(process.env["TEST_PRIVATE_KEY"]), CURVE.SECP256K1, getProvider());
 };
 
 const shouldRunProviderIntegrationTests = process.env["CI"] !== "true";
 
 if (shouldRunProviderIntegrationTests) {
-    const wallet = Wallet.createRandomSync(getProvider());
+    describe("Provider integration test", () => {
+        const wallet = Wallet.createRandomSync(getProvider());
 
-    // Register a new participant.
-    beforeAll(async () => {
-        const ix = await initWallet().execute({
-            fuel_price: 1,
-            fuel_limit: 100,
-            operations: [
-                {
-                    type: OpType.ParticipantCreate,
-                    payload: {
-                        address: await wallet.getAddress(),
-                        amount: 100_000,
-                        keys_payload: [{ public_key: ensureHexPrefix(wallet.publicKey), weight: 1000, signature_algorithm: 0 }],
+        // Register a new participant.
+        beforeEach(async () => {
+            const ix = await initWallet().execute({
+                fuel_price: 1,
+                fuel_limit: 100,
+                operations: [
+                    {
+                        type: OpType.ParticipantCreate,
+                        payload: {
+                            address: await wallet.getAddress(),
+                            amount: 100_000,
+                            keys_payload: [{ public_key: ensureHexPrefix(wallet.publicKey), weight: 1000, signature_algorithm: 0 }],
+                        },
                     },
-                },
-            ],
+                ],
+            });
+
+            await ix.wait();
         });
 
-        await ix.wait();
-    });
-
-    describe("Provider integration test", () => {
         const operations: IxOp[] = [
             {
                 type: OpType.AssetCreate,
@@ -296,7 +298,7 @@ if (shouldRunProviderIntegrationTests) {
         describe(wallet.execute, () => {
             let ix: InteractionResponse;
 
-            beforeEach(async () => {
+            beforeAll(async () => {
                 ix = await wallet.execute({
                     fuel_price: 1,
                     fuel_limit: 100,

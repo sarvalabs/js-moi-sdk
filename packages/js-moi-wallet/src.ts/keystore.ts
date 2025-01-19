@@ -1,18 +1,16 @@
 import { scrypt } from "@noble/hashes/scrypt";
 import { keccak_256 } from "@noble/hashes/sha3";
-import { randomBytes } from "@noble/hashes/utils";
 import { CTR } from "aes-js";
-import { Buffer } from "buffer";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, randomBytes } from "js-moi-utils";
 import { Keystore } from "../types/keystore";
 
 /**
- * Encrypts input data using AES-128-CTR mode with XOR encryption.
+ * Encrypts the input data using AES in CTR mode with XOR.
  *
- * @param {Buffer} key - Encryption key.
- * @param {Buffer} input - Input data to encrypt.
- * @param {Buffer} iv - Initialization vector.
- * @returns {Buffer} Encrypted data.
+ * @param key - The encryption key as a Uint8Array.
+ * @param input - The input data to be encrypted as a Uint8Array.
+ * @param iv - The initialization vector as a Uint8Array.
+ * @returns The encrypted data as a Uint8Array.
  */
 export const aesCTRWithXOR = (key: Uint8Array, input: Uint8Array, iv: Uint8Array): Uint8Array => {
     return new CTR(key, iv).encrypt(input);
@@ -27,7 +25,7 @@ export const aesCTRWithXOR = (key: Uint8Array, input: Uint8Array, iv: Uint8Array
  * @returns {Buffer} Derived key.
  * @throws {Error} If the KDF is unsupported.
  */
-export const getKDFKeyForKeystore = (keystore: Keystore, password: string): Buffer => {
+export const getKDFKeyForKeystore = (keystore: Keystore, password: string): Uint8Array => {
     const pwBuf = Buffer.from(password);
     const salt = Buffer.from(keystore.kdfparams.salt, "hex");
     const dkLen = keystore.kdfparams.dklen;
@@ -36,21 +34,13 @@ export const getKDFKeyForKeystore = (keystore: Keystore, password: string): Buff
         const n = keystore.kdfparams.n;
         const r = keystore.kdfparams.r;
         const p = keystore.kdfparams.p;
-        return Buffer.from(scrypt(pwBuf, salt, { N: n, r, p, dkLen }));
+        return scrypt(pwBuf, salt, { N: n, r, p, dkLen });
     }
 
     ErrorUtils.throwError(`Unsupported KDF: ${keystore.kdf}`, ErrorCode.INVALID_ARGUMENT);
 };
 
-/**
- * Encrypts the input data using AES-128-CTR mode with XOR encryption and
- * creates a keystore object.
- *
- * @param {Buffer} data - Data to be encrypted.
- * @param {string} password - Password for encryption.
- * @returns {Keystore} Encrypted keystore object.
- */
-export const encryptKeystoreData = (data: Buffer | Uint8Array, password: string): Keystore => {
+export const encryptKeystoreData = (data: Uint8Array, password: string): Keystore => {
     const salt = randomBytes(32);
 
     const derivedKey = scrypt(password, salt, {
