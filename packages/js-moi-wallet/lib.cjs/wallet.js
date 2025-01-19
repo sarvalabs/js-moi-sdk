@@ -112,7 +112,7 @@ class Wallet extends js_moi_signer_1.Signer {
     key_index = 0;
     constructor(key, curve, provider) {
         try {
-            super();
+            super(provider);
             __vault.set(this, {
                 value: void 0,
             });

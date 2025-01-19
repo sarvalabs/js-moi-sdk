@@ -1,14 +1,14 @@
-import { HttpProvider, JsonRpcProvider } from "js-moi-providers";
+import { HttpProvider, JsonRpcProvider, WebsocketProvider, type Provider } from "js-moi-providers";
 import type { SigType } from "js-moi-signer";
-import { AssetStandard, hexToBytes, isHex, OpType, type InteractionRequest } from "js-moi-utils";
+import { AssetStandard, ensureHexPrefix, hexToBytes, isHex, OpType, type InteractionRequest } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
 
-const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
-const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
-const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
-const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
-
 describe(Wallet, () => {
+    const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
+    const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+    const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+    const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
+
     it.concurrent("should create a wallet from a constructor", async () => {
         const wallet = new Wallet(PRIVATE_KEY, CURVE.SECP256K1);
 
@@ -215,3 +215,78 @@ describe(Wallet, () => {
         });
     });
 });
+
+const getProvider = (): Provider => {
+    switch (process.env["PROVIDER_TYPE"]) {
+        case "http": {
+            if (!process.env["HTTP_PROVIDER_HOST"]) {
+                throw new Error("PROVIDER_URL is not set");
+            }
+
+            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"]);
+        }
+
+        case "ws": {
+            if (!process.env["WS_PROVIDER_HOST"]) {
+                throw new Error("PROVIDER_URL is not set");
+            }
+
+            return new WebsocketProvider(process.env["WS_PROVIDER_HOST"]);
+        }
+
+        default: {
+            throw new Error(`Unknown provider type: ${process.env["PROVIDER_TYPE"]}`);
+        }
+    }
+};
+
+const initWallet = () => {
+    if (!process.env["TEST_PRIVATE_KEY"]) {
+        throw new Error("TEST_PRIVATE_KEY is not set");
+    }
+
+    return new Wallet(process.env["TEST_PRIVATE_KEY"], CURVE.SECP256K1);
+};
+
+const shouldRunProviderIntegrationTests = process.env["CI"] !== "true";
+
+if (shouldRunProviderIntegrationTests) {
+    const wallet = Wallet.createRandomSync(getProvider());
+
+    // Register a new participant.
+    beforeAll(async () => {
+        const ix = await initWallet().execute({
+            fuel_price: 1,
+            fuel_limit: 100,
+            operations: [
+                {
+                    type: OpType.ParticipantCreate,
+                    payload: {
+                        address: await wallet.getAddress(),
+                        amount: 100_000,
+                        keys_payload: [{ public_key: ensureHexPrefix(wallet.publicKey), weight: 1000, signature_algorithm: 0 }],
+                    },
+                },
+            ],
+        });
+
+        await ix.wait();
+    });
+
+    describe("Provider integration test", () => {
+        it.concurrent("should be able to simulate a interaction", async () => {
+            const simulation = await wallet.simulate({
+                fuel_price: 1,
+                operations: [
+                    {
+                        type: OpType.AssetCreate,
+                        payload: { symbol: "MOI", standard: AssetStandard.MAS0, supply: 1000 },
+                    },
+                ],
+            });
+
+            expect(simulation).toBeDefined();
+            expect(simulation.result).toHaveLength(1);
+        });
+    });
+}

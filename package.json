@@ -9,7 +9,7 @@
     "clean": "find . -path ./node_modules -prune -o -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
     "build": "./scripts/build.sh",
     "watch": "tsc -b -w",
-    "test": "jest",
+    "test": "jest --color",
     "check-types": "tsc --noEmit",
     "test:coverage": "jest --coverage --env=node --colors --verbose",
     "docs": "make -C docs html",

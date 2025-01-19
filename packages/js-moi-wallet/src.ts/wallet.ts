@@ -91,7 +91,7 @@ export class Wallet extends Signer {
 
     constructor(key: Buffer | string, curve: string, provider?: Provider) {
         try {
-            super();
+            super(provider);
 
             __vault.set(this, {
                 value: void 0,
