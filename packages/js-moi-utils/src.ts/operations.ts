@@ -12,7 +12,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      *
      * @returns Returns the POLO schema for the operation payload.
      */
-    schema: () => PoloSchema;
+    schema: PoloSchema;
     /**
      * Validates the operation payload.
      *
@@ -52,19 +52,17 @@ const isOperationType = <TOpType extends OpType>(type: TOpType, operation: IxOpe
 
 const createParticipantCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.ParticipantCreate>>({
-        schema: () => {
-            return polo.struct({
-                address: polo.bytes,
-                keys_payload: polo.arrayOf(
-                    polo.struct({
-                        public_key: polo.bytes,
-                        weight: polo.integer,
-                        signature_algorithm: polo.integer,
-                    })
-                ),
-                amount: polo.integer,
-            });
-        },
+        schema: polo.struct({
+            address: polo.bytes,
+            keys_payload: polo.arrayOf(
+                polo.struct({
+                    public_key: polo.bytes,
+                    weight: polo.integer,
+                    signature_algorithm: polo.integer,
+                })
+            ),
+            amount: polo.integer,
+        }),
 
         transform: ({ payload }) => ({ ...payload, address: hexToBytes(payload.address) }),
 
@@ -85,25 +83,21 @@ const createParticipantCreateDescriptor = () => {
 
 const createAssetCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.AssetCreate>>({
-        schema: () => {
-            const logicPayloadSchema = polo.struct({
+        schema: polo.struct({
+            symbol: polo.string,
+            supply: polo.integer,
+            standard: polo.integer,
+            dimension: polo.integer,
+            is_stateful: polo.boolean,
+            is_logical: polo.boolean,
+            logic_payload: polo.struct({
                 manifest: polo.bytes,
                 logic_id: polo.string,
                 callsite: polo.string,
                 calldata: polo.bytes,
                 interface: polo.map({ keys: polo.string, values: polo.string }),
-            });
-
-            return polo.struct({
-                symbol: polo.string,
-                supply: polo.integer,
-                standard: polo.integer,
-                dimension: polo.integer,
-                is_stateful: polo.boolean,
-                is_logical: polo.boolean,
-                logic_payload: logicPayloadSchema,
-            });
-        },
+            }),
+        }),
 
         validator: (operation) => {
             const { payload } = operation;
@@ -127,12 +121,10 @@ const createAssetCreateDescriptor = () => {
 
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze<IxOperationDescriptor<AssetSupplyOpType>>({
-        schema: () => {
-            return polo.struct({
-                asset_id: polo.string,
-                amount: polo.integer,
-            });
-        },
+        schema: polo.struct({
+            asset_id: polo.string,
+            amount: polo.integer,
+        }),
 
         validator: (operation) => {
             const { payload } = operation;
@@ -194,15 +186,13 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
     };
 
     return Object.freeze<IxOperationDescriptor<TOpType>>({
-        schema: () => {
-            return polo.struct({
-                benefactor: polo.bytes,
-                beneficiary: polo.bytes,
-                asset_id: polo.string,
-                amount: polo.integer,
-                timestamp: polo.integer,
-            });
-        },
+        schema: polo.struct({
+            benefactor: polo.bytes,
+            beneficiary: polo.bytes,
+            asset_id: polo.string,
+            amount: polo.integer,
+            timestamp: polo.integer,
+        }),
 
         transform: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
@@ -282,18 +272,16 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
     };
 
     return Object.freeze<IxOperationDescriptor<T>>({
-        schema: () => {
-            return polo.struct({
-                manifest: polo.bytes,
-                logic_id: polo.string,
-                callsite: polo.string,
-                calldata: polo.bytes,
-                interfaces: polo.map({
-                    keys: polo.string,
-                    values: polo.string,
-                }),
-            });
-        },
+        schema: polo.struct({
+            manifest: polo.bytes,
+            logic_id: polo.string,
+            callsite: polo.string,
+            calldata: polo.bytes,
+            interfaces: polo.map({
+                keys: polo.string,
+                values: polo.string,
+            }),
+        }),
 
         transform: ({ payload }) => {
             if ("manifest" in payload) {
@@ -420,7 +408,7 @@ export const encodeOperation = <TOpType extends OpType>(operation: IxOperation<T
     const polorizer = new Polorizer();
     const data = transformOperationPayload(operation);
 
-    polorizer.polorize(data, descriptor.schema());
+    polorizer.polorize(data, descriptor.schema);
 
     return { type: operation.type, payload: polorizer.bytes() };
 };

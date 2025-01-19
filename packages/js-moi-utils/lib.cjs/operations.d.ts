@@ -7,7 +7,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      *
      * @returns Returns the POLO schema for the operation payload.
      */
-    schema: () => PoloSchema;
+    schema: PoloSchema;
     /**
      * Validates the operation payload.
      *
