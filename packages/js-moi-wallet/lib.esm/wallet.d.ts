@@ -35,12 +35,6 @@ export declare class Wallet extends Signer {
     private readonly key_index;
     constructor(key: Buffer | string, curve: string, provider?: Provider);
     /**
-     * Checks if the wallet is initialized.
-     *
-     * @returns {boolean} true if the wallet is initialized, false otherwise.
-     */
-    isInitialized(): boolean;
-    /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
      * @param {string} password Used for encrypting the keystore data.

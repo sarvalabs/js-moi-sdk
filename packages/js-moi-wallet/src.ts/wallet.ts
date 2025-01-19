@@ -125,19 +125,6 @@ export class Wallet extends Signer {
     }
 
     /**
-     * Checks if the wallet is initialized.
-     *
-     * @returns {boolean} true if the wallet is initialized, false otherwise.
-     */
-    public isInitialized(): boolean {
-        if (privateMapGet(this, __vault)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
      * @param {string} password Used for encrypting the keystore data.
@@ -146,10 +133,6 @@ export class Wallet extends Signer {
      * is an error generating the keystore.
      */
     public generateKeystore(password: string): Keystore {
-        if (!this.isInitialized()) {
-            ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
-        }
-
         try {
             const data = Buffer.from(this.privateKey, "hex");
             return encryptKeystoreData(data, password);
@@ -165,11 +148,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     public get privateKey(): string {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._key;
-        }
-
-        ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._key;
     }
 
     /**
@@ -179,11 +158,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     public get mnemonic(): string {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._mnemonic;
-        }
-
-        ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._mnemonic;
     }
 
     /**
@@ -193,11 +168,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     public get publicKey(): string {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._public;
-        }
-
-        ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._public;
     }
 
     /**
@@ -206,11 +177,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     public get curve(): string {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._curve;
-        }
-
-        ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._curve;
     }
 
     /**
@@ -331,6 +298,7 @@ export class Wallet extends Signer {
             const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
             return new Wallet(privateKey, CURVE.SECP256K1);
         } catch (err) {
+            console.error(err);
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
             });

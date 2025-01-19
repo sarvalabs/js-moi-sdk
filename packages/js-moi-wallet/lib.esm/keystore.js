@@ -3,7 +3,7 @@ import { keccak_256 } from "@noble/hashes/sha3";
 import { randomBytes } from "@noble/hashes/utils";
 import { CTR } from "aes-js";
 import { Buffer } from "buffer";
-import { ErrorCode, ErrorUtils, bytesToHex } from "js-moi-utils";
+import { ErrorCode, ErrorUtils } from "js-moi-utils";
 /**
  * Encrypts input data using AES-128-CTR mode with XOR encryption.
  *
@@ -58,9 +58,9 @@ export const encryptKeystoreData = (data, password) => {
     const mac = keccak_256(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     return {
         cipher: "aes-128-ctr",
-        ciphertext: bytesToHex(cipherText),
+        ciphertext: Buffer.from(cipherText).toString("hex"),
         cipherparams: {
-            IV: bytesToHex(iv),
+            IV: Buffer.from(iv).toString("hex"),
         },
         kdf: "scrypt",
         kdfparams: {
@@ -68,9 +68,9 @@ export const encryptKeystoreData = (data, password) => {
             r: 8,
             p: 1,
             dklen: 32,
-            salt: bytesToHex(salt),
+            salt: Buffer.from(salt).toString("hex"),
         },
-        mac: bytesToHex(mac),
+        mac: Buffer.from(mac).toString("hex"),
     };
 };
 /**

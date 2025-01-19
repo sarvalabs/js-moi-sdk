@@ -63,9 +63,9 @@ const encryptKeystoreData = (data, password) => {
     const mac = (0, sha3_1.keccak_256)(buffer_1.Buffer.concat([derivedKey.slice(16, 32), cipherText]));
     return {
         cipher: "aes-128-ctr",
-        ciphertext: (0, js_moi_utils_1.bytesToHex)(cipherText),
+        ciphertext: buffer_1.Buffer.from(cipherText).toString("hex"),
         cipherparams: {
-            IV: (0, js_moi_utils_1.bytesToHex)(iv),
+            IV: buffer_1.Buffer.from(iv).toString("hex"),
         },
         kdf: "scrypt",
         kdfparams: {
@@ -73,9 +73,9 @@ const encryptKeystoreData = (data, password) => {
             r: 8,
             p: 1,
             dklen: 32,
-            salt: (0, js_moi_utils_1.bytesToHex)(salt),
+            salt: buffer_1.Buffer.from(salt).toString("hex"),
         },
-        mac: (0, js_moi_utils_1.bytesToHex)(mac),
+        mac: buffer_1.Buffer.from(mac).toString("hex"),
     };
 };
 exports.encryptKeystoreData = encryptKeystoreData;

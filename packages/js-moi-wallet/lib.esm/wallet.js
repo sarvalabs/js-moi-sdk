@@ -95,7 +95,7 @@ export class Wallet extends Signer {
                 ErrorUtils.throwError(`Unsupported curve: ${curve}`, ErrorCode.UNSUPPORTED_OPERATION);
             }
             const ecPrivKey = new elliptic.ec(curve);
-            const keyBuffer = key instanceof Buffer ? key : Buffer.from(key, "hex");
+            const keyBuffer = typeof key === "string" ? Buffer.from(key, "hex") : key;
             const keyInBytes = bufferToUint8(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
@@ -111,17 +111,6 @@ export class Wallet extends Signer {
         }
     }
     /**
-     * Checks if the wallet is initialized.
-     *
-     * @returns {boolean} true if the wallet is initialized, false otherwise.
-     */
-    isInitialized() {
-        if (privateMapGet(this, __vault)) {
-            return true;
-        }
-        return false;
-    }
-    /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
      * @param {string} password Used for encrypting the keystore data.
@@ -130,9 +119,6 @@ export class Wallet extends Signer {
      * is an error generating the keystore.
      */
     generateKeystore(password) {
-        if (!this.isInitialized()) {
-            ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
-        }
         try {
             const data = Buffer.from(this.privateKey, "hex");
             return encryptKeystoreData(data, password);
@@ -148,10 +134,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     get privateKey() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._key;
-        }
-        ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._key;
     }
     /**
      * Retrieves the mnemonic associated with the wallet.
@@ -160,10 +143,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     get mnemonic() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._mnemonic;
-        }
-        ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._mnemonic;
     }
     /**
      * Public key associated with the wallet.
@@ -172,10 +152,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     get publicKey() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._public;
-        }
-        ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._public;
     }
     /**
      * Curve associated with the wallet.
@@ -183,10 +160,7 @@ export class Wallet extends Signer {
      * @readonly
      */
     get curve() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._curve;
-        }
-        ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._curve;
     }
     /**
      * Retrieves the address associated with the wallet.
@@ -295,6 +269,7 @@ export class Wallet extends Signer {
             return new Wallet(privateKey, CURVE.SECP256K1);
         }
         catch (err) {
+            console.error(err);
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
             });

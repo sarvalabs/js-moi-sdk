@@ -124,7 +124,7 @@ class Wallet extends js_moi_signer_1.Signer {
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
             }
             const ecPrivKey = new elliptic_1.default.ec(curve);
-            const keyBuffer = key instanceof buffer_1.Buffer ? key : buffer_1.Buffer.from(key, "hex");
+            const keyBuffer = typeof key === "string" ? buffer_1.Buffer.from(key, "hex") : key;
             const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
@@ -140,17 +140,6 @@ class Wallet extends js_moi_signer_1.Signer {
         }
     }
     /**
-     * Checks if the wallet is initialized.
-     *
-     * @returns {boolean} true if the wallet is initialized, false otherwise.
-     */
-    isInitialized() {
-        if (privateMapGet(this, __vault)) {
-            return true;
-        }
-        return false;
-    }
-    /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
      * @param {string} password Used for encrypting the keystore data.
@@ -159,9 +148,6 @@ class Wallet extends js_moi_signer_1.Signer {
      * is an error generating the keystore.
      */
     generateKeystore(password) {
-        if (!this.isInitialized()) {
-            js_moi_utils_1.ErrorUtils.throwError("Keystore not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
-        }
         try {
             const data = buffer_1.Buffer.from(this.privateKey, "hex");
             return (0, keystore_1.encryptKeystoreData)(data, password);
@@ -177,10 +163,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * @readonly
      */
     get privateKey() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._key;
-        }
-        js_moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._key;
     }
     /**
      * Retrieves the mnemonic associated with the wallet.
@@ -189,10 +172,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * @readonly
      */
     get mnemonic() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._mnemonic;
-        }
-        js_moi_utils_1.ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._mnemonic;
     }
     /**
      * Public key associated with the wallet.
@@ -201,10 +181,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * @readonly
      */
     get publicKey() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._public;
-        }
-        js_moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._public;
     }
     /**
      * Curve associated with the wallet.
@@ -212,10 +189,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * @readonly
      */
     get curve() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._curve;
-        }
-        js_moi_utils_1.ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        return privateMapGet(this, __vault)._curve;
     }
     /**
      * Retrieves the address associated with the wallet.
@@ -324,6 +298,7 @@ class Wallet extends js_moi_signer_1.Signer {
             return new Wallet(privateKey, CURVE.SECP256K1);
         }
         catch (err) {
+            console.error(err);
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
             });

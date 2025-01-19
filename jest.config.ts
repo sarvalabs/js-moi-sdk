@@ -19,14 +19,14 @@ const configuration: Config = {
                 "^.+\\.tsx?$": "ts-jest",
             },
         },
-        // {
-        //     displayName: "js-moi-wallet",
-        //     testEnvironment: "ts-node",
-        //     testMatch: ["<rootDir>/packages/js-moi-wallet/__tests__/*.test.ts"],
-        //     transform: {
-        //         "^.+\\.tsx?$": "ts-jest",
-        //     },
-        // },
+        {
+            displayName: "js-moi-wallet",
+            testEnvironment: "ts-node",
+            testMatch: ["<rootDir>/packages/js-moi-wallet/__tests__/*.test.ts"],
+            transform: {
+                "^.+\\.tsx?$": "ts-jest",
+            },
+        },
         {
             displayName: "js-moi-manifest",
             testEnvironment: "ts-node",

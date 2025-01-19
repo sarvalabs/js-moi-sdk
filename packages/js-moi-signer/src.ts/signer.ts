@@ -27,8 +27,6 @@ export abstract class Signer {
 
     public abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
 
-    public abstract isInitialized(): boolean;
-
     public connect(provider: Provider): void {
         this.provider = provider;
     }

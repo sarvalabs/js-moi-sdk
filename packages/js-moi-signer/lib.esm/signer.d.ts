@@ -10,7 +10,6 @@ export declare abstract class Signer {
     abstract getAddress(): Promise<Hex>;
     abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
     abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
-    abstract isInitialized(): boolean;
     connect(provider: Provider): void;
     getProvider(): Provider;
     private getLatestSequence;
