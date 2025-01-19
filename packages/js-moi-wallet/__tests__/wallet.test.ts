@@ -132,6 +132,35 @@ describe(Wallet, () => {
         });
     });
 
+    describe(wallet.verify, () => {
+        it.concurrent("should be verify a signature using ECDSA secp256k1", async () => {
+            const message = "Hello, MOI";
+            const signature =
+                "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
+            const ok = wallet.verify(new TextEncoder().encode(message), signature, wallet.publicKey);
+
+            expect(ok).toBeTruthy();
+        });
+
+        it.concurrent("should be able to verify when public key in byte array", async () => {
+            const message = new TextEncoder().encode("Hello, MOI");
+            const signature =
+                "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
+            const ok = wallet.verify(message, signature, hexToBytes(wallet.publicKey));
+
+            expect(ok).toBeTruthy();
+        });
+
+        it.concurrent("should return false if signature is invalid", async () => {
+            const message = "Hello, MOI";
+            const signature =
+                "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726401";
+            const ok = wallet.verify(new TextEncoder().encode(message), signature, wallet.publicKey);
+
+            expect(ok).toBeFalsy();
+        });
+    });
+
     describe(wallet.signInteraction, () => {
         const interaction: InteractionRequest = {
             sender: {
