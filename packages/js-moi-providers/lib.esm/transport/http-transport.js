@@ -42,14 +42,12 @@ export class HttpTransport {
             result = await response.json();
         }
         catch (error) {
+            const isNetworkError = error?.cause.code === "ECONNREFUSED";
+            const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
             result = {
                 id: 1,
                 jsonrpc: "2.0",
-                error: {
-                    code: -1,
-                    message: error instanceof Error ? error.message : "An unknown error occurred",
-                    data: error,
-                },
+                error: { code: -1, message: errMessage, data: error },
             };
         }
         this.option?.debug?.(request, {
