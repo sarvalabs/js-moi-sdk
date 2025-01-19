@@ -33,7 +33,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-logic",
-        run_tests: false,
+        run_tests: true,
     },
     {
         name: "js-moi-signer",
@@ -41,7 +41,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-providers",
-        run_tests: false,
+        run_tests: true,
     },
     {
         name: "js-moi-utils",

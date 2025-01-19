@@ -22,9 +22,7 @@ const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc
 const HOST = "http://localhost:1600";
 
 describe(JsonRpcProvider, () => {
-    const provider = new HttpProvider(HOST, {
-        debug: (request) => console.log(JSON.stringify(request, null, 2)),
-    });
+    const provider = new HttpProvider(HOST, {});
 
     describe(provider.getNetworkInfo, () => {
         it.concurrent("should return the protocol version and chain id", async () => {
