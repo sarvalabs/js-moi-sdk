@@ -80,11 +80,11 @@ const config: Config = {
     coverageDirectory: "coverage",
     coverageReporters: ["html", "text-summary"],
     coverageProvider: "v8",
-    maxConcurrency: 10,
     detectLeaks: true,
     verbose: true,
     workerThreads: true,
-    maxWorkers: 10,
+    maxConcurrency: 50,
+    maxWorkers: "100%",
     coveragePathIgnorePatterns: ["<rootDir>/packages/*/__tests__/.+"],
     projects: getProjects(),
 };
