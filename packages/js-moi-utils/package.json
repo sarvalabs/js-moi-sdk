@@ -25,7 +25,7 @@
   "dependencies": {
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
-    "polo-schema": "^1.0.1",
+    "polo-schema": "^1.0.3",
     "js-moi-constants": "0.6.0"
   },
   "devDependencies": {

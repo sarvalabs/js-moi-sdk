@@ -298,7 +298,6 @@ class Wallet extends js_moi_signer_1.Signer {
             return new Wallet(privateKey, CURVE.SECP256K1);
         }
         catch (err) {
-            console.error(err);
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
             });

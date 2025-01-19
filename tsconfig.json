@@ -21,7 +21,9 @@
         "experimentalDecorators": true,
         "noUnusedLocals": true,
         "incremental": true,
-        "tsBuildInfoFile": "dist/.tsbuildinfo"
+        "tsBuildInfoFile": "dist/.tsbuildinfo",
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true
     },
     "ts-node": {
         "esm": true
