@@ -103,7 +103,6 @@ export class Wallet extends Signer {
             });
         }
         catch (error) {
-            console.log(error);
             ErrorUtils.throwError("Failed to load wallet", ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
     }

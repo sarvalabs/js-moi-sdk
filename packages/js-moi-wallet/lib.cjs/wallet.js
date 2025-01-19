@@ -132,7 +132,6 @@ class Wallet extends js_moi_signer_1.Signer {
             });
         }
         catch (error) {
-            console.log(error);
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
     }

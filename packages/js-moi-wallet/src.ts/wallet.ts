@@ -116,7 +116,6 @@ export class Wallet extends Signer {
                 _curve: curve,
             });
         } catch (error) {
-            console.log(error);
             ErrorUtils.throwError("Failed to load wallet", ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
     }

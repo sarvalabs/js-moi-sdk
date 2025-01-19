@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.decryptKeystoreData = exports.encryptKeystoreData = exports.getKDFKeyForKeystore = exports.aesCTRWithXOR = void 0;
 const scrypt_1 = require("@noble/hashes/scrypt");
 const sha3_1 = require("@noble/hashes/sha3");
+const utils_1 = require("@noble/hashes/utils");
 const aes_js_1 = require("aes-js");
 const js_moi_utils_1 = require("js-moi-utils");
 /**
@@ -17,18 +18,9 @@ const aesCTRWithXOR = (key, input, iv) => {
     return new aes_js_1.CTR(key, iv).encrypt(input);
 };
 exports.aesCTRWithXOR = aesCTRWithXOR;
-/**
- * Derives the key for a keystore based on the provided password and
- * KDF parameters.
- *
- * @param {Keystore} keystore - Keystore object.
- * @param {string} password - Password for key derivation.
- * @returns {Buffer} Derived key.
- * @throws {Error} If the KDF is unsupported.
- */
 const getKDFKeyForKeystore = (keystore, password) => {
-    const pwBuf = Buffer.from(password);
-    const salt = Buffer.from(keystore.kdfparams.salt, "hex");
+    const pwBuf = new TextEncoder().encode(password);
+    const salt = (0, js_moi_utils_1.hexToBytes)(keystore.kdfparams.salt);
     const dkLen = keystore.kdfparams.dklen;
     if (keystore.kdf === "scrypt") {
         const n = keystore.kdfparams.n;
@@ -50,12 +42,12 @@ const encryptKeystoreData = (data, password) => {
     const encryptKey = derivedKey.slice(0, 16);
     const iv = (0, js_moi_utils_1.randomBytes)(16);
     const cipherText = (0, exports.aesCTRWithXOR)(encryptKey, data, iv);
-    const mac = (0, sha3_1.keccak_256)(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
+    const mac = (0, sha3_1.keccak_256)((0, utils_1.concatBytes)(derivedKey.slice(16, 32), cipherText));
     return {
         cipher: "aes-128-ctr",
-        ciphertext: Buffer.from(cipherText).toString("hex"),
+        ciphertext: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(cipherText)),
         cipherparams: {
-            IV: Buffer.from(iv).toString("hex"),
+            IV: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(iv)),
         },
         kdf: "scrypt",
         kdfparams: {
@@ -63,34 +55,24 @@ const encryptKeystoreData = (data, password) => {
             r: 8,
             p: 1,
             dklen: 32,
-            salt: Buffer.from(salt).toString("hex"),
+            salt: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(salt)),
         },
-        mac: Buffer.from(mac).toString("hex"),
+        mac: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(mac)),
     };
 };
 exports.encryptKeystoreData = encryptKeystoreData;
-/**
- * Decrypts the keystore data using the provided password.
- *
- * @param {Keystore} keystore - Keystore object to decrypt.
- * @param {string} password - Password for decryption.
- * @returns {Buffer} Decrypted data.
- * @throws {Error} If the cipher is not supported or the password is incorrect.
- */
 const decryptKeystoreData = (keystore, password) => {
     if (keystore.cipher !== "aes-128-ctr") {
         js_moi_utils_1.ErrorUtils.throwError(`Cipher not supported: ${keystore.cipher}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
-    const mac = Buffer.from(keystore.mac, "hex");
-    const iv = Buffer.from(keystore.cipherparams.IV, "hex");
-    const cipherText = Buffer.from(keystore.ciphertext, "hex");
+    const iv = (0, js_moi_utils_1.hexToBytes)(keystore.cipherparams.IV);
+    const cipherText = (0, js_moi_utils_1.hexToBytes)(keystore.ciphertext);
     const derivedKey = (0, exports.getKDFKeyForKeystore)(keystore, password);
-    const hash = (0, sha3_1.keccak_256)(Buffer.concat([derivedKey.slice(16, 32), cipherText]));
-    const calculatedMAC = Buffer.from(hash);
-    if (!calculatedMAC.equals(mac)) {
+    const hash = (0, sha3_1.keccak_256)((0, utils_1.concatBytes)(derivedKey.slice(16, 32), cipherText));
+    if ((0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(hash)) !== keystore.mac) {
         js_moi_utils_1.ErrorUtils.throwError("Could not decrypt key with the given password", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
-    return Buffer.from((0, exports.aesCTRWithXOR)(derivedKey.slice(0, 16), cipherText, iv));
+    return (0, exports.aesCTRWithXOR)(derivedKey.slice(0, 16), cipherText, iv);
 };
 exports.decryptKeystoreData = decryptKeystoreData;
 //# sourceMappingURL=keystore.js.map

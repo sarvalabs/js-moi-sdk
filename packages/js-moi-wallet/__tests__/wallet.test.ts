@@ -104,8 +104,11 @@ describe(Wallet, () => {
         it.concurrent("should generate a keystore using a password", async () => {
             const password = "password";
             const keystore = wallet.generateKeystore(password);
+            const wallet2 = Wallet.fromKeystore(JSON.stringify(keystore), password);
 
             expect(keystore).toBeDefined();
+            expect(wallet2.privateKey).toEqual(wallet.privateKey);
+            expect(wallet2.publicKey).toEqual(wallet.publicKey);
         });
 
         it.concurrent("should throw an error if password is not provided", async () => {
