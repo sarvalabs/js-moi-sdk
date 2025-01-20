@@ -41,7 +41,7 @@
     "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@noble/hashes": "^1.1.5",

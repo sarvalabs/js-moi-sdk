@@ -304,40 +304,21 @@ describe("Provider integration test", () => {
     describe(wallet.execute, () => {
         let ix: InteractionResponse;
 
-        // TODO: This is behavior similar to `Promise.withResolver` in MDN. Consider moving this to a utility function.
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers
-        const signal = () => {
-            let done = () => {};
-            const promise = new Promise<void>((resolve) => {
-                done = resolve;
-            });
-
-            return { promise, done };
-        };
-
-        const complete = signal();
-
         beforeAll(async () => {
             ix = await wallet.execute({
                 fuel_price: 1,
                 fuel_limit: 100,
                 operations,
             });
-
-            complete.done();
         });
 
-        it.concurrent("should be able to execute a interaction", async () => {
-            await complete.promise;
-
+        it("should be able to execute a interaction", async () => {
             expect(ix).toBeDefined();
             expect(ix).toBeInstanceOf(InteractionResponse);
             expect(isHex(ix.hash)).toBeTruthy();
         });
 
-        it.concurrent("should be able to get the interaction confirmation", async () => {
-            await complete.promise;
-
+        it("should be able to get the interaction confirmation", async () => {
             const confirmation = await ix.wait();
 
             expect(confirmation).toBeDefined();
@@ -348,9 +329,7 @@ describe("Provider integration test", () => {
             }
         });
 
-        it.concurrent("should be able to get the interaction result", async () => {
-            await complete.promise;
-
+        it("should be able to get the interaction result", async () => {
             const result = await ix.result();
 
             expect(result).toBeDefined();
