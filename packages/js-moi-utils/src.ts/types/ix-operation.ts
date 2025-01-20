@@ -77,9 +77,9 @@ export interface AssetCreatePayload {
 }
 
 export interface KeyAddPayload {
-    public_key: Hex;
+    public_key: string;
     weight: number;
-    signature_algorithm: number;
+    signature_algorithm: 0;
 }
 
 export interface PoloParticipantCreatePayload {

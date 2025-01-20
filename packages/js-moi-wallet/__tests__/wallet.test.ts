@@ -260,7 +260,7 @@ if (shouldRunProviderIntegrationTests) {
         const wallet = Wallet.createRandomSync(getProvider());
 
         // Register a new participant.
-        beforeEach(async () => {
+        beforeAll(async () => {
             const ix = await initWallet().execute({
                 fuel_price: 1,
                 fuel_limit: 100,
@@ -270,7 +270,7 @@ if (shouldRunProviderIntegrationTests) {
                         payload: {
                             address: await wallet.getAddress(),
                             amount: 100_000,
-                            keys_payload: [{ public_key: ensureHexPrefix(wallet.publicKey), weight: 1000, signature_algorithm: 0 }],
+                            keys_payload: [{ public_key: wallet.publicKey, weight: 1000, signature_algorithm: 0 }],
                         },
                     },
                 ],
