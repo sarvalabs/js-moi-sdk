@@ -1,6 +1,6 @@
 import { HttpProvider, InteractionResponse, JsonRpcProvider, WebsocketProvider, type Provider } from "js-moi-providers";
 import type { SigType } from "js-moi-signer";
-import { AssetStandard, ensureHexPrefix, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
+import { AssetStandard, bytesToHex, ensureHexPrefix, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
 
 describe(Wallet, () => {
@@ -16,6 +16,29 @@ describe(Wallet, () => {
         expect(await wallet.getAddress()).toEqual(ADDRESS);
         expect(wallet.privateKey).toEqual(PRIVATE_KEY);
         expect(wallet.mnemonic).not.toBeDefined();
+    });
+
+    it.concurrent("should throw error creating wallet if curve is not supported", async () => {
+        expect(() => new Wallet(PRIVATE_KEY, "unknown" as CURVE)).toThrow();
+        expect(() => new Wallet(PRIVATE_KEY, "" as CURVE)).toThrow();
+    });
+
+    it.concurrent("should throw error creating wallet if private key is invalid", async () => {
+        expect(() => new Wallet(2 as any, CURVE.SECP256K1)).toThrow();
+        expect(() => new Wallet(true as any, CURVE.SECP256K1)).toThrow();
+        expect(() => new Wallet("", CURVE.SECP256K1)).toThrow();
+    });
+
+    it.concurrent("should throw error creating a wallet from invalid mnemonic", async () => {
+        await expect(Wallet.fromMnemonic("")).rejects.toThrow();
+        await expect(Wallet.fromMnemonic("a b c d e f g h i j k l")).rejects.toThrow();
+        await expect(Wallet.fromMnemonic(null!)).rejects.toThrow();
+    });
+
+    it.concurrent("should throw error creating a wallet from invalid mnemonic", async () => {
+        expect(() => Wallet.fromMnemonicSync("")).toThrow();
+        expect(() => Wallet.fromMnemonicSync("a b c d e f g h i j k l")).toThrow();
+        expect(() => Wallet.fromMnemonicSync(null!)).toThrow();
     });
 
     it.concurrent.each([
@@ -91,9 +114,24 @@ describe(Wallet, () => {
             expect(signing).rejects.toThrow();
         });
 
+        it.concurrent("should throw an error if message is invalid", async () => {
+            await expect(wallet.sign(null!, algorithm)).rejects.toThrow();
+            await expect(wallet.sign("" as any, algorithm)).rejects.toThrow();
+            await expect(wallet.sign(1 as any, algorithm)).rejects.toThrow();
+            await expect(wallet.sign("invalid" as any, algorithm)).rejects.toThrow();
+        });
+
+        const message = "Hello, MOI";
+
         it.concurrent("should sign a message using ECDSA secp256k1", async () => {
-            const message = "Hello, MOI";
             const signature = await wallet.sign(new TextEncoder().encode(message), algorithm);
+            const expected = "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
+
+            expect(signature).toEqual(expected);
+        });
+
+        it.concurrent("should be able to sign a message when message in a hex string", async () => {
+            const signature = await wallet.sign(bytesToHex(new TextEncoder().encode(message)), algorithm);
             const expected = "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
 
             expect(signature).toEqual(expected);
