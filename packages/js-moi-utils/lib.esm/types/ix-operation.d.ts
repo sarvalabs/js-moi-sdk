@@ -80,7 +80,9 @@ export interface KeyAddPayload {
 export interface PoloParticipantCreatePayload {
     address: Uint8Array;
     amount: number;
-    keys_payload: KeyAddPayload[];
+    keys_payload: (Omit<KeyAddPayload, "public_key"> & {
+        public_key: Uint8Array;
+    })[];
 }
 /**
  * `ParticipantCreatePayload` holds the data for creating a new participant account

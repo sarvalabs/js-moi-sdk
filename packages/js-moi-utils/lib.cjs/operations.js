@@ -31,7 +31,17 @@ const createParticipantCreateDescriptor = () => {
             })),
             amount: polo_schema_1.polo.integer,
         }),
-        transform: ({ payload }) => ({ ...payload, address: (0, hex_1.hexToBytes)(payload.address) }),
+        transform: ({ payload }) => {
+            const poloKeysPayload = payload.keys_payload.map((payload) => ({
+                ...payload,
+                public_key: (0, hex_1.hexToBytes)(payload.public_key),
+            }));
+            return {
+                ...payload,
+                address: (0, hex_1.hexToBytes)(payload.address),
+                keys_payload: poloKeysPayload,
+            };
+        },
         validator: (operation) => {
             const { payload } = operation;
             if (!(0, address_1.isValidAddress)(payload.address)) {

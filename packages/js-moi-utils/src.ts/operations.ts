@@ -64,7 +64,18 @@ const createParticipantCreateDescriptor = () => {
             amount: polo.integer,
         }),
 
-        transform: ({ payload }) => ({ ...payload, address: hexToBytes(payload.address) }),
+        transform: ({ payload }) => {
+            const poloKeysPayload = payload.keys_payload.map((payload) => ({
+                ...payload,
+                public_key: hexToBytes(payload.public_key),
+            }));
+
+            return {
+                ...payload,
+                address: hexToBytes(payload.address),
+                keys_payload: poloKeysPayload,
+            };
+        },
 
         validator: (operation) => {
             const { payload } = operation;
