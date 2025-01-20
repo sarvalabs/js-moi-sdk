@@ -98,6 +98,14 @@ describe(Wallet, () => {
     let wallet = Wallet.fromMnemonicSync(MNEMONIC, { path: DEVIATION_PATH });
     let algorithm: SigType = wallet.signingAlgorithms.ecdsa_secp256k1;
 
+    describe(wallet.getKeyIndex, () => {
+        it.concurrent("should return the key index", async () => {
+            const index = await wallet.getKeyIndex();
+
+            expect(index).toBeGreaterThanOrEqual(0);
+        });
+    });
+
     describe(wallet.sign, () => {
         it.concurrent("should throw an error is signing algorithm not provided", async () => {
             const message = "Hello, MOI";
@@ -285,6 +293,7 @@ const getProvider = (): Provider => {
 
 describe("Provider integration test", () => {
     const it = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it : globalThis.it.skip;
+    it.concurrent = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it.concurrent : globalThis.it.concurrent.skip;
 
     const initWallet = () => {
         if (!process.env["TEST_PRIVATE_KEY"]) {

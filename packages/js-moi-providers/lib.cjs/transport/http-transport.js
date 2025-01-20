@@ -1,10 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpTransport = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 class HttpTransport {
     host;
     option;
+    static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
     constructor(host, option) {
+        if (!host) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`Http host is required`, "host", host);
+        }
+        if (!HttpTransport.HOST_REGEX.test(host)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid host url "${host}"`, "host", host);
+        }
         this.host = host;
         this.option = option;
     }
