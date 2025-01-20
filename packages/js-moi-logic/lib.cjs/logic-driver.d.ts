@@ -1,6 +1,6 @@
 import type { SimulateInteractionRequest, TimerOption } from "js-moi-providers";
-import type { SignerIx } from "js-moi-signer";
-import { LogicId, LogicState, RoutineType, StorageKey, type Hex, type InteractionRequest, type IxOp } from "js-moi-utils";
+import type { Signer, SignerIx } from "js-moi-signer";
+import { LogicId, LogicState, RoutineType, StorageKey, type Address, type Hex, type InteractionRequest, type IxOp, type LogicManifest } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 /**
@@ -125,4 +125,14 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      */
     ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
 }
+/**
+ * Retrieves a LogicDriver instance for the given logic ID.
+ *
+ * @param logicId - The ID of the logic to retrieve.
+ * @param signer - The signer object used to interact with the logic.
+ * @returns A promise that resolves to a LogicDriver instance.
+ *
+ * @throws Will throw an error if the provider fails to retrieve the logic.
+ */
+export declare const getLogicDriver: <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Address | LogicId | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
 //# sourceMappingURL=logic-driver.d.ts.map
