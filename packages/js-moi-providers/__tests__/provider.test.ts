@@ -11,6 +11,7 @@ import {
     trimHexPrefix,
     type Address,
     type Hex,
+    type JsonRpcResponse,
 } from "js-moi-utils";
 import { HttpProvider, HttpTransport, JsonRpcProvider } from "../src.ts";
 import type { LogicMessageRequestOption } from "../src.ts/types/provider.ts";
@@ -21,10 +22,56 @@ const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc
 const HOST = "http://localhost:1600";
 
 describe(JsonRpcProvider, () => {
-    const provider = new HttpProvider(HOST, {});
+    const provider: JsonRpcProvider = new HttpProvider(HOST, {});
 
-    it("should create instance of JsonRpcProvider", () => {
-        expect(new JsonRpcProvider(new HttpTransport("http://localhost:1600"))).toBeInstanceOf(JsonRpcProvider);
+    describe("constructor", () => {
+        it.concurrent("should create instance of JsonRpcProvider", () => {
+            expect(new JsonRpcProvider(new HttpTransport("http://localhost:1600"))).toBeInstanceOf(JsonRpcProvider);
+        });
+
+        it.concurrent("should throw error if transport is not provided", () => {
+            expect(() => new JsonRpcProvider(null!)).toThrow();
+        });
+    });
+
+    describe("get transport", () => {
+        it.concurrent("should return the transport instance", () => {
+            expect(provider.transport).toBeInstanceOf(HttpTransport);
+        });
+    });
+
+    describe(provider.processJsonRpcResponse, () => {
+        it.concurrent("should return the result when response is successful", () => {
+            const response: JsonRpcResponse<unknown> = {
+                id: 1,
+                jsonrpc: "2.0",
+                result: "success",
+            };
+
+            const result = provider.processJsonRpcResponse(response);
+
+            expect(result).toBe(response.result);
+        });
+
+        it.concurrent("should throw error with correct error code when response is failed", () => {
+            const response: JsonRpcResponse<unknown> = {
+                id: 1,
+                jsonrpc: "2.0",
+                error: {
+                    code: 400,
+                    message: "Bad request",
+                    data: null,
+                },
+            };
+
+            try {
+                provider.processJsonRpcResponse(response);
+            } catch (error: any) {
+                expect(error instanceof Error).toBeTruthy();
+                expect(error?.message).toBe(response.error.message);
+                expect(error?.code).toBe(response.error.code);
+            }
+        });
     });
 
     describe("Network related tests", () => {
