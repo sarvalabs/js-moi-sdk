@@ -67,6 +67,8 @@ export class LogicDescriptor extends ElementDescriptor {
                 return toYaml(this.manifest);
             case ManifestCoderFormat.POLO:
                 return ManifestCoder.encodeManifest(this.manifest);
+            default:
+                ErrorUtils.throwArgumentError(`Unsupported format: ${format}`, "format", format);
         }
     }
     getStateElement(state) {

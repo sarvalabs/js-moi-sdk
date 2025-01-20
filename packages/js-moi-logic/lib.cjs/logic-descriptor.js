@@ -70,6 +70,8 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
                 return (0, yaml_1.stringify)(this.manifest);
             case js_moi_manifest_1.ManifestCoderFormat.POLO:
                 return js_moi_manifest_1.ManifestCoder.encodeManifest(this.manifest);
+            default:
+                js_moi_utils_1.ErrorUtils.throwArgumentError(`Unsupported format: ${format}`, "format", format);
         }
     }
     getStateElement(state) {
