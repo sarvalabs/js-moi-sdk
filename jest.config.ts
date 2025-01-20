@@ -1,12 +1,12 @@
 import deepmerge from "deepmerge";
 import type { Config } from "jest";
 
-// process.env["CI"] = (process.env.CI === "true").toString();
 process.env["HTTP_PROVIDER_HOST"] = "http://localhost:1600";
 process.env["WS_PROVIDER_HOST"] = "ws://localhost:1600/ws";
 process.env["PROVIDER_TYPE"] = "http";
 process.env["TEST_PRIVATE_KEY"] = "<WALLET PRIVATE KEY>";
 process.env["TEST_PRIVATE_KEY"] = "92799c19a74ae54ea453ee02176dbeb9c4b2c0a5133979d46e64afabeece8aea";
+process.env["RUN_NETWORK_TEST"] = "false";
 
 interface Package {
     name: string;
@@ -83,6 +83,7 @@ const getProjects = () => {
 
 const config: Config = {
     clearMocks: true,
+    ci: process.env.CI === "true",
     collectCoverage: true,
     coverageDirectory: "coverage",
     coverageReporters: ["html", "text-summary"],

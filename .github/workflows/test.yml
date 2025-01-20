@@ -37,6 +37,4 @@ jobs:
         run: npm install
 
       - name: Run tests
-        env:
-          CI: true
         run: npm run test

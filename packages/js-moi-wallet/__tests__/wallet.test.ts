@@ -246,11 +246,7 @@ const getProvider = (): Provider => {
 };
 
 describe("Provider integration test", () => {
-    const shouldRunProviderIntegrationTests = process.env["CI"] !== "true";
-
-    if (shouldRunProviderIntegrationTests === false) {
-        return;
-    }
+    const it = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it : globalThis.it.skip;
 
     const initWallet = () => {
         if (!process.env["TEST_PRIVATE_KEY"]) {
@@ -278,6 +274,8 @@ describe("Provider integration test", () => {
                 },
             ],
         });
+
+        console.log("Interaction Sent");
 
         await ix.wait();
     });
