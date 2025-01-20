@@ -245,86 +245,96 @@ const getProvider = (): Provider => {
     }
 };
 
-const initWallet = () => {
-    if (!process.env["TEST_PRIVATE_KEY"]) {
-        throw new Error("TEST_PRIVATE_KEY is not set");
+describe("Provider integration test", () => {
+    const shouldRunProviderIntegrationTests = process.env["CI"] !== "true";
+
+    if (shouldRunProviderIntegrationTests === false) {
+        return;
     }
 
-    return new Wallet(ensureHexPrefix(process.env["TEST_PRIVATE_KEY"]), CURVE.SECP256K1, getProvider());
-};
+    const initWallet = () => {
+        if (!process.env["TEST_PRIVATE_KEY"]) {
+            throw new Error("TEST_PRIVATE_KEY is not set");
+        }
 
-const shouldRunProviderIntegrationTests = process.env["CI"] !== "true";
+        return new Wallet(ensureHexPrefix(process.env["TEST_PRIVATE_KEY"]), CURVE.SECP256K1, getProvider());
+    };
 
-if (shouldRunProviderIntegrationTests) {
-    describe("Provider integration test", () => {
-        const wallet = Wallet.createRandomSync(getProvider());
+    const wallet = Wallet.createRandomSync(getProvider());
 
-        // Register a new participant.
-        beforeAll(async () => {
-            const ix = await initWallet().execute({
-                fuel_price: 1,
-                fuel_limit: 100,
-                operations: [
-                    {
-                        type: OpType.ParticipantCreate,
-                        payload: {
-                            address: await wallet.getAddress(),
-                            amount: 100_000,
-                            keys_payload: [{ public_key: wallet.publicKey, weight: 1000, signature_algorithm: 0 }],
-                        },
+    // Register a new participant.
+    beforeAll(async () => {
+        const ix = await initWallet().execute({
+            fuel_price: 1,
+            fuel_limit: 100,
+            operations: [
+                {
+                    type: OpType.ParticipantCreate,
+                    payload: {
+                        address: await wallet.getAddress(),
+                        amount: 100_000,
+                        keys_payload: [{ public_key: wallet.publicKey, weight: 1000, signature_algorithm: 0 }],
                     },
-                ],
-            });
-
-            await ix.wait();
+                },
+            ],
         });
 
-        const operations: IxOp[] = [
-            {
-                type: OpType.AssetCreate,
-                payload: { symbol: "MOI", standard: AssetStandard.MAS0, supply: 1000 },
-            },
-        ];
+        await ix.wait();
+    });
 
-        describe(wallet.simulate, () => {
-            it("should be able to simulate a interaction", async () => {
-                const simulation = await wallet.simulate({
-                    fuel_price: 1,
-                    operations,
-                });
+    const operations: IxOp[] = [
+        {
+            type: OpType.AssetCreate,
+            payload: { symbol: "MOI", standard: AssetStandard.MAS0, supply: 1000 },
+        },
+    ];
 
-                expect(simulation).toBeDefined();
-                expect(simulation.result).toHaveLength(1);
-            });
-        });
-
-        describe(wallet.execute, () => {
-            let ix: InteractionResponse;
-
-            beforeAll(async () => {
-                ix = await wallet.execute({
-                    fuel_price: 1,
-                    fuel_limit: 100,
-                    operations,
-                });
+    describe(wallet.simulate, () => {
+        it("should be able to simulate a interaction", async () => {
+            const simulation = await wallet.simulate({
+                fuel_price: 1,
+                operations,
             });
 
-            it("should be able to execute a interaction", async () => {
-                expect(ix).toBeDefined();
-                expect(ix).toBeInstanceOf(InteractionResponse);
-                expect(isHex(ix.hash)).toBeTruthy();
-            });
-
-            it("should be able to get the interaction confirmation", async () => {
-                const confirmation = await ix.wait();
-
-                expect(confirmation).toBeDefined();
-                expect(confirmation.status).toEqual(ReceiptStatus.Ok);
-
-                for (const operation of operations) {
-                    expect(confirmation.operations.some((op) => op.type === operation.type)).toBeTruthy();
-                }
-            });
+            expect(simulation).toBeDefined();
+            expect(simulation.result).toHaveLength(1);
         });
     });
-}
+
+    describe(wallet.execute, () => {
+        let ix: InteractionResponse;
+
+        beforeAll(async () => {
+            ix = await wallet.execute({
+                fuel_price: 1,
+                fuel_limit: 100,
+                operations,
+            });
+        });
+
+        it("should be able to execute a interaction", async () => {
+            expect(ix).toBeDefined();
+            expect(ix).toBeInstanceOf(InteractionResponse);
+            expect(isHex(ix.hash)).toBeTruthy();
+        });
+
+        it("should be able to get the interaction confirmation", async () => {
+            const confirmation = await ix.wait();
+
+            expect(confirmation).toBeDefined();
+            expect(confirmation.status).toEqual(ReceiptStatus.Ok);
+
+            for (const operation of operations) {
+                expect(confirmation.operations.some((op) => op.type === operation.type)).toBeTruthy();
+            }
+        });
+
+        it("should be able to get the interaction result", async () => {
+            const result = await ix.result();
+
+            expect(result).toBeDefined();
+            expect(result).toHaveLength(1);
+            expect(result[0].status).toEqual(ReceiptStatus.Ok);
+        });
+    });
+});
