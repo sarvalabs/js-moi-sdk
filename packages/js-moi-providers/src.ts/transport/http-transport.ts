@@ -54,7 +54,7 @@ export class HttpTransport implements Transport {
 
             result = await response.json();
         } catch (error: any) {
-            const isNetworkError = error?.cause.code === "ECONNREFUSED";
+            const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error.message === "Failed to fetch";
             const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
 
             result = {
