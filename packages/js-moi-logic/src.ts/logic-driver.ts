@@ -184,7 +184,6 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
         const simulation = await this.signer.simulate(baseIxRequest, option?.sequence);
 
-        // TODO: SHOULD SDK handle this? that if fuel limit is provided and it is less than the effort, it should throw an error
         if (option?.fuel_limit != null && option.fuel_limit < simulation.effort) {
             ErrorUtils.throwError(`Minimum fuel limit required for interaction is ${simulation.effort} but got ${option.fuel_limit}.`);
         }
@@ -236,7 +235,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
             const isDeployed = await this.isDeployed();
 
             if (isDeployerCallsite && isDeployed) {
-                ErrorUtils.throwError(`Logic is already deployed or deploying".`);
+                ErrorUtils.throwError(`Logic is already deployed or deploying.`);
             }
 
             if (!isDeployerCallsite && !isDeployed) {

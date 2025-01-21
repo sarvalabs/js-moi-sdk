@@ -133,7 +133,6 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             return baseIxRequest;
         }
         const simulation = await this.signer.simulate(baseIxRequest, option?.sequence);
-        // TODO: SHOULD SDK handle this? that if fuel limit is provided and it is less than the effort, it should throw an error
         if (option?.fuel_limit != null && option.fuel_limit < simulation.effort) {
             js_moi_utils_1.ErrorUtils.throwError(`Minimum fuel limit required for interaction is ${simulation.effort} but got ${option.fuel_limit}.`);
         }
@@ -175,7 +174,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         const callback = async (...args) => {
             const isDeployed = await this.isDeployed();
             if (isDeployerCallsite && isDeployed) {
-                js_moi_utils_1.ErrorUtils.throwError(`Logic is already deployed or deploying".`);
+                js_moi_utils_1.ErrorUtils.throwError(`Logic is already deployed or deploying.`);
             }
             if (!isDeployerCallsite && !isDeployed) {
                 js_moi_utils_1.ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);

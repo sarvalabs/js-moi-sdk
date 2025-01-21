@@ -5,7 +5,7 @@ import { getLogicDriver, LogicDriver } from "../src.ts";
 import { getWallet, registerNewWallet } from "./helpers";
 import { loadManifestFromFile } from "./manifests";
 
-const runNetworkTest = process.env["RUN_NETWORK_TESTS"] === "true";
+const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 
 describe(getLogicDriver, () => {
     const wallet = getWallet();
@@ -55,8 +55,13 @@ const logics = [
             args: ["MOI", 10_000],
         },
         invoke: {
+            type: OpType.LogicInvoke,
             name: "Transfer",
             args: [10_000, bytesToHex(randomBytes(32))],
+        },
+        persistent: {
+            accessor: (b) => b.name("Symbol"),
+            expected: "MOI",
         },
     },
     {
@@ -68,8 +73,13 @@ const logics = [
             args: ["MOI Foundation", "MOI", 10_000],
         },
         invoke: {
+            type: OpType.LogicEnlist,
             name: "Register",
             args: [],
+        },
+        ephemeral: {
+            accessor: (b) => b.name("Spendable"),
+            expected: 10_000,
         },
     },
 ];
@@ -173,17 +183,69 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
     describe("Network tests", () => {
         const it = runNetworkTest ? global.it : global.it.skip;
         let driver: LogicDriver;
+        let logicId: LogicId;
 
         beforeAll(async () => {
             const wallet = await registerNewWallet();
             driver = await getLogicDriver(manifest, wallet);
 
             const callback = driver.endpoint[logic.deploy.name];
-            const ix = await callback<InteractionResponse>(...(logic.deploy.args as any));
-
-            await ix.wait();
+            await callback<InteractionResponse>(...(logic.deploy.args as any));
+            logicId = await driver.getLogicId();
         });
 
-        it("should throw error if invoking routine when logic is not deployed", async () => {});
+        it("should deploy a logic", async () => {
+            const logic = await wallet.getProvider().getLogic(logicId);
+
+            expect(logic).toBeDefined();
+            expect(logic.metadata.logic_id).toEqual(logicId.value);
+        });
+
+        it("should throw error if logic if already deployed", async () => {
+            expect(driver.endpoint[logic.deploy.name](...(logic.deploy.args as any))).rejects.toThrow(/Logic is already deployed or deploying./);
+        });
+
+        describe(`should be able to invoke routine ${logic.invoke.name} of type ${OpType[logic.invoke.type]}`, () => {
+            it("when options are not provided", async () => {
+                const callback = driver.endpoint[logic.invoke.name];
+                const ix = await callback<InteractionResponse>(...(logic.invoke.args as any));
+
+                expect(ix.hash).toBeDefined();
+                const results = await ix.result();
+                expect(results).toHaveLength(1);
+                expect(results?.[0].type);
+            });
+
+            it("when options are provided", async () => {
+                const callback = driver.endpoint[logic.invoke.name];
+                const ix = await callback<InteractionResponse>(...(logic.invoke.args as any), {
+                    fuel_price: 1,
+                    fuel_limit: 10000,
+                });
+
+                expect(ix.hash).toBeDefined();
+                const results = await ix.result();
+                expect(results).toHaveLength(1);
+                expect(results?.[0].type);
+            });
+        });
+
+        describe("should be able to access storage", () => {
+            if (logic.persistent) {
+                it("should be able to retrieve from persistent storage", async () => {
+                    const value = await driver.persistent(logic.persistent.accessor);
+
+                    expect(value).toEqual(logic.persistent.expected);
+                });
+            }
+
+            if (logic.ephemeral) {
+                it("should be able to retrieve from ephemeral storage", async () => {
+                    const value = await driver.ephemeral(logic.ephemeral.accessor);
+
+                    expect(value).toEqual(logic.ephemeral.expected);
+                });
+            }
+        });
     });
 });

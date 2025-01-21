@@ -79,7 +79,7 @@ export const registerNewWallet = async () => {
                         amount: 50000,
                         keys_payload: [
                             {
-                                public_key: wallet.publicKey,
+                                public_key: newWallet.publicKey,
                                 signature_algorithm: 0,
                                 weight: 1000,
                             },
@@ -90,6 +90,7 @@ export const registerNewWallet = async () => {
         });
 
         await ix.wait();
+        newWallet.connect(wallet.getProvider());
         return newWallet;
     } catch (error) {
         throw new Error("Failed to register new participant", { cause: error });
