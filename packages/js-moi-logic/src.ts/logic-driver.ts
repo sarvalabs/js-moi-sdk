@@ -226,7 +226,6 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
             this.setLogicId(new LogicId(result.payload.logic_id));
         }
-
         return super.getLogicId();
     }
 

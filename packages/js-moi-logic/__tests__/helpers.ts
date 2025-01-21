@@ -62,3 +62,36 @@ export const deployLogic = async (wallet: Wallet, name: string, callsite: string
 };
 
 export const testIf = (condition: boolean, ...params: Parameters<typeof test>) => (condition ? test : test.skip)(...params);
+
+export const registerNewWallet = async () => {
+    try {
+        const wallet = getWallet();
+        const newWallet = await Wallet.createRandom();
+
+        const ix = await wallet.execute({
+            fuel_price: 1,
+            fuel_limit: 10000,
+            operations: [
+                {
+                    type: OpType.ParticipantCreate,
+                    payload: {
+                        address: await newWallet.getAddress(),
+                        amount: 50000,
+                        keys_payload: [
+                            {
+                                public_key: wallet.publicKey,
+                                signature_algorithm: 0,
+                                weight: 1000,
+                            },
+                        ],
+                    },
+                },
+            ],
+        });
+
+        await ix.wait();
+        return newWallet;
+    } catch (error) {
+        throw new Error("Failed to register new participant", { cause: error });
+    }
+};
