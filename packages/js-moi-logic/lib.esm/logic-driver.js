@@ -173,7 +173,7 @@ export class LogicDriver extends LogicDescriptor {
             if (isDeployerCallsite && (await this.isDeployed())) {
                 ErrorUtils.throwError(`Logic is already deployed or deploying".`);
             }
-            if (!isDeployerCallsite && !this.isDeployed()) {
+            if (!isDeployerCallsite && !(await this.isDeployed())) {
                 ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
             }
             const { option, args: callsiteArgs } = this.extractArgsAndOption(callsite, args);

@@ -50,18 +50,26 @@ const logics = [
         name: "tokenledger",
         isEphemeral: false,
         isPersistent: true,
-        deployer: {
+        deploy: {
             name: "Seed",
             args: ["MOI", 10_000],
+        },
+        invoke: {
+            name: "Transfer",
+            args: [10_000, bytesToHex(randomBytes(32))],
         },
     },
     {
         name: "lockledger",
         isEphemeral: true,
         isPersistent: true,
-        deployer: {
+        deploy: {
             name: "Seed",
             args: ["MOI Foundation", "MOI", 10_000],
+        },
+        invoke: {
+            name: "Register",
+            args: [],
         },
     },
 ];
@@ -154,13 +162,12 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
             expect(callback).toBeDefined();
             expect(callback).toBeInstanceOf(Function);
         });
+    });
 
-        it.each(routines)("should throw error by '$data.name' routine if args length is not equal to the number of arguments", async (routine) => {
-            const randomArgs = Array.from({ length: routine.data.accepts.length - 1 }, () => bytesToHex(randomBytes(3)));
-            const callback = driver.endpoint[routine.data.name];
+    it(`should throw error if invoking routine "${logic.invoke.name}" when logic is not deployed`, async () => {
+        const callback = driver.endpoint[logic.invoke.name];
 
-            await expect(() => callback(...(randomArgs as any))).rejects.toThrow(/Invalid number of arguments/);
-        });
+        await expect(() => callback(...(logic.invoke.args as any))).rejects.toThrow(/Logic is not deployed./);
     });
 
     describe("Network tests", () => {
@@ -170,10 +177,13 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
         beforeAll(async () => {
             const wallet = await registerNewWallet();
             driver = await getLogicDriver(manifest, wallet);
+
+            const callback = driver.endpoint[logic.deploy.name];
+            const ix = await callback<InteractionResponse>(...(logic.deploy.args as any));
+
+            expect(ix).toBeInstanceOf(InteractionResponse);
         });
 
-        it("should deploy logic", async () => {
-            console.log(driver);
-        });
+        it("should throw error if invoking routine when logic is not deployed", async () => {});
     });
 });

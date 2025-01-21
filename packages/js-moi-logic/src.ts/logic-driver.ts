@@ -237,7 +237,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 ErrorUtils.throwError(`Logic is already deployed or deploying".`);
             }
 
-            if (!isDeployerCallsite && !this.isDeployed()) {
+            if (!isDeployerCallsite && !(await this.isDeployed())) {
                 ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
             }
 
