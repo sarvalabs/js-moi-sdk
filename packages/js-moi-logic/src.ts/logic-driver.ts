@@ -233,11 +233,13 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         const isDeployerCallsite = this.getCallsiteType(callsite) === RoutineType.Deploy;
 
         const callback: CallsiteCallback = async (...args: unknown[]) => {
-            if (isDeployerCallsite && (await this.isDeployed())) {
+            const isDeployed = await this.isDeployed();
+
+            if (isDeployerCallsite && isDeployed) {
                 ErrorUtils.throwError(`Logic is already deployed or deploying".`);
             }
 
-            if (!isDeployerCallsite && !(await this.isDeployed())) {
+            if (!isDeployerCallsite && !isDeployed) {
                 ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
             }
 

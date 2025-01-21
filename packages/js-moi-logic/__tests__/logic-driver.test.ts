@@ -181,7 +181,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
             const callback = driver.endpoint[logic.deploy.name];
             const ix = await callback<InteractionResponse>(...(logic.deploy.args as any));
 
-            expect(ix).toBeInstanceOf(InteractionResponse);
+            await ix.wait();
         });
 
         it("should throw error if invoking routine when logic is not deployed", async () => {});
