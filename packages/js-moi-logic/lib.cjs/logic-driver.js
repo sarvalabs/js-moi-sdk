@@ -310,14 +310,14 @@ exports.LogicDriver = LogicDriver;
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
 const getLogicDriver = async (logicId, signer) => {
-    if (typeof logicId === "string" || logicId instanceof js_moi_utils_1.LogicId) {
+    if ((0, js_moi_utils_1.isHex)(logicId) || logicId instanceof js_moi_utils_1.LogicId) {
         const provider = signer.getProvider();
-        const id = typeof logicId === "string" ? new js_moi_utils_1.LogicId(logicId) : logicId;
-        const { manifest: encoded } = await provider.getLogic(id, {
+        const id = (0, js_moi_utils_1.isAddress)(logicId) ? logicId : logicId.getAddress();
+        const { manifest: encoded, metadata } = await provider.getLogic(id, {
             modifier: { include: ["manifest"] },
         });
         const manifest = js_moi_manifest_1.ManifestCoder.decodeManifest(encoded, js_moi_manifest_1.ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId: id, signer });
+        return new LogicDriver({ manifest, logicId: new js_moi_utils_1.LogicId(metadata.logic_id), signer });
     }
     return new LogicDriver({ manifest: logicId, signer });
 };

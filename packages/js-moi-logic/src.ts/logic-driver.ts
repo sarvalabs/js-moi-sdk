@@ -8,6 +8,7 @@ import {
     ErrorUtils,
     generateStorageKey,
     hexToBytes,
+    isAddress,
     isHex,
     LogicId,
     LogicState,
@@ -434,15 +435,15 @@ export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCa
     logicId: Address | LogicId | LogicManifest,
     signer: Signer
 ): Promise<LogicDriver<TCallsites>> => {
-    if (typeof logicId === "string" || logicId instanceof LogicId) {
+    if (isHex(logicId) || logicId instanceof LogicId) {
         const provider = signer.getProvider();
-        const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-        const { manifest: encoded } = await provider.getLogic(id, {
+        const id = isAddress(logicId) ? logicId : logicId.getAddress();
+        const { manifest: encoded, metadata } = await provider.getLogic(id, {
             modifier: { include: ["manifest"] },
         });
         const manifest = ManifestCoder.decodeManifest(encoded, ManifestCoderFormat.JSON);
 
-        return new LogicDriver({ manifest, logicId: id, signer });
+        return new LogicDriver({ manifest, logicId: new LogicId(metadata.logic_id), signer });
     }
 
     return new LogicDriver<TCallsites>({ manifest: logicId, signer });
