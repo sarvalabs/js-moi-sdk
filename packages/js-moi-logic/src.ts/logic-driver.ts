@@ -210,10 +210,6 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      * @throws If error occurs during the deployment process.
      */
     public async getLogicId(timer?: TimerOption): Promise<LogicId> {
-        if (this.logicId != null) {
-            return this.logicId;
-        }
-
         if (this.deployIxResponse != null) {
             const results = await this.deployIxResponse.result(timer);
             const result = results.at(0);
