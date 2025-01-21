@@ -12,6 +12,10 @@ export class LogicDescriptor extends ElementDescriptor {
     private state: Map<LogicState, number> = new Map();
 
     constructor(manifest: LogicManifest, logicId?: LogicId) {
+        if (manifest == null) {
+            ErrorUtils.throwArgumentError("Manifest is required.", "manifest", manifest);
+        }
+
         super(manifest.elements);
 
         this.manifest = manifest;

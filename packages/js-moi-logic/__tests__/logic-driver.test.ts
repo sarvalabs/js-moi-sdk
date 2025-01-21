@@ -1,10 +1,8 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { LogicId } from "js-moi-utils";
+import { LogicId, LogicState, StorageKey } from "js-moi-utils";
 import { getLogicDriver, LogicDriver } from "../src.ts";
 import { getWallet } from "./helpers";
 import { loadManifestFromFile } from "./manifests";
-
-// const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 
 describe(getLogicDriver, () => {
     const wallet = getWallet();
@@ -19,19 +17,21 @@ describe(getLogicDriver, () => {
     });
 
     afterAll(() => {
-        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it("should setup driver from logic address", async () => {
         const driver = await getLogicDriver(new LogicId(logicId).getAddress(), wallet);
 
         expect(driver).toBeInstanceOf(LogicDriver);
+        expect((await driver.getLogicId()).value).toEqual(logicId);
     });
 
     it("should setup driver from logic id", async () => {
         const driver = await getLogicDriver(new LogicId(logicId), wallet);
 
         expect(driver).toBeInstanceOf(LogicDriver);
+        expect((await driver.getLogicId()).value).toEqual(logicId);
     });
 
     it("should setup logic driver from manifest", async () => {
@@ -39,5 +39,35 @@ describe(getLogicDriver, () => {
 
         expect(driver).toBeDefined();
         expect(driver).toBeInstanceOf(LogicDriver);
+    });
+});
+
+describe(LogicDriver, () => {
+    const wallet = getWallet();
+    const manifest = loadManifestFromFile("tokenledger");
+
+    const driver = new LogicDriver({ manifest, signer: wallet });
+
+    describe("constructor", () => {
+        it("should throw error if manifest is not provided", () => {
+            expect(() => new LogicDriver({ manifest: null!, signer: wallet })).toThrow("Manifest is required.");
+        });
+
+        it("should throw error if signer is not provided", () => {
+            expect(() => new LogicDriver({ manifest, signer: null! })).toThrow();
+        });
+    });
+
+    describe(driver.getStorageKey, () => {
+        it("should get storage key", async () => {
+            const key = driver.getStorageKey(LogicState.Persistent, (b) => b.name("Symbol"));
+
+            expect(key).toBeInstanceOf(StorageKey);
+        });
+
+        it("should throw error if state is not in logic", () => {
+            const state = LogicState.Ephemeral;
+            expect(() => driver.getStorageKey(state, (b) => b.name("Symbol"))).toThrow(`State "${state}" not found in logic.`);
+        });
     });
 });

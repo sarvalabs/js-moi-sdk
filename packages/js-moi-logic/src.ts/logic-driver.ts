@@ -41,6 +41,10 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
     private deployIxResponse?: InteractionResponse;
 
     constructor(option: Omit<LogicDriverOption, "logicId"> & { logicId?: LogicId }) {
+        if (option.signer == null) {
+            ErrorUtils.throwError("Signer is required.", ErrorCode.INVALID_ARGUMENT);
+        }
+
         super(option.manifest, option.logicId);
 
         this.signer = option.signer;
