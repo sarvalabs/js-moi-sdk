@@ -7,6 +7,9 @@ export class LogicDescriptor extends ElementDescriptor {
     coder;
     state = new Map();
     constructor(manifest, logicId) {
+        if (manifest == null) {
+            ErrorUtils.throwArgumentError("Manifest is required.", "manifest", manifest);
+        }
         super(manifest.elements);
         this.manifest = manifest;
         this.logicId = logicId;

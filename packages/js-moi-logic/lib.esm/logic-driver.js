@@ -14,6 +14,9 @@ export class LogicDriver extends LogicDescriptor {
     endpoint;
     deployIxResponse;
     constructor(option) {
+        if (option.signer == null) {
+            ErrorUtils.throwError("Signer is required.", ErrorCode.INVALID_ARGUMENT);
+        }
         super(option.manifest, option.logicId);
         this.signer = option.signer;
         this.endpoint = this.setupEndpoint();
@@ -150,9 +153,6 @@ export class LogicDriver extends LogicDescriptor {
      * @throws If error occurs during the deployment process.
      */
     async getLogicId(timer) {
-        if (this.logicId != null) {
-            return this.logicId;
-        }
         if (this.deployIxResponse != null) {
             const results = await this.deployIxResponse.result(timer);
             const result = results.at(0);

@@ -10,6 +10,9 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
     coder;
     state = new Map();
     constructor(manifest, logicId) {
+        if (manifest == null) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Manifest is required.", "manifest", manifest);
+        }
         super(manifest.elements);
         this.manifest = manifest;
         this.logicId = logicId;
