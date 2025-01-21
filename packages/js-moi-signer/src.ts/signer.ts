@@ -64,9 +64,12 @@ export abstract class Signer {
     }
 
     public async createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>, sequence?: number): Promise<T> {
+        // TODO: If sender is not provided, then create sender
         return { ...ix, sender: await this.getSender(sequence) } as T;
     }
 
+    // TODOL: Don't exit sender address make it optional
+    // TODO: Allow execute polo interaction request
     public simulate(ix: SignerIx<SimulateInteractionRequest>): Promise<Simulate>;
     public simulate(ix: SignerIx<SimulateInteractionRequest>, sequence?: number, option?: SimulateOption): Promise<Simulate>;
     public simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
@@ -75,6 +78,8 @@ export abstract class Signer {
         return await this.getProvider().simulate(await this.createIxRequest(ix, sequence), option);
     }
 
+    // TODOL: Don't exit sender address make it optional
+    // TODO: Allow execute polo interaction request
     public async execute(ix: SignerIx<InteractionRequest>, sequence?: number): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
         const signedIx = await this.signInteraction(await this.createIxRequest(ix, sequence), algorithm);
