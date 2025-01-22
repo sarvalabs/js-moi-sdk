@@ -1,15 +1,20 @@
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, isHex, type Hex, type InteractionRequest, type IxOp, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
-export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender"> & { sender?: Partial<Omit<Sender, "address">> };
+export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender" | "fuel_price" | "fuel_limit"> & {
+    sender?: Partial<Omit<Sender, "address">>;
+    fuel_price?: InteractionRequest["fuel_price"];
+} & (T extends InteractionRequest ? { fuel_limit?: InteractionRequest["fuel_limit"] } : {});
 
 export abstract class Signer {
     private provider?: Provider;
 
     public signingAlgorithms: SigningAlgorithms;
+
+    private static DEFAULT_FUEL_PRICE = 1;
 
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
         this.provider = provider;
@@ -45,7 +50,7 @@ export abstract class Signer {
         return sequence;
     }
 
-    private async createIxSender(sender?: Partial<Omit<Sender, "address">>): Promise<Sender> {
+    private async createIxRequestSender(sender?: Partial<Omit<Sender, "address">>): Promise<Sender> {
         if (sender == null) {
             const [address, index, sequenceId] = await Promise.all([this.getAddress(), this.getKeyId(), this.getLatestSequence()]);
 
@@ -58,36 +63,107 @@ export abstract class Signer {
             }
         }
 
-        if (sender.sequence_id == null) {
-            sender.sequence_id = await this.getLatestSequence();
+        return {
+            address: await this.getAddress(),
+            key_id: sender.key_id ?? (await this.getKeyId()),
+            sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
+        };
+    }
+
+    private async createSimulateIxRequest(arg: SignerIx<SimulateInteractionRequest> | IxOp | IxOp[]): Promise<SimulateInteractionRequest> {
+        // request was array of operations
+        if (Array.isArray(arg)) {
+            return {
+                sender: await this.createIxRequestSender(),
+                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                operations: arg,
+            };
         }
 
-        if (sender.sequence_id == null) {
-            ErrorUtils.throwError("Sequence number is not provided", ErrorCode.NOT_INITIALIZED);
+        // request was single operation
+        if (typeof arg === "object" && "type" in arg && "payload" in arg) {
+            return {
+                sender: await this.createIxRequestSender(),
+                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                operations: [arg],
+            };
         }
 
-        const sequenceId = sender.sequence_id;
-        const key_id = sender.key_id ?? (await this.getKeyId());
-        const address = await this.getAddress();
-
-        return { key_id, sequence_id: sequenceId, address };
+        // request was simulate interaction request without `sender` and `fuel_price`
+        return {
+            ...arg,
+            sender: await this.createIxRequestSender(arg.sender),
+            fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
+        };
     }
 
-    public async createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>): Promise<T> {
-        ix.sender = await this.createIxSender(ix.sender);
+    public async createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | IxOp[] | IxOp): Promise<SimulateInteractionRequest>;
+    public async createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | IxOp[] | IxOp): Promise<InteractionRequest>;
+    public async createIxRequest(
+        type: "moi.Simulate" | "moi.Execute",
+        args: SignerIx<InteractionRequest | SimulateInteractionRequest> | IxOp[] | IxOp
+    ): Promise<SimulateInteractionRequest | InteractionRequest> {
+        if (!["moi.Simulate", "moi.Execute"].includes(type)) {
+            ErrorUtils.throwError("Invalid type provided", ErrorCode.INVALID_ARGUMENT, {
+                type,
+            });
+        }
 
-        return ix as T;
+        const simulateIxRequest = await this.createSimulateIxRequest(args);
+
+        if (type === "moi.Simulate") {
+            return simulateIxRequest;
+        }
+
+        if (typeof args === "object" && "fuel_limit" in args && typeof args.fuel_limit === "number") {
+            return { ...simulateIxRequest, fuel_limit: args.fuel_limit };
+        }
+
+        const simulation = await this.simulate(simulateIxRequest);
+
+        return {
+            ...simulateIxRequest,
+            fuel_limit: simulation.effort,
+        };
     }
 
-    public async simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate> {
-        return await this.getProvider().simulate(await this.createIxRequest(ix), option);
+    public async simulate(operation: IxOp, options?: SimulateOption): Promise<Simulate>;
+    public async simulate(operations: IxOp[], options?: SimulateOption): Promise<Simulate>;
+    public async simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(arg: SignerIx<SimulateInteractionRequest> | IxOp[] | IxOp, option?: SimulateOption): Promise<Simulate> {
+        const request = await this.createIxRequest("moi.Simulate", arg);
+
+        return await this.getProvider().simulate(request, option);
     }
 
-    public async execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse> {
+    public async execute(operation: IxOp): Promise<InteractionResponse>;
+    public async execute(operations: IxOp[]): Promise<InteractionResponse>;
+    public async execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse>;
+    public async execute(request: ExecuteIx): Promise<InteractionResponse>;
+    public async execute(arg: SignerIx<InteractionRequest> | IxOp | IxOp[] | ExecuteIx): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
-        const signedIx = await this.signInteraction(await this.createIxRequest(ix), algorithm);
 
-        return await this.getProvider().execute(signedIx);
+        // checking argument is an already signed request
+        if (typeof arg === "object" && "interaction" in arg && "signatures" in arg) {
+            if (!isHex(arg.interaction)) {
+                ErrorUtils.throwError("Invalid interaction provided. Not a valid hex.", ErrorCode.INVALID_ARGUMENT, {
+                    interaction: arg.interaction,
+                });
+            }
+
+            if (!Array.isArray(arg.signatures)) {
+                ErrorUtils.throwError("Invalid signatures provided. Not an array.", ErrorCode.INVALID_ARGUMENT, {
+                    signatures: arg.signatures,
+                });
+            }
+
+            return await this.getProvider().execute(arg);
+        }
+
+        const request = await this.createIxRequest("moi.Execute", arg);
+        const signedRequest = await this.signInteraction(request, algorithm);
+
+        return await this.getProvider().execute(signedRequest);
     }
 
     /**

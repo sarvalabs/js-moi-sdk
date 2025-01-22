@@ -10,6 +10,7 @@ const signature_1 = __importDefault(require("./signature"));
 class Signer {
     provider;
     signingAlgorithms;
+    static DEFAULT_FUEL_PRICE = 1;
     constructor(provider, signingAlgorithms) {
         this.provider = provider;
         this.signingAlgorithms = signingAlgorithms ?? {
@@ -30,7 +31,7 @@ class Signer {
         const { sequence } = await this.getProvider().getAccountKey(address, index);
         return sequence;
     }
-    async createIxSender(sender) {
+    async createIxRequestSender(sender) {
         if (sender == null) {
             const [address, index, sequenceId] = await Promise.all([this.getAddress(), this.getKeyId(), this.getLatestSequence()]);
             return { address, key_id: index, sequence_id: sequenceId };
@@ -40,28 +41,78 @@ class Signer {
                 js_moi_utils_1.ErrorUtils.throwError("Sequence number is outdated", js_moi_utils_1.ErrorCode.SEQUENCE_EXPIRED);
             }
         }
-        if (sender.sequence_id == null) {
-            sender.sequence_id = await this.getLatestSequence();
+        return {
+            address: await this.getAddress(),
+            key_id: sender.key_id ?? (await this.getKeyId()),
+            sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
+        };
+    }
+    async createSimulateIxRequest(arg) {
+        // request was array of operations
+        if (Array.isArray(arg)) {
+            return {
+                sender: await this.createIxRequestSender(),
+                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                operations: arg,
+            };
         }
-        if (sender.sequence_id == null) {
-            js_moi_utils_1.ErrorUtils.throwError("Sequence number is not provided", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+        // request was single operation
+        if (typeof arg === "object" && "type" in arg && "payload" in arg) {
+            return {
+                sender: await this.createIxRequestSender(),
+                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                operations: [arg],
+            };
         }
-        const sequenceId = sender.sequence_id;
-        const key_id = sender.key_id ?? (await this.getKeyId());
-        const address = await this.getAddress();
-        return { key_id, sequence_id: sequenceId, address };
+        // request was simulate interaction request without `sender` and `fuel_price`
+        return {
+            ...arg,
+            sender: await this.createIxRequestSender(arg.sender),
+            fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
+        };
     }
-    async createIxRequest(ix) {
-        ix.sender = await this.createIxSender(ix.sender);
-        return ix;
+    async createIxRequest(type, args) {
+        if (!["moi.Simulate", "moi.Execute"].includes(type)) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid type provided", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
+                type,
+            });
+        }
+        const simulateIxRequest = await this.createSimulateIxRequest(args);
+        if (type === "moi.Simulate") {
+            return simulateIxRequest;
+        }
+        if (typeof args === "object" && "fuel_limit" in args && typeof args.fuel_limit === "number") {
+            return { ...simulateIxRequest, fuel_limit: args.fuel_limit };
+        }
+        const simulation = await this.simulate(simulateIxRequest);
+        return {
+            ...simulateIxRequest,
+            fuel_limit: simulation.effort,
+        };
     }
-    async simulate(ix, option) {
-        return await this.getProvider().simulate(await this.createIxRequest(ix), option);
+    async simulate(arg, option) {
+        const request = await this.createIxRequest("moi.Simulate", arg);
+        return await this.getProvider().simulate(request, option);
     }
-    async execute(ix) {
+    async execute(arg) {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
-        const signedIx = await this.signInteraction(await this.createIxRequest(ix), algorithm);
-        return await this.getProvider().execute(signedIx);
+        // checking argument is an already signed request
+        if (typeof arg === "object" && "interaction" in arg && "signatures" in arg) {
+            if (!(0, js_moi_utils_1.isHex)(arg.interaction)) {
+                js_moi_utils_1.ErrorUtils.throwError("Invalid interaction provided. Not a valid hex.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
+                    interaction: arg.interaction,
+                });
+            }
+            if (!Array.isArray(arg.signatures)) {
+                js_moi_utils_1.ErrorUtils.throwError("Invalid signatures provided. Not an array.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, {
+                    signatures: arg.signatures,
+                });
+            }
+            return await this.getProvider().execute(arg);
+        }
+        const request = await this.createIxRequest("moi.Execute", arg);
+        const signedRequest = await this.signInteraction(request, algorithm);
+        return await this.getProvider().execute(signedRequest);
     }
     /**
      * Verifies the authenticity of a signature by performing signature verification

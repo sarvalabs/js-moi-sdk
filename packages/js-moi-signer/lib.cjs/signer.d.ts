@@ -1,12 +1,16 @@
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
+import { type Hex, type InteractionRequest, type IxOp, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
-export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender"> & {
+export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender" | "fuel_price" | "fuel_limit"> & {
     sender?: Partial<Omit<Sender, "address">>;
-};
+    fuel_price?: InteractionRequest["fuel_price"];
+} & (T extends InteractionRequest ? {
+    fuel_limit?: InteractionRequest["fuel_limit"];
+} : {});
 export declare abstract class Signer {
     private provider?;
     signingAlgorithms: SigningAlgorithms;
+    private static DEFAULT_FUEL_PRICE;
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms);
     abstract getKeyId(): Promise<number>;
     abstract getAddress(): Promise<Hex>;
@@ -15,10 +19,17 @@ export declare abstract class Signer {
     connect(provider: Provider): void;
     getProvider(): Provider;
     private getLatestSequence;
-    private createIxSender;
-    createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>): Promise<T>;
+    private createIxRequestSender;
+    private createSimulateIxRequest;
+    createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | IxOp[] | IxOp): Promise<SimulateInteractionRequest>;
+    createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | IxOp[] | IxOp): Promise<InteractionRequest>;
+    simulate(operation: IxOp, options?: SimulateOption): Promise<Simulate>;
+    simulate(operations: IxOp[], options?: SimulateOption): Promise<Simulate>;
     simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
+    execute(operation: IxOp): Promise<InteractionResponse>;
+    execute(operations: IxOp[]): Promise<InteractionResponse>;
     execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse>;
+    execute(request: ExecuteIx): Promise<InteractionResponse>;
     /**
      * Verifies the authenticity of a signature by performing signature verification
      * using the provided parameters.
