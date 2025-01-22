@@ -1,5 +1,5 @@
 import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
-import type { EventEmitter } from "stream";
+import type { EventEmitter } from "events";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams } from "./moi-execution-api";
 export type NonOptionKeys<T extends Record<string, any>> = {

@@ -28,7 +28,6 @@
     "hdkey": "^2.1.0",
     "js-moi-utils": "^0.6.0",
     "process": "^0.11.10",
-    "secp256k1": "^5.0.0",
-    "stream": "npm:stream-browserify"
+    "secp256k1": "^5.0.0"
   }
 }
