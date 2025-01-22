@@ -9,5 +9,6 @@
         "packages/*/lib.*/": true
     },
     "deno.enable": false,
-    "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"]
+    "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

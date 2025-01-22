@@ -44,8 +44,8 @@ describe(Wallet, () => {
     });
 
     it.concurrent.each([
-        { name: "synchronously", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, { path: DEVIATION_PATH }) },
-        { name: "asynchronously", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, { path: DEVIATION_PATH }) },
+        { name: "synchronously when path and option are passed", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH, {}) },
+        { name: "asynchronously when path and option are provided", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {}) },
     ])("should create a wallet from a mnemonic $name", async ({ createWallet }) => {
         const wallet = await createWallet();
 
@@ -97,7 +97,7 @@ describe(Wallet, () => {
         expect(createWallet).toThrow();
     });
 
-    let wallet = Wallet.fromMnemonicSync(MNEMONIC, { path: DEVIATION_PATH });
+    let wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
     let algorithm: SigType = wallet.signingAlgorithms.ecdsa_secp256k1;
 
     describe(wallet.getKeyId, () => {

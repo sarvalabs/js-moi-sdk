@@ -247,13 +247,14 @@ class Wallet extends js_moi_signer_1.Signer {
             js_moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
-    static async fromMnemonic(mnemonic, options) {
+    static async fromMnemonic(mnemonic, optionOrPath, options) {
         try {
-            mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, options?.words), options?.words);
+            const option = typeof optionOrPath === "object" ? optionOrPath : options;
+            mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, option?.words), option?.words);
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
-            const childNode = masterNode.derivePath(options?.path ?? js_moi_constants_1.MOI_DERIVATION_PATH);
-            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, options?.provider);
+            const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : js_moi_constants_1.MOI_DERIVATION_PATH);
+            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -266,12 +267,13 @@ class Wallet extends js_moi_signer_1.Signer {
             });
         }
     }
-    static fromMnemonicSync(mnemonic, option) {
+    static fromMnemonicSync(mnemonic, optionOrPath, options) {
         try {
+            const option = typeof optionOrPath === "object" ? optionOrPath : options;
             mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, option?.words), option?.words);
             const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
-            const childNode = masterNode.derivePath(option?.path ?? js_moi_constants_1.MOI_DERIVATION_PATH);
+            const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : js_moi_constants_1.MOI_DERIVATION_PATH);
             const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -297,7 +299,7 @@ class Wallet extends js_moi_signer_1.Signer {
     static fromKeystore(keystore, password, provider) {
         try {
             const privateKey = (0, keystore_1.decryptKeystoreData)(JSON.parse(keystore), password);
-            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1);
+            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, provider);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {

@@ -245,13 +245,17 @@ export class Wallet extends Signer {
         }
     }
 
-    static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet> {
+    static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Promise<Wallet> {
         try {
-            mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, options?.words), options?.words);
+            const option = typeof optionOrPath === "object" ? optionOrPath : options;
+
+            mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, option?.words), option?.words);
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = HDNode.fromSeed(seed);
-            const childNode = masterNode.derivePath(options?.path ?? MOI_DERIVATION_PATH);
-            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, options?.provider);
+            const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
+            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -266,12 +270,15 @@ export class Wallet extends Signer {
         }
     }
 
-    public static fromMnemonicSync(mnemonic: string, option?: FromMnemonicOptions): Wallet {
+    public static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Wallet {
         try {
+            const option = typeof optionOrPath === "object" ? optionOrPath : options;
             mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, option?.words), option?.words);
             const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
             const masterNode = HDNode.fromSeed(seed);
-            const childNode = masterNode.derivePath(option?.path ?? MOI_DERIVATION_PATH);
+            const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
 
             const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
 
@@ -300,7 +307,7 @@ export class Wallet extends Signer {
     public static fromKeystore(keystore: string, password: string, provider?: Provider): Wallet {
         try {
             const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
-            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1);
+            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, provider);
         } catch (err) {
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
