@@ -89,6 +89,8 @@ export class Wallet extends Signer {
 
     constructor(pKey: Uint8Array | string, curve: CURVE, provider?: Provider) {
         try {
+            super(provider);
+
             if (!pKey || !(pKey instanceof Uint8Array || typeof pKey === "string")) {
                 ErrorUtils.throwError("Key must be a Uint8Array or a string", ErrorCode.INVALID_ARGUMENT);
             }
@@ -96,8 +98,6 @@ export class Wallet extends Signer {
             if (!Object.values(CURVE).includes(curve)) {
                 ErrorUtils.throwError(`Unsupported curve: ${curve}`, ErrorCode.UNSUPPORTED_OPERATION);
             }
-
-            super(provider);
 
             if (typeof pKey === "string") {
                 pKey = hexToBytes(pKey);

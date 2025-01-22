@@ -2,8 +2,8 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "types": ["node", "jest"],
-        "lib": ["ES6", "ESNext", "DOM"],
-        "target": "ES2022",
+        "lib": ["ESNext", "DOM"],
+        "target": "ES2023",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "declaration": true,
@@ -22,8 +22,7 @@
         "noUnusedLocals": true,
         "incremental": true,
         "tsBuildInfoFile": "dist/.tsbuildinfo",
-        "skipLibCheck": true,
-        "skipDefaultLibCheck": true
+        "skipLibCheck": true
     },
     "ts-node": {
         "esm": true

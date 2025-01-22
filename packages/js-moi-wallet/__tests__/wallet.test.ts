@@ -3,6 +3,8 @@ import type { SigType } from "js-moi-signer";
 import { AssetStandard, bytesToHex, ensureHexPrefix, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
 
+const TEST_TIMEOUT = 2 * 60_000;
+
 describe(Wallet, () => {
     const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
     const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
@@ -98,9 +100,9 @@ describe(Wallet, () => {
     let wallet = Wallet.fromMnemonicSync(MNEMONIC, { path: DEVIATION_PATH });
     let algorithm: SigType = wallet.signingAlgorithms.ecdsa_secp256k1;
 
-    describe(wallet.getKeyIndex, () => {
+    describe(wallet.getKeyId, () => {
         it.concurrent("should return the key index", async () => {
-            const index = await wallet.getKeyIndex();
+            const index = await wallet.getKeyId();
 
             expect(index).toBeGreaterThanOrEqual(0);
         });
@@ -325,7 +327,7 @@ describe("Provider integration test", () => {
         console.log("Interaction Sent");
 
         await ix.wait();
-    });
+    }, TEST_TIMEOUT);
 
     const operations: IxOp[] = [
         {
@@ -355,7 +357,7 @@ describe("Provider integration test", () => {
                 fuel_limit: 100,
                 operations,
             });
-        });
+        }, TEST_TIMEOUT);
 
         it("should be able to execute a interaction", async () => {
             expect(ix).toBeDefined();

@@ -11,9 +11,7 @@ export const getProvider = (): Provider => {
                 throw new Error("PROVIDER_URL is not set");
             }
 
-            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"], {
-                debug: (request) => console.log(`Request: ${JSON.stringify(request)}`),
-            });
+            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"]);
         }
 
         case "ws": {
@@ -93,6 +91,7 @@ export const registerNewWallet = async () => {
         newWallet.connect(wallet.getProvider());
         return newWallet;
     } catch (error) {
-        throw new Error("Failed to register new participant", { cause: error });
+        console.error(error);
+        throw new Error("Failed to register new participant");
     }
 };

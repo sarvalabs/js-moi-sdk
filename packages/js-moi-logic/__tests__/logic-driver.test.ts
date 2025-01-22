@@ -6,6 +6,7 @@ import { getWallet, registerNewWallet } from "./helpers";
 import { loadManifestFromFile } from "./manifests";
 
 const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
+const TEST_TIMEOUT = 2 * 60000; // 2 minutes
 
 describe(getLogicDriver, () => {
     const wallet = getWallet();
@@ -58,6 +59,7 @@ const logics = [
             type: OpType.LogicInvoke,
             name: "BalanceOf",
             args: [bytesToHex(randomBytes(32))],
+            expected: { balance: 0 },
         },
         invoke: {
             type: OpType.LogicInvoke,
@@ -197,7 +199,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
             const callback = driver.endpoint[logic.deploy.name];
             await callback<InteractionResponse>(...(logic.deploy.args as any));
             logicId = await driver.getLogicId();
-        });
+        }, TEST_TIMEOUT);
 
         it("should deploy a logic", async () => {
             const logic = await wallet.getProvider().getLogic(logicId);
@@ -219,7 +221,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
                 const results = await ix.result();
                 expect(results).toHaveLength(1);
                 expect(results?.[0].type);
-            });
+            }, TEST_TIMEOUT);
 
             it("when options are provided", async () => {
                 const callback = driver.endpoint[logic.invoke.name];
@@ -232,8 +234,29 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
                 const results = await ix.result();
                 expect(results).toHaveLength(1);
                 expect(results?.[0].type);
-            });
+            }, TEST_TIMEOUT);
         });
+
+        if (logic.readonly) {
+            describe(`should be able to invoke routine ${logic.readonly.name} of type ${OpType[logic.readonly.type]}`, () => {
+                it("when options are not provided", async () => {
+                    const callback = driver.endpoint[logic.readonly.name];
+                    const value = await callback(...(logic.readonly.args as any));
+
+                    expect(value).toStrictEqual(logic.readonly.expected);
+                });
+
+                it("when options are provided", async () => {
+                    const callback = driver.endpoint[logic.readonly.name];
+                    const value = await callback(...(logic.readonly.args as any), {
+                        fuel_price: 1,
+                        fuel_limit: 10000,
+                    });
+
+                    expect(value).toStrictEqual(logic.readonly.expected);
+                });
+            });
+        }
 
         describe("should be able to access storage", () => {
             if (logic.persistent) {
