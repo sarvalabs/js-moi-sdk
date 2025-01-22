@@ -54,7 +54,6 @@
     "cross-fetch": "^4.0.0",
     "elliptic": "^6.5.4",
     "js-polo": "^0.1.4",
-    "stream": "npm:stream-browserify",
     "websocket": "^1.0.34"
   },
   "sideEffects": false
