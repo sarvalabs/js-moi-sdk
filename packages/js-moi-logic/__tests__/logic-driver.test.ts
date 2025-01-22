@@ -213,28 +213,36 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
         });
 
         describe(`should be able to invoke routine ${logic.invoke.name} of type ${OpType[logic.invoke.type]}`, () => {
-            it("when options are not provided", async () => {
-                const callback = driver.endpoint[logic.invoke.name];
-                const ix = await callback<InteractionResponse>(...(logic.invoke.args as any));
+            it(
+                "when options are not provided",
+                async () => {
+                    const callback = driver.endpoint[logic.invoke.name];
+                    const ix = await callback<InteractionResponse>(...(logic.invoke.args as any));
 
-                expect(ix.hash).toBeDefined();
-                const results = await ix.result();
-                expect(results).toHaveLength(1);
-                expect(results?.[0].type);
-            }, TEST_TIMEOUT);
+                    expect(ix.hash).toBeDefined();
+                    const results = await ix.result();
+                    expect(results).toHaveLength(1);
+                    expect(results?.[0].type);
+                },
+                TEST_TIMEOUT
+            );
 
-            it("when options are provided", async () => {
-                const callback = driver.endpoint[logic.invoke.name];
-                const ix = await callback<InteractionResponse>(...(logic.invoke.args as any), {
-                    fuel_price: 1,
-                    fuel_limit: 10000,
-                });
+            it(
+                "when options are provided",
+                async () => {
+                    const callback = driver.endpoint[logic.invoke.name];
+                    const ix = await callback<InteractionResponse>(...(logic.invoke.args as any), {
+                        fuel_price: 1,
+                        fuel_limit: 10000,
+                    });
 
-                expect(ix.hash).toBeDefined();
-                const results = await ix.result();
-                expect(results).toHaveLength(1);
-                expect(results?.[0].type);
-            }, TEST_TIMEOUT);
+                    expect(ix.hash).toBeDefined();
+                    const results = await ix.result();
+                    expect(results).toHaveLength(1);
+                    expect(results?.[0].type);
+                },
+                TEST_TIMEOUT
+            );
         });
 
         if (logic.readonly) {
