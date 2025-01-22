@@ -62,7 +62,7 @@ const bytesToBinary = (bytes) => {
     return bytes.map((x) => lpad(x.toString(2), "0", 8)).join("");
 };
 /**
- * Derive the checksum bits from an entropy buffer.
+ * Derive the checksum bits from an entropy.
  *
  * @param {Uint8Array} entropyBuffer - The entropy bytes.
  * @returns {string} The derived checksum bits.

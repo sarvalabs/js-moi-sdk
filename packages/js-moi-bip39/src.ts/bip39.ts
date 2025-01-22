@@ -68,7 +68,7 @@ const bytesToBinary = (bytes: number[]): string => {
 };
 
 /**
- * Derive the checksum bits from an entropy buffer.
+ * Derive the checksum bits from an entropy.
  *
  * @param {Uint8Array} entropyBuffer - The entropy bytes.
  * @returns {string} The derived checksum bits.

@@ -7,8 +7,8 @@ exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccess
 exports.generateStorageKey = generateStorageKey;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
-const buffer_1 = require("buffer");
 const js_polo_1 = require("js-polo");
+const bytes_1 = require("./bytes");
 const hex_1 = require("./hex");
 class StorageKey {
     value;
@@ -16,10 +16,10 @@ class StorageKey {
         this.value = new bn_js_1.default(value);
     }
     hex() {
-        return (0, hex_1.bytesToHex)(this.toBuffer());
+        return (0, hex_1.bytesToHex)(this.toBytes());
     }
-    toBuffer() {
-        return this.value.toBuffer("be", 32);
+    toBytes() {
+        return Uint8Array.from(this.value.toArray("be", 32));
     }
 }
 exports.StorageKey = StorageKey;
@@ -84,7 +84,6 @@ class PropertyAccessor extends AbstractAccessor {
                 polorizer.polorizeBool(key);
                 break;
             case key instanceof Uint8Array:
-            case key instanceof buffer_1.Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
@@ -98,9 +97,9 @@ class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const separator = buffer_1.Buffer.from(".");
-        const buffer = buffer_1.Buffer.concat([hash.toBuffer(), separator, this.key]);
-        return new StorageKey(this.sum256(buffer));
+        const separator = (0, bytes_1.encodeText)(".");
+        const bytes = (0, bytes_1.concatBytes)(hash.toBytes(), separator, this.key);
+        return new StorageKey(this.sum256(bytes));
     }
 }
 exports.PropertyAccessor = PropertyAccessor;
@@ -123,7 +122,7 @@ class ArrayIndexAccessor extends AbstractAccessor {
      * @returns The updated hash after accessing the element.
      */
     access(hash) {
-        const bytes = this.sum256(hash.toBuffer());
+        const bytes = this.sum256(hash.toBytes());
         const slot = new bn_js_1.default(bytes).add(new bn_js_1.default(this.index));
         return new StorageKey(slot);
     }
@@ -139,8 +138,7 @@ class ClassFieldAccessor extends AbstractAccessor {
         this.index = index;
     }
     access(hash) {
-        let blob = hash.toBuffer();
-        blob = this.sum256(blob);
+        let blob = this.sum256(hash.toBytes());
         const bn = new bn_js_1.default(blob).add(new bn_js_1.default(this.index));
         return new StorageKey(bn);
     }

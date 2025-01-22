@@ -1,12 +1,11 @@
 import BN from "bn.js";
-import { Buffer } from "buffer";
 export type Hex = `0x${string}`;
 /**
  * A type representing a number in hexadecimal format.
  */
 export type Quantity = Hex;
 export type Address = Hex;
-export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];
+export type NumberLike = string | number | bigint | BN | Uint8Array | number[];
 /**
  * Ensures that a given string has the '0x' prefix.
  * If the string already has the prefix, it is returned as is.

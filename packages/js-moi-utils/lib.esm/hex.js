@@ -1,5 +1,4 @@
 import BN from "bn.js";
-import { Buffer } from "buffer";
 import { ErrorUtils } from "./errors";
 /**
  * Ensures that a given string has the '0x' prefix.
@@ -54,7 +53,7 @@ export const toQuantity = (value) => numToHex(value);
  * @returns {Hex} The hexadecimal string representation of the Uint8Array.
  */
 export const encodeToString = (data) => {
-    return ensureHexPrefix(Buffer.from(data).toString("hex"));
+    return bytesToHex(data);
 };
 /**
  * Converts a hexadecimal string to a Uint8Array.
@@ -106,7 +105,11 @@ export const hexToBN = (hex) => {
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 export const bytesToHex = (data) => {
-    return `0x${Buffer.from(data).toString("hex")}`;
+    let hex = "0x";
+    for (let i = 0; i < data.length; i++) {
+        hex += data[i].toString(16).padStart(2, "0");
+    }
+    return hex;
 };
 /**
  * Checks if a given value is a hexadecimal string.

@@ -1,6 +1,6 @@
 export { isValidAddress } from "./address";
 export { decodeBase64, encodeBase64 } from "./base64";
-export { bufferToUint8, decodeText, encodeText, hexDataLength, isBytes, isHexString, isInteger, randomBytes, type Bytes } from "./bytes";
+export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isHexString, isInteger, randomBytes, type Bytes } from "./bytes";
 export {
     AccountType,
     AssetStandard,

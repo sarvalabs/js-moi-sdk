@@ -1,8 +1,3 @@
-import type { Buffer } from "buffer";
-
-/**
- * Array-like type representing bytes.
- */
 export type Bytes = ArrayLike<number>;
 
 /**
@@ -82,16 +77,6 @@ export const isHexString = (value: any, length?: number): boolean => {
 };
 
 /**
- * Converts a Buffer to a Uint8Array.
- *
- * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} The Uint8Array representation of the Buffer.
- */
-export const bufferToUint8 = (target: Buffer): Uint8Array => {
-    return new Uint8Array(target);
-};
-
-/**
  * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
  *
  * @param size - The number of random bytes to generate.
@@ -119,4 +104,25 @@ export const encodeText = (text: string) => {
  */
 export const decodeText = (data: Uint8Array) => {
     return new TextDecoder().decode(data);
+};
+
+/**
+ * Concatenates multiple Uint8Array instances into a single Uint8Array.
+ *
+ * @param {...Uint8Array[]} arrays - The arrays to concatenate.
+ * @returns {Uint8Array} A new Uint8Array containing the concatenated values.
+ */
+export const concatBytes = (...arrays: Uint8Array[]): Uint8Array => {
+    const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+    const result = new Uint8Array(totalLength);
+
+    let offset = 0;
+
+    for (let i = 0; i < arrays.length; i++) {
+        result.set(arrays[i], offset);
+
+        offset += arrays[i].length;
+    }
+
+    return result;
 };

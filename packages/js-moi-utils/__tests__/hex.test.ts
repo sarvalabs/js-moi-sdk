@@ -47,7 +47,7 @@ describe(encodeToString.name, () => {
     });
 });
 
-describe("hexToBytes", () => {
+describe(hexToBytes, () => {
     test("should convert a valid hexadecimal string to Uint8Array", () => {
         expect(hexToBytes("0x01020304")).toEqual(new Uint8Array([1, 2, 3, 4]));
     });

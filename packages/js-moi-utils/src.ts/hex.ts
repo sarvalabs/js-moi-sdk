@@ -1,5 +1,4 @@
 import BN from "bn.js";
-import { Buffer } from "buffer";
 import { ErrorUtils } from "./errors";
 
 export type Hex = `0x${string}`;
@@ -11,7 +10,7 @@ export type Quantity = Hex;
 
 export type Address = Hex;
 
-export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];
+export type NumberLike = string | number | bigint | BN | Uint8Array | number[];
 
 /**
  * Ensures that a given string has the '0x' prefix.
@@ -73,7 +72,7 @@ export const toQuantity = (value: NumberLike): Hex => numToHex(value);
  * @returns {Hex} The hexadecimal string representation of the Uint8Array.
  */
 export const encodeToString = (data: Uint8Array): Hex => {
-    return ensureHexPrefix(Buffer.from(data).toString("hex"));
+    return bytesToHex(data);
 };
 
 /**
@@ -134,7 +133,13 @@ export const hexToBN = (hex: string): bigint | number => {
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 export const bytesToHex = (data: Uint8Array): Hex => {
-    return `0x${Buffer.from(data).toString("hex")}` as Hex;
+    let hex: Hex = "0x";
+
+    for (let i = 0; i < data.length; i++) {
+        hex += data[i].toString(16).padStart(2, "0");
+    }
+
+    return hex;
 };
 
 /**
