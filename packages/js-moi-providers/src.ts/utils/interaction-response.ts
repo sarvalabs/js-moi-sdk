@@ -72,7 +72,9 @@ export class InteractionResponse {
             } catch (error) {
                 if (error instanceof CustomError && error.message === "error fetching interaction") {
                     if (this.notFoundRetries <= 0) {
-                        ErrorUtils.throwError("Interaction not found.", ErrorCode.ACTION_REJECTED);
+                        ErrorUtils.throwError(`Interaction not found. Hash ${this.hash}`, ErrorCode.ACTION_REJECTED, {
+                            hash: this.hash,
+                        });
                     }
 
                     this.notFoundRetries--;

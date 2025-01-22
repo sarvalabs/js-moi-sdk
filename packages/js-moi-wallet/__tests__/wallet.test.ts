@@ -274,9 +274,7 @@ const getProvider = (): Provider => {
                 throw new Error("PROVIDER_URL is not set");
             }
 
-            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"], {
-                debug: (request) => console.log(`Request: ${JSON.stringify(request)}`),
-            });
+            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"]);
         }
 
         case "ws": {
@@ -323,8 +321,6 @@ describe("Provider integration test", () => {
                 },
             ],
         });
-
-        console.log("Interaction Sent");
 
         await ix.wait();
     }, TEST_TIMEOUT);

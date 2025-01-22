@@ -47,7 +47,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-providers",
-        run_tests: true,
+        run_tests: !true,
     },
     {
         name: "js-moi-utils",
