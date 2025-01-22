@@ -110,13 +110,13 @@ class Wallet extends js_moi_signer_1.Signer {
     key_index = 0;
     constructor(pKey, curve, provider) {
         try {
+            super(provider);
             if (!pKey || !(pKey instanceof Uint8Array || typeof pKey === "string")) {
                 js_moi_utils_1.ErrorUtils.throwError("Key must be a Uint8Array or a string", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             if (!Object.values(CURVE).includes(curve)) {
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
             }
-            super(provider);
             if (typeof pKey === "string") {
                 pKey = (0, js_moi_utils_1.hexToBytes)(pKey);
             }
