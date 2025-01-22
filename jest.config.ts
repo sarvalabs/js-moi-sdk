@@ -1,11 +1,11 @@
-import deepmerge from "deepmerge";
+import * as deepmerge from "deepmerge";
 import type { Config } from "jest";
 
 process.env["HTTP_PROVIDER_HOST"] = "http://localhost:1600";
 process.env["WS_PROVIDER_HOST"] = "ws://localhost:1600/ws";
 process.env["PROVIDER_TYPE"] = "http";
-process.env["TEST_PRIVATE_KEY"] = "<WALLET PRIVATE KEY>";
-process.env["RUN_NETWORK_TEST"] = "false";
+process.env["TEST_PRIVATE_KEY"] = "92799c19a74ae54ea453ee02176dbeb9c4b2c0a5133979d46e64afabeece8aea";
+process.env["RUN_NETWORK_TEST"] = "true";
 
 interface Package {
     name: string;
