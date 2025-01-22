@@ -255,7 +255,7 @@ export class Wallet extends Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
-            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -280,7 +280,7 @@ export class Wallet extends Signer {
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
 
-            const wallet = new Wallet(Uint8Array.from(childNode.privateKey()), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
