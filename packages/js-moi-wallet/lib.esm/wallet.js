@@ -166,7 +166,7 @@ export class Wallet extends Signer {
     async getAddress() {
         return ensureHexPrefix(this.publicKey.slice(2));
     }
-    getKeyIndex() {
+    getKeyId() {
         return Promise.resolve(this.key_index);
     }
     /**

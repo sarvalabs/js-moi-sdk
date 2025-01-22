@@ -185,7 +185,7 @@ export class Wallet extends Signer {
         return ensureHexPrefix(this.publicKey.slice(2));
     }
 
-    public getKeyIndex(): Promise<number> {
+    public getKeyId(): Promise<number> {
         return Promise.resolve(this.key_index);
     }
 

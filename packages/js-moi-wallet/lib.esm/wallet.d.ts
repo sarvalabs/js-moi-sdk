@@ -75,7 +75,7 @@ export declare class Wallet extends Signer {
      * @returns {string} The address as a string.
      */
     getAddress(): Promise<Hex>;
-    getKeyIndex(): Promise<number>;
+    getKeyId(): Promise<number>;
     /**
      * Signs a message using the wallet's private key and the specified
      * signature algorithm.

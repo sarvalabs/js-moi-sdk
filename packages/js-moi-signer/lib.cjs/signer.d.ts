@@ -1,24 +1,24 @@
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { type Hex, type InteractionRequest, type Simulate } from "js-moi-utils";
+import { type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
-export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
+export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender"> & {
+    sender?: Partial<Omit<Sender, "address">>;
+};
 export declare abstract class Signer {
     private provider?;
     signingAlgorithms: SigningAlgorithms;
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms);
-    abstract getKeyIndex(): Promise<number>;
+    abstract getKeyId(): Promise<number>;
     abstract getAddress(): Promise<Hex>;
     abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
     abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
     connect(provider: Provider): void;
     getProvider(): Provider;
     private getLatestSequence;
-    private getSender;
-    createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>, sequence?: number): Promise<T>;
-    simulate(ix: SignerIx<SimulateInteractionRequest>): Promise<Simulate>;
-    simulate(ix: SignerIx<SimulateInteractionRequest>, sequence?: number, option?: SimulateOption): Promise<Simulate>;
+    private createIxSender;
+    createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>): Promise<T>;
     simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
-    execute(ix: SignerIx<InteractionRequest>, sequence?: number): Promise<InteractionResponse>;
+    execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse>;
     /**
      * Verifies the authenticity of a signature by performing signature verification
      * using the provided parameters.

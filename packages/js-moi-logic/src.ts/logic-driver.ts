@@ -182,7 +182,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
             return baseIxRequest;
         }
 
-        const simulation = await this.signer.simulate(baseIxRequest, option?.sequence);
+        const simulation = await this.signer.simulate(baseIxRequest);
 
         if (option?.fuel_limit != null && option.fuel_limit < simulation.effort) {
             ErrorUtils.throwError(`Minimum fuel limit required for interaction is ${simulation.effort} but got ${option.fuel_limit}.`);

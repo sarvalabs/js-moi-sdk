@@ -205,7 +205,7 @@ class Wallet extends js_moi_signer_1.Signer {
     async getAddress() {
         return (0, js_moi_utils_1.ensureHexPrefix)(this.publicKey.slice(2));
     }
-    getKeyIndex() {
+    getKeyId() {
         return Promise.resolve(this.key_index);
     }
     /**

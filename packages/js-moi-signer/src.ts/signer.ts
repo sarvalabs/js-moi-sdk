@@ -4,7 +4,7 @@ import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
-export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender">;
+export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender"> & { sender?: Partial<Omit<Sender, "address">> };
 
 export abstract class Signer {
     private provider?: Provider;
@@ -19,7 +19,7 @@ export abstract class Signer {
         };
     }
 
-    public abstract getKeyIndex(): Promise<number>;
+    public abstract getKeyId(): Promise<number>;
 
     public abstract getAddress(): Promise<Hex>;
 
@@ -40,49 +40,53 @@ export abstract class Signer {
     }
 
     private async getLatestSequence() {
-        const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
+        const [address, index] = await Promise.all([this.getAddress(), this.getKeyId()]);
         const { sequence } = await this.getProvider().getAccountKey(address, index);
         return sequence;
     }
 
-    private async getSender(sequence?: number): Promise<Sender> {
-        if (sequence != null) {
-            const latest = await this.getLatestSequence();
+    private async createIxSender(sender?: Partial<Omit<Sender, "address">>): Promise<Sender> {
+        if (sender == null) {
+            const [address, index, sequenceId] = await Promise.all([this.getAddress(), this.getKeyId(), this.getLatestSequence()]);
 
-            if (sequence < latest) {
+            return { address, key_id: index, sequence_id: sequenceId };
+        }
+
+        if (sender.sequence_id != null) {
+            if (sender.sequence_id < (await this.getLatestSequence())) {
                 ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
             }
         }
 
-        if (sequence == null) {
-            sequence = await this.getLatestSequence();
+        if (sender.sequence_id == null) {
+            sender.sequence_id = await this.getLatestSequence();
         }
 
-        const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
+        if (sender.sequence_id == null) {
+            ErrorUtils.throwError("Sequence number is not provided", ErrorCode.NOT_INITIALIZED);
+        }
 
-        return { address, key_id: index, sequence_id: sequence };
+        const sequenceId = sender.sequence_id;
+        const key_id = sender.key_id ?? (await this.getKeyId());
+        const address = await this.getAddress();
+
+        return { key_id, sequence_id: sequenceId, address };
     }
 
-    public async createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>, sequence?: number): Promise<T> {
-        // TODO: If sender is not provided, then create sender
-        return { ...ix, sender: await this.getSender(sequence) } as T;
+    public async createIxRequest<T extends InteractionRequest | SimulateInteractionRequest>(ix: SignerIx<T>): Promise<T> {
+        ix.sender = await this.createIxSender(ix.sender);
+
+        return ix as T;
     }
 
-    // TODOL: Don't exit sender address make it optional
-    // TODO: Allow execute polo interaction request
-    public simulate(ix: SignerIx<SimulateInteractionRequest>): Promise<Simulate>;
-    public simulate(ix: SignerIx<SimulateInteractionRequest>, sequence?: number, option?: SimulateOption): Promise<Simulate>;
-    public simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(ix: SignerIx<SimulateInteractionRequest>, sequenceOrOption?: number | SimulateOption, option?: SimulateOption): Promise<Simulate> {
-        const sequence = typeof sequenceOrOption === "number" ? sequenceOrOption : undefined;
-        return await this.getProvider().simulate(await this.createIxRequest(ix, sequence), option);
+    public async simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate> {
+        return await this.getProvider().simulate(await this.createIxRequest(ix), option);
     }
 
-    // TODOL: Don't exit sender address make it optional
-    // TODO: Allow execute polo interaction request
-    public async execute(ix: SignerIx<InteractionRequest>, sequence?: number): Promise<InteractionResponse> {
+    public async execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
-        const signedIx = await this.signInteraction(await this.createIxRequest(ix, sequence), algorithm);
+        const signedIx = await this.signInteraction(await this.createIxRequest(ix), algorithm);
+
         return await this.getProvider().execute(signedIx);
     }
 

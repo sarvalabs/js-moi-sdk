@@ -20,33 +20,41 @@ export class Signer {
         ErrorUtils.throwError("Provider is not initialized!", ErrorCode.NOT_INITIALIZED);
     }
     async getLatestSequence() {
-        const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
+        const [address, index] = await Promise.all([this.getAddress(), this.getKeyId()]);
         const { sequence } = await this.getProvider().getAccountKey(address, index);
         return sequence;
     }
-    async getSender(sequence) {
-        if (sequence != null) {
-            const latest = await this.getLatestSequence();
-            if (sequence < latest) {
+    async createIxSender(sender) {
+        if (sender == null) {
+            const [address, index, sequenceId] = await Promise.all([this.getAddress(), this.getKeyId(), this.getLatestSequence()]);
+            return { address, key_id: index, sequence_id: sequenceId };
+        }
+        if (sender.sequence_id != null) {
+            if (sender.sequence_id < (await this.getLatestSequence())) {
                 ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
             }
         }
-        if (sequence == null) {
-            sequence = await this.getLatestSequence();
+        if (sender.sequence_id == null) {
+            sender.sequence_id = await this.getLatestSequence();
         }
-        const [address, index] = await Promise.all([this.getAddress(), this.getKeyIndex()]);
-        return { address, key_id: index, sequence_id: sequence };
+        if (sender.sequence_id == null) {
+            ErrorUtils.throwError("Sequence number is not provided", ErrorCode.NOT_INITIALIZED);
+        }
+        const sequenceId = sender.sequence_id;
+        const key_id = sender.key_id ?? (await this.getKeyId());
+        const address = await this.getAddress();
+        return { key_id, sequence_id: sequenceId, address };
     }
-    async createIxRequest(ix, sequence) {
-        return { ...ix, sender: await this.getSender(sequence) };
+    async createIxRequest(ix) {
+        ix.sender = await this.createIxSender(ix.sender);
+        return ix;
     }
-    async simulate(ix, sequenceOrOption, option) {
-        const sequence = typeof sequenceOrOption === "number" ? sequenceOrOption : undefined;
-        return await this.getProvider().simulate(await this.createIxRequest(ix, sequence), option);
+    async simulate(ix, option) {
+        return await this.getProvider().simulate(await this.createIxRequest(ix), option);
     }
-    async execute(ix, sequence) {
+    async execute(ix) {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
-        const signedIx = await this.signInteraction(await this.createIxRequest(ix, sequence), algorithm);
+        const signedIx = await this.signInteraction(await this.createIxRequest(ix), algorithm);
         return await this.getProvider().execute(signedIx);
     }
     /**
