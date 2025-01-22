@@ -245,8 +245,8 @@ export class Wallet extends Signer {
         }
     }
 
-    static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
     static async fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
     static async fromMnemonic(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Promise<Wallet> {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
@@ -270,8 +270,8 @@ export class Wallet extends Signer {
         }
     }
 
-    public static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
     public static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
     public static fromMnemonicSync(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Wallet {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;

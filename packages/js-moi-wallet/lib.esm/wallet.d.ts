@@ -88,10 +88,10 @@ export declare class Wallet extends Signer {
      */
     sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
     signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
-    static fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
     static fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
+    static fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
     static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
+    static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
     /**
      * Initializes the wallet from a provided keystore.
      *
