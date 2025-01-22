@@ -1,6 +1,6 @@
 export { isValidAddress } from "./address";
 export { decodeBase64, encodeBase64 } from "./base64";
-export { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger, randomBytes } from "./bytes";
+export { bufferToUint8, decodeText, encodeText, hexDataLength, isBytes, isHexString, isInteger, randomBytes } from "./bytes";
 export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineKind, RoutineType, } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";

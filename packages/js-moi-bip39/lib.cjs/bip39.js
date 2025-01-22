@@ -16,8 +16,7 @@ exports.getDefaultWordlist = exports.validateMnemonic = exports.generateMnemonic
 const pbkdf2_1 = require("@noble/hashes/pbkdf2");
 const sha256_1 = require("@noble/hashes/sha256");
 const sha512_1 = require("@noble/hashes/sha512");
-const utils_1 = require("@noble/hashes/utils");
-const buffer_1 = require("buffer");
+const js_moi_utils_1 = require("js-moi-utils");
 const _wordlists_1 = require("./_wordlists");
 let DEFAULT_WORDLIST = _wordlists_1._default;
 const INVALID_MNEMONIC = "Invalid mnemonic";
@@ -31,7 +30,7 @@ const WORDLIST_REQUIRED = "A wordlist is required but a default could not be fou
  * @returns {string} The normalized string.
  */
 const normalize = (str) => {
-    return (str || "").normalize("NFKD");
+    return (str ?? "").normalize("NFKD");
 };
 /**
  * Left pad a string with a padString to a specific length.
@@ -68,7 +67,7 @@ const bytesToBinary = (bytes) => {
 /**
  * Derive the checksum bits from an entropy buffer.
  *
- * @param {Uint8Array} entropyBuffer - The entropy buffer.
+ * @param {Uint8Array} entropyBuffer - The entropy bytes.
  * @returns {string} The derived checksum bits.
  */
 const deriveChecksumBits = (entropyBuffer) => {
@@ -91,16 +90,14 @@ const salt = (password) => {
  *
  * @param {string} mnemonic - The mnemonic phrase.
  * @param {string} [password] - The optional password.
- * @returns {Buffer} The generated seed.
+ * @returns {Uint8Array} The generated seed.
  */
 const mnemonicToSeedSync = (mnemonic, password) => {
-    const mnemonicBuffer = Uint8Array.from(buffer_1.Buffer.from(normalize(mnemonic), "utf8"));
-    const saltBuffer = Uint8Array.from(buffer_1.Buffer.from(salt(normalize(password)), "utf8"));
-    const res = (0, pbkdf2_1.pbkdf2)(sha512_1.sha512, mnemonicBuffer, saltBuffer, {
+    const res = (0, pbkdf2_1.pbkdf2)(sha512_1.sha512, (0, js_moi_utils_1.encodeText)(normalize(mnemonic)), salt(normalize(password)), {
         c: 2048,
         dkLen: 64,
     });
-    return buffer_1.Buffer.from(res);
+    return res;
 };
 exports.mnemonicToSeedSync = mnemonicToSeedSync;
 /**
@@ -108,18 +105,16 @@ exports.mnemonicToSeedSync = mnemonicToSeedSync;
  *
  * @param {string} mnemonic - The mnemonic phrase.
  * @param {string} [password] - The optional password.
- * @returns {Promise<Buffer>} The generated seed.
+ * @returns {Promise<Uint8Array>} The generated seed.
  * @throws {Error} If an error occurs during the conversion.
  */
 const mnemonicToSeed = async (mnemonic, password) => {
     try {
-        const mnemonicBuffer = Uint8Array.from(buffer_1.Buffer.from(normalize(mnemonic), "utf8"));
-        const saltBuffer = Uint8Array.from(buffer_1.Buffer.from(salt(normalize(password)), "utf8"));
-        const res = await (0, pbkdf2_1.pbkdf2Async)(sha512_1.sha512, mnemonicBuffer, saltBuffer, {
+        const res = await (0, pbkdf2_1.pbkdf2Async)(sha512_1.sha512, (0, js_moi_utils_1.encodeText)(normalize(mnemonic)), salt(normalize(password)), {
             c: 2048,
             dkLen: 64,
         });
-        return buffer_1.Buffer.from(res);
+        return res;
     }
     catch (e) {
         throw new Error("Failed to generate seed from mnemonic", { cause: e });
@@ -166,37 +161,31 @@ const mnemonicToEntropy = (mnemonic, wordlist) => {
     if (entropyBytes.length % 4 !== 0) {
         throw new Error(INVALID_ENTROPY);
     }
-    const entropy = buffer_1.Buffer.from(entropyBytes);
+    const entropy = Uint8Array.from(entropyBytes);
     const newChecksum = deriveChecksumBits(entropy);
     if (newChecksum !== checksumBits) {
         throw new Error(INVALID_CHECKSUM);
     }
-    return entropy.toString("hex");
+    return (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(entropy));
 };
 exports.mnemonicToEntropy = mnemonicToEntropy;
 /**
  * Convert entropy to its corresponding mnemonic.
  *
- * @param {Buffer|string} entropy - The entropy value or buffer.
+ * @param {Uint8Array|string} entropy - The entropy value.
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The corresponding mnemonic phrase.
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
  */
 const entropyToMnemonic = (entropy, wordlist) => {
     if (typeof entropy === "string") {
-        entropy = buffer_1.Buffer.from(entropy, "hex");
+        entropy = (0, js_moi_utils_1.isHex)((0, js_moi_utils_1.ensureHexPrefix)(entropy)) ? (0, js_moi_utils_1.hexToBytes)(entropy) : new Uint8Array([]);
     }
     wordlist = wordlist || DEFAULT_WORDLIST;
     if (!wordlist) {
         throw new Error(WORDLIST_REQUIRED);
     }
-    if (entropy.length < 16) {
-        throw new TypeError(INVALID_ENTROPY);
-    }
-    if (entropy.length > 32) {
-        throw new TypeError(INVALID_ENTROPY);
-    }
-    if (entropy.length % 4 !== 0) {
+    if (entropy.length % 4 !== 0 || entropy.length < 16 || entropy.length > 32) {
         throw new TypeError(INVALID_ENTROPY);
     }
     const entropyBits = bytesToBinary(Array.from(entropy));
@@ -226,7 +215,7 @@ const generateMnemonic = (strength, rng, wordlist) => {
     if (strength % 32 !== 0) {
         throw new TypeError(INVALID_ENTROPY);
     }
-    rng = rng || ((size) => buffer_1.Buffer.from((0, utils_1.randomBytes)(size)));
+    rng = rng ?? ((size) => (0, js_moi_utils_1.randomBytes)(size));
     return (0, exports.entropyToMnemonic)(rng(strength / 8), wordlist);
 };
 exports.generateMnemonic = generateMnemonic;

@@ -1,21 +1,20 @@
-import { Buffer } from "buffer";
 /**
  * Synchronously convert a mnemonic to a seed.
  *
  * @param {string} mnemonic - The mnemonic phrase.
  * @param {string} [password] - The optional password.
- * @returns {Buffer} The generated seed.
+ * @returns {Uint8Array} The generated seed.
  */
-export declare const mnemonicToSeedSync: (mnemonic: string, password?: string) => Buffer;
+export declare const mnemonicToSeedSync: (mnemonic: string, password?: string) => Uint8Array;
 /**
  * Asynchronously convert a mnemonic to a seed.
  *
  * @param {string} mnemonic - The mnemonic phrase.
  * @param {string} [password] - The optional password.
- * @returns {Promise<Buffer>} The generated seed.
+ * @returns {Promise<Uint8Array>} The generated seed.
  * @throws {Error} If an error occurs during the conversion.
  */
-export declare const mnemonicToSeed: (mnemonic: string, password?: string) => Promise<Buffer>;
+export declare const mnemonicToSeed: (mnemonic: string, password?: string) => Promise<Uint8Array>;
 /**
  * Convert a mnemonic to its corresponding entropy value.
  *
@@ -28,12 +27,12 @@ export declare const mnemonicToEntropy: (mnemonic: string, wordlist?: string[]) 
 /**
  * Convert entropy to its corresponding mnemonic.
  *
- * @param {Buffer|string} entropy - The entropy value or buffer.
+ * @param {Uint8Array|string} entropy - The entropy value.
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The corresponding mnemonic phrase.
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
  */
-export declare const entropyToMnemonic: (entropy: Buffer | Uint8Array | string, wordlist?: string[]) => string;
+export declare const entropyToMnemonic: (entropy: Uint8Array | string, wordlist?: string[]) => string;
 /**
  * Generate a mnemonic phrase with the specified strength (in bits).
  *
@@ -43,7 +42,7 @@ export declare const entropyToMnemonic: (entropy: Buffer | Uint8Array | string, 
  * @returns {string} The generated mnemonic phrase.
  * @throws {TypeError} If the strength is not divisible by 32.
  */
-export declare const generateMnemonic: (strength?: number, rng?: (size: number) => Buffer, wordlist?: string[]) => string;
+export declare const generateMnemonic: (strength?: number, rng?: (size: number) => Uint8Array, wordlist?: string[]) => string;
 /**
  * Validate a mnemonic phrase.
  *

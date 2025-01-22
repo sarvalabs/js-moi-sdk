@@ -24,7 +24,7 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "buffer": "^6.0.3",
+    "js-moi-utils": "0.6.0",
     "@noble/hashes": "^1.1.5"
   }
 }

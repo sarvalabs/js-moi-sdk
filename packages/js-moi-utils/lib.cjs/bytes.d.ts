@@ -47,4 +47,18 @@ export declare const bufferToUint8: (target: Buffer) => Uint8Array;
  * @returns A Uint8Array containing the generated random bytes.
  */
 export declare const randomBytes: (size: number) => Uint8Array;
+/**
+ * Encodes a given text string into a Uint8Array using the TextEncoder API.
+ *
+ * @param text - The text string to be encoded.
+ * @returns A Uint8Array containing the encoded text.
+ */
+export declare const encodeText: (text: string) => Uint8Array;
+/**
+ * Decodes a Uint8Array into a string using the TextDecoder API.
+ *
+ * @param data - The Uint8Array to decode.
+ * @returns The decoded string.
+ */
+export declare const decodeText: (data: Uint8Array) => string;
 //# sourceMappingURL=bytes.d.ts.map

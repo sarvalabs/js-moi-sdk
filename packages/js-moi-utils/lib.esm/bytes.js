@@ -83,4 +83,22 @@ export const bufferToUint8 = (target) => {
 export const randomBytes = (size) => {
     return globalThis.crypto.getRandomValues(new Uint8Array(size));
 };
+/**
+ * Encodes a given text string into a Uint8Array using the TextEncoder API.
+ *
+ * @param text - The text string to be encoded.
+ * @returns A Uint8Array containing the encoded text.
+ */
+export const encodeText = (text) => {
+    return new TextEncoder().encode(text);
+};
+/**
+ * Decodes a Uint8Array into a string using the TextDecoder API.
+ *
+ * @param data - The Uint8Array to decode.
+ * @returns The decoded string.
+ */
+export const decodeText = (data) => {
+    return new TextDecoder().decode(data);
+};
 //# sourceMappingURL=bytes.js.map
