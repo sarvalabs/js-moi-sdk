@@ -54,6 +54,11 @@ const logics = [
             name: "Seed",
             args: ["MOI", 10_000],
         },
+        readonly: {
+            type: OpType.LogicInvoke,
+            name: "BalanceOf",
+            args: [bytesToHex(randomBytes(32))],
+        },
         invoke: {
             type: OpType.LogicInvoke,
             name: "Transfer",

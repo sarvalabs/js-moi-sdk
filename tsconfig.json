@@ -2,7 +2,7 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "types": ["node", "jest"],
-        "lib": ["ESNext", "DOM"],
+        "lib": ["ES6", "ESNext", "DOM"],
         "target": "ES2022",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
