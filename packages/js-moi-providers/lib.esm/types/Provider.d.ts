@@ -1,5 +1,5 @@
-import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { EventEmitter } from "events";
+import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams } from "./moi-execution-api";
 export type NonOptionKeys<T extends Record<string, any>> = {
@@ -16,6 +16,11 @@ export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
  * Structure for `moi.Protocol` to get network information.
  */
 interface ProtocolRequest {
+    /**
+     * Get the version and chain ID of the network.
+     *
+     * @param option - Optional parameters for the request.
+     */
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
 }
 export type SimulateOption = TesseractReferenceParam;

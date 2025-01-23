@@ -13,8 +13,7 @@ import {
     type Hex,
     type JsonRpcResponse,
 } from "js-moi-utils";
-import { HttpProvider, HttpTransport, JsonRpcProvider } from "../src.ts";
-import type { LogicMessageRequestOption } from "../src.ts/types/provider.ts";
+import { HttpProvider, HttpTransport, JsonRpcProvider, type LogicMessageRequestOption } from "../src.ts";
 
 const ADDRESS: Address = "0x06cae4700aed3168ab5c41cbcd1fe3ad27b1137a3545bc4efc7601b8bc9879f9";
 const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
