@@ -49,10 +49,10 @@ const getPackages = (): Package[] => [
     //     name: "js-moi-utils",
     //     run_tests: true,
     // },
-    // {
-    //     name: "js-moi-wallet",
-    //     run_tests: true,
-    // },
+    {
+        name: "js-moi-wallet",
+        run_tests: true,
+    },
 ];
 
 const getSharedConfiguration = (pkg: Package): Config => {

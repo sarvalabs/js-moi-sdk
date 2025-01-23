@@ -1,7 +1,8 @@
-import { HttpProvider, InteractionResponse, JsonRpcProvider, WebsocketProvider, type Provider } from "js-moi-providers";
+import { HttpProvider, InteractionResponse, JsonRpcProvider } from "js-moi-providers";
 import type { SigType } from "js-moi-signer";
-import { AssetStandard, bytesToHex, ensureHexPrefix, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
+import { AssetStandard, bytesToHex, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
+import { createWallet } from "./helper";
 
 const TEST_TIMEOUT = 2 * 60_000;
 
@@ -267,63 +268,11 @@ describe(Wallet, () => {
     });
 });
 
-const getProvider = (): Provider => {
-    switch (process.env["PROVIDER_TYPE"]) {
-        case "http": {
-            if (!process.env["HTTP_PROVIDER_HOST"]) {
-                throw new Error("PROVIDER_URL is not set");
-            }
-
-            return new HttpProvider(process.env["HTTP_PROVIDER_HOST"]);
-        }
-
-        case "ws": {
-            if (!process.env["WS_PROVIDER_HOST"]) {
-                throw new Error("PROVIDER_URL is not set");
-            }
-
-            return new WebsocketProvider(process.env["WS_PROVIDER_HOST"]);
-        }
-
-        default: {
-            throw new Error(`Unknown provider type: ${process.env["PROVIDER_TYPE"]}`);
-        }
-    }
-};
-
 describe("Provider integration test", () => {
     const it = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it : globalThis.it.skip;
     it.concurrent = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it.concurrent : globalThis.it.concurrent.skip;
 
-    const initWallet = () => {
-        if (!process.env["TEST_PRIVATE_KEY"]) {
-            throw new Error("TEST_PRIVATE_KEY is not set");
-        }
-
-        return new Wallet(ensureHexPrefix(process.env["TEST_PRIVATE_KEY"]), CURVE.SECP256K1, getProvider());
-    };
-
-    const wallet = Wallet.createRandomSync(getProvider());
-
-    // Register a new participant.
-    beforeAll(async () => {
-        const ix = await initWallet().execute({
-            fuel_price: 1,
-            fuel_limit: 100,
-            operations: [
-                {
-                    type: OpType.ParticipantCreate,
-                    payload: {
-                        address: await wallet.getAddress(),
-                        amount: 100_000,
-                        keys_payload: [{ public_key: wallet.publicKey, weight: 1000, signature_algorithm: 0 }],
-                    },
-                },
-            ],
-        });
-
-        await ix.wait();
-    }, TEST_TIMEOUT);
+    let wallet = createWallet();
 
     const operations: IxOp[] = [
         {
@@ -333,7 +282,7 @@ describe("Provider integration test", () => {
     ];
 
     describe(wallet.simulate, () => {
-        it("should be able to simulate a interaction", async () => {
+        it.concurrent("should be able to simulate a interaction", async () => {
             const simulation = await wallet.simulate({
                 fuel_price: 1,
                 operations,

@@ -6,7 +6,7 @@ type ProviderType = "http" | "websocket";
 //#region Constants
 const MNEMONIC: string = "scheme hunt brand slam allow melody detail pledge buddy pair trumpet security";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
-const PROVIDER_TYPE: ProviderType = "http";
+const PROVIDER_TYPE = "http" as ProviderType;
 const LOGIC_ID = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
 //#endregion
 
@@ -79,7 +79,6 @@ const getAssetId = async (wallet: Wallet) => {
 };
 
 const setup = async () => {
-    console.log("\n");
     log(`Starting testing setup`);
 
     process.env["PROVIDER_TYPE"] = PROVIDER_TYPE;
