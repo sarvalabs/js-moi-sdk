@@ -25,6 +25,7 @@
   "dependencies": {
     "bn.js": "^5.2.1",
     "polo-schema": "^1.0.3",
+    "@noble/hashes": "^1.1.5",
     "js-moi-constants": "0.6.0"
   },
   "devDependencies": {
