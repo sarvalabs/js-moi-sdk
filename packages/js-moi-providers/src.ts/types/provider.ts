@@ -55,7 +55,7 @@ interface ProtocolRequest {
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
 }
 
-export type SimulateOption = TesseractReferenceParam;
+export type SimulateOption = Pick<MethodParams<"moi.Simulate">[0], "references">;
 
 export type SimulateInteractionRequest = Omit<InteractionRequest, "fuel_limit">;
 

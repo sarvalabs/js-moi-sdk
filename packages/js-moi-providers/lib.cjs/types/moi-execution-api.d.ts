@@ -1,4 +1,4 @@
-import type { Account, AccountAsset, AccountKey, Address, Asset, Hex, Interaction, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, AccountAsset, AccountKey, Address, Asset, Hex, Interaction, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
@@ -8,8 +8,12 @@ interface IdentifierParam<TValue> {
 }
 interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> {
 }
-interface SimulateRequestParam extends TesseractReferenceParam {
+interface SimulateRequestParam {
     interaction: Hex;
+    references?: {
+        address: Address;
+        reference: TesseractReference;
+    };
 }
 interface AccountRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {
 }

@@ -12,6 +12,7 @@ import type {
     ResponseModifierParam,
     Simulate,
     Tesseract,
+    TesseractReference,
     TesseractReferenceParam,
 } from "js-moi-utils";
 
@@ -26,8 +27,9 @@ interface IdentifierParam<TValue> {
 
 interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> {}
 
-interface SimulateRequestParam extends TesseractReferenceParam {
+interface SimulateRequestParam {
     interaction: Hex;
+    references?: { address: Address, reference: TesseractReference  }
 }
 
 interface AccountRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {}
