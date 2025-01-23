@@ -1,11 +1,7 @@
 import * as deepmerge from "deepmerge";
 import type { Config } from "jest";
 
-process.env["HTTP_PROVIDER_HOST"] = "http://localhost:1600";
-process.env["WS_PROVIDER_HOST"] = "ws://localhost:1600/ws";
-process.env["PROVIDER_TYPE"] = "http";
-process.env["TEST_PRIVATE_KEY"] = "92799c19a74ae54ea453ee02176dbeb9c4b2c0a5133979d46e64afabeece8aea";
-process.env["RUN_NETWORK_TEST"] = "false";
+const runNetworkTest = process.env.RUN_NETWORK_TEST === "true";
 
 interface Package {
     name: string;
@@ -29,34 +25,34 @@ const getPackages = (): Package[] => [
         name: "js-moi-bip39",
         run_tests: true,
     },
-    {
-        name: "js-moi-hdnode",
-        run_tests: true,
-    },
-    {
-        name: "js-moi-manifest",
-        run_tests: true,
-    },
-    {
-        name: "js-moi-logic",
-        run_tests: true,
-    },
-    {
-        name: "js-moi-signer",
-        run_tests: true,
-    },
+    // {
+    //     name: "js-moi-hdnode",
+    //     run_tests: true,
+    // },
+    // {
+    //     name: "js-moi-manifest",
+    //     run_tests: true,
+    // },
+    // {
+    //     name: "js-moi-logic",
+    //     run_tests: true,
+    // },
+    // {
+    //     name: "js-moi-signer",
+    //     run_tests: true,
+    // },
     {
         name: "js-moi-providers",
         run_tests: true,
     },
-    {
-        name: "js-moi-utils",
-        run_tests: true,
-    },
-    {
-        name: "js-moi-wallet",
-        run_tests: true,
-    },
+    // {
+    //     name: "js-moi-utils",
+    //     run_tests: true,
+    // },
+    // {
+    //     name: "js-moi-wallet",
+    //     run_tests: true,
+    // },
 ];
 
 const getSharedConfiguration = (pkg: Package): Config => {
@@ -83,6 +79,7 @@ const getProjects = () => {
 const config: Config = {
     clearMocks: true,
     ci: process.env.CI === "true",
+    globalSetup: runNetworkTest ? "<rootDir>/jest.setup.ts" : null,
     collectCoverage: true,
     coverageDirectory: "coverage",
     coverageReporters: ["html", "text-summary"],

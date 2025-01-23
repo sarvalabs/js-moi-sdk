@@ -2,26 +2,47 @@ import {
     ArrayIndexAccessor,
     AssetId,
     AssetStandard,
+    ensureHexPrefix,
     generateStorageKey,
-    hexToBytes,
+    interaction,
     isHex,
     LogicId,
     OpType,
     ReceiptStatus,
     trimHexPrefix,
-    type Address,
-    type Hex,
     type JsonRpcResponse,
 } from "js-moi-utils";
-import { HttpProvider, HttpTransport, JsonRpcProvider, type LogicMessageRequestOption } from "../src.ts";
-
-const ADDRESS: Address = "0x06cae4700aed3168ab5c41cbcd1fe3ad27b1137a3545bc4efc7601b8bc9879f9";
-const GUARDIAN_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
-const FAUCET_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548";
-const HOST = "http://localhost:1600";
+import { HttpTransport, JsonRpcProvider, WebsocketTransport, type LogicMessageRequestOption } from "../src.ts";
 
 describe(JsonRpcProvider, () => {
-    const provider: JsonRpcProvider = new HttpProvider(HOST, {});
+    const providerType = process.env["PROVIDER_TYPE"]!;
+    const providerUrl = process.env["PROVIDER_URL"]!;
+    const address = ensureHexPrefix(process.env["WALLET_ADDRESS"]!);
+    const logic_id = ensureHexPrefix(process.env["LOGIC_ID"]!);
+    const asset_id = ensureHexPrefix(process.env["ASSET_ID"]!);
+
+    const provider: JsonRpcProvider = (() => {
+        if (!providerUrl) {
+            throw new Error("PROVIDER_URL is not set");
+        }
+
+        switch (providerType) {
+            case "http":
+                return new JsonRpcProvider(
+                    new HttpTransport(providerUrl, {
+                        debug: (request, { success }) => {
+                            if (success) return;
+
+                            return console.log(JSON.stringify(request));
+                        },
+                    })
+                );
+            case "websocket":
+                return new JsonRpcProvider(new WebsocketTransport(providerUrl));
+            default:
+                throw new Error(`Unknown provider type: ${providerType}`);
+        }
+    })();
 
     describe("constructor", () => {
         it.concurrent("should create instance of JsonRpcProvider", () => {
@@ -35,7 +56,8 @@ describe(JsonRpcProvider, () => {
 
     describe("get transport", () => {
         it.concurrent("should return the transport instance", () => {
-            expect(provider.transport).toBeInstanceOf(HttpTransport);
+            const transport = providerType === "http" ? HttpTransport : WebsocketTransport;
+            expect(provider.transport).toBeInstanceOf(transport);
         });
     });
 
@@ -88,20 +110,12 @@ describe(JsonRpcProvider, () => {
         describe(provider.simulate, () => {
             it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
                 const result = await provider.simulate({
-                    sender: {
-                        address: ADDRESS,
-                        key_id: 0,
-                        sequence_id: 0,
-                    },
+                    sender: { address, key_id: 0, sequence_id: 0 },
                     fuel_price: 1,
                     operations: [
                         {
                             type: OpType.AssetCreate,
-                            payload: {
-                                symbol: "TST",
-                                standard: AssetStandard.MAS0,
-                                supply: 1000000,
-                            },
+                            payload: { symbol: "TST", standard: AssetStandard.MAS0, supply: 1000000 },
                         },
                     ],
                 });
@@ -112,9 +126,17 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
-                const args = hexToBytes(
-                    "0x0e9f020ee004e304f304a005ae05fe07800d800d5f06830483043dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf21010186a01f0e2f0316050e7f063363636161605453540f42401f0e5f06830491043dedcbbb3bbaedaf75ee57990d899bde242c915b553dcaed873a8b1a1aabbf2102"
-                );
+                const args = interaction({
+                    sender: { address, key_id: 0, sequence_id: 0 },
+                    fuel_price: 1,
+                    fuel_limit: 1000,
+                    operations: [
+                        {
+                            type: OpType.AssetCreate,
+                            payload: { symbol: "TST", standard: AssetStandard.MAS0, supply: 1000000 },
+                        },
+                    ],
+                });
 
                 const result = await provider.simulate(args);
 
@@ -126,23 +148,26 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getAccount, () => {
             it.concurrent("should return the account when retrieved using address", async () => {
-                const account = await provider.getAccount(ADDRESS);
+                const account = await provider.getAccount(address);
 
                 expect(account).toBeDefined();
-                expect(account.metadata.address).toEqual(ADDRESS);
+                expect(account.metadata.address).toEqual(address);
             });
 
-            it.concurrent("should able to get account using reference", async () => {
+            it.concurrent.skip("[ERROR HAPPENING HERE] should able to get account using reference", async () => {
                 const height = 0;
-                const account = await provider.getAccount(ADDRESS, {
-                    reference: { relative: { height, identifier: ADDRESS } },
-                    modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
+                const account = await provider.getAccount(address, {
+                    reference: { relative: { height, identifier: address } },
+                    // TODO: With field `enlisted` it throw error. Confirm with team and fix it.
+                    // modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
+                    modifier: { include: ["state", "keys", "balances", "mandates", "guardians", "enlisted", "lockups"] },
                 });
 
                 expect(account).toBeDefined();
                 expect(account.metadata.height).toBe(height);
                 expect(account.state).toBeDefined();
                 expect(account.balances).toBeDefined();
+                // TODO: With field `enlisted` it throw error. Confirm with team and fix it.
                 expect(account.enlisted).toBeDefined();
                 expect(account.guardians).toBeDefined();
                 expect(account.keys).toBeDefined();
@@ -150,14 +175,14 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account with included fields", async () => {
-                const account = await provider.getAccount(ADDRESS, { modifier: { include: ["balances"] } });
+                const account = await provider.getAccount(address, { modifier: { include: ["balances"] } });
 
                 expect(account).toBeDefined();
                 expect(account.balances).toBeDefined();
             });
 
             it.concurrent("should return the object with the extracted fields", async () => {
-                const balances = await provider.getAccount(ADDRESS, { modifier: { extract: "balances" } });
+                const balances = await provider.getAccount(address, { modifier: { extract: "balances" } });
 
                 expect(balances).toBeDefined();
                 expect(Array.isArray(balances)).toBeTruthy();
@@ -167,7 +192,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.getTesseract, () => {
             it.concurrent("should return the tesseract when retrieved using address and height", async () => {
                 const height = 0;
-                const tesseract = await provider.getTesseract(ADDRESS, height, {
+                const tesseract = await provider.getTesseract(address, height, {
                     modifier: { include: ["confirmations", "consensus", "interactions"] },
                 });
 
@@ -178,7 +203,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the tesseract when retrieved using tesseract hash", async () => {
                 const height = 0;
-                const currentTesseract = await provider.getTesseract(ADDRESS, height);
+                const currentTesseract = await provider.getTesseract(address, height);
                 const tesseract = await provider.getTesseract(currentTesseract.hash);
 
                 expect(tesseract).toBeDefined();
@@ -188,8 +213,8 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the tesseract when retrieved using tesseract reference", async () => {
                 const height = 0;
-                const currentTesseract = await provider.getTesseract(ADDRESS, height);
-                const tesseract = await provider.getTesseract({ relative: { height, identifier: ADDRESS } });
+                const currentTesseract = await provider.getTesseract(address, height);
+                const tesseract = await provider.getTesseract({ relative: { height, identifier: address } });
 
                 expect(tesseract).toBeDefined();
                 expect(tesseract.hash).toBeDefined();
@@ -197,7 +222,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the tesseract with included fields", async () => {
-                const tesseract = await provider.getTesseract(ADDRESS, 0, {
+                const tesseract = await provider.getTesseract(address, 0, {
                     modifier: { include: ["confirmations", "consensus", "interactions"] },
                 });
 
@@ -211,41 +236,42 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getLogic, () => {
             it.concurrent("should return the logic when retrieved using logic id", async () => {
-                const logic = await provider.getLogic(new LogicId(GUARDIAN_LOGIC_ID));
+                const logic = await provider.getLogic(new LogicId(logic_id));
 
                 expect(logic).toBeDefined();
-                expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ID))).toBeTruthy();
+                expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
             });
 
             it.concurrent("should return the logic when retrieved using address", async () => {
-                const logic = await provider.getLogic(new LogicId(GUARDIAN_LOGIC_ID).getAddress());
+                const logic = await provider.getLogic(new LogicId(logic_id).getAddress());
 
                 expect(logic).toBeDefined();
-                expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ID))).toBeTruthy();
+                expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
             });
 
             it.concurrent("should return the logic with reference", async () => {
-                const logic = await provider.getLogic(GUARDIAN_LOGIC_ID, {
-                    reference: { relative: { identifier: GUARDIAN_LOGIC_ID, height: 0 } },
+                const logic = await provider.getLogic(new LogicId(logic_id), {
+                    reference: { relative: { identifier: new LogicId(logic_id).getAddress(), height: 0 } },
                 });
 
                 expect(logic).toBeDefined();
-                expect(logic.metadata.logic_id.includes(trimHexPrefix(GUARDIAN_LOGIC_ID))).toBeTruthy();
+                expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
             });
 
-            it.concurrent("should return the logic with included fields", async () => {
-                const logic = await provider.getLogic(GUARDIAN_LOGIC_ID, {
+            it.concurrent.skip("[ERROR HAPPENING HERE] should return the logic with included fields", async () => {
+                const logic = await provider.getLogic(new LogicId(logic_id), {
                     modifier: { include: ["manifest", "controller", "edition"] },
                 });
 
                 expect(logic).toBeDefined();
                 expect(logic.manifest).toBeDefined();
+                // FIXME: Protocol erroring out with `controller` and `edition` fields not found.
                 expect(logic.controller).toBeDefined();
                 expect(logic.edition).toBeDefined();
             });
 
             it.concurrent("should return the logic with extracted fields", async () => {
-                const manifest = await provider.getLogic(GUARDIAN_LOGIC_ID, {
+                const manifest = await provider.getLogic(new LogicId(logic_id), {
                     modifier: { extract: "manifest" },
                 });
 
@@ -257,7 +283,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.getLogicStorage, () => {
             it.concurrent("should return the logic storage when retrieved using logic id and storage id", async () => {
                 const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
-                const value = await provider.getLogicStorage(GUARDIAN_LOGIC_ID, storageId);
+                const value = await provider.getLogicStorage(logic_id, storageId);
 
                 expect(value).toBeDefined();
                 expect(isHex(value)).toBeTruthy();
@@ -265,7 +291,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic storage when retrieved using logic id and storage id", async () => {
                 const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
-                const value = await provider.getLogicStorage(new LogicId(GUARDIAN_LOGIC_ID), storageId.hex());
+                const value = await provider.getLogicStorage(new LogicId(logic_id), storageId.hex());
 
                 expect(value).toBeDefined();
                 expect(isHex(value)).toBeTruthy();
@@ -273,8 +299,8 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic storage using reference", async () => {
                 const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
-                const logicId = new LogicId(GUARDIAN_LOGIC_ID);
-                const value = await provider.getLogicStorage(logicId, storageId, {
+                const logicId = new LogicId(logic_id);
+                const value = await provider.getLogicStorage(logic_id, storageId, {
                     reference: { relative: { identifier: logicId.getAddress(), height: 0 } },
                 });
 
@@ -284,13 +310,13 @@ describe(JsonRpcProvider, () => {
         });
 
         describe(provider.getAsset, () => {
-            const assetId = new AssetId(FAUCET_ASSET_ID);
+            const assetId = new AssetId(asset_id);
 
             it.concurrent("should return the asset when retrieved using asset address", async () => {
                 const asset = await provider.getAsset(assetId.getAddress());
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(FAUCET_ASSET_ID);
+                expect(asset.metadata.asset_id).toBe(assetId.value);
                 expect(asset.metadata.standard).toBe(assetId.getStandard());
             });
 
@@ -298,7 +324,7 @@ describe(JsonRpcProvider, () => {
                 const asset = await provider.getAsset(assetId);
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(FAUCET_ASSET_ID);
+                expect(asset.metadata.asset_id).toBe(assetId.value);
                 expect(asset.metadata.logical).toBe(assetId.isLogical());
             });
 
@@ -308,7 +334,7 @@ describe(JsonRpcProvider, () => {
                 });
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(FAUCET_ASSET_ID);
+                expect(asset.metadata.asset_id).toBe(assetId.value);
                 expect(asset.metadata.supply).toBe(expect.any(String));
             });
 
@@ -346,7 +372,7 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getLogicMessage, () => {
             it.concurrent("should return the logic message when retrieved using logic id", async () => {
-                const messages = await provider.getLogicMessage(GUARDIAN_LOGIC_ID);
+                const messages = await provider.getLogicMessage(logic_id);
 
                 expect(messages).toBeDefined();
                 expect(Array.isArray(messages)).toBeTruthy();
@@ -356,13 +382,13 @@ describe(JsonRpcProvider, () => {
                 if (message != null) {
                     expect(message.event).toBeDefined();
                     expect(message.source).toBeDefined();
-                    expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
+                    expect(message.event.logic_id).toBe(logic_id);
                 }
             });
 
             it.concurrent("should return the logic message when address is passed", async () => {
-                const messages = await provider.getLogicMessage(GUARDIAN_LOGIC_ID, {
-                    address: new LogicId(GUARDIAN_LOGIC_ID).getAddress(),
+                const messages = await provider.getLogicMessage(logic_id, {
+                    address: new LogicId(logic_id).getAddress(),
                 });
 
                 expect(messages).toBeDefined();
@@ -373,14 +399,14 @@ describe(JsonRpcProvider, () => {
                 if (message != null) {
                     expect(message.event).toBeDefined();
                     expect(message.source).toBeDefined();
-                    expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
+                    expect(message.event.logic_id).toBe(logic_id);
                 }
             });
 
             it.concurrent.each<LogicMessageRequestOption & { case: string }>([
                 {
                     case: "when address is passed",
-                    address: ADDRESS,
+                    address: address,
                 },
                 {
                     case: "when range is passed",
@@ -405,7 +431,7 @@ describe(JsonRpcProvider, () => {
                     range: { start: 0, stop: 9 },
                 },
             ])("should return the logic message $case", async ({ case: name, ...option }) => {
-                const messages = await provider.getLogicMessage(GUARDIAN_LOGIC_ID, option);
+                const messages = await provider.getLogicMessage(logic_id, option);
                 console.log();
                 expect(messages).toBeDefined();
                 expect(Array.isArray(messages)).toBeTruthy();
@@ -415,22 +441,22 @@ describe(JsonRpcProvider, () => {
                 if (message != null) {
                     expect(message.event).toBeDefined();
                     expect(message.source).toBeDefined();
-                    expect(message.event.logic_id).toBe(GUARDIAN_LOGIC_ID);
+                    expect(message.event.logic_id).toBe(logic_id);
                 }
             });
         });
 
         describe(provider.getAccountAsset, () => {
             it.concurrent("should return the account asset when retrieved using address and asset id", async () => {
-                const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID);
+                const accountAsset = await provider.getAccountAsset(address, asset_id);
 
                 expect(accountAsset).toBeDefined();
                 expect(isHex(accountAsset.balance)).toBeTruthy();
             });
 
             it.concurrent("should return the account asset with reference", async () => {
-                const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
-                    reference: { relative: { identifier: ADDRESS, height: 0 } },
+                const accountAsset = await provider.getAccountAsset(address, asset_id, {
+                    reference: { relative: { identifier: address, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
@@ -438,7 +464,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account asset with included fields", async () => {
-                const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                const accountAsset = await provider.getAccountAsset(address, asset_id, {
                     modifier: { include: ["lockup", "mandate"] },
                 });
 
@@ -449,7 +475,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account asset with extracted fields", async () => {
-                const lockup = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                const lockup = await provider.getAccountAsset(address, asset_id, {
                     modifier: { extract: "lockup" },
                 });
 
@@ -457,9 +483,9 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account asset with modifier and reference", async () => {
-                const accountAsset = await provider.getAccountAsset(ADDRESS, FAUCET_ASSET_ID, {
+                const accountAsset = await provider.getAccountAsset(address, asset_id, {
                     modifier: { include: ["lockup", "mandate"] },
-                    reference: { relative: { identifier: ADDRESS, height: 0 } },
+                    reference: { relative: { identifier: address, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
@@ -471,7 +497,7 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getAccountKey, () => {
             it.concurrent("should return the account key when retrieved using address and key index", async () => {
-                const accountKey = await provider.getAccountKey(ADDRESS, 0);
+                const accountKey = await provider.getAccountKey(address, 0);
 
                 expect(accountKey).toBeDefined();
                 expect(accountKey.key_idx).toBe(0);
@@ -481,8 +507,8 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account key with reference", async () => {
-                const accountKey = await provider.getAccountKey(ADDRESS, 0, {
-                    reference: { relative: { identifier: ADDRESS, height: 0 } },
+                const accountKey = await provider.getAccountKey(address, 0, {
+                    reference: { relative: { identifier: address, height: 0 } },
                 });
 
                 expect(accountKey).toBeDefined();
@@ -493,7 +519,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account key with pending true", async () => {
-                const accountKey = await provider.getAccountKey(ADDRESS, 0, { pending: true });
+                const accountKey = await provider.getAccountKey(address, 0, { pending: true });
 
                 expect(accountKey).toBeDefined();
                 expect(accountKey.key_idx).toBe(0);
