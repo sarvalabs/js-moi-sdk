@@ -30,10 +30,10 @@ describe(JsonRpcProvider, () => {
             case "http":
                 return new JsonRpcProvider(
                     new HttpTransport(providerUrl, {
-                        debug: (request, { success }) => {
-                            if (success) return;
-
-                            return console.log(JSON.stringify(request));
+                        debug: ({ ok, request, response }) => {
+                            if (!ok) {
+                                console.log(`\tRequest: ${JSON.stringify(request)}\n\tResponse: ${JSON.stringify(response)}\n`);
+                            }
                         },
                     })
                 );
@@ -428,7 +428,6 @@ describe(JsonRpcProvider, () => {
                 },
             ])("should return the logic message $case", async ({ case: name, ...option }) => {
                 const messages = await provider.getLogicMessage(logic_id, option);
-                console.log();
                 expect(messages).toBeDefined();
                 expect(Array.isArray(messages)).toBeTruthy();
 

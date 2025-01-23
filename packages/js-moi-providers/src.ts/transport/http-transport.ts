@@ -34,8 +34,8 @@ export class HttpTransport implements Transport {
 
     private createPayload(method: string, params: unknown[]): JsonRpcRequest {
         return {
-            id: 1,
             jsonrpc: "2.0",
+            id: 1,
             method: method,
             params: params,
         };
@@ -49,7 +49,7 @@ export class HttpTransport implements Transport {
             const content = JSON.stringify(request);
             const headers: HeadersInit = new Headers({
                 "Content-Type": "application/json",
-                "Content-Length": content.length.toString(),
+                // "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
             const response = await fetch(this.host, {
@@ -60,8 +60,8 @@ export class HttpTransport implements Transport {
 
             if (!response.ok) {
                 result = {
-                    id: 1,
                     jsonrpc: "2.0",
+                    id: 1,
                     error: {
                         code: response.status,
                         message: `Request failed`,
@@ -76,8 +76,8 @@ export class HttpTransport implements Transport {
             const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
 
             result = {
-                id: 1,
                 jsonrpc: "2.0",
+                id: 1,
                 error: { code: -1, message: errMessage, data: error },
             };
         }
@@ -85,7 +85,7 @@ export class HttpTransport implements Transport {
         this.option?.debug?.({
             request,
             response: result,
-            ok: "error" in result,
+            ok: "error" in result === false,
             error: "error" in result ? result.error : undefined,
             host: this.host,
         });
