@@ -1,11 +1,13 @@
 import { type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
+type DebugArgument = {
+    ok: boolean;
+    request: JsonRpcRequest;
+    response: JsonRpcResponse;
+    error?: unknown;
+    host: string;
+};
 export interface HttpTransportOption {
-    debug?: (params: {
-        ok: boolean;
-        request: JsonRpcRequest;
-        response: JsonRpcResponse;
-        error?: unknown;
-    }) => void;
+    debug?: (params: DebugArgument) => void;
 }
 export declare class HttpTransport implements Transport {
     private readonly host;
@@ -15,4 +17,5 @@ export declare class HttpTransport implements Transport {
     private createPayload;
     request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>>;
 }
+export {};
 //# sourceMappingURL=http-transport.d.ts.map

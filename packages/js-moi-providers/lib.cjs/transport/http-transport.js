@@ -66,6 +66,7 @@ class HttpTransport {
             response: result,
             ok: "error" in result,
             error: "error" in result ? result.error : undefined,
+            host: this.host,
         });
         return result;
     }
