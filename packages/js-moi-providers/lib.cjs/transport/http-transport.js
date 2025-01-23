@@ -61,9 +61,11 @@ class HttpTransport {
                 error: { code: -1, message: errMessage, data: error },
             };
         }
-        this.option?.debug?.(request, {
-            success: "result" in result,
-            cause: "error" in result ? result.error : undefined,
+        this.option?.debug?.({
+            request,
+            response: result,
+            ok: "error" in result,
+            error: "error" in result ? result.error : undefined,
         });
         return result;
     }

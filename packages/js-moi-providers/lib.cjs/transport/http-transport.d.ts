@@ -1,8 +1,10 @@
 import { type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 export interface HttpTransportOption {
-    debug?: (request: JsonRpcRequest, result: {
-        success: boolean;
-        cause?: unknown;
+    debug?: (params: {
+        ok: boolean;
+        request: JsonRpcRequest;
+        response: JsonRpcResponse;
+        error?: unknown;
     }) => void;
 }
 export declare class HttpTransport implements Transport {

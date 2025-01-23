@@ -1,7 +1,7 @@
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
 export interface HttpTransportOption {
-    debug?: (request: JsonRpcRequest, result: { success: boolean; cause?: unknown }) => void;
+    debug?: (params: { ok: boolean; request: JsonRpcRequest; response: JsonRpcResponse; error?: unknown }) => void;
 }
 
 export class HttpTransport implements Transport {
@@ -74,9 +74,11 @@ export class HttpTransport implements Transport {
             };
         }
 
-        this.option?.debug?.(request, {
-            success: "result" in result,
-            cause: "error" in result ? result.error : undefined,
+        this.option?.debug?.({
+            request,
+            response: result,
+            ok: "error" in result,
+            error: "error" in result ? result.error : undefined,
         });
 
         return result;
