@@ -197,7 +197,7 @@ const createInvalidResult = (value, field, message) => {
  * - Checks if the operations are present, is an array, and contains at least one operation.
  * - Checks each operation to ensure it has a type and payload, and validates the operation.
  */
-export const validateIxRequest = (ix) => {
+export function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
@@ -207,13 +207,13 @@ export const validateIxRequest = (ix) => {
     if (ix.fuel_price == null) {
         return createInvalidResult(ix, "fuel_price", "Fuel price is required");
     }
-    if (ix.fuel_limit == null) {
+    if (type === "moi.Execute" && ix["fuel_limit"] == null) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit is required");
     }
     if (ix.fuel_price < 0) {
         return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
     }
-    if (ix.fuel_limit <= 0) {
+    if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
     if (ix.payer != null && !isValidAddress(ix.payer)) {
@@ -271,16 +271,5 @@ export const validateIxRequest = (ix) => {
         return error;
     }
     return null;
-};
-export const isValidIxRequest = (ix) => {
-    try {
-        if (typeof ix !== "object" || ix === null) {
-            return false;
-        }
-        return validateIxRequest(ix) == null;
-    }
-    catch (error) {
-        return false;
-    }
-};
+}
 //# sourceMappingURL=interaction.js.map

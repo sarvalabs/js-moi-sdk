@@ -1,5 +1,5 @@
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes, isHex, type Hex, type InteractionRequest, type IxOp, type Sender, type Simulate } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest, type Hex, type InteractionRequest, type IxOp, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
@@ -120,11 +120,18 @@ export abstract class Signer {
         }
 
         const simulation = await this.simulate(simulateIxRequest);
-
-        return {
+        const executeIxRequest = {
             ...simulateIxRequest,
             fuel_limit: simulation.effort,
         };
+
+        const err = validateIxRequest("moi.Execute", executeIxRequest);
+
+        if (err != null) {
+            ErrorUtils.throwError(`Invalid interaction request: ${err.message}`, ErrorCode.INVALID_ARGUMENT, { ...err });
+        }
+
+        return executeIxRequest;
     }
 
     public async simulate(operation: IxOp, options?: SimulateOption): Promise<Simulate>;

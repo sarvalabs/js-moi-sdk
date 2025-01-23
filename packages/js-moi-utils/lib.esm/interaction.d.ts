@@ -54,7 +54,6 @@ declare const createInvalidResult: <T extends Record<any, any>>(value: T, field:
  * - Checks if the operations are present, is an array, and contains at least one operation.
  * - Checks each operation to ensure it has a type and payload, and validates the operation.
  */
-export declare const validateIxRequest: (ix: InteractionRequest) => ReturnType<typeof createInvalidResult> | null;
-export declare const isValidIxRequest: (ix: unknown) => ix is InteractionRequest;
+export declare function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(type: TType, ix: TType extends "moi.Execute" ? InteractionRequest : Omit<InteractionRequest, "fuel_limit">): ReturnType<typeof createInvalidResult> | null;
 export {};
 //# sourceMappingURL=interaction.d.ts.map

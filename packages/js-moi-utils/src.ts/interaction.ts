@@ -226,7 +226,10 @@ const createInvalidResult = <T extends Record<any, any>>(value: T, field: keyof 
  * - Checks if the operations are present, is an array, and contains at least one operation.
  * - Checks each operation to ensure it has a type and payload, and validates the operation.
  */
-export const validateIxRequest = (ix: InteractionRequest): ReturnType<typeof createInvalidResult> | null => {
+export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
+    type: TType,
+    ix: TType extends "moi.Execute" ? InteractionRequest : Omit<InteractionRequest, "fuel_limit">
+): ReturnType<typeof createInvalidResult> | null {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
@@ -239,16 +242,16 @@ export const validateIxRequest = (ix: InteractionRequest): ReturnType<typeof cre
         return createInvalidResult(ix, "fuel_price", "Fuel price is required");
     }
 
-    if (ix.fuel_limit == null) {
-        return createInvalidResult(ix, "fuel_limit", "Fuel limit is required");
+    if (type === "moi.Execute" && ix["fuel_limit"] == null) {
+        return createInvalidResult(<InteractionRequest>ix, "fuel_limit", "Fuel limit is required");
     }
 
     if (ix.fuel_price < 0) {
         return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
     }
 
-    if (ix.fuel_limit <= 0) {
-        return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
+    if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
+        return createInvalidResult(<InteractionRequest>ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
 
     if (ix.payer != null && !isValidAddress(ix.payer)) {
@@ -323,16 +326,4 @@ export const validateIxRequest = (ix: InteractionRequest): ReturnType<typeof cre
     }
 
     return null;
-};
-
-export const isValidIxRequest = (ix: unknown): ix is InteractionRequest => {
-    try {
-        if (typeof ix !== "object" || ix === null) {
-            return false;
-        }
-
-        return validateIxRequest(ix as InteractionRequest) == null;
-    } catch (error) {
-        return false;
-    }
-};
+}

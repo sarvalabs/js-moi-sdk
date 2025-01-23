@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isValidIxRequest = exports.validateIxRequest = exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
+exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
+exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
@@ -204,7 +205,7 @@ const createInvalidResult = (value, field, message) => {
  * - Checks if the operations are present, is an array, and contains at least one operation.
  * - Checks each operation to ensure it has a type and payload, and validates the operation.
  */
-const validateIxRequest = (ix) => {
+function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
@@ -214,13 +215,13 @@ const validateIxRequest = (ix) => {
     if (ix.fuel_price == null) {
         return createInvalidResult(ix, "fuel_price", "Fuel price is required");
     }
-    if (ix.fuel_limit == null) {
+    if (type === "moi.Execute" && ix["fuel_limit"] == null) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit is required");
     }
     if (ix.fuel_price < 0) {
         return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
     }
-    if (ix.fuel_limit <= 0) {
+    if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
     if (ix.payer != null && !(0, address_1.isValidAddress)(ix.payer)) {
@@ -278,18 +279,5 @@ const validateIxRequest = (ix) => {
         return error;
     }
     return null;
-};
-exports.validateIxRequest = validateIxRequest;
-const isValidIxRequest = (ix) => {
-    try {
-        if (typeof ix !== "object" || ix === null) {
-            return false;
-        }
-        return (0, exports.validateIxRequest)(ix) == null;
-    }
-    catch (error) {
-        return false;
-    }
-};
-exports.isValidIxRequest = isValidIxRequest;
+}
 //# sourceMappingURL=interaction.js.map

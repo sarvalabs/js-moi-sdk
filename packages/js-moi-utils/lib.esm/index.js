@@ -5,7 +5,7 @@ export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus,
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, isAddress, isHex, numToHex, trimHexPrefix } from "./hex";
 export { AssetId, LogicId } from "./identifier";
-export { encodeInteraction, getInteractionRequestSchema, interaction, isValidIxRequest, transformInteraction, validateIxRequest } from "./interaction";
+export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformOperationPayload, validateOperation, } from "./operations";
 export { defineReadOnly } from "./properties";

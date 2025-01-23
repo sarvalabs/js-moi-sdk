@@ -126,13 +126,10 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
 
             case typeof ix === "object": {
                 if (!("fuel_limit" in ix)) {
-                    console.warn("Simulating interaction should not take a fuel limit.");
-                    console.warn("For simulation, fuel limit not provided. Using default value 1.");
+                    console.warn("Simulating interaction should not take a fuel limit.\nFor simulation, fuel limit not provided. Using default value 1.");
                     ix["fuel_limit"] = 1;
                 }
-                // TODO: Validate interaction request based on what is trying to be simulated or executed
-                // @ts-ignore - This is a not a valid interaction request for simulation is should not take fuel limit
-                const result = validateIxRequest(ix);
+                const result = validateIxRequest("moi.Simulate", ix);
 
                 if (result != null) {
                     ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, ErrorCode.INVALID_ARGUMENT, { ...result });

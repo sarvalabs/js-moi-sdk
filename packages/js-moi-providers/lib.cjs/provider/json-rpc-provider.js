@@ -68,13 +68,12 @@ class JsonRpcProvider extends events_1.EventEmitter {
             }
             case typeof ix === "object": {
                 if (!("fuel_limit" in ix)) {
-                    console.warn("Simulating interaction should not take a fuel limit.");
-                    console.warn("For simulation, fuel limit not provided. Using default value 1.");
+                    console.warn("Simulating interaction should not take a fuel limit.\nFor simulation, fuel limit not provided. Using default value 1.");
                     ix["fuel_limit"] = 1;
                 }
                 // TODO: Validate interaction request based on what is trying to be simulated or executed
                 // @ts-ignore - This is a not a valid interaction request for simulation is should not take fuel limit
-                const result = (0, js_moi_utils_1.validateIxRequest)(ix);
+                const result = (0, js_moi_utils_1.validateIxRequest)("moi.Simulate", ix);
                 if (result != null) {
                     js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, { ...result });
                 }
