@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
-const address_1 = require("./address");
 const enums_1 = require("./enums");
 const errors_1 = require("./errors");
 const hex_1 = require("./hex");
@@ -44,7 +43,7 @@ const createParticipantCreateDescriptor = () => {
         },
         validator: (operation) => {
             const { payload } = operation;
-            if (!(0, address_1.isValidAddress)(payload.address)) {
+            if (!(0, hex_1.isAddress)(payload.address)) {
                 return createInvalidResult(payload, "address", "Invalid address");
             }
             if (payload.amount < 0) {
@@ -147,7 +146,7 @@ const createAssetActionDescriptor = () => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
-                benefactor: "benefactor" in payload && (0, address_1.isValidAddress)(payload.benefactor) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && (0, hex_1.isAddress)(payload.benefactor) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
                 beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
             };
             return raw;
@@ -159,7 +158,7 @@ const createAssetActionDescriptor = () => {
             if (!(0, hex_1.isHex)(operation.payload.asset_id)) {
                 return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
-            if (!(0, address_1.isValidAddress)(operation.payload.beneficiary)) {
+            if (!(0, hex_1.isAddress)(operation.payload.beneficiary)) {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
             switch (true) {

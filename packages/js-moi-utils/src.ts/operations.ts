@@ -1,6 +1,5 @@
 import { Polorizer } from "js-polo";
 import { polo, type PoloSchema } from "polo-schema";
-import { isValidAddress } from "./address";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isAddress, isHex } from "./hex";
@@ -79,7 +78,7 @@ const createParticipantCreateDescriptor = () => {
 
         validator: (operation) => {
             const { payload } = operation;
-            if (!isValidAddress(payload.address)) {
+            if (!isAddress(payload.address)) {
                 return createInvalidResult(payload, "address", "Invalid address");
             }
 
@@ -209,7 +208,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw: PoloIxOperationPayload<TOpType> = {
                 ...payload,
-                benefactor: "benefactor" in payload && isValidAddress(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && isAddress(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
 
@@ -225,7 +224,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
                 return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
 
-            if (!isValidAddress(operation.payload.beneficiary)) {
+            if (!isAddress(operation.payload.beneficiary)) {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
 

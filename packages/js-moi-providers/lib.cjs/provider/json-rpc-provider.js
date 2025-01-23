@@ -71,8 +71,6 @@ class JsonRpcProvider extends events_1.EventEmitter {
                     console.warn("Simulating interaction should not take a fuel limit.\nFor simulation, fuel limit not provided. Using default value 1.");
                     ix["fuel_limit"] = 1;
                 }
-                // TODO: Validate interaction request based on what is trying to be simulated or executed
-                // @ts-ignore - This is a not a valid interaction request for simulation is should not take fuel limit
                 const result = (0, js_moi_utils_1.validateIxRequest)("moi.Simulate", ix);
                 if (result != null) {
                     js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: ${result.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, { ...result });
@@ -97,7 +95,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         });
     }
     async getAccount(identifier, option) {
-        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+        if (!(0, js_moi_utils_1.isAddress)(identifier)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         return await this.call("moi.Account", { identifier, ...option });
@@ -111,7 +109,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
-            case (0, js_moi_utils_1.isValidAddress)(identifier) && typeof height === "number" && isValidOption(option): {
+            case (0, js_moi_utils_1.isAddress)(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
@@ -131,7 +129,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
     }
     getLogic(value, option) {
         const identifier = typeof value === "string" ? value : value.getAddress();
-        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+        if (!(0, js_moi_utils_1.isAddress)(identifier)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         return this.call("moi.Logic", { identifier, ...option });
@@ -149,7 +147,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
             case typeof storageId === "string":
             case storageId instanceof js_moi_utils_1.StorageKey: {
                 // Getting logic storage by logic id, address, and storage key
-                if (!(0, js_moi_utils_1.isValidAddress)(address)) {
+                if (!(0, js_moi_utils_1.isAddress)(address)) {
                     js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
                 }
                 const id = typeof storageId === "string" ? storageId : storageId.hex();
@@ -163,7 +161,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return (0, js_moi_utils_1.ensureHexPrefix)(await this.call("moi.LogicStorage", ...params));
     }
     async getAsset(identifier, option) {
-        if (typeof identifier === "string" && !(0, js_moi_utils_1.isValidAddress)(identifier)) {
+        if (typeof identifier === "string" && !(0, js_moi_utils_1.isAddress)(identifier)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         const address = typeof identifier === "string" ? identifier : identifier.getAddress();
@@ -174,14 +172,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
     }
     async getAccountAsset(identifier, assetId, option) {
-        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+        if (!(0, js_moi_utils_1.isAddress)(identifier)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         const { value } = typeof assetId === "string" ? new js_moi_utils_1.AssetId(assetId) : assetId;
         return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
     }
     async getAccountKey(identifier, index, option) {
-        if (!(0, js_moi_utils_1.isValidAddress)(identifier)) {
+        if (!(0, js_moi_utils_1.isAddress)(identifier)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         if (Number.isNaN(index) || index < 0) {

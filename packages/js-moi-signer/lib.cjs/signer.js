@@ -85,10 +85,15 @@ class Signer {
             return { ...simulateIxRequest, fuel_limit: args.fuel_limit };
         }
         const simulation = await this.simulate(simulateIxRequest);
-        return {
+        const executeIxRequest = {
             ...simulateIxRequest,
             fuel_limit: simulation.effort,
         };
+        const err = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", executeIxRequest);
+        if (err != null) {
+            js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: ${err.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, { ...err });
+        }
+        return executeIxRequest;
     }
     async simulate(arg, option) {
         const request = await this.createIxRequest("moi.Simulate", arg);

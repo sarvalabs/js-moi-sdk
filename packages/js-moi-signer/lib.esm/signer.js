@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, hexToBytes, isHex } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 export class Signer {
@@ -79,10 +79,15 @@ export class Signer {
             return { ...simulateIxRequest, fuel_limit: args.fuel_limit };
         }
         const simulation = await this.simulate(simulateIxRequest);
-        return {
+        const executeIxRequest = {
             ...simulateIxRequest,
             fuel_limit: simulation.effort,
         };
+        const err = validateIxRequest("moi.Execute", executeIxRequest);
+        if (err != null) {
+            ErrorUtils.throwError(`Invalid interaction request: ${err.message}`, ErrorCode.INVALID_ARGUMENT, { ...err });
+        }
+        return executeIxRequest;
     }
     async simulate(arg, option) {
         const request = await this.createIxRequest("moi.Simulate", arg);

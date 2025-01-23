@@ -1,4 +1,3 @@
-export { isValidAddress } from "./address";
 export { decodeBase64, encodeBase64 } from "./base64";
 export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isHexString, isInteger, randomBytes, type Bytes } from "./bytes";
 export {

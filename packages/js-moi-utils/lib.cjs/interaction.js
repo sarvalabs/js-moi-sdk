@@ -6,7 +6,6 @@ exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
-const address_1 = require("./address");
 const enums_1 = require("./enums");
 const hex_1 = require("./hex");
 const identifier_1 = require("./identifier");
@@ -209,7 +208,7 @@ function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!(0, address_1.isValidAddress)(ix.sender.address)) {
+    if (!(0, hex_1.isAddress)(ix.sender.address)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {
@@ -224,7 +223,7 @@ function validateIxRequest(type, ix) {
     if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
-    if (ix.payer != null && !(0, address_1.isValidAddress)(ix.payer)) {
+    if (ix.payer != null && !(0, hex_1.isAddress)(ix.payer)) {
         return createInvalidResult(ix, "payer", "Invalid payer address");
     }
     if (ix.participants != null) {
@@ -236,7 +235,7 @@ function validateIxRequest(type, ix) {
             if (error != null) {
                 return error;
             }
-            if (!(0, address_1.isValidAddress)(participant.address)) {
+            if (!(0, hex_1.isAddress)(participant.address)) {
                 error = createInvalidResult(participant, "address", "Invalid participant address");
                 break;
             }

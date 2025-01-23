@@ -6,7 +6,7 @@ import {
     ErrorUtils,
     interaction,
     isHex,
-    isValidAddress,
+    isAddress,
     LogicId,
     StorageKey,
     validateIxRequest,
@@ -160,7 +160,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     async getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
-        if (!isValidAddress(identifier)) {
+        if (!isAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
 
@@ -188,7 +188,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         const isValidOption = (option: unknown): option is TOption => typeof option === "undefined" || typeof option === "object";
 
         switch (true) {
-            case isValidAddress(identifier) && typeof height === "number" && isValidOption(option): {
+            case isAddress(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
 
                 if (Number.isNaN(height) || height < -1) {
@@ -219,7 +219,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     getLogic<TOption extends LogicRequestOption>(value: Address | LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
         const identifier = typeof value === "string" ? value : value.getAddress();
 
-        if (!isValidAddress(identifier)) {
+        if (!isAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
 
@@ -251,7 +251,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             case storageId instanceof StorageKey: {
                 // Getting logic storage by logic id, address, and storage key
 
-                if (!isValidAddress(address)) {
+                if (!isAddress(address)) {
                     ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
                 }
                 const id: Hex = typeof storageId === "string" ? storageId : storageId.hex();
@@ -271,7 +271,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     async getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     async getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     async getAsset<TOption extends AssetRequestOption>(identifier: Address | AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
-        if (typeof identifier === "string" && !isValidAddress(identifier)) {
+        if (typeof identifier === "string" && !isAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
         const address = typeof identifier === "string" ? identifier : identifier.getAddress();
@@ -289,7 +289,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         assetId: Hex | AssetId,
         option?: TOption
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>> {
-        if (!isValidAddress(identifier)) {
+        if (!isAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
 
@@ -299,7 +299,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     async getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
-        if (!isValidAddress(identifier)) {
+        if (!isAddress(identifier)) {
             ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
         }
 

@@ -1,9 +1,8 @@
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
-import { isValidAddress } from "./address";
 import { LockType, OpType } from "./enums";
-import { hexToBytes } from "./hex";
+import { hexToBytes, isAddress } from "./hex";
 import { AssetId, LogicId } from "./identifier";
 import { encodeOperation, validateOperation } from "./operations";
 /**
@@ -201,7 +200,7 @@ export function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!isValidAddress(ix.sender.address)) {
+    if (!isAddress(ix.sender.address)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {
@@ -216,7 +215,7 @@ export function validateIxRequest(type, ix) {
     if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
-    if (ix.payer != null && !isValidAddress(ix.payer)) {
+    if (ix.payer != null && !isAddress(ix.payer)) {
         return createInvalidResult(ix, "payer", "Invalid payer address");
     }
     if (ix.participants != null) {
@@ -228,7 +227,7 @@ export function validateIxRequest(type, ix) {
             if (error != null) {
                 return error;
             }
-            if (!isValidAddress(participant.address)) {
+            if (!isAddress(participant.address)) {
                 error = createInvalidResult(participant, "address", "Invalid participant address");
                 break;
             }

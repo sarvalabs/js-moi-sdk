@@ -4,6 +4,12 @@
   "description": "Collection of utility functions used in js-moi-sdk.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib.esm/index.js",
+      "require": "./lib.cjs/index.js"
+    }
+  },
   "scripts": {
     "compile": "tsc -b tsconfig.json"
   },
