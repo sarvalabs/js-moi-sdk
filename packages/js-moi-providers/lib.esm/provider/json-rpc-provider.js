@@ -1,5 +1,5 @@
-import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isHex, isAddress, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { EventEmitter } from "events";
+import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isAddress, isHex, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { InteractionResponse } from "../utils/interaction-response";
 export class JsonRpcProvider extends EventEmitter {
     _transport;

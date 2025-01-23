@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
 const events_1 = require("events");
+const js_moi_utils_1 = require("js-moi-utils");
 const interaction_response_1 = require("../utils/interaction-response");
 class JsonRpcProvider extends events_1.EventEmitter {
     _transport;

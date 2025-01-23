@@ -1,3 +1,4 @@
+import { EventEmitter } from "events";
 import {
     AssetId,
     bytesToHex,
@@ -5,8 +6,8 @@ import {
     ErrorCode,
     ErrorUtils,
     interaction,
-    isHex,
     isAddress,
+    isHex,
     LogicId,
     StorageKey,
     validateIxRequest,
@@ -27,8 +28,6 @@ import {
     type TesseractReference,
     type Transport,
 } from "js-moi-utils";
-
-import { EventEmitter } from "events";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import type {
     AccountAssetRequestOption,
