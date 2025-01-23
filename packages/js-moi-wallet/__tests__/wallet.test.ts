@@ -272,8 +272,7 @@ describe("Provider integration test", () => {
     const it = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it : globalThis.it.skip;
     it.concurrent = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it.concurrent : globalThis.it.concurrent.skip;
 
-    let wallet = createWallet();
-
+    const wallet = process.env["RUN_NETWORK_TEST"] === "true" ? createWallet() : Wallet.createRandomSync();
     const operations: IxOp[] = [
         {
             type: OpType.AssetCreate,

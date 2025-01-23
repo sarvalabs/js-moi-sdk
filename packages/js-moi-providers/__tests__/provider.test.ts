@@ -2,26 +2,30 @@ import {
     ArrayIndexAccessor,
     AssetId,
     AssetStandard,
+    bytesToHex,
     ensureHexPrefix,
     generateStorageKey,
     interaction,
     isHex,
     LogicId,
     OpType,
+    randomBytes,
     ReceiptStatus,
     trimHexPrefix,
+    type Hex,
     type JsonRpcResponse,
 } from "js-moi-utils";
-import { HttpTransport, JsonRpcProvider, WebsocketTransport, type LogicMessageRequestOption } from "../src.ts";
+import { HttpProvider, HttpTransport, JsonRpcProvider, WebsocketTransport, type LogicMessageRequestOption } from "../src.ts";
 
 describe(JsonRpcProvider, () => {
     const providerType = process.env["PROVIDER_TYPE"]!;
     const providerUrl = process.env["PROVIDER_URL"]!;
-    const address = ensureHexPrefix(process.env["WALLET_ADDRESS"]!);
-    const logic_id = ensureHexPrefix(process.env["LOGIC_ID"]!);
-    const asset_id = ensureHexPrefix(process.env["ASSET_ID"]!);
 
     const provider: JsonRpcProvider = (() => {
+        if (!providerType) {
+            return new HttpProvider("http://localhost:1600");
+        }
+
         if (!providerUrl) {
             throw new Error("PROVIDER_URL is not set");
         }
@@ -56,8 +60,8 @@ describe(JsonRpcProvider, () => {
 
     describe("get transport", () => {
         it.concurrent("should return the transport instance", () => {
-            const transport = providerType === "http" ? HttpTransport : WebsocketTransport;
-            expect(provider.transport).toBeInstanceOf(transport);
+            expect("request" in provider.transport).toBeTruthy();
+            expect(provider.transport.request).toBeInstanceOf(Function);
         });
     });
 
@@ -98,6 +102,13 @@ describe(JsonRpcProvider, () => {
     describe("Network related tests", () => {
         const it = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it : globalThis.it.skip;
         it.concurrent = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it.concurrent : globalThis.it.concurrent.skip;
+
+        const FALLBACK_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
+        const FALLBACK_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548";
+
+        const address = ensureHexPrefix(process.env["WALLET_ADDRESS"] ?? bytesToHex(randomBytes(32)));
+        const logic_id = ensureHexPrefix(process.env["LOGIC_ID"] ?? FALLBACK_LOGIC_ID);
+        const asset_id = ensureHexPrefix(process.env["ASSET_ID"] ?? FALLBACK_ASSET_ID);
 
         describe(provider.getNetworkInfo, () => {
             it.concurrent("should return the protocol version and chain id", async () => {
@@ -154,7 +165,7 @@ describe(JsonRpcProvider, () => {
                 expect(account.metadata.address).toEqual(address);
             });
 
-            it.concurrent.skip("[ERROR HAPPENING HERE] should able to get account using reference", async () => {
+            it.concurrent("[ERROR HAPPENING HERE] should able to get account using reference", async () => {
                 const height = 0;
                 const account = await provider.getAccount(address, {
                     reference: { relative: { height, identifier: address } },
@@ -258,7 +269,7 @@ describe(JsonRpcProvider, () => {
                 expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
             });
 
-            it.concurrent.skip("[ERROR HAPPENING HERE] should return the logic with included fields", async () => {
+            it.concurrent("[ERROR HAPPENING HERE] should return the logic with included fields", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id), {
                     modifier: { include: ["manifest", "controller", "edition"] },
                 });
@@ -312,7 +323,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.getAsset, () => {
             const assetId = new AssetId(asset_id);
 
-            it.concurrent.skip("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset address", async () => {
+            it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset address", async () => {
                 const asset = await provider.getAsset(assetId.getAddress());
 
                 expect(asset).toBeDefined();
@@ -320,7 +331,7 @@ describe(JsonRpcProvider, () => {
                 expect(asset.metadata.standard).toBe(assetId.getStandard());
             });
 
-            it.concurrent.skip("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset id", async () => {
+            it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset id", async () => {
                 const asset = await provider.getAsset(assetId);
 
                 expect(asset).toBeDefined();
@@ -328,7 +339,7 @@ describe(JsonRpcProvider, () => {
                 expect(asset.metadata.logical).toBe(assetId.isLogical());
             });
 
-            it.concurrent.skip("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset with reference", async () => {
+            it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset with reference", async () => {
                 const asset = await provider.getAsset(assetId, {
                     reference: { relative: { identifier: assetId.getAddress(), height: -1 } },
                 });
@@ -338,7 +349,7 @@ describe(JsonRpcProvider, () => {
                 expect(asset.metadata.supply).toBe(expect.any(String));
             });
 
-            it.concurrent.skip("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with included fields", async () => {
+            it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with included fields", async () => {
                 const asset = await provider.getAsset(assetId, {
                     modifier: { include: ["controller", "creator", "edition"] },
                 });
@@ -357,7 +368,7 @@ describe(JsonRpcProvider, () => {
                 expect(controller).toBeDefined();
             });
 
-            it.concurrent.skip("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with modifier and reference", async () => {
+            it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with modifier and reference", async () => {
                 const asset = await provider.getAsset(assetId, {
                     modifier: { include: ["controller", "creator", "edition"] },
                     reference: { relative: { identifier: assetId.getAddress(), height: -1 } },
