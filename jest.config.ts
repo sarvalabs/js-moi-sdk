@@ -25,30 +25,30 @@ const getPackages = (): Package[] => [
         name: "js-moi-bip39",
         run_tests: true,
     },
-    // {
-    //     name: "js-moi-hdnode",
-    //     run_tests: true,
-    // },
-    // {
-    //     name: "js-moi-manifest",
-    //     run_tests: true,
-    // },
-    // {
-    //     name: "js-moi-logic",
-    //     run_tests: true,
-    // },
-    // {
-    //     name: "js-moi-signer",
-    //     run_tests: true,
-    // },
+    {
+        name: "js-moi-hdnode",
+        run_tests: true,
+    },
+    {
+        name: "js-moi-manifest",
+        run_tests: true,
+    },
+    {
+        name: "js-moi-logic",
+        run_tests: true,
+    },
+    {
+        name: "js-moi-signer",
+        run_tests: true,
+    },
     {
         name: "js-moi-providers",
         run_tests: true,
     },
-    // {
-    //     name: "js-moi-utils",
-    //     run_tests: true,
-    // },
+    {
+        name: "js-moi-utils",
+        run_tests: true,
+    },
     {
         name: "js-moi-wallet",
         run_tests: true,

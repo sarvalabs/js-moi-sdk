@@ -15,8 +15,8 @@ export class HttpTransport {
     }
     createPayload(method, params) {
         return {
-            id: 1,
             jsonrpc: "2.0",
+            id: 1,
             method: method,
             params: params,
         };
@@ -28,7 +28,7 @@ export class HttpTransport {
             const content = JSON.stringify(request);
             const headers = new Headers({
                 "Content-Type": "application/json",
-                "Content-Length": content.length.toString(),
+                // "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
             const response = await fetch(this.host, {
@@ -38,8 +38,8 @@ export class HttpTransport {
             });
             if (!response.ok) {
                 result = {
-                    id: 1,
                     jsonrpc: "2.0",
+                    id: 1,
                     error: {
                         code: response.status,
                         message: `Request failed`,
@@ -53,15 +53,15 @@ export class HttpTransport {
             const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error.message === "Failed to fetch";
             const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
             result = {
-                id: 1,
                 jsonrpc: "2.0",
+                id: 1,
                 error: { code: -1, message: errMessage, data: error },
             };
         }
         this.option?.debug?.({
             request,
             response: result,
-            ok: "error" in result,
+            ok: "error" in result === false,
             error: "error" in result ? result.error : undefined,
             host: this.host,
         });

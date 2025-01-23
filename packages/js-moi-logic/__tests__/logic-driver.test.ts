@@ -2,14 +2,15 @@ import { ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse } from "js-moi-providers";
 import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, randomBytes, StorageKey, type Interaction } from "js-moi-utils";
 import { getLogicDriver, LogicDriver } from "../src.ts";
-import { getWallet, registerNewWallet } from "./helpers";
 import { loadManifestFromFile } from "./manifests";
+
+import { createWallet } from "./helpers.ts";
 
 const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 const TEST_TIMEOUT = 2 * 60000; // 2 minutes
 
 describe(getLogicDriver, () => {
-    const wallet = getWallet();
+    const wallet = createWallet();
     const manifest = loadManifestFromFile("flipper");
     const logicId = "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782";
 
@@ -92,7 +93,7 @@ const logics = [
 ];
 
 describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
-    const wallet = getWallet();
+    const wallet = createWallet();
     const manifest = loadManifestFromFile(logic.name);
     const driver = new LogicDriver({ manifest, signer: wallet });
 
@@ -193,7 +194,6 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
         let logicId: LogicId;
 
         beforeAll(async () => {
-            const wallet = await registerNewWallet();
             driver = await getLogicDriver(manifest, wallet);
 
             const callback = driver.endpoint[logic.deploy.name];
