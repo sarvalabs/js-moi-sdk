@@ -4,7 +4,7 @@ import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, 
 import { getLogicDriver, LogicDriver } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
-import { createWallet } from "./helpers.ts";
+import { createWallet } from "./helpers";
 
 const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 const TEST_TIMEOUT = 2 * 60000; // 2 minutes

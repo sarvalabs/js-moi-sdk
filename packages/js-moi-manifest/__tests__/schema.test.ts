@@ -1,5 +1,4 @@
-import { ElementType, LogicManifest } from "js-moi-utils";
-import type { LogicElement } from "js-moi-utils/src.ts";
+import { ElementType, LogicManifest, type LogicElement } from "js-moi-utils";
 import { Schema } from "../src.ts/schema";
 import { loadManifestFromFile } from "./utils/helper";
 
