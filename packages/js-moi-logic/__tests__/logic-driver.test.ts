@@ -201,16 +201,24 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
             logicId = await driver.getLogicId();
         }, TEST_TIMEOUT);
 
-        it("should deploy a logic", async () => {
-            const logic = await wallet.getProvider().getLogic(logicId);
+        it(
+            "should deploy a logic",
+            async () => {
+                const logic = await wallet.getProvider().getLogic(logicId);
 
-            expect(logic).toBeDefined();
-            expect(logic.metadata.logic_id).toEqual(logicId.value);
-        });
+                expect(logic).toBeDefined();
+                expect(logic.metadata.logic_id).toEqual(logicId.value);
+            },
+            TEST_TIMEOUT
+        );
 
-        it("should throw error if logic if already deployed", async () => {
-            expect(driver.endpoint[logic.deploy.name](...(logic.deploy.args as any))).rejects.toThrow(/Logic is already deployed or deploying./);
-        });
+        it(
+            "should throw error if logic if already deployed",
+            async () => {
+                expect(driver.endpoint[logic.deploy.name](...(logic.deploy.args as any))).rejects.toThrow(/Logic is already deployed or deploying./);
+            },
+            TEST_TIMEOUT
+        );
 
         describe(`should be able to invoke routine ${logic.invoke.name} of type ${OpType[logic.invoke.type]}`, () => {
             it(

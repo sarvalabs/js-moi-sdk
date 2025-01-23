@@ -304,29 +304,41 @@ describe("Provider integration test", () => {
             });
         }, TEST_TIMEOUT);
 
-        it("should be able to execute a interaction", async () => {
-            expect(ix).toBeDefined();
-            expect(ix).toBeInstanceOf(InteractionResponse);
-            expect(isHex(ix.hash)).toBeTruthy();
-        });
+        it(
+            "should be able to execute a interaction",
+            async () => {
+                expect(ix).toBeDefined();
+                expect(ix).toBeInstanceOf(InteractionResponse);
+                expect(isHex(ix.hash)).toBeTruthy();
+            },
+            TEST_TIMEOUT
+        );
 
-        it("should be able to get the interaction confirmation", async () => {
-            const confirmation = await ix.wait();
+        it(
+            "should be able to get the interaction confirmation",
+            async () => {
+                const confirmation = await ix.wait();
 
-            expect(confirmation).toBeDefined();
-            expect(confirmation.status).toEqual(ReceiptStatus.Ok);
+                expect(confirmation).toBeDefined();
+                expect(confirmation.status).toEqual(ReceiptStatus.Ok);
 
-            for (const operation of operations) {
-                expect(confirmation.operations.some((op) => op.type === operation.type)).toBeTruthy();
-            }
-        });
+                for (const operation of operations) {
+                    expect(confirmation.operations.some((op) => op.type === operation.type)).toBeTruthy();
+                }
+            },
+            TEST_TIMEOUT
+        );
 
-        it("should be able to get the interaction result", async () => {
-            const result = await ix.result();
+        it(
+            "should be able to get the interaction result",
+            async () => {
+                const result = await ix.result();
 
-            expect(result).toBeDefined();
-            expect(result).toHaveLength(1);
-            expect(result[0].status).toEqual(ReceiptStatus.Ok);
-        });
+                expect(result).toBeDefined();
+                expect(result).toHaveLength(1);
+                expect(result[0].status).toEqual(ReceiptStatus.Ok);
+            },
+            TEST_TIMEOUT
+        );
     });
 });
