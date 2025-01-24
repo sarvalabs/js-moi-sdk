@@ -1,5 +1,5 @@
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { type Hex, type InteractionRequest, type IxOp, type Sender, type Simulate } from "js-moi-utils";
+import { type AnyIxOperation, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender" | "fuel_price" | "fuel_limit"> & {
     sender?: Partial<Omit<Sender, "address">>;
@@ -21,13 +21,13 @@ export declare abstract class Signer {
     private getLatestSequence;
     private createIxRequestSender;
     private createSimulateIxRequest;
-    createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | IxOp[] | IxOp): Promise<SimulateInteractionRequest>;
-    createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | IxOp[] | IxOp): Promise<InteractionRequest>;
-    simulate(operation: IxOp, options?: SimulateOption): Promise<Simulate>;
-    simulate(operations: IxOp[], options?: SimulateOption): Promise<Simulate>;
+    createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<SimulateInteractionRequest>;
+    createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<InteractionRequest>;
+    simulate(operation: AnyIxOperation, options?: SimulateOption): Promise<Simulate>;
+    simulate(operations: AnyIxOperation[], options?: SimulateOption): Promise<Simulate>;
     simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
-    execute(operation: IxOp): Promise<InteractionResponse>;
-    execute(operations: IxOp[]): Promise<InteractionResponse>;
+    execute(operation: AnyIxOperation): Promise<InteractionResponse>;
+    execute(operations: AnyIxOperation[]): Promise<InteractionResponse>;
     execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse>;
     execute(request: ExecuteIx): Promise<InteractionResponse>;
     /**

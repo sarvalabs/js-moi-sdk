@@ -1,6 +1,6 @@
 import type { LockType } from "../enums";
 import type { Hex } from "../hex";
-import type { IxOp, IxRawOperation } from "./ix-operation";
+import type { AnyIxOperation, IxRawOperation } from "./ix-operation";
 export interface RawSender {
     address: Uint8Array;
     sequence_id: number;
@@ -72,7 +72,7 @@ export interface InteractionRequest {
     /**
      * Represents an array of raw operations to be executed in the interaction
      */
-    operations: IxOp[];
+    operations: AnyIxOperation[];
     /**
      * It represents a participant with an addresses and their lock type.
      */

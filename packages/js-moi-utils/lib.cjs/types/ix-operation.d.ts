@@ -1,4 +1,4 @@
-import { OpType, type AssetStandard } from "../enums";
+import type { AssetStandard, OpType } from "../enums";
 import type { Address, Hex } from "../hex";
 export interface PoloLogicPayload {
     manifest: Uint8Array;
@@ -203,7 +203,7 @@ export interface IxOperation<TOpType extends OpType> {
     payload: IxOperationPayload<TOpType>;
 }
 /**
- * `IxOp` is a union type that holds all the operations.
+ * `AnyIxOperation` is a union type that holds all the operations.
  */
-export type IxOp = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.AssetRevoke> | IxOperation<OpType.AssetLockup> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate>;
+export type AnyIxOperation = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.AssetRevoke> | IxOperation<OpType.AssetLockup> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate>;
 //# sourceMappingURL=ix-operation.d.ts.map

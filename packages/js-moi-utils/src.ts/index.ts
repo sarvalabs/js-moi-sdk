@@ -43,6 +43,7 @@ export type {
     Sender,
 } from "./types/interaction";
 export type {
+    AnyIxOperation,
     AssetActionPayload,
     AssetApprovePayload,
     AssetCreatePayload,
@@ -51,7 +52,6 @@ export type {
     AssetRevokePayload,
     AssetSupplyPayload,
     AssetTransferPayload,
-    IxOp,
     IxOperation,
     IxOperationPayload,
     IxRawOperation,

@@ -1,4 +1,4 @@
-import { OpType, type AssetStandard } from "../enums";
+import type { AssetStandard, OpType } from "../enums";
 import type { Address, Hex } from "../hex";
 
 export interface PoloLogicPayload {
@@ -260,9 +260,9 @@ export interface IxOperation<TOpType extends OpType> {
 }
 
 /**
- * `IxOp` is a union type that holds all the operations.
+ * `AnyIxOperation` is a union type that holds all the operations.
  */
-export type IxOp =
+export type AnyIxOperation =
     | IxOperation<OpType.AssetBurn>
     | IxOperation<OpType.AssetCreate>
     | IxOperation<OpType.AssetMint>

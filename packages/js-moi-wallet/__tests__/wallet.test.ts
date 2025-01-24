@@ -1,6 +1,6 @@
 import { HttpProvider, InteractionResponse, JsonRpcProvider } from "js-moi-providers";
 import type { SigType } from "js-moi-signer";
-import { AssetStandard, bytesToHex, hexToBytes, isHex, OpType, ReceiptStatus, type InteractionRequest, type IxOp } from "js-moi-utils";
+import { AssetStandard, bytesToHex, hexToBytes, isHex, OpType, ReceiptStatus, type AnyIxOperation, type InteractionRequest } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts";
 import { createWallet } from "./helper";
 
@@ -273,7 +273,7 @@ describe("Provider integration test", () => {
     it.concurrent = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it.concurrent : globalThis.it.concurrent.skip;
 
     const wallet = process.env["RUN_NETWORK_TEST"] === "true" ? createWallet() : Wallet.createRandomSync();
-    const operations: IxOp[] = [
+    const operations: AnyIxOperation[] = [
         {
             type: OpType.AssetCreate,
             payload: { symbol: "MOI", standard: AssetStandard.MAS0, supply: 1000 },

@@ -1,7 +1,7 @@
-import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type IxOp } from "../src.ts";
+import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type AnyIxOperation } from "../src.ts";
 
 interface TestCase {
-    operation: IxOp;
+    operation: AnyIxOperation;
     expected: string;
 }
 
@@ -193,7 +193,7 @@ describe(encodeOperation, () => {
             payload: {},
         };
 
-        expect(() => encodeOperation(operation as IxOp)).toThrow();
+        expect(() => encodeOperation(operation as AnyIxOperation)).toThrow();
     });
 });
 

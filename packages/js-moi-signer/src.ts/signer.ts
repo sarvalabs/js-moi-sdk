@@ -1,5 +1,5 @@
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest, type Hex, type InteractionRequest, type IxOp, type Sender, type Simulate } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest, type AnyIxOperation, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
@@ -70,7 +70,7 @@ export abstract class Signer {
         };
     }
 
-    private async createSimulateIxRequest(arg: SignerIx<SimulateInteractionRequest> | IxOp | IxOp[]): Promise<SimulateInteractionRequest> {
+    private async createSimulateIxRequest(arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation | AnyIxOperation[]): Promise<SimulateInteractionRequest> {
         // request was array of operations
         if (Array.isArray(arg)) {
             return {
@@ -97,11 +97,11 @@ export abstract class Signer {
         };
     }
 
-    public async createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | IxOp[] | IxOp): Promise<SimulateInteractionRequest>;
-    public async createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | IxOp[] | IxOp): Promise<InteractionRequest>;
+    public async createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<SimulateInteractionRequest>;
+    public async createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<InteractionRequest>;
     public async createIxRequest(
         type: "moi.Simulate" | "moi.Execute",
-        args: SignerIx<InteractionRequest | SimulateInteractionRequest> | IxOp[] | IxOp
+        args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
     ): Promise<SimulateInteractionRequest | InteractionRequest> {
         if (!["moi.Simulate", "moi.Execute"].includes(type)) {
             ErrorUtils.throwError("Invalid type provided", ErrorCode.INVALID_ARGUMENT, {
@@ -134,20 +134,20 @@ export abstract class Signer {
         return executeIxRequest;
     }
 
-    public async simulate(operation: IxOp, options?: SimulateOption): Promise<Simulate>;
-    public async simulate(operations: IxOp[], options?: SimulateOption): Promise<Simulate>;
+    public async simulate(operation: AnyIxOperation, options?: SimulateOption): Promise<Simulate>;
+    public async simulate(operations: AnyIxOperation[], options?: SimulateOption): Promise<Simulate>;
     public async simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
-    public async simulate(arg: SignerIx<SimulateInteractionRequest> | IxOp[] | IxOp, option?: SimulateOption): Promise<Simulate> {
+    public async simulate(arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation, option?: SimulateOption): Promise<Simulate> {
         const request = await this.createIxRequest("moi.Simulate", arg);
 
         return await this.getProvider().simulate(request, option);
     }
 
-    public async execute(operation: IxOp): Promise<InteractionResponse>;
-    public async execute(operations: IxOp[]): Promise<InteractionResponse>;
+    public async execute(operation: AnyIxOperation): Promise<InteractionResponse>;
+    public async execute(operations: AnyIxOperation[]): Promise<InteractionResponse>;
     public async execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse>;
     public async execute(request: ExecuteIx): Promise<InteractionResponse>;
-    public async execute(arg: SignerIx<InteractionRequest> | IxOp | IxOp[] | ExecuteIx): Promise<InteractionResponse> {
+    public async execute(arg: SignerIx<InteractionRequest> | AnyIxOperation | AnyIxOperation[] | ExecuteIx): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
 
         // checking argument is an already signed request

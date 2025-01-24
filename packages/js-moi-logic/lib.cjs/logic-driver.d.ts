@@ -1,6 +1,6 @@
 import type { SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
-import { LogicId, LogicState, RoutineType, StorageKey, type Address, type Hex, type InteractionRequest, type IxOp, type LogicManifest } from "js-moi-utils";
+import { LogicId, LogicState, RoutineType, StorageKey, type Address, type AnyIxOperation, type Hex, type InteractionRequest, type LogicManifest } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 /**
@@ -50,7 +50,7 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      *
      * @throws an error if the callsite is not present.
      */
-    createIxOperation(callsite: string, args: unknown[]): Promise<IxOp>;
+    createIxOperation(callsite: string, args: unknown[]): Promise<AnyIxOperation>;
     /**
      * Creates an interaction request for a given callsite and its arguments.
      *

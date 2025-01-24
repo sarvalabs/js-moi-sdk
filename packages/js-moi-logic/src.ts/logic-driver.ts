@@ -17,9 +17,9 @@ import {
     RoutineType,
     StorageKey,
     type Address,
+    type AnyIxOperation,
     type Hex,
     type InteractionRequest,
-    type IxOp,
     type LogicManifest,
 } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
@@ -132,7 +132,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      *
      * @throws an error if the callsite is not present.
      */
-    public async createIxOperation(callsite: string, args: unknown[]): Promise<IxOp> {
+    public async createIxOperation(callsite: string, args: unknown[]): Promise<AnyIxOperation> {
         const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
         const callsiteType = this.getCallsiteType(callsite);
 
