@@ -86,7 +86,17 @@ export type {
     TesseractReference,
     TesseractReferenceParam,
 } from "./types/rpc/common-entities";
-export type { AssetCreateResult, AssetSupplyResult, IxOpResult, LogicActionResult, LogicDeployResult, LogicResult, NoOperationResult } from "./types/rpc/ix-result";
+export type {
+    AnyIxOperationResult,
+    AssetCreateResult,
+    AssetSupplyResult,
+    IxOpResult,
+    IxResult,
+    LogicActionResult,
+    LogicDeployResult,
+    LogicResult,
+    NoOperationResult,
+} from "./types/rpc/ix-result";
 export type {
     Account,
     AccountAsset,
@@ -115,7 +125,6 @@ export type {
     InteractionConfirmation,
     InteractionInfo,
     IxAccount,
-    IxOperationResult,
     KramaID,
     Lockup,
     Logic,
@@ -134,7 +143,6 @@ export type {
     PreviousICS,
     Simulate,
     SimulationEffects,
-    SimulationResult,
     Stochastic,
     Tesseract,
     TesseractData,

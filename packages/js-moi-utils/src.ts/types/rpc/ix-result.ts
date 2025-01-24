@@ -1,4 +1,4 @@
-import type { OpType } from "../../enums";
+import type { OperationStatus, OpType } from "../../enums";
 import type { Hex } from "../../hex";
 
 export interface AssetCreateResult {
@@ -31,3 +31,20 @@ export type IxOpResult<TOpType extends OpType> = TOpType extends OpType.AssetCre
     : TOpType extends OpType.ParticipantCreate | OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
     ? NoOperationResult
     : unknown;
+
+export interface IxResult<TOpType extends OpType> {
+    type: TOpType;
+    status: OperationStatus;
+    payload: IxOpResult<TOpType>;
+}
+
+export type AnyIxOperationResult =
+    | IxResult<OpType.AssetCreate>
+    | IxResult<OpType.AssetTransfer>
+    | IxResult<OpType.AssetApprove>
+    | IxResult<OpType.AssetRevoke>
+    | IxResult<OpType.AssetLockup>
+    | IxResult<OpType.AssetRelease>
+    | IxResult<OpType.LogicDeploy>
+    | IxResult<OpType.LogicEnlist>
+    | IxResult<OpType.LogicInvoke>;
