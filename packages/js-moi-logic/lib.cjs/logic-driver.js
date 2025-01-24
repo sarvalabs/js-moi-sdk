@@ -298,6 +298,16 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         }
         return await this.getLogicStateValue(js_moi_utils_1.LogicState.Ephemeral, accessor);
     }
+    /**
+     * Retrieves logic messages based on the provided options.
+     *
+     * @param {LogicMessageRequestOption} [option] - Optional parameter to specify the request options for logic messages.
+     * @returns {Promise<LogicMessage[]>} A promise that resolves to an array of logic messages.
+     */
+    async getLogicMessages(option) {
+        const provider = this.signer.getProvider();
+        return await provider.getLogicMessage(await this.getLogicId(), option);
+    }
 }
 exports.LogicDriver = LogicDriver;
 /**

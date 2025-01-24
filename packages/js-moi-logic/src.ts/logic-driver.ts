@@ -1,5 +1,5 @@
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
-import type { InteractionResponse, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
+import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
 import {
     CustomError,
@@ -21,6 +21,7 @@ import {
     type Hex,
     type InteractionRequest,
     type LogicManifest,
+    type LogicMessage,
 } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -419,6 +420,17 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         }
 
         return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+    }
+
+    /**
+     * Retrieves logic messages based on the provided options.
+     *
+     * @param {LogicMessageRequestOption} [option] - Optional parameter to specify the request options for logic messages.
+     * @returns {Promise<LogicMessage[]>} A promise that resolves to an array of logic messages.
+     */
+    public async getLogicMessages(option?: LogicMessageRequestOption): Promise<LogicMessage[]> {
+        const provider = this.signer.getProvider();
+        return await provider.getLogicMessage(await this.getLogicId(), option);
     }
 }
 

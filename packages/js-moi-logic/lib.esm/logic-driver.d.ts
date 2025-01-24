@@ -1,6 +1,6 @@
-import type { SimulateInteractionRequest, TimerOption } from "js-moi-providers";
+import type { LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
-import { LogicId, LogicState, RoutineType, StorageKey, type Address, type AnyIxOperation, type Hex, type InteractionRequest, type LogicManifest } from "js-moi-utils";
+import { LogicId, LogicState, RoutineType, StorageKey, type Address, type AnyIxOperation, type Hex, type InteractionRequest, type LogicManifest, type LogicMessage } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 /**
@@ -124,6 +124,13 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      * @returns A promise that resolves to the ephemeral storage decoded value.
      */
     ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
+    /**
+     * Retrieves logic messages based on the provided options.
+     *
+     * @param {LogicMessageRequestOption} [option] - Optional parameter to specify the request options for logic messages.
+     * @returns {Promise<LogicMessage[]>} A promise that resolves to an array of logic messages.
+     */
+    getLogicMessages(option?: LogicMessageRequestOption): Promise<LogicMessage[]>;
 }
 /**
  * Retrieves a LogicDriver instance for the given logic ID.
