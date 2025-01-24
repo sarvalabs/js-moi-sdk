@@ -29,7 +29,7 @@ interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> 
 
 interface SimulateRequestParam {
     interaction: Hex;
-    references?: { address: Address, reference: TesseractReference  }
+    references?: { address: Address; reference: TesseractReference };
 }
 
 interface AccountRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {}
@@ -46,10 +46,12 @@ interface LogicStorageRequestParam extends TesseractReferenceParam {
 
 interface AssetRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Asset, "metadata">>, TesseractReferenceParam {}
 
+export type NestedArray<T> = T[] | NestedArray<T>[];
+
 interface LogicMessageRequestParam {
     logic_id: Hex;
     address?: Address;
-    topics?: Hex[];
+    topics?: NestedArray<Hex>;
     range?: { start: number; stop: number };
 }
 

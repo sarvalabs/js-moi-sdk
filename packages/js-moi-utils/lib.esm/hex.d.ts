@@ -92,4 +92,11 @@ export declare const trimHexPrefix: (data: string) => string;
  * @returns {boolean} True if the value is an address, false otherwise.
  */
 export declare const isAddress: (value: unknown) => value is Address;
+/**
+ * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
+ *
+ * @param hex - The hexadecimal string to be hashed.
+ * @returns The resulting hash as a hexadecimal string.
+ */
+export declare const hexToHash: (hex: Hex | Uint8Array) => Hex;
 //# sourceMappingURL=hex.d.ts.map

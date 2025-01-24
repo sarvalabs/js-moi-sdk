@@ -23,7 +23,7 @@ import type {
     TesseractReferenceParam,
 } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
-import type { MethodParams } from "./moi-execution-api";
+import type { MethodParams, NestedArray } from "./moi-execution-api";
 
 export type NonOptionKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: undefined extends T[K] ? never : K;
@@ -99,7 +99,9 @@ interface AssetRequest {
     getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
 }
 
-export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id">;
+export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id" | "topics"> & {
+    topics?: NestedArray<string>;
+};
 
 interface LogicMessageRequest {
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;

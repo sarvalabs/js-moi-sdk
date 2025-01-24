@@ -5,6 +5,7 @@ import {
     ensureHexPrefix,
     ErrorCode,
     ErrorUtils,
+    hexToHash,
     interaction,
     isAddress,
     isHex,
@@ -28,7 +29,8 @@ import {
     type TesseractReference,
     type Transport,
 } from "js-moi-utils";
-import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
+import { Polorizer } from "js-polo";
+import type { MethodParams, MethodResponse, NestedArray, NetworkMethod } from "../types/moi-execution-api";
 import type {
     AccountAssetRequestOption,
     AccountKeyRequestOption,
@@ -277,10 +279,33 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.Asset", { identifier: address, ...option });
     }
 
+    private encodeTopics(topics: NestedArray<string>): NestedArray<Hex> {
+        const encodedTopics = Array.from<any>({ length: topics.length });
+
+        for (let i = 0; i < topics.length; i++) {
+            const topic = topics[i];
+
+            if (typeof topic === "string") {
+                const polorizer = new Polorizer();
+                polorizer.polorizeString(topic);
+                encodedTopics[i] = hexToHash(polorizer.bytes());
+                continue;
+            }
+
+            encodedTopics[i] = this.encodeTopics(topic);
+        }
+
+        return encodedTopics;
+    }
+
     async getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
         const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
 
-        return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
+        return await this.call("moi.LogicMessage", {
+            logic_id: id.value,
+            ...options,
+            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
+        });
     }
 
     async getAccountAsset<TOption extends AccountAssetRequestOption>(

@@ -1,3 +1,4 @@
+import { blake2b } from "@noble/hashes/blake2b";
 import BN from "bn.js";
 import { ErrorUtils } from "./errors";
 
@@ -185,3 +186,14 @@ export const trimHexPrefix = (data: string): string => {
  * @returns {boolean} True if the value is an address, false otherwise.
  */
 export const isAddress = (value: unknown): value is Address => isHex(value, 32);
+
+/**
+ * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
+ *
+ * @param hex - The hexadecimal string to be hashed.
+ * @returns The resulting hash as a hexadecimal string.
+ */
+export const hexToHash = (hex: Hex | Uint8Array): Hex => {
+    const hash = blake2b(hex, { dkLen: 32 });
+    return bytesToHex(hash);
+};

@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAddress = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
+exports.hexToHash = exports.isAddress = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
+const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
 const errors_1 = require("./errors");
 /**
@@ -164,4 +165,15 @@ exports.trimHexPrefix = trimHexPrefix;
  */
 const isAddress = (value) => (0, exports.isHex)(value, 32);
 exports.isAddress = isAddress;
+/**
+ * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
+ *
+ * @param hex - The hexadecimal string to be hashed.
+ * @returns The resulting hash as a hexadecimal string.
+ */
+const hexToHash = (hex) => {
+    const hash = (0, blake2b_1.blake2b)(hex, { dkLen: 32 });
+    return (0, exports.bytesToHex)(hash);
+};
+exports.hexToHash = hexToHash;
 //# sourceMappingURL=hex.js.map
