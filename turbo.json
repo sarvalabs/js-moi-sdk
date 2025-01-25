@@ -36,8 +36,7 @@
             ],
             "cache": true,
             "outputs": [
-                "packages/*/lib.cjs",
-                "packages/*/lib.esm"
+                "packages/*/lib.*/"
             ]
         }
     }
