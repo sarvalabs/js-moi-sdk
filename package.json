@@ -5,16 +5,7 @@
   "private": true,
   "main": "packages/js-moi/lib.cjs/index.js",
   "module": "packages/js-moi/lib.esm/index.js",
-  "scripts": {
-    "clean": "find . -path ./node_modules -prune -o -type d \\( -name 'lib.cjs' -o -name 'lib.esm' \\) -exec rm -rf {} +",
-    "build": "./scripts/build.sh",
-    "watch": "tsc -b -w",
-    "test": "jest --color",
-    "test:network": "RUN_NETWORK_TEST=true npm run test",
-    "check-types": "tsc --noEmit",
-    "docs": "make -C docs html",
-    "watch:docs": "make -C docs watch"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sarvalabs/js-moi-sdk.git"
