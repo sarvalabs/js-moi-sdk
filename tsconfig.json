@@ -4,6 +4,7 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "resolveJsonModule": true,
+        "rootDir": "packages",
 
         // Emit Setting
         "target": "ES2022",
@@ -30,8 +31,6 @@
         // Language and Environment Setting
         "lib": ["ESNext", "DOM"]
     },
-
-    "include": ["packages/**/*"],
-    "exclude": ["node_modules", "packages/**/node_modules"],
-    "files": ["./jest.config.ts", "./jest.setup.ts"]
+    "include": ["packages/js-moi-constants"],
+    "exclude": ["node_modules", "packages/**/node_modules", "packages/**/lib.*"]
 }
