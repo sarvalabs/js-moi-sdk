@@ -25,8 +25,8 @@ import type {
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams, NestedArray } from "./moi-execution-api";
 
-export type NonOptionKeys<T extends Record<string, any>> = {
-    [K in keyof T]-?: undefined extends T[K] ? never : K;
+type NonOptionalKeys<T extends Record<string, any>> = {
+    [K in keyof T]-?: T extends { [K1 in K]: any } ? K : never;
 }[keyof T];
 
 type NonUndefined<T> = T extends undefined ? never : T;
@@ -36,10 +36,10 @@ export type SelectFromResponseModifier<TObject extends Record<string, any>, TMod
         ? TModifier extends { modifier: ExtractModifier<infer E> }
             ? NonUndefined<TObject[E]>
             : TModifier extends { modifier: IncludeModifier<infer E> }
-            ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>>
-            : never
-        : TObject
-    : Pick<TObject, NonOptionKeys<TObject>>;
+            ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionalKeys<TObject>>
+            : Pick<TObject, NonOptionalKeys<TObject>>
+        : Pick<TObject, NonOptionalKeys<TObject>>
+    : Pick<TObject, NonOptionalKeys<TObject>>;
 
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
 
@@ -131,7 +131,7 @@ interface ExecuteRequest {
     execute(ix: ExecuteIx): Promise<InteractionResponse>;
 }
 
-export type InteractionRequestOption = ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">>;
+export type InteractionRequestOption = ResponseModifierParam<"confirmation">;
 
 // Type name colliding with the one from `js-moi-utils`
 interface InteractionRequestMethod {
