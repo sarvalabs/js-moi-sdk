@@ -29,6 +29,6 @@
         // Language and Environment Setting
         "lib": ["ESNext", "DOM"]
     },
-    "include": ["packages"],
+    "include": ["packages/**/*"],
     "exclude": ["node_modules", "packages/**/node_modules", "packages/**/lib.*"]
 }

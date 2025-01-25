@@ -57,6 +57,9 @@ export class InteractionResponse {
         const delayInMs = timer.delayInSec * 1000;
         for (let retries = 0; retries < timer.retries; retries++) {
             try {
+                const a = await this.provider.getTesseract("0x", 1, {
+                    modifier: { include: ["consensus"] },
+                });
                 const ix = await this.provider.getInteraction(this.hash, {
                     modifier: { include: ["confirmation"] },
                 });

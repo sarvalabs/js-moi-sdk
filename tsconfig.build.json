@@ -1,6 +1,7 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
+        "noEmitOnError": false,
         // Type Checking Setting
         "strict": false,
         "alwaysStrict": true,
