@@ -10,10 +10,11 @@
         "noImplicitAny": false,
         "noImplicitOverride": false,
         "noPropertyAccessFromIndexSignature": false,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "useUnknownInCatchVariables": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "useUnknownInCatchVariables": false,
         "skipLibCheck": true,
+        "noCheck": false,
 
         // Interoperability Setting
 

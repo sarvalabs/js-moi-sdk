@@ -25,16 +25,14 @@
         },
         "watch": {
             "dependsOn": [
-                "^watch"
+                "^build"
             ],
             "cache": false,
             "persistent": true
         },
         "build": {
             "dependsOn": [
-                "clean",
-                "build:cjs",
-                "build:esm"
+                "^build"
             ],
             "cache": true,
             "outputs": [
