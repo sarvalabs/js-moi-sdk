@@ -27,7 +27,7 @@
     "js-moi-sdk"
   ],
   "workspaces": [
-    "packages/js-moi-constants"
+    "packages/*"
   ],
   "author": "",
   "license": "Apache-2.0 OR MIT",

@@ -18,7 +18,7 @@
     "watch": "npm run watch:cjs & npm run watch:esm",
     "build": "npm run build:cjs && npm run build:esm",
     "check-types": "tsc --noEmit",
-    "clean:build": "rm -rf ./lib.cjs ./lib.esm",
+    "clean": "rm -rf ./lib.cjs ./lib.esm",
     "clean:node_modules": "rm -rf node_modules"
   },
   "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",
