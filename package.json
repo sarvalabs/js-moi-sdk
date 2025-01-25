@@ -7,8 +7,8 @@
   "module": "packages/js-moi/lib.esm/index.js",
   "packageManager": "npm@10.9.2",
   "scripts": {
-    "build": "turbo run build --concurrency 2",
-    "build:clean": "turbo run build --no-cache",
+    "build": "turbo run build --concurrency 5",
+    "build:clean": "turbo run build --force",
     "clean": "turbo run clean",
     "watch": "turbo run watch --continue --no-cache",
     "check-types": "turbo run check-types",
