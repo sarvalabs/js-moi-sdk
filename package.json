@@ -5,7 +5,10 @@
   "private": true,
   "main": "packages/js-moi/lib.cjs/index.js",
   "module": "packages/js-moi/lib.esm/index.js",
-  "scripts": {},
+  "packageManager": "npm@10.9.2",
+  "scripts": {
+    "build": "turbo run build"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sarvalabs/js-moi-sdk.git"
