@@ -7,7 +7,10 @@
   "module": "packages/js-moi/lib.esm/index.js",
   "packageManager": "npm@10.9.2",
   "scripts": {
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "check-types": "turbo run check-types",
+    "clean:node_modules": "turbo run clean:node_modules"
   },
   "repository": {
     "type": "git",
@@ -23,7 +26,7 @@
     "js-moi-sdk"
   ],
   "workspaces": [
-    "packages/js-moi-utils"
+    "packages/js-moi-constants"
   ],
   "author": "",
   "license": "Apache-2.0 OR MIT",

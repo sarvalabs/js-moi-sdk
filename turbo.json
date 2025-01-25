@@ -1,16 +1,26 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "tasks": {
-        "build-esm": {
+        "clean": {
             "cache": false
         },
-        "build-cjs": {
+        "clean:node_modules": {
+            "cache": false
+        },
+        "check-types": {
+            "cache": false
+        },
+        "build:esm": {
+            "cache": false
+        },
+        "build:cjs": {
             "cache": false
         },
         "build": {
-            "dependsOn": [
-                "build-esm",
-                "build-cjs"
+            "cache": true,
+            "outputs": [
+                "lib.cjs",
+                "lib.esm"
             ]
         }
     }

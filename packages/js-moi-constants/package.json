@@ -5,8 +5,12 @@
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
   "scripts": {
-    "build-cjs": "tsc --project '../../tsconfig.build.json' --outDir lib.cjs",
-    "build-esm": "tsc --project '../../tsconfig.build.json' --outDir lib.esm --module esnext --moduleResolution=bundler"
+    "build:cjs": "tsc --project ../../tsconfig.cjs.json --outDir ./lib.cjs",
+    "build:esm": "tsc --project ../../tsconfig.esm.json --outDir ./lib.esm",
+    "check-types": "tsc --project ../../tsconfig.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "clean": "rm -rf ./lib.cjs ./lib.esm",
+    "clean:node_modules": "rm -rf node_modules"
   },
   "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",
   "repository": {
