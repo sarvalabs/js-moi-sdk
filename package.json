@@ -8,6 +8,7 @@
   "packageManager": "npm@10.9.2",
   "scripts": {
     "build": "turbo run build",
+    "build:clean": "turbo run build:clean",
     "clean": "turbo run clean",
     "watch": "turbo run watch --continue --no-cache",
     "check-types": "turbo run check-types",

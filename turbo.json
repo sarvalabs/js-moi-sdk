@@ -37,11 +37,19 @@
             "cache": true,
             "inputs": [
                 "src.ts/**",
-                "types/**"
+                "types/**",
+                "tsconfig.json"
             ],
             "outputs": [
                 "lib.*/**"
             ]
+        },
+        "build:clean": {
+            "dependsOn": [
+                "clean",
+                "build"
+            ],
+            "cache": false
         }
     }
 }
