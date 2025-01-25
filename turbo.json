@@ -35,6 +35,10 @@
                 "^build"
             ],
             "cache": true,
+            "inputs": [
+                "src.ts/**",
+                "types/**"
+            ],
             "outputs": [
                 "lib.*/**"
             ]
