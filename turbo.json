@@ -1,5 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
     "tasks": {
         "clean": {
             "cache": false
@@ -21,6 +22,13 @@
                 "^build:cjs"
             ],
             "cache": false
+        },
+        "watch": {
+            "dependsOn": [
+                "^watch"
+            ],
+            "cache": false,
+            "persistent": true
         },
         "build": {
             "dependsOn": [
