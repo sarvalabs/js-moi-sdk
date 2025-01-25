@@ -32,7 +32,9 @@
         },
         "build": {
             "dependsOn": [
-                "^build"
+                "clean",
+                "build:cjs",
+                "build:esm"
             ],
             "cache": true,
             "outputs": [
