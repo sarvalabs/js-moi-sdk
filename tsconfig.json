@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        // Module Setting
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "resolveJsonModule": true,
+
+        // Emit Setting
+        "target": "ES2022",
+        "noEmit": true,
+
+        // Type Checking Setting
+        "strict": true,
+        "alwaysStrict": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "useUnknownInCatchVariables": true,
+        "skipLibCheck": true,
+
+        // Interoperability Setting
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+
+        // Language and Environment Setting
+        "lib": ["ESNext", "DOM"]
+    },
+
+    "include": ["packages/**/*"],
+    "exclude": ["node_modules", "packages/**/node_modules"],
+    "files": ["./jest.config.ts", "./jest.setup.ts"]
+}
