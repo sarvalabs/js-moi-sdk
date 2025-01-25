@@ -11,11 +11,13 @@
     }
   },
   "scripts": {
-    "build:cjs": "tsc --project ../../tsconfig.cjs.json --outDir ./lib.cjs",
-    "build:esm": "tsc --project ../../tsconfig.esm.json --outDir ./lib.esm",
-    "check-types": "tsc --project ../../tsconfig.json",
+    "build:cjs": "tsc --outDir ./lib.cjs",
+    "watch:cjs": "tsc --outDir ./lib.cjs --watch",
+    "build:esm": "tsc --outDir ./lib.esm --module ESNext --moduleResolution Bundler",
+    "watch:esm": "tsc --outDir ./lib.esm --module ESNext --moduleResolution Bundler --watch",
+    "check-types": "tsc --noEmit",
     "build": "npm run build:cjs && npm run build:esm",
-    "clean": "rm -rf ./lib.cjs ./lib.esm",
+    "clean:build": "rm -rf ./lib.cjs ./lib.esm",
     "clean:node_modules": "rm -rf node_modules"
   },
   "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",

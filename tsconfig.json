@@ -7,7 +7,6 @@
 
         // Emit Setting
         "target": "ES2022",
-        "noEmit": true,
 
         // Type Checking Setting
         "strict": true,
@@ -30,6 +29,6 @@
         // Language and Environment Setting
         "lib": ["ESNext", "DOM"]
     },
-    "include": ["packages/js-moi-constants"],
+    "include": ["packages"],
     "exclude": ["node_modules", "packages/**/node_modules", "packages/**/lib.*"]
 }
