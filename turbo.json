@@ -43,13 +43,6 @@
             "outputs": [
                 "lib.*/**"
             ]
-        },
-        "build:clean": {
-            "dependsOn": [
-                "clean",
-                "build"
-            ],
-            "cache": false
         }
     }
 }
