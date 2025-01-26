@@ -4,6 +4,12 @@
   "description": "Module to interact with MOI Logic Objects.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib.esm/index.js",
+      "require": "./lib.cjs/index.js"
+    }
+  },
   "scripts": {
     "build:cjs": "tsc -p tsconfig.build.json --outDir ./lib.cjs",
     "watch:cjs": "tsc -p tsconfig.build.json --outDir ./lib.cjs --watch",

@@ -4,6 +4,12 @@
   "description": "A feature-rich library designed to seamlessly interact with the MOI Protocol.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib.esm/index.js",
+      "require": "./lib.cjs/index.js"
+    }
+  },
   "scripts": {
     "build:cjs": "tsc -p tsconfig.build.json --outDir ./lib.cjs",
     "watch:cjs": "tsc -p tsconfig.build.json --outDir ./lib.cjs --watch",
