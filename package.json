@@ -15,7 +15,8 @@
     "check-types": "turbo run check-types --continue",
     "clean:node_modules": "turbo run clean:node_modules",
     "pretest": "npm run build",
-    "lint": "eslint ./packages/*"
+    "lint": "eslint ./packages/*",
+    "lint:fix": "eslint ./packages/* --fix"
   },
   "repository": {
     "type": "git",
