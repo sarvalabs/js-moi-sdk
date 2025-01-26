@@ -1,16 +1,18 @@
 import type { EventEmitter } from "events";
 import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
-import type { MethodParams } from "./moi-execution-api";
-export type NonOptionKeys<T extends Record<string, any>> = {
-    [K in keyof T]-?: undefined extends T[K] ? never : K;
+import type { MethodParams, NestedArray } from "./moi-execution-api";
+type NonOptionalKeys<T extends Record<string, any>> = {
+    [K in keyof T]-?: T extends {
+        [K1 in K]: any;
+    } ? K : never;
 }[keyof T];
 type NonUndefined<T> = T extends undefined ? never : T;
 export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>> ? K extends keyof TObject ? TModifier extends {
     modifier: ExtractModifier<infer E>;
 } ? NonUndefined<TObject[E]> : TModifier extends {
     modifier: IncludeModifier<infer E>;
-} ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionKeys<TObject>> : never : TObject : Pick<TObject, NonOptionKeys<TObject>>;
+} ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionalKeys<TObject>> : Pick<TObject, NonOptionalKeys<TObject>> : Pick<TObject, NonOptionalKeys<TObject>> : Pick<TObject, NonOptionalKeys<TObject>>;
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
 /**
  * Structure for `moi.Protocol` to get network information.
@@ -54,7 +56,9 @@ interface AssetRequest {
     getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
 }
-export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id">;
+export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id" | "topics"> & {
+    topics?: NestedArray<string>;
+};
 interface LogicMessageRequest {
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
 }
@@ -72,7 +76,7 @@ interface ExecuteRequest {
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
     execute(ix: ExecuteIx): Promise<InteractionResponse>;
 }
-export type InteractionRequestOption = ResponseModifierParam<Exclude<keyof Interaction, "hash" | "status" | "interaction">>;
+export type InteractionRequestOption = ResponseModifierParam<"confirmation">;
 interface InteractionRequestMethod {
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
 }

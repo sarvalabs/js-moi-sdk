@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
 const events_1 = require("events");
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
 const interaction_response_1 = require("../utils/interaction-response");
 class JsonRpcProvider extends events_1.EventEmitter {
     _transport;
@@ -167,9 +168,27 @@ class JsonRpcProvider extends events_1.EventEmitter {
         const address = typeof identifier === "string" ? identifier : identifier.getAddress();
         return await this.call("moi.Asset", { identifier: address, ...option });
     }
+    encodeTopics(topics) {
+        const encodedTopics = Array.from({ length: topics.length });
+        for (let i = 0; i < topics.length; i++) {
+            const topic = topics[i];
+            if (typeof topic === "string") {
+                const polorizer = new js_polo_1.Polorizer();
+                polorizer.polorizeString(topic);
+                encodedTopics[i] = (0, js_moi_utils_1.hexToHash)(polorizer.bytes());
+                continue;
+            }
+            encodedTopics[i] = this.encodeTopics(topic);
+        }
+        return encodedTopics;
+    }
     async getLogicMessage(logicId, options) {
         const id = typeof logicId === "string" ? new js_moi_utils_1.LogicId(logicId) : logicId;
-        return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
+        return await this.call("moi.LogicMessage", {
+            logic_id: id.value,
+            ...options,
+            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
+        });
     }
     async getAccountAsset(identifier, assetId, option) {
         if (!(0, js_moi_utils_1.isAddress)(identifier)) {

@@ -56,6 +56,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    private encodeTopics;
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
     getAccountAsset<TOption extends AccountAssetRequestOption>(identifier: Address, assetId: Hex | AssetId, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
     getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;

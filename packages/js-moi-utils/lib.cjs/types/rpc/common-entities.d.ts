@@ -6,7 +6,7 @@ export interface IncludeModifier<T extends string = string> {
      * the response object. If a field that is already returned by default is mentioned, it is ignored.
      */
     include: T[];
-    extract?: never;
+    extract?: undefined;
 }
 export interface ExtractModifier<T extends string = string> {
     /**
@@ -15,7 +15,7 @@ export interface ExtractModifier<T extends string = string> {
      * also be a field that is not returned by default.
      */
     extract: T;
-    include?: never;
+    include?: undefined;
 }
 /**
  * The `ResponseModifier` can be used to modify the API response by including additional
@@ -56,6 +56,8 @@ export type TesseractReference = AbsoluteTesseractReference | RelativeTesseractR
  * A utility type to extract create a object of type and value
  */
 export type ParamField<TName extends string, TType> = Record<TName, TType>;
-export type ResponseModifierParam<T extends string = string> = Partial<ParamField<"modifier", ResponseModifier<T>>>;
+export type ResponseModifierParam<T extends string = string> = {
+    modifier?: ResponseModifier<T>;
+};
 export type TesseractReferenceParam = Partial<ParamField<"reference", TesseractReference | undefined>>;
 //# sourceMappingURL=common-entities.d.ts.map

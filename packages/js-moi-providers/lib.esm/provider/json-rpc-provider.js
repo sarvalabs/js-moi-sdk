@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
-import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, interaction, isAddress, isHex, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
+import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
+import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";
 export class JsonRpcProvider extends EventEmitter {
     _transport;
@@ -164,9 +165,27 @@ export class JsonRpcProvider extends EventEmitter {
         const address = typeof identifier === "string" ? identifier : identifier.getAddress();
         return await this.call("moi.Asset", { identifier: address, ...option });
     }
+    encodeTopics(topics) {
+        const encodedTopics = Array.from({ length: topics.length });
+        for (let i = 0; i < topics.length; i++) {
+            const topic = topics[i];
+            if (typeof topic === "string") {
+                const polorizer = new Polorizer();
+                polorizer.polorizeString(topic);
+                encodedTopics[i] = hexToHash(polorizer.bytes());
+                continue;
+            }
+            encodedTopics[i] = this.encodeTopics(topic);
+        }
+        return encodedTopics;
+    }
     async getLogicMessage(logicId, options) {
         const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-        return await this.call("moi.LogicMessage", { logic_id: id.value, ...options });
+        return await this.call("moi.LogicMessage", {
+            logic_id: id.value,
+            ...options,
+            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
+        });
     }
     async getAccountAsset(identifier, assetId, option) {
         if (!isAddress(identifier)) {

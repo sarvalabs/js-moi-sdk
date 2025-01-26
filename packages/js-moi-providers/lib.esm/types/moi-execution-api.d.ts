@@ -28,10 +28,11 @@ interface LogicStorageRequestParam extends TesseractReferenceParam {
 }
 interface AssetRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Asset, "metadata">>, TesseractReferenceParam {
 }
+export type NestedArray<T> = T[] | NestedArray<T>[];
 interface LogicMessageRequestParam {
     logic_id: Hex;
     address?: Address;
-    topics?: Hex[];
+    topics?: NestedArray<Hex>;
     range?: {
         start: number;
         stop: number;
