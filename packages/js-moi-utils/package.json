@@ -29,10 +29,10 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
+    "@noble/hashes": "^1.7.1",
     "bn.js": "^5.2.1",
-    "polo-schema": "^1.0.3",
-    "@noble/hashes": "^1.1.5",
-    "js-moi-constants": "0.6.0"
+    "js-moi-constants": "0.6.0",
+    "polo-schema": "^1.0.3"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5"
