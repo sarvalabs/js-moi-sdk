@@ -14,7 +14,6 @@
         "noUnusedParameters": false,
         "useUnknownInCatchVariables": false,
         "skipLibCheck": true,
-        "noCheck": false,
 
         // Interoperability Setting
 
