@@ -1,7 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse, WebsocketProvider } from "js-moi-providers";
 import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, randomBytes, StorageKey, type Interaction } from "js-moi-utils";
-import { getLogicDriver, LogicDriver } from "../src.ts";
+import { getLogicDriver, LogicDriver, type StateAccessorBuilder } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
 import { Wallet } from "../../js-moi-wallet/src.ts";
@@ -69,7 +69,7 @@ const logics = [
             args: [10_000, bytesToHex(randomBytes(32))],
         },
         persistent: {
-            accessor: (b) => b.name("Symbol"),
+            accessor: (b: StateAccessorBuilder) => b.name("Symbol"),
             expected: "MOI",
         },
     },
@@ -87,7 +87,7 @@ const logics = [
             args: [],
         },
         ephemeral: {
-            accessor: (b) => b.name("Spendable"),
+            accessor: (b: StateAccessorBuilder) => b.name("Spendable"),
             expected: 10_000,
         },
     },

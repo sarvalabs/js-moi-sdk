@@ -113,14 +113,15 @@ export class WebsocketProvider extends JsonRpcProvider {
         });
     }
 
-    on<K, T extends ProviderEvent>(event: T, listener: ProviderEventListener<T>): this {
+    override on<K, T extends ProviderEvent>(event: T, listener: ProviderEventListener<T>): this {
         return this.subscribeToEvent<K>("on", event, listener);
     }
 
-    once<K, T extends ProviderEvent>(eventName: T, listener: ProviderEventListener<T>): this {
+    override once<K, T extends ProviderEvent>(eventName: T, listener: ProviderEventListener<T>): this {
         return this.subscribeToEvent<K>("once", eventName, listener);
     }
 
+    // @ts-ignore - The method is not implemented in the base class.
     private subscribeToEvent<K>(type: "on" | "once", event: ProviderEvent, listener: (...args: any[]) => void) {
         const eventName = WebsocketProvider.getEventName(event);
 

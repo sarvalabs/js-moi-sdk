@@ -241,6 +241,7 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
         return createInvalidResult(ix, "fuel_price", "Fuel price is required");
     }
 
+    // @ts-ignore - The fuel_limit field is not present in the Simulate type.
     if (type === "moi.Execute" && ix["fuel_limit"] == null) {
         return createInvalidResult(<InteractionRequest>ix, "fuel_limit", "Fuel limit is required");
     }
@@ -249,6 +250,7 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
         return createInvalidResult(ix, "fuel_price", "Fuel price must be greater than or equal to 0");
     }
 
+    // @ts-ignore - The fuel_limit field is not present in the Simulate type.
     if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(<InteractionRequest>ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }

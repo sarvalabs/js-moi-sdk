@@ -142,7 +142,7 @@ export class ManifestCoder {
     public encodeArguments(routine: string, ...args: any[]): Hex {
         const element = this.elementDescriptor.getRoutineElement(routine).data;
         const schema = this.schema.parseFields(element.accepts ?? []);
-        const calldata = Object.values(element.accepts).reduce((acc, field) => {
+        const calldata = Object.values(element.accepts).reduce((acc: Record<string, any>, field) => {
             if (schema.fields) {
                 acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
             }

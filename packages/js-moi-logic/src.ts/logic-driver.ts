@@ -209,7 +209,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      * @throws If the logic id not deployed.
      * @throws If error occurs during the deployment process.
      */
-    public async getLogicId(timer?: TimerOption): Promise<LogicId> {
+    public override async getLogicId(timer?: TimerOption): Promise<LogicId> {
         if (this.deployIxResponse != null) {
             const results = await this.deployIxResponse.result(timer);
             const result = results.at(0);
@@ -285,7 +285,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
     }
 
     private setupEndpoint() {
-        const endpoint = {};
+        const endpoint: Record<string, CallsiteCallback> = {};
 
         for (const { ptr } of this.getCallsites().values()) {
             const element = this.getElement(ptr);

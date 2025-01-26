@@ -9,7 +9,15 @@
             "cache": false
         },
         "check-types": {
-            "cache": false
+            "dependsOn": [
+                "^build"
+            ],
+            "cache": true,
+            "inputs": [
+                "src.ts/**",
+                "types/**",
+                "tsconfig.build.json"
+            ]
         },
         "build:esm": {
             "dependsOn": [
@@ -38,7 +46,7 @@
             "inputs": [
                 "src.ts/**",
                 "types/**",
-                "tsconfig.json"
+                "tsconfig.build.json"
             ],
             "outputs": [
                 "lib.*/**"

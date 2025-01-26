@@ -128,6 +128,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             case typeof ix === "object": {
                 if (!("fuel_limit" in ix)) {
                     console.warn("Simulating interaction should not take a fuel limit.\nFor simulation, fuel limit not provided. Using default value 1.");
+                    // @ts-ignore - fuel_limit is not in the type
                     ix["fuel_limit"] = 1;
                 }
                 const result = validateIxRequest("moi.Simulate", ix);
@@ -375,7 +376,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return this.call("moi.Interaction", { hash, ...option });
     }
 
-    async subscribe(event: string, params?: unknown): Promise<void> {
+    async subscribe(_event: string, _params?: unknown): Promise<void> {
         throw new Error("Method not implemented. Return type needs to be updated");
         // return await this.call("moi.Subscribe", event, params);
     }
