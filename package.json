@@ -9,10 +9,12 @@
   "scripts": {
     "build": "turbo run build",
     "build:clean": "turbo run build --force",
+    "test": "jest --colors",
     "clean": "turbo run clean",
     "watch": "turbo run watch --continue --cache=local:r,remote:r --concurrency 11",
     "check-types": "turbo run check-types --continue",
-    "clean:node_modules": "turbo run clean:node_modules"
+    "clean:node_modules": "turbo run clean:node_modules",
+    "pretest": "npm run build"
   },
   "repository": {
     "type": "git",
