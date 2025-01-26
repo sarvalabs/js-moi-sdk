@@ -17,6 +17,9 @@
                 "src.ts/**",
                 "types/**",
                 "tsconfig.build.json"
+            ],
+            "outputs": [
+                "lib.*/**"
             ]
         },
         "build:esm": {
