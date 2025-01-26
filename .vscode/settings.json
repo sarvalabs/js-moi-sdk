@@ -10,5 +10,6 @@
     },
     "deno.enable": false,
     "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"],
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.codeActionsOnSave": {}
 }
