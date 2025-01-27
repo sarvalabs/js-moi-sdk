@@ -1,23 +1,23 @@
-import { bytesToHex, ErrorUtils, hexToBytes, isNullBytes, type AssetStandard, type Hex } from "js-moi-utils";
+import { bytesToHex, ErrorUtils, hexToBytes, isNullBytes, type Hex } from "js-moi-utils";
 import { flagMasks, getFlag, type Flag } from "./flags";
 import { Identifier } from "./identifier";
 import { IdentifierKind } from "./identifier-kind";
 import { IdentifierTag } from "./identifier-tag";
 
-export class AssetId {
+export class LogicId {
     private readonly buff: Uint8Array;
 
     constructor(value: Uint8Array) {
         if (value.length !== 32) {
-            ErrorUtils.throwArgumentError("Invalid asset id length. Expected 32 bytes.", "value", value);
+            ErrorUtils.throwArgumentError("Invalid logic id length. Expected 32 bytes.", "value", value);
         }
 
         this.buff = value;
 
-        const error = AssetId.validate(this);
+        const error = LogicId.validate(this);
 
         if (error != null) {
-            ErrorUtils.throwArgumentError(`Invalid asset identifier. ${error.message}`, "value", value);
+            ErrorUtils.throwArgumentError(`Invalid logic identifier. ${error.message}`, "value", value);
         }
     }
 
@@ -30,7 +30,7 @@ export class AssetId {
     }
 
     public toIdentifier(): Identifier {
-        return new Identifier(this.buff);
+        return new Identifier(this.toBytes());
     }
 
     public getTag() {
@@ -46,12 +46,6 @@ export class AssetId {
         return new DataView(variant.buffer).getUint32(0, true);
     }
 
-    public getStandard(): AssetStandard {
-        const buff = this.toBytes().slice(2, 4);
-
-        return new DataView(buff.buffer).getUint16(0, false);
-    }
-
     public getFlag(flag: Flag) {
         if (!flag.supports(this.getTag())) {
             return false;
@@ -65,26 +59,26 @@ export class AssetId {
         return !isNullBytes(variant);
     }
 
-    public static validate(asset: AssetId): Error | null {
-        const tag = asset.getTag();
+    public static validate(logicId: LogicId): Error | null {
+        const tag = logicId.getTag();
         const error = IdentifierTag.validate(tag);
 
         if (error) {
             return error;
         }
 
-        if (tag.getKind() !== IdentifierKind.Asset) {
+        if (tag.getKind() !== IdentifierKind.Logic) {
             return new Error("Invalid identifier kind. Expected a participant identifier.");
         }
 
-        if ((asset[1] & (flagMasks.get(tag.getValue()) ?? 0)) !== 0) {
+        if ((logicId[1] & (flagMasks.get(tag.getValue()) ?? 0)) !== 0) {
             return new Error("Invalid participant identifier flags.");
         }
 
         return null;
     }
 
-    public static fromHex(value: Hex): AssetId {
-        return new AssetId(hexToBytes(value));
+    public static fromHex(value: Hex): LogicId {
+        return new LogicId(hexToBytes(value));
     }
 }
