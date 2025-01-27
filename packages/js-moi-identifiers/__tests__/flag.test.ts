@@ -1,4 +1,5 @@
-import { Flag, getFlag, IdentifierKind, setFlag } from "../src.ts";
+import { Flag, IdentifierKind } from "../src.ts";
+import { getFlag, setFlag } from "../src.ts/flags";
 
 describe(Flag, () => {
     describe("constructor", () => {
