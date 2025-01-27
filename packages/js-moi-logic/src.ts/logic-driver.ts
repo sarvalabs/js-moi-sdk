@@ -180,7 +180,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         };
 
         if (!this.isCallsiteMutable(callsite)) {
-            return baseIxRequest as SignerIx<SimulateInteractionRequest>;
+            return baseIxRequest;
         }
 
         const simulation = await this.signer.simulate(baseIxRequest);
