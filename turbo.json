@@ -10,17 +10,10 @@
         },
         "check-types": {
             "dependsOn": [
-                "^build"
+                "^build",
+                "^check-types"
             ],
-            "cache": true,
-            "inputs": [
-                "src.ts/**",
-                "types/**",
-                "tsconfig.build.json"
-            ],
-            "outputs": [
-                "lib.*/**"
-            ]
+            "cache": false
         },
         "build:esm": {
             "dependsOn": [
