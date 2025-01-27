@@ -66,8 +66,8 @@ export const getFlag = (value: number, index: number): boolean => {
     return (value & (1 << index)) !== 0;
 };
 
-export const flagMasks = new Map([
-    [TagParticipantV0, 0b01111111],
-    [TagLogicV0, 0b01111000],
-    [TagAssetV0, 0b01111100],
+export const flagMasks = new Map<number, number>([
+    [TagParticipantV0.getValue(), 0b01111111],
+    [TagLogicV0.getValue(), 0b01111000],
+    [TagAssetV0.getValue(), 0b01111100],
 ]);

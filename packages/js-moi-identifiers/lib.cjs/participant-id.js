@@ -30,7 +30,7 @@ class ParticipantId {
         if (tag.getKind() !== identifier_kind_1.IdentifierKind.Participant) {
             return new Error("Invalid identifier kind. Expected a participant identifier.");
         }
-        if ((participant[1] & (flags_1.flagMasks.get(tag) ?? 0)) !== 0) {
+        if ((participant[1] & (flags_1.flagMasks.get(tag.getValue()) ?? 0)) !== 0) {
             return new Error("Invalid participant identifier flags.");
         }
         return null;
@@ -50,7 +50,7 @@ class ParticipantId {
     toIdentifier() {
         return new identifier_1.Identifier(this.bytes);
     }
-    getFingerPrint() {
+    getFingerprint() {
         return new Uint8Array(this.bytes.slice(4, 28));
     }
     getVariant() {

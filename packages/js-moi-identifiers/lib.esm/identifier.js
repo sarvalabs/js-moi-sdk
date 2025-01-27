@@ -42,7 +42,7 @@ export class Identifier {
      *
      * @returns {Uint8Array} A new Uint8Array containing the fingerprint bytes.
      */
-    getFingerPrint() {
+    getFingerprint() {
         return new Uint8Array(this.bytes.slice(4, 28));
     }
     getVariantBytes() {

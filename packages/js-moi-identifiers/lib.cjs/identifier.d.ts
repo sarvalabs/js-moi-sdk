@@ -31,7 +31,7 @@ export declare class Identifier {
      *
      * @returns {Uint8Array} A new Uint8Array containing the fingerprint bytes.
      */
-    getFingerPrint(): Uint8Array;
+    getFingerprint(): Uint8Array;
     private getVariantBytes;
     /**
      * Retrieves the variant from the identifier bytes.

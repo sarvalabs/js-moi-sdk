@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantId = exports.TagParticipantV0 = exports.TagLogicIdV0 = exports.TagAssetV0 = exports.IdentifierTag = exports.IdentifierKind = exports.Identifier = exports.setFlag = exports.getFlag = exports.Flag = void 0;
+exports.ParticipantId = exports.TagParticipantV0 = exports.TagLogicIdV0 = exports.TagAssetV0 = exports.IdentifierTag = exports.IdentifierKind = exports.Identifier = exports.setFlag = exports.getFlag = exports.Flag = exports.AssetId = void 0;
+var asset_id_1 = require("./asset-id");
+Object.defineProperty(exports, "AssetId", { enumerable: true, get: function () { return asset_id_1.AssetId; } });
 var flags_1 = require("./flags");
 Object.defineProperty(exports, "Flag", { enumerable: true, get: function () { return flags_1.Flag; } });
 Object.defineProperty(exports, "getFlag", { enumerable: true, get: function () { return flags_1.getFlag; } });

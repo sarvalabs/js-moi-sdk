@@ -27,7 +27,7 @@ export class ParticipantId {
         if (tag.getKind() !== IdentifierKind.Participant) {
             return new Error("Invalid identifier kind. Expected a participant identifier.");
         }
-        if ((participant[1] & (flagMasks.get(tag) ?? 0)) !== 0) {
+        if ((participant[1] & (flagMasks.get(tag.getValue()) ?? 0)) !== 0) {
             return new Error("Invalid participant identifier flags.");
         }
         return null;
@@ -47,7 +47,7 @@ export class ParticipantId {
     toIdentifier() {
         return new Identifier(this.bytes);
     }
-    getFingerPrint() {
+    getFingerprint() {
         return new Uint8Array(this.bytes.slice(4, 28));
     }
     getVariant() {

@@ -11,7 +11,7 @@ export declare class ParticipantId {
     toBytes(): Uint8Array;
     toHex(): Hex;
     toIdentifier(): Identifier;
-    getFingerPrint(): Uint8Array<ArrayBuffer>;
+    getFingerprint(): Uint8Array<ArrayBuffer>;
     getVariant(): number;
     isVariant(): boolean;
     isFlagSupported(flag: Flag): boolean;

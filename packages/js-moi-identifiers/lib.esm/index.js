@@ -1,3 +1,4 @@
+export { AssetId } from "./asset-id";
 export { Flag, getFlag, setFlag } from "./flags";
 export { Identifier } from "./identifier";
 export { IdentifierKind } from "./identifier-kind";

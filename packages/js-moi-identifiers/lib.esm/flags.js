@@ -55,8 +55,8 @@ export const getFlag = (value, index) => {
     return (value & (1 << index)) !== 0;
 };
 export const flagMasks = new Map([
-    [TagParticipantV0, 0b01111111],
-    [TagLogicV0, 0b01111000],
-    [TagAssetV0, 0b01111100],
+    [TagParticipantV0.getValue(), 0b01111111],
+    [TagLogicV0.getValue(), 0b01111000],
+    [TagAssetV0.getValue(), 0b01111100],
 ]);
 //# sourceMappingURL=flags.js.map

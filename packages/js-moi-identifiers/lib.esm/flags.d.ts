@@ -32,5 +32,5 @@ export declare const setFlag: (value: number, index: number, flag: boolean) => n
  * @returns `true` if the flag at the specified index is set, otherwise `false`.
  */
 export declare const getFlag: (value: number, index: number) => boolean;
-export declare const flagMasks: Map<IdentifierTag, number>;
+export declare const flagMasks: Map<number, number>;
 //# sourceMappingURL=flags.d.ts.map
