@@ -7,8 +7,9 @@ Object.defineProperty(exports, "getFlag", { enumerable: true, get: function () {
 Object.defineProperty(exports, "setFlag", { enumerable: true, get: function () { return flags_1.setFlag; } });
 var identifier_1 = require("./identifier");
 Object.defineProperty(exports, "Identifier", { enumerable: true, get: function () { return identifier_1.Identifier; } });
+var identifier_kind_1 = require("./identifier-kind");
+Object.defineProperty(exports, "IdentifierKind", { enumerable: true, get: function () { return identifier_kind_1.IdentifierKind; } });
 var identifier_tag_1 = require("./identifier-tag");
-Object.defineProperty(exports, "IdentifierKind", { enumerable: true, get: function () { return identifier_tag_1.IdentifierKind; } });
 Object.defineProperty(exports, "IdentifierTag", { enumerable: true, get: function () { return identifier_tag_1.IdentifierTag; } });
 Object.defineProperty(exports, "TagAssetV0", { enumerable: true, get: function () { return identifier_tag_1.TagAssetV0; } });
 Object.defineProperty(exports, "TagLogicIdV0", { enumerable: true, get: function () { return identifier_tag_1.TagLogicIdV0; } });

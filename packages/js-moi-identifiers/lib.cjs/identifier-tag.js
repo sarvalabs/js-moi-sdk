@@ -1,26 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IdentifierTag = exports.TagLogicIdV0 = exports.TagAssetV0 = exports.TagParticipantV0 = exports.IdentifierKind = void 0;
+exports.IdentifierTag = exports.TagLogicIdV0 = exports.TagAssetV0 = exports.TagParticipantV0 = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-var IdentifierKind;
-(function (IdentifierKind) {
-    IdentifierKind[IdentifierKind["Participant"] = 0] = "Participant";
-    IdentifierKind[IdentifierKind["Asset"] = 1] = "Asset";
-    IdentifierKind[IdentifierKind["Logic"] = 2] = "Logic";
-})(IdentifierKind || (exports.IdentifierKind = IdentifierKind = {}));
-const maxIdentifierKind = IdentifierKind.Logic;
+const identifier_kind_1 = require("./identifier-kind");
+const maxIdentifierKind = identifier_kind_1.IdentifierKind.Logic;
 const identifierV0 = 0;
 /**
  * kindSupport is a map of IdentifierKind to the maximum supported version.
  */
 const kindSupport = new Map([
-    [IdentifierKind.Participant, 0],
-    [IdentifierKind.Asset, 0],
-    [IdentifierKind.Logic, 0],
+    [identifier_kind_1.IdentifierKind.Participant, 0],
+    [identifier_kind_1.IdentifierKind.Asset, 0],
+    [identifier_kind_1.IdentifierKind.Logic, 0],
 ]);
-exports.TagParticipantV0 = (IdentifierKind.Participant << 4) | identifierV0;
-exports.TagAssetV0 = (IdentifierKind.Asset << 4) | identifierV0;
-exports.TagLogicIdV0 = (IdentifierKind.Logic << 4) | identifierV0;
+exports.TagParticipantV0 = (identifier_kind_1.IdentifierKind.Participant << 4) | identifierV0;
+exports.TagAssetV0 = (identifier_kind_1.IdentifierKind.Asset << 4) | identifierV0;
+exports.TagLogicIdV0 = (identifier_kind_1.IdentifierKind.Logic << 4) | identifierV0;
 class IdentifierTag {
     tag;
     constructor(tag) {

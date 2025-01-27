@@ -1,8 +1,4 @@
-export declare enum IdentifierKind {
-    Participant = 0,
-    Asset = 1,
-    Logic = 2
-}
+import { IdentifierKind } from "./identifier-kind";
 export declare const TagParticipantV0: number;
 export declare const TagAssetV0: number;
 export declare const TagLogicIdV0: number;

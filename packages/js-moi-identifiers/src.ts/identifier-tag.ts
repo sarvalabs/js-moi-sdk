@@ -1,10 +1,5 @@
 import { ErrorUtils } from "js-moi-utils";
-
-export enum IdentifierKind {
-    Participant = 0,
-    Asset = 1,
-    Logic = 2,
-}
+import { IdentifierKind } from "./identifier-kind";
 
 const maxIdentifierKind = IdentifierKind.Logic;
 const identifierV0 = 0;
