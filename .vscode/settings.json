@@ -1,7 +1,6 @@
 {
     "editor.formatOnSave": true,
-    "prettier.tabWidth": 4,
-    "prettier.printWidth": 180,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "search.exclude": {
         "**/node_modules": true,
         "**/bower_components": true,
@@ -11,5 +10,8 @@
     "deno.enable": false,
     "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"],
     "typescript.tsdk": "node_modules/typescript/lib",
-    "editor.codeActionsOnSave": {}
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always",
+        "source.fixAll.ts": "always"
+    }
 }

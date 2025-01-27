@@ -1,6 +1,8 @@
 import pluginJs from "@eslint/js";
+import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import importPlugin from "eslint-plugin-import";
+import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -14,18 +16,16 @@ export default [
     { files: ["**/*.{js,mjs,cjs,ts}"] },
     { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
     pluginJs.configs.recommended,
-    {
-        files: ["**/*.{ts,tsx}"],
-        // other configs...
-    },
     ...tseslint.configs.recommended,
     ...tseslint.configs.stylisticTypeChecked,
     ...tseslint.configs.strict,
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
+    eslintPluginPrettier,
+    eslintConfigPrettier,
     {
         settings: {
-            "import/resolver-next": [createTypeScriptImportResolver({ project: "./tsconfig.json" })],
+            "import/resolver-next": [createTypeScriptImportResolver()],
         },
         plugins: {
             "simple-import-sort": simpleImportSort,
@@ -37,6 +37,8 @@ export default [
             },
         },
         rules: {
+            "prettier/prettier": "warn",
+
             "sort-imports": "off",
             "simple-import-sort/imports": "error",
             "simple-import-sort/exports": "error",
