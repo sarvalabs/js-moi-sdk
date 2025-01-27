@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setFlag = exports.Flag = void 0;
+exports.getFlag = exports.setFlag = exports.Flag = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 /**
  * Represents a flag specifier for an identifier.
@@ -48,4 +48,15 @@ const setFlag = (value, index, flag) => {
     return value;
 };
 exports.setFlag = setFlag;
+/**
+ * Determines if a specific flag is set in a given value.
+ *
+ * @param value - The number containing the flags.
+ * @param index - The index of the flag to check (0-based).
+ * @returns `true` if the flag at the specified index is set, otherwise `false`.
+ */
+const getFlag = (value, index) => {
+    return (value & (1 << index)) !== 0;
+};
+exports.getFlag = getFlag;
 //# sourceMappingURL=flags.js.map

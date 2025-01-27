@@ -53,3 +53,14 @@ export const setFlag = (value: number, index: number, flag: boolean): number => 
 
     return value;
 };
+
+/**
+ * Determines if a specific flag is set in a given value.
+ *
+ * @param value - The number containing the flags.
+ * @param index - The index of the flag to check (0-based).
+ * @returns `true` if the flag at the specified index is set, otherwise `false`.
+ */
+export const getFlag = (value: number, index: number): boolean => {
+    return (value & (1 << index)) !== 0;
+};

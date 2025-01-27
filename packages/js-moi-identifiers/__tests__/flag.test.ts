@@ -1,4 +1,4 @@
-import { Flag, IdentifierKind, setFlag } from "../src.ts";
+import { Flag, getFlag, IdentifierKind, setFlag } from "../src.ts";
 
 describe(Flag, () => {
     describe("constructor", () => {
@@ -30,5 +30,18 @@ describe(setFlag, () => {
         [0b10101010, 1, false, 0b10101000],
     ])(`should set the flag`, (value, index, flag, expected) => {
         expect(setFlag(value, index, flag)).toBe(expected);
+    });
+});
+
+describe(getFlag, () => {
+    it.concurrent.each([
+        [0b00000001, 0, true],
+        [0b00000000, 0, false],
+        [0b10000000, 7, true],
+        [0b00000000, 7, false],
+        [0b10101010, 1, true],
+        [0b10101010, 2, false],
+    ])("should get the flag", (value, index, expected) => {
+        expect(getFlag(value, index)).toBe(expected);
     });
 });

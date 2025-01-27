@@ -23,4 +23,12 @@ export declare class Flag {
  * @returns The modified number with the specified bit set or cleared.
  */
 export declare const setFlag: (value: number, index: number, flag: boolean) => number;
+/**
+ * Determines if a specific flag is set in a given value.
+ *
+ * @param value - The number containing the flags.
+ * @param index - The index of the flag to check (0-based).
+ * @returns `true` if the flag at the specified index is set, otherwise `false`.
+ */
+export declare const getFlag: (value: number, index: number) => boolean;
 //# sourceMappingURL=flags.d.ts.map
