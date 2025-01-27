@@ -50,7 +50,7 @@ export class HttpTransport {
             result = await response.json();
         }
         catch (error) {
-            const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error.message === "Failed to fetch";
+            const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error?.message === "Failed to fetch" || error?.code === "ConnectionRefused";
             const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
             result = {
                 jsonrpc: "2.0",
