@@ -13,5 +13,8 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "always",
         "source.fixAll.ts": "always"
+    },
+    "[ignore]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
     }
 }
