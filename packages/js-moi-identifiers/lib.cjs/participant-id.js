@@ -67,22 +67,6 @@ class ParticipantId {
         }
         return (0, flags_1.getFlag)(this.bytes[1], flag.index);
     }
-    static generateParticipantIdV0(fingerprint, variant, ...flags) {
-        if (fingerprint.length !== 24) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid fingerprint length. Expected 24 bytes.", "fingerprint", fingerprint);
-        }
-        const metadata = new Uint8Array(4);
-        metadata[0] = identifier_tag_1.TagParticipantV0.getValue();
-        for (const flag of flags) {
-            if (!flag.supports(identifier_tag_1.TagParticipantV0)) {
-                js_moi_utils_1.ErrorUtils.throwError("Unsupported flag for participant identifier.");
-            }
-            metadata[1] = (0, flags_1.setFlag)(metadata[1], flag.index, true);
-        }
-        let buff = (0, js_moi_utils_1.concatBytes)(metadata, new Uint8Array(fingerprint), new Uint8Array(4));
-        new DataView(buff.buffer).setUint32(28, variant, true);
-        return new ParticipantId(buff);
-    }
 }
 exports.ParticipantId = ParticipantId;
 //# sourceMappingURL=participant-id.js.map
