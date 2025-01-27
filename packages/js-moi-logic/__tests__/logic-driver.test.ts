@@ -1,5 +1,5 @@
 import { ManifestCoder } from "js-moi-manifest";
-import { InteractionResponse, WebsocketProvider } from "js-moi-providers";
+import { HttpProvider, InteractionResponse } from "js-moi-providers";
 import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, randomBytes, StorageKey, type Interaction } from "js-moi-utils";
 import { getLogicDriver, LogicDriver } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
@@ -11,7 +11,7 @@ const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 const TEST_TIMEOUT = 2 * 60000; // 2 minutes
 
 describe(getLogicDriver, () => {
-    const wallet = Wallet.createRandomSync(new WebsocketProvider("ws://localhost:1600"));
+    const wallet = Wallet.createRandomSync(new HttpProvider("http://localhost:1600"));
     const manifest = loadManifestFromFile("flipper");
     const logicId = "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782";
 
