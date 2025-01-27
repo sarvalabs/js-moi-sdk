@@ -1,4 +1,5 @@
 import { ErrorUtils } from "js-moi-utils";
+
 import type { IdentifierKind, IdentifierTag } from "./identifier-tag";
 
 /**

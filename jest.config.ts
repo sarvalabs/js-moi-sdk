@@ -30,6 +30,10 @@ const getPackages = (): Package[] => [
         run_tests: true,
     },
     {
+        name: "js-moi-identifiers",
+        run_tests: true,
+    },
+    {
         name: "js-moi-manifest",
         run_tests: true,
     },

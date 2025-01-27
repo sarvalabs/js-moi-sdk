@@ -1,2 +1,2 @@
-"use strict";
+export { Flag } from "./flags";
 //# sourceMappingURL=index.js.map
