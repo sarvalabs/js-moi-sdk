@@ -23,6 +23,7 @@ export {
     hexToHash,
     isAddress,
     isHex,
+    isNullBytes,
     numToHex,
     trimHexPrefix,
     type Address,

@@ -159,4 +159,13 @@ export const hexToHash = (hex) => {
     const hash = blake2b(hex, { dkLen: 32 });
     return bytesToHex(hash);
 };
+/**
+ * Checks if the given Uint8Array consists entirely of null bytes (0x00).
+ *
+ * @param bytes - The Uint8Array to check.
+ * @returns `true` if all bytes are null (0x00), otherwise `false`.
+ */
+export const isNullBytes = (bytes) => {
+    return bytes.every((byte) => byte === 0);
+};
 //# sourceMappingURL=hex.js.map

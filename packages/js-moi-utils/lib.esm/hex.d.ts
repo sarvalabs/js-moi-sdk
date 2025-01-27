@@ -99,4 +99,11 @@ export declare const isAddress: (value: unknown) => value is Address;
  * @returns The resulting hash as a hexadecimal string.
  */
 export declare const hexToHash: (hex: Hex | Uint8Array) => Hex;
+/**
+ * Checks if the given Uint8Array consists entirely of null bytes (0x00).
+ *
+ * @param bytes - The Uint8Array to check.
+ * @returns `true` if all bytes are null (0x00), otherwise `false`.
+ */
+export declare const isNullBytes: (bytes: Uint8Array) => boolean;
 //# sourceMappingURL=hex.d.ts.map

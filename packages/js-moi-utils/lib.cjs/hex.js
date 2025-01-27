@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hexToHash = exports.isAddress = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
+exports.isNullBytes = exports.hexToHash = exports.isAddress = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
 const errors_1 = require("./errors");
@@ -176,4 +176,14 @@ const hexToHash = (hex) => {
     return (0, exports.bytesToHex)(hash);
 };
 exports.hexToHash = hexToHash;
+/**
+ * Checks if the given Uint8Array consists entirely of null bytes (0x00).
+ *
+ * @param bytes - The Uint8Array to check.
+ * @returns `true` if all bytes are null (0x00), otherwise `false`.
+ */
+const isNullBytes = (bytes) => {
+    return bytes.every((byte) => byte === 0);
+};
+exports.isNullBytes = isNullBytes;
 //# sourceMappingURL=hex.js.map
