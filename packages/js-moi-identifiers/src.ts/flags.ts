@@ -1,0 +1,54 @@
+import { ErrorUtils } from "js-moi-utils";
+import type { IdentifierKind, IdentifierTag } from "./identifier-tag";
+
+/**
+ * Represents a flag specifier for an identifier.
+ */
+export class Flag {
+    public readonly index: number;
+
+    private support: Map<IdentifierKind, number>;
+
+    constructor(kind: IdentifierKind, index: number, version: number) {
+        if (index > 7) {
+            ErrorUtils.throwArgumentError("Invalid flag index. Expected a value between 0 and 7.", "index", index);
+        }
+
+        if (version > 15) {
+            ErrorUtils.throwArgumentError("Invalid flag version. Expected a value between 0 and 15.", "version", version);
+        }
+
+        this.index = index;
+        this.support = new Map([[kind, version]]);
+    }
+
+    /**
+     * Checks if the given identifier tag is supported.
+     *
+     * @param tag - The identifier tag to check.
+     * @returns `true` if the tag is supported, `false` otherwise.
+     */
+    supports(tag: IdentifierTag) {
+        const version = this.support.get(tag.getKind());
+
+        return version != null && tag.getVersion() >= version;
+    }
+}
+
+/**
+ * Sets or clears a specific bit in a number based on the provided flag.
+ *
+ * @param value - The original number whose bit is to be modified.
+ * @param index - The position of the bit to be set or cleared (0-based).
+ * @param flag - A boolean indicating whether to set (true) or clear (false) the bit.
+ * @returns The modified number with the specified bit set or cleared.
+ */
+export const setFlag = (value: number, index: number, flag: boolean): number => {
+    if (flag) {
+        value |= 1 << index;
+    } else {
+        value = value & ~(1 << index);
+    }
+
+    return value;
+};

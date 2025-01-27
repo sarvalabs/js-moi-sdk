@@ -1,5 +1,6 @@
-import { bytesToHex, ErrorUtils, hexToBytes, isHex, isNullBytes, type Hex } from "js-moi-utils";
-import { IdentifierTag } from "./indentifier-tag";
+import { bytesToHex, ErrorCode, ErrorUtils, hexToBytes, isHex, isNullBytes, type Hex } from "js-moi-utils";
+import { setFlag, type Flag } from "./flags";
+import { IdentifierTag } from "./identifier-tag";
 
 export class Identifier {
     private readonly bytes: Uint8Array;
@@ -79,8 +80,27 @@ export class Identifier {
         return variant.every((byte) => byte === 0);
     }
 
-    public deriveVariant(): Identifier {
-        throw new Error("Not implemented");
+    public deriveVariant(variant: number, set: Flag[], unset: Flag[]): Identifier {
+        const derived = new Uint8Array(this.bytes);
+        new DataView(derived.buffer.slice(28)).setInt32(0, variant, false);
+
+        for (const flag of set) {
+            if (!flag.supports(this.getTag())) {
+                ErrorUtils.throwError("Flag not supported for identifier.", ErrorCode.UNSUPPORTED_OPERATION, flag);
+            }
+
+            derived[1] = setFlag(derived[1], flag.index, true);
+        }
+
+        for (const flag of unset) {
+            if (!flag.supports(this.getTag())) {
+                ErrorUtils.throwError("Flag not supported for identifier.", ErrorCode.UNSUPPORTED_OPERATION, flag);
+            }
+
+            derived[1] = setFlag(derived[1], flag.index, false);
+        }
+
+        return new Identifier(derived);
     }
 
     /**

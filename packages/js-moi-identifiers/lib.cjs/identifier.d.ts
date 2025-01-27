@@ -1,5 +1,6 @@
 import { type Hex } from "js-moi-utils";
-import { IdentifierTag } from "./indentifier-tag";
+import { type Flag } from "./flags";
+import { IdentifierTag } from "./identifier-tag";
 export declare class Identifier {
     private readonly bytes;
     constructor(value: Uint8Array);
@@ -48,7 +49,7 @@ export declare class Identifier {
      * @returns {boolean} `true` if all variant bytes are zero, otherwise `false`.
      */
     isVariant(): boolean;
-    deriveVariant(): Identifier;
+    deriveVariant(variant: number, set: Flag[], unset: Flag[]): Identifier;
     /**
      * Checks if the current identifier is nil (empty or uninitialized).
      *

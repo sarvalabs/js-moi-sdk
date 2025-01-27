@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Identifier = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-const indentifier_tag_1 = require("./indentifier-tag");
+const flags_1 = require("./flags");
+const identifier_tag_1 = require("./identifier-tag");
 class Identifier {
     bytes;
     constructor(value) {
@@ -17,7 +18,7 @@ class Identifier {
      * @returns {IdentifierTag} The tag of the identifier, created from the first byte of the identifier's byte array.
      */
     getTag() {
-        return new indentifier_tag_1.IdentifierTag(this.bytes[0]);
+        return new identifier_tag_1.IdentifierTag(this.bytes[0]);
     }
     /**
      * Retrieves the flags from the identifier.
@@ -71,8 +72,22 @@ class Identifier {
         const variant = this.getVariantBytes();
         return variant.every((byte) => byte === 0);
     }
-    deriveVariant() {
-        throw new Error("Not implemented");
+    deriveVariant(variant, set, unset) {
+        const derived = new Uint8Array(this.bytes);
+        new DataView(derived.buffer.slice(28)).setInt32(0, variant, false);
+        for (const flag of set) {
+            if (!flag.supports(this.getTag())) {
+                js_moi_utils_1.ErrorUtils.throwError("Flag not supported for identifier.", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION, flag);
+            }
+            derived[1] = (0, flags_1.setFlag)(derived[1], flag.index, true);
+        }
+        for (const flag of unset) {
+            if (!flag.supports(this.getTag())) {
+                js_moi_utils_1.ErrorUtils.throwError("Flag not supported for identifier.", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION, flag);
+            }
+            derived[1] = (0, flags_1.setFlag)(derived[1], flag.index, false);
+        }
+        return new Identifier(derived);
     }
     /**
      * Checks if the current identifier is nil (empty or uninitialized).
