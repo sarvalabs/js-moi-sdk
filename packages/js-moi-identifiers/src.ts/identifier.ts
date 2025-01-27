@@ -1,6 +1,7 @@
 import { bytesToHex, ErrorCode, ErrorUtils, hexToBytes, isHex, isNullBytes, type Hex } from "js-moi-utils";
 import { setFlag, type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
+import { ParticipantId } from "./participant-id";
 
 export class Identifier {
     private readonly bytes: Uint8Array;
@@ -119,6 +120,10 @@ export class Identifier {
      */
     public toBytes(): Uint8Array {
         return new Uint8Array(this.bytes);
+    }
+
+    toParticipantId(): ParticipantId {
+        return new ParticipantId(new Uint8Array(this.bytes));
     }
 
     /**

@@ -1,6 +1,7 @@
 import { type Hex } from "js-moi-utils";
 import { type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
+import { ParticipantId } from "./participant-id";
 export declare class Identifier {
     private readonly bytes;
     constructor(value: Uint8Array);
@@ -62,6 +63,7 @@ export declare class Identifier {
      * @returns {Uint8Array} The byte array representation of the instance.
      */
     toBytes(): Uint8Array;
+    toParticipantId(): ParticipantId;
     /**
      * Converts the identifier bytes to a hexadecimal string.
      *

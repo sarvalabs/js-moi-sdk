@@ -4,6 +4,7 @@ exports.Identifier = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const flags_1 = require("./flags");
 const identifier_tag_1 = require("./identifier-tag");
+const participant_id_1 = require("./participant-id");
 class Identifier {
     bytes;
     constructor(value) {
@@ -104,6 +105,9 @@ class Identifier {
      */
     toBytes() {
         return new Uint8Array(this.bytes);
+    }
+    toParticipantId() {
+        return new participant_id_1.ParticipantId(new Uint8Array(this.bytes));
     }
     /**
      * Converts the identifier bytes to a hexadecimal string.

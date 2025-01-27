@@ -1,6 +1,7 @@
 import { bytesToHex, ErrorCode, ErrorUtils, hexToBytes, isHex, isNullBytes } from "js-moi-utils";
 import { setFlag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
+import { ParticipantId } from "./participant-id";
 export class Identifier {
     bytes;
     constructor(value) {
@@ -101,6 +102,9 @@ export class Identifier {
      */
     toBytes() {
         return new Uint8Array(this.bytes);
+    }
+    toParticipantId() {
+        return new ParticipantId(new Uint8Array(this.bytes));
     }
     /**
      * Converts the identifier bytes to a hexadecimal string.
