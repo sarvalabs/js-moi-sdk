@@ -16,7 +16,8 @@
     "clean:node_modules": "turbo run clean:node_modules",
     "pretest": "npm run build",
     "lint": "eslint ./packages/*",
-    "lint:fix": "eslint ./packages/* --fix"
+    "lint:fix": "eslint ./packages/* --fix",
+    "format": "prettier --write ./packages/*"
   },
   "repository": {
     "type": "git",
