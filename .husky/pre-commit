@@ -1,1 +1,1 @@
-echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+npx lint-staged -c .lintstagedrc.mjs

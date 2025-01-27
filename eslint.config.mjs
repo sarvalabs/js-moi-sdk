@@ -10,7 +10,7 @@ import tseslint from "typescript-eslint";
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     {
-        ignores: ["node_modules", "dist", "build", "out", "coverage", "**/lib.*/**", "*.config.{js,mjs,cjs,ts}"],
+        ignores: ["node_modules", "dist", "build", "out", "coverage", "**/lib.*/**", "*.config.{js,mjs,cjs,ts}", ".lintstagedrc.{js,mjs,cjs,ts}"],
         name: "root-eslint-config",
     },
     { files: ["**/*.{js,mjs,cjs,ts}"] },
