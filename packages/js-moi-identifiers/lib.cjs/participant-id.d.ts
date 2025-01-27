@@ -15,5 +15,6 @@ export declare class ParticipantId {
     getVariant(): number;
     isVariant(): boolean;
     isFlagSupported(flag: Flag): boolean;
+    static generateParticipantIdV0(fingerprint: Uint8Array, variant: number, ...flags: Flag[]): ParticipantId;
 }
 //# sourceMappingURL=participant-id.d.ts.map

@@ -1,8 +1,8 @@
-import { bytesToHex, ErrorUtils, hexToBytes, isHex, isNullBytes, type Hex } from "js-moi-utils";
-import { flagMasks, getFlag, type Flag } from "./flags";
+import { bytesToHex, concatBytes, ErrorUtils, hexToBytes, isHex, isNullBytes, type Hex } from "js-moi-utils";
+import { flagMasks, getFlag, setFlag, type Flag } from "./flags";
 import { Identifier } from "./identifier";
 import { IdentifierKind } from "./identifier-kind";
-import { IdentifierTag } from "./identifier-tag";
+import { IdentifierTag, TagParticipantV0 } from "./identifier-tag";
 
 export class ParticipantId {
     private readonly bytes: Uint8Array;
@@ -84,5 +84,28 @@ export class ParticipantId {
         }
 
         return getFlag(this.bytes[1], flag.index);
+    }
+
+    public static generateParticipantIdV0(fingerprint: Uint8Array, variant: number, ...flags: Flag[]): ParticipantId {
+        if (fingerprint.length !== 24) {
+            ErrorUtils.throwArgumentError("Invalid fingerprint length. Expected 24 bytes.", "fingerprint", fingerprint);
+        }
+
+        const metadata = new Uint8Array(4);
+
+        metadata[0] = TagParticipantV0.getValue();
+
+        for (const flag of flags) {
+            if (!flag.supports(TagParticipantV0)) {
+                ErrorUtils.throwError("Unsupported flag for participant identifier.");
+            }
+
+            metadata[1] = setFlag(metadata[1], flag.index, true);
+        }
+
+        let buff = concatBytes(metadata, new Uint8Array(fingerprint), new Uint8Array(4));
+        new DataView(buff.buffer).setUint32(28, variant, true);
+
+        return new ParticipantId(buff);
     }
 }

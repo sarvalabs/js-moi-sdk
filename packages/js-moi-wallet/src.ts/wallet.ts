@@ -4,8 +4,9 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { type ExecuteIx, type Provider, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bytesToHex, ensureHexPrefix, hexToBytes, interaction, isHex, randomBytes, type Hex, type InteractionRequest } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bytesToHex, ensureHexPrefix, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, type Hex, type InteractionRequest } from "js-moi-utils";
 
+import { Identifier, ParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
 import { FromMnemonicOptions } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
@@ -112,7 +113,7 @@ export class Wallet extends Signer {
 
             privateMapSet(this, __vault, {
                 _key: keyPair.getPrivate("hex"),
-                _public: keyPair.getPublic(true, "hex"),
+                _public: trimHexPrefix(bytesToHex(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
         } catch (error) {
@@ -174,6 +175,12 @@ export class Wallet extends Signer {
      */
     public get curve(): string {
         return privateMapGet(this, __vault)._curve;
+    }
+
+    public async getIdentifier(): Promise<Identifier> {
+        const buff = hexToBytes(ensureHexPrefix(this.publicKey)).slice(0, 24);
+        const participant = ParticipantId.generateParticipantIdV0(buff, 0);
+        return participant.toIdentifier();
     }
 
     /**

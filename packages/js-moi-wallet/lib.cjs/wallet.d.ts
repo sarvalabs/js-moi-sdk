@@ -1,6 +1,7 @@
 import { type ExecuteIx, type Provider } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { type Hex, type InteractionRequest } from "js-moi-utils";
+import { Identifier } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
 import { FromMnemonicOptions } from "../types/wallet";
 export declare enum CURVE {
@@ -69,6 +70,7 @@ export declare class Wallet extends Signer {
      * @readonly
      */
     get curve(): string;
+    getIdentifier(): Promise<Identifier>;
     /**
      * Retrieves the address associated with the wallet.
      *

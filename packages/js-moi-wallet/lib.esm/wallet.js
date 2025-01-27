@@ -3,7 +3,8 @@ import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bytesToHex, ensureHexPrefix, hexToBytes, interaction, isHex, randomBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bytesToHex, ensureHexPrefix, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix } from "js-moi-utils";
+import { ParticipantId } from "js-moi-identifiers";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 export var CURVE;
@@ -98,7 +99,7 @@ export class Wallet extends Signer {
             const keyPair = ecPrivKey.keyFromPrivate(pKey);
             privateMapSet(this, __vault, {
                 _key: keyPair.getPrivate("hex"),
-                _public: keyPair.getPublic(true, "hex"),
+                _public: trimHexPrefix(bytesToHex(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
         }
@@ -157,6 +158,11 @@ export class Wallet extends Signer {
      */
     get curve() {
         return privateMapGet(this, __vault)._curve;
+    }
+    async getIdentifier() {
+        const buff = hexToBytes(ensureHexPrefix(this.publicKey)).slice(0, 24);
+        const participant = ParticipantId.generateParticipantIdV0(buff, 0);
+        return participant.toIdentifier();
     }
     /**
      * Retrieves the address associated with the wallet.

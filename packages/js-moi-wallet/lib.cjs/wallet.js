@@ -43,6 +43,7 @@ const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_hdnode_1 = require("js-moi-hdnode");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const SigningKeyErrors = __importStar(require("./errors"));
 const keystore_1 = require("./keystore");
 var CURVE;
@@ -137,7 +138,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const keyPair = ecPrivKey.keyFromPrivate(pKey);
             privateMapSet(this, __vault, {
                 _key: keyPair.getPrivate("hex"),
-                _public: keyPair.getPublic(true, "hex"),
+                _public: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
         }
@@ -196,6 +197,11 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     get curve() {
         return privateMapGet(this, __vault)._curve;
+    }
+    async getIdentifier() {
+        const buff = (0, js_moi_utils_1.hexToBytes)((0, js_moi_utils_1.ensureHexPrefix)(this.publicKey)).slice(0, 24);
+        const participant = js_moi_identifiers_1.ParticipantId.generateParticipantIdV0(buff, 0);
+        return participant.toIdentifier();
     }
     /**
      * Retrieves the address associated with the wallet.
