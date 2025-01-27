@@ -77,7 +77,7 @@ export class Identifier {
      */
     public isVariant(): boolean {
         const variant = this.getVariantBytes();
-        return variant.every((byte) => byte === 0);
+        return !isNullBytes(variant);
     }
 
     public deriveVariant(variant: number, set: Flag[], unset: Flag[]): Identifier {

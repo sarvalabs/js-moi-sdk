@@ -1,5 +1,5 @@
 import type { IdentifierKind } from "./identifier-kind";
-import type { IdentifierTag } from "./identifier-tag";
+import { type IdentifierTag } from "./identifier-tag";
 /**
  * Represents a flag specifier for an identifier.
  */
@@ -32,4 +32,5 @@ export declare const setFlag: (value: number, index: number, flag: boolean) => n
  * @returns `true` if the flag at the specified index is set, otherwise `false`.
  */
 export declare const getFlag: (value: number, index: number) => boolean;
+export declare const flagMasks: Map<IdentifierTag, number>;
 //# sourceMappingURL=flags.d.ts.map

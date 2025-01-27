@@ -10,9 +10,6 @@ const kindSupport = new Map([
     [IdentifierKind.Asset, 0],
     [IdentifierKind.Logic, 0],
 ]);
-export const TagParticipantV0 = (IdentifierKind.Participant << 4) | identifierV0;
-export const TagAssetV0 = (IdentifierKind.Asset << 4) | identifierV0;
-export const TagLogicIdV0 = (IdentifierKind.Logic << 4) | identifierV0;
 export class IdentifierTag {
     tag;
     constructor(tag) {
@@ -37,6 +34,9 @@ export class IdentifierTag {
     getVersion() {
         return this.tag & 0x0f;
     }
+    getValue() {
+        return this.tag;
+    }
     /**
      * Check if the `IdentifierTag` is valid and return an error if it is not.
      *
@@ -56,4 +56,7 @@ export class IdentifierTag {
         return null;
     }
 }
+export const TagParticipantV0 = new IdentifierTag((IdentifierKind.Participant << 4) | identifierV0);
+export const TagAssetV0 = new IdentifierTag((IdentifierKind.Asset << 4) | identifierV0);
+export const TagLogicV0 = new IdentifierTag((IdentifierKind.Logic << 4) | identifierV0);
 //# sourceMappingURL=identifier-tag.js.map

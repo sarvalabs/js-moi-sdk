@@ -1,4 +1,5 @@
 import { ErrorUtils, hexToBytes, isHex } from "js-moi-utils";
+import { IdentifierTag } from "./identifier-tag";
 export class ParticipantId {
     bytes;
     constructor(value) {
@@ -19,7 +20,7 @@ export class ParticipantId {
         if (value instanceof Uint8Array && value.length !== 32) {
             return new Error("Invalid byte length for participant id. Expected 32 bytes.");
         }
-        return null;
+        return IdentifierTag.validate();
     }
 }
 //# sourceMappingURL=participants.js.map

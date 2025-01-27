@@ -1,7 +1,4 @@
 import { IdentifierKind } from "./identifier-kind";
-export declare const TagParticipantV0: number;
-export declare const TagAssetV0: number;
-export declare const TagLogicIdV0: number;
 export declare class IdentifierTag {
     private readonly tag;
     constructor(tag: number);
@@ -16,6 +13,7 @@ export declare class IdentifierTag {
      * @returns The version of the identifier.
      */
     getVersion(): number;
+    getValue(): number;
     /**
      * Check if the `IdentifierTag` is valid and return an error if it is not.
      *
@@ -27,4 +25,7 @@ export declare class IdentifierTag {
      */
     static validate(tag: IdentifierTag): Error | null;
 }
+export declare const TagParticipantV0: IdentifierTag;
+export declare const TagAssetV0: IdentifierTag;
+export declare const TagLogicV0: IdentifierTag;
 //# sourceMappingURL=identifier-tag.d.ts.map

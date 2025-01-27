@@ -13,12 +13,6 @@ const kindSupport: Map<IdentifierKind, number> = new Map([
     [IdentifierKind.Logic, 0],
 ]);
 
-export const TagParticipantV0 = (IdentifierKind.Participant << 4) | identifierV0;
-
-export const TagAssetV0 = (IdentifierKind.Asset << 4) | identifierV0;
-
-export const TagLogicIdV0 = (IdentifierKind.Logic << 4) | identifierV0;
-
 export class IdentifierTag {
     private readonly tag: number;
 
@@ -49,6 +43,10 @@ export class IdentifierTag {
         return this.tag & 0x0f;
     }
 
+    public getValue(): number {
+        return this.tag;
+    }
+
     /**
      * Check if the `IdentifierTag` is valid and return an error if it is not.
      *
@@ -70,3 +68,9 @@ export class IdentifierTag {
         return null;
     }
 }
+
+export const TagParticipantV0 = new IdentifierTag((IdentifierKind.Participant << 4) | identifierV0);
+
+export const TagAssetV0 = new IdentifierTag((IdentifierKind.Asset << 4) | identifierV0);
+
+export const TagLogicV0 = new IdentifierTag((IdentifierKind.Logic << 4) | identifierV0);

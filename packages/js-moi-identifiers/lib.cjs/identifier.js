@@ -70,7 +70,7 @@ class Identifier {
      */
     isVariant() {
         const variant = this.getVariantBytes();
-        return variant.every((byte) => byte === 0);
+        return !(0, js_moi_utils_1.isNullBytes)(variant);
     }
     deriveVariant(variant, set, unset) {
         const derived = new Uint8Array(this.bytes);

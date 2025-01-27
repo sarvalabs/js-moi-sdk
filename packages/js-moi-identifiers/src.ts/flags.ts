@@ -1,7 +1,7 @@
 import { ErrorUtils } from "js-moi-utils";
 
 import type { IdentifierKind } from "./identifier-kind";
-import type { IdentifierTag } from "./identifier-tag";
+import { TagAssetV0, TagLogicV0, TagParticipantV0, type IdentifierTag } from "./identifier-tag";
 
 /**
  * Represents a flag specifier for an identifier.
@@ -65,3 +65,9 @@ export const setFlag = (value: number, index: number, flag: boolean): number => 
 export const getFlag = (value: number, index: number): boolean => {
     return (value & (1 << index)) !== 0;
 };
+
+export const flagMasks = new Map([
+    [TagParticipantV0, 0b01111111],
+    [TagLogicV0, 0b01111000],
+    [TagAssetV0, 0b01111100],
+]);

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IdentifierTag = exports.TagLogicIdV0 = exports.TagAssetV0 = exports.TagParticipantV0 = void 0;
+exports.TagLogicV0 = exports.TagAssetV0 = exports.TagParticipantV0 = exports.IdentifierTag = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const identifier_kind_1 = require("./identifier-kind");
 const maxIdentifierKind = identifier_kind_1.IdentifierKind.Logic;
@@ -13,9 +13,6 @@ const kindSupport = new Map([
     [identifier_kind_1.IdentifierKind.Asset, 0],
     [identifier_kind_1.IdentifierKind.Logic, 0],
 ]);
-exports.TagParticipantV0 = (identifier_kind_1.IdentifierKind.Participant << 4) | identifierV0;
-exports.TagAssetV0 = (identifier_kind_1.IdentifierKind.Asset << 4) | identifierV0;
-exports.TagLogicIdV0 = (identifier_kind_1.IdentifierKind.Logic << 4) | identifierV0;
 class IdentifierTag {
     tag;
     constructor(tag) {
@@ -40,6 +37,9 @@ class IdentifierTag {
     getVersion() {
         return this.tag & 0x0f;
     }
+    getValue() {
+        return this.tag;
+    }
     /**
      * Check if the `IdentifierTag` is valid and return an error if it is not.
      *
@@ -60,4 +60,7 @@ class IdentifierTag {
     }
 }
 exports.IdentifierTag = IdentifierTag;
+exports.TagParticipantV0 = new IdentifierTag((identifier_kind_1.IdentifierKind.Participant << 4) | identifierV0);
+exports.TagAssetV0 = new IdentifierTag((identifier_kind_1.IdentifierKind.Asset << 4) | identifierV0);
+exports.TagLogicV0 = new IdentifierTag((identifier_kind_1.IdentifierKind.Logic << 4) | identifierV0);
 //# sourceMappingURL=identifier-tag.js.map

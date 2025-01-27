@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFlag = exports.setFlag = exports.Flag = void 0;
+exports.flagMasks = exports.getFlag = exports.setFlag = exports.Flag = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const identifier_tag_1 = require("./identifier-tag");
 /**
  * Represents a flag specifier for an identifier.
  */
@@ -59,4 +60,9 @@ const getFlag = (value, index) => {
     return (value & (1 << index)) !== 0;
 };
 exports.getFlag = getFlag;
+exports.flagMasks = new Map([
+    [identifier_tag_1.TagParticipantV0, 0b01111111],
+    [identifier_tag_1.TagLogicV0, 0b01111000],
+    [identifier_tag_1.TagAssetV0, 0b01111100],
+]);
 //# sourceMappingURL=flags.js.map

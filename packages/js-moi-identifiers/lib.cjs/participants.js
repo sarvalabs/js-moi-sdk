@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipantId = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const identifier_tag_1 = require("./identifier-tag");
 class ParticipantId {
     bytes;
     constructor(value) {
@@ -22,7 +23,7 @@ class ParticipantId {
         if (value instanceof Uint8Array && value.length !== 32) {
             return new Error("Invalid byte length for participant id. Expected 32 bytes.");
         }
-        return null;
+        return identifier_tag_1.IdentifierTag.validate();
     }
 }
 exports.ParticipantId = ParticipantId;
