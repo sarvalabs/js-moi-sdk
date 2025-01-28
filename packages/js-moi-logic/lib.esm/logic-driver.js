@@ -1,5 +1,6 @@
+import { Identifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isAddress, isHex, LogicId, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
+import { CustomError, ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { LogicDescriptor } from "./logic-descriptor";
 import { SlotAccessorBuilder } from "./state/accessor-builder";
@@ -101,9 +102,10 @@ export class LogicDriver extends LogicDescriptor {
             }
             case RoutineType.Invoke:
             case RoutineType.Enlist: {
+                const logicId = await this.getLogicId();
                 return {
                     type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
-                    payload: { logic_id: (await this.getLogicId()).value, callsite, calldata },
+                    payload: { logic_id: logicId.toHex(), callsite, calldata },
                 };
             }
             default: {
@@ -162,7 +164,7 @@ export class LogicDriver extends LogicDescriptor {
             if (exception != null) {
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId(new LogicId(result.payload.logic_id));
+            this.setLogicId(LogicId.fromHex(result.payload.logic_id).toIdentifier());
         }
         return super.getLogicId();
     }
@@ -316,14 +318,13 @@ export class LogicDriver extends LogicDescriptor {
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
 export const getLogicDriver = async (logicId, signer) => {
-    if (isHex(logicId) || logicId instanceof LogicId) {
+    if (logicId instanceof Identifier) {
         const provider = signer.getProvider();
-        const id = isAddress(logicId) ? logicId : logicId.getAddress();
-        const { manifest: encoded, metadata } = await provider.getLogic(id, {
-            modifier: { include: ["manifest"] },
+        const manifestInPolo = await provider.getLogic(logicId, {
+            modifier: { extract: "manifest" },
         });
-        const manifest = ManifestCoder.decodeManifest(encoded, ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId: new LogicId(metadata.logic_id), signer });
+        const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
+        return new LogicDriver({ manifest, logicId: Identifier.fromHex(logicId.toHex()), signer });
     }
     return new LogicDriver({ manifest: logicId, signer });
 };

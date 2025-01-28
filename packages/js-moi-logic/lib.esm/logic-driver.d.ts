@@ -1,6 +1,7 @@
+import { Identifier } from "js-moi-identifiers";
 import type { LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
-import { LogicId, LogicState, RoutineType, StorageKey, type Address, type AnyIxOperation, type Hex, type InteractionRequest, type LogicManifest, type LogicMessage } from "js-moi-utils";
+import { LogicState, RoutineType, StorageKey, type AnyIxOperation, type Hex, type InteractionRequest, type LogicManifest, type LogicMessage } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 /**
@@ -13,7 +14,7 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
     readonly endpoint: TCallsites;
     private deployIxResponse?;
     constructor(option: Omit<LogicDriverOption, "logicId"> & {
-        logicId?: LogicId;
+        logicId?: Identifier;
     });
     /**
      * Checks if the logic has been deployed.
@@ -74,7 +75,7 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      * @throws If the logic id not deployed.
      * @throws If error occurs during the deployment process.
      */
-    getLogicId(timer?: TimerOption): Promise<LogicId>;
+    getLogicId(timer?: TimerOption): Promise<Identifier>;
     private newCallsite;
     private setupEndpoint;
     /**
@@ -141,5 +142,5 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export declare const getLogicDriver: <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Address | LogicId | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
+export declare const getLogicDriver: <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
 //# sourceMappingURL=logic-driver.d.ts.map

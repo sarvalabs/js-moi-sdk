@@ -1,3 +1,4 @@
+import { Identifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
@@ -8,15 +9,12 @@ import {
     ErrorUtils,
     generateStorageKey,
     hexToBytes,
-    isAddress,
     isHex,
-    LogicId,
     LogicState,
     OpType,
     RoutineKind,
     RoutineType,
     StorageKey,
-    type Address,
     type AnyIxOperation,
     type Hex,
     type InteractionRequest,
@@ -41,7 +39,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
     private deployIxResponse?: InteractionResponse;
 
-    constructor(option: Omit<LogicDriverOption, "logicId"> & { logicId?: LogicId }) {
+    constructor(option: Omit<LogicDriverOption, "logicId"> & { logicId?: Identifier }) {
         if (option.signer == null) {
             ErrorUtils.throwError("Signer is required.", ErrorCode.INVALID_ARGUMENT);
         }
@@ -147,9 +145,11 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
             case RoutineType.Invoke:
             case RoutineType.Enlist: {
+                const logicId = await this.getLogicId();
+
                 return {
                     type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
-                    payload: { logic_id: (await this.getLogicId()).value, callsite, calldata },
+                    payload: { logic_id: logicId.toHex(), callsite, calldata },
                 };
             }
 
@@ -209,7 +209,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      * @throws If the logic id not deployed.
      * @throws If error occurs during the deployment process.
      */
-    public async getLogicId(timer?: TimerOption): Promise<LogicId> {
+    public async getLogicId(timer?: TimerOption): Promise<Identifier> {
         if (this.deployIxResponse != null) {
             const results = await this.deployIxResponse.result(timer);
             const result = results.at(0);
@@ -224,8 +224,9 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
 
-            this.setLogicId(new LogicId(result.payload.logic_id));
+            this.setLogicId(LogicId.fromHex(result.payload.logic_id).toIdentifier());
         }
+
         return super.getLogicId();
     }
 
@@ -443,19 +444,15 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(
-    logicId: Address | LogicId | LogicManifest,
-    signer: Signer
-): Promise<LogicDriver<TCallsites>> => {
-    if (isHex(logicId) || logicId instanceof LogicId) {
+export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer): Promise<LogicDriver<TCallsites>> => {
+    if (logicId instanceof Identifier) {
         const provider = signer.getProvider();
-        const id = isAddress(logicId) ? logicId : logicId.getAddress();
-        const { manifest: encoded, metadata } = await provider.getLogic(id, {
-            modifier: { include: ["manifest"] },
+        const manifestInPolo = await provider.getLogic(logicId, {
+            modifier: { extract: "manifest" },
         });
-        const manifest = ManifestCoder.decodeManifest(encoded, ManifestCoderFormat.JSON);
+        const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
 
-        return new LogicDriver({ manifest, logicId: new LogicId(metadata.logic_id), signer });
+        return new LogicDriver({ manifest, logicId: Identifier.fromHex(logicId.toHex()), signer });
     }
 
     return new LogicDriver<TCallsites>({ manifest: logicId, signer });

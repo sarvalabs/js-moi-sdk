@@ -37,27 +37,11 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
         }
         return this.logicId;
     }
-    async getVersion() {
-        const id = await this.getLogicId();
-        return id.getVersion();
-    }
-    async getEdition() {
-        const id = await this.getLogicId();
-        return id.getEdition();
-    }
-    async getLogicAddress() {
-        const id = await this.getLogicId();
-        return id.getAddress();
-    }
     isEphemeral() {
         return this.state.has(js_moi_utils_1.LogicState.Ephemeral);
     }
     isPersistent() {
         return this.state.has(js_moi_utils_1.LogicState.Persistent);
-    }
-    async isAssetLogic() {
-        const id = await this.getLogicId();
-        return id.isAssetLogic();
     }
     getManifestCoder() {
         if (this.coder == null) {

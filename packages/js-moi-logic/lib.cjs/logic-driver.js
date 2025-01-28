@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLogicDriver = exports.LogicDriver = void 0;
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
@@ -104,9 +105,10 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             }
             case js_moi_utils_1.RoutineType.Invoke:
             case js_moi_utils_1.RoutineType.Enlist: {
+                const logicId = await this.getLogicId();
                 return {
                     type: callsiteType === js_moi_utils_1.RoutineType.Invoke ? js_moi_utils_1.OpType.LogicInvoke : js_moi_utils_1.OpType.LogicEnlist,
-                    payload: { logic_id: (await this.getLogicId()).value, callsite, calldata },
+                    payload: { logic_id: logicId.toHex(), callsite, calldata },
                 };
             }
             default: {
@@ -165,7 +167,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             if (exception != null) {
                 js_moi_utils_1.ErrorUtils.throwError(exception.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId(new js_moi_utils_1.LogicId(result.payload.logic_id));
+            this.setLogicId(js_moi_identifiers_1.LogicId.fromHex(result.payload.logic_id).toIdentifier());
         }
         return super.getLogicId();
     }
@@ -320,14 +322,13 @@ exports.LogicDriver = LogicDriver;
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
 const getLogicDriver = async (logicId, signer) => {
-    if ((0, js_moi_utils_1.isHex)(logicId) || logicId instanceof js_moi_utils_1.LogicId) {
+    if (logicId instanceof js_moi_identifiers_1.Identifier) {
         const provider = signer.getProvider();
-        const id = (0, js_moi_utils_1.isAddress)(logicId) ? logicId : logicId.getAddress();
-        const { manifest: encoded, metadata } = await provider.getLogic(id, {
-            modifier: { include: ["manifest"] },
+        const manifestInPolo = await provider.getLogic(logicId, {
+            modifier: { extract: "manifest" },
         });
-        const manifest = js_moi_manifest_1.ManifestCoder.decodeManifest(encoded, js_moi_manifest_1.ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId: new js_moi_utils_1.LogicId(metadata.logic_id), signer });
+        const manifest = js_moi_manifest_1.ManifestCoder.decodeManifest(manifestInPolo, js_moi_manifest_1.ManifestCoderFormat.JSON);
+        return new LogicDriver({ manifest, logicId: js_moi_identifiers_1.Identifier.fromHex(logicId.toHex()), signer });
     }
     return new LogicDriver({ manifest: logicId, signer });
 };

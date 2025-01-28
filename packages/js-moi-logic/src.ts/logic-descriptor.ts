@@ -1,9 +1,10 @@
+import type { Identifier } from "js-moi-identifiers";
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ElementType, ErrorCode, ErrorUtils, LogicState, type Address, type Element, type Hex, type LogicManifest } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicState, type Element, type Hex, type LogicManifest } from "js-moi-utils";
 import { stringify as toYaml } from "yaml";
 
 export class LogicDescriptor extends ElementDescriptor {
-    protected logicId?: LogicId;
+    protected logicId?: Identifier;
 
     private readonly manifest: LogicManifest;
 
@@ -11,7 +12,7 @@ export class LogicDescriptor extends ElementDescriptor {
 
     private state: Map<LogicState, number> = new Map();
 
-    constructor(manifest: LogicManifest, logicId?: LogicId) {
+    constructor(manifest: LogicManifest, logicId?: Identifier) {
         if (manifest == null) {
             ErrorUtils.throwArgumentError("Manifest is required.", "manifest", manifest);
         }
@@ -28,7 +29,7 @@ export class LogicDescriptor extends ElementDescriptor {
         }
     }
 
-    protected setLogicId(logicId: LogicId) {
+    protected setLogicId(logicId: Identifier) {
         this.logicId = logicId;
     }
 
@@ -40,27 +41,12 @@ export class LogicDescriptor extends ElementDescriptor {
         return this.manifest.syntax;
     }
 
-    public async getLogicId(): Promise<LogicId> {
+    public async getLogicId(): Promise<Identifier> {
         if (this.logicId == null) {
             ErrorUtils.throwError("Logic id not found. This can happen if the logic is not deployed.", ErrorCode.NOT_INITIALIZED);
         }
 
         return this.logicId;
-    }
-
-    public async getVersion(): Promise<number> {
-        const id = await this.getLogicId();
-        return id.getVersion();
-    }
-
-    public async getEdition(): Promise<number> {
-        const id = await this.getLogicId();
-        return id.getEdition();
-    }
-
-    public async getLogicAddress(): Promise<Address> {
-        const id = await this.getLogicId();
-        return id.getAddress();
     }
 
     public isEphemeral(): boolean {
@@ -69,11 +55,6 @@ export class LogicDescriptor extends ElementDescriptor {
 
     public isPersistent(): boolean {
         return this.state.has(LogicState.Persistent);
-    }
-
-    public async isAssetLogic(): Promise<boolean> {
-        const id = await this.getLogicId();
-        return id.isAssetLogic();
     }
 
     public getManifestCoder(): ManifestCoder {

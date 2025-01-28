@@ -34,27 +34,11 @@ export class LogicDescriptor extends ElementDescriptor {
         }
         return this.logicId;
     }
-    async getVersion() {
-        const id = await this.getLogicId();
-        return id.getVersion();
-    }
-    async getEdition() {
-        const id = await this.getLogicId();
-        return id.getEdition();
-    }
-    async getLogicAddress() {
-        const id = await this.getLogicId();
-        return id.getAddress();
-    }
     isEphemeral() {
         return this.state.has(LogicState.Ephemeral);
     }
     isPersistent() {
         return this.state.has(LogicState.Persistent);
-    }
-    async isAssetLogic() {
-        const id = await this.getLogicId();
-        return id.isAssetLogic();
     }
     getManifestCoder() {
         if (this.coder == null) {
