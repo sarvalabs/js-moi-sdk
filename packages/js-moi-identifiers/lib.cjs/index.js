@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantId = exports.participantId = exports.createParticipantId = exports.logicId = exports.LogicId = exports.isLogicId = exports.IdentifierTag = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.isIdentifier = exports.BaseIdentifier = exports.isAssetId = exports.assetId = exports.AssetId = void 0;
+exports.ParticipantId = exports.participantId = exports.isParticipantId = exports.createParticipantId = exports.logicId = exports.LogicId = exports.isLogicId = exports.IdentifierTag = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.isIdentifier = exports.BaseIdentifier = exports.isAssetId = exports.assetId = exports.AssetId = void 0;
 var asset_id_1 = require("./asset-id");
 Object.defineProperty(exports, "AssetId", { enumerable: true, get: function () { return asset_id_1.AssetId; } });
 Object.defineProperty(exports, "assetId", { enumerable: true, get: function () { return asset_id_1.assetId; } });
@@ -21,6 +21,7 @@ Object.defineProperty(exports, "LogicId", { enumerable: true, get: function () {
 Object.defineProperty(exports, "logicId", { enumerable: true, get: function () { return logic_id_1.logicId; } });
 var participant_id_1 = require("./participant-id");
 Object.defineProperty(exports, "createParticipantId", { enumerable: true, get: function () { return participant_id_1.createParticipantId; } });
+Object.defineProperty(exports, "isParticipantId", { enumerable: true, get: function () { return participant_id_1.isParticipantId; } });
 Object.defineProperty(exports, "participantId", { enumerable: true, get: function () { return participant_id_1.participantId; } });
 Object.defineProperty(exports, "ParticipantId", { enumerable: true, get: function () { return participant_id_1.ParticipantId; } });
 //# sourceMappingURL=index.js.map
