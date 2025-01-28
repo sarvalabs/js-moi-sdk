@@ -101,3 +101,13 @@ export abstract class BaseIdentifier implements Identifier {
         return new IdentifierTag(value[0]);
     }
 }
+
+/**
+ * Checks if the given value is an identifier.
+ *
+ * @param value - The value to check.
+ * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ */
+export const isIdentifier = (value: unknown): value is Identifier => {
+    return value instanceof BaseIdentifier;
+};

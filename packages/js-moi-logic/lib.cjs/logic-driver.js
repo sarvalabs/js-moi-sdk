@@ -167,7 +167,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             if (exception != null) {
                 js_moi_utils_1.ErrorUtils.throwError(exception.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId(js_moi_identifiers_1.LogicId.fromHex(result.payload.logic_id).toIdentifier());
+            this.setLogicId((0, js_moi_identifiers_1.logicId)(result.payload.logic_id));
         }
         return super.getLogicId();
     }
@@ -322,13 +322,13 @@ exports.LogicDriver = LogicDriver;
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
 const getLogicDriver = async (logicId, signer) => {
-    if (logicId instanceof js_moi_identifiers_1.Identifier) {
+    if ((0, js_moi_identifiers_1.isIdentifier)(logicId)) {
         const provider = signer.getProvider();
         const manifestInPolo = await provider.getLogic(logicId, {
             modifier: { extract: "manifest" },
         });
         const manifest = js_moi_manifest_1.ManifestCoder.decodeManifest(manifestInPolo, js_moi_manifest_1.ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId: js_moi_identifiers_1.Identifier.fromHex(logicId.toHex()), signer });
+        return new LogicDriver({ manifest, logicId, signer });
     }
     return new LogicDriver({ manifest: logicId, signer });
 };

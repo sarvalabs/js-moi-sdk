@@ -1,4 +1,4 @@
-import { LogicId } from "js-moi-identifiers";
+import { isIdentifier, logicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import { CustomError, ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
@@ -164,7 +164,7 @@ export class LogicDriver extends LogicDescriptor {
             if (exception != null) {
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId(LogicId.fromHex(result.payload.logic_id).toIdentifier());
+            this.setLogicId(logicId(result.payload.logic_id));
         }
         return super.getLogicId();
     }
@@ -318,13 +318,13 @@ export class LogicDriver extends LogicDescriptor {
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
 export const getLogicDriver = async (logicId, signer) => {
-    if (logicId instanceof Identifier) {
+    if (isIdentifier(logicId)) {
         const provider = signer.getProvider();
         const manifestInPolo = await provider.getLogic(logicId, {
             modifier: { extract: "manifest" },
         });
         const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId: Identifier.fromHex(logicId.toHex()), signer });
+        return new LogicDriver({ manifest, logicId, signer });
     }
     return new LogicDriver({ manifest: logicId, signer });
 };

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
 const events_1 = require("events");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const interaction_response_1 = require("../utils/interaction-response");
@@ -107,14 +108,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
-            case identifier instanceof js_moi_identifiers_1.Identifier && typeof height === "number" && isValidOption(option): {
+            case (0, js_moi_identifiers_1.isIdentifier)(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
                 return await this.getTesseractByReference({ relative: { identifier: identifier.toHex(), height } }, option);
             }
-            case typeof identifier === "object" && !(identifier instanceof js_moi_identifiers_1.Identifier) && isValidOption(height): {
+            case typeof identifier === "object" && !(0, js_moi_identifiers_1.isIdentifier)(identifier) && isValidOption(height): {
                 // Getting tesseract by reference
                 return await this.getTesseractByReference(identifier, height);
             }
@@ -136,7 +137,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
                 params = [{ logic_id: logic.toHex(), storage_id: participantOrStorage instanceof js_moi_utils_1.StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option }];
                 break;
             }
-            case participantOrStorage instanceof js_moi_identifiers_1.Identifier: {
+            case (0, js_moi_identifiers_1.isIdentifier)(participantOrStorage): {
                 // getting value from ephemeral storage
                 if (storageId == null) {
                     js_moi_utils_1.ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);

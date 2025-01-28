@@ -1,5 +1,5 @@
 export { AssetId, assetId, isAssetId } from "./asset-id";
-export { BaseIdentifier } from "./base-identifier";
+export { BaseIdentifier, isIdentifier } from "./base-identifier";
 export { IdentifierKind, IdentifierVersion } from "./enums";
 export { Flag } from "./flags";
 export { IdentifierTag } from "./identifier-tag";

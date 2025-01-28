@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { Identifier } from "js-moi-identifiers";
+import { Identifier, isIdentifier } from "js-moi-identifiers";
 import {
     bytesToHex,
     ErrorCode,
@@ -181,7 +181,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         const isValidOption = (option: unknown): option is TOption => typeof option === "undefined" || typeof option === "object";
 
         switch (true) {
-            case identifier instanceof Identifier && typeof height === "number" && isValidOption(option): {
+            case isIdentifier(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
@@ -190,7 +190,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
                 return await this.getTesseractByReference({ relative: { identifier: identifier.toHex(), height } }, option);
             }
 
-            case typeof identifier === "object" && !(identifier instanceof Identifier) && isValidOption(height): {
+            case typeof identifier === "object" && !isIdentifier(identifier) && isValidOption(height): {
                 // Getting tesseract by reference
                 return await this.getTesseractByReference(identifier, height);
             }
@@ -225,7 +225,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
                 break;
             }
 
-            case participantOrStorage instanceof Identifier: {
+            case isIdentifier(participantOrStorage): {
                 // getting value from ephemeral storage
                 if (storageId == null) {
                     ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);

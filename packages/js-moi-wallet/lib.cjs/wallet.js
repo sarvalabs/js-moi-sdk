@@ -195,9 +195,7 @@ class Wallet extends js_moi_signer_1.Signer {
     async getIdentifier() {
         const publickey = await this.getPublicKey();
         const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(0, 24);
-        const variant = 0;
-        const version = js_moi_identifiers_1.IdentifierVersion.V0;
-        return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant, version });
+        return (0, js_moi_identifiers_1.participantId)({ fingerprint, variant: 0, version: js_moi_identifiers_1.IdentifierVersion.V0 });
     }
     getKeyId() {
         return Promise.resolve(this.key_index);

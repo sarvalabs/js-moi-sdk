@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseIdentifier = void 0;
+exports.isIdentifier = exports.BaseIdentifier = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const flags_1 = require("./flags");
 const identifier_tag_1 = require("./identifier-tag");
@@ -90,4 +90,14 @@ class BaseIdentifier {
     }
 }
 exports.BaseIdentifier = BaseIdentifier;
+/**
+ * Checks if the given value is an identifier.
+ *
+ * @param value - The value to check.
+ * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ */
+const isIdentifier = (value) => {
+    return value instanceof BaseIdentifier;
+};
+exports.isIdentifier = isIdentifier;
 //# sourceMappingURL=base-identifier.js.map

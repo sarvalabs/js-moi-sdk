@@ -86,4 +86,13 @@ export class BaseIdentifier {
         return new IdentifierTag(value[0]);
     }
 }
+/**
+ * Checks if the given value is an identifier.
+ *
+ * @param value - The value to check.
+ * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ */
+export const isIdentifier = (value) => {
+    return value instanceof BaseIdentifier;
+};
 //# sourceMappingURL=base-identifier.js.map

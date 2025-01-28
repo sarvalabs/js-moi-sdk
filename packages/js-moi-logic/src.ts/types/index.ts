@@ -1,13 +1,14 @@
+import type { Identifier } from "js-moi-identifiers";
 import type { InteractionResponse } from "js-moi-providers";
 import type { Signer } from "js-moi-signer";
-import type { Hex, LogicId, LogicManifest } from "js-moi-utils";
+import type { LogicManifest } from "js-moi-utils";
 import type { AccessorBuilder } from "../state/accessor-builder";
 import type { StateAccessorBuilder } from "../state/state-accessor-builder";
 
 export interface LogicDriverOption {
     manifest: LogicManifest;
     signer: Signer;
-    logicId?: Hex | LogicId;
+    logicId?: Identifier;
 }
 
 export type CallsiteOption = {

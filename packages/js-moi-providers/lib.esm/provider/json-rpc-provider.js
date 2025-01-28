@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { isIdentifier } from "js-moi-identifiers";
 import { bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isHex, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";
@@ -104,14 +105,14 @@ export class JsonRpcProvider extends EventEmitter {
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
-            case identifier instanceof Identifier && typeof height === "number" && isValidOption(option): {
+            case isIdentifier(identifier) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
                 }
                 return await this.getTesseractByReference({ relative: { identifier: identifier.toHex(), height } }, option);
             }
-            case typeof identifier === "object" && !(identifier instanceof Identifier) && isValidOption(height): {
+            case typeof identifier === "object" && !isIdentifier(identifier) && isValidOption(height): {
                 // Getting tesseract by reference
                 return await this.getTesseractByReference(identifier, height);
             }
@@ -133,7 +134,7 @@ export class JsonRpcProvider extends EventEmitter {
                 params = [{ logic_id: logic.toHex(), storage_id: participantOrStorage instanceof StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option }];
                 break;
             }
-            case participantOrStorage instanceof Identifier: {
+            case isIdentifier(participantOrStorage): {
                 // getting value from ephemeral storage
                 if (storageId == null) {
                     ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);

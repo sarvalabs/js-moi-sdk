@@ -59,4 +59,11 @@ export declare abstract class BaseIdentifier implements Identifier {
      */
     protected static getTag(value: Uint8Array): IdentifierTag;
 }
+/**
+ * Checks if the given value is an identifier.
+ *
+ * @param value - The value to check.
+ * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ */
+export declare const isIdentifier: (value: unknown) => value is Identifier;
 //# sourceMappingURL=base-identifier.d.ts.map

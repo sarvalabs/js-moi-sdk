@@ -1,4 +1,4 @@
-import { Identifier, LogicId } from "js-moi-identifiers";
+import { Identifier, isIdentifier, logicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
@@ -224,7 +224,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
 
-            this.setLogicId(LogicId.fromHex(result.payload.logic_id).toIdentifier());
+            this.setLogicId(logicId(result.payload.logic_id));
         }
 
         return super.getLogicId();
@@ -445,14 +445,14 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
 export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer): Promise<LogicDriver<TCallsites>> => {
-    if (logicId instanceof Identifier) {
+    if (isIdentifier(logicId)) {
         const provider = signer.getProvider();
         const manifestInPolo = await provider.getLogic(logicId, {
             modifier: { extract: "manifest" },
         });
         const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
 
-        return new LogicDriver({ manifest, logicId: Identifier.fromHex(logicId.toHex()), signer });
+        return new LogicDriver({ manifest, logicId, signer });
     }
 
     return new LogicDriver<TCallsites>({ manifest: logicId, signer });

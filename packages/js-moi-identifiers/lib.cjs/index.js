@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantId = exports.participantId = exports.createParticipantId = exports.logicId = exports.LogicId = exports.isLogicId = exports.IdentifierTag = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.BaseIdentifier = exports.isAssetId = exports.assetId = exports.AssetId = void 0;
+exports.ParticipantId = exports.participantId = exports.createParticipantId = exports.logicId = exports.LogicId = exports.isLogicId = exports.IdentifierTag = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.isIdentifier = exports.BaseIdentifier = exports.isAssetId = exports.assetId = exports.AssetId = void 0;
 var asset_id_1 = require("./asset-id");
 Object.defineProperty(exports, "AssetId", { enumerable: true, get: function () { return asset_id_1.AssetId; } });
 Object.defineProperty(exports, "assetId", { enumerable: true, get: function () { return asset_id_1.assetId; } });
 Object.defineProperty(exports, "isAssetId", { enumerable: true, get: function () { return asset_id_1.isAssetId; } });
 var base_identifier_1 = require("./base-identifier");
 Object.defineProperty(exports, "BaseIdentifier", { enumerable: true, get: function () { return base_identifier_1.BaseIdentifier; } });
+Object.defineProperty(exports, "isIdentifier", { enumerable: true, get: function () { return base_identifier_1.isIdentifier; } });
 var enums_1 = require("./enums");
 Object.defineProperty(exports, "IdentifierKind", { enumerable: true, get: function () { return enums_1.IdentifierKind; } });
 Object.defineProperty(exports, "IdentifierVersion", { enumerable: true, get: function () { return enums_1.IdentifierVersion; } });
