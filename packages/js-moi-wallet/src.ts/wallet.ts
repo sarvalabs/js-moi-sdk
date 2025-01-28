@@ -4,7 +4,7 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { type ExecuteIx, type Provider, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bytesToHex, ensureHexPrefix, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, type Hex, type InteractionRequest } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest, type Hex, type InteractionRequest } from "js-moi-utils";
 
 import { Identifier, ParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
@@ -179,16 +179,6 @@ export class Wallet extends Signer {
         return participant.toIdentifier();
     }
 
-    /**
-     * Retrieves the address associated with the wallet.
-     *
-     * @returns {string} The address as a string.
-     */
-    public async getIdentifier(): Promise<Hex> {
-        const publickey = await this.getPublicKey();
-        return ensureHexPrefix(publickey.slice(2));
-    }
-
     public getKeyId(): Promise<number> {
         return Promise.resolve(this.key_index);
     }
@@ -232,8 +222,16 @@ export class Wallet extends Signer {
 
     public async signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx> {
         try {
-            if (ix.sender.address !== (await this.getIdentifier())) {
-                ErrorUtils.throwError("Sender address does not match signer address", ErrorCode.INVALID_ARGUMENT);
+            const error = validateIxRequest("moi.Execute", ix);
+
+            if (error) {
+                ErrorUtils.throwArgumentError(`Invalid interaction request: ${error.message}`, ErrorCode.INVALID_ARGUMENT, error);
+            }
+
+            const identifier = await this.getIdentifier();
+
+            if (ix.sender.address !== identifier.toHex()) {
+                ErrorUtils.throwError("Sender identifier does not match signer identifier", ErrorCode.INVALID_ARGUMENT);
             }
 
             const encoded = interaction(ix);

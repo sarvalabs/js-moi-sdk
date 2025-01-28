@@ -198,15 +198,6 @@ class Wallet extends js_moi_signer_1.Signer {
         const participant = js_moi_identifiers_1.ParticipantId.generateParticipantIdV0(fingerprint, 0);
         return participant.toIdentifier();
     }
-    /**
-     * Retrieves the address associated with the wallet.
-     *
-     * @returns {string} The address as a string.
-     */
-    async getIdentifier() {
-        const publickey = await this.getPublicKey();
-        return (0, js_moi_utils_1.ensureHexPrefix)(publickey.slice(2));
-    }
     getKeyId() {
         return Promise.resolve(this.key_index);
     }
@@ -243,8 +234,13 @@ class Wallet extends js_moi_signer_1.Signer {
     }
     async signInteraction(ix, sig) {
         try {
-            if (ix.sender.address !== (await this.getIdentifier())) {
-                js_moi_utils_1.ErrorUtils.throwError("Sender address does not match signer address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            const error = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", ix);
+            if (error) {
+                js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid interaction request: ${error.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, error);
+            }
+            const identifier = await this.getIdentifier();
+            if (ix.sender.address !== identifier.toHex()) {
+                js_moi_utils_1.ErrorUtils.throwError("Sender identifier does not match signer identifier", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             const encoded = (0, js_moi_utils_1.interaction)(ix);
             const signatures = {
