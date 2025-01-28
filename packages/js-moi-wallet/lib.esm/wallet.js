@@ -4,7 +4,7 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest } from "js-moi-utils";
-import { IdentifierVersion, participantId } from "js-moi-identifiers";
+import { IdentifierVersion, createParticipantId } from "js-moi-identifiers";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 export var CURVE;
@@ -156,7 +156,7 @@ export class Wallet extends Signer {
     async getIdentifier() {
         const publickey = await this.getPublicKey();
         const fingerprint = hexToBytes(publickey).slice(0, 24);
-        return participantId({ fingerprint, variant: 0, version: IdentifierVersion.V0 });
+        return createParticipantId({ fingerprint, variant: 0, version: IdentifierVersion.V0 });
     }
     getKeyId() {
         return Promise.resolve(this.key_index);

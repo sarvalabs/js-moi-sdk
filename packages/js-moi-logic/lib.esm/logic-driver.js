@@ -1,4 +1,4 @@
-import { isIdentifier, logicId } from "js-moi-identifiers";
+import { isIdentifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import { CustomError, ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
@@ -164,7 +164,7 @@ export class LogicDriver extends LogicDescriptor {
             if (exception != null) {
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId(logicId(result.payload.logic_id));
+            this.setLogicId(new LogicId(result.payload.logic_id));
         }
         return super.getLogicId();
     }

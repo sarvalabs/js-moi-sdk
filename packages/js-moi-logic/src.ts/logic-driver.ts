@@ -1,4 +1,4 @@
-import { Identifier, isIdentifier, logicId } from "js-moi-identifiers";
+import { Identifier, isIdentifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
@@ -224,7 +224,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
 
-            this.setLogicId(logicId(result.payload.logic_id));
+            this.setLogicId(new LogicId(result.payload.logic_id));
         }
 
         return super.getLogicId();

@@ -58,7 +58,7 @@ exports.getInteractionRequestSchema = getInteractionRequestSchema;
 const transformInteraction = (ix) => {
     return {
         ...ix,
-        sender: { ...ix.sender, address: (0, js_moi_identifiers_1.participantId)(ix.sender.address).toBytes() },
+        sender: { ...ix.sender, address: new js_moi_identifiers_1.ParticipantId(ix.sender.address).toBytes() },
         payer: (0, hex_1.hexToBytes)(ix.payer ?? js_moi_constants_1.ZERO_ADDRESS),
         ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),

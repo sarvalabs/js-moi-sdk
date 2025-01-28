@@ -167,7 +167,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             if (exception != null) {
                 js_moi_utils_1.ErrorUtils.throwError(exception.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId((0, js_moi_identifiers_1.logicId)(result.payload.logic_id));
+            this.setLogicId(new js_moi_identifiers_1.LogicId(result.payload.logic_id));
         }
         return super.getLogicId();
     }

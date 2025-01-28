@@ -1,5 +1,5 @@
 import { ZERO_ADDRESS } from "js-moi-constants";
-import { AssetId, LogicId, participantId } from "js-moi-identifiers";
+import { AssetId, LogicId, ParticipantId } from "js-moi-identifiers";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
@@ -52,7 +52,7 @@ export const getInteractionRequestSchema = () => {
 export const transformInteraction = (ix) => {
     return {
         ...ix,
-        sender: { ...ix.sender, address: participantId(ix.sender.address).toBytes() },
+        sender: { ...ix.sender, address: new ParticipantId(ix.sender.address).toBytes() },
         payer: hexToBytes(ix.payer ?? ZERO_ADDRESS),
         ix_operations: ix.operations.map(encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: hexToBytes(participant.address) })),
