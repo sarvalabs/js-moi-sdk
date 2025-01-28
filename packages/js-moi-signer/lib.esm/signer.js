@@ -28,7 +28,7 @@ export class Signer {
     async createIxRequestSender(sender) {
         if (sender == null) {
             const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
-            return { address: participant.toHex(), key_id: index, sequence_id: sequenceId };
+            return { address: participant, key_id: index, sequence_id: sequenceId };
         }
         if (sender.sequence_id != null) {
             if (sender.sequence_id < (await this.getLatestSequence())) {
@@ -36,7 +36,7 @@ export class Signer {
             }
         }
         return {
-            address: (await this.getIdentifier()).toHex(),
+            address: await this.getIdentifier(),
             key_id: sender.key_id ?? (await this.getKeyId()),
             sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
         };
