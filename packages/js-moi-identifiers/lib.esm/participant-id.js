@@ -13,6 +13,9 @@ export class ParticipantId extends BaseIdentifier {
     }
     static validate(value) {
         const participant = value instanceof Uint8Array ? value : hexToBytes(value);
+        if (participant.length !== 32) {
+            return { why: "Invalid length. Expected a 32-byte identifier." };
+        }
         const tag = this.getTag(participant);
         const kind = tag.getKind();
         if (kind !== IdentifierKind.Participant) {
@@ -23,6 +26,9 @@ export class ParticipantId extends BaseIdentifier {
             return { why: "Invalid Flags. Unsupported flags for identifier" };
         }
         return null;
+    }
+    static isValid(value) {
+        return this.validate(value) === null;
     }
 }
 /**

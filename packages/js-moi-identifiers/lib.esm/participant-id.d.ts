@@ -12,6 +12,7 @@ export interface GenerateParticipantOption {
 export declare class ParticipantId extends BaseIdentifier {
     constructor(value: Uint8Array | Hex);
     static validate(value: Uint8Array | Hex): InvalidReason | null;
+    static isValid(value: Uint8Array | Hex): boolean;
 }
 /**
  * Generates a participant identifier based on the provided options.

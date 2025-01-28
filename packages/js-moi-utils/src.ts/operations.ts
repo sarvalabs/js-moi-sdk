@@ -2,7 +2,7 @@ import { Polorizer } from "js-polo";
 import { polo, type PoloSchema } from "polo-schema";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
-import { hexToBytes, isAddress, isHex } from "./hex";
+import { hexToBytes, isHex } from "./hex";
 import type { IxOperation, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
@@ -78,8 +78,8 @@ const createParticipantCreateDescriptor = () => {
 
         validator: (operation) => {
             const { payload } = operation;
-            if (!isAddress(payload.address)) {
-                return createInvalidResult(payload, "address", "Invalid address");
+            if (isHex(payload.address, 32)) {
+                return createInvalidResult(payload, "address", "Invalid identifier");
             }
 
             if (payload.amount < 0) {
@@ -188,7 +188,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             return createInvalidResult(payload, "benefactor", "Benefactor is required for release operation");
         }
 
-        if (!isAddress(payload.benefactor)) {
+        if (!isHex(payload.benefactor, 32)) {
             return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
         }
 
@@ -208,7 +208,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw: PoloIxOperationPayload<TOpType> = {
                 ...payload,
-                benefactor: "benefactor" in payload && isAddress(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && isHex(payload.benefactor, 32) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
 
@@ -220,11 +220,11 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
                 return createInvalidResult(operation.payload, "asset_id", "Asset ID is required");
             }
 
-            if (!isHex(operation.payload.asset_id)) {
+            if (!isHex(operation.payload.asset_id, 32)) {
                 return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
 
-            if (!isAddress(operation.payload.beneficiary)) {
+            if (!isHex(operation.payload.beneficiary, 32)) {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
 

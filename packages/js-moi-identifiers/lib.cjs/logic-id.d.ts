@@ -4,6 +4,7 @@ import { type Hex } from "./utils";
 export declare class LogicId extends BaseIdentifier {
     constructor(value: Uint8Array | Hex);
     static validate(value: Uint8Array | Hex): InvalidReason | null;
+    static isValid(value: Uint8Array | Hex): boolean;
 }
 /**
  * Generates a new LogicId identifier from the given value.

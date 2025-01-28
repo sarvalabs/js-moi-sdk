@@ -11,17 +11,23 @@ export class LogicId extends BaseIdentifier {
         }
     }
     static validate(value) {
-        const asset = value instanceof Uint8Array ? value : hexToBytes(value);
-        const tag = this.getTag(asset);
+        const logic = value instanceof Uint8Array ? value : hexToBytes(value);
+        if (logic.length !== 32) {
+            return { why: "Invalid length. Expected a 32-byte identifier." };
+        }
+        const tag = this.getTag(logic);
         const kind = tag.getKind();
         if (kind !== IdentifierKind.Logic) {
             return { why: "Invalid identifier kind. Expected a logic identifier." };
         }
-        const hasUnsupportedFlags = (asset[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;
+        const hasUnsupportedFlags = (logic[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;
         if (hasUnsupportedFlags) {
             return { why: "Invalid Flags. Unsupported flags for identifier" };
         }
         return null;
+    }
+    static isValid(value) {
+        return this.validate(value) === null;
     }
 }
 /**

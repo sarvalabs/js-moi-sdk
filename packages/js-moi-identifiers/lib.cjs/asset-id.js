@@ -27,6 +27,9 @@ class AssetId extends base_identifier_1.BaseIdentifier {
     }
     static validate(value) {
         const asset = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
+        if (asset.length !== 32) {
+            return { why: "Invalid length. Expected a 32-byte identifier." };
+        }
         const tag = this.getTag(asset);
         const kind = tag.getKind();
         if (kind !== enums_1.IdentifierKind.Asset) {
@@ -37,6 +40,9 @@ class AssetId extends base_identifier_1.BaseIdentifier {
             return { why: "Invalid Flags. Unsupported flags for identifier" };
         }
         return null;
+    }
+    static isValid(value) {
+        return this.validate(value) === null;
     }
 }
 exports.AssetId = AssetId;

@@ -43,8 +43,8 @@ const createParticipantCreateDescriptor = () => {
         },
         validator: (operation) => {
             const { payload } = operation;
-            if (!(0, hex_1.isAddress)(payload.address)) {
-                return createInvalidResult(payload, "address", "Invalid address");
+            if ((0, hex_1.isHex)(payload.address, 32)) {
+                return createInvalidResult(payload, "address", "Invalid identifier");
             }
             if (payload.amount < 0) {
                 return createInvalidResult(payload, "amount", "Amount cannot be negative");
@@ -129,7 +129,7 @@ const createAssetActionDescriptor = () => {
         if (payload.benefactor == null) {
             return createInvalidResult(payload, "benefactor", "Benefactor is required for release operation");
         }
-        if (!(0, hex_1.isAddress)(payload.benefactor)) {
+        if (!(0, hex_1.isHex)(payload.benefactor, 32)) {
             return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
         }
         return null;
@@ -146,7 +146,7 @@ const createAssetActionDescriptor = () => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
-                benefactor: "benefactor" in payload && (0, hex_1.isAddress)(payload.benefactor) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && (0, hex_1.isHex)(payload.benefactor, 32) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
                 beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
             };
             return raw;
@@ -155,10 +155,10 @@ const createAssetActionDescriptor = () => {
             if (!operation.payload.asset_id) {
                 return createInvalidResult(operation.payload, "asset_id", "Asset ID is required");
             }
-            if (!(0, hex_1.isHex)(operation.payload.asset_id)) {
+            if (!(0, hex_1.isHex)(operation.payload.asset_id, 32)) {
                 return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
-            if (!(0, hex_1.isAddress)(operation.payload.beneficiary)) {
+            if (!(0, hex_1.isHex)(operation.payload.beneficiary, 32)) {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
             switch (true) {

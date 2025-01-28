@@ -14,6 +14,7 @@ export declare class AssetId extends BaseIdentifier {
      */
     getStandard(): number;
     static validate(value: Uint8Array | Hex): InvalidReason | null;
+    static isValid(value: Uint8Array | Hex): boolean;
 }
 /**
  * Generates an `Identifier` for a given asset.
