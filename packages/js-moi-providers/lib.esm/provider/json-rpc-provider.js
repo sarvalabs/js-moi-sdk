@@ -93,10 +93,7 @@ export class JsonRpcProvider extends EventEmitter {
         });
     }
     async getAccount(identifier, option) {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-        return await this.call("moi.Account", { identifier, ...option });
+        return await this.call("moi.Account", { identifier: identifier.toHex(), ...option });
     }
     async getTesseractByReference(reference, option) {
         return await this.call("moi.Tesseract", {

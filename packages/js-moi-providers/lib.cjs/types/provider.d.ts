@@ -1,8 +1,8 @@
 import type { EventEmitter } from "events";
+import type { Identifier } from "js-moi-identifiers";
 import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams, NestedArray } from "./moi-execution-api";
-import type { Identifier } from "js-moi-identifiers";
 type NonOptionalKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: T extends {
         [K1 in K]: any;
@@ -34,7 +34,7 @@ interface SimulateRequest {
 }
 export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam;
 interface AccountRequest {
-    getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
+    getAccount<TOption extends AccountRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
 }
 export type TesseractRequestOption = ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>;
 interface TesseractRequest {
@@ -84,7 +84,8 @@ interface InteractionRequestMethod {
 interface SubscribeRequest {
     subscribe(event: string, params?: unknown): Promise<void>;
 }
-export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
+export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, // DONE
+AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

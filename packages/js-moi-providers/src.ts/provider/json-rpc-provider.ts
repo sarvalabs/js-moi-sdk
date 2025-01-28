@@ -161,12 +161,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         });
     }
 
-    async getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
-        return await this.call("moi.Account", { identifier, ...option });
+    async getAccount<TOption extends AccountRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
+        return await this.call("moi.Account", { identifier: identifier.toHex(), ...option });
     }
 
     private async getTesseractByReference<TOption extends TesseractRequestOption>(

@@ -46,7 +46,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
     simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
-    getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
+    getAccount<TOption extends AccountRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
     private getTesseractByReference;
     getTesseract<TOption extends TesseractRequestOption>(identifier: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;

@@ -1,4 +1,5 @@
 import type { EventEmitter } from "events";
+import type { Identifier } from "js-moi-identifiers";
 import type {
     Account,
     AccountAsset,
@@ -24,7 +25,6 @@ import type {
 } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams, NestedArray } from "./moi-execution-api";
-import type { Identifier } from "js-moi-identifiers";
 
 type NonOptionalKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: T extends { [K1 in K]: any } ? K : never;
@@ -68,7 +68,7 @@ interface SimulateRequest {
 export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam;
 
 interface AccountRequest {
-    getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
+    getAccount<TOption extends AccountRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
 }
 
 export type TesseractRequestOption = ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>;
@@ -146,7 +146,7 @@ interface SubscribeRequest {
 export interface Provider
     extends EventEmitter,
         AccountAssetRequest,
-        AccountKeyRequest,
+        AccountKeyRequest, // DONE
         AccountRequest,
         AssetRequest,
         ExecuteRequest,
