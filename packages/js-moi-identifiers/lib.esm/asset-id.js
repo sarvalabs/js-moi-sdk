@@ -26,7 +26,7 @@ export class AssetId extends BaseIdentifier {
         const asset = value instanceof Uint8Array ? value : hexToBytes(value);
         const tag = this.getTag(asset);
         const kind = tag.getKind();
-        if (kind !== IdentifierKind.Participant) {
+        if (kind !== IdentifierKind.Asset) {
             return { why: "Invalid identifier kind. Expected a asset identifier." };
         }
         const hasUnsupportedFlags = (asset[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;

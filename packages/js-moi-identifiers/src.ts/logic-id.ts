@@ -20,8 +20,8 @@ export class LogicId extends BaseIdentifier {
         const tag = this.getTag(asset);
         const kind = tag.getKind();
 
-        if (kind !== IdentifierKind.Participant) {
-            return { why: "Invalid identifier kind. Expected a asset identifier." };
+        if (kind !== IdentifierKind.Logic) {
+            return { why: "Invalid identifier kind. Expected a logic identifier." };
         }
 
         const hasUnsupportedFlags = (asset[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;

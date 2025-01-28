@@ -29,7 +29,7 @@ class AssetId extends base_identifier_1.BaseIdentifier {
         const asset = value instanceof Uint8Array ? value : (0, js_moi_utils_1.hexToBytes)(value);
         const tag = this.getTag(asset);
         const kind = tag.getKind();
-        if (kind !== enums_1.IdentifierKind.Participant) {
+        if (kind !== enums_1.IdentifierKind.Asset) {
             return { why: "Invalid identifier kind. Expected a asset identifier." };
         }
         const hasUnsupportedFlags = (asset[1] & (flags_1.flagMasks.get(tag.value) ?? 0)) !== 0;

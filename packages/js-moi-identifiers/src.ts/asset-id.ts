@@ -33,7 +33,7 @@ export class AssetId extends BaseIdentifier {
         const tag = this.getTag(asset);
         const kind = tag.getKind();
 
-        if (kind !== IdentifierKind.Participant) {
+        if (kind !== IdentifierKind.Asset) {
             return { why: "Invalid identifier kind. Expected a asset identifier." };
         }
 
