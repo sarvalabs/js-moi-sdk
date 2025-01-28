@@ -4,11 +4,11 @@ exports.interaction = exports.transformInteraction = exports.getInteractionReque
 exports.encodeInteraction = encodeInteraction;
 exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
 const hex_1 = require("./hex");
-const identifier_1 = require("./identifier");
 const operations_1 = require("./operations");
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -115,9 +115,9 @@ const gatherIxParticipants = (interaction) => {
             }
             case enums_1.OpType.AssetMint:
             case enums_1.OpType.AssetBurn: {
-                const assetId = new identifier_1.AssetId(payload.asset_id);
-                participants.set(assetId.getAddress(), {
-                    address: assetId.getAddress(),
+                const identifier = new js_moi_identifiers_1.AssetId(payload.asset_id);
+                participants.set(identifier.toHex(), {
+                    address: identifier.toHex(),
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });
@@ -133,9 +133,9 @@ const gatherIxParticipants = (interaction) => {
             }
             case enums_1.OpType.LogicInvoke:
             case enums_1.OpType.LogicEnlist: {
-                const logicId = new identifier_1.LogicId(payload.logic_id);
-                participants.set(logicId.getAddress(), {
-                    address: logicId.getAddress(),
+                const identifier = new js_moi_identifiers_1.LogicId(payload.logic_id);
+                participants.set(identifier.toHex(), {
+                    address: identifier.toHex(),
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });

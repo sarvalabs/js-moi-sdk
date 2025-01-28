@@ -1,9 +1,9 @@
 import { ZERO_ADDRESS } from "js-moi-constants";
+import { AssetId, LogicId } from "js-moi-identifiers";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
 import { hexToBytes, isAddress } from "./hex";
-import { AssetId, LogicId } from "./identifier";
 import { encodeOperation, validateOperation } from "./operations";
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -108,9 +108,9 @@ const gatherIxParticipants = (interaction) => {
             }
             case OpType.AssetMint:
             case OpType.AssetBurn: {
-                const assetId = new AssetId(payload.asset_id);
-                participants.set(assetId.getAddress(), {
-                    address: assetId.getAddress(),
+                const identifier = new AssetId(payload.asset_id);
+                participants.set(identifier.toHex(), {
+                    address: identifier.toHex(),
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
@@ -126,9 +126,9 @@ const gatherIxParticipants = (interaction) => {
             }
             case OpType.LogicInvoke:
             case OpType.LogicEnlist: {
-                const logicId = new LogicId(payload.logic_id);
-                participants.set(logicId.getAddress(), {
-                    address: logicId.getAddress(),
+                const identifier = new LogicId(payload.logic_id);
+                participants.set(identifier.toHex(), {
+                    address: identifier.toHex(),
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
