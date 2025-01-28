@@ -141,9 +141,9 @@ interface SubscribeRequest {
 export interface Provider
     extends EventEmitter,
         AccountAssetRequest,
-        AccountKeyRequest, // DONE
-        AccountRequest, // DONE
-        AssetRequest, // DONE
+        AccountKeyRequest,
+        AccountRequest,
+        AssetRequest,
         ExecuteRequest,
         InteractionRequestMethod,
         LogicMessageRequest,
