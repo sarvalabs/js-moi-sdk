@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { Identifier } from "js-moi-identifiers";
-import { AssetId, bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
+import { AssetId, bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";
 export class JsonRpcProvider extends EventEmitter {
@@ -170,12 +170,7 @@ export class JsonRpcProvider extends EventEmitter {
         return encodedTopics;
     }
     async getLogicMessage(logicId, options) {
-        const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-        return await this.call("moi.LogicMessage", {
-            logic_id: id.value,
-            ...options,
-            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
-        });
+        return await this.call("moi.LogicMessage", { logic_id: logicId.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
     }
     async getAccountAsset(identifier, assetId, option) {
         if (!isAddress(identifier)) {

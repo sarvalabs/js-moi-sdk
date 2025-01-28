@@ -101,7 +101,7 @@ export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0]
 };
 
 interface LogicMessageRequest {
-    getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
+    getLogicMessage(logicId: Identifier, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
 }
 
 export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam;

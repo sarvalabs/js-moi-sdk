@@ -173,12 +173,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return encodedTopics;
     }
     async getLogicMessage(logicId, options) {
-        const id = typeof logicId === "string" ? new js_moi_utils_1.LogicId(logicId) : logicId;
-        return await this.call("moi.LogicMessage", {
-            logic_id: id.value,
-            ...options,
-            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
-        });
+        return await this.call("moi.LogicMessage", { logic_id: logicId.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
     }
     async getAccountAsset(identifier, assetId, option) {
         if (!(0, js_moi_utils_1.isAddress)(identifier)) {

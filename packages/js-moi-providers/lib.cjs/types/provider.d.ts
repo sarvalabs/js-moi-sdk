@@ -59,7 +59,7 @@ export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0]
     topics?: NestedArray<string>;
 };
 interface LogicMessageRequest {
-    getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
+    getLogicMessage(logicId: Identifier, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
 }
 export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam;
 interface AccountAssetRequest {

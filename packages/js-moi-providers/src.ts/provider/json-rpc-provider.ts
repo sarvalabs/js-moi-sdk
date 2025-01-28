@@ -9,7 +9,6 @@ import {
     interaction,
     isAddress,
     isHex,
-    LogicId,
     StorageKey,
     validateIxRequest,
     type Account,
@@ -278,14 +277,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return encodedTopics;
     }
 
-    async getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
-        const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-
-        return await this.call("moi.LogicMessage", {
-            logic_id: id.value,
-            ...options,
-            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
-        });
+    async getLogicMessage(logicId: Identifier, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
+        return await this.call("moi.LogicMessage", { logic_id: logicId.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
     }
 
     async getAccountAsset<TOption extends AccountAssetRequestOption>(
