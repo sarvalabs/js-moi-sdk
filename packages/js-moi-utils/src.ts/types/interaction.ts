@@ -1,3 +1,4 @@
+import type { Identifier } from "js-moi-identifiers";
 import type { LockType } from "../enums";
 import type { Hex } from "../hex";
 import type { AnyIxOperation, IxRawOperation } from "./ix-operation";
@@ -9,7 +10,7 @@ export interface RawSender {
 }
 
 export interface Sender {
-    address: Hex;
+    address: Identifier;
     sequence_id: number;
     key_id: number;
 }

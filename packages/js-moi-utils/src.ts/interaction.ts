@@ -3,7 +3,7 @@ import { AssetId, LogicId } from "js-moi-identifiers";
 import { Polorizer, type Schema } from "js-polo";
 import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
-import { hexToBytes, isAddress, type Address, type Hex } from "./hex";
+import { hexToBytes, isAddress, type Hex } from "./hex";
 import { encodeOperation, validateOperation } from "./operations";
 import type { InteractionRequest, IxFund, IxParticipant, RawInteractionRequest } from "./types/interaction";
 
@@ -61,7 +61,7 @@ export const getInteractionRequestSchema = (): Schema => {
 export const transformInteraction = (ix: InteractionRequest): RawInteractionRequest => {
     return {
         ...ix,
-        sender: { ...ix.sender, address: hexToBytes(ix.sender.address) },
+        sender: { ...ix.sender, address: ix.sender.address.toBytes() },
         payer: hexToBytes(ix.payer ?? ZERO_ADDRESS),
         ix_operations: ix.operations.map(encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: hexToBytes(participant.address) })),
@@ -91,11 +91,11 @@ export function encodeInteraction(ix: InteractionRequest | RawInteractionRequest
 }
 
 const gatherIxParticipants = (interaction: InteractionRequest) => {
-    const participants = new Map<Address, IxParticipant>([
+    const participants = new Map<Hex, IxParticipant>([
         [
-            interaction.sender.address,
+            interaction.sender.address.toHex(),
             {
-                address: interaction.sender.address,
+                address: interaction.sender.address.toHex(),
                 lock_type: LockType.MutateLock,
                 notary: false,
             },
