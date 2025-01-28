@@ -4,7 +4,6 @@ import type {
     Account,
     AccountAsset,
     AccountKey,
-    Address,
     Asset,
     ExtractModifier,
     Hex,
@@ -66,13 +65,13 @@ interface SimulateRequest {
 export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam;
 
 interface AccountRequest {
-    getAccount<TOption extends AccountRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
+    getAccount<TOption extends AccountRequestOption>(participant: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
 }
 
 export type TesseractRequestOption = ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">>;
 
 interface TesseractRequest {
-    getTesseract<TOption extends TesseractRequestOption>(identifier: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    getTesseract<TOption extends TesseractRequestOption>(participant: Identifier, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
 }
@@ -87,13 +86,13 @@ export type LogicStorageRequestOption = TesseractReferenceParam;
 
 interface LogicStorageRequest {
     getLogicStorage(logicId: Identifier, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
-    getLogicStorage(logicId: Identifier, participantId: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, participant: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
 }
 
 export type AssetRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Asset, "metadata">>;
 
 interface AssetRequest {
-    getAsset<TOption extends AssetRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    getAsset<TOption extends AssetRequestOption>(asset: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
 }
 
 export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id" | "topics"> & {
@@ -101,7 +100,7 @@ export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0]
 };
 
 interface LogicMessageRequest {
-    getLogicMessage(logicId: Identifier, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
+    getLogicMessage(logic: Identifier, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
 }
 
 export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam;
@@ -109,7 +108,7 @@ export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof Acco
 interface AccountAssetRequest {
     getAccountAsset<TOption extends AccountAssetRequestOption>(
         participant: Identifier,
-        assetId: Identifier,
+        asset: Identifier,
         option?: TOption
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
 }
@@ -117,7 +116,7 @@ interface AccountAssetRequest {
 export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "identifier" | "key_idx">;
 
 interface AccountKeyRequest {
-    getAccountKey(identifier: Identifier, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
+    getAccountKey(participant: Identifier, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }
 
 export type ExecuteIx = MethodParams<"moi.Execute">[0];

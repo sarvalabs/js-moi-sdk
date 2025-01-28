@@ -96,8 +96,8 @@ class JsonRpcProvider extends events_1.EventEmitter {
             ...option,
         });
     }
-    async getAccount(identifier, option) {
-        return await this.call("moi.Account", { identifier: identifier.toHex(), ...option });
+    async getAccount(participant, option) {
+        return await this.call("moi.Account", { identifier: participant.toHex(), ...option });
     }
     async getTesseractByReference(reference, option) {
         return await this.call("moi.Tesseract", {
@@ -108,18 +108,18 @@ class JsonRpcProvider extends events_1.EventEmitter {
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
-            case (0, js_moi_utils_1.isAddress)(identifier) && typeof height === "number" && isValidOption(option): {
+            case identifier instanceof js_moi_identifiers_1.Identifier && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
-                return await this.getTesseractByReference({ relative: { identifier: identifier, height } }, option);
+                return await this.getTesseractByReference({ relative: { identifier: identifier.toHex(), height } }, option);
             }
-            case typeof identifier === "object" && isValidOption(height): {
+            case typeof identifier === "object" && !(identifier instanceof js_moi_identifiers_1.Identifier) && isValidOption(height): {
                 // Getting tesseract by reference
                 return await this.getTesseractByReference(identifier, height);
             }
-            case typeof identifier === "string" && isValidOption(height): {
+            case (0, js_moi_utils_1.isHex)(identifier) && isValidOption(height): {
                 // Getting tesseract by hash
                 return await this.getTesseractByReference({ absolute: identifier }, height);
             }
@@ -129,15 +129,15 @@ class JsonRpcProvider extends events_1.EventEmitter {
     getLogic(identifier, option) {
         return this.call("moi.Logic", { identifier: identifier.toHex(), ...option });
     }
-    async getLogicStorage(logicId, address, storageId, option) {
+    async getLogicStorage(logic, participantOrStorage, storageId, option) {
         let params;
         switch (true) {
-            case (0, js_moi_utils_1.isHex)(address) || address instanceof js_moi_utils_1.StorageKey: {
+            case (0, js_moi_utils_1.isHex)(participantOrStorage) || participantOrStorage instanceof js_moi_utils_1.StorageKey: {
                 // getting value from persistent storage
-                params = [{ logic_id: logicId.toHex(), storage_id: address instanceof js_moi_utils_1.StorageKey ? address.hex() : address, ...option }];
+                params = [{ logic_id: logic.toHex(), storage_id: participantOrStorage instanceof js_moi_utils_1.StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option }];
                 break;
             }
-            case address instanceof js_moi_identifiers_1.Identifier: {
+            case participantOrStorage instanceof js_moi_identifiers_1.Identifier: {
                 // getting value from ephemeral storage
                 if (storageId == null) {
                     js_moi_utils_1.ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);
@@ -146,7 +146,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
                     js_moi_utils_1.ErrorUtils.throwArgumentError("Storage key must be a valid hex string or StorageKey instance", "storageId", storageId);
                 }
                 const storageIdHex = storageId instanceof js_moi_utils_1.StorageKey ? storageId.hex() : storageId;
-                params = [{ logic_id: logicId.toHex(), address: address.toHex(), storage_id: storageIdHex, ...option }];
+                params = [{ logic_id: logic.toHex(), address: participantOrStorage.toHex(), storage_id: storageIdHex, ...option }];
                 break;
             }
             default: {
@@ -155,8 +155,8 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return await this.call("moi.LogicStorage", ...params);
     }
-    async getAsset(identifier, option) {
-        return await this.call("moi.Asset", { identifier: identifier.toHex(), ...option });
+    async getAsset(asset, option) {
+        return await this.call("moi.Asset", { identifier: asset.toHex(), ...option });
     }
     encodeTopics(topics) {
         const encodedTopics = Array.from({ length: topics.length });
@@ -172,18 +172,18 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return encodedTopics;
     }
-    async getLogicMessage(logicId, options) {
-        return await this.call("moi.LogicMessage", { logic_id: logicId.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
+    async getLogicMessage(logic, options) {
+        return await this.call("moi.LogicMessage", { logic_id: logic.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
     }
-    async getAccountAsset(participant, assetId, option) {
-        return await this.call("moi.AccountAsset", { identifier: participant.toHex(), asset_id: assetId.toHex(), ...option });
+    async getAccountAsset(participant, asset, option) {
+        return await this.call("moi.AccountAsset", { identifier: participant.toHex(), asset_id: asset.toHex(), ...option });
     }
-    async getAccountKey(identifier, index, option) {
+    async getAccountKey(participant, index, option) {
         if (Number.isNaN(index) || index < 0) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
         }
         return await this.call("moi.AccountKey", {
-            identifier: identifier.toHex(),
+            identifier: participant.toHex(),
             key_idx: index,
             ...option,
         });
