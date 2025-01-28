@@ -35,16 +35,16 @@
             "path": "./packages/js-moi-constants/tsconfig.esm.json"
         },
         {
-            "path": "./packages/js-moi-utils/tsconfig.cjs.json"
-        },
-        {
-            "path": "./packages/js-moi-utils/tsconfig.esm.json"
-        },
-        {
             "path": "./packages/js-moi-identifiers/tsconfig.esm.json"
         },
         {
             "path": "./packages/js-moi-identifiers/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-utils/tsconfig.cjs.json"
+        },
+        {
+            "path": "./packages/js-moi-utils/tsconfig.esm.json"
         },
         {
             "path": "./packages/js-moi-manifest/tsconfig.cjs.json"
