@@ -135,6 +135,14 @@ export class Identifier {
         return bytesToHex(this.bytes);
     }
 
+    public toString(): string {
+        return this.toHex();
+    }
+
+    public toJSON(): string {
+        return this.toHex();
+    }
+
     /**
      * Create an `Identifier` from a hex string.
      *

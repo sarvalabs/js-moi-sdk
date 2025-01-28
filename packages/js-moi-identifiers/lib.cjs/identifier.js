@@ -117,6 +117,12 @@ class Identifier {
     toHex() {
         return (0, js_moi_utils_1.bytesToHex)(this.bytes);
     }
+    toString() {
+        return this.toHex();
+    }
+    toJSON() {
+        return this.toHex();
+    }
     /**
      * Create an `Identifier` from a hex string.
      *

@@ -1,5 +1,5 @@
 import { ElementDescriptor, ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ElementType, ErrorCode, ErrorUtils, LogicState, type Address, type Element, type Hex, type LogicId, type LogicManifest } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, LogicState, type Address, type Element, type Hex, type LogicManifest } from "js-moi-utils";
 import { stringify as toYaml } from "yaml";
 
 export class LogicDescriptor extends ElementDescriptor {

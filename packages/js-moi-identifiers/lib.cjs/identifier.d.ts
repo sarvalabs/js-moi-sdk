@@ -70,6 +70,8 @@ export declare class Identifier {
      * @returns {Hex} The hexadecimal representation of the identifier bytes.
      */
     toHex(): Hex;
+    toString(): string;
+    toJSON(): string;
     /**
      * Create an `Identifier` from a hex string.
      *
