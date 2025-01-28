@@ -1,4 +1,5 @@
-import { getFlag, type Flag } from "./flags";
+import type { IdentifierKind, IdentifierVersion } from "./enums";
+import { getFlag, setFlag, type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
 import type { Identifier } from "./types/identifier";
 import { bytesToHex, hexToBytes, type Hex } from "./utils";
@@ -35,6 +36,76 @@ export abstract class BaseIdentifier implements Identifier {
      */
     public getTag(): IdentifierTag {
         return BaseIdentifier.getTag(this.value);
+    }
+
+    /**
+     * Retrieves the kind of the identifier.
+     *
+     * @returns The kind of the identifier.
+     */
+    public getKind(): IdentifierKind {
+        return this.getTag().getKind();
+    }
+
+    /**
+     * Retrieves the version of the identifier.
+     *
+     * @returns The version of the identifier.
+     */
+    public getVersion(): IdentifierVersion {
+        return this.getTag().getVersion();
+    }
+
+    /**
+     * Retrieves the flags of the identifier.
+     *
+     * @returns The flags of the identifier.
+     */
+    public getFlags(): number {
+        return this.value[1];
+    }
+
+    /**
+     * Creates a new variant of the identifier.
+     *
+     * @param variant - The new variant number.
+     * @param set - The flags to set.
+     * @param unset - The flags to unset.
+     *
+     * @returns A new identifier with the specified variant and flags.
+     */
+    public createNewVariant(variant: number, set?: Flag[], unset?: Flag[]): Identifier {
+        const newVariant = this.toBytes();
+        new DataView(newVariant.buffer).setUint32(28, variant, false);
+
+        for (const flag of set ?? []) {
+            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+                throw new Error(`Invalid flag. Unsupported flag for identifier.`);
+            }
+
+            newVariant[1] = setFlag(newVariant[1], flag.index, true);
+        }
+
+        for (const flag of unset ?? []) {
+            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+                throw new Error(`Invalid flag. Unsupported flag for identifier.`);
+            }
+
+            newVariant[1] = setFlag(newVariant[1], flag.index, false);
+        }
+
+        // We need to create a new instance of the identifier with the new variant.
+        // This is tricky because we need to create the instance of parent class without knowing the exact class.
+        return new (this.constructor as new (value: Uint8Array) => Identifier)(newVariant);
+    }
+
+    /**
+     * Retrieves the metadata from the identifier's value.
+     *
+     * @returns The metadata as a Uint8Array.
+     */
+    public getMetadata(): Uint8Array {
+        return new Uint8Array([this.value[2], this.value[3]]);
     }
 
     /**
@@ -94,10 +165,6 @@ export abstract class BaseIdentifier implements Identifier {
      * @throws {Error} If the length of the identifier value is not 32 bytes.
      */
     protected static getTag(value: Uint8Array): IdentifierTag {
-        if (value.length !== 32) {
-            throw new TypeError("Invalid identifier length. Expected 32 bytes.");
-        }
-
         return new IdentifierTag(value[0]);
     }
 }

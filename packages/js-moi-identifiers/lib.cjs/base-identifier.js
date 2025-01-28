@@ -33,6 +33,66 @@ class BaseIdentifier {
         return BaseIdentifier.getTag(this.value);
     }
     /**
+     * Retrieves the kind of the identifier.
+     *
+     * @returns The kind of the identifier.
+     */
+    getKind() {
+        return this.getTag().getKind();
+    }
+    /**
+     * Retrieves the version of the identifier.
+     *
+     * @returns The version of the identifier.
+     */
+    getVersion() {
+        return this.getTag().getVersion();
+    }
+    /**
+     * Retrieves the flags of the identifier.
+     *
+     * @returns The flags of the identifier.
+     */
+    getFlags() {
+        return this.value[1];
+    }
+    /**
+     * Creates a new variant of the identifier.
+     *
+     * @param variant - The new variant number.
+     * @param set - The flags to set.
+     * @param unset - The flags to unset.
+     *
+     * @returns A new identifier with the specified variant and flags.
+     */
+    createNewVariant(variant, set, unset) {
+        const newVariant = this.toBytes();
+        new DataView(newVariant.buffer).setUint32(28, variant, false);
+        for (const flag of set ?? []) {
+            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+                throw new Error(`Invalid flag. Unsupported flag for identifier.`);
+            }
+            newVariant[1] = (0, flags_1.setFlag)(newVariant[1], flag.index, true);
+        }
+        for (const flag of unset ?? []) {
+            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+                throw new Error(`Invalid flag. Unsupported flag for identifier.`);
+            }
+            newVariant[1] = (0, flags_1.setFlag)(newVariant[1], flag.index, false);
+        }
+        // We need to create a new instance of the identifier with the new variant.
+        // This is tricky because we need to create the instance of parent class without knowing the exact class.
+        return new this.constructor(newVariant);
+    }
+    /**
+     * Retrieves the metadata from the identifier's value.
+     *
+     * @returns The metadata as a Uint8Array.
+     */
+    getMetadata() {
+        return new Uint8Array([this.value[2], this.value[3]]);
+    }
+    /**
      * Retrieves the variant number from the identifier's value.
      *
      * The variant is extracted from a specific slice of the identifier's value,
@@ -83,9 +143,6 @@ class BaseIdentifier {
      * @throws {Error} If the length of the identifier value is not 32 bytes.
      */
     static getTag(value) {
-        if (value.length !== 32) {
-            throw new TypeError("Invalid identifier length. Expected 32 bytes.");
-        }
         return new identifier_tag_1.IdentifierTag(value[0]);
     }
 }

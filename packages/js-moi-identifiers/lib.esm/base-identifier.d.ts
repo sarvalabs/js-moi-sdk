@@ -1,3 +1,4 @@
+import type { IdentifierKind, IdentifierVersion } from "./enums";
 import { type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
 import type { Identifier } from "./types/identifier";
@@ -20,6 +21,40 @@ export declare abstract class BaseIdentifier implements Identifier {
      * @returns {IdentifierTag} The tag of the identifier.
      */
     getTag(): IdentifierTag;
+    /**
+     * Retrieves the kind of the identifier.
+     *
+     * @returns The kind of the identifier.
+     */
+    getKind(): IdentifierKind;
+    /**
+     * Retrieves the version of the identifier.
+     *
+     * @returns The version of the identifier.
+     */
+    getVersion(): IdentifierVersion;
+    /**
+     * Retrieves the flags of the identifier.
+     *
+     * @returns The flags of the identifier.
+     */
+    getFlags(): number;
+    /**
+     * Creates a new variant of the identifier.
+     *
+     * @param variant - The new variant number.
+     * @param set - The flags to set.
+     * @param unset - The flags to unset.
+     *
+     * @returns A new identifier with the specified variant and flags.
+     */
+    createNewVariant(variant: number, set?: Flag[], unset?: Flag[]): Identifier;
+    /**
+     * Retrieves the metadata from the identifier's value.
+     *
+     * @returns The metadata as a Uint8Array.
+     */
+    getMetadata(): Uint8Array;
     /**
      * Retrieves the variant number from the identifier's value.
      *

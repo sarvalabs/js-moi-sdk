@@ -1,3 +1,4 @@
+import type { IdentifierKind, IdentifierVersion } from "../enums";
 import { type Flag } from "../flags";
 import type { IdentifierTag } from "../identifier-tag";
 import type { Hex } from "../utils";
@@ -36,11 +37,50 @@ export interface Identifier {
     getTag(): IdentifierTag;
 
     /**
+     * Retrieves the version of the identifier.
+     *
+     * @returns The version of the identifier.
+     */
+    getVersion(): IdentifierVersion;
+
+    /**
+     * Retrieves the kind of the identifier.
+     *
+     * @returns The kind of the identifier.
+     */
+    getKind(): IdentifierKind;
+
+    /**
+     * Retrieves the flags of the identifier.
+     *
+     * @returns The flags of the identifier.
+     */
+    getFlags(): number;
+
+    /**
+     * Retrieves the metadata of the identifier.
+     *
+     * @returns The metadata of the identifier.
+     */
+    getMetadata(): Uint8Array;
+
+    /**
      * Retrieves the variant number from the identifier's value.
      *
      * @returns The variant number.
      */
     getVariant(): number;
+
+    /**
+     * Creates a new variant of the identifier.
+     * 
+     * @param variant - The new variant number.
+     * @param set - The flags to set.
+     * @param unset - The flags to unset.
+     * 
+     * @returns A new identifier with the specified variant and flags.
+     */
+    createNewVariant(variant: number, set?: Flag[], unset?: Flag[]): Identifier;
 
     /**
      * Checks if the current identifier has the specified flag.
