@@ -1,4 +1,4 @@
-import { concatBytes, ErrorUtils, hexToBytes } from "js-moi-utils";
+import { concatBytes, ErrorUtils, hexToBytes, isHex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind, IdentifierVersion } from "./enums";
 import { flagMasks, setFlag } from "./flags";
@@ -53,5 +53,29 @@ export const createParticipantId = (option) => {
     const participant = concatBytes(metadata, option.fingerprint, new Uint8Array(4));
     new DataView(participant.buffer).setUint32(28, option.variant, false);
     return new ParticipantId(participant);
+};
+/**
+ * Creates a new `Identifier` instance from the given value.
+ *
+ * @param value - The value to create the `ParticipantId` from. It can be either a `Uint8Array` or a `Hex` string.
+ * @returns A new `ParticipantId` instance.
+ */
+export const participantId = (value) => {
+    if (value instanceof Uint8Array || isHex(value)) {
+        return new ParticipantId(value);
+    }
+    if (typeof value === "object") {
+        return createParticipantId(value);
+    }
+    ErrorUtils.throwArgumentError("Invalid value. Expected a Uint8Array, Hex string or object.", "value", value);
+};
+/**
+ * Checks if the given value is a valid ParticipantId.
+ *
+ * @param value - The value to check, which can be a Uint8Array, Hex, or Identifier.
+ * @returns True if the value is a valid ParticipantId, otherwise false.
+ */
+export const isParticipantId = (value) => {
+    return value instanceof ParticipantId;
 };
 //# sourceMappingURL=participant-id.js.map

@@ -1,9 +1,9 @@
-import { concatBytes, ErrorUtils, hexToBytes, type Hex } from "js-moi-utils";
+import { concatBytes, ErrorUtils, hexToBytes, isHex, type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind, IdentifierVersion } from "./enums";
 import { flagMasks, setFlag, type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
-import type { InvalidReason } from "./types/identifier";
+import type { Identifier, InvalidReason } from "./types/identifier";
 
 export interface GenerateParticipantOption {
     version: IdentifierVersion;
@@ -76,4 +76,32 @@ export const createParticipantId = (option: GenerateParticipantOption): Particip
     new DataView(participant.buffer).setUint32(28, option.variant, false);
 
     return new ParticipantId(participant);
+};
+
+/**
+ * Creates a new `Identifier` instance from the given value.
+ *
+ * @param value - The value to create the `ParticipantId` from. It can be either a `Uint8Array` or a `Hex` string.
+ * @returns A new `ParticipantId` instance.
+ */
+export const participantId = (value: Uint8Array | Hex | GenerateParticipantOption): Identifier => {
+    if (value instanceof Uint8Array || isHex(value)) {
+        return new ParticipantId(value);
+    }
+
+    if (typeof value === "object") {
+        return createParticipantId(value);
+    }
+
+    ErrorUtils.throwArgumentError("Invalid value. Expected a Uint8Array, Hex string or object.", "value", value);
+};
+
+/**
+ * Checks if the given value is a valid ParticipantId.
+ *
+ * @param value - The value to check, which can be a Uint8Array, Hex, or Identifier.
+ * @returns True if the value is a valid ParticipantId, otherwise false.
+ */
+export const isParticipantId = (value: Identifier): value is ParticipantId => {
+    return value instanceof ParticipantId;
 };

@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantId = exports.createParticipantId = exports.IdentifierTag = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.BaseIdentifier = void 0;
+exports.ParticipantId = exports.participantId = exports.createParticipantId = exports.logicId = exports.LogicId = exports.isLogicId = exports.IdentifierTag = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.BaseIdentifier = exports.isAssetId = exports.assetId = exports.AssetId = void 0;
+var asset_id_1 = require("./asset-id");
+Object.defineProperty(exports, "AssetId", { enumerable: true, get: function () { return asset_id_1.AssetId; } });
+Object.defineProperty(exports, "assetId", { enumerable: true, get: function () { return asset_id_1.assetId; } });
+Object.defineProperty(exports, "isAssetId", { enumerable: true, get: function () { return asset_id_1.isAssetId; } });
 var base_identifier_1 = require("./base-identifier");
 Object.defineProperty(exports, "BaseIdentifier", { enumerable: true, get: function () { return base_identifier_1.BaseIdentifier; } });
 var enums_1 = require("./enums");
@@ -10,7 +14,12 @@ var flags_1 = require("./flags");
 Object.defineProperty(exports, "Flag", { enumerable: true, get: function () { return flags_1.Flag; } });
 var identifier_tag_1 = require("./identifier-tag");
 Object.defineProperty(exports, "IdentifierTag", { enumerable: true, get: function () { return identifier_tag_1.IdentifierTag; } });
+var logic_id_1 = require("./logic-id");
+Object.defineProperty(exports, "isLogicId", { enumerable: true, get: function () { return logic_id_1.isLogicId; } });
+Object.defineProperty(exports, "LogicId", { enumerable: true, get: function () { return logic_id_1.LogicId; } });
+Object.defineProperty(exports, "logicId", { enumerable: true, get: function () { return logic_id_1.logicId; } });
 var participant_id_1 = require("./participant-id");
 Object.defineProperty(exports, "createParticipantId", { enumerable: true, get: function () { return participant_id_1.createParticipantId; } });
+Object.defineProperty(exports, "participantId", { enumerable: true, get: function () { return participant_id_1.participantId; } });
 Object.defineProperty(exports, "ParticipantId", { enumerable: true, get: function () { return participant_id_1.ParticipantId; } });
 //# sourceMappingURL=index.js.map
