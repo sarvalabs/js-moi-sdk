@@ -199,8 +199,8 @@ class Wallet extends js_moi_signer_1.Signer {
         return privateMapGet(this, __vault)._curve;
     }
     async getIdentifier() {
-        const buff = (0, js_moi_utils_1.hexToBytes)((0, js_moi_utils_1.ensureHexPrefix)(this.publicKey)).slice(0, 24);
-        const participant = js_moi_identifiers_1.ParticipantId.generateParticipantIdV0(buff, 0);
+        const fingerprint = (0, js_moi_utils_1.hexToBytes)((0, js_moi_utils_1.ensureHexPrefix)(this.publicKey)).slice(0, 24);
+        const participant = js_moi_identifiers_1.ParticipantId.generateParticipantIdV0(fingerprint, 0);
         return participant.toIdentifier();
     }
     /**

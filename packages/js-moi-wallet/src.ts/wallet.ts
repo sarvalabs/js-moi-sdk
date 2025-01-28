@@ -178,8 +178,8 @@ export class Wallet extends Signer {
     }
 
     public async getIdentifier(): Promise<Identifier> {
-        const buff = hexToBytes(ensureHexPrefix(this.publicKey)).slice(0, 24);
-        const participant = ParticipantId.generateParticipantIdV0(buff, 0);
+        const fingerprint = hexToBytes(ensureHexPrefix(this.publicKey)).slice(0, 24);
+        const participant = ParticipantId.generateParticipantIdV0(fingerprint, 0);
         return participant.toIdentifier();
     }
 
