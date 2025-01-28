@@ -1,9 +1,8 @@
 import { EventEmitter } from "events";
-import type { Identifier } from "js-moi-identifiers";
+import { Identifier } from "js-moi-identifiers";
 import {
     AssetId,
     bytesToHex,
-    ensureHexPrefix,
     ErrorCode,
     ErrorUtils,
     hexToHash,
@@ -216,37 +215,35 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return this.call("moi.Logic", { identifier: identifier.toHex(), ...option });
     }
 
-    async getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
-    async getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    async getLogicStorage(logicId: Identifier, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    async getLogicStorage(logicId: Identifier, address: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     async getLogicStorage(
-        logicId: Hex | LogicId,
-        address: Hex | Address | StorageKey,
+        logicId: Identifier,
+        address: Hex | Identifier | StorageKey,
         storageId?: Hex | StorageKey | LogicStorageRequestOption,
         option?: LogicStorageRequestOption
     ): Promise<Hex> {
-        const logicID = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-
         let params: MethodParams<"moi.LogicStorage">;
 
         switch (true) {
-            case typeof storageId === "undefined" || (typeof storageId === "object" && !(storageId instanceof StorageKey)): {
-                // Getting logic storage by logic id and storage key
-                const id: Hex = typeof address === "string" ? address : address.hex();
-
-                params = [{ storage_id: id, logic_id: logicID.value, ...storageId }];
+            case isHex(address) || address instanceof StorageKey: {
+                // getting value from persistent storage
+                params = [{ logic_id: logicId.toHex(), storage_id: address instanceof StorageKey ? address.hex() : address, ...option }];
                 break;
             }
 
-            case typeof storageId === "string":
-            case storageId instanceof StorageKey: {
-                // Getting logic storage by logic id, address, and storage key
-
-                if (!isAddress(address)) {
-                    ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
+            case address instanceof Identifier: {
+                // getting value from ephemeral storage
+                if (storageId == null) {
+                    ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);
                 }
-                const id: Hex = typeof storageId === "string" ? storageId : storageId.hex();
 
-                params = [{ storage_id: id, logic_id: logicID.value, address, ...option }];
+                if (!(storageId instanceof StorageKey) && !isHex(storageId)) {
+                    ErrorUtils.throwArgumentError("Storage key must be a valid hex string or StorageKey instance", "storageId", storageId);
+                }
+
+                const storageIdHex = storageId instanceof StorageKey ? storageId.hex() : storageId;
+                params = [{ logic_id: logicId.toHex(), address: address.toHex(), storage_id: storageIdHex, ...option }];
                 break;
             }
 
@@ -255,7 +252,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             }
         }
 
-        return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
+        return await this.call("moi.LogicStorage", ...params);
     }
 
     async getAsset<TOption extends AssetRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {

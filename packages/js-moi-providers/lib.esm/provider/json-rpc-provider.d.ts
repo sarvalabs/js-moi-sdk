@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import type { Identifier } from "js-moi-identifiers";
+import { Identifier } from "js-moi-identifiers";
 import { AssetId, LogicId, StorageKey, type Account, type AccountAsset, type AccountKey, type Address, type Asset, type Hex, type Interaction, type JsonRpcResponse, type Logic, type LogicMessage, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateInteractionRequest, SimulateOption, TesseractRequestOption } from "../types/provider";
@@ -52,8 +52,8 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getLogic<TOption extends LogicRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-    getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
-    getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, address: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     getAsset<TOption extends AssetRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     private encodeTopics;
     getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
 const events_1 = require("events");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const interaction_response_1 = require("../utils/interaction-response");
@@ -129,30 +130,30 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return this.call("moi.Logic", { identifier: identifier.toHex(), ...option });
     }
     async getLogicStorage(logicId, address, storageId, option) {
-        const logicID = typeof logicId === "string" ? new js_moi_utils_1.LogicId(logicId) : logicId;
         let params;
         switch (true) {
-            case typeof storageId === "undefined" || (typeof storageId === "object" && !(storageId instanceof js_moi_utils_1.StorageKey)): {
-                // Getting logic storage by logic id and storage key
-                const id = typeof address === "string" ? address : address.hex();
-                params = [{ storage_id: id, logic_id: logicID.value, ...storageId }];
+            case (0, js_moi_utils_1.isHex)(address) || address instanceof js_moi_utils_1.StorageKey: {
+                // getting value from persistent storage
+                params = [{ logic_id: logicId.toHex(), storage_id: address instanceof js_moi_utils_1.StorageKey ? address.hex() : address, ...option }];
                 break;
             }
-            case typeof storageId === "string":
-            case storageId instanceof js_moi_utils_1.StorageKey: {
-                // Getting logic storage by logic id, address, and storage key
-                if (!(0, js_moi_utils_1.isAddress)(address)) {
-                    js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
+            case address instanceof js_moi_identifiers_1.Identifier: {
+                // getting value from ephemeral storage
+                if (storageId == null) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);
                 }
-                const id = typeof storageId === "string" ? storageId : storageId.hex();
-                params = [{ storage_id: id, logic_id: logicID.value, address, ...option }];
+                if (!(storageId instanceof js_moi_utils_1.StorageKey) && !(0, js_moi_utils_1.isHex)(storageId)) {
+                    js_moi_utils_1.ErrorUtils.throwArgumentError("Storage key must be a valid hex string or StorageKey instance", "storageId", storageId);
+                }
+                const storageIdHex = storageId instanceof js_moi_utils_1.StorageKey ? storageId.hex() : storageId;
+                params = [{ logic_id: logicId.toHex(), address: address.toHex(), storage_id: storageIdHex, ...option }];
                 break;
             }
             default: {
                 js_moi_utils_1.ErrorUtils.throwError("Invalid arguments passed to get correct method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
         }
-        return (0, js_moi_utils_1.ensureHexPrefix)(await this.call("moi.LogicStorage", ...params));
+        return await this.call("moi.LogicStorage", ...params);
     }
     async getAsset(identifier, option) {
         return await this.call("moi.Asset", { identifier: identifier.toHex(), ...option });

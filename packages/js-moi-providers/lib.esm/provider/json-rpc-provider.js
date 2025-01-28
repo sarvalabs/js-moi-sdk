@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
-import { AssetId, bytesToHex, ensureHexPrefix, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
+import { Identifier } from "js-moi-identifiers";
+import { AssetId, bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, LogicId, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";
 export class JsonRpcProvider extends EventEmitter {
@@ -126,30 +127,30 @@ export class JsonRpcProvider extends EventEmitter {
         return this.call("moi.Logic", { identifier: identifier.toHex(), ...option });
     }
     async getLogicStorage(logicId, address, storageId, option) {
-        const logicID = typeof logicId === "string" ? new LogicId(logicId) : logicId;
         let params;
         switch (true) {
-            case typeof storageId === "undefined" || (typeof storageId === "object" && !(storageId instanceof StorageKey)): {
-                // Getting logic storage by logic id and storage key
-                const id = typeof address === "string" ? address : address.hex();
-                params = [{ storage_id: id, logic_id: logicID.value, ...storageId }];
+            case isHex(address) || address instanceof StorageKey: {
+                // getting value from persistent storage
+                params = [{ logic_id: logicId.toHex(), storage_id: address instanceof StorageKey ? address.hex() : address, ...option }];
                 break;
             }
-            case typeof storageId === "string":
-            case storageId instanceof StorageKey: {
-                // Getting logic storage by logic id, address, and storage key
-                if (!isAddress(address)) {
-                    ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
+            case address instanceof Identifier: {
+                // getting value from ephemeral storage
+                if (storageId == null) {
+                    ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);
                 }
-                const id = typeof storageId === "string" ? storageId : storageId.hex();
-                params = [{ storage_id: id, logic_id: logicID.value, address, ...option }];
+                if (!(storageId instanceof StorageKey) && !isHex(storageId)) {
+                    ErrorUtils.throwArgumentError("Storage key must be a valid hex string or StorageKey instance", "storageId", storageId);
+                }
+                const storageIdHex = storageId instanceof StorageKey ? storageId.hex() : storageId;
+                params = [{ logic_id: logicId.toHex(), address: address.toHex(), storage_id: storageIdHex, ...option }];
                 break;
             }
             default: {
                 ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
             }
         }
-        return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
+        return await this.call("moi.LogicStorage", ...params);
     }
     async getAsset(identifier, option) {
         return await this.call("moi.Asset", { identifier: identifier.toHex(), ...option });
