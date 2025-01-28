@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import type { Identifier } from "js-moi-identifiers";
 import {
     AssetId,
     bytesToHex,
@@ -322,16 +323,16 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
     }
 
-    async getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
+    async getAccountKey(identifier: Identifier, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
         if (Number.isNaN(index) || index < 0) {
             ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
         }
 
-        return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
+        return await this.call("moi.AccountKey", {
+            identifier: identifier.toHex(),
+            key_idx: index,
+            ...option,
+        });
     }
 
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;

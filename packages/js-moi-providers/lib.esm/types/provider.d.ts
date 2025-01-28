@@ -2,6 +2,7 @@ import type { EventEmitter } from "events";
 import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams, NestedArray } from "./moi-execution-api";
+import type { Identifier } from "js-moi-identifiers";
 type NonOptionalKeys<T extends Record<string, any>> = {
     [K in keyof T]-?: T extends {
         [K1 in K]: any;
@@ -68,7 +69,7 @@ interface AccountAssetRequest {
 }
 export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "identifier" | "key_idx">;
 interface AccountKeyRequest {
-    getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
+    getAccountKey(identifier: Identifier, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }
 export type ExecuteIx = MethodParams<"moi.Execute">[0];
 export type Signature = ExecuteIx["signatures"][number];

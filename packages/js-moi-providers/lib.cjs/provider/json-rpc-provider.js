@@ -198,13 +198,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
     }
     async getAccountKey(identifier, index, option) {
-        if (!(0, js_moi_utils_1.isAddress)(identifier)) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
         if (Number.isNaN(index) || index < 0) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
         }
-        return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
+        return await this.call("moi.AccountKey", {
+            identifier: identifier.toHex(),
+            key_idx: index,
+            ...option,
+        });
     }
     async execute(ix, signatures) {
         let params;
