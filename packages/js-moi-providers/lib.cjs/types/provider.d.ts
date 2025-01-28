@@ -29,8 +29,8 @@ interface ProtocolRequest {
 export type SimulateOption = Pick<MethodParams<"moi.Simulate">[0], "references">;
 export type SimulateInteractionRequest = Omit<InteractionRequest, "fuel_limit">;
 interface SimulateRequest {
-    simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
 }
 export type AccountRequestOption = ResponseModifierParam<Exclude<keyof Account, "metadata">> & TesseractReferenceParam;
 interface AccountRequest {

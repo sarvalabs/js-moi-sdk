@@ -44,8 +44,8 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * @returns A promise that resolves to the Moi client version.
      */
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
-    simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     getAccount<TOption extends AccountRequestOption>(participant: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
     private getTesseractByReference;
     getTesseract<TOption extends TesseractRequestOption>(participant: Identifier, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;

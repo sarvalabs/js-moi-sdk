@@ -110,8 +110,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call<"moi.Protocol", SelectFromResponseModifier<NetworkInfo, TOption>>("moi.Protocol", option);
     }
 
-    public async simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     public async simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     public async simulate(ix: SimulateInteractionRequest | Uint8Array | Hex, option?: SimulateOption): Promise<Simulate> {
         let encodedIxArgs: Hex;
 
