@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import { Identifier } from "js-moi-identifiers";
 import { bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isHex, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";

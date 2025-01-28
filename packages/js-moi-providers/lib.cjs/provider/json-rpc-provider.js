@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonRpcProvider = void 0;
 const events_1 = require("events");
-const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const interaction_response_1 = require("../utils/interaction-response");
