@@ -1,7 +1,6 @@
 import { EventEmitter } from "events";
 import { Identifier } from "js-moi-identifiers";
 import {
-    AssetId,
     bytesToHex,
     ErrorCode,
     ErrorUtils,
@@ -282,17 +281,11 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     async getAccountAsset<TOption extends AccountAssetRequestOption>(
-        identifier: Address,
-        assetId: Hex | AssetId,
+        participant: Identifier,
+        assetId: Identifier,
         option?: TOption
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>> {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
-        const { value } = typeof assetId === "string" ? new AssetId(assetId) : assetId;
-
-        return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
+        return await this.call("moi.AccountAsset", { identifier: participant.toHex(), asset_id: assetId.toHex(), ...option });
     }
 
     async getAccountKey(identifier: Identifier, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {

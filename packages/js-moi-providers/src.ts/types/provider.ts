@@ -108,8 +108,8 @@ export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof Acco
 
 interface AccountAssetRequest {
     getAccountAsset<TOption extends AccountAssetRequestOption>(
-        identifier: Address,
-        assetId: Hex | AssetId,
+        participant: Identifier,
+        assetId: Identifier,
         option?: TOption
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
 }

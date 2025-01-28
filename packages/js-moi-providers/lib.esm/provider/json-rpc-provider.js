@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { Identifier } from "js-moi-identifiers";
-import { AssetId, bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, StorageKey, validateIxRequest, } from "js-moi-utils";
+import { bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isAddress, isHex, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";
 export class JsonRpcProvider extends EventEmitter {
@@ -172,12 +172,8 @@ export class JsonRpcProvider extends EventEmitter {
     async getLogicMessage(logicId, options) {
         return await this.call("moi.LogicMessage", { logic_id: logicId.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
     }
-    async getAccountAsset(identifier, assetId, option) {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-        const { value } = typeof assetId === "string" ? new AssetId(assetId) : assetId;
-        return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
+    async getAccountAsset(participant, assetId, option) {
+        return await this.call("moi.AccountAsset", { identifier: participant.toHex(), asset_id: assetId.toHex(), ...option });
     }
     async getAccountKey(identifier, index, option) {
         if (Number.isNaN(index) || index < 0) {

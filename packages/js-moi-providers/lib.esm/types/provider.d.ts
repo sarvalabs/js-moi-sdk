@@ -63,7 +63,7 @@ interface LogicMessageRequest {
 }
 export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof AccountAsset, "balance">> & TesseractReferenceParam;
 interface AccountAssetRequest {
-    getAccountAsset<TOption extends AccountAssetRequestOption>(identifier: Address, assetId: Hex | AssetId, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
+    getAccountAsset<TOption extends AccountAssetRequestOption>(participant: Identifier, assetId: Identifier, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
 }
 export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "identifier" | "key_idx">;
 interface AccountKeyRequest {
