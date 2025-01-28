@@ -1,5 +1,6 @@
 import { ErrorUtils } from "js-moi-utils";
-import { TagAssetV0, TagLogicV0, TagParticipantV0 } from "./identifier-tag";
+import { IdentifierKind } from "./identifier-kind";
+import { IdentifierTag, IdentifierVersion } from "./types/identifier";
 /**
  * Represents a flag specifier for an identifier.
  */
@@ -55,8 +56,8 @@ export const getFlag = (value, index) => {
     return (value & (1 << index)) !== 0;
 };
 export const flagMasks = new Map([
-    [TagParticipantV0.getValue(), 0b01111111],
-    [TagLogicV0.getValue(), 0b01111000],
-    [TagAssetV0.getValue(), 0b01111100],
+    [IdentifierTag.getTag(IdentifierKind.Participant, IdentifierVersion.V0).value, 0b01111111],
+    [IdentifierTag.getTag(IdentifierKind.Logic, IdentifierVersion.V0).value, 0b01111000],
+    [IdentifierTag.getTag(IdentifierKind.Asset, IdentifierVersion.V0).value, 0b01111111],
 ]);
 //# sourceMappingURL=flags.js.map

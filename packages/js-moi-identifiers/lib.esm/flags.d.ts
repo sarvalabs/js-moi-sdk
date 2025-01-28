@@ -1,5 +1,5 @@
-import type { IdentifierKind } from "./identifier-kind";
-import { type IdentifierTag } from "./identifier-tag";
+import { IdentifierKind } from "./identifier-kind";
+import { IdentifierTag } from "./types/identifier";
 /**
  * Represents a flag specifier for an identifier.
  */
