@@ -266,14 +266,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
     }
 
-    async getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
-    async getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
-    async getAsset<TOption extends AssetRequestOption>(identifier: Address | AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
-        if (typeof identifier === "string" && !isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-        const address = typeof identifier === "string" ? identifier : identifier.getAddress();
-        return await this.call("moi.Asset", { identifier: address, ...option });
+    async getAsset<TOption extends AssetRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
+        return await this.call("moi.Asset", { identifier: identifier.toHex(), ...option });
     }
 
     private encodeTopics(topics: NestedArray<string>): NestedArray<Hex> {

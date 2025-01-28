@@ -54,8 +54,7 @@ interface LogicStorageRequest {
 }
 export type AssetRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Asset, "metadata">>;
 interface AssetRequest {
-    getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
-    getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    getAsset<TOption extends AssetRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
 }
 export type LogicMessageRequestOption = Omit<MethodParams<"moi.LogicMessage">[0], "logic_id" | "topics"> & {
     topics?: NestedArray<string>;
@@ -85,7 +84,8 @@ interface SubscribeRequest {
     subscribe(event: string, params?: unknown): Promise<void>;
 }
 export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, // DONE
-AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
+AccountRequest, // DONE
+AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

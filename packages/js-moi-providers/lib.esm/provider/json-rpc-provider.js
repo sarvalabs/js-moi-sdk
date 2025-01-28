@@ -156,11 +156,7 @@ export class JsonRpcProvider extends EventEmitter {
         return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
     }
     async getAsset(identifier, option) {
-        if (typeof identifier === "string" && !isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-        const address = typeof identifier === "string" ? identifier : identifier.getAddress();
-        return await this.call("moi.Asset", { identifier: address, ...option });
+        return await this.call("moi.Asset", { identifier: identifier.toHex(), ...option });
     }
     encodeTopics(topics) {
         const encodedTopics = Array.from({ length: topics.length });
