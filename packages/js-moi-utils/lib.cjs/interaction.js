@@ -58,7 +58,7 @@ exports.getInteractionRequestSchema = getInteractionRequestSchema;
 const transformInteraction = (ix) => {
     return {
         ...ix,
-        sender: { ...ix.sender, address: ix.sender.address.toBytes() },
+        sender: { ...ix.sender, address: (0, js_moi_identifiers_1.participantId)(ix.sender.address).toBytes() },
         payer: (0, hex_1.hexToBytes)(ix.payer ?? js_moi_constants_1.ZERO_ADDRESS),
         ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),
@@ -88,9 +88,9 @@ function encodeInteraction(ix) {
 const gatherIxParticipants = (interaction) => {
     const participants = new Map([
         [
-            interaction.sender.address.toHex(),
+            interaction.sender.address,
             {
-                address: interaction.sender.address.toHex(),
+                address: interaction.sender.address,
                 lock_type: enums_1.LockType.MutateLock,
                 notary: false,
             },
@@ -208,7 +208,7 @@ function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!(0, js_moi_identifiers_1.isParticipantId)(ix.sender.address)) {
+    if (!(0, hex_1.isHex)(ix.sender.address, 32)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {

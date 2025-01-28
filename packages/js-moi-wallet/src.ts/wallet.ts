@@ -229,13 +229,13 @@ export class Wallet extends Signer {
 
             const identifier = await this.getIdentifier();
 
-            if (ix.sender.address.toHex() !== identifier.toHex()) {
+            if (ix.sender.address !== identifier.toHex()) {
                 ErrorUtils.throwError("Sender identifier does not match signer identifier", ErrorCode.INVALID_ARGUMENT);
             }
 
             const encoded = interaction(ix);
             const signatures: Signature = {
-                identifier: ix.sender.address.toHex(),
+                identifier: ix.sender.address,
                 key_idx: ix.sender.key_id,
                 signature: await this.sign(encoded, sig),
             };
