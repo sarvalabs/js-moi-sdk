@@ -208,7 +208,7 @@ function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!(0, hex_1.isHex)(ix.sender.address, 32)) {
+    if (!(0, js_moi_identifiers_1.isParticipantId)(ix.sender.address)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {

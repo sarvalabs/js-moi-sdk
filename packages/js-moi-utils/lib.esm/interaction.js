@@ -1,5 +1,5 @@
 import { ZERO_ADDRESS } from "js-moi-constants";
-import { AssetId, LogicId } from "js-moi-identifiers";
+import { AssetId, isParticipantId, LogicId } from "js-moi-identifiers";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
@@ -200,7 +200,7 @@ export function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!isHex(ix.sender.address, 32)) {
+    if (!isParticipantId(ix.sender.address)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {
