@@ -1,7 +1,7 @@
-import { type Hex } from "js-moi-utils";
 import { type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
 import type { Identifier } from "./types/identifier";
+import { type Hex } from "./utils";
 export declare abstract class BaseIdentifier implements Identifier {
     private readonly value;
     constructor(value: Uint8Array | Hex);

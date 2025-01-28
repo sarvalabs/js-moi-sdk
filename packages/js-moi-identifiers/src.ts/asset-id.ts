@@ -1,8 +1,8 @@
-import { ErrorUtils, hexToBytes, type AssetStandard, type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind } from "./enums";
 import { flagMasks } from "./flags";
 import type { Identifier, InvalidReason } from "./types/identifier";
+import { hexToBytes, type Hex } from "./utils";
 
 export class AssetId extends BaseIdentifier {
     constructor(value: Uint8Array | Hex) {
@@ -11,7 +11,7 @@ export class AssetId extends BaseIdentifier {
         const error = AssetId.validate(this.toBytes());
 
         if (error) {
-            ErrorUtils.throwArgumentError(`Invalid asset identifier. ${error.why}`, "value", value);
+            throw new TypeError(`Invalid asset identifier. ${error.why}`);
         }
     }
 
@@ -24,7 +24,7 @@ export class AssetId extends BaseIdentifier {
      *
      * @returns {AssetStandard} The standard of the asset as a 16-bit unsigned integer.
      */
-    getStandard(): AssetStandard {
+    getStandard(): number {
         return new DataView(this.toBytes().slice(2, 4).buffer).getUint16(0, false);
     }
 

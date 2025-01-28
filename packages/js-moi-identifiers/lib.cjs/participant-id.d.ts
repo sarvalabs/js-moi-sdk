@@ -1,8 +1,8 @@
-import { type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierVersion } from "./enums";
 import { type Flag } from "./flags";
 import type { Identifier, InvalidReason } from "./types/identifier";
+import { type Hex } from "./utils";
 export interface GenerateParticipantOption {
     version: IdentifierVersion;
     fingerprint: Uint8Array;

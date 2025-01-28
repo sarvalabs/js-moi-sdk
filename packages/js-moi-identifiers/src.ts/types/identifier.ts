@@ -1,6 +1,6 @@
-import { type Hex } from "js-moi-utils";
 import { type Flag } from "../flags";
 import type { IdentifierTag } from "../identifier-tag";
+import type { Hex } from "../utils";
 
 export interface InvalidReason {
     why: string;

@@ -82,10 +82,7 @@ interface InteractionRequestMethod {
 interface SubscribeRequest {
     subscribe(event: string, params?: unknown): Promise<void>;
 }
-export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, // DONE
-AccountRequest, // DONE
-AssetRequest, // DONE
-ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
+export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

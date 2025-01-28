@@ -1,5 +1,5 @@
-import { AssetStandard, hexToBytes } from "js-moi-utils";
 import { assetId, AssetId, IdentifierKind, isAssetId, participantId } from "../src.ts";
+import { hexToBytes } from "../src.ts/utils";
 
 const TEST_ASSET_ID = "0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000";
 const NOT_A_ASSET_ID = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000";
@@ -16,7 +16,7 @@ describe(AssetId, () => {
             expect(assetId).toBeInstanceOf(AssetId);
             expect(assetId.getTag().getKind()).toBe(IdentifierKind.Asset);
             expect(assetId.getFingerprint()).toEqual(hexToBytes(TEST_ASSET_ID).slice(4, 28));
-            expect(assetId.getStandard()).toBe(AssetStandard.MAS0);
+            expect(assetId.getStandard()).toBe(0);
         });
     });
 

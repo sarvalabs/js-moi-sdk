@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isIdentifier = exports.BaseIdentifier = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
 const flags_1 = require("./flags");
 const identifier_tag_1 = require("./identifier-tag");
+const utils_1 = require("./utils");
 class BaseIdentifier {
     value;
     constructor(value) {
-        value = value instanceof Uint8Array ? value : (0, js_moi_utils_1.hexToBytes)(value);
+        value = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
         if (value.length !== 32) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid identifier length. Expected 32 bytes.", "value", value);
+            throw new TypeError("Invalid identifier length. Expected 32 bytes.");
         }
         this.value = value;
     }
@@ -67,7 +67,7 @@ class BaseIdentifier {
      * @returns {Hex} The hexadecimal representation of the identifier value.
      */
     toHex() {
-        return (0, js_moi_utils_1.bytesToHex)(this.value);
+        return (0, utils_1.bytesToHex)(this.value);
     }
     toString() {
         return this.toHex();
@@ -84,7 +84,7 @@ class BaseIdentifier {
      */
     static getTag(value) {
         if (value.length !== 32) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid identifier length. Expected 32 bytes.", "value", value);
+            throw new TypeError("Invalid identifier length. Expected 32 bytes.");
         }
         return new identifier_tag_1.IdentifierTag(value[0]);
     }

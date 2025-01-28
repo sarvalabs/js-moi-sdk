@@ -1,5 +1,5 @@
-import { hexToBytes } from "js-moi-utils";
 import { assetId, BaseIdentifier, IdentifierKind, IdentifierTag, logicId, participantId } from "../src.ts";
+import { hexToBytes } from "../src.ts/utils";
 
 const ASSET_ID = "0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000";
 const LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";

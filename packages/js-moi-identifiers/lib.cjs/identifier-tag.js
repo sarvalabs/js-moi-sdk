@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IdentifierTag = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
 const enums_1 = require("./enums");
 class IdentifierTag {
     value;
@@ -14,7 +13,7 @@ class IdentifierTag {
     constructor(value) {
         const validation = IdentifierTag.validate(value);
         if (validation) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid identifier value. ${validation.why}`, "value", value);
+            throw new Error(`Invalid identifier value. ${validation.why}`);
         }
         this.value = value;
     }

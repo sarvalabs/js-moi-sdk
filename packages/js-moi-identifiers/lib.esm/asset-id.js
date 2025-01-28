@@ -1,13 +1,13 @@
-import { ErrorUtils, hexToBytes } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind } from "./enums";
 import { flagMasks } from "./flags";
+import { hexToBytes } from "./utils";
 export class AssetId extends BaseIdentifier {
     constructor(value) {
         super(value);
         const error = AssetId.validate(this.toBytes());
         if (error) {
-            ErrorUtils.throwArgumentError(`Invalid asset identifier. ${error.why}`, "value", value);
+            throw new TypeError(`Invalid asset identifier. ${error.why}`);
         }
     }
     /**

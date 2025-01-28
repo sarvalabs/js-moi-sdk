@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.flagMasks = exports.getFlag = exports.setFlag = exports.Flag = void 0;
-const js_moi_utils_1 = require("js-moi-utils");
 const enums_1 = require("./enums");
 const identifier_tag_1 = require("./identifier-tag");
 /**
@@ -12,10 +11,10 @@ class Flag {
     support;
     constructor(kind, index, version) {
         if (index > 7) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid flag index. Expected a value between 0 and 7.", "index", index);
+            throw new RangeError("Invalid flag index. Expected a value between 0 and 7.");
         }
         if (version > 15) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid flag version. Expected a value between 0 and 15.", "version", version);
+            throw new RangeError("Invalid flag version. Expected a value between 0 and 15.");
         }
         this.index = index;
         this.support = new Map([[kind, version]]);

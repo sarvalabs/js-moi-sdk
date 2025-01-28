@@ -1,4 +1,3 @@
-import { ErrorUtils } from "js-moi-utils";
 import { IdentifierKind } from "./enums";
 export class IdentifierTag {
     value;
@@ -11,7 +10,7 @@ export class IdentifierTag {
     constructor(value) {
         const validation = IdentifierTag.validate(value);
         if (validation) {
-            ErrorUtils.throwArgumentError(`Invalid identifier value. ${validation.why}`, "value", value);
+            throw new Error(`Invalid identifier value. ${validation.why}`);
         }
         this.value = value;
     }

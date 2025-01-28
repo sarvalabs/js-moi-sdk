@@ -1,4 +1,3 @@
-import { ErrorUtils } from "js-moi-utils";
 import { IdentifierKind, type IdentifierVersion } from "./enums";
 import type { InvalidReason } from "./types/identifier";
 
@@ -17,7 +16,7 @@ export class IdentifierTag {
         const validation = IdentifierTag.validate(value);
 
         if (validation) {
-            ErrorUtils.throwArgumentError(`Invalid identifier value. ${validation.why}`, "value", value);
+            throw new Error(`Invalid identifier value. ${validation.why}`);
         }
 
         this.value = value;

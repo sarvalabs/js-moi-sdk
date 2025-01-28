@@ -1,5 +1,3 @@
-import { ErrorUtils } from "js-moi-utils";
-
 import { IdentifierKind, IdentifierVersion } from "./enums";
 import { IdentifierTag } from "./identifier-tag";
 
@@ -13,11 +11,11 @@ export class Flag {
 
     constructor(kind: IdentifierKind, index: number, version: number) {
         if (index > 7) {
-            ErrorUtils.throwArgumentError("Invalid flag index. Expected a value between 0 and 7.", "index", index);
+            throw new RangeError("Invalid flag index. Expected a value between 0 and 7.");
         }
 
         if (version > 15) {
-            ErrorUtils.throwArgumentError("Invalid flag version. Expected a value between 0 and 15.", "version", version);
+            throw new RangeError("Invalid flag version. Expected a value between 0 and 15.");
         }
 
         this.index = index;

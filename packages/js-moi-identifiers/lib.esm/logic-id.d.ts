@@ -1,6 +1,6 @@
-import { type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import type { Identifier, InvalidReason } from "./types/identifier";
+import { type Hex } from "./utils";
 export declare class LogicId extends BaseIdentifier {
     constructor(value: Uint8Array | Hex);
     static validate(value: Uint8Array | Hex): InvalidReason | null;

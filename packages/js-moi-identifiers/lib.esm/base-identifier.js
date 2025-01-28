@@ -1,12 +1,12 @@
-import { bytesToHex, ErrorUtils, hexToBytes } from "js-moi-utils";
 import { getFlag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
+import { bytesToHex, hexToBytes } from "./utils";
 export class BaseIdentifier {
     value;
     constructor(value) {
         value = value instanceof Uint8Array ? value : hexToBytes(value);
         if (value.length !== 32) {
-            ErrorUtils.throwArgumentError("Invalid identifier length. Expected 32 bytes.", "value", value);
+            throw new TypeError("Invalid identifier length. Expected 32 bytes.");
         }
         this.value = value;
     }
@@ -81,7 +81,7 @@ export class BaseIdentifier {
      */
     static getTag(value) {
         if (value.length !== 32) {
-            ErrorUtils.throwArgumentError("Invalid identifier length. Expected 32 bytes.", "value", value);
+            throw new TypeError("Invalid identifier length. Expected 32 bytes.");
         }
         return new IdentifierTag(value[0]);
     }

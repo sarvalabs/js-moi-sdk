@@ -1,6 +1,6 @@
-import { type AssetStandard, type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import type { Identifier, InvalidReason } from "./types/identifier";
+import { type Hex } from "./utils";
 export declare class AssetId extends BaseIdentifier {
     constructor(value: Uint8Array | Hex);
     /**
@@ -12,7 +12,7 @@ export declare class AssetId extends BaseIdentifier {
      *
      * @returns {AssetStandard} The standard of the asset as a 16-bit unsigned integer.
      */
-    getStandard(): AssetStandard;
+    getStandard(): number;
     static validate(value: Uint8Array | Hex): InvalidReason | null;
 }
 /**

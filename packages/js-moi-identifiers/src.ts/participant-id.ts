@@ -1,9 +1,9 @@
-import { concatBytes, ErrorUtils, hexToBytes, isHex, type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind, IdentifierVersion } from "./enums";
 import { flagMasks, setFlag, type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
 import type { Identifier, InvalidReason } from "./types/identifier";
+import { hexToBytes, type Hex } from "./utils";
 
 export interface GenerateParticipantOption {
     version: IdentifierVersion;
@@ -19,7 +19,7 @@ export class ParticipantId extends BaseIdentifier {
         const error = ParticipantId.validate(this.toBytes());
 
         if (error) {
-            ErrorUtils.throwArgumentError(`Invalid participant identifier. ${error.why}`, "value", value);
+            throw new Error(`Invalid participant identifier. ${error.why}`);
         }
     }
 
@@ -53,11 +53,11 @@ export class ParticipantId extends BaseIdentifier {
  */
 export const createParticipantId = (option: GenerateParticipantOption): ParticipantId => {
     if (option.version !== IdentifierVersion.V0) {
-        ErrorUtils.throwArgumentError("Invalid identifier version. Expected V0.", "version", option.version);
+        throw new TypeError("Invalid identifier version. Expected V0.");
     }
 
     if (option.fingerprint.length !== 24) {
-        ErrorUtils.throwArgumentError("Invalid fingerprint length. Expected 24 bytes.", "fingerprint", option.fingerprint);
+        throw new TypeError("Invalid fingerprint length. Expected 24 bytes.");
     }
 
     const metadata = new Uint8Array(4);
@@ -66,13 +66,13 @@ export const createParticipantId = (option: GenerateParticipantOption): Particip
 
     for (const flag of option.flags ?? []) {
         if (!flag.supports(participantTag)) {
-            ErrorUtils.throwArgumentError(`Invalid flag. Unsupported flag for participant identifier.`, "flag", flag);
+            throw new Error(`Invalid flag. Unsupported flag for participant identifier.`);
         }
 
         metadata[1] = setFlag(metadata[1], flag.index, true);
     }
 
-    const participant = concatBytes(metadata, option.fingerprint, new Uint8Array(4));
+    const participant = Uint8Array.from([...metadata, ...option.fingerprint, ...new Uint8Array(4)]);
     new DataView(participant.buffer).setUint32(28, option.variant, false);
 
     return new ParticipantId(participant);
@@ -85,7 +85,7 @@ export const createParticipantId = (option: GenerateParticipantOption): Particip
  * @returns A new `ParticipantId` instance.
  */
 export const participantId = (value: Uint8Array | Hex | GenerateParticipantOption): Identifier => {
-    if (value instanceof Uint8Array || isHex(value)) {
+    if (value instanceof Uint8Array || typeof value === "string") {
         return new ParticipantId(value);
     }
 
@@ -93,7 +93,7 @@ export const participantId = (value: Uint8Array | Hex | GenerateParticipantOptio
         return createParticipantId(value);
     }
 
-    ErrorUtils.throwArgumentError("Invalid value. Expected a Uint8Array, Hex string or object.", "value", value);
+    throw new Error("Invalid value. Expected a Uint8Array, Hex string or object.");
 };
 
 /**

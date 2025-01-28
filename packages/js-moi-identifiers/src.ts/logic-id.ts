@@ -1,8 +1,8 @@
-import { ErrorUtils, hexToBytes, type Hex } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind } from "./enums";
 import { flagMasks } from "./flags";
 import type { Identifier, InvalidReason } from "./types/identifier";
+import { hexToBytes, type Hex } from "./utils";
 
 export class LogicId extends BaseIdentifier {
     constructor(value: Uint8Array | Hex) {
@@ -11,7 +11,7 @@ export class LogicId extends BaseIdentifier {
         const error = LogicId.validate(this.toBytes());
 
         if (error) {
-            ErrorUtils.throwArgumentError(`Invalid logic identifier. ${error.why}`, "value", value);
+            throw new Error(`Invalid logic identifier. ${error.why}`);
         }
     }
 

@@ -1,5 +1,5 @@
-import { hexToBytes } from "js-moi-utils";
 import { IdentifierKind, isLogicId, logicId, LogicId, participantId } from "../src.ts";
+import { hexToBytes } from "../src.ts/utils";
 
 const NOT_A_LOGIC_ID = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000";
 const TEST_LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";

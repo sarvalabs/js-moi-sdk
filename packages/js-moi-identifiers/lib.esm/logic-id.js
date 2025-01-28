@@ -1,13 +1,13 @@
-import { ErrorUtils, hexToBytes } from "js-moi-utils";
 import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind } from "./enums";
 import { flagMasks } from "./flags";
+import { hexToBytes } from "./utils";
 export class LogicId extends BaseIdentifier {
     constructor(value) {
         super(value);
         const error = LogicId.validate(this.toBytes());
         if (error) {
-            ErrorUtils.throwArgumentError(`Invalid logic identifier. ${error.why}`, "value", value);
+            throw new Error(`Invalid logic identifier. ${error.why}`);
         }
     }
     static validate(value) {
