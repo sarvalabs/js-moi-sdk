@@ -1,9 +1,8 @@
-export { AssetId, assetId, isAssetId } from "./asset-id";
-export { BaseIdentifier, isIdentifier } from "./base-identifier";
+export { AssetId } from "./asset-id";
 export { IdentifierKind, IdentifierVersion } from "./enums";
 export { Flag } from "./flags";
+export { Identifier, isIdentifier, type InvalidReason } from "./identifier";
 export { IdentifierTag } from "./identifier-tag";
-export { isLogicId, LogicId, logicId } from "./logic-id";
-export { createParticipantId, isParticipantId, participantId, ParticipantId, type GenerateParticipantOption } from "./participant-id";
-export type { Identifier, InvalidReason } from "./types/identifier";
+export { LogicId } from "./logic-id";
+export { createParticipantId, ParticipantId, type GenerateParticipantOption } from "./participant-id";
 //# sourceMappingURL=index.d.ts.map

@@ -1,14 +1,17 @@
 import type { IdentifierKind, IdentifierVersion } from "./enums";
 import { getFlag, setFlag, type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
-import type { Identifier } from "./types/identifier";
 import { bytesToHex, hexToBytes, type Hex } from "./utils";
 
-export abstract class BaseIdentifier implements Identifier {
+export interface InvalidReason {
+    why: string;
+}
+
+export class Identifier {
     private readonly value: Uint8Array;
 
-    constructor(value: Uint8Array | Hex) {
-        value = value instanceof Uint8Array ? value : hexToBytes(value);
+    constructor(value: Uint8Array | Hex | Identifier) {
+        value = value instanceof Uint8Array ? value : value instanceof Identifier ? value.toBytes() : hexToBytes(value);
 
         if (value.length !== 32) {
             throw new TypeError("Invalid identifier length. Expected 32 bytes.");
@@ -35,7 +38,7 @@ export abstract class BaseIdentifier implements Identifier {
      * @returns {IdentifierTag} The tag of the identifier.
      */
     public getTag(): IdentifierTag {
-        return BaseIdentifier.getTag(this.value);
+        return Identifier.getTag(this.value);
     }
 
     /**
@@ -79,7 +82,7 @@ export abstract class BaseIdentifier implements Identifier {
         new DataView(newVariant.buffer).setUint32(28, variant, false);
 
         for (const flag of set ?? []) {
-            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+            if (!flag.supports(Identifier.getTag(newVariant))) {
                 throw new Error(`Invalid flag. Unsupported flag for identifier.`);
             }
 
@@ -87,7 +90,7 @@ export abstract class BaseIdentifier implements Identifier {
         }
 
         for (const flag of unset ?? []) {
-            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+            if (!flag.supports(Identifier.getTag(newVariant))) {
                 throw new Error(`Invalid flag. Unsupported flag for identifier.`);
             }
 
@@ -176,5 +179,5 @@ export abstract class BaseIdentifier implements Identifier {
  * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
  */
 export const isIdentifier = (value: unknown): value is Identifier => {
-    return value instanceof BaseIdentifier;
+    return value instanceof Identifier;
 };

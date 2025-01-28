@@ -1,11 +1,10 @@
-import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind } from "./enums";
 import { flagMasks } from "./flags";
-import type { Identifier, InvalidReason } from "./types/identifier";
+import { Identifier, type InvalidReason } from "./identifier";
 import { hexToBytes, type Hex } from "./utils";
 
-export class LogicId extends BaseIdentifier {
-    constructor(value: Uint8Array | Hex) {
+export class LogicId extends Identifier {
+    constructor(value: Uint8Array | Hex | LogicId) {
         super(value);
 
         const error = LogicId.validate(this.toBytes());
@@ -42,23 +41,3 @@ export class LogicId extends BaseIdentifier {
         return this.validate(value) === null;
     }
 }
-
-/**
- * Generates a new LogicId identifier from the given value.
- *
- * @param value - The value to be used for generating the LogicId. It can be either a Uint8Array or a Hex string.
- * @returns An Identifier instance created from the provided value.
- */
-export const logicId = (value: Uint8Array | Hex): Identifier => {
-    return new LogicId(value);
-};
-
-/**
- * Checks if the given identifier is an instance of LogicId.
- *
- * @param value - The identifier to check.
- * @returns True if the identifier is an instance of LogicId, otherwise false.
- */
-export const isLogicId = (value: Identifier): value is LogicId => {
-    return value instanceof LogicId;
-};

@@ -1,5 +1,5 @@
 import { IdentifierKind, type IdentifierVersion } from "./enums";
-import type { InvalidReason } from "./types/identifier";
+import type { InvalidReason } from "./identifier";
 export declare class IdentifierTag {
     readonly value: number;
     private static MAX_IDENTIFIER_KIND;

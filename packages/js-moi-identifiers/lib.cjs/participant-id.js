@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isParticipantId = exports.participantId = exports.createParticipantId = exports.ParticipantId = void 0;
-const base_identifier_1 = require("./base-identifier");
+exports.createParticipantId = exports.ParticipantId = void 0;
 const enums_1 = require("./enums");
 const flags_1 = require("./flags");
+const identifier_1 = require("./identifier");
 const identifier_tag_1 = require("./identifier-tag");
 const utils_1 = require("./utils");
-class ParticipantId extends base_identifier_1.BaseIdentifier {
+class ParticipantId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
         const error = ParticipantId.validate(this.toBytes());
@@ -65,30 +65,4 @@ const createParticipantId = (option) => {
     return new ParticipantId(participant);
 };
 exports.createParticipantId = createParticipantId;
-/**
- * Creates a new `Identifier` instance from the given value.
- *
- * @param value - The value to create the `ParticipantId` from. It can be either a `Uint8Array` or a `Hex` string.
- * @returns A new `ParticipantId` instance.
- */
-const participantId = (value) => {
-    if (value instanceof Uint8Array || typeof value === "string") {
-        return new ParticipantId(value);
-    }
-    if (typeof value === "object") {
-        return (0, exports.createParticipantId)(value);
-    }
-    throw new Error("Invalid value. Expected a Uint8Array, Hex string or object.");
-};
-exports.participantId = participantId;
-/**
- * Checks if the given value is a valid ParticipantId.
- *
- * @param value - The value to check, which can be a Uint8Array, Hex, or Identifier.
- * @returns True if the value is a valid ParticipantId, otherwise false.
- */
-const isParticipantId = (value) => {
-    return value instanceof ParticipantId;
-};
-exports.isParticipantId = isParticipantId;
 //# sourceMappingURL=participant-id.js.map

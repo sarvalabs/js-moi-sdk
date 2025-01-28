@@ -1,4 +1,4 @@
-import { Flag, IdentifierKind, IdentifierVersion, isParticipantId, logicId, ParticipantId, participantId } from "../src.ts";
+import { createParticipantId, Flag, Identifier, IdentifierKind, IdentifierVersion, ParticipantId } from "../src.ts";
 import { hexToBytes } from "../src.ts/utils";
 
 const VALID_PARTICIPANT_ID = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000";
@@ -8,6 +8,10 @@ describe(ParticipantId, () => {
     describe("constructor", () => {
         it.concurrent("should throw error for invalid participant id", () => {
             expect(() => new ParticipantId(NOT_A_PARTICIPANT_ID)).toThrow();
+        });
+
+        it.concurrent("should throw error if identifier kind is not participant", () => {
+            expect(() => new ParticipantId(new Identifier(NOT_A_PARTICIPANT_ID))).toThrow();
         });
 
         it.concurrent("should create a new participant id", () => {
@@ -31,9 +35,9 @@ describe(ParticipantId, () => {
     });
 });
 
-describe(participantId, () => {
+describe(createParticipantId, () => {
     it.concurrent("should generate a valid participant id from object", () => {
-        const participant = participantId({
+        const participant = createParticipantId({
             fingerprint: globalThis.crypto.getRandomValues(new Uint8Array(24)),
             variant: 0,
             version: IdentifierVersion.V0,
@@ -44,38 +48,12 @@ describe(participantId, () => {
 
     it.concurrent("should throw error for when created with object using invalid flags", () => {
         expect(() =>
-            participantId({
+            createParticipantId({
                 fingerprint: globalThis.crypto.getRandomValues(new Uint8Array(24)),
                 variant: 0,
                 version: IdentifierVersion.V0,
                 flags: [new Flag(IdentifierKind.Participant, 2, 3)],
             })
         ).toThrow();
-    });
-
-    it.concurrent("should generate a valid participant id from hex", () => {
-        const participant = participantId(VALID_PARTICIPANT_ID);
-
-        expect(participant).toBeInstanceOf(ParticipantId);
-    });
-
-    it.concurrent("should generate a valid participant id from bytes", () => {
-        const participant = participantId(hexToBytes(VALID_PARTICIPANT_ID));
-
-        expect(participant).toBeInstanceOf(ParticipantId);
-    });
-});
-
-describe(isParticipantId, () => {
-    it.concurrent("should return true for valid participant id", () => {
-        const participant = participantId(VALID_PARTICIPANT_ID);
-
-        expect(isParticipantId(participant)).toBe(true);
-    });
-
-    it.concurrent("should return false for invalid participant id", () => {
-        const identifier = logicId(NOT_A_PARTICIPANT_ID);
-
-        expect(isParticipantId(identifier)).toBe(false);
     });
 });

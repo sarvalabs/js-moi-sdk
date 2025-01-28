@@ -1,8 +1,7 @@
-import { BaseIdentifier } from "./base-identifier";
-import type { Identifier, InvalidReason } from "./types/identifier";
+import { Identifier, type InvalidReason } from "./identifier";
 import { type Hex } from "./utils";
-export declare class AssetId extends BaseIdentifier {
-    constructor(value: Uint8Array | Hex);
+export declare class AssetId extends Identifier {
+    constructor(value: Uint8Array | Hex | Identifier);
     /**
      * Retrieves the standard of the asset.
      *
@@ -16,18 +15,4 @@ export declare class AssetId extends BaseIdentifier {
     static validate(value: Uint8Array | Hex): InvalidReason | null;
     static isValid(value: Uint8Array | Hex): boolean;
 }
-/**
- * Generates an `Identifier` for a given asset.
- *
- * @param value - The value of the asset, which can be either a `Uint8Array` or a `Hex` string.
- * @returns An `Identifier` representing the asset.
- */
-export declare const assetId: (value: Uint8Array | Hex) => Identifier;
-/**
- * Checks if the given identifier is an instance of AssetId.
- *
- * @param value - The identifier to check.
- * @returns True if the identifier is an instance of AssetId, otherwise false.
- */
-export declare const isAssetId: (value: Identifier) => value is AssetId;
 //# sourceMappingURL=asset-id.d.ts.map

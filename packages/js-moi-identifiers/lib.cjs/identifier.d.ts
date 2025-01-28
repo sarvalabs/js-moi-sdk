@@ -1,11 +1,13 @@
 import type { IdentifierKind, IdentifierVersion } from "./enums";
 import { type Flag } from "./flags";
 import { IdentifierTag } from "./identifier-tag";
-import type { Identifier } from "./types/identifier";
 import { type Hex } from "./utils";
-export declare abstract class BaseIdentifier implements Identifier {
+export interface InvalidReason {
+    why: string;
+}
+export declare class Identifier {
     private readonly value;
-    constructor(value: Uint8Array | Hex);
+    constructor(value: Uint8Array | Hex | Identifier);
     /**
      * Generates a fingerprint for the identifier.
      *
@@ -101,4 +103,4 @@ export declare abstract class BaseIdentifier implements Identifier {
  * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
  */
 export declare const isIdentifier: (value: unknown) => value is Identifier;
-//# sourceMappingURL=base-identifier.d.ts.map
+//# sourceMappingURL=identifier.d.ts.map

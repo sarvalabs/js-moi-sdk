@@ -1,8 +1,7 @@
-import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind, IdentifierVersion } from "./enums";
 import { flagMasks, setFlag, type Flag } from "./flags";
+import { Identifier, type InvalidReason } from "./identifier";
 import { IdentifierTag } from "./identifier-tag";
-import type { Identifier, InvalidReason } from "./types/identifier";
 import { hexToBytes, type Hex } from "./utils";
 
 export interface GenerateParticipantOption {
@@ -12,8 +11,8 @@ export interface GenerateParticipantOption {
     flags?: Flag[];
 }
 
-export class ParticipantId extends BaseIdentifier {
-    constructor(value: Uint8Array | Hex) {
+export class ParticipantId extends Identifier {
+    constructor(value: Uint8Array | Hex | Identifier) {
         super(value);
 
         const error = ParticipantId.validate(this.toBytes());
@@ -85,32 +84,4 @@ export const createParticipantId = (option: GenerateParticipantOption): Particip
     new DataView(participant.buffer).setUint32(28, option.variant, false);
 
     return new ParticipantId(participant);
-};
-
-/**
- * Creates a new `Identifier` instance from the given value.
- *
- * @param value - The value to create the `ParticipantId` from. It can be either a `Uint8Array` or a `Hex` string.
- * @returns A new `ParticipantId` instance.
- */
-export const participantId = (value: Uint8Array | Hex | GenerateParticipantOption): Identifier => {
-    if (value instanceof Uint8Array || typeof value === "string") {
-        return new ParticipantId(value);
-    }
-
-    if (typeof value === "object") {
-        return createParticipantId(value);
-    }
-
-    throw new Error("Invalid value. Expected a Uint8Array, Hex string or object.");
-};
-
-/**
- * Checks if the given value is a valid ParticipantId.
- *
- * @param value - The value to check, which can be a Uint8Array, Hex, or Identifier.
- * @returns True if the value is a valid ParticipantId, otherwise false.
- */
-export const isParticipantId = (value: Identifier): value is ParticipantId => {
-    return value instanceof ParticipantId;
 };

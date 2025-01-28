@@ -1,10 +1,13 @@
-import { getFlag, setFlag } from "./flags";
-import { IdentifierTag } from "./identifier-tag";
-import { bytesToHex, hexToBytes } from "./utils";
-export class BaseIdentifier {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isIdentifier = exports.Identifier = void 0;
+const flags_1 = require("./flags");
+const identifier_tag_1 = require("./identifier-tag");
+const utils_1 = require("./utils");
+class Identifier {
     value;
     constructor(value) {
-        value = value instanceof Uint8Array ? value : hexToBytes(value);
+        value = value instanceof Uint8Array ? value : value instanceof Identifier ? value.toBytes() : (0, utils_1.hexToBytes)(value);
         if (value.length !== 32) {
             throw new TypeError("Invalid identifier length. Expected 32 bytes.");
         }
@@ -27,7 +30,7 @@ export class BaseIdentifier {
      * @returns {IdentifierTag} The tag of the identifier.
      */
     getTag() {
-        return BaseIdentifier.getTag(this.value);
+        return Identifier.getTag(this.value);
     }
     /**
      * Retrieves the kind of the identifier.
@@ -66,16 +69,16 @@ export class BaseIdentifier {
         const newVariant = this.toBytes();
         new DataView(newVariant.buffer).setUint32(28, variant, false);
         for (const flag of set ?? []) {
-            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+            if (!flag.supports(Identifier.getTag(newVariant))) {
                 throw new Error(`Invalid flag. Unsupported flag for identifier.`);
             }
-            newVariant[1] = setFlag(newVariant[1], flag.index, true);
+            newVariant[1] = (0, flags_1.setFlag)(newVariant[1], flag.index, true);
         }
         for (const flag of unset ?? []) {
-            if (!flag.supports(BaseIdentifier.getTag(newVariant))) {
+            if (!flag.supports(Identifier.getTag(newVariant))) {
                 throw new Error(`Invalid flag. Unsupported flag for identifier.`);
             }
-            newVariant[1] = setFlag(newVariant[1], flag.index, false);
+            newVariant[1] = (0, flags_1.setFlag)(newVariant[1], flag.index, false);
         }
         // We need to create a new instance of the identifier with the new variant.
         // This is tricky because we need to create the instance of parent class without knowing the exact class.
@@ -108,7 +111,7 @@ export class BaseIdentifier {
      * @returns `true` if the identifier has the specified flag, otherwise `false`.
      */
     hasFlag(flag) {
-        return flag.supports(this.getTag()) || getFlag(this.value[1], flag.index);
+        return flag.supports(this.getTag()) || (0, flags_1.getFlag)(this.value[1], flag.index);
     }
     /**
      * Converts the current value to a byte array.
@@ -124,7 +127,7 @@ export class BaseIdentifier {
      * @returns {Hex} The hexadecimal representation of the identifier value.
      */
     toHex() {
-        return bytesToHex(this.value);
+        return (0, utils_1.bytesToHex)(this.value);
     }
     toString() {
         return this.toHex();
@@ -140,16 +143,18 @@ export class BaseIdentifier {
      * @throws {Error} If the length of the identifier value is not 32 bytes.
      */
     static getTag(value) {
-        return new IdentifierTag(value[0]);
+        return new identifier_tag_1.IdentifierTag(value[0]);
     }
 }
+exports.Identifier = Identifier;
 /**
  * Checks if the given value is an identifier.
  *
  * @param value - The value to check.
  * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
  */
-export const isIdentifier = (value) => {
-    return value instanceof BaseIdentifier;
+const isIdentifier = (value) => {
+    return value instanceof Identifier;
 };
-//# sourceMappingURL=base-identifier.js.map
+exports.isIdentifier = isIdentifier;
+//# sourceMappingURL=identifier.js.map

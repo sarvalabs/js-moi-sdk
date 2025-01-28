@@ -1,4 +1,4 @@
-import { AssetId, ensureHexPrefix, LogicId, type Hex } from "../src.ts";
+import { ensureHexPrefix, type Hex } from "../src.ts";
 
 interface TestCase<TVal, TExpected> {
     value: TVal;

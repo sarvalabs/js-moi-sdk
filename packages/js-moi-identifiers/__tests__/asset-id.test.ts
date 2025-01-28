@@ -1,4 +1,4 @@
-import { assetId, AssetId, IdentifierKind, isAssetId, participantId } from "../src.ts";
+import { AssetId, Identifier, IdentifierKind } from "../src.ts";
 import { hexToBytes } from "../src.ts/utils";
 
 const TEST_ASSET_ID = "0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000";
@@ -8,6 +8,10 @@ describe(AssetId, () => {
     describe("constructor", () => {
         it.concurrent("should throw error for invalid asset id", () => {
             expect(() => new AssetId(NOT_A_ASSET_ID)).toThrow();
+        });
+
+        it.concurrent("should throw error if identifier kind is not asset", () => {
+            expect(() => new AssetId(new Identifier(NOT_A_ASSET_ID))).toThrow();
         });
 
         it.concurrent("should create instance for valid asset id", () => {
@@ -28,37 +32,5 @@ describe(AssetId, () => {
         it.concurrent("should return error for invalid asset id", () => {
             expect(AssetId.validate(hexToBytes(NOT_A_ASSET_ID))).not.toBeNull();
         });
-    });
-});
-
-describe(assetId, () => {
-    it.concurrent("should create asset from hex string", () => {
-        const asset = assetId(TEST_ASSET_ID);
-
-        expect(asset).toBeInstanceOf(AssetId);
-    });
-
-    it.concurrent("should create asset from Uint8Array", () => {
-        const asset = assetId(hexToBytes(TEST_ASSET_ID));
-
-        expect(asset).toBeInstanceOf(AssetId);
-    });
-
-    it.concurrent("should throw error for invalid asset id", () => {
-        expect(() => assetId(NOT_A_ASSET_ID)).toThrow();
-    });
-});
-
-describe(isAssetId, () => {
-    it.concurrent("should return true for valid asset id", () => {
-        const identifier = assetId(TEST_ASSET_ID);
-
-        expect(isAssetId(identifier)).toBe(true);
-    });
-
-    it.concurrent("should return false for invalid asset id", () => {
-        const identifier = participantId(NOT_A_ASSET_ID);
-
-        expect(isAssetId(identifier)).toBe(false);
     });
 });

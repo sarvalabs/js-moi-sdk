@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAssetId = exports.assetId = exports.AssetId = void 0;
-const base_identifier_1 = require("./base-identifier");
+exports.AssetId = void 0;
 const enums_1 = require("./enums");
 const flags_1 = require("./flags");
+const identifier_1 = require("./identifier");
 const utils_1 = require("./utils");
-class AssetId extends base_identifier_1.BaseIdentifier {
+class AssetId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
         const error = AssetId.validate(this.toBytes());
@@ -46,24 +46,4 @@ class AssetId extends base_identifier_1.BaseIdentifier {
     }
 }
 exports.AssetId = AssetId;
-/**
- * Generates an `Identifier` for a given asset.
- *
- * @param value - The value of the asset, which can be either a `Uint8Array` or a `Hex` string.
- * @returns An `Identifier` representing the asset.
- */
-const assetId = (value) => {
-    return new AssetId(value);
-};
-exports.assetId = assetId;
-/**
- * Checks if the given identifier is an instance of AssetId.
- *
- * @param value - The identifier to check.
- * @returns True if the identifier is an instance of AssetId, otherwise false.
- */
-const isAssetId = (value) => {
-    return value instanceof AssetId;
-};
-exports.isAssetId = isAssetId;
 //# sourceMappingURL=asset-id.js.map

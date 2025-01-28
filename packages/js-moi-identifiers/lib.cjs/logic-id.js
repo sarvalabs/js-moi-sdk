@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isLogicId = exports.logicId = exports.LogicId = void 0;
-const base_identifier_1 = require("./base-identifier");
+exports.LogicId = void 0;
 const enums_1 = require("./enums");
 const flags_1 = require("./flags");
+const identifier_1 = require("./identifier");
 const utils_1 = require("./utils");
-class LogicId extends base_identifier_1.BaseIdentifier {
+class LogicId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
         const error = LogicId.validate(this.toBytes());
@@ -34,24 +34,4 @@ class LogicId extends base_identifier_1.BaseIdentifier {
     }
 }
 exports.LogicId = LogicId;
-/**
- * Generates a new LogicId identifier from the given value.
- *
- * @param value - The value to be used for generating the LogicId. It can be either a Uint8Array or a Hex string.
- * @returns An Identifier instance created from the provided value.
- */
-const logicId = (value) => {
-    return new LogicId(value);
-};
-exports.logicId = logicId;
-/**
- * Checks if the given identifier is an instance of LogicId.
- *
- * @param value - The identifier to check.
- * @returns True if the identifier is an instance of LogicId, otherwise false.
- */
-const isLogicId = (value) => {
-    return value instanceof LogicId;
-};
-exports.isLogicId = isLogicId;
 //# sourceMappingURL=logic-id.js.map

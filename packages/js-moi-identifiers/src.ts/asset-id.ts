@@ -1,11 +1,10 @@
-import { BaseIdentifier } from "./base-identifier";
 import { IdentifierKind } from "./enums";
 import { flagMasks } from "./flags";
-import type { Identifier, InvalidReason } from "./types/identifier";
+import { Identifier, type InvalidReason } from "./identifier";
 import { hexToBytes, type Hex } from "./utils";
 
-export class AssetId extends BaseIdentifier {
-    constructor(value: Uint8Array | Hex) {
+export class AssetId extends Identifier {
+    constructor(value: Uint8Array | Hex | Identifier) {
         super(value);
 
         const error = AssetId.validate(this.toBytes());
@@ -55,23 +54,3 @@ export class AssetId extends BaseIdentifier {
         return this.validate(value) === null;
     }
 }
-
-/**
- * Generates an `Identifier` for a given asset.
- *
- * @param value - The value of the asset, which can be either a `Uint8Array` or a `Hex` string.
- * @returns An `Identifier` representing the asset.
- */
-export const assetId = (value: Uint8Array | Hex): Identifier => {
-    return new AssetId(value);
-};
-
-/**
- * Checks if the given identifier is an instance of AssetId.
- *
- * @param value - The identifier to check.
- * @returns True if the identifier is an instance of AssetId, otherwise false.
- */
-export const isAssetId = (value: Identifier): value is AssetId => {
-    return value instanceof AssetId;
-};
