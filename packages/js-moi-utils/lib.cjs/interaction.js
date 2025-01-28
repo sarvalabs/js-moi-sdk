@@ -208,7 +208,7 @@ function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!(0, hex_1.isAddress)(ix.sender.address)) {
+    if (!(0, hex_1.isHex)(ix.sender.address, 32)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {
@@ -223,7 +223,7 @@ function validateIxRequest(type, ix) {
     if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
-    if (ix.payer != null && !(0, hex_1.isAddress)(ix.payer)) {
+    if (ix.payer != null && !(0, hex_1.isHex)(ix.payer, 32)) {
         return createInvalidResult(ix, "payer", "Invalid payer address");
     }
     if (ix.participants != null) {
@@ -235,7 +235,7 @@ function validateIxRequest(type, ix) {
             if (error != null) {
                 return error;
             }
-            if (!(0, hex_1.isAddress)(participant.address)) {
+            if (!(0, hex_1.isHex)(participant.address, 32)) {
                 error = createInvalidResult(participant, "address", "Invalid participant address");
                 break;
             }

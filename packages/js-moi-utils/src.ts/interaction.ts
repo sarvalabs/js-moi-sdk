@@ -3,7 +3,7 @@ import { AssetId, LogicId } from "js-moi-identifiers";
 import { Polorizer, type Schema } from "js-polo";
 import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
-import { hexToBytes, isAddress, type Hex } from "./hex";
+import { hexToBytes, isHex, type Hex } from "./hex";
 import { encodeOperation, validateOperation } from "./operations";
 import type { InteractionRequest, IxFund, IxParticipant, RawInteractionRequest } from "./types/interaction";
 
@@ -233,7 +233,7 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
         return createInvalidResult(ix, "sender", "Sender is required");
     }
 
-    if (!isAddress(ix.sender.address)) {
+    if (!isHex(ix.sender.address, 32)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
 
@@ -253,7 +253,7 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
         return createInvalidResult(<InteractionRequest>ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
 
-    if (ix.payer != null && !isAddress(ix.payer)) {
+    if (ix.payer != null && !isHex(ix.payer, 32)) {
         return createInvalidResult(ix, "payer", "Invalid payer address");
     }
 
@@ -269,7 +269,7 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
                 return error;
             }
 
-            if (!isAddress(participant.address)) {
+            if (!isHex(participant.address, 32)) {
                 error = createInvalidResult(participant, "address", "Invalid participant address");
                 break;
             }

@@ -3,7 +3,7 @@ import { AssetId, LogicId } from "js-moi-identifiers";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
-import { hexToBytes, isAddress } from "./hex";
+import { hexToBytes, isHex } from "./hex";
 import { encodeOperation, validateOperation } from "./operations";
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -200,7 +200,7 @@ export function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!isAddress(ix.sender.address)) {
+    if (!isHex(ix.sender.address, 32)) {
         return createInvalidResult(ix.sender, "address", "Invalid sender address");
     }
     if (ix.fuel_price == null) {
@@ -215,7 +215,7 @@ export function validateIxRequest(type, ix) {
     if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
-    if (ix.payer != null && !isAddress(ix.payer)) {
+    if (ix.payer != null && !isHex(ix.payer, 32)) {
         return createInvalidResult(ix, "payer", "Invalid payer address");
     }
     if (ix.participants != null) {
@@ -227,7 +227,7 @@ export function validateIxRequest(type, ix) {
             if (error != null) {
                 return error;
             }
-            if (!isAddress(participant.address)) {
+            if (!isHex(participant.address, 32)) {
                 error = createInvalidResult(participant, "address", "Invalid participant address");
                 break;
             }

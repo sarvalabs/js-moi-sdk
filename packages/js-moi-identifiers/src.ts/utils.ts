@@ -36,3 +36,4 @@ export const bytesToHex = (data: Uint8Array): Hex => {
 
     return hex;
 };
+
