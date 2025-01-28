@@ -65,12 +65,6 @@ export declare class Wallet extends Signer {
      */
     getCurve(): Promise<CURVE>;
     getIdentifier(): Promise<Identifier>;
-    /**
-     * Retrieves the address associated with the wallet.
-     *
-     * @returns {string} The address as a string.
-     */
-    getAddress(): Promise<Hex>;
     getKeyId(): Promise<number>;
     /**
      * Signs a message using the wallet's private key and the specified

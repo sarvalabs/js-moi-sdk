@@ -184,7 +184,7 @@ export class Wallet extends Signer {
      *
      * @returns {string} The address as a string.
      */
-    public async getAddress(): Promise<Hex> {
+    public async getIdentifier(): Promise<Hex> {
         const publickey = await this.getPublicKey();
         return ensureHexPrefix(publickey.slice(2));
     }
@@ -232,7 +232,7 @@ export class Wallet extends Signer {
 
     public async signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx> {
         try {
-            if (ix.sender.address !== (await this.getAddress())) {
+            if (ix.sender.address !== (await this.getIdentifier())) {
                 ErrorUtils.throwError("Sender address does not match signer address", ErrorCode.INVALID_ARGUMENT);
             }
 

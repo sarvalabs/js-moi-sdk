@@ -233,7 +233,7 @@ export class LogicDriver extends LogicDescriptor {
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case LogicState.Ephemeral: {
-                const address = await this.signer.getAddress();
+                const address = await this.signer.getIdentifier();
                 return await this.signer.getProvider().getLogicStorage(logicId, address, storageKey);
             }
             default:

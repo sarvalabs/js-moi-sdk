@@ -1,3 +1,4 @@
+import type { Identifier } from "js-moi-identifiers";
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
 import { type AnyIxOperation, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
@@ -13,7 +14,7 @@ export declare abstract class Signer {
     private static DEFAULT_FUEL_PRICE;
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms);
     abstract getKeyId(): Promise<number>;
-    abstract getAddress(): Promise<Hex>;
+    abstract getIdentifier(): Promise<Identifier>;
     abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
     abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
     connect(provider: Provider): void;

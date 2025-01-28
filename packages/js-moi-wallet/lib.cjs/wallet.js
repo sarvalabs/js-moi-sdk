@@ -203,7 +203,7 @@ class Wallet extends js_moi_signer_1.Signer {
      *
      * @returns {string} The address as a string.
      */
-    async getAddress() {
+    async getIdentifier() {
         const publickey = await this.getPublicKey();
         return (0, js_moi_utils_1.ensureHexPrefix)(publickey.slice(2));
     }
@@ -243,7 +243,7 @@ class Wallet extends js_moi_signer_1.Signer {
     }
     async signInteraction(ix, sig) {
         try {
-            if (ix.sender.address !== (await this.getAddress())) {
+            if (ix.sender.address !== (await this.getIdentifier())) {
                 js_moi_utils_1.ErrorUtils.throwError("Sender address does not match signer address", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             const encoded = (0, js_moi_utils_1.interaction)(ix);

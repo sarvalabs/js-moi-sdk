@@ -21,14 +21,14 @@ export class Signer {
         ErrorUtils.throwError("Provider is not initialized!", ErrorCode.NOT_INITIALIZED);
     }
     async getLatestSequence() {
-        const [address, index] = await Promise.all([this.getAddress(), this.getKeyId()]);
-        const { sequence } = await this.getProvider().getAccountKey(address, index);
+        const [participant, index] = await Promise.all([this.getIdentifier(), this.getKeyId()]);
+        const { sequence } = await this.getProvider().getAccountKey(participant, index);
         return sequence;
     }
     async createIxRequestSender(sender) {
         if (sender == null) {
-            const [address, index, sequenceId] = await Promise.all([this.getAddress(), this.getKeyId(), this.getLatestSequence()]);
-            return { address, key_id: index, sequence_id: sequenceId };
+            const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
+            return { address: participant.toHex(), key_id: index, sequence_id: sequenceId };
         }
         if (sender.sequence_id != null) {
             if (sender.sequence_id < (await this.getLatestSequence())) {
@@ -36,7 +36,7 @@ export class Signer {
             }
         }
         return {
-            address: await this.getAddress(),
+            address: (await this.getIdentifier()).toHex(),
             key_id: sender.key_id ?? (await this.getKeyId()),
             sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
         };
