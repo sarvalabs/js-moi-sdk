@@ -145,7 +145,6 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
-        console.log("close");
         this.ws.close();
     }
 

@@ -97,7 +97,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         });
     }
     async getAccount(participant, option) {
-        return await this.call("moi.Account", { identifier: participant.toHex(), ...option });
+        return await this.call("moi.Account", { identifier: new js_moi_identifiers_1.Identifier(participant).toHex(), ...option });
     }
     async getTesseractByReference(reference, option) {
         return await this.call("moi.Tesseract", {
@@ -108,12 +108,12 @@ class JsonRpcProvider extends events_1.EventEmitter {
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
-            case (0, js_moi_identifiers_1.isIdentifier)(identifier) && typeof height === "number" && isValidOption(option): {
+            case ((0, js_moi_identifiers_1.isIdentifier)(identifier) || (0, js_moi_utils_1.isHex)(identifier, 32)) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
                 if (Number.isNaN(height) || height < -1) {
                     js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
-                return await this.getTesseractByReference({ relative: { identifier: identifier.toHex(), height } }, option);
+                return await this.getTesseractByReference({ relative: { identifier: new js_moi_identifiers_1.Identifier(identifier).toHex(), height } }, option);
             }
             case typeof identifier === "object" && !(0, js_moi_identifiers_1.isIdentifier)(identifier) && isValidOption(height): {
                 // Getting tesseract by reference
@@ -127,14 +127,16 @@ class JsonRpcProvider extends events_1.EventEmitter {
         js_moi_utils_1.ErrorUtils.throwError("Invalid arguments passed to get correct method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
     getLogic(identifier, option) {
-        return this.call("moi.Logic", { identifier: identifier.toHex(), ...option });
+        return this.call("moi.Logic", { identifier: new js_moi_identifiers_1.LogicId(identifier).toHex(), ...option });
     }
     async getLogicStorage(logic, participantOrStorage, storageId, option) {
         let params;
         switch (true) {
             case (0, js_moi_utils_1.isHex)(participantOrStorage) || participantOrStorage instanceof js_moi_utils_1.StorageKey: {
                 // getting value from persistent storage
-                params = [{ logic_id: logic.toHex(), storage_id: participantOrStorage instanceof js_moi_utils_1.StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option }];
+                params = [
+                    { logic_id: new js_moi_identifiers_1.LogicId(logic).toHex(), storage_id: participantOrStorage instanceof js_moi_utils_1.StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option },
+                ];
                 break;
             }
             case (0, js_moi_identifiers_1.isIdentifier)(participantOrStorage): {
@@ -146,7 +148,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
                     js_moi_utils_1.ErrorUtils.throwArgumentError("Storage key must be a valid hex string or StorageKey instance", "storageId", storageId);
                 }
                 const storageIdHex = storageId instanceof js_moi_utils_1.StorageKey ? storageId.hex() : storageId;
-                params = [{ logic_id: logic.toHex(), address: participantOrStorage.toHex(), storage_id: storageIdHex, ...option }];
+                params = [{ logic_id: new js_moi_identifiers_1.LogicId(logic).toHex(), address: participantOrStorage.toHex(), storage_id: storageIdHex, ...option }];
                 break;
             }
             default: {
@@ -156,7 +158,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.LogicStorage", ...params);
     }
     async getAsset(asset, option) {
-        return await this.call("moi.Asset", { identifier: asset.toHex(), ...option });
+        return await this.call("moi.Asset", { identifier: new js_moi_identifiers_1.AssetId(asset).toHex(), ...option });
     }
     encodeTopics(topics) {
         const encodedTopics = Array.from({ length: topics.length });
@@ -173,17 +175,21 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return encodedTopics;
     }
     async getLogicMessage(logic, options) {
-        return await this.call("moi.LogicMessage", { logic_id: logic.toHex(), ...options, topics: options?.topics == null ? undefined : this.encodeTopics(options.topics) });
+        return await this.call("moi.LogicMessage", {
+            logic_id: new js_moi_identifiers_1.LogicId(logic).toHex(),
+            ...options,
+            topics: this.encodeTopics(options?.topics ?? []),
+        });
     }
     async getAccountAsset(participant, asset, option) {
-        return await this.call("moi.AccountAsset", { identifier: participant.toHex(), asset_id: asset.toHex(), ...option });
+        return await this.call("moi.AccountAsset", { identifier: new js_moi_identifiers_1.Identifier(participant).toHex(), asset_id: new js_moi_identifiers_1.AssetId(asset).toHex(), ...option });
     }
     async getAccountKey(participant, index, option) {
         if (Number.isNaN(index) || index < 0) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
         }
         return await this.call("moi.AccountKey", {
-            identifier: participant.toHex(),
+            identifier: new js_moi_identifiers_1.Identifier(participant).toHex(),
             key_idx: index,
             ...option,
         });

@@ -112,7 +112,6 @@ class WebsocketTransport extends events_1.default {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
-        console.log("close");
         this.ws.close();
     }
     createId() {
