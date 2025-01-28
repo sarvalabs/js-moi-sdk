@@ -154,9 +154,9 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the wallet is not initialized or loaded, or if there
      * is an error generating the keystore.
      */
-    generateKeystore(password) {
+    async generateKeystore(password) {
         try {
-            const data = (0, js_moi_utils_1.hexToBytes)(this.privateKey);
+            const data = (0, js_moi_utils_1.hexToBytes)(await this.getPrivateKey());
             return (0, keystore_1.encryptKeystoreData)(data, password);
         }
         catch (err) {
@@ -169,8 +169,8 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    get privateKey() {
-        return privateMapGet(this, __vault)._key;
+    getPrivateKey() {
+        return Promise.resolve(privateMapGet(this, __vault)._key);
     }
     /**
      * Retrieves the mnemonic associated with the wallet.
@@ -178,28 +178,23 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    get mnemonic() {
-        return privateMapGet(this, __vault)._mnemonic;
+    getMnemonic() {
+        return Promise.resolve(privateMapGet(this, __vault)._mnemonic);
     }
-    /**
-     * Public key associated with the wallet.
-     *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
-     */
-    get publicKey() {
-        return privateMapGet(this, __vault)._public;
+    getPublicKey() {
+        return Promise.resolve(privateMapGet(this, __vault)._public);
     }
     /**
      * Curve associated with the wallet.
      *
      * @readonly
      */
-    get curve() {
+    getCurve() {
         return privateMapGet(this, __vault)._curve;
     }
     async getIdentifier() {
-        const fingerprint = (0, js_moi_utils_1.hexToBytes)((0, js_moi_utils_1.ensureHexPrefix)(this.publicKey)).slice(0, 24);
+        const publickey = await this.getPublicKey();
+        const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(0, 24);
         const participant = js_moi_identifiers_1.ParticipantId.generateParticipantIdV0(fingerprint, 0);
         return participant.toIdentifier();
     }
@@ -209,7 +204,8 @@ class Wallet extends js_moi_signer_1.Signer {
      * @returns {string} The address as a string.
      */
     async getAddress() {
-        return (0, js_moi_utils_1.ensureHexPrefix)(this.publicKey.slice(2));
+        const publickey = await this.getPublicKey();
+        return (0, js_moi_utils_1.ensureHexPrefix)(publickey.slice(2));
     }
     getKeyId() {
         return Promise.resolve(this.key_index);
@@ -236,10 +232,9 @@ class Wallet extends js_moi_signer_1.Signer {
         }
         switch (sig.sigName) {
             case "ECDSA_S256": {
-                const _sigAlgo = this.signingAlgorithms.ecdsa_secp256k1;
-                const sig = _sigAlgo.sign(message, this.privateKey);
-                const sigBytes = sig.serialize();
-                return (0, js_moi_utils_1.bytesToHex)(sigBytes);
+                const algorithm = this.signingAlgorithms.ecdsa_secp256k1;
+                const sig = algorithm.sign(message, await this.getPrivateKey());
+                return (0, js_moi_utils_1.bytesToHex)(sig.serialize());
             }
             default: {
                 js_moi_utils_1.ErrorUtils.throwError("Unsupported signature type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

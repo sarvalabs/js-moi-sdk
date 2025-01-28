@@ -42,34 +42,28 @@ export declare class Wallet extends Signer {
      * @throws {Error} if the wallet is not initialized or loaded, or if there
      * is an error generating the keystore.
      */
-    generateKeystore(password: string): Keystore;
+    generateKeystore(password: string): Promise<Keystore>;
     /**
      * Private key associated with the wallet.
      *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    get privateKey(): string;
+    getPrivateKey(): Promise<string>;
     /**
      * Retrieves the mnemonic associated with the wallet.
      *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    get mnemonic(): string | undefined;
-    /**
-     * Public key associated with the wallet.
-     *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
-     */
-    get publicKey(): string;
+    getMnemonic(): Promise<string | undefined>;
+    getPublicKey(): Promise<string>;
     /**
      * Curve associated with the wallet.
      *
      * @readonly
      */
-    get curve(): string;
+    getCurve(): Promise<CURVE>;
     getIdentifier(): Promise<Identifier>;
     /**
      * Retrieves the address associated with the wallet.
