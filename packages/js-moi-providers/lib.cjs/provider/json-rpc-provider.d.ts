@@ -51,8 +51,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getTesseract<TOption extends TesseractRequestOption>(identifier: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
-    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-    getLogic<TOption extends LogicRequestOption>(identifier: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+    getLogic<TOption extends LogicRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
     getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     getAsset<TOption extends AssetRequestOption>(identifier: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;

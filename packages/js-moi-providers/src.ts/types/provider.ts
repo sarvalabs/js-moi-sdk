@@ -6,14 +6,12 @@ import type {
     AccountKey,
     Address,
     Asset,
-    AssetId,
     ExtractModifier,
     Hex,
     IncludeModifier,
     Interaction,
     InteractionRequest,
     Logic,
-    LogicId,
     LogicMessage,
     NetworkInfo,
     ResponseModifierParam,
@@ -82,15 +80,14 @@ interface TesseractRequest {
 export type LogicRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Logic, "metadata">>;
 
 interface LogicRequest {
-    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-    getLogic<TOption extends LogicRequestOption>(logicId: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+    getLogic<TOption extends LogicRequestOption>(logicId: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
 }
 
 export type LogicStorageRequestOption = TesseractReferenceParam;
 
 interface LogicStorageRequest {
-    getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
-    getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, participantId: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
 }
 
 export type AssetRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Asset, "metadata">>;
@@ -147,7 +144,7 @@ export interface Provider
         AccountAssetRequest,
         AccountKeyRequest, // DONE
         AccountRequest, // DONE
-        AssetRequest,
+        AssetRequest, // DONE
         ExecuteRequest,
         InteractionRequestMethod,
         LogicMessageRequest,

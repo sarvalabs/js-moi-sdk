@@ -1,6 +1,6 @@
 import type { EventEmitter } from "events";
 import type { Identifier } from "js-moi-identifiers";
-import type { Account, AccountAsset, AccountKey, Address, Asset, AssetId, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicId, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, AccountAsset, AccountKey, Address, Asset, ExtractModifier, Hex, IncludeModifier, Interaction, InteractionRequest, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, StorageKey, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 import type { InteractionResponse } from "../utils/interaction-response";
 import type { MethodParams, NestedArray } from "./moi-execution-api";
 type NonOptionalKeys<T extends Record<string, any>> = {
@@ -44,13 +44,12 @@ interface TesseractRequest {
 }
 export type LogicRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Logic, "metadata">>;
 interface LogicRequest {
-    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-    getLogic<TOption extends LogicRequestOption>(logicId: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
+    getLogic<TOption extends LogicRequestOption>(logicId: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
 }
 export type LogicStorageRequestOption = TesseractReferenceParam;
 interface LogicStorageRequest {
-    getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
-    getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    getLogicStorage(logicId: Identifier, participantId: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
 }
 export type AssetRequestOption = TesseractReferenceParam & ResponseModifierParam<Exclude<keyof Asset, "metadata">>;
 interface AssetRequest {
@@ -85,7 +84,8 @@ interface SubscribeRequest {
 }
 export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, // DONE
 AccountRequest, // DONE
-AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
+AssetRequest, // DONE
+ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map
