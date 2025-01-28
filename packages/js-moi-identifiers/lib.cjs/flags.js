@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.flagMasks = exports.getFlag = exports.setFlag = exports.Flag = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-const identifier_kind_1 = require("./identifier-kind");
-const identifier_1 = require("./types/identifier");
+const enums_1 = require("./enums");
+const identifier_tag_1 = require("./identifier-tag");
 /**
  * Represents a flag specifier for an identifier.
  */
@@ -62,8 +62,8 @@ const getFlag = (value, index) => {
 };
 exports.getFlag = getFlag;
 exports.flagMasks = new Map([
-    [identifier_1.IdentifierTag.getTag(identifier_kind_1.IdentifierKind.Participant, identifier_1.IdentifierVersion.V0).value, 0b01111111],
-    [identifier_1.IdentifierTag.getTag(identifier_kind_1.IdentifierKind.Logic, identifier_1.IdentifierVersion.V0).value, 0b01111000],
-    [identifier_1.IdentifierTag.getTag(identifier_kind_1.IdentifierKind.Asset, identifier_1.IdentifierVersion.V0).value, 0b01111111],
+    [identifier_tag_1.IdentifierTag.getTag(enums_1.IdentifierKind.Participant, enums_1.IdentifierVersion.V0).value, 0b01111111],
+    [identifier_tag_1.IdentifierTag.getTag(enums_1.IdentifierKind.Logic, enums_1.IdentifierVersion.V0).value, 0b01111000],
+    [identifier_tag_1.IdentifierTag.getTag(enums_1.IdentifierKind.Asset, enums_1.IdentifierVersion.V0).value, 0b01111111],
 ]);
 //# sourceMappingURL=flags.js.map

@@ -1,88 +1,62 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantId = void 0;
+exports.createParticipantId = exports.ParticipantId = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const base_identifier_1 = require("./base-identifier");
+const enums_1 = require("./enums");
 const flags_1 = require("./flags");
-const identifier_1 = require("./identifier");
-const identifier_kind_1 = require("./identifier-kind");
 const identifier_tag_1 = require("./identifier-tag");
-class ParticipantId {
-    bytes;
+class ParticipantId extends base_identifier_1.BaseIdentifier {
     constructor(value) {
-        if (value.length !== 32) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid byte length for participant identifier. Expected 32 bytes.", "value", value);
-        }
-        this.bytes = value;
-        const error = ParticipantId.validate(this);
+        super(value);
+        const error = ParticipantId.validate(this.toBytes());
         if (error) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid participant identifier. ${error.message}`, "value", value);
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid participant identifier. ${error.why}`, "value", value);
         }
     }
-    getTag() {
-        return new identifier_tag_1.IdentifierTag(this.bytes[0]);
-    }
-    static validate(participant) {
-        const tag = participant.getTag();
-        const error = identifier_tag_1.IdentifierTag.validate(tag);
-        if (error) {
-            return error;
+    static validate(value) {
+        const participant = value instanceof Uint8Array ? value : (0, js_moi_utils_1.hexToBytes)(value);
+        const tag = this.getTag(participant);
+        const kind = tag.getKind();
+        if (kind !== enums_1.IdentifierKind.Participant) {
+            return { why: "Invalid identifier kind. Expected a participant identifier." };
         }
-        if (tag.getKind() !== identifier_kind_1.IdentifierKind.Participant) {
-            return new Error("Invalid identifier kind. Expected a participant identifier.");
-        }
-        if ((participant[1] & (flags_1.flagMasks.get(tag.getValue()) ?? 0)) !== 0) {
-            return new Error("Invalid participant identifier flags.");
+        const hasUnsupportedFlags = (participant[1] & (flags_1.flagMasks.get(tag.value) ?? 0)) !== 0;
+        if (hasUnsupportedFlags) {
+            return { why: "Invalid Flags. Unsupported flags for identifier" };
         }
         return null;
     }
-    static fromHex(value) {
-        if (!(0, js_moi_utils_1.isHex)(value)) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid hex value.", "value", value);
-        }
-        return new ParticipantId((0, js_moi_utils_1.hexToBytes)(value));
-    }
-    toBytes() {
-        return new Uint8Array(this.bytes);
-    }
-    toHex() {
-        return (0, js_moi_utils_1.bytesToHex)(this.bytes);
-    }
-    toIdentifier() {
-        return new identifier_1.Identifier(this.bytes);
-    }
-    getFingerprint() {
-        return new Uint8Array(this.bytes.slice(4, 28));
-    }
-    getVariant() {
-        const variant = new Uint8Array(this.bytes.slice(28));
-        return new DataView(variant.buffer).getUint32(0, true);
-    }
-    isVariant() {
-        const variant = new Uint8Array(this.bytes.slice(28));
-        return !(0, js_moi_utils_1.isNullBytes)(variant);
-    }
-    isFlagSupported(flag) {
-        if (!flag.supports(this.getTag())) {
-            return false;
-        }
-        return (0, flags_1.getFlag)(this.bytes[1], flag.index);
-    }
-    static generateParticipantIdV0(fingerprint, variant, ...flags) {
-        if (fingerprint.length !== 24) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid fingerprint length. Expected 24 bytes.", "fingerprint", fingerprint);
-        }
-        const metadata = new Uint8Array(4);
-        metadata[0] = identifier_tag_1.TagParticipantV0.getValue();
-        for (const flag of flags) {
-            if (!flag.supports(identifier_tag_1.TagParticipantV0)) {
-                js_moi_utils_1.ErrorUtils.throwError("Unsupported flag for participant identifier.");
-            }
-            metadata[1] = (0, flags_1.setFlag)(metadata[1], flag.index, true);
-        }
-        let buff = (0, js_moi_utils_1.concatBytes)(metadata, new Uint8Array(fingerprint), new Uint8Array(4));
-        new DataView(buff.buffer).setUint32(28, variant, true);
-        return new ParticipantId(buff);
-    }
 }
 exports.ParticipantId = ParticipantId;
+/**
+ * Generates a participant identifier based on the provided options.
+ *
+ * @returns A new `ParticipantId` instance.
+ *
+ * @throws {Error} If the identifier version is not `IdentifierVersion.V0`.
+ * @throws {Error} If the fingerprint length is not 24 bytes.
+ * @throws {Error} If any flag is unsupported for the participant identifier.
+ */
+const createParticipantId = (option) => {
+    if (option.version !== enums_1.IdentifierVersion.V0) {
+        js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid identifier version. Expected V0.", "version", option.version);
+    }
+    if (option.fingerprint.length !== 24) {
+        js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid fingerprint length. Expected 24 bytes.", "fingerprint", option.fingerprint);
+    }
+    const metadata = new Uint8Array(4);
+    const participantTag = identifier_tag_1.IdentifierTag.getTag(enums_1.IdentifierKind.Participant, option.version);
+    metadata[0] = participantTag.value;
+    for (const flag of option.flags ?? []) {
+        if (!flag.supports(participantTag)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid flag. Unsupported flag for participant identifier.`, "flag", flag);
+        }
+        metadata[1] = (0, flags_1.setFlag)(metadata[1], flag.index, true);
+    }
+    const participant = (0, js_moi_utils_1.concatBytes)(metadata, option.fingerprint, new Uint8Array(4));
+    new DataView(participant.buffer).setUint32(28, option.variant, false);
+    return new ParticipantId(participant);
+};
+exports.createParticipantId = createParticipantId;
 //# sourceMappingURL=participant-id.js.map

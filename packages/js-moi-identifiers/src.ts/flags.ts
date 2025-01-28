@@ -1,7 +1,7 @@
 import { ErrorUtils } from "js-moi-utils";
 
-import { IdentifierKind } from "./identifier-kind";
-import { IdentifierTag, IdentifierVersion } from "./types/identifier";
+import { IdentifierKind, IdentifierVersion } from "./enums";
+import { IdentifierTag } from "./identifier-tag";
 
 /**
  * Represents a flag specifier for an identifier.

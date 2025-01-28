@@ -1,76 +1,61 @@
 import { ErrorUtils } from "js-moi-utils";
-import { IdentifierKind } from "./identifier-kind";
-
-const maxIdentifierKind = IdentifierKind.Logic;
-const identifierV0 = 0;
-
-/**
- * kindSupport is a map of IdentifierKind to the maximum supported version.
- */
-const kindSupport: Map<IdentifierKind, number> = new Map([
-    [IdentifierKind.Participant, 0],
-    [IdentifierKind.Asset, 0],
-    [IdentifierKind.Logic, 0],
-]);
+import { IdentifierKind, type IdentifierVersion } from "./enums";
+import type { InvalidReason } from "./types/identifier";
 
 export class IdentifierTag {
-    private readonly tag: number;
+    public readonly value: number;
 
-    constructor(tag: number) {
-        this.tag = tag;
+    private static MAX_IDENTIFIER_KIND = IdentifierKind.Logic;
 
-        const error = IdentifierTag.validate(this);
+    private static kindMaxSupportedVersion: Record<IdentifierKind, number> = {
+        [IdentifierKind.Participant]: 0,
+        [IdentifierKind.Asset]: 0,
+        [IdentifierKind.Logic]: 0,
+    };
 
-        if (error) {
-            ErrorUtils.throwArgumentError(error.message, "tag", tag);
+    constructor(value: number) {
+        const validation = IdentifierTag.validate(value);
+
+        if (validation) {
+            ErrorUtils.throwArgumentError(`Invalid identifier value. ${validation.why}`, "value", value);
         }
+
+        this.value = value;
     }
 
-    /**
-     * Get the `IdentifierKind` from the `IdentifierTag`.
-     * @returns The kind of identifier.
-     */
     public getKind(): IdentifierKind {
-        return this.tag >> 4;
+        return IdentifierTag.getKind(this.value);
     }
 
-    /**
-     * Get the version of the `IdentifierTag`.
-     *
-     * @returns The version of the identifier.
-     */
     public getVersion(): number {
-        return this.tag & 0x0f;
+        return IdentifierTag.getVersion(this.value);
     }
 
-    public getValue(): number {
-        return this.tag;
+    public static getKind(value: number): IdentifierKind {
+        return value >> 4;
     }
 
-    /**
-     * Check if the `IdentifierTag` is valid and return an error if it is not.
-     *
-     * @param tag The `IdentifierTag` to validate.
-     * @returns a error if the `IdentifierTag` is invalid, otherwise null.
-     *
-     * @throws if the version is not supported.
-     * @throws if the kind is not supported.
-     */
-    public static validate(tag: IdentifierTag): Error | null {
-        if (tag.getKind() > maxIdentifierKind) {
-            return new Error("Unsupported identifier kind.");
+    public static getVersion(value: number): number {
+        return value & 0x0f;
+    }
+
+    public static getMaxSupportedVersion(kind: IdentifierKind): number {
+        return IdentifierTag.kindMaxSupportedVersion[kind];
+    }
+
+    public static getTag(kind: IdentifierKind, version: IdentifierVersion): IdentifierTag {
+        return new IdentifierTag((kind << 4) | version);
+    }
+
+    public static validate(value: number): InvalidReason | null {
+        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+            return { why: "Unsupported identifier kind." };
         }
 
-        if (tag.getVersion() > (kindSupport.get(tag.getKind()) ?? 0)) {
-            return new Error("Unsupported identifier version.");
+        if (IdentifierTag.getVersion(value) > IdentifierTag.getMaxSupportedVersion(IdentifierTag.getKind(value))) {
+            return { why: "Unsupported identifier version." };
         }
 
         return null;
     }
 }
-
-export const TagParticipantV0 = new IdentifierTag((IdentifierKind.Participant << 4) | identifierV0);
-
-export const TagAssetV0 = new IdentifierTag((IdentifierKind.Asset << 4) | identifierV0);
-
-export const TagLogicV0 = new IdentifierTag((IdentifierKind.Logic << 4) | identifierV0);

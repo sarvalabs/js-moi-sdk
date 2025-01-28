@@ -3,3 +3,7 @@ export enum IdentifierKind {
     Asset = 1,
     Logic = 2,
 }
+
+export enum IdentifierVersion {
+    V0 = 0,
+}

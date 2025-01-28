@@ -1,5 +1,5 @@
-import { IdentifierKind } from "./identifier-kind";
-import { IdentifierTag } from "./types/identifier";
+import { IdentifierKind } from "./enums";
+import { IdentifierTag } from "./identifier-tag";
 /**
  * Represents a flag specifier for an identifier.
  */

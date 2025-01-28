@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssetId = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const enums_1 = require("./enums");
 const flags_1 = require("./flags");
 const identifier_1 = require("./identifier");
-const identifier_kind_1 = require("./identifier-kind");
 const identifier_tag_1 = require("./identifier-tag");
 class AssetId {
     buff;
@@ -57,7 +57,7 @@ class AssetId {
         if (error) {
             return error;
         }
-        if (tag.getKind() !== identifier_kind_1.IdentifierKind.Asset) {
+        if (tag.getKind() !== enums_1.IdentifierKind.Asset) {
             return new Error("Invalid identifier kind. Expected a participant identifier.");
         }
         if ((asset[1] & (flags_1.flagMasks.get(tag.getValue()) ?? 0)) !== 0) {

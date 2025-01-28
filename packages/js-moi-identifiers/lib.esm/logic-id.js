@@ -1,7 +1,7 @@
 import { bytesToHex, ErrorUtils, hexToBytes, isNullBytes } from "js-moi-utils";
+import { IdentifierKind } from "./enums";
 import { flagMasks, getFlag } from "./flags";
 import { Identifier } from "./identifier";
-import { IdentifierKind } from "./identifier-kind";
 import { IdentifierTag } from "./identifier-tag";
 export class LogicId {
     buff;

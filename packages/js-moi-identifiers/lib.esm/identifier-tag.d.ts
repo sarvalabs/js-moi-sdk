@@ -1,31 +1,16 @@
-import { IdentifierKind } from "./identifier-kind";
+import { IdentifierKind, type IdentifierVersion } from "./enums";
+import type { InvalidReason } from "./types/identifier";
 export declare class IdentifierTag {
-    private readonly tag;
-    constructor(tag: number);
-    /**
-     * Get the `IdentifierKind` from the `IdentifierTag`.
-     * @returns The kind of identifier.
-     */
+    readonly value: number;
+    private static MAX_IDENTIFIER_KIND;
+    private static kindMaxSupportedVersion;
+    constructor(value: number);
     getKind(): IdentifierKind;
-    /**
-     * Get the version of the `IdentifierTag`.
-     *
-     * @returns The version of the identifier.
-     */
     getVersion(): number;
-    getValue(): number;
-    /**
-     * Check if the `IdentifierTag` is valid and return an error if it is not.
-     *
-     * @param tag The `IdentifierTag` to validate.
-     * @returns a error if the `IdentifierTag` is invalid, otherwise null.
-     *
-     * @throws if the version is not supported.
-     * @throws if the kind is not supported.
-     */
-    static validate(tag: IdentifierTag): Error | null;
+    static getKind(value: number): IdentifierKind;
+    static getVersion(value: number): number;
+    static getMaxSupportedVersion(kind: IdentifierKind): number;
+    static getTag(kind: IdentifierKind, version: IdentifierVersion): IdentifierTag;
+    static validate(value: number): InvalidReason | null;
 }
-export declare const TagParticipantV0: IdentifierTag;
-export declare const TagAssetV0: IdentifierTag;
-export declare const TagLogicV0: IdentifierTag;
 //# sourceMappingURL=identifier-tag.d.ts.map

@@ -1,62 +1,46 @@
 import { ErrorUtils } from "js-moi-utils";
-import { IdentifierKind } from "./identifier-kind";
-const maxIdentifierKind = IdentifierKind.Logic;
-const identifierV0 = 0;
-/**
- * kindSupport is a map of IdentifierKind to the maximum supported version.
- */
-const kindSupport = new Map([
-    [IdentifierKind.Participant, 0],
-    [IdentifierKind.Asset, 0],
-    [IdentifierKind.Logic, 0],
-]);
+import { IdentifierKind } from "./enums";
 export class IdentifierTag {
-    tag;
-    constructor(tag) {
-        this.tag = tag;
-        const error = IdentifierTag.validate(this);
-        if (error) {
-            ErrorUtils.throwArgumentError(error.message, "tag", tag);
+    value;
+    static MAX_IDENTIFIER_KIND = IdentifierKind.Logic;
+    static kindMaxSupportedVersion = {
+        [IdentifierKind.Participant]: 0,
+        [IdentifierKind.Asset]: 0,
+        [IdentifierKind.Logic]: 0,
+    };
+    constructor(value) {
+        const validation = IdentifierTag.validate(value);
+        if (validation) {
+            ErrorUtils.throwArgumentError(`Invalid identifier value. ${validation.why}`, "value", value);
         }
+        this.value = value;
     }
-    /**
-     * Get the `IdentifierKind` from the `IdentifierTag`.
-     * @returns The kind of identifier.
-     */
     getKind() {
-        return this.tag >> 4;
+        return IdentifierTag.getKind(this.value);
     }
-    /**
-     * Get the version of the `IdentifierTag`.
-     *
-     * @returns The version of the identifier.
-     */
     getVersion() {
-        return this.tag & 0x0f;
+        return IdentifierTag.getVersion(this.value);
     }
-    getValue() {
-        return this.tag;
+    static getKind(value) {
+        return value >> 4;
     }
-    /**
-     * Check if the `IdentifierTag` is valid and return an error if it is not.
-     *
-     * @param tag The `IdentifierTag` to validate.
-     * @returns a error if the `IdentifierTag` is invalid, otherwise null.
-     *
-     * @throws if the version is not supported.
-     * @throws if the kind is not supported.
-     */
-    static validate(tag) {
-        if (tag.getKind() > maxIdentifierKind) {
-            return new Error("Unsupported identifier kind.");
+    static getVersion(value) {
+        return value & 0x0f;
+    }
+    static getMaxSupportedVersion(kind) {
+        return IdentifierTag.kindMaxSupportedVersion[kind];
+    }
+    static getTag(kind, version) {
+        return new IdentifierTag((kind << 4) | version);
+    }
+    static validate(value) {
+        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+            return { why: "Unsupported identifier kind." };
         }
-        if (tag.getVersion() > (kindSupport.get(tag.getKind()) ?? 0)) {
-            return new Error("Unsupported identifier version.");
+        if (IdentifierTag.getVersion(value) > IdentifierTag.getMaxSupportedVersion(IdentifierTag.getKind(value))) {
+            return { why: "Unsupported identifier version." };
         }
         return null;
     }
 }
-export const TagParticipantV0 = new IdentifierTag((IdentifierKind.Participant << 4) | identifierV0);
-export const TagAssetV0 = new IdentifierTag((IdentifierKind.Asset << 4) | identifierV0);
-export const TagLogicV0 = new IdentifierTag((IdentifierKind.Logic << 4) | identifierV0);
 //# sourceMappingURL=identifier-tag.js.map

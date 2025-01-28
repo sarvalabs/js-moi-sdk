@@ -1,20 +1,26 @@
 import { type Hex } from "js-moi-utils";
+import { BaseIdentifier } from "./base-identifier";
+import { IdentifierVersion } from "./enums";
 import { type Flag } from "./flags";
-import { Identifier } from "./identifier";
-import { IdentifierTag } from "./identifier-tag";
-export declare class ParticipantId {
-    private readonly bytes;
-    constructor(value: Uint8Array);
-    getTag(): IdentifierTag;
-    static validate(participant: ParticipantId): Error | null;
-    static fromHex(value: Hex): ParticipantId;
-    toBytes(): Uint8Array;
-    toHex(): Hex;
-    toIdentifier(): Identifier;
-    getFingerprint(): Uint8Array<ArrayBuffer>;
-    getVariant(): number;
-    isVariant(): boolean;
-    isFlagSupported(flag: Flag): boolean;
-    static generateParticipantIdV0(fingerprint: Uint8Array, variant: number, ...flags: Flag[]): ParticipantId;
+import type { InvalidReason } from "./types/identifier";
+export interface GenerateParticipantOption {
+    version: IdentifierVersion;
+    fingerprint: Uint8Array;
+    variant: number;
+    flags?: Flag[];
 }
+export declare class ParticipantId extends BaseIdentifier {
+    constructor(value: Uint8Array | Hex);
+    static validate(value: Uint8Array | Hex): InvalidReason | null;
+}
+/**
+ * Generates a participant identifier based on the provided options.
+ *
+ * @returns A new `ParticipantId` instance.
+ *
+ * @throws {Error} If the identifier version is not `IdentifierVersion.V0`.
+ * @throws {Error} If the fingerprint length is not 24 bytes.
+ * @throws {Error} If any flag is unsupported for the participant identifier.
+ */
+export declare const createParticipantId: (option: GenerateParticipantOption) => ParticipantId;
 //# sourceMappingURL=participant-id.d.ts.map
