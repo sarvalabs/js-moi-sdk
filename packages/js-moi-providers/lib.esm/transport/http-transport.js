@@ -1,9 +1,10 @@
+import EventEmitter from "events";
 import { ErrorUtils } from "js-moi-utils";
-export class HttpTransport {
+export class HttpTransport extends EventEmitter {
     host;
-    option;
     static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
-    constructor(host, option) {
+    constructor(host) {
+        super();
         if (!host) {
             ErrorUtils.throwArgumentError(`Http host is required`, "host", host);
         }
@@ -11,12 +12,11 @@ export class HttpTransport {
             ErrorUtils.throwArgumentError(`Invalid host url "${host}"`, "host", host);
         }
         this.host = host;
-        this.option = option;
     }
     createPayload(method, params) {
         return {
             jsonrpc: "2.0",
-            id: 1,
+            id: globalThis.crypto.randomUUID(),
             method: method,
             params: params,
         };
@@ -31,6 +31,7 @@ export class HttpTransport {
                 "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
+            this.emit("debug", { action: "json-rpc-request", payload: request });
             const response = await fetch(this.host, {
                 method: "POST",
                 body: content,
@@ -39,7 +40,7 @@ export class HttpTransport {
             if (!response.ok) {
                 result = {
                     jsonrpc: "2.0",
-                    id: 1,
+                    id: request.id,
                     error: {
                         code: response.status,
                         message: `Request failed`,
@@ -54,10 +55,11 @@ export class HttpTransport {
             const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
             result = {
                 jsonrpc: "2.0",
-                id: 1,
+                id: request.id,
                 error: { code: -1, message: errMessage, data: error },
             };
         }
+        this.emit("debug", { action: "json-rpc-response", payload: result });
         return result;
     }
 }

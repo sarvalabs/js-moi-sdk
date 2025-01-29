@@ -1,5 +1,5 @@
 interface JsonRpcCommon {
-    id: number;
+    id: number | string;
     jsonrpc: "2.0";
 }
 /**

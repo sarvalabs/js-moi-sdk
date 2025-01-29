@@ -1,15 +1,14 @@
+import EventEmitter from "events";
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
-export interface HttpTransportOption {}
-
-export class HttpTransport implements Transport {
+export class HttpTransport extends EventEmitter implements Transport {
     private readonly host: string;
-
-    private readonly option?: HttpTransportOption;
 
     private static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
 
-    constructor(host: string, option?: HttpTransportOption) {
+    constructor(host: string) {
+        super();
+
         if (!host) {
             ErrorUtils.throwArgumentError(`Http host is required`, "host", host);
         }
@@ -19,13 +18,12 @@ export class HttpTransport implements Transport {
         }
 
         this.host = host;
-        this.option = option;
     }
 
     private createPayload(method: string, params: unknown[]): JsonRpcRequest {
         return {
             jsonrpc: "2.0",
-            id: 1,
+            id: globalThis.crypto.randomUUID(),
             method: method,
             params: params,
         };
@@ -42,6 +40,9 @@ export class HttpTransport implements Transport {
                 "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
+
+            this.emit("debug", { action: "json-rpc-request", payload: request });
+
             const response = await fetch(this.host, {
                 method: "POST",
                 body: content,
@@ -51,7 +52,7 @@ export class HttpTransport implements Transport {
             if (!response.ok) {
                 result = {
                     jsonrpc: "2.0",
-                    id: 1,
+                    id: request.id,
                     error: {
                         code: response.status,
                         message: `Request failed`,
@@ -67,11 +68,12 @@ export class HttpTransport implements Transport {
 
             result = {
                 jsonrpc: "2.0",
-                id: 1,
+                id: request.id,
                 error: { code: -1, message: errMessage, data: error },
             };
         }
 
+        this.emit("debug", { action: "json-rpc-response", payload: result });
         return result;
     }
 }
