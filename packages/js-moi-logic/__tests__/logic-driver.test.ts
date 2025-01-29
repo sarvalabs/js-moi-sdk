@@ -209,7 +209,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
                 const logic = await wallet.getProvider().getLogic(logicId);
 
                 expect(logic).toBeDefined();
-                expect(logic.metadata.logic_id).toEqual(logicId.value);
+                expect(logic.metadata.logic_id).toEqual(logicId.toString());
             },
             TEST_TIMEOUT
         );
