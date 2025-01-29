@@ -165,7 +165,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent("should able to get account using reference", async () => {
                 const height = 0;
                 const account = await provider.getAccount(address, {
-                    reference: { relative: { height, identifier: address } },
+                    reference: { relative: { height, id: address } },
                     modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
                 });
 
@@ -219,7 +219,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent("should return the tesseract when retrieved using tesseract reference", async () => {
                 const height = 0;
                 const currentTesseract = await provider.getTesseract(address, height);
-                const tesseract = await provider.getTesseract({ relative: { height, identifier: address } });
+                const tesseract = await provider.getTesseract({ relative: { height, id: address } });
 
                 expect(tesseract).toBeDefined();
                 expect(tesseract.hash).toBeDefined();
@@ -256,7 +256,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic with reference", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id), {
-                    reference: { relative: { identifier: new LogicId(logic_id).toHex(), height: 0 } },
+                    reference: { relative: { id: new LogicId(logic_id).toHex(), height: 0 } },
                 });
 
                 expect(logic).toBeDefined();
@@ -306,7 +306,7 @@ describe(JsonRpcProvider, () => {
                 const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
                 const logicId = new LogicId(logic_id);
                 const value = await provider.getLogicStorage(logic_id, storageId, {
-                    reference: { relative: { identifier: logicId.toHex(), height: 0 } },
+                    reference: { relative: { id: logicId.toHex(), height: 0 } },
                 });
 
                 expect(value).toBeDefined();
@@ -335,7 +335,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset with reference", async () => {
                 const asset = await provider.getAsset(assetId, {
-                    reference: { relative: { identifier: assetId.toHex(), height: -1 } },
+                    reference: { relative: { id: assetId.toHex(), height: -1 } },
                 });
 
                 expect(asset).toBeDefined();
@@ -365,7 +365,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with modifier and reference", async () => {
                 const asset = await provider.getAsset(assetId, {
                     modifier: { include: ["controller", "creator", "edition"] },
-                    reference: { relative: { identifier: assetId.toHex(), height: -1 } },
+                    reference: { relative: { id: assetId.toHex(), height: -1 } },
                 });
 
                 expect(asset).toBeDefined();
@@ -454,7 +454,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the account asset with reference", async () => {
                 const accountAsset = await provider.getAccountAsset(address, asset_id, {
-                    reference: { relative: { identifier: address, height: 0 } },
+                    reference: { relative: { id: address, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
@@ -483,7 +483,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent("should return the account asset with modifier and reference", async () => {
                 const accountAsset = await provider.getAccountAsset(address, asset_id, {
                     modifier: { include: ["lockup", "mandate"] },
-                    reference: { relative: { identifier: address, height: 0 } },
+                    reference: { relative: { id: address, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
@@ -506,7 +506,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the account key with reference", async () => {
                 const accountKey = await provider.getAccountKey(address, 0, {
-                    reference: { relative: { identifier: address, height: 0 } },
+                    reference: { relative: { id: address, height: 0 } },
                 });
 
                 expect(accountKey).toBeDefined();
