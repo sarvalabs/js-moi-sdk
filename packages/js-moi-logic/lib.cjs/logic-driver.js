@@ -62,7 +62,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         if (option == null) {
             return null;
         }
-        if ("sequence" in option && (typeof option.sequence !== "number" || Number.isNaN(option.sequence) || option.sequence < 0)) {
+        if ("sequence" in option && (typeof option.sequence_id !== "number" || Number.isNaN(option.sequence_id) || option.sequence_id < 0)) {
             return new js_moi_utils_1.CustomError("Invalid sequence number.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         if ("simulate" in option && typeof option.simulate !== "boolean") {
@@ -128,6 +128,9 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     async createIxRequest(callsite, callsiteArguments, option) {
         const baseIxRequest = {
+            sender: {
+                sequence_id: option?.sequence_id,
+            },
             fuel_price: option?.fuel_price ?? 1,
             operations: [await this.createIxOperation(callsite, callsiteArguments)],
         };

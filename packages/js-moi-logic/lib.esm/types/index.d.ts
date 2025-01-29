@@ -12,8 +12,7 @@ export interface LogicDriverOption {
 export type CallsiteOption = {
     fuel_price?: number;
     fuel_limit?: number;
-    sequence?: number;
-    simulate?: boolean;
+    sequence_id?: number;
 };
 type CallsiteResult = InteractionResponse | Record<any, any>;
 export interface CallsiteCallback {

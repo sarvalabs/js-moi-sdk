@@ -92,7 +92,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
             return null;
         }
 
-        if ("sequence" in option && (typeof option.sequence !== "number" || Number.isNaN(option.sequence) || option.sequence < 0)) {
+        if ("sequence" in option && (typeof option.sequence_id !== "number" || Number.isNaN(option.sequence_id) || option.sequence_id < 0)) {
             return new CustomError("Invalid sequence number.", ErrorCode.INVALID_ARGUMENT);
         }
 
@@ -175,6 +175,9 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         option?: CallsiteOption
     ): Promise<SignerIx<SimulateInteractionRequest> | SignerIx<InteractionRequest>> {
         const baseIxRequest: SignerIx<SimulateInteractionRequest> = {
+            sender: {
+                sequence_id: option?.sequence_id,
+            },
             fuel_price: option?.fuel_price ?? 1,
             operations: [await this.createIxOperation(callsite, callsiteArguments)],
         };

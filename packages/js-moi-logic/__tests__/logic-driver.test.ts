@@ -1,7 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { HttpProvider, InteractionResponse } from "js-moi-providers";
 import { bytesToHex, ElementType, LogicState, OperationStatus, OpType, randomBytes, StorageKey } from "js-moi-utils";
-import { getLogicDriver, LogicDriver } from "../src.ts";
+import { getLogicDriver, LogicDriver, type CallsiteOption } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
 import { LogicId } from "js-moi-identifiers";
@@ -198,8 +198,14 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
         beforeAll(async () => {
             driver = await getLogicDriver(manifest, wallet);
 
+            const sequenceId = process.env["WALLET_SEQUENCE_CURRENT"] ?? undefined;
+            process.env["WALLET_SEQUENCE_CURRENT"] = process.env["WALLET_SEQUENCE_CURRENT"] ? (parseInt(process.env["WALLET_SEQUENCE_CURRENT"]) + 1).toString() : "1";
+
             const callback = driver.endpoint[logic.deploy.name];
-            await callback<InteractionResponse>(...(logic.deploy.args as any));
+            const option: CallsiteOption = {
+                sequence_id: sequenceId ? parseInt(sequenceId) : undefined,
+            };
+            await callback<InteractionResponse>(...(logic.deploy.args as any[]), option);
             logicId = await driver.getLogicId();
         }, TEST_TIMEOUT);
 

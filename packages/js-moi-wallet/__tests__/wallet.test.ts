@@ -286,7 +286,7 @@ describe("Provider integration test", () => {
             });
 
             expect(simulation).toBeDefined();
-            expect(simulation.result).toHaveLength(1);
+            expect(simulation.results).toHaveLength(1);
         });
     });
 
@@ -294,7 +294,13 @@ describe("Provider integration test", () => {
         let ix: InteractionResponse;
 
         beforeAll(async () => {
+            const sequenceId = process.env["WALLET_SEQUENCE_CURRENT"] ?? undefined;
+            process.env["WALLET_SEQUENCE_CURRENT"] = process.env["WALLET_SEQUENCE_CURRENT"] ? (parseInt(process.env["WALLET_SEQUENCE_CURRENT"]) + 1).toString() : "1";
+            
             ix = await wallet.execute({
+                sender: {
+                    sequence_id: sequenceId ? parseInt(sequenceId) : undefined,
+                },
                 fuel_price: 1,
                 fuel_limit: 100,
                 operations,
