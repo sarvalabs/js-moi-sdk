@@ -1,4 +1,4 @@
-import type { JsonRpcResponse } from "./json-rpc";
+import type { JsonRpcRequest, JsonRpcResponse } from "./json-rpc";
 
 /**
  * Transport represents a way to send and receive JSON-RPC messages.
@@ -11,5 +11,5 @@ export interface Transport {
      * @param params The parameters to pass to the method.
      * @returns The JSON-RPC response.
      */
-    request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>>;
+    request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>>;
 }

@@ -16,6 +16,7 @@ import {
     type Hex,
     type Interaction,
     type InteractionRequest,
+    type JsonRpcRequest,
     type JsonRpcResponse,
     type Logic,
     type LogicMessage,
@@ -98,7 +99,18 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @throws Will throw an error if the response contains an error.
      */
     public async request<T>(method: string, params: unknown[] = []): Promise<JsonRpcResponse<T>> {
-        return await this.transport.request<T>(method, params);
+        const payload: JsonRpcRequest = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method,
+            params,
+        };
+
+        this.emit("debug", { action: "json-rpc-request", payload });
+        const response = await this.transport.request<T>(payload);
+        this.emit("debug", { action: "json-rpc-response", response });
+
+        return response;
     }
 
     /**

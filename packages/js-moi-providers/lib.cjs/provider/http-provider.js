@@ -5,9 +5,7 @@ const http_transport_1 = require("../transport/http-transport");
 const json_rpc_provider_1 = require("./json-rpc-provider");
 class HttpProvider extends json_rpc_provider_1.JsonRpcProvider {
     constructor(host) {
-        const transport = new http_transport_1.HttpTransport(host);
-        super(transport);
-        transport.on("debug", (data) => this.emit("debug", data));
+        super(new http_transport_1.HttpTransport(host));
     }
 }
 exports.HttpProvider = HttpProvider;

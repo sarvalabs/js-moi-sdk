@@ -1,10 +1,8 @@
-import EventEmitter from "events";
 import { ErrorUtils } from "js-moi-utils";
-export class HttpTransport extends EventEmitter {
+export class HttpTransport {
     host;
     static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
     constructor(host) {
-        super();
         if (!host) {
             ErrorUtils.throwArgumentError(`Http host is required`, "host", host);
         }
@@ -13,16 +11,7 @@ export class HttpTransport extends EventEmitter {
         }
         this.host = host;
     }
-    createPayload(method, params) {
-        return {
-            jsonrpc: "2.0",
-            id: globalThis.crypto.randomUUID(),
-            method: method,
-            params: params,
-        };
-    }
-    async request(method, params) {
-        const request = this.createPayload(method, params);
+    async request(request) {
         let result;
         try {
             const content = JSON.stringify(request);
@@ -31,7 +20,6 @@ export class HttpTransport extends EventEmitter {
                 "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
-            this.emit("debug", { action: "json-rpc-request", payload: request });
             const response = await fetch(this.host, {
                 method: "POST",
                 body: content,
@@ -59,7 +47,6 @@ export class HttpTransport extends EventEmitter {
                 error: { code: -1, message: errMessage, data: error },
             };
         }
-        this.emit("debug", { action: "json-rpc-response", payload: result });
         return result;
     }
 }

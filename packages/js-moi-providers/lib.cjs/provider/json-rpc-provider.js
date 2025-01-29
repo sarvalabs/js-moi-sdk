@@ -51,7 +51,16 @@ class JsonRpcProvider extends events_1.EventEmitter {
      * @throws Will throw an error if the response contains an error.
      */
     async request(method, params = []) {
-        return await this.transport.request(method, params);
+        const payload = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method,
+            params,
+        };
+        this.emit("debug", { action: "json-rpc-request", payload });
+        const response = await this.transport.request(payload);
+        this.emit("debug", { action: "json-rpc-response", response });
+        return response;
     }
     /**
      * Retrieves the version and chain id of the MOI protocol network.
