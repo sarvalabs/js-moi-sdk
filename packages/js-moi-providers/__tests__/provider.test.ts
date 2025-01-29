@@ -1,13 +1,11 @@
+import { AssetId, createParticipantId, IdentifierVersion, LogicId } from "js-moi-identifiers";
 import {
     ArrayIndexAccessor,
-    AssetId,
     AssetStandard,
-    bytesToHex,
     ensureHexPrefix,
     generateStorageKey,
     interaction,
     isHex,
-    LogicId,
     OpType,
     randomBytes,
     ReceiptStatus,
@@ -32,15 +30,7 @@ describe(JsonRpcProvider, () => {
 
         switch (providerType) {
             case "http":
-                return new JsonRpcProvider(
-                    new HttpTransport(providerUrl, {
-                        debug: ({ ok, request, response }) => {
-                            if (!ok) {
-                                console.log(`\tRequest: ${JSON.stringify(request)}\n\tResponse: ${JSON.stringify(response)}\n`);
-                            }
-                        },
-                    })
-                );
+                return new JsonRpcProvider(new HttpTransport(providerUrl));
             case "websocket":
                 return new JsonRpcProvider(new WebsocketTransport(providerUrl));
             default:
@@ -103,10 +93,17 @@ describe(JsonRpcProvider, () => {
         const it = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it : globalThis.it.skip;
         it.concurrent = process.env["RUN_NETWORK_TEST"] === "true" ? globalThis.it.concurrent : globalThis.it.concurrent.skip;
 
-        const FALLBACK_LOGIC_ID: Hex = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
-        const FALLBACK_ASSET_ID: Hex = "0x000000004cd973c4eb83cdb8870c0de209736270491b7acc99873da1eddced5826c3b548";
+        const FALLBACK_LOGIC_ID: Hex = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
+        const FALLBACK_ASSET_ID: Hex = "0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000";
 
-        const address = ensureHexPrefix(process.env["WALLET_ADDRESS"] ?? bytesToHex(randomBytes(32)));
+        const address = ensureHexPrefix(
+            process.env["WALLET_ADDRESS"] ??
+                createParticipantId({
+                    fingerprint: randomBytes(24),
+                    variant: 0,
+                    version: IdentifierVersion.V0,
+                }).toHex()
+        );
         const logic_id = ensureHexPrefix(process.env["LOGIC_ID"] ?? FALLBACK_LOGIC_ID);
         const asset_id = ensureHexPrefix(process.env["ASSET_ID"] ?? FALLBACK_ASSET_ID);
 
@@ -165,20 +162,17 @@ describe(JsonRpcProvider, () => {
                 expect(account.metadata.address).toEqual(address);
             });
 
-            it.concurrent("[ERROR HAPPENING HERE] should able to get account using reference", async () => {
+            it.concurrent("should able to get account using reference", async () => {
                 const height = 0;
                 const account = await provider.getAccount(address, {
                     reference: { relative: { height, identifier: address } },
-                    // TODO: With field `enlisted` it throw error. Confirm with team and fix it.
-                    // modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
-                    modifier: { include: ["state", "keys", "balances", "mandates", "guardians", "enlisted", "lockups"] },
+                    modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
                 });
 
                 expect(account).toBeDefined();
                 expect(account.metadata.height).toBe(height);
                 expect(account.state).toBeDefined();
                 expect(account.balances).toBeDefined();
-                // TODO: With field `enlisted` it throw error. Confirm with team and fix it.
                 expect(account.enlisted).toBeDefined();
                 expect(account.guardians).toBeDefined();
                 expect(account.keys).toBeDefined();
@@ -246,7 +240,7 @@ describe(JsonRpcProvider, () => {
         });
 
         describe(provider.getLogic, () => {
-            it.concurrent("should return the logic when retrieved using logic id", async () => {
+            it.concurrent("should return the logic when retrieved using identifier", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id));
 
                 expect(logic).toBeDefined();
@@ -254,7 +248,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the logic when retrieved using address", async () => {
-                const logic = await provider.getLogic(new LogicId(logic_id).getAddress());
+                const logic = await provider.getLogic(logic_id);
 
                 expect(logic).toBeDefined();
                 expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
@@ -262,7 +256,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic with reference", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id), {
-                    reference: { relative: { identifier: new LogicId(logic_id).getAddress(), height: 0 } },
+                    reference: { relative: { identifier: new LogicId(logic_id).toHex(), height: 0 } },
                 });
 
                 expect(logic).toBeDefined();
@@ -312,7 +306,7 @@ describe(JsonRpcProvider, () => {
                 const storageId = generateStorageKey(1, new ArrayIndexAccessor(0));
                 const logicId = new LogicId(logic_id);
                 const value = await provider.getLogicStorage(logic_id, storageId, {
-                    reference: { relative: { identifier: logicId.getAddress(), height: 0 } },
+                    reference: { relative: { identifier: logicId.toHex(), height: 0 } },
                 });
 
                 expect(value).toBeDefined();
@@ -324,10 +318,10 @@ describe(JsonRpcProvider, () => {
             const assetId = new AssetId(asset_id);
 
             it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset address", async () => {
-                const asset = await provider.getAsset(assetId.getAddress());
+                const asset = await provider.getAsset(assetId);
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(assetId.value);
+                expect(asset.metadata.asset_id).toBe(assetId.toHex());
                 expect(asset.metadata.standard).toBe(assetId.getStandard());
             });
 
@@ -335,17 +329,17 @@ describe(JsonRpcProvider, () => {
                 const asset = await provider.getAsset(assetId);
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(assetId.value);
-                expect(asset.metadata.logical).toBe(assetId.isLogical());
+                expect(asset.metadata.asset_id).toBe(assetId.toHex());
+                expect(asset.metadata.logical).toBe(false);
             });
 
             it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset with reference", async () => {
                 const asset = await provider.getAsset(assetId, {
-                    reference: { relative: { identifier: assetId.getAddress(), height: -1 } },
+                    reference: { relative: { identifier: assetId.toHex(), height: -1 } },
                 });
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(assetId.value);
+                expect(asset.metadata.asset_id).toBe(assetId.toHex());
                 expect(asset.metadata.supply).toBe(expect.any(String));
             });
 
@@ -371,7 +365,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with modifier and reference", async () => {
                 const asset = await provider.getAsset(assetId, {
                     modifier: { include: ["controller", "creator", "edition"] },
-                    reference: { relative: { identifier: assetId.getAddress(), height: -1 } },
+                    reference: { relative: { identifier: assetId.toHex(), height: -1 } },
                 });
 
                 expect(asset).toBeDefined();
@@ -397,7 +391,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic message when address is passed", async () => {
                 const messages = await provider.getLogicMessage(new LogicId(logic_id), {
-                    address: new LogicId(logic_id).getAddress(),
+                    address: new LogicId(logic_id).toHex(),
                 });
 
                 expect(messages).toBeDefined();
