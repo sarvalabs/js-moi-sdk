@@ -205,7 +205,7 @@ export class Wallet extends Signer {
             const encoded = interaction(ix);
             const signatures = {
                 id: ix.sender.address,
-                key_idx: ix.sender.key_id,
+                key_id: ix.sender.key_id,
                 signature: await this.sign(encoded, sig),
             };
             return { interaction: bytesToHex(encoded), signatures: [signatures] };

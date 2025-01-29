@@ -67,7 +67,7 @@ interface AccountKeyRequestParam extends IdentifierParam<Identifier | Hex>, Tess
 
 interface InteractionSignature extends IdentifierParam<Identifier | Hex> {
     signature: Hex;
-    key_idx: number;
+    key_id: number;
 }
 
 interface ExecuteRequestParam {
