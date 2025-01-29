@@ -8,7 +8,7 @@ const TEST_TIMEOUT = 2 * 60_000;
 
 describe(Wallet, () => {
     const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
-    const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+    const ID_STR = "0x00000000870ad6c5150ea8c0355316974873313004c6b9425a855a0600000000";
     const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
     const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
 
@@ -16,9 +16,9 @@ describe(Wallet, () => {
         const wallet = new Wallet(PRIVATE_KEY, CURVE.SECP256K1);
 
         expect(wallet).toBeInstanceOf(Wallet);
-        expect(await wallet.getAddress()).toEqual(ADDRESS);
-        expect(wallet.privateKey).toEqual(PRIVATE_KEY);
-        expect(wallet.mnemonic).not.toBeDefined();
+        expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
+        expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
+        expect(await wallet.getMnemonic()).not.toBeDefined();
     });
 
     it.concurrent("should throw error creating wallet if curve is not supported", async () => {
@@ -51,10 +51,10 @@ describe(Wallet, () => {
         const wallet = await createWallet();
 
         expect(wallet).toBeInstanceOf(Wallet);
-        expect(await wallet.getAddress()).toEqual(ADDRESS);
-        expect(wallet.privateKey).toEqual(PRIVATE_KEY);
-        expect(wallet.mnemonic).toEqual(MNEMONIC);
-        expect(wallet.curve).toEqual(CURVE.SECP256K1);
+        expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
+        expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
+        expect(await wallet.getMnemonic()).toEqual(MNEMONIC);
+        expect(await wallet.getMnemonic()).toEqual(CURVE.SECP256K1);
     });
 
     it.concurrent.each([
@@ -64,10 +64,10 @@ describe(Wallet, () => {
         const wallet = await createWallet();
 
         expect(wallet).toBeInstanceOf(Wallet);
-        expect(await wallet.getAddress()).toEqual(expect.any(String));
-        expect(wallet.privateKey).toEqual(expect.any(String));
-        expect(wallet.mnemonic).toEqual(expect.any(String));
-        expect(wallet.curve).toEqual(CURVE.SECP256K1);
+        expect((await wallet.getIdentifier()).toString()).toEqual(expect.any(String));
+        expect(await wallet.getPrivateKey()).toEqual(expect.any(String));
+        expect(await wallet.getMnemonic()).toEqual(expect.any(String));
+        expect(await wallet.getCurve()).toEqual(CURVE.SECP256K1);
     });
 
     const keystore =
@@ -78,10 +78,10 @@ describe(Wallet, () => {
         const wallet = Wallet.fromKeystore(keystore, password);
 
         expect(wallet).toBeInstanceOf(Wallet);
-        expect(await wallet.getAddress()).toEqual(ADDRESS);
-        expect(wallet.privateKey).toEqual(PRIVATE_KEY);
-        expect(wallet.mnemonic).not.toBeDefined();
-        expect(wallet.curve).toEqual(CURVE.SECP256K1);
+        expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
+        expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
+        expect(await wallet.getMnemonic()).not.toBeDefined();
+        expect(await wallet.getCurve()).toEqual(CURVE.SECP256K1);
     });
 
     it.concurrent("should throw an error if password is incorrect", async () => {
@@ -156,8 +156,8 @@ describe(Wallet, () => {
             const wallet2 = Wallet.fromKeystore(JSON.stringify(keystore), password);
 
             expect(keystore).toBeDefined();
-            expect(wallet2.privateKey).toEqual(wallet.privateKey);
-            expect(wallet2.publicKey).toEqual(wallet.publicKey);
+            expect(await wallet2.getPrivateKey()).toEqual(await wallet.getPrivateKey());
+            expect(await wallet2.getPublicKey()).toEqual(await wallet.getPublicKey());
         });
 
         it.concurrent("should throw an error if password is not provided", async () => {
@@ -189,7 +189,7 @@ describe(Wallet, () => {
             const message = "Hello, MOI";
             const signature =
                 "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
-            const ok = wallet.verify(new TextEncoder().encode(message), signature, wallet.publicKey);
+            const ok = wallet.verify(new TextEncoder().encode(message), signature, await wallet.getPublicKey());
 
             expect(ok).toBeTruthy();
         });
@@ -198,7 +198,7 @@ describe(Wallet, () => {
             const message = new TextEncoder().encode("Hello, MOI");
             const signature =
                 "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
-            const ok = wallet.verify(message, signature, hexToBytes(wallet.publicKey));
+            const ok = wallet.verify(message, signature, hexToBytes(await wallet.getPublicKey()));
 
             expect(ok).toBeTruthy();
         });
@@ -207,7 +207,7 @@ describe(Wallet, () => {
             const message = "Hello, MOI";
             const signature =
                 "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726401";
-            const ok = wallet.verify(new TextEncoder().encode(message), signature, wallet.publicKey);
+            const ok = wallet.verify(new TextEncoder().encode(message), signature, await wallet.getPublicKey());
 
             expect(ok).toBeFalsy();
         });
@@ -216,7 +216,7 @@ describe(Wallet, () => {
     describe(wallet.signInteraction, () => {
         const interaction: InteractionRequest = {
             sender: {
-                address: ADDRESS,
+                address: ID_STR,
                 key_id: 0,
                 sequence_id: 0,
             },
@@ -258,7 +258,7 @@ describe(Wallet, () => {
             const { interaction: encoded, signatures } = await wallet.signInteraction(interaction, algorithm);
             const expectedSignature =
                 "0x0146304402201781a592e1543d7035c7e2bcc371054fb1b31329c8215990012a27049c802d9402201ed6ac66c334e037fa347a647e7e4a1c64926af67301d8deac71dbaddcf84d6f02";
-            const verify = wallet.verify(hexToBytes(encoded), signatures[0].signature, wallet.publicKey);
+            const verify = wallet.verify(hexToBytes(encoded), signatures[0].signature, await wallet.getPublicKey());
 
             expect(isHex(encoded)).toBeTruthy();
             expect(signatures).toHaveLength(1);

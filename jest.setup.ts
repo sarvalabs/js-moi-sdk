@@ -6,7 +6,7 @@ type ProviderType = "http" | "websocket";
 //#region Constants
 const MNEMONIC: string = "keep board tiger clean island wisdom apology when anger doctor pencil volcano";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
-const PROVIDER_TYPE = "websocket" as ProviderType;
+const PROVIDER_TYPE = "http" as ProviderType;
 const LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 //#endregion
 
