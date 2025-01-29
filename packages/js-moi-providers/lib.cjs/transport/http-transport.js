@@ -31,7 +31,7 @@ class HttpTransport {
             const content = JSON.stringify(request);
             const headers = new Headers({
                 "Content-Type": "application/json",
-                // "Content-Length": content.length.toString(),
+                "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
             const response = await fetch(this.host, {
@@ -61,13 +61,6 @@ class HttpTransport {
                 error: { code: -1, message: errMessage, data: error },
             };
         }
-        this.option?.debug?.({
-            request,
-            response: result,
-            ok: "error" in result === false,
-            error: "error" in result ? result.error : undefined,
-            host: this.host,
-        });
         return result;
     }
 }

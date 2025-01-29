@@ -1,16 +1,6 @@
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
-type DebugArgument = {
-    ok: boolean;
-    request: JsonRpcRequest;
-    response: JsonRpcResponse;
-    error?: unknown;
-    host: string;
-};
-
-export interface HttpTransportOption {
-    debug?: (params: DebugArgument) => void;
-}
+export interface HttpTransportOption {}
 
 export class HttpTransport implements Transport {
     private readonly host: string;
@@ -49,7 +39,7 @@ export class HttpTransport implements Transport {
             const content = JSON.stringify(request);
             const headers: HeadersInit = new Headers({
                 "Content-Type": "application/json",
-                // "Content-Length": content.length.toString(),
+                "Content-Length": content.length.toString(),
                 Accept: "application/json",
             });
             const response = await fetch(this.host, {
@@ -81,14 +71,6 @@ export class HttpTransport implements Transport {
                 error: { code: -1, message: errMessage, data: error },
             };
         }
-
-        this.option?.debug?.({
-            request,
-            response: result,
-            ok: "error" in result === false,
-            error: "error" in result ? result.error : undefined,
-            host: this.host,
-        });
 
         return result;
     }
