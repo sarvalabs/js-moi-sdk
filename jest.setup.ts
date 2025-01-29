@@ -110,6 +110,7 @@ const setup = async () => {
     process.env["WALLET_PRIVATE_KEY"] = await wallet.getPrivateKey();
     process.env["WALLET_CURVE"] = await wallet.getCurve();
     process.env["WALLET_ADDRESS"] = (await wallet.getIdentifier()).toHex();
+    process.env["WALLET_SEQUENCE_CURRENT"] = (await wallet.getProvider().getAccountKey(await wallet.getIdentifier(), 0)).sequence.toString();
     process.env["ASSET_ID"] = await getAssetId(wallet);
 
     log("Testing setup complete\n");

@@ -1,7 +1,7 @@
 import type { Identifier } from "js-moi-identifiers";
 import type { InteractionResponse } from "js-moi-providers";
-import type { Signer } from "js-moi-signer";
-import type { LogicManifest } from "js-moi-utils";
+import type { Signer, SignerIx } from "js-moi-signer";
+import type { InteractionRequest, LogicManifest } from "js-moi-utils";
 import type { AccessorBuilder } from "../state/accessor-builder";
 import type { StateAccessorBuilder } from "../state/state-accessor-builder";
 export interface LogicDriverOption {
@@ -9,11 +9,7 @@ export interface LogicDriverOption {
     signer: Signer;
     logicId?: Identifier;
 }
-export type CallsiteOption = {
-    fuel_price?: number;
-    fuel_limit?: number;
-    sequence_id?: number;
-};
+export type CallsiteOption = Omit<Partial<SignerIx<InteractionRequest>>, "operations">;
 type CallsiteResult = InteractionResponse | Record<any, any>;
 export interface CallsiteCallback {
     <TRes extends CallsiteResult = any>(option?: CallsiteOption): Promise<TRes>;

@@ -192,7 +192,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
 
             const callback = driver.endpoint[logic.deploy.name];
             const option: CallsiteOption = {
-                sequence_id: sequenceId ? parseInt(sequenceId) : undefined,
+                sender: { sequence_id: sequenceId ? parseInt(sequenceId) : undefined },
             };
             await callback<InteractionResponse>(...(logic.deploy.args as any[]), option);
             logicId = await driver.getLogicId();

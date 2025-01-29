@@ -1,6 +1,6 @@
 import { isIdentifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
-import { CustomError, ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
+import { ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import { LogicDescriptor } from "./logic-descriptor";
 import { SlotAccessorBuilder } from "./state/accessor-builder";
@@ -55,30 +55,14 @@ export class LogicDriver extends LogicDescriptor {
         const element = this.getRoutineElement(callsite);
         return kinds.includes(element.data.mode);
     }
-    validateCallsiteOption(option) {
-        if (option == null) {
-            return null;
-        }
-        if ("sequence" in option && (typeof option.sequence_id !== "number" || Number.isNaN(option.sequence_id) || option.sequence_id < 0)) {
-            return new CustomError("Invalid sequence number.", ErrorCode.INVALID_ARGUMENT);
-        }
-        if ("simulate" in option && typeof option.simulate !== "boolean") {
-            return new CustomError("Invalid simulate flag.", ErrorCode.INVALID_ARGUMENT);
-        }
-        return null;
-    }
     extractArgsAndOption(callsite, callsiteArguments) {
         const element = this.getRoutineElement(callsite);
         if (callsiteArguments.length < element.data.accepts.length) {
             const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
             ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
         }
-        const option = callsiteArguments.at(element.data.accepts.length + 1);
+        const option = callsiteArguments.at(element.data.accepts.length);
         const args = callsiteArguments.slice(0, element.data.accepts.length);
-        const error = this.validateCallsiteOption(option);
-        if (error != null) {
-            throw error;
-        }
         return { option, args };
     }
     /**
@@ -91,6 +75,10 @@ export class LogicDriver extends LogicDescriptor {
      * @throws an error if the callsite is not present.
      */
     async createIxOperation(callsite, args) {
+        const routine = this.getRoutineElement(callsite);
+        if (routine.data.accepts.length !== args.length) {
+            ErrorUtils.throwError(`Invalid number of arguments for callsite "${callsite}".`, ErrorCode.INVALID_ARGUMENT);
+        }
         const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
         const callsiteType = this.getCallsiteType(callsite);
         switch (callsiteType) {
@@ -113,36 +101,18 @@ export class LogicDriver extends LogicDescriptor {
             }
         }
     }
-    /**
-     * Creates an interaction request for a given callsite and its arguments.
-     *
-     * @param callsite - The name of the callsite function to be invoked.
-     * @param callsiteArguments - An array of arguments to be passed to the callsite function.
-     * @param option - Optional parameters for the callsite, including fuel price and fuel limit.
-     * @returns A promise that resolves to a SignerIx object, which can be either a SimulateInteractionRequest or an InteractionRequest.
-     *
-     * @throws Will throw an error if the provided fuel limit is less than the required simulation effort.
-     */
-    async createIxRequest(callsite, callsiteArguments, option) {
-        const baseIxRequest = {
-            sender: {
-                sequence_id: option?.sequence_id,
-            },
-            fuel_price: option?.fuel_price ?? 1,
-            operations: [await this.createIxOperation(callsite, callsiteArguments)],
-        };
-        if (!this.isCallsiteMutable(callsite)) {
-            return baseIxRequest;
+    async createIxRequest(method, callsite, callsiteArguments, params) {
+        const operation = await this.createIxOperation(callsite, callsiteArguments);
+        if (method === "moi.Simulate") {
+            return await this.signer.createIxRequest("moi.Simulate", {
+                ...params,
+                operations: [operation],
+            });
         }
-        const simulation = await this.signer.simulate(baseIxRequest);
-        if (option?.fuel_limit != null && option.fuel_limit < simulation.effort) {
-            ErrorUtils.throwError(`Minimum fuel limit required for interaction is ${simulation.effort} but got ${option.fuel_limit}.`);
-        }
-        const request = {
-            ...baseIxRequest,
-            fuel_limit: option?.fuel_limit ?? simulation.effort,
-        };
-        return request;
+        return await this.signer.createIxRequest("moi.Execute", {
+            ...params,
+            operations: [operation],
+        });
     }
     /**
      * Retrieves the logic ID associated with this instance. If the logic ID is already set, it returns the existing logic ID.
@@ -182,9 +152,9 @@ export class LogicDriver extends LogicDescriptor {
                 ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
             }
             const { option, args: callsiteArgs } = this.extractArgsAndOption(callsite, args);
-            const ixRequest = await this.createIxRequest(callsite, callsiteArgs, option);
             if (!this.isCallsiteMutable(callsite)) {
-                const simulation = await this.signer.simulate(ixRequest);
+                const simulateIxRequest = await this.createIxRequest("moi.Simulate", callsite, callsiteArgs, option);
+                const simulation = await this.signer.simulate(simulateIxRequest);
                 const result = simulation.results.at(0);
                 if (result?.type !== OpType.LogicInvoke) {
                     ErrorUtils.throwError("Expected LogicInvoke operation.", ErrorCode.UNKNOWN_ERROR);
@@ -196,10 +166,8 @@ export class LogicDriver extends LogicDescriptor {
                 }
                 return this.getManifestCoder().decodeOutput(callsite, outputs);
             }
-            if (!("fuel_limit" in ixRequest) || typeof ixRequest.fuel_limit !== "number") {
-                ErrorUtils.throwError("Invalid interaction request. Fuel limit must be a number.", ErrorCode.INVALID_ARGUMENT);
-            }
-            const response = await this.signer.execute(ixRequest);
+            const request = await this.createIxRequest("moi.Execute", callsite, callsiteArgs, option);
+            const response = await this.signer.execute(request);
             if (isDeployerCallsite) {
                 this.deployIxResponse = response;
             }

@@ -8,6 +8,6 @@
         "**/*.code-search": true,
         "packages/*/lib.*/": true
     },
-    "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"],
+    "cSpell.words": ["callsite", "Callsites", "depolorize", "Depolorizer", "POLO", "polorizer"],
     "typescript.tsdk": "node_modules/typescript/lib"
 }

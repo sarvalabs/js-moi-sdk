@@ -1,9 +1,9 @@
 import { Identifier } from "js-moi-identifiers";
 import type { LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
-import { LogicState, RoutineType, StorageKey, type AnyIxOperation, type Hex, type InteractionRequest, type LogicManifest, type LogicMessage } from "js-moi-utils";
+import { LogicState, OpType, RoutineType, StorageKey, type Hex, type InteractionRequest, type IxOperation, type LogicManifest, type LogicMessage } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import type { CallsiteOption, LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
+import type { LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
 /**
  * It is class that is used to interact with the logic.
  *
@@ -40,7 +40,6 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      * @returns A boolean indicating whether the callsite is mutable.
      */
     isCallsiteMutable(callsite: string): boolean;
-    private validateCallsiteOption;
     private extractArgsAndOption;
     /**
      * Creates an interaction operation for the specified callsite.
@@ -51,7 +50,7 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      *
      * @throws an error if the callsite is not present.
      */
-    createIxOperation(callsite: string, args: unknown[]): Promise<AnyIxOperation>;
+    createIxOperation(callsite: string, args: unknown[]): Promise<IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicEnlist>>;
     /**
      * Creates an interaction request for a given callsite and its arguments.
      *
@@ -62,7 +61,8 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      *
      * @throws Will throw an error if the provided fuel limit is less than the required simulation effort.
      */
-    createIxRequest(callsite: string, callsiteArguments: unknown[], option?: CallsiteOption): Promise<SignerIx<SimulateInteractionRequest> | SignerIx<InteractionRequest>>;
+    createIxRequest(method: "moi.Simulate", callsite: string, callsiteArguments: unknown[], params?: Omit<Partial<SignerIx<SimulateInteractionRequest>>, "operations">): Promise<SimulateInteractionRequest>;
+    createIxRequest(method: "moi.Execute", callsite: string, callsiteArguments: unknown[], params?: Omit<Partial<SignerIx<InteractionRequest>>, "operations">): Promise<InteractionRequest>;
     /**
      * Retrieves the logic ID associated with this instance. If the logic ID is already set, it returns the existing logic ID.
      *

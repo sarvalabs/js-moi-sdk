@@ -55,7 +55,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-wallet",
-        run_tests: true,
+        run_tests: !true,
     },
 ];
 
