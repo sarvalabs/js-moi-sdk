@@ -14,7 +14,7 @@ const TEST_TIMEOUT = 2 * 60000; // 2 minutes
 describe(getLogicDriver, () => {
     const wallet = Wallet.createRandomSync(new HttpProvider("http://localhost:1600"));
     const manifest = loadManifestFromFile("flipper");
-    const logicId = "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782";
+    const logicId = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 
     beforeAll(() => {
         jest.spyOn(wallet.getProvider(), "getLogic").mockReturnValue({
@@ -126,7 +126,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
 
     describe(driver.isDeployed, () => {
         it("should return true if logic is deployed", async () => {
-            const logicId = "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782";
+            const logicId = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
             const mockLogicId = new LogicId(logicId);
             const getLogicSpy = jest.spyOn(driver, "getLogicId").mockResolvedValue(mockLogicId);
 
