@@ -1,3 +1,4 @@
+import type { Identifier, LogicId } from "js-moi-identifiers";
 import type {
     Account,
     AccountAsset,
@@ -22,7 +23,7 @@ export type ApiMethod<TParams extends any[], TResponse = any> = {
 };
 
 interface IdentifierParam<TValue> {
-    identifier: TValue;
+    id: TValue;
 }
 
 interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> {}
@@ -32,39 +33,39 @@ interface SimulateRequestParam {
     references?: { address: Address; reference: TesseractReference };
 }
 
-interface AccountRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {}
+interface AccountRequestParam extends IdentifierParam<Identifier | Hex>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {}
 
 interface TesseractRequestParam extends Required<TesseractReferenceParam>, ResponseModifierParam<Exclude<keyof Tesseract, "hash" | "tesseract">> {}
 
-interface LogicRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Logic, "metadata">> {}
+interface LogicRequestParam extends IdentifierParam<Identifier | Hex>, ResponseModifierParam<Exclude<keyof Logic, "metadata">> {}
 
 interface LogicStorageRequestParam extends TesseractReferenceParam {
-    logic_id: Hex;
+    logic_id: Hex | LogicId;
     storage_id: Hex;
-    address?: Address;
+    id?: Hex | Identifier;
 }
 
-interface AssetRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof Asset, "metadata">>, TesseractReferenceParam {}
+interface AssetRequestParam extends IdentifierParam<Identifier | Hex>, ResponseModifierParam<Exclude<keyof Asset, "metadata">>, TesseractReferenceParam {}
 
 export type NestedArray<T> = T[] | NestedArray<T>[];
 
 interface LogicMessageRequestParam {
-    logic_id: Hex;
-    address?: Address;
+    logic_id: Identifier | Hex;
+    id?: Hex | Identifier;
     topics?: NestedArray<Hex>;
     range?: { start: number; stop: number };
 }
 
-interface AccountAssetRequestParam extends IdentifierParam<Address>, ResponseModifierParam<Exclude<keyof AccountAsset, "balance">>, TesseractReferenceParam {
-    asset_id: Hex;
+interface AccountAssetRequestParam extends IdentifierParam<Identifier | Hex>, ResponseModifierParam<Exclude<keyof AccountAsset, "balance">>, TesseractReferenceParam {
+    asset_id: Identifier | Hex;
 }
 
-interface AccountKeyRequestParam extends IdentifierParam<Address>, TesseractReferenceParam {
+interface AccountKeyRequestParam extends IdentifierParam<Identifier | Hex>, TesseractReferenceParam {
     key_idx: number;
     pending?: boolean;
 }
 
-interface InteractionSignature extends IdentifierParam<Address> {
+interface InteractionSignature extends IdentifierParam<Identifier | Hex> {
     signature: Hex;
     key_idx: number;
 }

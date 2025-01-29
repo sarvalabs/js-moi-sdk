@@ -391,7 +391,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic message when address is passed", async () => {
                 const messages = await provider.getLogicMessage(new LogicId(logic_id), {
-                    address: new LogicId(logic_id).toHex(),
+                    id: new LogicId(logic_id).toHex(),
                 });
 
                 expect(messages).toBeDefined();
@@ -407,7 +407,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent.each<LogicMessageRequestOption & { case: string }>([
                 {
                     case: "when address is passed",
-                    address: address,
+                    id: address,
                 },
                 {
                     case: "when range is passed",
@@ -427,7 +427,7 @@ describe(JsonRpcProvider, () => {
                 },
                 {
                     case: "when all options are passed",
-                    address: "0x5fc0247c18448e91d15542ffb7a0956b6d5f1a19bdd11a36e6a1f7369288f886",
+                    id: "0x5fc0247c18448e91d15542ffb7a0956b6d5f1a19bdd11a36e6a1f7369288f886",
                     topics: ["0x5edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a"],
                     range: { start: 0, stop: 9 },
                 },

@@ -178,12 +178,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     //     }
 
     //     return {
-    //         relative: { id: new Identifier(reference.relative.id).toHex(), height: reference.relative.height },
+    //         relative: { id: new Identifier(reference.relative.id), height: reference.relative.height },
     //     };
     // };
 
     async getAccount<TOption extends AccountRequestOption>(participant: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
-        return await this.call("moi.Account", { identifier: new Identifier(participant).toHex(), ...option });
+        return await this.call("moi.Account", { id: new Identifier(participant), ...option });
     }
 
     private async getTesseractByReference<TOption extends TesseractRequestOption>(
@@ -217,7 +217,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
                     ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
                 }
 
-                return await this.getTesseractByReference({ relative: { id: new Identifier(identifier).toHex(), height } }, option);
+                return await this.getTesseractByReference({ relative: { id: new Identifier(identifier), height } }, option);
             }
 
             case typeof identifier === "object" && !isIdentifier(identifier) && isValidOption(height): {
@@ -235,7 +235,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     getLogic<TOption extends LogicRequestOption>(identifier: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
-        return this.call("moi.Logic", { identifier: new LogicId(identifier).toHex(), ...option });
+        return this.call("moi.Logic", { id: new Identifier(identifier), ...option });
     }
 
     async getLogicStorage(logic: Identifier | Hex, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
@@ -251,9 +251,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         switch (true) {
             case isHex(participantOrStorage) || participantOrStorage instanceof StorageKey: {
                 // getting value from persistent storage
-                params = [
-                    { logic_id: new LogicId(logic).toHex(), storage_id: participantOrStorage instanceof StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option },
-                ];
+                params = [{ logic_id: new LogicId(logic), storage_id: participantOrStorage instanceof StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option }];
                 break;
             }
 
@@ -268,7 +266,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
                 }
 
                 const storageIdHex = storageId instanceof StorageKey ? storageId.hex() : storageId;
-                params = [{ logic_id: new LogicId(logic).toHex(), address: participantOrStorage.toHex(), storage_id: storageIdHex, ...option }];
+                params = [{ logic_id: new LogicId(logic), id: participantOrStorage, storage_id: storageIdHex, ...option }];
                 break;
             }
 
@@ -281,7 +279,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     async getAsset<TOption extends AssetRequestOption>(asset: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
-        return await this.call("moi.Asset", { identifier: new AssetId(asset).toHex(), ...option });
+        return await this.call("moi.Asset", { id: new AssetId(asset), ...option });
     }
 
     private encodeTopics(topics: NestedArray<string>): NestedArray<Hex> {
@@ -305,7 +303,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
 
     async getLogicMessage(logic: Identifier | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
         return await this.call("moi.LogicMessage", {
-            logic_id: new LogicId(logic).toHex(),
+            logic_id: new LogicId(logic),
             ...options,
             topics: this.encodeTopics(options?.topics ?? []),
         });
@@ -316,7 +314,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         asset: Identifier | Hex,
         option?: TOption
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>> {
-        return await this.call("moi.AccountAsset", { identifier: new Identifier(participant).toHex(), asset_id: new AssetId(asset).toHex(), ...option });
+        return await this.call("moi.AccountAsset", { id: new Identifier(participant), asset_id: new AssetId(asset), ...option });
     }
 
     async getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
@@ -325,7 +323,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         }
 
         return await this.call("moi.AccountKey", {
-            identifier: new Identifier(participant).toHex(),
+            id: new Identifier(participant),
             key_idx: index,
             ...option,
         });
