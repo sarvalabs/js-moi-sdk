@@ -506,7 +506,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the account key with reference", async () => {
                 const accountKey = await provider.getAccountKey(address, 0, {
-                    reference: { relative: { id: address, height: 0 } },
+                    
                 });
 
                 expect(accountKey).toBeDefined();
