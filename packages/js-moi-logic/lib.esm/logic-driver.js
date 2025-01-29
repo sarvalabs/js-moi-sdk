@@ -70,7 +70,9 @@ export class LogicDriver extends LogicDescriptor {
     extractArgsAndOption(callsite, callsiteArguments) {
         const element = this.getRoutineElement(callsite);
         if (callsiteArguments.length < element.data.accepts.length) {
-            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
+            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts
+                .map((accept) => `${accept.label} ${accept.type}`)
+                .join(", ")})`;
             ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
         }
         const option = callsiteArguments.at(element.data.accepts.length + 1);
@@ -160,11 +162,11 @@ export class LogicDriver extends LogicDescriptor {
             if (result?.type !== OpType.LogicDeploy) {
                 ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
             }
-            const exception = ManifestCoder.decodeException(result.payload.error);
+            const exception = ManifestCoder.decodeException(result.data.error);
             if (exception != null) {
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
-            this.setLogicId(new LogicId(result.payload.logic_id));
+            this.setLogicId(new LogicId(result.data.logic_id));
         }
         return super.getLogicId();
     }

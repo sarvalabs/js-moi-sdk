@@ -20,7 +20,7 @@ export interface SimulationEffects {
 export interface Simulate {
     hash: Hex;
     status: ReceiptStatus;
-    result: AnyIxOperationResult[];
+    results: AnyIxOperationResult[];
     effort: number;
     effects: SimulationEffects[] | null;
 }
@@ -141,7 +141,7 @@ export interface ParticipantCreateOperation {
 export interface AssetCreateOperation {
     symbol: string;
     supply: Quantity;
-    dimension: Quantity;
+    dimension: number;
     standard: AssetStandard;
     is_logical: boolean;
     is_stateful: boolean;

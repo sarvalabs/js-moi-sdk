@@ -28,14 +28,20 @@ export type IxOpResult<TOpType extends OpType> = TOpType extends OpType.AssetCre
     ? LogicDeployResult
     : TOpType extends OpType.LogicInvoke | OpType.LogicEnlist
     ? LogicActionResult
-    : TOpType extends OpType.ParticipantCreate | OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
+    : TOpType extends
+          | OpType.ParticipantCreate
+          | OpType.AssetTransfer
+          | OpType.AssetApprove
+          | OpType.AssetRevoke
+          | OpType.AssetLockup
+          | OpType.AssetRelease
     ? NoOperationResult
     : unknown;
 
 export interface IxResult<TOpType extends OpType> {
     type: TOpType;
     status: OperationStatus;
-    payload: IxOpResult<TOpType>;
+    data: IxOpResult<TOpType>;
 }
 
 export type AnyIxOperationResult =

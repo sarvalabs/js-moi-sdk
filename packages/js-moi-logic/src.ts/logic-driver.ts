@@ -107,7 +107,9 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         const element = this.getRoutineElement(callsite);
 
         if (callsiteArguments.length < element.data.accepts.length) {
-            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
+            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts
+                .map((accept) => `${accept.label} ${accept.type}`)
+                .join(", ")})`;
             ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
         }
 
@@ -218,13 +220,13 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
             }
 
-            const exception = ManifestCoder.decodeException(result.payload.error);
+            const exception = ManifestCoder.decodeException(result.data.error);
 
             if (exception != null) {
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
 
-            this.setLogicId(new LogicId(result.payload.logic_id));
+            this.setLogicId(new LogicId(result.data.logic_id));
         }
 
         return super.getLogicId();
@@ -249,16 +251,13 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
             if (!this.isCallsiteMutable(callsite)) {
                 const simulation = await this.signer.simulate(ixRequest);
-                // TODO: remove any here
-                const result: any = simulation.result.at(0);
+                const result = simulation.results.at(0);
 
                 console.warn("Still the 'field' is op_type, should be type");
-                // TODO: op_type should be type
-                if (result?.op_type !== OpType.LogicInvoke) {
+                if (result?.type !== OpType.LogicInvoke) {
                     ErrorUtils.throwError("Expected LogicInvoke operation.", ErrorCode.UNKNOWN_ERROR);
                 }
 
-                // TODO: payload should be data
                 const { error, outputs } = result.data;
                 const exception = ManifestCoder.decodeException(error);
 
@@ -444,7 +443,10 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer): Promise<LogicDriver<TCallsites>> => {
+export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(
+    logicId: Identifier | LogicManifest,
+    signer: Signer
+): Promise<LogicDriver<TCallsites>> => {
     if (isIdentifier(logicId)) {
         const provider = signer.getProvider();
         const manifestInPolo = await provider.getLogic(logicId, {
