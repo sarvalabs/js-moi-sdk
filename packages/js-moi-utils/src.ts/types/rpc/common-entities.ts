@@ -35,7 +35,7 @@ export interface AbsoluteTesseractReference {
 }
 
 export interface RelativeReference {
-    identifier: Hex;
+    id: Hex;
     height: number;
 }
 

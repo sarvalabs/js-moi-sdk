@@ -203,7 +203,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
                     ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
                 }
 
-                return await this.getTesseractByReference({ relative: { identifier: new Identifier(identifier).toHex(), height } }, option);
+                return await this.getTesseractByReference({ relative: { id: new Identifier(identifier).toHex(), height } }, option);
             }
 
             case typeof identifier === "object" && !isIdentifier(identifier) && isValidOption(height): {

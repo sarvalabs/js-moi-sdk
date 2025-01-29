@@ -30,7 +30,7 @@ export interface AbsoluteTesseractReference {
     relative?: never;
 }
 export interface RelativeReference {
-    identifier: Hex;
+    id: Hex;
     height: number;
 }
 export interface RelativeTesseractReference {

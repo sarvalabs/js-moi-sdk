@@ -122,7 +122,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
                 if (Number.isNaN(height) || height < -1) {
                     js_moi_utils_1.ErrorUtils.throwError("Invalid height value", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
-                return await this.getTesseractByReference({ relative: { identifier: new js_moi_identifiers_1.Identifier(identifier).toHex(), height } }, option);
+                return await this.getTesseractByReference({ relative: { id: new js_moi_identifiers_1.Identifier(identifier).toHex(), height } }, option);
             }
             case typeof identifier === "object" && !(0, js_moi_identifiers_1.isIdentifier)(identifier) && isValidOption(height): {
                 // Getting tesseract by reference
