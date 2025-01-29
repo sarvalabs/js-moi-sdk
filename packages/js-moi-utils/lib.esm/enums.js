@@ -96,8 +96,7 @@ export var ElementType;
 })(ElementType || (ElementType = {}));
 export var InteractionStatus;
 (function (InteractionStatus) {
-    InteractionStatus[InteractionStatus["Queued"] = 0] = "Queued";
-    InteractionStatus[InteractionStatus["Pending"] = 1] = "Pending";
-    InteractionStatus[InteractionStatus["Finalized"] = 2] = "Finalized";
+    InteractionStatus[InteractionStatus["Pending"] = 0] = "Pending";
+    InteractionStatus[InteractionStatus["Finalized"] = 1] = "Finalized";
 })(InteractionStatus || (InteractionStatus = {}));
 //# sourceMappingURL=enums.js.map
