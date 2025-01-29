@@ -1,3 +1,4 @@
+import type { Identifier } from "js-moi-identifiers";
 import type { Hex } from "../../hex";
 
 export interface IncludeModifier<T extends string = string> {
@@ -35,7 +36,7 @@ export interface AbsoluteTesseractReference {
 }
 
 export interface RelativeReference {
-    id: Hex;
+    id: Hex | Identifier;
     height: number;
 }
 
