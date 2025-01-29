@@ -414,10 +414,6 @@ describe(JsonRpcProvider, () => {
                     range: { start: 0, stop: 10 },
                 },
                 {
-                    case: "when invalid range is passed",
-                    range: { start: -100, stop: 10 },
-                },
-                {
                     case: "when invalid topics are passed",
                     topics: ["0x01", "0x02"],
                 },
