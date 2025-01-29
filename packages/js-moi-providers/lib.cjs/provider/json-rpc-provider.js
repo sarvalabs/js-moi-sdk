@@ -59,7 +59,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         };
         this.emit("debug", { action: "json-rpc-request", payload });
         const response = await this.transport.request(payload);
-        this.emit("debug", { action: "json-rpc-response", response });
+        this.emit("debug", { action: "json-rpc-response", payload: response });
         return response;
     }
     /**
