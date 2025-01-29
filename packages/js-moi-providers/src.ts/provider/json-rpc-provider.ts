@@ -168,20 +168,6 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         });
     }
 
-    // private readonly processTesseractReference = (reference: TesseractReference): BaseTesseractReferenceParam["reference"] => {
-    //     if (reference == null) {
-    //         return undefined;
-    //     }
-
-    //     if ("absolute" in reference && reference.absolute != null) {
-    //         return { absolute: reference.absolute };
-    //     }
-
-    //     return {
-    //         relative: { id: new Identifier(reference.relative.id), height: reference.relative.height },
-    //     };
-    // };
-
     async getAccount<TOption extends AccountRequestOption>(participant: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
         return await this.call("moi.Account", { id: new Identifier(participant), ...option });
     }

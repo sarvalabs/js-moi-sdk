@@ -105,17 +105,6 @@ class JsonRpcProvider extends events_1.EventEmitter {
             ...option,
         });
     }
-    // private readonly processTesseractReference = (reference: TesseractReference): BaseTesseractReferenceParam["reference"] => {
-    //     if (reference == null) {
-    //         return undefined;
-    //     }
-    //     if ("absolute" in reference && reference.absolute != null) {
-    //         return { absolute: reference.absolute };
-    //     }
-    //     return {
-    //         relative: { id: new Identifier(reference.relative.id), height: reference.relative.height },
-    //     };
-    // };
     async getAccount(participant, option) {
         return await this.call("moi.Account", { id: new js_moi_identifiers_1.Identifier(participant), ...option });
     }
