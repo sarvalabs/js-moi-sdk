@@ -1,12 +1,12 @@
 import { styleText } from "node:util";
-import { HttpProvider, OpType, Wallet } from "./packages/js-moi";
+import { HttpProvider, OpType, Wallet, WebsocketProvider, type Provider } from "./packages/js-moi";
 
 type ProviderType = "http" | "websocket";
 
 //#region Constants
 const MNEMONIC: string = "keep board tiger clean island wisdom apology when anger doctor pencil volcano";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
-const PROVIDER_TYPE = "http" as ProviderType;
+const PROVIDER_TYPE = "websocket" as ProviderType;
 const LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 //#endregion
 
@@ -26,7 +26,19 @@ const createProvider = () => {
 
     log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
 
-    const p = new HttpProvider(provider[PROVIDER_TYPE]);
+    let p: Provider | undefined = undefined;
+
+    if (PROVIDER_TYPE === "websocket") {
+        p = new WebsocketProvider(provider["websocket"]);
+    }
+
+    if (PROVIDER_TYPE === "http") {
+        p = new HttpProvider(provider["http"]);
+    }
+
+    if (p == null) {
+        throw new Error("Provider not created");
+    }
 
     p.on("debug", (message) => {
         console.log(styleText("yellow", `DEBUG: ${JSON.stringify(message)}`));
