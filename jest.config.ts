@@ -39,7 +39,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-logic",
-        run_tests: false,
+        run_tests: !true,
     },
     {
         name: "js-moi-signer",
@@ -55,7 +55,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-wallet",
-        run_tests: false,
+        run_tests: true,
     },
 ];
 
