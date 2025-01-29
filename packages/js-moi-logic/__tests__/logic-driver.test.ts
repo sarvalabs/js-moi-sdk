@@ -1,9 +1,10 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { HttpProvider, InteractionResponse } from "js-moi-providers";
-import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, randomBytes, StorageKey } from "js-moi-utils";
+import { bytesToHex, ElementType, LogicState, OperationStatus, OpType, randomBytes, StorageKey } from "js-moi-utils";
 import { getLogicDriver, LogicDriver } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
+import { LogicId } from "js-moi-identifiers";
 import { Wallet } from "../../js-moi-wallet/src.ts";
 import { createWallet } from "./helpers";
 
@@ -27,7 +28,7 @@ describe(getLogicDriver, () => {
     });
 
     it("should setup driver from logic address", async () => {
-        const driver = await getLogicDriver(new LogicId(logicId).getAddress(), wallet);
+        const driver = await getLogicDriver(new LogicId(logicId), wallet);
 
         expect(driver).toBeInstanceOf(LogicDriver);
         expect((await driver.getLogicId()).toString()).toEqual(logicId);
