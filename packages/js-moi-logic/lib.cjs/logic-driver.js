@@ -73,9 +73,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     extractArgsAndOption(callsite, callsiteArguments) {
         const element = this.getRoutineElement(callsite);
         if (callsiteArguments.length < element.data.accepts.length) {
-            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts
-                .map((accept) => `${accept.label} ${accept.type}`)
-                .join(", ")})`;
+            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
             js_moi_utils_1.ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
         }
         const option = callsiteArguments.at(element.data.accepts.length + 1);
@@ -187,14 +185,10 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
             const ixRequest = await this.createIxRequest(callsite, callsiteArgs, option);
             if (!this.isCallsiteMutable(callsite)) {
                 const simulation = await this.signer.simulate(ixRequest);
-                // TODO: remove any here
-                const result = simulation.result.at(0);
-                console.warn("Still the 'field' is op_type, should be type");
-                // TODO: op_type should be type
-                if (result?.op_type !== js_moi_utils_1.OpType.LogicInvoke) {
+                const result = simulation.results.at(0);
+                if (result?.type !== js_moi_utils_1.OpType.LogicInvoke) {
                     js_moi_utils_1.ErrorUtils.throwError("Expected LogicInvoke operation.", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
                 }
-                // TODO: payload should be data
                 const { error, outputs } = result.data;
                 const exception = js_moi_manifest_1.ManifestCoder.decodeException(error);
                 if (exception != null) {

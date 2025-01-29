@@ -1,6 +1,6 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { HttpProvider, InteractionResponse } from "js-moi-providers";
-import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, randomBytes, StorageKey, type Interaction } from "js-moi-utils";
+import { bytesToHex, ElementType, LogicId, LogicState, OperationStatus, OpType, randomBytes, StorageKey } from "js-moi-utils";
 import { getLogicDriver, LogicDriver } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
@@ -30,14 +30,14 @@ describe(getLogicDriver, () => {
         const driver = await getLogicDriver(new LogicId(logicId).getAddress(), wallet);
 
         expect(driver).toBeInstanceOf(LogicDriver);
-        expect((await driver.getLogicId()).value).toEqual(logicId);
+        expect((await driver.getLogicId()).toString()).toEqual(logicId);
     });
 
     it("should setup driver from logic id", async () => {
         const driver = await getLogicDriver(new LogicId(logicId), wallet);
 
         expect(driver).toBeInstanceOf(LogicDriver);
-        expect((await driver.getLogicId()).value).toEqual(logicId);
+        expect((await driver.getLogicId()).toString()).toEqual(logicId);
     });
 
     it("should setup logic driver from manifest", async () => {
@@ -145,7 +145,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
         });
 
         it("should get logic id", async () => {
-            const interaction = {
+            const interaction: any = {
                 hash: bytesToHex(randomBytes(32)),
                 confirmation: {
                     operations: [
@@ -161,10 +161,10 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
                 },
             };
 
-            const interactionResponseMock = jest.replaceProperty(driver, "deployIxResponse" as any, new InteractionResponse(interaction as Interaction, wallet.getProvider()));
-
+            const interactionResponseMock = jest.replaceProperty(driver, "deployIxResponse" as any, new InteractionResponse(interaction, wallet.getProvider()));
             const logicId = await driver.getLogicId();
-            expect(logicId.value).toEqual(interaction.confirmation.operations[0].payload.logic_id);
+
+            expect(logicId.toString()).toEqual(interaction.confirmation.operations[0].payload.logic_id);
 
             // cleanup
             interactionResponseMock.restore();
