@@ -197,7 +197,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return await this.call("moi.AccountKey", {
             id: new js_moi_identifiers_1.Identifier(participant),
-            key_idx: index,
+            key_id: index,
             ...option,
         });
     }

@@ -61,7 +61,7 @@ interface AccountAssetRequestParam extends IdentifierParam<Identifier | Hex>, Re
 }
 
 interface AccountKeyRequestParam extends IdentifierParam<Identifier | Hex>, TesseractReferenceParam {
-    key_idx: number;
+    key_id: number;
     pending?: boolean;
 }
 

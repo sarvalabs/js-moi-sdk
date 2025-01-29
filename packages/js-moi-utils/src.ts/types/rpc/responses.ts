@@ -44,7 +44,7 @@ export interface AccountState {
 }
 
 export interface AccountKey {
-    key_idx: number;
+    key_id: number;
     weight: number;
     revoked: boolean;
     public_key: Hex;

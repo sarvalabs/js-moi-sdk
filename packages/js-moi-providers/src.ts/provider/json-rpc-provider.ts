@@ -310,7 +310,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
 
         return await this.call("moi.AccountKey", {
             id: new Identifier(participant),
-            key_idx: index,
+            key_id: index,
             ...option,
         });
     }

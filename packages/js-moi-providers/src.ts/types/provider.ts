@@ -113,7 +113,7 @@ interface AccountAssetRequest {
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
 }
 
-export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "id" | "key_idx">;
+export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "id" | "key_id">;
 
 interface AccountKeyRequest {
     getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;

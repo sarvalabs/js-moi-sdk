@@ -26,7 +26,13 @@ const createProvider = () => {
 
     log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
 
-    return new HttpProvider(provider[PROVIDER_TYPE]);
+    const p = new HttpProvider(provider[PROVIDER_TYPE]);
+
+    p.on("debug", (message) => {
+        console.log(styleText("yellow", `DEBUG: ${JSON.stringify(message)}`));
+    });
+
+    return p;
 };
 
 const createWallet = async () => {
