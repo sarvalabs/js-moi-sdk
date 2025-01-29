@@ -78,7 +78,7 @@ const createParticipantCreateDescriptor = () => {
 
         validator: (operation) => {
             const { payload } = operation;
-            if (isHex(payload.address, 32)) {
+            if (!isHex(payload.address, 32)) {
                 return createInvalidResult(payload, "address", "Invalid identifier");
             }
 
