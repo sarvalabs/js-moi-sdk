@@ -116,6 +116,10 @@ class Signer {
             return await this.getProvider().execute(arg);
         }
         const request = await this.createIxRequest("moi.Execute", arg);
+        const error = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", request);
+        if (error != null) {
+            js_moi_utils_1.ErrorUtils.throwError(`Invalid interaction request: ${error.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, error);
+        }
         const signedRequest = await this.signInteraction(request, algorithm);
         return await this.getProvider().execute(signedRequest);
     }
