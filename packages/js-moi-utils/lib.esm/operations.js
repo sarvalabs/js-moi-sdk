@@ -1,3 +1,4 @@
+import { LogicId } from "js-moi-identifiers";
 import { Polorizer } from "js-polo";
 import { polo } from "polo-schema";
 import { AssetStandard, OpType } from "./enums";
@@ -201,7 +202,7 @@ const createLogicActionDescriptor = () => {
     return Object.freeze({
         schema: polo.struct({
             manifest: polo.bytes,
-            logic_id: polo.string,
+            logic_id: polo.bytes,
             callsite: polo.string,
             calldata: polo.bytes,
             interfaces: polo.map({
@@ -224,7 +225,7 @@ const createLogicActionDescriptor = () => {
             }
             return {
                 ...payload,
-                logic_id: payload.logic_id,
+                logic_id: new LogicId(payload.logic_id).toBytes(),
                 calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             };

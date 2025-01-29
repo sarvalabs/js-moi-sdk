@@ -296,7 +296,7 @@ describe("Provider integration test", () => {
         beforeAll(async () => {
             const sequenceId = process.env["WALLET_SEQUENCE_CURRENT"] ?? undefined;
             process.env["WALLET_SEQUENCE_CURRENT"] = process.env["WALLET_SEQUENCE_CURRENT"] ? (parseInt(process.env["WALLET_SEQUENCE_CURRENT"]) + 1).toString() : "1";
-            
+
             ix = await wallet.execute({
                 sender: {
                     sequence_id: sequenceId ? parseInt(sequenceId) : undefined,

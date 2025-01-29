@@ -1,6 +1,6 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { HttpProvider, InteractionResponse } from "js-moi-providers";
-import { bytesToHex, ElementType, LogicState, OperationStatus, OpType, randomBytes, StorageKey } from "js-moi-utils";
+import { bytesToHex, ElementType, LogicState, OperationStatus, OpType, randomBytes, StorageKey, type IxResult } from "js-moi-utils";
 import { getLogicDriver, LogicDriver, type CallsiteOption } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
@@ -8,37 +8,28 @@ import { LogicId } from "js-moi-identifiers";
 import { Wallet } from "../../js-moi-wallet/src.ts";
 import { createWallet } from "./helpers";
 
+const TEST_LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
+
 const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 const TEST_TIMEOUT = 2 * 60000; // 2 minutes
 
 describe(getLogicDriver, () => {
     const wallet = Wallet.createRandomSync(new HttpProvider("http://localhost:1600"));
     const manifest = loadManifestFromFile("flipper");
-    const logicId = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 
     beforeAll(() => {
-        jest.spyOn(wallet.getProvider(), "getLogic").mockReturnValue({
-            manifest: ManifestCoder.encodeManifest(manifest),
-            metadata: { logic_id: logicId },
-        } as any);
+        jest.spyOn(wallet.getProvider(), "getLogic").mockReturnValue(ManifestCoder.encodeManifest(manifest) as any);
     });
 
     afterAll(() => {
         jest.restoreAllMocks();
     });
 
-    it("should setup driver from logic address", async () => {
-        const driver = await getLogicDriver(new LogicId(logicId), wallet);
-
-        expect(driver).toBeInstanceOf(LogicDriver);
-        expect((await driver.getLogicId()).toString()).toEqual(logicId);
-    });
-
     it("should setup driver from logic id", async () => {
-        const driver = await getLogicDriver(new LogicId(logicId), wallet);
+        const driver = await getLogicDriver(new LogicId(TEST_LOGIC_ID), wallet);
 
         expect(driver).toBeInstanceOf(LogicDriver);
-        expect((await driver.getLogicId()).toString()).toEqual(logicId);
+        expect((await driver.getLogicId()).toString()).toEqual(TEST_LOGIC_ID);
     });
 
     it("should setup logic driver from manifest", async () => {
@@ -126,9 +117,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
 
     describe(driver.isDeployed, () => {
         it("should return true if logic is deployed", async () => {
-            const logicId = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
-            const mockLogicId = new LogicId(logicId);
-            const getLogicSpy = jest.spyOn(driver, "getLogicId").mockResolvedValue(mockLogicId);
+            const getLogicSpy = jest.spyOn(driver, "getLogicId").mockResolvedValue(new LogicId(TEST_LOGIC_ID));
 
             expect(await driver.isDeployed()).toBe(true);
 
@@ -153,11 +142,11 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
                         {
                             type: OpType.LogicDeploy,
                             status: OperationStatus.Ok,
-                            payload: {
+                            data: {
                                 error: "0x",
-                                logic_id: "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b781",
+                                logic_id: TEST_LOGIC_ID,
                             },
-                        },
+                        } satisfies IxResult<OpType.LogicDeploy>,
                     ],
                 },
             };
@@ -165,7 +154,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
             const interactionResponseMock = jest.replaceProperty(driver, "deployIxResponse" as any, new InteractionResponse(interaction, wallet.getProvider()));
             const logicId = await driver.getLogicId();
 
-            expect(logicId.toString()).toEqual(interaction.confirmation.operations[0].payload.logic_id);
+            expect(logicId.toString()).toEqual(interaction.confirmation.operations[0].data.logic_id);
 
             // cleanup
             interactionResponseMock.restore();

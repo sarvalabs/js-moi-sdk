@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
@@ -204,7 +205,7 @@ const createLogicActionDescriptor = () => {
     return Object.freeze({
         schema: polo_schema_1.polo.struct({
             manifest: polo_schema_1.polo.bytes,
-            logic_id: polo_schema_1.polo.string,
+            logic_id: polo_schema_1.polo.bytes,
             callsite: polo_schema_1.polo.string,
             calldata: polo_schema_1.polo.bytes,
             interfaces: polo_schema_1.polo.map({
@@ -227,7 +228,7 @@ const createLogicActionDescriptor = () => {
             }
             return {
                 ...payload,
-                logic_id: payload.logic_id,
+                logic_id: new js_moi_identifiers_1.LogicId(payload.logic_id).toBytes(),
                 calldata: payload.calldata != null ? (0, hex_1.hexToBytes)(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             };
