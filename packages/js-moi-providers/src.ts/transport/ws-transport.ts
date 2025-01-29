@@ -2,8 +2,6 @@ import EventEmitter from "events";
 import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
 import { Websocket } from "../provider/ws/ws";
 
-export type Websocketify<T extends JsonRpcRequest | JsonRpcResponse> = Omit<T, "id"> & { id: string };
-
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }
@@ -114,27 +112,19 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         return this.waitForConnectionPromise;
     }
 
-    public async request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>> {
+    public async request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>> {
         await this.waitForConnection();
-
-        const request: Websocketify<JsonRpcRequest> = this.createPayload(method, params);
 
         return new Promise((resolve, reject) => {
             const listener = (data: string) => {
                 try {
-                    const wsResponse = JSON.parse(data) as Websocketify<JsonRpcResponse>;
+                    const response = JSON.parse(data) as JsonRpcResponse;
 
-                    if (wsResponse.id !== request.id) {
+                    if (response.id !== request.id) {
                         return;
                     }
 
-                    resolve({ ...wsResponse, id: 1 } as JsonRpcResponse<TResult>);
-                    this.emit("debug", {
-                        host: this.address,
-                        response: wsResponse,
-                        ok: !("error" in wsResponse),
-                        error: "error" in wsResponse ? wsResponse.error : undefined,
-                    });
+                    resolve(response as JsonRpcResponse<TResult>);
                     this.off("message", listener);
                 } catch (error) {
                     reject(error);
@@ -154,25 +144,11 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         this.ws.close();
     }
 
-    private createId(): string {
-        return globalThis.crypto.randomUUID();
-    }
-
-    private createPayload(method: string, params: unknown[]): Websocketify<JsonRpcRequest> {
-        return {
-            id: this.createId(),
-            jsonrpc: "2.0",
-            method,
-            params,
-        };
-    }
-
     protected send(data: unknown): void {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
 
-        this.emit("debug", { request: data, host: this.address });
         this.ws.send(JSON.stringify(data));
     }
 

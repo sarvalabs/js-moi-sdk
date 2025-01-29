@@ -1,5 +1,5 @@
-import type { Hex, JsonRpcRequest, JsonRpcResponse, Tesseract } from "js-moi-utils";
-import { WebsocketTransport, type Websocketify, type WebsocketTransportOptions } from "../transport/ws-transport";
+import type { Hex, Tesseract } from "js-moi-utils";
+import { WebsocketTransport, type WebsocketTransportOptions } from "../transport/ws-transport";
 import { JsonRpcProvider } from "./json-rpc-provider";
 
 export enum WebsocketEvent {
@@ -17,7 +17,7 @@ export enum WebsocketEvent {
 
 type BaseListener = (...args: any[]) => void;
 
-type DebugCallback = (params: Websocketify<JsonRpcRequest> | (({ ok: boolean; error?: string } & Websocketify<JsonRpcResponse>) & { host: string })) => void;
+type DebugParam = { action: string; payload: unknown };
 
 export type ProviderEvent =
     | WebsocketEvent.Close
@@ -43,7 +43,7 @@ type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends Webs
     : TEvent extends WebsocketEvent.Message
     ? (message: any) => void
     : TEvent extends WebsocketEvent.Debug
-    ? DebugCallback
+    ? (data: DebugParam) => void
     : TEvent extends WebsocketEvent.Open | WebsocketEvent.Close
     ? () => void
     : BaseListener;

@@ -1,5 +1,5 @@
-import type { Hex, JsonRpcRequest, JsonRpcResponse, Tesseract } from "js-moi-utils";
-import { type Websocketify, type WebsocketTransportOptions } from "../transport/ws-transport";
+import type { Hex, Tesseract } from "js-moi-utils";
+import { type WebsocketTransportOptions } from "../transport/ws-transport";
 import { JsonRpcProvider } from "./json-rpc-provider";
 export declare enum WebsocketEvent {
     Error = "error",
@@ -14,12 +14,10 @@ export declare enum WebsocketEvent {
     NewLogs = "newLogs"
 }
 type BaseListener = (...args: any[]) => void;
-type DebugCallback = (params: Websocketify<JsonRpcRequest> | (({
-    ok: boolean;
-    error?: string;
-} & Websocketify<JsonRpcResponse>) & {
-    host: string;
-})) => void;
+type DebugParam = {
+    action: string;
+    payload: unknown;
+};
 export type ProviderEvent = WebsocketEvent.Close | WebsocketEvent.Error | WebsocketEvent.Open | WebsocketEvent.Reconnect | WebsocketEvent.Message | WebsocketEvent.NewPendingInteractions | WebsocketEvent.NewTesseracts | {
     event: WebsocketEvent.NewTesseractsByAccount;
     params: [{
@@ -34,7 +32,7 @@ export type ProviderEvent = WebsocketEvent.Close | WebsocketEvent.Error | Websoc
         topics: any[];
     }];
 } | string | symbol;
-type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends WebsocketEvent.NewPendingInteractions ? (hash: string) => void : TEvent extends WebsocketEvent.NewTesseracts | WebsocketEvent.NewTesseractsByAccount ? (tesseracts: Tesseract) => void : TEvent extends WebsocketEvent.Reconnect ? (reconnects: number) => void : TEvent extends WebsocketEvent.Error ? (error: Error) => void : TEvent extends WebsocketEvent.Message ? (message: any) => void : TEvent extends WebsocketEvent.Debug ? DebugCallback : TEvent extends WebsocketEvent.Open | WebsocketEvent.Close ? () => void : BaseListener;
+type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends WebsocketEvent.NewPendingInteractions ? (hash: string) => void : TEvent extends WebsocketEvent.NewTesseracts | WebsocketEvent.NewTesseractsByAccount ? (tesseracts: Tesseract) => void : TEvent extends WebsocketEvent.Reconnect ? (reconnects: number) => void : TEvent extends WebsocketEvent.Error ? (error: Error) => void : TEvent extends WebsocketEvent.Message ? (message: any) => void : TEvent extends WebsocketEvent.Debug ? (data: DebugParam) => void : TEvent extends WebsocketEvent.Open | WebsocketEvent.Close ? () => void : BaseListener;
 type ProviderEventListener<TEvent extends ProviderEvent> = TEvent extends string ? TEvent extends WebsocketEvent ? WebsocketEventListener<TEvent> : BaseListener : TEvent extends symbol ? BaseListener : TEvent extends {
     event: infer TEventType;
 } ? TEventType extends WebsocketEvent ? WebsocketEventListener<TEventType> : never : never;

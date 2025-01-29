@@ -80,23 +80,16 @@ export class WebsocketTransport extends EventEmitter {
         });
         return this.waitForConnectionPromise;
     }
-    async request(method, params) {
+    async request(request) {
         await this.waitForConnection();
-        const request = this.createPayload(method, params);
         return new Promise((resolve, reject) => {
             const listener = (data) => {
                 try {
-                    const wsResponse = JSON.parse(data);
-                    if (wsResponse.id !== request.id) {
+                    const response = JSON.parse(data);
+                    if (response.id !== request.id) {
                         return;
                     }
-                    resolve({ ...wsResponse, id: 1 });
-                    this.emit("debug", {
-                        host: this.address,
-                        response: wsResponse,
-                        ok: !("error" in wsResponse),
-                        error: "error" in wsResponse ? wsResponse.error : undefined,
-                    });
+                    resolve(response);
                     this.off("message", listener);
                 }
                 catch (error) {
@@ -114,22 +107,10 @@ export class WebsocketTransport extends EventEmitter {
         }
         this.ws.close();
     }
-    createId() {
-        return globalThis.crypto.randomUUID();
-    }
-    createPayload(method, params) {
-        return {
-            id: this.createId(),
-            jsonrpc: "2.0",
-            method,
-            params,
-        };
-    }
     send(data) {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
-        this.emit("debug", { request: data, host: this.address });
         this.ws.send(JSON.stringify(data));
     }
     static validateOptions(options) {
