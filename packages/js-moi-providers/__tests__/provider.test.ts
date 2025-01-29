@@ -498,7 +498,7 @@ describe(JsonRpcProvider, () => {
                 const accountKey = await provider.getAccountKey(participant, 0);
 
                 expect(accountKey).toBeDefined();
-                expect(accountKey.key_idx).toBe(0);
+                expect(accountKey.key_id).toBe(0);
                 expect(accountKey.public_key).toBeDefined();
                 expect(accountKey.weight).toBeDefined();
                 expect(accountKey.revoked).toBeDefined();
@@ -510,7 +510,7 @@ describe(JsonRpcProvider, () => {
                 });
 
                 expect(accountKey).toBeDefined();
-                expect(accountKey.key_idx).toBe(0);
+                expect(accountKey.key_id).toBe(0);
                 expect(accountKey.public_key).toBeDefined();
                 expect(accountKey.weight).toBeDefined();
                 expect(accountKey.revoked).toBeDefined();
@@ -520,7 +520,7 @@ describe(JsonRpcProvider, () => {
                 const accountKey = await provider.getAccountKey(participant, 0);
 
                 expect(accountKey).toBeDefined();
-                expect(accountKey.key_idx).toBe(0);
+                expect(accountKey.key_id).toBe(0);
                 expect(accountKey.public_key).toBeDefined();
                 expect(accountKey.weight).toBeDefined();
                 expect(accountKey.revoked).toBeDefined();
