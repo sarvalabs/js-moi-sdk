@@ -96,7 +96,7 @@ describe(JsonRpcProvider, () => {
         const FALLBACK_LOGIC_ID: Hex = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
         const FALLBACK_ASSET_ID: Hex = "0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000";
 
-        const address = ensureHexPrefix(
+        const participant = ensureHexPrefix(
             process.env["WALLET_ADDRESS"] ??
                 createParticipantId({
                     fingerprint: randomBytes(24),
@@ -118,7 +118,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.simulate, () => {
             it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
                 const result = await provider.simulate({
-                    sender: { address, key_id: 0, sequence_id: 0 },
+                    sender: { address: participant, key_id: 0, sequence_id: 0 },
                     fuel_price: 1,
                     operations: [
                         {
@@ -135,7 +135,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
                 const args = interaction({
-                    sender: { address, key_id: 0, sequence_id: 0 },
+                    sender: { address: participant, key_id: 0, sequence_id: 0 },
                     fuel_price: 1,
                     fuel_limit: 1000,
                     operations: [
@@ -156,16 +156,16 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getAccount, () => {
             it.concurrent("should return the account when retrieved using address", async () => {
-                const account = await provider.getAccount(address);
+                const account = await provider.getAccount(participant);
 
                 expect(account).toBeDefined();
-                expect(account.metadata.address).toEqual(address);
+                expect(account.metadata.address).toEqual(participant);
             });
 
             it.concurrent("should able to get account using reference", async () => {
                 const height = 0;
-                const account = await provider.getAccount(address, {
-                    reference: { relative: { height, id: address } },
+                const account = await provider.getAccount(participant, {
+                    reference: { relative: { height, id: participant } },
                     modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
                 });
 
@@ -180,14 +180,14 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account with included fields", async () => {
-                const account = await provider.getAccount(address, { modifier: { include: ["balances"] } });
+                const account = await provider.getAccount(participant, { modifier: { include: ["balances"] } });
 
                 expect(account).toBeDefined();
                 expect(account.balances).toBeDefined();
             });
 
             it.concurrent("should return the object with the extracted fields", async () => {
-                const balances = await provider.getAccount(address, { modifier: { extract: "balances" } });
+                const balances = await provider.getAccount(participant, { modifier: { extract: "balances" } });
 
                 expect(balances).toBeDefined();
                 expect(Array.isArray(balances)).toBeTruthy();
@@ -197,7 +197,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.getTesseract, () => {
             it.concurrent("should return the tesseract when retrieved using address and height", async () => {
                 const height = 0;
-                const tesseract = await provider.getTesseract(address, height, {
+                const tesseract = await provider.getTesseract(participant, height, {
                     modifier: { include: ["confirmations", "consensus", "interactions"] },
                 });
 
@@ -208,7 +208,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the tesseract when retrieved using tesseract hash", async () => {
                 const height = 0;
-                const currentTesseract = await provider.getTesseract(address, height);
+                const currentTesseract = await provider.getTesseract(participant, height);
                 const tesseract = await provider.getTesseract(currentTesseract.hash);
 
                 expect(tesseract).toBeDefined();
@@ -218,8 +218,8 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the tesseract when retrieved using tesseract reference", async () => {
                 const height = 0;
-                const currentTesseract = await provider.getTesseract(address, height);
-                const tesseract = await provider.getTesseract({ relative: { height, id: address } });
+                const currentTesseract = await provider.getTesseract(participant, height);
+                const tesseract = await provider.getTesseract({ relative: { height, id: participant } });
 
                 expect(tesseract).toBeDefined();
                 expect(tesseract.hash).toBeDefined();
@@ -227,7 +227,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the tesseract with included fields", async () => {
-                const tesseract = await provider.getTesseract(address, 0, {
+                const tesseract = await provider.getTesseract(participant, 0, {
                     modifier: { include: ["confirmations", "consensus", "interactions"] },
                 });
 
@@ -407,7 +407,7 @@ describe(JsonRpcProvider, () => {
             it.concurrent.each<LogicMessageRequestOption & { case: string }>([
                 {
                     case: "when address is passed",
-                    id: address,
+                    id: participant,
                 },
                 {
                     case: "when range is passed",
@@ -446,15 +446,15 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getAccountAsset, () => {
             it.concurrent("should return the account asset when retrieved using address and asset id", async () => {
-                const accountAsset = await provider.getAccountAsset(address, asset_id);
+                const accountAsset = await provider.getAccountAsset(participant, asset_id);
 
                 expect(accountAsset).toBeDefined();
                 expect(isHex(accountAsset.balance)).toBeTruthy();
             });
 
             it.concurrent("should return the account asset with reference", async () => {
-                const accountAsset = await provider.getAccountAsset(address, asset_id, {
-                    reference: { relative: { id: address, height: 0 } },
+                const accountAsset = await provider.getAccountAsset(participant, asset_id, {
+                    reference: { relative: { id: participant, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
@@ -462,7 +462,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account asset with included fields", async () => {
-                const accountAsset = await provider.getAccountAsset(address, asset_id, {
+                const accountAsset = await provider.getAccountAsset(participant, asset_id, {
                     modifier: { include: ["lockup", "mandate"] },
                 });
 
@@ -473,7 +473,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account asset with extracted fields", async () => {
-                const lockup = await provider.getAccountAsset(address, asset_id, {
+                const lockup = await provider.getAccountAsset(participant, asset_id, {
                     modifier: { extract: "lockup" },
                 });
 
@@ -481,9 +481,9 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account asset with modifier and reference", async () => {
-                const accountAsset = await provider.getAccountAsset(address, asset_id, {
+                const accountAsset = await provider.getAccountAsset(participant, asset_id, {
                     modifier: { include: ["lockup", "mandate"] },
-                    reference: { relative: { id: address, height: 0 } },
+                    reference: { relative: { id: participant, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
@@ -495,7 +495,7 @@ describe(JsonRpcProvider, () => {
 
         describe(provider.getAccountKey, () => {
             it.concurrent("should return the account key when retrieved using address and key index", async () => {
-                const accountKey = await provider.getAccountKey(address, 0);
+                const accountKey = await provider.getAccountKey(participant, 0);
 
                 expect(accountKey).toBeDefined();
                 expect(accountKey.key_idx).toBe(0);
@@ -505,8 +505,8 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account key with reference", async () => {
-                const accountKey = await provider.getAccountKey(address, 0, {
-                    
+                const accountKey = await provider.getAccountKey(participant, 0, {
+                    reference: { relative: { id: participant, height: 0 } },
                 });
 
                 expect(accountKey).toBeDefined();
@@ -517,7 +517,7 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the account key with pending true", async () => {
-                const accountKey = await provider.getAccountKey(address, 0, { pending: true });
+                const accountKey = await provider.getAccountKey(participant, 0);
 
                 expect(accountKey).toBeDefined();
                 expect(accountKey.key_idx).toBe(0);

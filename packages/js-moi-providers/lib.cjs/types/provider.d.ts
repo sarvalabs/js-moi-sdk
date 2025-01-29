@@ -65,7 +65,7 @@ export type AccountAssetRequestOption = ResponseModifierParam<Exclude<keyof Acco
 interface AccountAssetRequest {
     getAccountAsset<TOption extends AccountAssetRequestOption>(participant: Identifier | Hex, asset: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
 }
-export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "identifier" | "key_idx">;
+export type AccountKeyRequestOption = Omit<MethodParams<"moi.AccountKey">[0], "id" | "key_idx">;
 interface AccountKeyRequest {
     getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
 }

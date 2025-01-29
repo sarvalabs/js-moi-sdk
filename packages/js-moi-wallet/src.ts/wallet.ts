@@ -235,7 +235,7 @@ export class Wallet extends Signer {
 
             const encoded = interaction(ix);
             const signatures: Signature = {
-                identifier: ix.sender.address,
+                id: ix.sender.address,
                 key_idx: ix.sender.key_id,
                 signature: await this.sign(encoded, sig),
             };

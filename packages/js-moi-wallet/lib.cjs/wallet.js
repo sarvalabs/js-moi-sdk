@@ -243,7 +243,7 @@ class Wallet extends js_moi_signer_1.Signer {
             }
             const encoded = (0, js_moi_utils_1.interaction)(ix);
             const signatures = {
-                identifier: ix.sender.address,
+                id: ix.sender.address,
                 key_idx: ix.sender.key_id,
                 signature: await this.sign(encoded, sig),
             };
