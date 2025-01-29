@@ -86,11 +86,17 @@ export class WebsocketTransport extends EventEmitter {
         return new Promise((resolve, reject) => {
             const listener = (data) => {
                 try {
-                    const response = JSON.parse(data);
-                    if (response.id !== request.id) {
+                    const wsResponse = JSON.parse(data);
+                    if (wsResponse.id !== request.id) {
                         return;
                     }
-                    resolve({ ...response, id: 1 });
+                    resolve({ ...wsResponse, id: 1 });
+                    this.emit("debug", {
+                        host: this.address,
+                        response: wsResponse,
+                        ok: !("error" in wsResponse),
+                        error: "error" in wsResponse ? wsResponse.error : undefined,
+                    });
                     this.off("message", listener);
                 }
                 catch (error) {
@@ -123,6 +129,7 @@ export class WebsocketTransport extends EventEmitter {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
+        this.emit("debug", { request: data, host: this.address });
         this.ws.send(JSON.stringify(data));
     }
     static validateOptions(options) {

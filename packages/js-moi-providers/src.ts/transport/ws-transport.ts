@@ -2,7 +2,7 @@ import EventEmitter from "events";
 import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
 import { Websocket } from "../provider/ws/ws";
 
-type Websocketify<T extends JsonRpcRequest | JsonRpcResponse> = Omit<T, "id"> & { id: string };
+export type Websocketify<T extends JsonRpcRequest | JsonRpcResponse> = Omit<T, "id"> & { id: string };
 
 export interface WebsocketTransportOptions {
     reconnect?: number;
@@ -122,13 +122,19 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         return new Promise((resolve, reject) => {
             const listener = (data: string) => {
                 try {
-                    const response = JSON.parse(data) as Websocketify<JsonRpcResponse>;
+                    const wsResponse = JSON.parse(data) as Websocketify<JsonRpcResponse>;
 
-                    if (response.id !== request.id) {
+                    if (wsResponse.id !== request.id) {
                         return;
                     }
 
-                    resolve({ ...response, id: 1 } as JsonRpcResponse<TResult>);
+                    resolve({ ...wsResponse, id: 1 } as JsonRpcResponse<TResult>);
+                    this.emit("debug", {
+                        host: this.address,
+                        response: wsResponse,
+                        ok: !("error" in wsResponse),
+                        error: "error" in wsResponse ? wsResponse.error : undefined,
+                    });
                     this.off("message", listener);
                 } catch (error) {
                     reject(error);
@@ -166,6 +172,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
             throw new Error("Websocket is not initialized");
         }
 
+        this.emit("debug", { request: data, host: this.address });
         this.ws.send(JSON.stringify(data));
     }
 

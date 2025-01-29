@@ -4,6 +4,7 @@ export var WebsocketEvent;
 (function (WebsocketEvent) {
     WebsocketEvent["Error"] = "error";
     WebsocketEvent["Open"] = "open";
+    WebsocketEvent["Debug"] = "debug";
     WebsocketEvent["Close"] = "close";
     WebsocketEvent["Reconnect"] = "reconnect";
     WebsocketEvent["Message"] = "message";
@@ -14,7 +15,7 @@ export var WebsocketEvent;
 })(WebsocketEvent || (WebsocketEvent = {}));
 export class WebsocketProvider extends JsonRpcProvider {
     static events = {
-        client: new Set(["error", "open", "close", "reconnect"]),
+        client: new Set(["error", "open", "close", "reconnect", "debug"]),
         internal: new Set(["message"]),
         network: new Set(["newPendingInteractions", "newTesseracts", "newTesseractsByAccount", "newLogs"]),
     };
@@ -61,11 +62,10 @@ export class WebsocketProvider extends JsonRpcProvider {
     subscribeToEvent(type, event, listener) {
         const eventName = WebsocketProvider.getEventName(event);
         if (WebsocketProvider.events.network.has(eventName)) {
-            void this.handleOnNetworkEventSubscription(type, event, listener);
+            this.handleOnNetworkEventSubscription(type, event, listener);
+            return this;
         }
-        else {
-            super[type](eventName, listener);
-        }
+        super[type](eventName, listener);
         return this;
     }
     static isWebsocketEmittedResponse(response) {

@@ -1,5 +1,8 @@
 import EventEmitter from "events";
-import type { JsonRpcResponse, Transport } from "js-moi-utils";
+import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
+export type Websocketify<T extends JsonRpcRequest | JsonRpcResponse> = Omit<T, "id"> & {
+    id: string;
+};
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }
