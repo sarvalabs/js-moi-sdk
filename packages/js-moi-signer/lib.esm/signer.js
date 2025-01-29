@@ -30,11 +30,6 @@ export class Signer {
             const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
             return { address: participant.toHex(), key_id: index, sequence_id: sequenceId };
         }
-        if (sender.sequence_id != null) {
-            if (sender.sequence_id < (await this.getLatestSequence())) {
-                ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
-            }
-        }
         return {
             address: (await this.getIdentifier()).toHex(),
             key_id: sender.key_id ?? (await this.getKeyId()),
@@ -66,11 +61,6 @@ export class Signer {
         };
     }
     async createIxRequest(type, args) {
-        if (!["moi.Simulate", "moi.Execute"].includes(type)) {
-            ErrorUtils.throwError("Invalid type provided", ErrorCode.INVALID_ARGUMENT, {
-                type,
-            });
-        }
         const simulateIxRequest = await this.createSimulateIxRequest(args);
         if (type === "moi.Simulate") {
             return simulateIxRequest;
@@ -110,6 +100,9 @@ export class Signer {
             return await this.getProvider().execute(arg);
         }
         const request = await this.createIxRequest("moi.Execute", arg);
+        if (request.sender.sequence_id < (await this.getLatestSequence())) {
+            ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
+        }
         const error = validateIxRequest("moi.Execute", request);
         if (error != null) {
             ErrorUtils.throwError(`Invalid interaction request: ${error.message}`, ErrorCode.INVALID_ARGUMENT, error);

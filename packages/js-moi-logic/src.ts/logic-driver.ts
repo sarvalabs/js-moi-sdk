@@ -146,7 +146,6 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
             case RoutineType.Invoke:
             case RoutineType.Enlist: {
                 const logicId = await this.getLogicId();
-
                 return {
                     type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
                     payload: { logic_id: logicId.toHex(), callsite, calldata },

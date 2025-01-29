@@ -58,12 +58,6 @@ export abstract class Signer {
             return { address: participant.toHex(), key_id: index, sequence_id: sequenceId };
         }
 
-        if (sender.sequence_id != null) {
-            if (sender.sequence_id < (await this.getLatestSequence())) {
-                ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
-            }
-        }
-
         return {
             address: (await this.getIdentifier()).toHex(),
             key_id: sender.key_id ?? (await this.getKeyId()),
@@ -104,12 +98,6 @@ export abstract class Signer {
         type: "moi.Simulate" | "moi.Execute",
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
     ): Promise<SimulateInteractionRequest | InteractionRequest> {
-        if (!["moi.Simulate", "moi.Execute"].includes(type)) {
-            ErrorUtils.throwError("Invalid type provided", ErrorCode.INVALID_ARGUMENT, {
-                type,
-            });
-        }
-
         const simulateIxRequest = await this.createSimulateIxRequest(args);
 
         if (type === "moi.Simulate") {
@@ -169,6 +157,10 @@ export abstract class Signer {
         }
 
         const request = await this.createIxRequest("moi.Execute", arg);
+
+        if (request.sender.sequence_id < (await this.getLatestSequence())) {
+            ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
+        }
 
         const error = validateIxRequest("moi.Execute", request);
 

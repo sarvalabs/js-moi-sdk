@@ -15,6 +15,7 @@ export type CallsiteOption = {
     fuel_price?: number;
     fuel_limit?: number;
     sequence_id?: number;
+    simulate?: boolean;
 };
 
 type CallsiteResult = InteractionResponse | Record<any, any>;
