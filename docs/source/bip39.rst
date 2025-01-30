@@ -1,7 +1,5 @@
-BIP39
-=====
-
---------------------------------------------------------------------------------
+JS-MOI-BIP39
+============
 
 The `BIP39 <https://en.bitcoin.it/wiki/BIP_0039>`_ module provides utility 
 functions for working with mnemonic phrases, entropy, and seed generation. It 
@@ -10,6 +8,31 @@ asynchronously, converting mnemonic phrases to their corresponding entropy
 values and vice versa, generating mnemonic phrases with specified strengths, 
 and validating the correctness of mnemonic phrases.
 
+Installation
+============
+
+This package is already included in the ``js-moi-sdk`` package, if you want to install
+`js-moi-bip39 <https://www.npmjs.com/package/js-moi-bip39>`_ package separately,
+you can install it using the following command:
+
+**Using npm**
+
+.. code-block:: bash
+
+    npm install js-moi-bip39
+
+**Using yarn**
+
+.. code-block:: bash
+
+    yarn add js-moi-bip39
+
+**Using pnpm**
+
+.. code-block:: bash
+
+    pnpm add js-moi-bip39
+
 Functions
 ---------
 
@@ -17,10 +40,9 @@ Functions
 
 .. code-block:: javascript
 
-    import { mnemonicToSeed } from "js-moi-sdk";
+    import { mnemonicToSeed } from "js-moi-bip39";
 
-    const mnemonic =
-        "hollow appear story text start mask salt social child space aspect hurdle";
+    const mnemonic = "hollow appear ... hurdle";
     const password = "password";
     const seed = await mnemonicToSeed(mnemonic, password);
 
@@ -29,67 +51,83 @@ Functions
     >> Uint8Array(64) [ 36, 250, 169, ... ]
 
 
-.. autofunction:: bip39.mnemonicToSeedSync
+.. autofunction:: mnemonicToSeedSync
 
 .. code-block:: javascript
 
-    // Example
-    const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
-    const password = 'password';
-    const seed = mnemonicToSeedSync(mnemonic, password);
-    console.log(seed)
+.. code-block:: javascript
 
-    >> Buffer
+    import { mnemonicToSeed } from "js-moi-bip39";
 
-.. autofunction:: bip39.mnemonicToEntropy
+    const mnemonic = "hollow appear ... hurdle";
+    const password = "password";
+    const seed = await mnemonicToSeedSync(mnemonic, password);
+
+    console.log(seed);
+
+    >> Uint8Array(64) [ 36, 250, 169, ... ]
+
+.. autofunction:: mnemonicToEntropy
 
 .. code-block:: javascript
 
-    // Example
-    const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+    import { mnemonicToEntropy } from "js-moi-bip39";
+
+    const mnemonic = "hollow appear ... hurdle";
     const entropy = mnemonicToEntropy(mnemonic);
-    console.log(entropy)
 
-    >> 6ce1535a6fdd4b10efae6f27fa0835b7
+    console.log(entropy);
 
-.. autofunction:: bip39.entropyToMnemonic
+    >> "6ce1535a6fdd...ae6f27fa0835b7"
+
+
+.. autofunction:: entropyToMnemonic
 
 .. code-block:: javascript
 
-    // Example
-    const entropy = 'c1f651a1fb62bebf8db1ecacf66a6a3d';
+    import { entropyToMnemonic } from "js-moi-bip39";
+
+    const entropy = "6ce1535a6fdd...ae6f27fa0835b7";
     const mnemonic = entropyToMnemonic(entropy);
-    console.log(mnemonic)
 
-    >> sea raw half walnut cloud garlic cycle diesel provide rebuild once key
+    console.log(mnemonic);
 
-.. autofunction:: bip39.generateMnemonic
+    >> "hollow appear ... hurdle"
+
+.. autofunction:: generateMnemonic
 
 .. code-block:: javascript
 
-    // Example
+    import { generateMnemonic } from "js-moi-bip39";
+
     const mnemonic = generateMnemonic();
-    console.log(mnemonic)
 
-    >> gaze hole neither spring effort fringe kit neck girl lamp smart afraid
+    console.log(mnemonic);
 
-.. autofunction:: bip39.validateMnemonic
+    >> "gaze hole ... smart afraid"
+
+.. autofunction:: validateMnemonic
 
 .. code-block:: javascript
 
-    // Example
-    const mnemonic = 'invalid mnemonic';
+    import { generateMnemonic, validateMnemonic } from "js-moi-bip39";
+
+    const mnemonic = generateMnemonic();
     const isValid = validateMnemonic(mnemonic);
-    console.log(isValid)
 
-    >> false
+    console.log(isValid);
 
-.. autofunction:: bip39.getDefaultWordlist
+    >> true
+
+.. autofunction:: getDefaultWordlist
 
 .. code-block:: javascript
 
-    // Example
-    const language = getDefaultWordlist();
-    console.log(language)
+    import { getDefaultWordlist } from "js-moi-bip39";
 
-    >> english
+    const wordlist = getDefaultWordlist();
+
+    console.log(wordlist);
+
+    >> "english"
+
