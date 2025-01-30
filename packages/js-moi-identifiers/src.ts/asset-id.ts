@@ -3,6 +3,10 @@ import { flagMasks } from "./flags";
 import { Identifier, type InvalidReason } from "./identifier";
 import { hexToBytes, type Hex } from "./utils";
 
+/**
+ * Represents an asset identifier which extends the base `Identifier` class.
+ * This class ensures that the provided identifier is valid according to specific rules
+ */
 export class AssetId extends Identifier {
     constructor(value: Uint8Array | Hex | Identifier) {
         super(value);
@@ -27,6 +31,12 @@ export class AssetId extends Identifier {
         return new DataView(this.toBytes().slice(2, 4).buffer).getUint16(0, false);
     }
 
+    /**
+     * Validates the given asset identifier.
+     *
+     * @param value - The asset identifier to validate. It can be either a `Uint8Array` or a hexadecimal string.
+     * @returns An `InvalidReason` object containing the reason why the identifier is invalid, or `null` if the identifier is valid.
+     */
     public static validate(value: Uint8Array | Hex): InvalidReason | null {
         const asset = value instanceof Uint8Array ? value : hexToBytes(value);
 
@@ -50,6 +60,12 @@ export class AssetId extends Identifier {
         return null;
     }
 
+    /**
+     * Checks if the given value is a valid asset identifier.
+     *
+     * @param value - The value to be validated, which can be a Uint8Array or a Hex string.
+     * @returns `true` if the value is valid, otherwise `false`.
+     */
     public static isValid(value: Uint8Array | Hex): boolean {
         return this.validate(value) === null;
     }

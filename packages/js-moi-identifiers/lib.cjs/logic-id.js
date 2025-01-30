@@ -5,6 +5,9 @@ const enums_1 = require("./enums");
 const flags_1 = require("./flags");
 const identifier_1 = require("./identifier");
 const utils_1 = require("./utils");
+/**
+ * Represents a logic identifier which extends the base `Identifier` class.
+ */
 class LogicId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
@@ -13,6 +16,12 @@ class LogicId extends identifier_1.Identifier {
             throw new Error(`Invalid logic identifier. ${error.why}`);
         }
     }
+    /**
+     * Validates a given identifier value.
+     *
+     * @param value - The identifier value to validate. It can be either a Uint8Array or a Hex string.
+     * @returns An object containing the reason for invalidity if the identifier is invalid, or null if the identifier is valid.
+     */
     static validate(value) {
         const logic = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
         if (logic.length !== 32) {
@@ -29,6 +38,12 @@ class LogicId extends identifier_1.Identifier {
         }
         return null;
     }
+    /**
+     * Checks if the provided value is valid.
+     *
+     * @param value - The value to be validated, which can be a Uint8Array or a Hex string.
+     * @returns A boolean indicating whether the value is valid (true) or not (false).
+     */
     static isValid(value) {
         return this.validate(value) === null;
     }

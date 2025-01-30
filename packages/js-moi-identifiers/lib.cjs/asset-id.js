@@ -5,6 +5,10 @@ const enums_1 = require("./enums");
 const flags_1 = require("./flags");
 const identifier_1 = require("./identifier");
 const utils_1 = require("./utils");
+/**
+ * Represents an asset identifier which extends the base `Identifier` class.
+ * This class ensures that the provided identifier is valid according to specific rules
+ */
 class AssetId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
@@ -25,6 +29,12 @@ class AssetId extends identifier_1.Identifier {
     getStandard() {
         return new DataView(this.toBytes().slice(2, 4).buffer).getUint16(0, false);
     }
+    /**
+     * Validates the given asset identifier.
+     *
+     * @param value - The asset identifier to validate. It can be either a `Uint8Array` or a hexadecimal string.
+     * @returns An `InvalidReason` object containing the reason why the identifier is invalid, or `null` if the identifier is valid.
+     */
     static validate(value) {
         const asset = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
         if (asset.length !== 32) {
@@ -41,6 +51,12 @@ class AssetId extends identifier_1.Identifier {
         }
         return null;
     }
+    /**
+     * Checks if the given value is a valid asset identifier.
+     *
+     * @param value - The value to be validated, which can be a Uint8Array or a Hex string.
+     * @returns `true` if the value is valid, otherwise `false`.
+     */
     static isValid(value) {
         return this.validate(value) === null;
     }
