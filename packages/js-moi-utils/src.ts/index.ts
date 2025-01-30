@@ -23,6 +23,7 @@ export {
     hexToHash,
     isAddress,
     isHex,
+    isNullBytes,
     numToHex,
     trimHexPrefix,
     type Address,
@@ -30,7 +31,6 @@ export {
     type NumberLike,
     type Quantity,
 } from "./hex";
-export { AssetId, LogicId } from "./identifier";
 export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export {

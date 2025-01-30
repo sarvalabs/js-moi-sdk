@@ -1,9 +1,15 @@
 {
-  "name": "js-moi-wallet",
+  "name": "js-moi-identifiers",
   "version": "0.6.0",
-  "description": "Module to interact with the MOI accounts.",
+  "description": "It a library that contains implementations for all account identifiers used in the MOI Protocol such as the `AssetID`, `LogicID` and `ParticipantID` identifiers",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib.esm/index.js",
+      "require": "./lib.cjs/index.js"
+    }
+  },
   "scripts": {
     "build:cjs": "tsc -p tsconfig.build.json --outDir ./lib.cjs",
     "watch:cjs": "tsc -p tsconfig.build.json --outDir ./lib.cjs --watch",
@@ -26,23 +32,8 @@
   "keywords": [
     "moichain",
     "moi",
-    "wallet"
+    "utility"
   ],
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
-  "license": "Apache-2.0 OR MIT",
-  "dependencies": {
-    "js-moi-hdnode": "^0.6.0",
-    "js-moi-identifiers": "^0.6.0",
-    "js-moi-signer": "^0.6.0",
-    "js-moi-providers": "^0.6.0",
-    "js-moi-constants": "^0.6.0",
-    "js-moi-utils": "^0.6.0",
-    "js-moi-bip39": "^0.6.0",
-    "@noble/hashes": "^1.1.5",
-    "aes-js": "4.0.0-beta.5",
-    "elliptic": "^6.5.4"
-  },
-  "devDependencies": {
-    "@types/elliptic": "^6.4.0"
-  }
+  "license": "Apache-2.0 OR MIT"
 }

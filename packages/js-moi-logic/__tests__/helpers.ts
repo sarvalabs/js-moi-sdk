@@ -22,7 +22,7 @@ export const createWallet = (): Wallet => {
     const privateKey = process.env.WALLET_PRIVATE_KEY;
 
     if (!privateKey) {
-        return Wallet.createRandomSync(new HttpProvider("http://localhost:8545"));
+        return Wallet.createRandomSync(new HttpProvider("http://localhost:1600"));
     }
 
     const curve = process.env.WALLET_CURVE as CURVE | undefined;

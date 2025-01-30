@@ -1,21 +1,17 @@
+import type { Identifier } from "js-moi-identifiers";
 import type { InteractionResponse } from "js-moi-providers";
-import type { Signer } from "js-moi-signer";
-import type { Hex, LogicId, LogicManifest } from "js-moi-utils";
+import type { Signer, SignerIx } from "js-moi-signer";
+import type { InteractionRequest, LogicManifest } from "js-moi-utils";
 import type { AccessorBuilder } from "../state/accessor-builder";
 import type { StateAccessorBuilder } from "../state/state-accessor-builder";
 
 export interface LogicDriverOption {
     manifest: LogicManifest;
     signer: Signer;
-    logicId?: Hex | LogicId;
+    logicId?: Identifier;
 }
 
-export type CallsiteOption = {
-    fuel_price?: number;
-    fuel_limit?: number;
-    sequence?: number;
-    simulate?: boolean;
-};
+export type CallsiteOption = Omit<Partial<SignerIx<InteractionRequest>>, "operations">;
 
 type CallsiteResult = InteractionResponse | Record<any, any>;
 // Typescript doesn't last param of type T to be optional

@@ -1,10 +1,11 @@
-import type { Hex } from "js-moi-utils";
+import type { Hex, Tesseract } from "js-moi-utils";
 import { WebsocketTransport, type WebsocketTransportOptions } from "../transport/ws-transport";
 import { JsonRpcProvider } from "./json-rpc-provider";
 
 export enum WebsocketEvent {
     Error = "error",
     Open = "open",
+    Debug = "debug",
     Close = "close",
     Reconnect = "reconnect",
     Message = "message",
@@ -15,6 +16,8 @@ export enum WebsocketEvent {
 }
 
 type BaseListener = (...args: any[]) => void;
+
+type DebugParam = { action: string; payload: unknown };
 
 export type ProviderEvent =
     | WebsocketEvent.Close
@@ -32,13 +35,15 @@ export type ProviderEvent =
 type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends WebsocketEvent.NewPendingInteractions
     ? (hash: string) => void
     : TEvent extends WebsocketEvent.NewTesseracts | WebsocketEvent.NewTesseractsByAccount
-    ? (tesseracts: {}) => void
+    ? (tesseracts: Tesseract) => void
     : TEvent extends WebsocketEvent.Reconnect
     ? (reconnects: number) => void
     : TEvent extends WebsocketEvent.Error
     ? (error: Error) => void
     : TEvent extends WebsocketEvent.Message
     ? (message: any) => void
+    : TEvent extends WebsocketEvent.Debug
+    ? (data: DebugParam) => void
     : TEvent extends WebsocketEvent.Open | WebsocketEvent.Close
     ? () => void
     : BaseListener;
@@ -64,7 +69,7 @@ type WebsocketEmittedResponse = {
 
 export class WebsocketProvider extends JsonRpcProvider {
     private static events: Record<string, Set<string | symbol>> = {
-        client: new Set(["error", "open", "close", "reconnect"]),
+        client: new Set(["error", "open", "close", "reconnect", "debug"]),
         internal: new Set(["message"]),
         network: new Set<string>(["newPendingInteractions", "newTesseracts", "newTesseractsByAccount", "newLogs"]),
     };
@@ -126,10 +131,11 @@ export class WebsocketProvider extends JsonRpcProvider {
         const eventName = WebsocketProvider.getEventName(event);
 
         if (WebsocketProvider.events.network.has(eventName)) {
-            void this.handleOnNetworkEventSubscription(type, event, listener);
-        } else {
-            super[type](eventName, listener);
+            this.handleOnNetworkEventSubscription(type, event, listener);
+            return this;
         }
+
+        super[type](eventName, listener);
 
         return this;
     }

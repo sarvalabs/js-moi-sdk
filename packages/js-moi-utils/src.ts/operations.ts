@@ -1,8 +1,9 @@
+import { LogicId } from "js-moi-identifiers";
 import { Polorizer } from "js-polo";
 import { polo, type PoloSchema } from "polo-schema";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
-import { hexToBytes, isAddress, isHex } from "./hex";
+import { hexToBytes, isHex } from "./hex";
 import type { IxOperation, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
@@ -78,8 +79,8 @@ const createParticipantCreateDescriptor = () => {
 
         validator: (operation) => {
             const { payload } = operation;
-            if (!isAddress(payload.address)) {
-                return createInvalidResult(payload, "address", "Invalid address");
+            if (!isHex(payload.address, 32)) {
+                return createInvalidResult(payload, "address", "Invalid identifier");
             }
 
             if (payload.amount < 0) {
@@ -125,6 +126,53 @@ const createAssetCreateDescriptor = () => {
             }
 
             return null;
+        },
+    });
+};
+
+const createAccountConfigureDescriptor = () => {
+    const schema = polo.struct({
+        add: polo.arrayOf(
+            polo.struct({
+                public_key: polo.bytes,
+                weight: polo.integer,
+                signature_algorithm: polo.integer,
+            })
+        ),
+        revoke: polo.arrayOf(
+            polo.struct({
+                key_id: polo.integer,
+            })
+        ),
+    });
+
+    return Object.freeze<IxOperationDescriptor<OpType.AccountConfigure>>({
+        schema: schema,
+
+        validator: ({ payload }) => {
+            if (payload.add == null || payload.revoke == null) {
+                createInvalidResult(payload, "add", "Add and revoke are required");
+            }
+
+            for (const key in payload) {
+                const value = payload[key];
+
+                if (Object.keys(value).length === 0) {
+                    return createInvalidResult(payload, key as keyof typeof payload, `At least value is required in ${key}`);
+                }
+            }
+
+            return null;
+        },
+
+        transform: ({ payload }): PoloIxOperationPayload<OpType.AccountConfigure> => {
+            return {
+                add: payload.add?.map((key) => ({
+                    ...key,
+                    public_key: key.public_key ? hexToBytes(key.public_key) : undefined,
+                })),
+                revoke: payload.revoke,
+            };
         },
     });
 };
@@ -188,7 +236,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             return createInvalidResult(payload, "benefactor", "Benefactor is required for release operation");
         }
 
-        if (!isAddress(payload.benefactor)) {
+        if (!isHex(payload.benefactor, 32)) {
             return createInvalidResult(payload, "benefactor", "Invalid benefactor address");
         }
 
@@ -208,7 +256,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw: PoloIxOperationPayload<TOpType> = {
                 ...payload,
-                benefactor: "benefactor" in payload && isAddress(payload.benefactor) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && isHex(payload.benefactor, 32) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
 
@@ -220,11 +268,11 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
                 return createInvalidResult(operation.payload, "asset_id", "Asset ID is required");
             }
 
-            if (!isHex(operation.payload.asset_id)) {
+            if (!isHex(operation.payload.asset_id, 32)) {
                 return createInvalidResult(operation.payload, "asset_id", "Invalid asset ID");
             }
 
-            if (!isAddress(operation.payload.beneficiary)) {
+            if (!isHex(operation.payload.beneficiary, 32)) {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
 
@@ -284,7 +332,7 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
     return Object.freeze<IxOperationDescriptor<T>>({
         schema: polo.struct({
             manifest: polo.bytes,
-            logic_id: polo.string,
+            logic_id: polo.bytes,
             callsite: polo.string,
             calldata: polo.bytes,
             interfaces: polo.map({
@@ -311,7 +359,7 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
 
             return {
                 ...payload,
-                logic_id: payload.logic_id,
+                logic_id: new LogicId(payload.logic_id).toBytes(),
                 calldata: payload.calldata != null ? hexToBytes(payload.calldata) : undefined,
                 interfaces: "interfaces" in payload && payload.interfaces != null ? new Map(Object.entries(payload.interfaces)) : undefined,
             } as any;
@@ -342,6 +390,8 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
 
 const ixOpDescriptor: IxOperationDescriptorLookup = {
     [OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
+
+    [OpType.AccountConfigure]: createAccountConfigureDescriptor(),
 
     [OpType.AssetCreate]: createAssetCreateDescriptor(),
     [OpType.AssetMint]: createAssetSupplyDescriptorFor(),

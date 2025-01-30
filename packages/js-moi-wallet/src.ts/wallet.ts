@@ -4,8 +4,9 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { type ExecuteIx, type Provider, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bytesToHex, ensureHexPrefix, hexToBytes, interaction, isHex, randomBytes, type Hex, type InteractionRequest } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest, type Hex, type InteractionRequest } from "js-moi-utils";
 
+import { Identifier, IdentifierVersion, createParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
 import { FromMnemonicOptions } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
@@ -112,7 +113,7 @@ export class Wallet extends Signer {
 
             privateMapSet(this, __vault, {
                 _key: keyPair.getPrivate("hex"),
-                _public: keyPair.getPublic(true, "hex"),
+                _public: trimHexPrefix(bytesToHex(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
         } catch (error) {
@@ -128,9 +129,9 @@ export class Wallet extends Signer {
      * @throws {Error} if the wallet is not initialized or loaded, or if there
      * is an error generating the keystore.
      */
-    public generateKeystore(password: string): Keystore {
+    public async generateKeystore(password: string): Promise<Keystore> {
         try {
-            const data = hexToBytes(this.privateKey);
+            const data = hexToBytes(await this.getPrivateKey());
             return encryptKeystoreData(data, password);
         } catch (err) {
             ErrorUtils.throwError("Failed to generate keystore", ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -143,8 +144,8 @@ export class Wallet extends Signer {
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    public get privateKey(): string {
-        return privateMapGet(this, __vault)._key;
+    public getPrivateKey(): Promise<string> {
+        return Promise.resolve(privateMapGet(this, __vault)._key);
     }
 
     /**
@@ -153,18 +154,12 @@ export class Wallet extends Signer {
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
-    public get mnemonic(): string | undefined {
-        return privateMapGet(this, __vault)._mnemonic;
+    public getMnemonic(): Promise<string | undefined> {
+        return Promise.resolve(privateMapGet(this, __vault)._mnemonic);
     }
 
-    /**
-     * Public key associated with the wallet.
-     *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
-     */
-    public get publicKey(): string {
-        return privateMapGet(this, __vault)._public;
+    public getPublicKey(): Promise<string> {
+        return Promise.resolve(privateMapGet(this, __vault)._public);
     }
 
     /**
@@ -172,17 +167,15 @@ export class Wallet extends Signer {
      *
      * @readonly
      */
-    public get curve(): string {
+    public getCurve(): Promise<CURVE> {
         return privateMapGet(this, __vault)._curve;
     }
 
-    /**
-     * Retrieves the address associated with the wallet.
-     *
-     * @returns {string} The address as a string.
-     */
-    public async getAddress(): Promise<Hex> {
-        return ensureHexPrefix(this.publicKey.slice(2));
+    public async getIdentifier(): Promise<Identifier> {
+        const publickey = await this.getPublicKey();
+        const fingerprint = hexToBytes(publickey).slice(0, 24);
+
+        return createParticipantId({ fingerprint, variant: 0, version: IdentifierVersion.V0 });
     }
 
     public getKeyId(): Promise<number> {
@@ -215,10 +208,10 @@ export class Wallet extends Signer {
 
         switch (sig.sigName) {
             case "ECDSA_S256": {
-                const _sigAlgo = this.signingAlgorithms.ecdsa_secp256k1;
-                const sig = _sigAlgo.sign(message, this.privateKey);
-                const sigBytes = sig.serialize();
-                return bytesToHex(sigBytes);
+                const algorithm = this.signingAlgorithms.ecdsa_secp256k1;
+                const sig = algorithm.sign(message, await this.getPrivateKey());
+
+                return bytesToHex(sig.serialize());
             }
             default: {
                 ErrorUtils.throwError("Unsupported signature type", ErrorCode.UNSUPPORTED_OPERATION);
@@ -228,14 +221,22 @@ export class Wallet extends Signer {
 
     public async signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx> {
         try {
-            if (ix.sender.address !== (await this.getAddress())) {
-                ErrorUtils.throwError("Sender address does not match signer address", ErrorCode.INVALID_ARGUMENT);
+            const error = validateIxRequest("moi.Execute", ix);
+
+            if (error) {
+                ErrorUtils.throwArgumentError(`Invalid interaction request: ${error.message}`, ErrorCode.INVALID_ARGUMENT, error);
+            }
+
+            const identifier = await this.getIdentifier();
+
+            if (ix.sender.address !== identifier.toHex()) {
+                ErrorUtils.throwError("Sender identifier does not match signer identifier", ErrorCode.INVALID_ARGUMENT);
             }
 
             const encoded = interaction(ix);
             const signatures: Signature = {
-                identifier: ix.sender.address,
-                key_idx: ix.sender.key_id,
+                id: ix.sender.address,
+                key_id: ix.sender.key_id,
                 signature: await this.sign(encoded, sig),
             };
 

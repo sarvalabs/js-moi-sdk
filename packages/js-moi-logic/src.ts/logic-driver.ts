@@ -1,25 +1,22 @@
+import { Identifier, isIdentifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
 import {
-    CustomError,
     ElementType,
     ErrorCode,
     ErrorUtils,
     generateStorageKey,
     hexToBytes,
-    isAddress,
     isHex,
-    LogicId,
     LogicState,
     OpType,
     RoutineKind,
     RoutineType,
     StorageKey,
-    type Address,
-    type AnyIxOperation,
     type Hex,
     type InteractionRequest,
+    type IxOperation,
     type LogicManifest,
     type LogicMessage,
 } from "js-moi-utils";
@@ -41,7 +38,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
     private deployIxResponse?: InteractionResponse;
 
-    constructor(option: Omit<LogicDriverOption, "logicId"> & { logicId?: LogicId }) {
+    constructor(option: Omit<LogicDriverOption, "logicId"> & { logicId?: Identifier }) {
         if (option.signer == null) {
             ErrorUtils.throwError("Signer is required.", ErrorCode.INVALID_ARGUMENT);
         }
@@ -89,37 +86,15 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
         return kinds.includes(element.data.mode);
     }
 
-    private validateCallsiteOption(option?: CallsiteOption): Error | null {
-        if (option == null) {
-            return null;
-        }
-
-        if ("sequence" in option && (typeof option.sequence !== "number" || Number.isNaN(option.sequence) || option.sequence < 0)) {
-            return new CustomError("Invalid sequence number.", ErrorCode.INVALID_ARGUMENT);
-        }
-
-        if ("simulate" in option && typeof option.simulate !== "boolean") {
-            return new CustomError("Invalid simulate flag.", ErrorCode.INVALID_ARGUMENT);
-        }
-
-        return null;
-    }
-
     private extractArgsAndOption(callsite: string, callsiteArguments: unknown[]) {
         const element = this.getRoutineElement(callsite);
-
         if (callsiteArguments.length < element.data.accepts.length) {
             const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
             ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
         }
 
-        const option = <CallsiteOption | undefined>callsiteArguments.at(element.data.accepts.length + 1);
+        const option = <CallsiteOption | undefined>callsiteArguments.at(element.data.accepts.length);
         const args = callsiteArguments.slice(0, element.data.accepts.length);
-        const error = this.validateCallsiteOption(option);
-
-        if (error != null) {
-            throw error;
-        }
 
         return { option, args };
     }
@@ -133,7 +108,16 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      *
      * @throws an error if the callsite is not present.
      */
-    public async createIxOperation(callsite: string, args: unknown[]): Promise<AnyIxOperation> {
+    public async createIxOperation(
+        callsite: string,
+        args: unknown[]
+    ): Promise<IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicEnlist>> {
+        const routine = this.getRoutineElement(callsite);
+
+        if (routine.data.accepts.length !== args.length) {
+            ErrorUtils.throwError(`Invalid number of arguments for callsite "${callsite}".`, ErrorCode.INVALID_ARGUMENT);
+        }
+
         const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
         const callsiteType = this.getCallsiteType(callsite);
 
@@ -147,9 +131,10 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
 
             case RoutineType.Invoke:
             case RoutineType.Enlist: {
+                const logicId = await this.getLogicId();
                 return {
                     type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
-                    payload: { logic_id: (await this.getLogicId()).value, callsite, calldata },
+                    payload: { logic_id: logicId.toHex(), callsite, calldata },
                 };
             }
 
@@ -170,31 +155,35 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      * @throws Will throw an error if the provided fuel limit is less than the required simulation effort.
      */
     public async createIxRequest(
+        method: "moi.Simulate",
         callsite: string,
         callsiteArguments: unknown[],
-        option?: CallsiteOption
-    ): Promise<SignerIx<SimulateInteractionRequest> | SignerIx<InteractionRequest>> {
-        const baseIxRequest: SignerIx<SimulateInteractionRequest> = {
-            fuel_price: option?.fuel_price ?? 1,
-            operations: [await this.createIxOperation(callsite, callsiteArguments)],
-        };
-
-        if (!this.isCallsiteMutable(callsite)) {
-            return baseIxRequest as SignerIx<SimulateInteractionRequest>;
+        params?: Omit<Partial<SignerIx<SimulateInteractionRequest>>, "operations">
+    ): Promise<SimulateInteractionRequest>;
+    public async createIxRequest(
+        method: "moi.Execute",
+        callsite: string,
+        callsiteArguments: unknown[],
+        params?: Omit<Partial<SignerIx<InteractionRequest>>, "operations">
+    ): Promise<InteractionRequest>;
+    public async createIxRequest(
+        method: "moi.Simulate" | "moi.Execute",
+        callsite: string,
+        callsiteArguments: unknown[],
+        params?: Omit<Partial<SignerIx<InteractionRequest>> | Partial<SignerIx<SimulateInteractionRequest>>, "operations">
+    ): Promise<SimulateInteractionRequest | InteractionRequest> {
+        const operation = await this.createIxOperation(callsite, callsiteArguments);
+        if (method === "moi.Simulate") {
+            return await this.signer.createIxRequest("moi.Simulate", {
+                ...params,
+                operations: [operation],
+            });
         }
 
-        const simulation = await this.signer.simulate(baseIxRequest);
-
-        if (option?.fuel_limit != null && option.fuel_limit < simulation.effort) {
-            ErrorUtils.throwError(`Minimum fuel limit required for interaction is ${simulation.effort} but got ${option.fuel_limit}.`);
-        }
-
-        const request: SignerIx<InteractionRequest> = {
-            ...baseIxRequest,
-            fuel_limit: option?.fuel_limit ?? simulation.effort,
-        };
-
-        return request;
+        return await this.signer.createIxRequest("moi.Execute", {
+            ...params,
+            operations: [operation],
+        });
     }
 
     /**
@@ -209,7 +198,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
      * @throws If the logic id not deployed.
      * @throws If error occurs during the deployment process.
      */
-    public override async getLogicId(timer?: TimerOption): Promise<LogicId> {
+    public async getLogicId(timer?: TimerOption): Promise<Identifier> {
         if (this.deployIxResponse != null) {
             const results = await this.deployIxResponse.result(timer);
             const result = results.at(0);
@@ -218,14 +207,15 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
             }
 
-            const exception = ManifestCoder.decodeException(result.payload.error);
+            const exception = ManifestCoder.decodeException(result.data.error);
 
             if (exception != null) {
                 ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
             }
 
-            this.setLogicId(new LogicId(result.payload.logic_id));
+            this.setLogicId(new LogicId(result.data.logic_id));
         }
+
         return super.getLogicId();
     }
 
@@ -244,20 +234,15 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
             }
 
             const { option, args: callsiteArgs } = this.extractArgsAndOption(callsite, args);
-            const ixRequest = await this.createIxRequest(callsite, callsiteArgs, option);
-
             if (!this.isCallsiteMutable(callsite)) {
-                const simulation = await this.signer.simulate(ixRequest);
-                // TODO: remove any here
-                const result: any = simulation.result.at(0);
+                const simulateIxRequest = await this.createIxRequest("moi.Simulate", callsite, callsiteArgs, option);
+                const simulation = await this.signer.simulate(simulateIxRequest);
+                const result = simulation.results.at(0);
 
-                console.warn("Still the 'field' is op_type, should be type");
-                // TODO: op_type should be type
-                if (result?.op_type !== OpType.LogicInvoke) {
+                if (result?.type !== OpType.LogicInvoke) {
                     ErrorUtils.throwError("Expected LogicInvoke operation.", ErrorCode.UNKNOWN_ERROR);
                 }
 
-                // TODO: payload should be data
                 const { error, outputs } = result.data;
                 const exception = ManifestCoder.decodeException(error);
 
@@ -268,11 +253,8 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 return this.getManifestCoder().decodeOutput(callsite, outputs);
             }
 
-            if (!("fuel_limit" in ixRequest) || typeof ixRequest.fuel_limit !== "number") {
-                ErrorUtils.throwError("Invalid interaction request. Fuel limit must be a number.", ErrorCode.INVALID_ARGUMENT);
-            }
-
-            const response = await this.signer.execute(ixRequest);
+            const request = await this.createIxRequest("moi.Execute", callsite, callsiteArgs, option);
+            const response = await this.signer.execute(request);
 
             if (isDeployerCallsite) {
                 this.deployIxResponse = response;
@@ -316,7 +298,7 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case LogicState.Ephemeral: {
-                const address = await this.signer.getAddress();
+                const address = await this.signer.getIdentifier();
                 return await this.signer.getProvider().getLogicStorage(logicId, address, storageKey);
             }
             default:
@@ -443,19 +425,15 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(
-    logicId: Address | LogicId | LogicManifest,
-    signer: Signer
-): Promise<LogicDriver<TCallsites>> => {
-    if (isHex(logicId) || logicId instanceof LogicId) {
+export const getLogicDriver = async <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer): Promise<LogicDriver<TCallsites>> => {
+    if (isIdentifier(logicId)) {
         const provider = signer.getProvider();
-        const id = isAddress(logicId) ? logicId : logicId.getAddress();
-        const { manifest: encoded, metadata } = await provider.getLogic(id, {
-            modifier: { include: ["manifest"] },
+        const manifestInPolo = await provider.getLogic(logicId, {
+            modifier: { extract: "manifest" },
         });
-        const manifest = ManifestCoder.decodeManifest(encoded, ManifestCoderFormat.JSON);
+        const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
 
-        return new LogicDriver({ manifest, logicId: new LogicId(metadata.logic_id), signer });
+        return new LogicDriver({ manifest, logicId, signer });
     }
 
     return new LogicDriver<TCallsites>({ manifest: logicId, signer });

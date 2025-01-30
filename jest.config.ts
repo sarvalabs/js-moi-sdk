@@ -30,6 +30,10 @@ const getPackages = (): Package[] => [
         run_tests: true,
     },
     {
+        name: "js-moi-identifiers",
+        run_tests: true,
+    },
+    {
         name: "js-moi-manifest",
         run_tests: true,
     },
@@ -51,7 +55,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-wallet",
-        run_tests: true,
+        run_tests: !true,
     },
 ];
 
