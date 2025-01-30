@@ -96,26 +96,8 @@ const __vault = new WeakMap();
 /**
  * A class representing a wallet that can sign interactions.
  *
- * The Wallet implements the Signer API and can be used anywhere a [Signer](https://js-moi-sdk.docs.moi.technology/signer)
- * is expected and has all the required properties.
- *
- * @example
- * // creating a wallet from mnemonic
- * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
- *
- * @example
- * // creating a wallet from keystore
- * const keystore = { ... }
- * const wallet = Wallet.fromKeystore(keystore, "password");
- *
- * @example
- * // Connecting a wallet to a provider
- * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
- * const provider = new VoyagerProvider("babylon");
- *
- * wallet.connect(provider);
- *
- * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
+ * The Wallet implements the Signer API and can be used anywhere a
+ * `Signer` is expected and has all the required properties.
  */
 class Wallet extends js_moi_signer_1.Signer {
     key_index = 0;
@@ -150,9 +132,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
      * @param {string} password Used for encrypting the keystore data.
-     * @returns {Keystore} The generated keystore object.
-     * @throws {Error} if the wallet is not initialized or loaded, or if there
-     * is an error generating the keystore.
+     * @returns {Promise<Keystore>} A promise that resolves to the keystore.
      */
     async generateKeystore(password) {
         try {
@@ -164,10 +144,9 @@ class Wallet extends js_moi_signer_1.Signer {
         }
     }
     /**
-     * Private key associated with the wallet.
+     * Retrieves the private key associated with the wallet.
      *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
+     * @returns {Promise<string>} A promise that resolves to the private key
      */
     getPrivateKey() {
         return Promise.resolve(privateMapGet(this, __vault)._key);
@@ -175,28 +154,42 @@ class Wallet extends js_moi_signer_1.Signer {
     /**
      * Retrieves the mnemonic associated with the wallet.
      *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
+     * @returns {Promise<string | undefined>} A promise that resolves to the mnemonic
      */
     getMnemonic() {
         return Promise.resolve(privateMapGet(this, __vault)._mnemonic);
     }
+    /**
+     * Retrieves the public key associated with the wallet.
+     *
+     * @returns {Promise<string>} A promise that resolves to the public key
+     */
     getPublicKey() {
         return Promise.resolve(privateMapGet(this, __vault)._public);
     }
     /**
-     * Curve associated with the wallet.
+     * Retrieves the curve associated with the wallet.
      *
-     * @readonly
+     * @returns {Promise<CURVE>} A promise that resolves to the curve
      */
     getCurve() {
         return privateMapGet(this, __vault)._curve;
     }
+    /**
+     * Retrieves the identifier for the wallet.
+     *
+     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     */
     async getIdentifier() {
         const publickey = await this.getPublicKey();
         const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(0, 24);
         return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: 0, version: js_moi_identifiers_1.IdentifierVersion.V0 });
     }
+    /**
+     * Retrieves the key identifier.
+     *
+     * @returns {Promise<number>} A promise that resolves to the key index.
+     */
     getKeyId() {
         return Promise.resolve(this.key_index);
     }
@@ -205,10 +198,22 @@ class Wallet extends js_moi_signer_1.Signer {
      * signature algorithm.
      *
      * @param {Uint8Array} message - The message to sign as a Uint8Array.
-     * @param {SigType} sigAlgo - The signature algorithm to use.
-     * @returns {string} The signature as a string.
-     * @throws {Error} if the signature type is unsupported or undefined, or if
-     * there is an error during signing.
+     * @param {SigType} sig - The signature algorithm to use.
+     * @returns {string} A promise that resolves to the signature as a hex string.
+     * @throws {Error} if the signature type is unsupported or undefined, or if there is an error during signing.
+     *
+     * @example
+     * import { encodeText, Wallet } from "js-moi-sdk";
+     *
+     * const wallet = await Wallet.createRandom();
+     * const message = "Hello, World!";
+     * const algorithm = wallet.signingAlgorithms.ecdsa_secp256k1;
+     *
+     * const signature = await wallet.sign(encodeText(message), algorithm);
+     *
+     * console.log(signature);
+     *
+     * >> "0x014730450221009cb0e...bafc8b989602"
      */
     async sign(message, sig) {
         if (!message || !((0, js_moi_utils_1.isHex)(message) || message instanceof Uint8Array)) {
@@ -231,6 +236,45 @@ class Wallet extends js_moi_signer_1.Signer {
             }
         }
     }
+    /**
+     * Signs an interaction request.
+     *
+     * @param {InteractionRequest} ix - The interaction request to be signed.
+     * @param {SigType} sig - The signature type to be used for signing.
+     * @returns {Promise<ExecuteIx>} A promise that resolves to an object containing the encoded interaction and its signatures.
+     * @throws {Error} Throws an error if the interaction request is invalid, the sender identifier does not match the signer identifier, or if signing the interaction fails.
+     *
+     * @example
+     * import { AssetStandard, HttpProvider, OpType, Wallet } from "js-moi-sdk";
+     *
+     * const host = "https://voyage-rpc.moi.technology/babylon/";
+     * const provider = new HttpProvider(host);
+     * const wallet = await Wallet.createRandom();
+     * const identifier = await wallet.getIdentifier();
+     * const algorithm = wallet.signingAlgorithms.ecdsa_secp256k1;
+     * const request = {
+     *     sender: {
+     *         address: identifier.toHex(),
+     *         key_id: 0,
+     *         sequence_id: 0,
+     *     },
+     *     fuel_price: 1,
+     *     fuel_limit: 100,
+     *     operations: [
+     *         {
+     *             type: OpType.AssetCreate,
+     *             payload: {
+     *                 standard: AssetStandard.MAS0,
+     *                 supply: 1000000,
+     *                 symbol: "DUMMY",
+     *             },
+     *         },
+     *     ],
+     * };
+     *
+     * wallet.connect(provider);
+     * const signedRequest = await wallet.signInteraction(request, algorithm);
+     */
     async signInteraction(ix, sig) {
         try {
             const error = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", ix);
@@ -253,6 +297,16 @@ class Wallet extends js_moi_signer_1.Signer {
             js_moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
+    /**
+     * Create a wallet from mnemonic
+     *
+     * It is a polymorphic function that accepts mnemonic as first argument,
+     * if path is provided as second argument, it will use the path to derive the wallet.
+     *
+     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
+     *
+     * @throws {Error} if there is an error during initialization.
+     */
     static async fromMnemonic(mnemonic, optionOrPath, options) {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
@@ -273,6 +327,14 @@ class Wallet extends js_moi_signer_1.Signer {
             });
         }
     }
+    /**
+     * Create a wallet from mnemonic synchronously.
+     *
+     * It is a polymorphic function that accepts mnemonic as first argument,
+     * if path is provided as second argument, it will use the path to derive the wallet.
+     *
+     * @returns {Wallet} a instance of `Wallet`.
+     */
     static fromMnemonicSync(mnemonic, optionOrPath, options) {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
@@ -294,13 +356,15 @@ class Wallet extends js_moi_signer_1.Signer {
         }
     }
     /**
-     * Initializes the wallet from a provided keystore.
+     * Creates a Wallet instance from a keystore JSON string and a password.
      *
-     * @param {string} keystore - The keystore to initialize the wallet with.
-     * @param {string} password - The password used to decrypt the keystore.
+     * @param {string} keystore - The keystore JSON string containing the encrypted private key.
+     * @param {string} password - The password to decrypt the keystore.
+     * @param {Provider} provider - (Optional) The provider to be used by the wallet.
      *
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
+     * @returns A Wallet instance.
+     *
+     * @throws Will throw an error if the wallet cannot be loaded from the keystore.
      */
     static fromKeystore(keystore, password, provider) {
         try {
