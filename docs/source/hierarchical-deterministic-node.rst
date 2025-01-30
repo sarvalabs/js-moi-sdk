@@ -1,5 +1,5 @@
-JS-MOI-HDNODE
-=============
+Hierarchical Deterministic Node
+===============================
 
 The ``HDNode`` class in js-moi-sdk represents a Hierarchical Deterministic (HD) Node 
 used for cryptographic key generation and derivation. It follows the `BIP-32 

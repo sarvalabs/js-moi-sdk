@@ -1,5 +1,5 @@
-JS-MOI-CONSTANTS
-================
+Constants
+=========
 
 The constants module contains the following constant variables.
 

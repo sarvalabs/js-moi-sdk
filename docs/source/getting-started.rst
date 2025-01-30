@@ -5,6 +5,23 @@ Kickstart your journey with js-moi-sdk by installing and importing it. Unleash i
 potential through comprehensive documentation and resources to supercharge 
 your application development.
 
+It consists of several modules that provide a wide range of functionalities
+to interact with the MOI Protocol and its ecosystem. These modules include
+
+- `js-moi-bip39 <https://www.npmjs.com/package/js-moi-bip39>`_: Package for deterministic key generation using mnemonic code.
+- `js-moi-constants <https://www.npmjs.com/package/js-moi-constants>`_: Package contains collection of constant variables.
+- `js-moi-hdnode <https://www.npmjs.com/package/js-moi-hdnode>`_: BIP32 HD Node package for cryptocurrency key management.
+- `js-moi-signer <https://www.npmjs.com/package/js-moi-signer>`_: Package enables users to sign and verify messages in their applications.
+- `js-moi-provider <https://www.npmjs.com/package/js-moi-provider>`_: Package to connect and interact with MOI network
+- `js-moi-wallet <https://www.npmjs.com/package/js-moi-wallet>`_: Package to interact with the MOI accounts.
+- `js-moi-logic <https://www.npmjs.com/package/js-moi-logic>`_: Package to interact with MOI logics.
+- `js-moi-manifest <https://www.npmjs.com/package/js-moi-manifest>`_: Package to encode and decode MOI Logic manifest, calldata.
+- `js-moi-identifiers <https://www.npmjs.com/package/js-moi-identifiers>`_: Package that contains implementations for all account identifiers used in the MOI Protocol such as the `AssetID`, `LogicID` and `ParticipantID` identifiers
+- `js-moi-utils <https://www.npmjs.com/package/js-moi-utils>`_: Package of utility functions used in other packages.
+
+All of these modules come pre-installed with ``js-moi-sdk``. However, if you
+prefer, you can also install them individually based on your needs.
+
 Installing
 ------------
 Install the latest `release <https://www.npmjs.com/package/js-moi-sdk>`_ 

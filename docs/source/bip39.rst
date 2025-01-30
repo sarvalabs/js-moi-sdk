@@ -1,5 +1,5 @@
-JS-MOI-BIP39
-============
+Bip39
+=====
 
 The `BIP39 <https://en.bitcoin.it/wiki/BIP_0039>`_ module provides utility 
 functions for working with mnemonic phrases, entropy, and seed generation. It 
