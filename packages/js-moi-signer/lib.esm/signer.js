@@ -1,8 +1,20 @@
 import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
+/**
+ * The `Signer` class is an abstract class that provides the base functionality for
+ * signing and verifying messages and interactions. It also provides the ability to
+ * create and execute interactions.
+ *
+ * Inheriting classes must implement the abstract methods `getKeyId`, `getIdentifier`,
+ * `sign`, and `signInteraction`.
+ */
 export class Signer {
     provider;
+    /**
+     * The signing algorithms that the signer supports.
+     * By default, the signer supports the `ecdsa_secp256k1` algorithm.
+     */
     signingAlgorithms;
     static DEFAULT_FUEL_PRICE = 1;
     constructor(provider, signingAlgorithms) {
@@ -11,9 +23,21 @@ export class Signer {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
     }
+    /**
+     * Connects the signer to a provider.
+     *
+     * @param {Provider} provider - The provider to connect to.
+     */
     connect(provider) {
         this.provider = provider;
     }
+    /**
+     * Returns the provider that the signer is connected to.
+     *
+     * @returns {Provider} The provider that the signer is connected to.
+     *
+     * @throws {Error} if the provider is not initialized.
+     */
     getProvider() {
         if (this.provider) {
             return this.provider;
@@ -60,6 +84,14 @@ export class Signer {
             fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
         };
     }
+    /**
+     * Creates an interaction request for either `moi.Simulate` or `moi.Execute`
+     *
+     * @param {string} type - The type of interaction request to create.
+     * @param {SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation} args - The arguments to create the interaction request.
+     *
+     * @returns {Promise<SimulateInteractionRequest | InteractionRequest>} A promise that resolves to the created interaction request.
+     */
     async createIxRequest(type, args) {
         const simulateIxRequest = await this.createSimulateIxRequest(args);
         if (type === "moi.Simulate") {
@@ -79,10 +111,64 @@ export class Signer {
         }
         return executeIxRequest;
     }
+    /**
+     * It a polymorphic function that can simulate an operation, multiple operations, or an interaction request.
+     *
+     * @param {AnyIxOperation | AnyIxOperation[] | SignerIx<SimulateInteractionRequest>} arg - The operation, multiple operations, or interaction request to simulate.
+     * @param {SimulateOption} option - The options to use for simulation.
+     *
+     * @returns {Promise<Simulate>} A promise that resolves to the simulation result.
+     *
+     * @example
+     * import { AssetStandard, HttpProvider, OpType, Wallet } from "js-moi-sdk";
+     *
+     * const host = "https://voyage-rpc.moi.technology/babylon/";
+     * const provider = new HttpProvider(host);
+     * const wallet = await Wallet.createRandom(provider);
+     * const request = {
+     *     type: OpType.AssetCreate,
+     *     payload: {
+     *         standard: AssetStandard.MAS0,
+     *         supply: 1000000,
+     *         symbol: "DUMMY",
+     *     },
+     * };
+     *
+     * const simulation = await wallet.simulate(request);
+     */
     async simulate(arg, option) {
         const request = await this.createIxRequest("moi.Simulate", arg);
         return await this.getProvider().simulate(request, option);
     }
+    /**
+     * Executes an operation, multiple operations, or an interaction request.
+     *
+     * @param {AnyIxOperation | AnyIxOperation[] | SignerIx<InteractionRequest> | ExecuteIx} arg - The operation, multiple operations, interaction request, or already signed request to execute.
+     *
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
+     *
+     * @throws {Error} if the sequence number is outdated or the interaction request is invalid.
+     *
+     * @example
+     * import { AssetStandard, HttpProvider, OpType, Wallet } from "js-moi-sdk";
+     *
+     * const host = "https://voyage-rpc.moi.technology/babylon/";
+     * const provider = new HttpProvider(host);
+     * const wallet = await Wallet.createRandom(provider);
+     * const request = {
+     *     type: OpType.AssetCreate,
+     *     payload: {
+     *         standard: AssetStandard.MAS0,
+     *         supply: 1000000,
+     *         symbol: "DUMMY",
+     *     },
+     * };
+     *
+     * const ix = await wallet.execute(request);
+     * console.log(ix.hash);
+     *
+     * >> "0xfe1...19"
+     */
     async execute(arg) {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
         // checking argument is an already signed request
@@ -115,10 +201,8 @@ export class Signer {
      * using the provided parameters.
      *
      * @param {Uint8Array} message - The message that was signed.
-     * @param {string|Uint8Array} signature - The signature to verify, as a
-     * string or Buffer.
-     * @param {string|Uint8Array} publicKey - The public key used for
-     * verification, as a string or Buffer.
+     * @param {string|Uint8Array} signature - The signature to verify, as a string or Buffer.
+     * @param {string|Uint8Array} publicKey - The public key used for verification, as a string or Buffer.
      * @returns {boolean} A boolean indicating whether the signature is valid or not.
      * @throws {Error} if the signature is invalid or the signature byte is not recognized.
      */

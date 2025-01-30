@@ -18,8 +18,7 @@ Wallet
 A wallet can be created using a private key, mnemonic, or keystore. The ``Wallet``
 class provides methods to instantiate a wallet.
 
-Creating a Wallet from a Private Key
-************************************
+**Creating a Wallet from a Private Key**
 
 .. code-block:: javascript
     
@@ -32,8 +31,7 @@ Creating a Wallet from a Private Key
 
     >> Wallet
 
-Creating a Wallet from a Mnemonic
-*********************************
+**Creating a Wallet from a Mnemonic**
 
 .. code-block:: javascript
 
@@ -46,8 +44,7 @@ Creating a Wallet from a Mnemonic
 
     >> Wallet
 
-Creating a Wallet from a Keystore
-*********************************
+**Creating a Wallet from a Keystore**
 
 .. code-block:: javascript
 
@@ -62,4 +59,4 @@ Creating a Wallet from a Keystore
     >> Wallet
 
 .. autoclass:: Wallet(privateKey, curve, [provider])
-    :members: getMnemonic, getPrivateKey, getPublicKey, getCurve, getIdentifier, generateKeystore, getKeyId, sign, signInteraction, fromMnemonic, fromMnemonicSync, fromKeystore, createRandom, createRandomSync
+    :members:

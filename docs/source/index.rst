@@ -21,4 +21,5 @@ full potential of the MOI Protocol.
    bip39
    hierarchical-deterministic-node
    identifiers
+   signer
    hierarchical-deterministic-wallet

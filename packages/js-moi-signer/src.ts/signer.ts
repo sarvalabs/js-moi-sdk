@@ -10,9 +10,21 @@ export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> 
     fuel_price?: InteractionRequest["fuel_price"];
 } & (T extends InteractionRequest ? { fuel_limit?: InteractionRequest["fuel_limit"] } : {});
 
+/**
+ * The `Signer` class is an abstract class that provides the base functionality for
+ * signing and verifying messages and interactions. It also provides the ability to
+ * create and execute interactions.
+ *
+ * Inheriting classes must implement the abstract methods `getKeyId`, `getIdentifier`,
+ * `sign`, and `signInteraction`.
+ */
 export abstract class Signer {
     private provider?: Provider;
 
+    /**
+     * The signing algorithms that the signer supports.
+     * By default, the signer supports the `ecdsa_secp256k1` algorithm.
+     */
     public signingAlgorithms: SigningAlgorithms;
 
     private static DEFAULT_FUEL_PRICE = 1;
@@ -25,18 +37,56 @@ export abstract class Signer {
         };
     }
 
+    /**
+     * Returns the key ID of the signer.
+     *
+     * @returns {Promise<number>} A promise that resolves to the key ID of the signer.
+     */
     public abstract getKeyId(): Promise<number>;
 
+    /**
+     * Returns the identifier of the signer.
+     *
+     * @returns {Promise<Identifier>} A promise that resolves to the identifier of the signer.
+     */
     public abstract getIdentifier(): Promise<Identifier>;
 
+    /**
+     * Signs a message using the provided signature type.
+     *
+     * @param {Hex|Uint8Array} message - The message to sign.
+     * @param {SigType} sig - The signature type to use.
+     *
+     * @returns {Promise<Hex>} A promise that resolves to the signed message.
+     */
     public abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
 
+    /**
+     * Signs an interaction request using the provided signature type.
+     *
+     * @param {InteractionRequest} ix - The interaction request to sign.
+     * @param {SigType} sig - The signature type to use.
+     *
+     * @returns {Promise<ExecuteIx>} A promise that resolves to the signed interaction request.
+     */
     public abstract signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
 
+    /**
+     * Connects the signer to a provider.
+     *
+     * @param {Provider} provider - The provider to connect to.
+     */
     public connect(provider: Provider): void {
         this.provider = provider;
     }
 
+    /**
+     * Returns the provider that the signer is connected to.
+     *
+     * @returns {Provider} The provider that the signer is connected to.
+     *
+     * @throws {Error} if the provider is not initialized.
+     */
     public getProvider(): Provider {
         if (this.provider) {
             return this.provider;
@@ -92,8 +142,32 @@ export abstract class Signer {
         };
     }
 
+    /**
+     * Creates an interaction request for either `moi.Simulate`
+     *
+     * @param {string} type - The type of interaction request to create.
+     * @param {SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation} args - The arguments to create the interaction request.
+     *
+     * @returns {Promise<SimulateInteractionRequest>} A promise that resolves to the created interaction request.
+     */
     public async createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<SimulateInteractionRequest>;
+    /**
+     * Creates an interaction request for either `moi.Execute`
+     *
+     * @param {string} type - The type of interaction request to create.
+     * @param {SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation} args - The arguments to create the interaction request.
+     *
+     * @returns {Promise<InteractionRequest>} A promise that resolves to the created interaction request.
+     */
     public async createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<InteractionRequest>;
+    /**
+     * Creates an interaction request for either `moi.Simulate` or `moi.Execute`
+     *
+     * @param {string} type - The type of interaction request to create.
+     * @param {SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation} args - The arguments to create the interaction request.
+     *
+     * @returns {Promise<SimulateInteractionRequest | InteractionRequest>} A promise that resolves to the created interaction request.
+     */
     public async createIxRequest(
         type: "moi.Simulate" | "moi.Execute",
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
@@ -123,19 +197,125 @@ export abstract class Signer {
         return executeIxRequest;
     }
 
+    /**
+     * Simulates an operation
+     *
+     * @param {AnyIxOperation} operation - The operation to simulate.
+     * @param {SimulateOption} options - The options to use for simulation.
+     *
+     * @returns {Promise<Simulate>} A promise that resolves to the simulation result.
+     */
     public async simulate(operation: AnyIxOperation, options?: SimulateOption): Promise<Simulate>;
+    /**
+     * Simulates multiple operations
+     *
+     * @param {AnyIxOperation[]} operations - The operations to simulate.
+     * @param {SimulateOption} options - The options to use for simulation.
+     *
+     * @returns {Promise<Simulate>} A promise that resolves to the simulation result.
+     */
     public async simulate(operations: AnyIxOperation[], options?: SimulateOption): Promise<Simulate>;
+    /**
+     * Simulates an interaction request
+     *
+     * @param {SignerIx<SimulateInteractionRequest>} ix - The interaction request to simulate.
+     * @param {SimulateOption} option - The options to use for simulation.
+     *
+     * @returns {Promise<Simulate>} A promise that resolves to the simulation result.
+     */
     public async simulate(ix: SignerIx<SimulateInteractionRequest>, option?: SimulateOption): Promise<Simulate>;
+    /**
+     * It a polymorphic function that can simulate an operation, multiple operations, or an interaction request.
+     *
+     * @param {AnyIxOperation | AnyIxOperation[] | SignerIx<SimulateInteractionRequest>} arg - The operation, multiple operations, or interaction request to simulate.
+     * @param {SimulateOption} option - The options to use for simulation.
+     *
+     * @returns {Promise<Simulate>} A promise that resolves to the simulation result.
+     *
+     * @example
+     * import { AssetStandard, HttpProvider, OpType, Wallet } from "js-moi-sdk";
+     *
+     * const host = "https://voyage-rpc.moi.technology/babylon/";
+     * const provider = new HttpProvider(host);
+     * const wallet = await Wallet.createRandom(provider);
+     * const request = {
+     *     type: OpType.AssetCreate,
+     *     payload: {
+     *         standard: AssetStandard.MAS0,
+     *         supply: 1000000,
+     *         symbol: "DUMMY",
+     *     },
+     * };
+     *
+     * const simulation = await wallet.simulate(request);
+     */
     public async simulate(arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation, option?: SimulateOption): Promise<Simulate> {
         const request = await this.createIxRequest("moi.Simulate", arg);
 
         return await this.getProvider().simulate(request, option);
     }
 
+    /**
+     * Executes an operation.
+     *
+     * @param {AnyIxOperation} operation - The operation to execute
+     *
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
+     */
     public async execute(operation: AnyIxOperation): Promise<InteractionResponse>;
+    /**
+     * Executes multiple operations.
+     *
+     * @param {AnyIxOperation[]} operations - The operations to execute.
+     *
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
+     */
     public async execute(operations: AnyIxOperation[]): Promise<InteractionResponse>;
+    /**
+     * Executes an interaction request.
+     *
+     * @param {SignerIx<InteractionRequest>} ix - The interaction request to execute.
+     *
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
+     */
     public async execute(ix: SignerIx<InteractionRequest>): Promise<InteractionResponse>;
+    /**
+     * Executes an signed interaction request.
+     *
+     * @param {ExecuteIx} arg - The signed interaction request to execute.
+     *
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
+     */
     public async execute(request: ExecuteIx): Promise<InteractionResponse>;
+    /**
+     * Executes an operation, multiple operations, or an interaction request.
+     *
+     * @param {AnyIxOperation | AnyIxOperation[] | SignerIx<InteractionRequest> | ExecuteIx} arg - The operation, multiple operations, interaction request, or already signed request to execute.
+     *
+     * @returns {Promise<InteractionResponse>} A promise that resolves to the interaction response.
+     *
+     * @throws {Error} if the sequence number is outdated or the interaction request is invalid.
+     *
+     * @example
+     * import { AssetStandard, HttpProvider, OpType, Wallet } from "js-moi-sdk";
+     *
+     * const host = "https://voyage-rpc.moi.technology/babylon/";
+     * const provider = new HttpProvider(host);
+     * const wallet = await Wallet.createRandom(provider);
+     * const request = {
+     *     type: OpType.AssetCreate,
+     *     payload: {
+     *         standard: AssetStandard.MAS0,
+     *         supply: 1000000,
+     *         symbol: "DUMMY",
+     *     },
+     * };
+     *
+     * const ix = await wallet.execute(request);
+     * console.log(ix.hash);
+     *
+     * >> "0xfe1...19"
+     */
     public async execute(arg: SignerIx<InteractionRequest> | AnyIxOperation | AnyIxOperation[] | ExecuteIx): Promise<InteractionResponse> {
         const { ecdsa_secp256k1: algorithm } = this.signingAlgorithms;
 
@@ -178,10 +358,8 @@ export abstract class Signer {
      * using the provided parameters.
      *
      * @param {Uint8Array} message - The message that was signed.
-     * @param {string|Uint8Array} signature - The signature to verify, as a
-     * string or Buffer.
-     * @param {string|Uint8Array} publicKey - The public key used for
-     * verification, as a string or Buffer.
+     * @param {string|Uint8Array} signature - The signature to verify, as a string or Buffer.
+     * @param {string|Uint8Array} publicKey - The public key used for verification, as a string or Buffer.
      * @returns {boolean} A boolean indicating whether the signature is valid or not.
      * @throws {Error} if the signature is invalid or the signature byte is not recognized.
      */
