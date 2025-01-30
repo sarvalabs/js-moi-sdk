@@ -1,13 +1,13 @@
 import { styleText } from "node:util";
-import { HttpProvider, OpType, Wallet } from "./packages/js-moi";
+import { HttpProvider, OpType, Wallet, WebsocketProvider, type Provider } from "./packages/js-moi";
 
 type ProviderType = "http" | "websocket";
 
 //#region Constants
-const MNEMONIC: string = "scheme hunt brand slam allow melody detail pledge buddy pair trumpet security";
+const MNEMONIC: string = "keep board tiger clean island wisdom apology when anger doctor pencil volcano";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
 const PROVIDER_TYPE = "http" as ProviderType;
-const LOGIC_ID = "0x0800005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f780d88233a4e57b10a";
+const LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 //#endregion
 
 const provider: Record<ProviderType, string> = {
@@ -26,7 +26,25 @@ const createProvider = () => {
 
     log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
 
-    return new HttpProvider(provider[PROVIDER_TYPE]);
+    let p: Provider | undefined = undefined;
+
+    if (PROVIDER_TYPE === "websocket") {
+        p = new WebsocketProvider(provider["websocket"]);
+    }
+
+    if (PROVIDER_TYPE === "http") {
+        p = new HttpProvider(provider["http"]);
+    }
+
+    if (p == null) {
+        throw new Error("Provider not created");
+    }
+
+    p.on("debug", (message) => {
+        console.log(styleText("yellow", `DEBUG: ${JSON.stringify(message)}`));
+    });
+
+    return p;
 };
 
 const createWallet = async () => {
@@ -40,14 +58,16 @@ const createNewParticipant = async () => {
 
     const wallet = await createWallet();
     const newWallet = await Wallet.createRandom(wallet.getProvider());
+    const newWalletIdentifier = await newWallet.getIdentifier();
+
     const ix = await wallet.execute({
         type: OpType.ParticipantCreate,
         payload: {
-            address: await newWallet.getAddress(),
+            address: newWalletIdentifier.toHex(),
             amount: 10000000,
             keys_payload: [
                 {
-                    public_key: newWallet.publicKey,
+                    public_key: await newWallet.getPublicKey(),
                     signature_algorithm: 0,
                     weight: 1000,
                 },
@@ -56,7 +76,7 @@ const createNewParticipant = async () => {
     });
 
     await ix.wait();
-    log(`New Participant Created.\nAddress=${await newWallet.getAddress()}`);
+    log(`New Participant Created.\nAddress=${newWalletIdentifier.toHex()}`);
     return newWallet;
 };
 
@@ -64,7 +84,7 @@ const getAssetId = async (wallet: Wallet) => {
     log("Searching for Asset ID");
 
     const provider = wallet.getProvider();
-    const balances = await provider.getAccount(await wallet.getAddress(), {
+    const balances = await provider.getAccount(await wallet.getIdentifier(), {
         modifier: { extract: "balances" },
     });
 
@@ -87,9 +107,10 @@ const setup = async () => {
 
     const wallet = await createNewParticipant();
 
-    process.env["WALLET_PRIVATE_KEY"] = wallet.privateKey;
-    process.env["WALLET_CURVE"] = wallet.curve;
-    process.env["WALLET_ADDRESS"] = await wallet.getAddress();
+    process.env["WALLET_PRIVATE_KEY"] = await wallet.getPrivateKey();
+    process.env["WALLET_CURVE"] = await wallet.getCurve();
+    process.env["WALLET_ADDRESS"] = (await wallet.getIdentifier()).toHex();
+    process.env["WALLET_SEQUENCE_CURRENT"] = (await wallet.getProvider().getAccountKey(await wallet.getIdentifier(), 0)).sequence.toString();
     process.env["ASSET_ID"] = await getAssetId(wallet);
 
     log("Testing setup complete\n");

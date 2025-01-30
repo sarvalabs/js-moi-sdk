@@ -2,8 +2,6 @@ import EventEmitter from "events";
 import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
 import { Websocket } from "../provider/ws/ws";
 
-type Websocketify<T extends JsonRpcRequest | JsonRpcResponse> = Omit<T, "id"> & { id: string };
-
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }
@@ -114,21 +112,19 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         return this.waitForConnectionPromise;
     }
 
-    public async request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>> {
+    public async request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>> {
         await this.waitForConnection();
-
-        const request: Websocketify<JsonRpcRequest> = this.createPayload(method, params);
 
         return new Promise((resolve, reject) => {
             const listener = (data: string) => {
                 try {
-                    const response = JSON.parse(data) as Websocketify<JsonRpcResponse>;
+                    const response = JSON.parse(data) as JsonRpcResponse;
 
                     if (response.id !== request.id) {
                         return;
                     }
 
-                    resolve({ ...response, id: 1 } as JsonRpcResponse<TResult>);
+                    resolve(response as JsonRpcResponse<TResult>);
                     this.off("message", listener);
                 } catch (error) {
                     reject(error);
@@ -145,21 +141,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");
         }
-        console.log("close");
         this.ws.close();
-    }
-
-    private createId(): string {
-        return globalThis.crypto.randomUUID();
-    }
-
-    private createPayload(method: string, params: unknown[]): Websocketify<JsonRpcRequest> {
-        return {
-            id: this.createId(),
-            jsonrpc: "2.0",
-            method,
-            params,
-        };
     }
 
     protected send(data: unknown): void {

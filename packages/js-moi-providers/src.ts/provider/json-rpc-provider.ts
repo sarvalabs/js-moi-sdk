@@ -1,25 +1,22 @@
 import { EventEmitter } from "events";
+import { AssetId, Identifier, isIdentifier, LogicId } from "js-moi-identifiers";
 import {
-    AssetId,
     bytesToHex,
-    ensureHexPrefix,
     ErrorCode,
     ErrorUtils,
     hexToHash,
     interaction,
-    isAddress,
     isHex,
-    LogicId,
     StorageKey,
     validateIxRequest,
     type Account,
     type AccountAsset,
     type AccountKey,
-    type Address,
     type Asset,
     type Hex,
     type Interaction,
     type InteractionRequest,
+    type JsonRpcRequest,
     type JsonRpcResponse,
     type Logic,
     type LogicMessage,
@@ -102,7 +99,18 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @throws Will throw an error if the response contains an error.
      */
     public async request<T>(method: string, params: unknown[] = []): Promise<JsonRpcResponse<T>> {
-        return await this.transport.request<T>(method, params);
+        const payload: JsonRpcRequest = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method,
+            params,
+        };
+
+        this.emit("debug", { action: "json-rpc-request", payload });
+        const response = await this.transport.request<T>(payload);
+        this.emit("debug", { action: "json-rpc-response", payload: response });
+
+        return response;
     }
 
     /**
@@ -114,8 +122,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call<"moi.Protocol", SelectFromResponseModifier<NetworkInfo, TOption>>("moi.Protocol", option);
     }
 
-    public async simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     public async simulate(ix: SimulateInteractionRequest, option?: SimulateOption): Promise<Simulate>;
+    public async simulate(interaction: Uint8Array | Hex, option?: SimulateOption): Promise<Simulate>;
     public async simulate(ix: SimulateInteractionRequest | Uint8Array | Hex, option?: SimulateOption): Promise<Simulate> {
         let encodedIxArgs: Hex;
 
@@ -126,11 +134,6 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             }
 
             case typeof ix === "object": {
-                if (!("fuel_limit" in ix)) {
-                    console.warn("Simulating interaction should not take a fuel limit.\nFor simulation, fuel limit not provided. Using default value 1.");
-                    // @ts-ignore - fuel_limit is not in the type
-                    ix["fuel_limit"] = 1;
-                }
                 const result = validateIxRequest("moi.Simulate", ix);
 
                 if (result != null) {
@@ -161,12 +164,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         });
     }
 
-    async getAccount<TOption extends AccountRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
-        return await this.call("moi.Account", { identifier, ...option });
+    async getAccount<TOption extends AccountRequestOption>(participant: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
+        return await this.call("moi.Account", { id: new Identifier(participant), ...option });
     }
 
     private async getTesseractByReference<TOption extends TesseractRequestOption>(
@@ -179,36 +178,37 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         });
     }
 
-    public getTesseract<TOption extends TesseractRequestOption>(identifier: Address, height: number, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
+    public getTesseract<TOption extends TesseractRequestOption>(
+        participant: Identifier | Hex,
+        height: number,
+        option?: TOption
+    ): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     public getTesseract<TOption extends TesseractRequestOption>(tesseract: Hex, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     public getTesseract<TOption extends TesseractRequestOption>(reference: TesseractReference, option?: TOption): Promise<SelectFromResponseModifier<Tesseract, TOption>>;
     public async getTesseract<TOption extends TesseractRequestOption>(
-        identifier: Hex | TesseractReference,
+        identifier: Identifier | Hex | TesseractReference,
         height?: number | TOption,
         option?: TOption
     ): Promise<SelectFromResponseModifier<Tesseract, TOption>> {
         const isValidOption = (option: unknown): option is TOption => typeof option === "undefined" || typeof option === "object";
 
         switch (true) {
-            case isAddress(identifier) && typeof height === "number" && isValidOption(option): {
+            case (isIdentifier(identifier) || isHex(identifier, 32)) && typeof height === "number" && isValidOption(option): {
                 // Getting tesseract by address and height
-
                 if (Number.isNaN(height) || height < -1) {
                     ErrorUtils.throwError("Invalid height value", ErrorCode.INVALID_ARGUMENT);
                 }
 
-                return await this.getTesseractByReference({ relative: { identifier: identifier, height } }, option);
+                return await this.getTesseractByReference({ relative: { id: new Identifier(identifier), height } }, option);
             }
 
-            case typeof identifier === "object" && isValidOption(height): {
+            case typeof identifier === "object" && !isIdentifier(identifier) && isValidOption(height): {
                 // Getting tesseract by reference
-
                 return await this.getTesseractByReference(identifier, height);
             }
 
-            case typeof identifier === "string" && isValidOption(height): {
+            case isHex(identifier) && isValidOption(height): {
                 // Getting tesseract by hash
-
                 return await this.getTesseractByReference({ absolute: identifier }, height);
             }
         }
@@ -216,49 +216,39 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         ErrorUtils.throwError("Invalid arguments passed to get correct method signature", ErrorCode.INVALID_ARGUMENT);
     }
 
-    getLogic<TOption extends LogicRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-    getLogic<TOption extends LogicRequestOption>(identifier: LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
-    getLogic<TOption extends LogicRequestOption>(value: Address | LogicId, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
-        const identifier = typeof value === "string" ? value : value.getAddress();
-
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
-        return this.call("moi.Logic", { identifier, ...option });
+    getLogic<TOption extends LogicRequestOption>(identifier: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
+        return this.call("moi.Logic", { id: new Identifier(identifier), ...option });
     }
 
-    async getLogicStorage(logicId: Hex | LogicId, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
-    async getLogicStorage(logicId: Hex | LogicId, address: Address, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    async getLogicStorage(logic: Identifier | Hex, storageId: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
+    async getLogicStorage(logic: Identifier | Hex, participant: Identifier, storageKey: Hex | StorageKey, option?: LogicStorageRequestOption): Promise<Hex>;
     async getLogicStorage(
-        logicId: Hex | LogicId,
-        address: Hex | Address | StorageKey,
+        logic: Identifier | Hex,
+        participantOrStorage: Hex | Identifier | StorageKey,
         storageId?: Hex | StorageKey | LogicStorageRequestOption,
         option?: LogicStorageRequestOption
     ): Promise<Hex> {
-        const logicID = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-
         let params: MethodParams<"moi.LogicStorage">;
 
         switch (true) {
-            case typeof storageId === "undefined" || (typeof storageId === "object" && !(storageId instanceof StorageKey)): {
-                // Getting logic storage by logic id and storage key
-                const id: Hex = typeof address === "string" ? address : address.hex();
-
-                params = [{ storage_id: id, logic_id: logicID.value, ...storageId }];
+            case isHex(participantOrStorage) || participantOrStorage instanceof StorageKey: {
+                // getting value from persistent storage
+                params = [{ logic_id: new LogicId(logic), storage_id: participantOrStorage instanceof StorageKey ? participantOrStorage.hex() : participantOrStorage, ...option }];
                 break;
             }
 
-            case typeof storageId === "string":
-            case storageId instanceof StorageKey: {
-                // Getting logic storage by logic id, address, and storage key
-
-                if (!isAddress(address)) {
-                    ErrorUtils.throwArgumentError("Must be a valid address", "address", address);
+            case isIdentifier(participantOrStorage): {
+                // getting value from ephemeral storage
+                if (storageId == null) {
+                    ErrorUtils.throwArgumentError("Storage key is required", "storageId", storageId);
                 }
-                const id: Hex = typeof storageId === "string" ? storageId : storageId.hex();
 
-                params = [{ storage_id: id, logic_id: logicID.value, address, ...option }];
+                if (!(storageId instanceof StorageKey) && !isHex(storageId)) {
+                    ErrorUtils.throwArgumentError("Storage key must be a valid hex string or StorageKey instance", "storageId", storageId);
+                }
+
+                const storageIdHex = storageId instanceof StorageKey ? storageId.hex() : storageId;
+                params = [{ logic_id: new LogicId(logic), id: participantOrStorage, storage_id: storageIdHex, ...option }];
                 break;
             }
 
@@ -267,17 +257,11 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
             }
         }
 
-        return ensureHexPrefix(await this.call("moi.LogicStorage", ...params));
+        return await this.call("moi.LogicStorage", ...params);
     }
 
-    async getAsset<TOption extends AssetRequestOption>(assetId: AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
-    async getAsset<TOption extends AssetRequestOption>(identifier: Address, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
-    async getAsset<TOption extends AssetRequestOption>(identifier: Address | AssetId, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
-        if (typeof identifier === "string" && !isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-        const address = typeof identifier === "string" ? identifier : identifier.getAddress();
-        return await this.call("moi.Asset", { identifier: address, ...option });
+    async getAsset<TOption extends AssetRequestOption>(asset: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
+        return await this.call("moi.Asset", { id: new AssetId(asset), ...option });
     }
 
     private encodeTopics(topics: NestedArray<string>): NestedArray<Hex> {
@@ -299,40 +283,32 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return encodedTopics;
     }
 
-    async getLogicMessage(logicId: LogicId | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
-        const id = typeof logicId === "string" ? new LogicId(logicId) : logicId;
-
+    async getLogicMessage(logic: Identifier | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]> {
         return await this.call("moi.LogicMessage", {
-            logic_id: id.value,
+            logic_id: new LogicId(logic),
             ...options,
-            topics: options?.topics == null ? undefined : this.encodeTopics(options.topics),
+            topics: this.encodeTopics(options?.topics ?? []),
         });
     }
 
     async getAccountAsset<TOption extends AccountAssetRequestOption>(
-        identifier: Address,
-        assetId: Hex | AssetId,
+        participant: Identifier | Hex,
+        asset: Identifier | Hex,
         option?: TOption
     ): Promise<SelectFromResponseModifier<AccountAsset, TOption>> {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
-        const { value } = typeof assetId === "string" ? new AssetId(assetId) : assetId;
-
-        return await this.call("moi.AccountAsset", { identifier, asset_id: value, ...option });
+        return await this.call("moi.AccountAsset", { id: new Identifier(participant), asset_id: new AssetId(asset), ...option });
     }
 
-    async getAccountKey(identifier: Address, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
-        if (!isAddress(identifier)) {
-            ErrorUtils.throwArgumentError("Must be a valid address", "identifier", identifier);
-        }
-
+    async getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
         if (Number.isNaN(index) || index < 0) {
             ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
         }
 
-        return await this.call("moi.AccountKey", { identifier, key_idx: index, ...option });
+        return await this.call("moi.AccountKey", {
+            id: new Identifier(participant),
+            key_id: index,
+            ...option,
+        });
     }
 
     execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;

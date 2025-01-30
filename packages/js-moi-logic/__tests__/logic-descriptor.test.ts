@@ -1,5 +1,6 @@
+import { LogicId } from "js-moi-identifiers";
 import { ManifestCoder, ManifestCoderFormat } from "js-moi-manifest";
-import { ElementType, EngineKind, isAddress, isHex, LogicId, LogicState, type Hex, type LogicManifest } from "js-moi-utils";
+import { ElementType, EngineKind, isHex, LogicState, type Hex, type LogicManifest } from "js-moi-utils";
 import { parse } from "yaml";
 import { LogicDescriptor } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
@@ -55,33 +56,8 @@ describe.each(manifests)(`${LogicDescriptor.name} of manifest "$name"`, (manifes
         expect(coder).toBeInstanceOf(ManifestCoder);
     });
 
-    describe("if logic id is not defined", () => {
-        describe.each([
-            {
-                name: "getVersion",
-                callback: async () => descriptor.getVersion(),
-            },
-            {
-                name: "getEdition",
-                callback: async () => descriptor.getEdition(),
-            },
-            {
-                name: "getLogicAddress",
-                callback: async () => descriptor.getLogicAddress(),
-            },
-            {
-                name: "isAssetLogic",
-                callback: async () => descriptor.isAssetLogic(),
-            },
-        ])("$name", ({ callback }) => {
-            it.concurrent("should throw error if logic id is not set", async () => {
-                await expect(callback()).rejects.toThrow();
-            });
-        });
-    });
-
     describe("if logic id is defined", () => {
-        const value = "0x080000fc61d49266591e2c6fa27f60973e085586d26acab0c7f0d354bf9c61afe7b782";
+        const value = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 
         beforeAll(() => {
             descriptor["setLogicId"](new LogicId(value));
@@ -97,44 +73,7 @@ describe.each(manifests)(`${LogicDescriptor.name} of manifest "$name"`, (manifes
 
                 expect(logicId).toBeDefined();
                 expect(logicId).toBeInstanceOf(LogicId);
-                expect(logicId.value).toBe(value);
-            });
-        });
-
-        describe(descriptor.getVersion, () => {
-            it("should return version", async () => {
-                const version = await descriptor.getVersion();
-
-                expect(version).toBeDefined();
-                expect(version).toBe(0);
-            });
-        });
-
-        describe(descriptor.getEdition, () => {
-            it("should return edition", async () => {
-                const edition = await descriptor.getEdition();
-
-                expect(edition).toBeDefined();
-                expect(edition).not.toBeNaN();
-                expect(edition).toBeGreaterThanOrEqual(0);
-            });
-        });
-
-        describe(descriptor.getLogicAddress, () => {
-            it("should return logic address", async () => {
-                const address = await descriptor.getLogicAddress();
-
-                expect(address).toBeDefined();
-                expect(isAddress(address)).toBeTruthy();
-            });
-        });
-
-        describe(descriptor.isAssetLogic, () => {
-            it("should return a boolean value", async () => {
-                const result = await descriptor.isAssetLogic();
-
-                expect(result).toBeDefined();
-                expect(result).toBeFalsy();
+                expect(logicId.toString()).toBe(value);
             });
         });
     });

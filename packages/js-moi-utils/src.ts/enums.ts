@@ -96,7 +96,6 @@ export enum ElementType {
 }
 
 export enum InteractionStatus {
-    Queued = 0,
-    Pending = 1,
-    Finalized = 2,
+    Pending = 0,
+    Finalized = 1,
 }
