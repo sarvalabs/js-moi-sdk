@@ -169,6 +169,19 @@ export interface PoloLogicActionPayload extends Omit<PoloLogicPayload, "manifest
  */
 export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {
 }
+export interface KeyRevokePayload {
+    key_id: number;
+}
+export interface AccountConfigurePayload {
+    add?: Partial<KeyAddPayload>[];
+    revoke?: KeyRevokePayload[];
+}
+export interface PoloAccountConfigurePayload {
+    add?: Partial<Omit<KeyAddPayload, "public_key"> & {
+        public_key: Uint8Array;
+    }>[];
+    revoke?: KeyRevokePayload[];
+}
 /**
  * `OperationPayload` is a type that holds the payload of an operation.
  *
@@ -177,8 +190,8 @@ export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {
  *  const operation: Operation<OpType.AssetCreate> = { ... }
  * ```
  */
-export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetTransferPayload : T extends OpType.AssetApprove ? AssetApprovePayload : T extends OpType.AssetRelease ? AssetReleasePayload : T extends OpType.AssetRevoke ? AssetRevokePayload : T extends OpType.AssetLockup ? AssetLockupPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : never;
-export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? PoloAssetTransferPayload : T extends OpType.AssetApprove ? PoloAssetApprovePayload : T extends OpType.AssetRelease ? PoloAssetReleasePayload : T extends OpType.AssetRevoke ? PoloAssetRevokePayload : T extends OpType.AssetLockup ? PoloAssetLockupPayload : T extends OpType.LogicDeploy ? PoloLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload : never;
+export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetTransferPayload : T extends OpType.AssetApprove ? AssetApprovePayload : T extends OpType.AssetRelease ? AssetReleasePayload : T extends OpType.AssetRevoke ? AssetRevokePayload : T extends OpType.AssetLockup ? AssetLockupPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : T extends OpType.AccountConfigure ? AccountConfigurePayload : never;
+export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? PoloAssetTransferPayload : T extends OpType.AssetApprove ? PoloAssetApprovePayload : T extends OpType.AssetRelease ? PoloAssetReleasePayload : T extends OpType.AssetRevoke ? PoloAssetRevokePayload : T extends OpType.AssetLockup ? PoloAssetLockupPayload : T extends OpType.LogicDeploy ? PoloLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload : T extends OpType.AccountConfigure ? PoloAccountConfigurePayload : never;
 /**
  * `IxRawOperation` is a type that holds the raw operation data.
  */
@@ -205,5 +218,5 @@ export interface IxOperation<TOpType extends OpType> {
 /**
  * `AnyIxOperation` is a union type that holds all the operations.
  */
-export type AnyIxOperation = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.AssetRevoke> | IxOperation<OpType.AssetLockup> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate>;
+export type AnyIxOperation = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.AssetRevoke> | IxOperation<OpType.AssetLockup> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate> | IxOperation<OpType.AccountConfigure>;
 //# sourceMappingURL=ix-operation.d.ts.map

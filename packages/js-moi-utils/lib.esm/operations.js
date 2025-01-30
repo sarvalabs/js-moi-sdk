@@ -83,6 +83,42 @@ const createAssetCreateDescriptor = () => {
         },
     });
 };
+const createAccountConfigureDescriptor = () => {
+    const schema = polo.struct({
+        add: polo.arrayOf(polo.struct({
+            public_key: polo.bytes,
+            weight: polo.integer,
+            signature_algorithm: polo.integer,
+        })),
+        revoke: polo.arrayOf(polo.struct({
+            key_id: polo.integer,
+        })),
+    });
+    return Object.freeze({
+        schema: schema,
+        validator: ({ payload }) => {
+            if (payload.add == null || payload.revoke == null) {
+                createInvalidResult(payload, "add", "Add and revoke are required");
+            }
+            for (const key in payload) {
+                const value = payload[key];
+                if (Object.keys(value).length === 0) {
+                    return createInvalidResult(payload, key, `At least value is required in ${key}`);
+                }
+            }
+            return null;
+        },
+        transform: ({ payload }) => {
+            return {
+                add: payload.add?.map((key) => ({
+                    ...key,
+                    public_key: key.public_key ? hexToBytes(key.public_key) : undefined,
+                })),
+                revoke: payload.revoke,
+            };
+        },
+    });
+};
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze({
         schema: polo.struct({
@@ -251,6 +287,7 @@ const createLogicActionDescriptor = () => {
 };
 const ixOpDescriptor = {
     [OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
+    [OpType.AccountConfigure]: createAccountConfigureDescriptor(),
     [OpType.AssetCreate]: createAssetCreateDescriptor(),
     [OpType.AssetMint]: createAssetSupplyDescriptorFor(),
     [OpType.AssetBurn]: createAssetSupplyDescriptorFor(),

@@ -86,6 +86,42 @@ const createAssetCreateDescriptor = () => {
         },
     });
 };
+const createAccountConfigureDescriptor = () => {
+    const schema = polo_schema_1.polo.struct({
+        add: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
+            public_key: polo_schema_1.polo.bytes,
+            weight: polo_schema_1.polo.integer,
+            signature_algorithm: polo_schema_1.polo.integer,
+        })),
+        revoke: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
+            key_id: polo_schema_1.polo.integer,
+        })),
+    });
+    return Object.freeze({
+        schema: schema,
+        validator: ({ payload }) => {
+            if (payload.add == null || payload.revoke == null) {
+                createInvalidResult(payload, "add", "Add and revoke are required");
+            }
+            for (const key in payload) {
+                const value = payload[key];
+                if (Object.keys(value).length === 0) {
+                    return createInvalidResult(payload, key, `At least value is required in ${key}`);
+                }
+            }
+            return null;
+        },
+        transform: ({ payload }) => {
+            return {
+                add: payload.add?.map((key) => ({
+                    ...key,
+                    public_key: key.public_key ? (0, hex_1.hexToBytes)(key.public_key) : undefined,
+                })),
+                revoke: payload.revoke,
+            };
+        },
+    });
+};
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze({
         schema: polo_schema_1.polo.struct({
@@ -254,6 +290,7 @@ const createLogicActionDescriptor = () => {
 };
 const ixOpDescriptor = {
     [enums_1.OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
+    [enums_1.OpType.AccountConfigure]: createAccountConfigureDescriptor(),
     [enums_1.OpType.AssetCreate]: createAssetCreateDescriptor(),
     [enums_1.OpType.AssetMint]: createAssetSupplyDescriptorFor(),
     [enums_1.OpType.AssetBurn]: createAssetSupplyDescriptorFor(),

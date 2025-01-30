@@ -182,6 +182,20 @@ export interface PoloLogicActionPayload extends Omit<PoloLogicPayload, "manifest
  */
 export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {}
 
+export interface KeyRevokePayload {
+    key_id: number;
+}
+
+export interface AccountConfigurePayload {
+    add?: Partial<KeyAddPayload>[];
+    revoke?: KeyRevokePayload[];
+}
+
+export interface PoloAccountConfigurePayload {
+    add?: Partial<Omit<KeyAddPayload, "public_key"> & { public_key: Uint8Array }>[];
+    revoke?: KeyRevokePayload[];
+}
+
 /**
  * `OperationPayload` is a type that holds the payload of an operation.
  *
@@ -210,6 +224,8 @@ export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantC
     ? LogicDeployPayload
     : T extends OpType.LogicInvoke | OpType.LogicEnlist
     ? LogicActionPayload
+    : T extends OpType.AccountConfigure
+    ? AccountConfigurePayload
     : never;
 
 export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
@@ -232,6 +248,8 @@ export type PoloIxOperationPayload<T extends OpType> = T extends OpType.Particip
     ? PoloLogicDeployPayload
     : T extends OpType.LogicInvoke | OpType.LogicEnlist
     ? PoloLogicActionPayload
+    : T extends OpType.AccountConfigure
+    ? PoloAccountConfigurePayload
     : never;
 
 /**
@@ -274,4 +292,5 @@ export type AnyIxOperation =
     | IxOperation<OpType.LogicDeploy>
     | IxOperation<OpType.LogicEnlist>
     | IxOperation<OpType.LogicInvoke>
-    | IxOperation<OpType.ParticipantCreate>;
+    | IxOperation<OpType.ParticipantCreate>
+    | IxOperation<OpType.AccountConfigure>;

@@ -177,6 +177,15 @@ describe(encodeOperation, () => {
             expected:
                 "0x0e9f010686048608a311a311000000000000000000000000000000000000000000000000000000000000000014c1e6005ba03c48130c9c32c1fd7d1a0364413253eb5cf1c56164f93a6c87513078303030303030303061396635653834363362616263323937323532646533336132363565656163373163333439373434306330366661613233336264613934313235646263363631",
         },
+        {
+            operation: {
+                type: OpType.AccountConfigure,
+                payload: {
+                    add: [{ weight: 1 }],
+                },
+            },
+            expected: "0x0e2f0e701f0e3f00031301",
+        },
     ];
 
     it.each(cases.map((v) => ({ ...v, name: OpType[v.operation.type] })))("should encodes $name operation with correct payload and type matching", ({ operation, expected }) => {
@@ -199,7 +208,7 @@ describe(encodeOperation, () => {
 describe(listIxOperationDescriptors, () => {
     it("should list all operation descriptors", () => {
         const descriptors = listIxOperationDescriptors();
-        expect(descriptors.length).toBeGreaterThan(0);
+        expect(descriptors.length).toBe(13);
     });
 });
 

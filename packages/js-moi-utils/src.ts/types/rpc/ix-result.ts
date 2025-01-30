@@ -35,6 +35,7 @@ export type IxOpResult<TOpType extends OpType> = TOpType extends OpType.AssetCre
           | OpType.AssetRevoke
           | OpType.AssetLockup
           | OpType.AssetRelease
+          | OpType.AccountConfigure
     ? NoOperationResult
     : unknown;
 
@@ -53,4 +54,5 @@ export type AnyIxOperationResult =
     | IxResult<OpType.AssetRelease>
     | IxResult<OpType.LogicDeploy>
     | IxResult<OpType.LogicEnlist>
-    | IxResult<OpType.LogicInvoke>;
+    | IxResult<OpType.LogicInvoke>
+    | IxResult<OpType.AccountConfigure>;
