@@ -238,7 +238,7 @@ export abstract class Signer {
      * const host = "https://voyage-rpc.moi.technology/babylon/";
      * const provider = new HttpProvider(host);
      * const wallet = await Wallet.createRandom(provider);
-     * const request = {
+     * const operation = {
      *     type: OpType.AssetCreate,
      *     payload: {
      *         standard: AssetStandard.MAS0,
@@ -247,7 +247,7 @@ export abstract class Signer {
      *     },
      * };
      *
-     * const simulation = await wallet.simulate(request);
+     * const simulation = await wallet.simulate(operation);
      */
     public async simulate(arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation, option?: SimulateOption): Promise<Simulate> {
         const request = await this.createIxRequest("moi.Simulate", arg);
@@ -302,7 +302,7 @@ export abstract class Signer {
      * const host = "https://voyage-rpc.moi.technology/babylon/";
      * const provider = new HttpProvider(host);
      * const wallet = await Wallet.createRandom(provider);
-     * const request = {
+     * const operation = {
      *     type: OpType.AssetCreate,
      *     payload: {
      *         standard: AssetStandard.MAS0,
@@ -311,7 +311,7 @@ export abstract class Signer {
      *     },
      * };
      *
-     * const ix = await wallet.execute(request);
+     * const ix = await wallet.execute(operation);
      * console.log(ix.hash);
      *
      * >> "0xfe1...19"
