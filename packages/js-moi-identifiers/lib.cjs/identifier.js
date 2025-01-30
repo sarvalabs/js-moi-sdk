@@ -164,7 +164,7 @@ exports.Identifier = Identifier;
  * Checks if the given value is an identifier.
  *
  * @param value - The value to check.
- * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ * @returns True if the value is an instance of `Identifier`, otherwise false.
  */
 const isIdentifier = (value) => {
     return value instanceof Identifier;

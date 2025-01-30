@@ -34,9 +34,34 @@ you can install it using the following command:
 
     pnpm add js-moi-identifiers
 
-Participant
+Identifier Tag
+--------------
+
+.. autoclass:: IdentifierTag
+    
+
+Identifier
 -----------
 
-.. autoclass:: ParticipantId
-   :members: 
+.. autoclass:: Identifier
+    :members: getFingerprint, getTag, getKind, getVersion, getFlags, createNewVariant, getMetadata, getVariant, toBytes, toHex, toString, toJSON
+
+.. autofunction:: createParticipantId
+
+.. code-block:: javascript
+
+    import { createParticipantId, IdentifierVersion, randomBytes } from "js-moi-sdk";
+
+    const participant = createParticipantId({
+        fingerprint: randomBytes(24),
+        variant: 0,
+        version: IdentifierVersion.V0,
+    });
+
+    console.log(participant.toString());
+
+    >> "0x00000000168f031d5aaffe36b54dc4df07a5921ade2c1ac51b6df83800000000"
+
+
+.. autofunction:: isIdentifier
 

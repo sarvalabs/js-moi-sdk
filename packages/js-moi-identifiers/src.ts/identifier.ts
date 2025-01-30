@@ -189,7 +189,7 @@ export class Identifier {
  * Checks if the given value is an identifier.
  *
  * @param value - The value to check.
- * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ * @returns True if the value is an instance of `Identifier`, otherwise false.
  */
 export const isIdentifier = (value: unknown): value is Identifier => {
     return value instanceof Identifier;

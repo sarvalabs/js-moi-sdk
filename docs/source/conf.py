@@ -23,17 +23,18 @@ release = u'v0.6.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ['sphinx_js', 'sphinx_copybutton']
-root_for_relative_js_paths = '~/'
+root_for_relative_js_paths = '../../'
 js_source_path = [
-    '../../packages/js-moi-manifest/lib.esm', 
-    '../../packages/js-moi-providers/lib.esm',
-    '../../packages/js-moi-signer/lib.esm',
-    '../../packages/js-moi-logic/lib.esm',
-    '../../packages/js-moi-bip39/lib.esm',
-    '../../packages/js-moi-hdnode/lib.esm',
-    '../../packages/js-moi-wallet/lib.esm',
-    '../../packages/js-moi-utils/lib.esm'
-    '../../packages/js-moi-identifiers/lib.esm'
+    '../../packages/js-moi-identifiers/lib.cjs',
+    '../../packages/js-moi-hdnode/lib.cjs',
+    '../../packages/js-moi-bip39/lib.cjs',
+    '../../packages/js-moi-wallet/lib.cjs',
+    '../../packages/js-moi-signer/lib.cjs',
+    '../../packages/js-moi-provider/lib.cjs',
+    '../../packages/js-moi-manifest/lib.cjs',
+    '../../packages/js-moi-logic/lib.cjs',
+    '../../packages/js-moi-utils/lib.cjs',
+
 ]
 primary_domain = 'js'
 
