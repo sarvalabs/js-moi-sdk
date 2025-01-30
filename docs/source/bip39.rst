@@ -9,7 +9,7 @@ values and vice versa, generating mnemonic phrases with specified strengths,
 and validating the correctness of mnemonic phrases.
 
 Installation
-============
+------------
 
 This package is already included in the ``js-moi-sdk`` package, if you want to install
 `js-moi-bip39 <https://www.npmjs.com/package/js-moi-bip39>`_ package separately,
