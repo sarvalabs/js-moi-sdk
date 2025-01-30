@@ -8,6 +8,13 @@ export interface GenerateParticipantOption {
     variant: number;
     flags?: Flag[];
 }
+/**
+ * Represents a participant identifier which extends the base `Identifier` class.
+ * This class ensures that the provided identifier is valid according to specific rules
+ * for participant identifiers.
+ *
+ * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+ */
 export declare class ParticipantId extends Identifier {
     constructor(value: Uint8Array | Hex | Identifier);
     static validate(value: Uint8Array | Hex): InvalidReason | null;

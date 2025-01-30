@@ -3,6 +3,13 @@ import { flagMasks, setFlag } from "./flags";
 import { Identifier } from "./identifier";
 import { IdentifierTag } from "./identifier-tag";
 import { hexToBytes } from "./utils";
+/**
+ * Represents a participant identifier which extends the base `Identifier` class.
+ * This class ensures that the provided identifier is valid according to specific rules
+ * for participant identifiers.
+ *
+ * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+ */
 export class ParticipantId extends Identifier {
     constructor(value) {
         super(value);

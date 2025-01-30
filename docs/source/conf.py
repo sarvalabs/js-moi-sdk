@@ -33,6 +33,7 @@ js_source_path = [
     '../../packages/js-moi-hdnode/lib.esm',
     '../../packages/js-moi-wallet/lib.esm',
     '../../packages/js-moi-utils/lib.esm'
+    '../../packages/js-moi-identifiers/lib.esm'
 ]
 primary_domain = 'js'
 

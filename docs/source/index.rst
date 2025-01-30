@@ -20,3 +20,4 @@ full potential of the MOI Protocol.
    constants
    bip39
    hierarchical-deterministic-node
+   identifiers

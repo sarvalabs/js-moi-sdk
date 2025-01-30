@@ -4,8 +4,21 @@ exports.isIdentifier = exports.Identifier = void 0;
 const flags_1 = require("./flags");
 const identifier_tag_1 = require("./identifier-tag");
 const utils_1 = require("./utils");
+/**
+ * Represents an identifier with a fixed length of 32 bytes.
+ *
+ * The `Identifier` class provides methods to manipulate and retrieve information
+ * from the identifier, such as its fingerprint, tag, kind, version, flags, metadata,
+ * and variant. It also allows creating new variants of the identifier with specified
+ * flags.
+ */
 class Identifier {
     value;
+    /**
+     * Creates a new instance of the `Identifier` class.
+     *
+     * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+     */
     constructor(value) {
         value = value instanceof Uint8Array ? value : value instanceof Identifier ? value.toBytes() : (0, utils_1.hexToBytes)(value);
         if (value.length !== 32) {

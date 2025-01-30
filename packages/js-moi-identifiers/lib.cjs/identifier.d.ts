@@ -5,8 +5,21 @@ import { type Hex } from "./utils";
 export interface InvalidReason {
     why: string;
 }
+/**
+ * Represents an identifier with a fixed length of 32 bytes.
+ *
+ * The `Identifier` class provides methods to manipulate and retrieve information
+ * from the identifier, such as its fingerprint, tag, kind, version, flags, metadata,
+ * and variant. It also allows creating new variants of the identifier with specified
+ * flags.
+ */
 export declare class Identifier {
     private readonly value;
+    /**
+     * Creates a new instance of the `Identifier` class.
+     *
+     * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+     */
     constructor(value: Uint8Array | Hex | Identifier);
     /**
      * Generates a fingerprint for the identifier.

@@ -6,6 +6,13 @@ const flags_1 = require("./flags");
 const identifier_1 = require("./identifier");
 const identifier_tag_1 = require("./identifier-tag");
 const utils_1 = require("./utils");
+/**
+ * Represents a participant identifier which extends the base `Identifier` class.
+ * This class ensures that the provided identifier is valid according to specific rules
+ * for participant identifiers.
+ *
+ * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+ */
 class ParticipantId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
