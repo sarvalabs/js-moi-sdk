@@ -22,7 +22,7 @@ release = u'v0.6.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx_js', 'sphinx_copybutton']
+extensions = ['sphinx_js']
 root_for_relative_js_paths = '~/'
 js_source_path = [
     '../../packages/js-moi-manifest/lib.esm', 

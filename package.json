@@ -13,7 +13,7 @@
     "test:network": "RUN_NETWORK_TEST=true npm run test",
     "check-types": "tsc --noEmit",
     "docs": "make -C docs html",
-    "watch:docs": "make -C docs watch"
+    "dev:docs": "make -C docs watch"
   },
   "repository": {
     "type": "git",
