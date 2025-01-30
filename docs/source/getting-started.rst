@@ -1,8 +1,6 @@
 Getting Started
 ===============
 
---------------------------------------------------------------------------------
-
 Kickstart your journey with js-moi-sdk by installing and importing it. Unleash its 
 potential through comprehensive documentation and resources to supercharge 
 your application development.

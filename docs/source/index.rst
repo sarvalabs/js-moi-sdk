@@ -19,4 +19,4 @@ full potential of the MOI Protocol.
    getting-started
    constants
    bip39
-
+   hierarchical-deterministic-node
