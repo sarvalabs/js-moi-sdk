@@ -25,3 +25,5 @@ full potential of the MOI Protocol.
    signer
    hierarchical-deterministic-wallet
    utilities
+   contributions
+   license-and-copyright
