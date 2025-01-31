@@ -9,39 +9,28 @@ This package provides functionality to extract flags, metadata,
 variant IDs, and account IDs from an identifier. It also includes
 validation for multiple versions of each identifier.
 
-Identifier Tag
---------------
+Classes
+-------
+
 .. autoclass:: IdentifierTag
     :members:
 
 
-Identifier
-----------
-
 .. autoclass:: Identifier
     :members:
-
-.. autofunction:: isIdentifier
-
-Participant Id
---------------
 
 .. autoclass:: ParticipantId
     :members:
 
-
-.. autofunction:: createParticipantId
-
-
-Logic Id
---------
-
 .. autoclass:: LogicId
     :members:
 
-
-Asset Id
---------
-
 .. autoclass:: AssetId
     :members:
+
+Functions
+---------
+
+.. autofunction:: createParticipantId
+
+.. autofunction:: isIdentifier

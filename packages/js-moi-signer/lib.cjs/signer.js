@@ -8,12 +8,55 @@ const js_moi_utils_1 = require("js-moi-utils");
 const ecdsa_1 = __importDefault(require("./ecdsa"));
 const signature_1 = __importDefault(require("./signature"));
 /**
- * The `Signer` class is an abstract class that provides the base functionality for
+ * This is an abstract class that provides the base functionality for
  * signing and verifying messages and interactions. It also provides the ability to
  * create and execute interactions.
  *
- * Inheriting classes must implement the abstract methods `getKeyId`, `getIdentifier`,
- * `sign`, and `signInteraction`.
+ * Inheriting classes must implement the abstract methods ``getKeyId``, ``getIdentifier``,
+ * ``sign``, and ``signInteraction``.
+ *
+ * .. js:method:: getKeyId
+ *
+ *      Retrieves the key ID of the participant.
+ *
+ *      `This is an abstract method that must be implemented by the inheriting class.`
+ *
+ *      :returns: A promise that resolves to the key ID of the participant.
+ *
+ * .. js:method:: getIdentifier
+ *
+ *      Retrieves the identifier of the participant.
+ *
+ *      `This is an abstract method that must be implemented by the inheriting class.`
+ *
+ *      :returns: A promise that resolves to the identifier of the signer.
+ *
+ * .. js:method:: sign
+ *
+ *      Signs a message using the provided signature type.
+ *
+ *      `This is an abstract method that must be implemented by the inheriting class.`
+ *
+ *      :param message: The message to sign.
+ *      :type message: Hex | Uint8Array
+ *      :param sig: The signature type to use.
+ *      :type sig: SigType
+ *
+ *      :returns: A promise that resolves to the hex-encoded signed message.
+ *
+ * .. js:method:: signInteraction
+ *
+ *      Signs an interaction request using the provided signature type.
+ *
+ *      `This is an abstract method that must be implemented by the inheriting class.`
+ *
+ *      :param ix: The interaction request to sign.
+ *      :type ix: InteractionRequest
+ *      :param sig: The signature type to use.
+ *      :type sig: SigType
+ *
+ *      :returns: A promise that resolves to the signed interaction request.
+ *
  */
 class Signer {
     provider;

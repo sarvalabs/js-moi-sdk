@@ -88,6 +88,16 @@ const salt = (password) => {
  * @param {string} mnemonic - The mnemonic phrase.
  * @param {string} [password] - The optional password.
  * @returns {Uint8Array} The generated seed.
+ *
+ * @example
+ * import { mnemonicToSeedSync } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const seed = mnemonicToSeedSync(mnemonic);
+ *
+ * console.log(seed);
+ *
+ * >> Uint8Array(64) [ 0, 1, 2, ... ]
  */
 export const mnemonicToSeedSync = (mnemonic, password) => {
     const res = pbkdf2(sha512, encodeText(normalize(mnemonic)), salt(normalize(password)), {
@@ -103,6 +113,16 @@ export const mnemonicToSeedSync = (mnemonic, password) => {
  * @param {string} [password] - The optional password.
  * @returns {Promise<Uint8Array>} The generated seed.
  * @throws {Error} If an error occurs during the conversion.
+ *
+ * @example
+ * import { mnemonicToSeed } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const seed = await mnemonicToSeed(mnemonic);
+ *
+ * console.log(seed);
+ *
+ * >> Uint8Array(64) [ 0, 1, 2, ... ]
  */
 export const mnemonicToSeed = async (mnemonic, password) => {
     try {
@@ -123,6 +143,16 @@ export const mnemonicToSeed = async (mnemonic, password) => {
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The corresponding entropy.
  * @throws {Error} If the mnemonic is invalid or a wordlist is required but not found.
+ *
+ * @example
+ * import { mnemonicToEntropy } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const entropy = mnemonicToEntropy(mnemonic);
+ *
+ * console.log(entropy);
+ *
+ * >> "6ce1535a6fdd...ae6f27fa0835b7"
  */
 export const mnemonicToEntropy = (mnemonic, wordlist) => {
     wordlist = wordlist || DEFAULT_WORDLIST;
@@ -170,6 +200,16 @@ export const mnemonicToEntropy = (mnemonic, wordlist) => {
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The corresponding mnemonic phrase.
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
+ *
+ * @example
+ * import { entropyToMnemonic } from "js-moi-sdk";
+ *
+ * const entropy = "6ce1535a6fdd...ae6f27fa0835b7";
+ * const mnemonic = entropyToMnemonic(entropy);
+ *
+ * console.log(mnemonic);
+ *
+ * >> "abandon hair ..."
  */
 export const entropyToMnemonic = (entropy, wordlist) => {
     if (typeof entropy === "string") {
@@ -190,8 +230,9 @@ export const entropyToMnemonic = (entropy, wordlist) => {
         const index = binaryToByte(binary);
         return wordlist[index];
     });
-    return wordlist[0] === "\u3042\u3044\u3053\u304f\u3057\u3093" // Japanese wordlist
-        ? words.join("\u3000")
+    return (wordlist[0] === "\u3042\u3044\u3053\u304f\u3057\u3093" // Japanese wordlist
+    ) ?
+        words.join("\u3000")
         : words.join(" ");
 };
 /**
@@ -202,6 +243,15 @@ export const entropyToMnemonic = (entropy, wordlist) => {
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The generated mnemonic phrase.
  * @throws {TypeError} If the strength is not divisible by 32.
+ *
+ * @example
+ * import { generateMnemonic } from "js-moi-sdk";
+ *
+ * const mnemonic = generateMnemonic();
+ *
+ * console.log(mnemonic);
+ *
+ * >> "abandon hair ..."
  */
 export const generateMnemonic = (strength, rng, wordlist) => {
     strength = strength || 128;
@@ -217,6 +267,16 @@ export const generateMnemonic = (strength, rng, wordlist) => {
  * @param {string} mnemonic - The mnemonic phrase to validate.
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {boolean} True if the mnemonic is valid, false otherwise.
+ *
+ * @example
+ * import { validateMnemonic } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const isValid = validateMnemonic(mnemonic);
+ *
+ * console.log(isValid);
+ *
+ * >> true
  */
 export const validateMnemonic = (mnemonic, wordlist) => {
     try {
@@ -232,6 +292,15 @@ export const validateMnemonic = (mnemonic, wordlist) => {
  *
  * @returns {string} The language code of the default wordlist.
  * @throws {Error} If the default wordlist is not set.
+ *
+ * @example
+ * import { getDefaultWordlist } from "js-moi-sdk";
+ *
+ * const wordlist = getDefaultWordlist();
+ *
+ * console.log(wordlist);
+ *
+ * >> "engli"
  */
 export const getDefaultWordlist = () => {
     if (!DEFAULT_WORDLIST) {
