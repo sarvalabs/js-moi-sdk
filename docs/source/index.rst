@@ -19,7 +19,8 @@ full potential of the MOI Protocol.
    getting-started
    constants
    bip39
-   hierarchical-deterministic-node
    identifiers
+   manifest-coder
+   hierarchical-deterministic-node
    signer
    hierarchical-deterministic-wallet

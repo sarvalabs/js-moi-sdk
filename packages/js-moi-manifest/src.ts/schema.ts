@@ -5,18 +5,43 @@ const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 
 const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
 
+/**
+ * Checks if the given type is a primitive type.
+ *
+ * @param type - The type to check.
+ * @returns `true` if the type is a primitive type, otherwise `false`.
+ */
 export const isPrimitiveType = (type: string): boolean => {
     return primitiveTypes.includes(type);
 };
 
+/**
+ * Checks if the given type string matches the array pattern.
+ *
+ * @param type - The type string to be checked.
+ * @returns `true` if the type string matches the array pattern, otherwise `false`.
+ */
 export const isArray = (type: string): boolean => {
     return ARRAY_MATCHER_REGEX.test(type);
 };
 
+/**
+ * Checks if the given type string starts with "map".
+ *
+ * @param type - The type string to check.
+ * @returns `true` if the type string starts with "map", otherwise `false`.
+ */
 export const isMap = (type: string): boolean => {
     return type.startsWith("map");
 };
 
+/**
+ * Checks if a given type is present in the class definitions map.
+ *
+ * @param type - The type to check for in the class definitions.
+ * @param classDefs - A map containing class definitions where the key is the class type and the value is a number.
+ * @returns `true` if the type is present in the class definitions map, otherwise `false`.
+ */
 export const isClass = (type: string, classDefs: Map<string, number>): boolean => {
     return classDefs.has(type);
 };
@@ -38,6 +63,9 @@ export class Schema {
         this.classDefs = classDefs;
     }
 
+    /**
+     * Represents the schema for the PISA engine.
+     */
     public static PISA_ENGINE_SCHEMA = {
         kind: "struct",
         fields: {
@@ -55,6 +83,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA dependencies.
+     */
     public static PISA_DEPS_SCHEMA = {
         kind: "array",
         fields: {
@@ -64,6 +95,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA type field.
+     */
     public static PISA_TYPE_FIELD_SCHEMA = {
         kind: "array",
         fields: {
@@ -84,6 +118,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for the PISA method field.
+     */
     public static PISA_METHOD_FIELD_SCHEMA = {
         kind: "array",
         fields: {
@@ -101,6 +138,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA instructions.
+     */
     public static PISA_INSTRUCTIONS_SCHEMA = {
         kind: "struct",
         fields: {
@@ -121,6 +161,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA state.
+     */
     public static PISA_STATE_SCHEMA = {
         kind: "struct",
         fields: {
@@ -133,6 +176,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA constant.
+     */
     public static PISA_CONSTANT_SCHEMA = {
         kind: "struct",
         fields: {
@@ -145,11 +191,17 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA typedef.
+     */
     public static PISA_TYPEDEF_SCHEMA = {
         kind: "string",
         fields: {},
     };
 
+    /**
+     * Schema definition for PISA class.
+     */
     public static PISA_CLASS_SCHEMA = {
         kind: "struct",
         fields: {
@@ -165,6 +217,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA routine.
+     */
     public static PISA_ROUTINE_SCHEMA = {
         kind: "struct",
         fields: {
@@ -197,6 +252,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA method.
+     */
     public static PISA_METHOD_SCHEMA = {
         kind: "struct",
         fields: {
@@ -229,6 +287,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA event.
+     */
     public static PISA_EVENT_SCHEMA = {
         kind: "struct",
         fields: {
@@ -244,6 +305,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA exception.
+     */
     public static PISA_EXCEPTION_SCHEMA = {
         kind: "struct",
         fields: {
@@ -267,6 +331,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA result.
+     */
     public static PISA_RESULT_SCHEMA = {
         kind: "struct",
         fields: {
@@ -279,6 +346,9 @@ export class Schema {
         },
     };
 
+    /**
+     * Schema definition for PISA log.
+     */
     public static PISA_BUILT_IN_LOG_SCHEMA = {
         kind: "struct",
         fields: {
