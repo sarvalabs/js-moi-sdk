@@ -168,12 +168,11 @@ interactions with the MOI network.
 
 .. code-block:: javascript
 
-    import { Provider } from "js-moi-sdk";
+    import { JsonRpcProvider } from "js-moi-sdk";
     import { AxiosTransport } from "./axios-transport";
 
-    const provider = new Provider(new AxiosTransport());
-
-    const info await provider.getNetworkInfo()
+    const provider = new JsonRpcProvider(new AxiosTransport());
+    const info = await provider.getNetworkInfo()
     
     console.log(info);
 
