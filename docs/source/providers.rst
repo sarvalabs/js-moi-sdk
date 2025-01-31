@@ -23,7 +23,6 @@ Classes
 
 .. js:autoclass:: JsonRpcProvider
     :members:
-    :undoc-members:
 
 .. js:autoclass:: HttpProvider
     :members:
@@ -34,6 +33,97 @@ Classes
 Events
 ******
 
+Provider extends from NodeJS `EventEmitter <https://nodejs.org/api/events.html>`_
+and events can be either either strings or objects.
+
+Callbacks can be registered for the following events:
+
+
+- ``WebsocketEvent.Error``: Emitted when an error occurs in the WebSocket connection.
+- ``WebsocketEvent.Open``: Emitted when the WebSocket connection is opened.
+- ``WebsocketEvent.Close``: Emitted when the WebSocket connection is closed.
+- ``WebsocketEvent.Message``: Emitted when a message is received from the WebSocket connection.
+- ``WebsocketEvent.Debug``: Emitted when a provider emits debug information. All provider can emit this event for debugging purposes.
+- ``WebsocketEvent.NewPendingInteractions``: Emitted when a new pending interaction is received from connected MOI node.
+- ``WebsocketEvent.NewTesseracts``: Emitted when a new tesseract is received from connected MOI node.
+- ``WebsocketEvent.NewTesseractsByAccount``: Emitted when a new tesseract is received for a specific account from connected MOI node. Developes have to pass the account address.
+- ``WebsocketEvent.NewLogs``: Emitted when a new log is emitted any logic.
+
+**Example**
+
+.. code-block:: javascript
+
+    import { WebsocketEvent, WebsocketProvider } from "js-moi-sdk";
+
+    const url = "ws://localhost:1600/ws";
+    const provider = new WebsocketProvider(url);
+
+    const participant = "0x1ce...af3";
+
+    // Emitted an event when the connection is established
+    provider.on(WebsocketEvent.Open, () => {
+        console.log("Connected to", url);
+    });
+
+    // Emitted an event when the provider emits a debug message
+    provider.on(WebsocketEvent.Debug, (info) => {
+        console.log("DEBUG:", info);
+    });
+
+    // Emitted an event when the connection is closed
+    provider.on(WebsocketEvent.Close, () => {
+        console.log("Connection closed");
+    });
+
+    // Emitted an event when an error occurs
+    provider.on(WebsocketEvent.Error, (error) => {
+        console.error("ERROR:", error);
+    });
+
+    // Emitted when new interaction is created on the network
+    provider.on(WebsocketEvent.NewPendingInteractions, (hash) => {
+        console.log("New pending interaction hash:", hash);
+    });
+
+    // Emitted when new tesseract is created on the network
+    provider.on(WebsocketEvent.NewTesseracts, (tesseract) => {
+        console.log("New tesseract:", tesseract);
+    });
+
+    // Emitted when new tesseract is created for a specific identifier
+    provider.on(
+        {
+            event: WebsocketEvent.NewTesseractsByAccount,
+            params: [{ address: participant }],
+        },
+        (tesseract) => {
+            console.log("New tesseract for account", participant, ":", tesseract);
+        }
+    );
+
+    // Emitted when new logs are emitted by the logic on a network
+    provider.on(
+        {
+            event: WebsocketEvent.NewLogs,
+            params: [
+                {
+                    address: participant,
+                    start_height: 0,
+                    end_height: 100,
+                    topics: [],
+                },
+            ],
+        },
+        (logs) => {
+            console.log("Logs for account", participant, ":", logs);
+        }
+    );
+
+InteractionResponse
+*******************
+
+.. js:autoclass:: InteractionResponse
+    :members:
 
 Transport
 ---------

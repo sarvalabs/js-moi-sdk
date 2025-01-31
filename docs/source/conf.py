@@ -32,6 +32,7 @@ js_source_path = [
     '../../packages/js-moi-signer/lib.cjs',
     '../../packages/js-moi-providers/lib.cjs/provider',
     '../../packages/js-moi-providers/lib.cjs/transport',
+    '../../packages/js-moi-providers/lib.cjs/utils',
     '../../packages/js-moi-manifest/lib.cjs',
     '../../packages/js-moi-logic/lib.cjs',
     '../../packages/js-moi-utils/lib.cjs',
