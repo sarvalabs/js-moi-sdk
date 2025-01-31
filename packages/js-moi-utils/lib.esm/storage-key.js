@@ -3,14 +3,29 @@ import BN from "bn.js";
 import { Polorizer } from "js-polo";
 import { concatBytes, encodeText } from "./bytes";
 import { bytesToHex } from "./hex";
+/**
+ * Represents a storage key with a value that can be converted to different formats.
+ */
 export class StorageKey {
     value;
+    /**
+     * Creates an instance of StorageKey.
+     * @param value - The value of the storage key, which can be a number, string, Uint8Array, or BN.
+     */
     constructor(value) {
         this.value = new BN(value);
     }
+    /**
+     * Converts the storage key value to a hexadecimal string.
+     * @returns The hexadecimal representation of the storage key value.
+     */
     hex() {
         return bytesToHex(this.toBytes());
     }
+    /**
+     * Converts the storage key value to a byte array.
+     * @returns The byte array representation of the storage key value.
+     */
     toBytes() {
         return Uint8Array.from(this.value.toArray("be", 32));
     }
@@ -34,6 +49,12 @@ export class AbstractAccessor {
  * It generates slot hash for accessing the length of an Array/VArray or a Map.
  */
 export class LengthAccessor extends AbstractAccessor {
+    /**
+     * Accesses the provided storage key.
+     *
+     * @param hash - The storage key to be accessed.
+     * @returns The same storage key that was provided.
+     */
     access(hash) {
         return hash;
     }
@@ -125,12 +146,25 @@ export class ClassFieldAccessor extends AbstractAccessor {
         super();
         this.index = index;
     }
+    /**
+     * Computes a new `StorageKey` by hashing the provided `StorageKey` and adding an index.
+     *
+     * @param {StorageKey} hash - The `StorageKey` to be hashed and used for computation.
+     * @returns {StorageKey} - The newly computed `StorageKey`.
+     */
     access(hash) {
         let blob = this.sum256(hash.toBytes());
         const bn = new BN(blob).add(new BN(this.index));
         return new StorageKey(bn);
     }
 }
+/**
+ * Generates a slot hash based on the provided base value and accessors.
+ *
+ * @param {number | StorageKey} base - The base value for generating the slot hash.
+ * @param {...Accessor} args - The accessors used in generating the slot hash.
+ * @returns {StorageKey} - The generated slot hash as a StorageKey.
+ */
 export function generateStorageKey(base, ...args) {
     let slot = typeof base === "number" ? new StorageKey(base) : base;
     const accessors = Array.isArray(args[0]) ? args[0] : args;

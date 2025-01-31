@@ -1,9 +1,24 @@
 import BN from "bn.js";
 import { type Hex } from "./hex";
+/**
+ * Represents a storage key with a value that can be converted to different formats.
+ */
 export declare class StorageKey {
     private value;
+    /**
+     * Creates an instance of StorageKey.
+     * @param value - The value of the storage key, which can be a number, string, Uint8Array, or BN.
+     */
     constructor(value: number | string | Uint8Array | BN);
+    /**
+     * Converts the storage key value to a hexadecimal string.
+     * @returns The hexadecimal representation of the storage key value.
+     */
     hex(): Hex;
+    /**
+     * Converts the storage key value to a byte array.
+     * @returns The byte array representation of the storage key value.
+     */
     toBytes(): Uint8Array;
 }
 /**
@@ -42,6 +57,12 @@ export declare abstract class AbstractAccessor implements Accessor {
  * It generates slot hash for accessing the length of an Array/VArray or a Map.
  */
 export declare class LengthAccessor extends AbstractAccessor {
+    /**
+     * Accesses the provided storage key.
+     *
+     * @param hash - The storage key to be accessed.
+     * @returns The same storage key that was provided.
+     */
     access(hash: StorageKey): StorageKey;
 }
 /**
@@ -90,6 +111,12 @@ export declare class ArrayIndexAccessor extends AbstractAccessor {
 export declare class ClassFieldAccessor extends AbstractAccessor {
     private index;
     constructor(index: number);
+    /**
+     * Computes a new `StorageKey` by hashing the provided `StorageKey` and adding an index.
+     *
+     * @param {StorageKey} hash - The `StorageKey` to be hashed and used for computation.
+     * @returns {StorageKey} - The newly computed `StorageKey`.
+     */
     access(hash: StorageKey): StorageKey;
 }
 /**
