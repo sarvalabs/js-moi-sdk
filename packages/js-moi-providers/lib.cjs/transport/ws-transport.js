@@ -89,6 +89,13 @@ class WebsocketTransport extends events_1.default {
         });
         return this.waitForConnectionPromise;
     }
+    /**
+     * Sends a JSON-RPC request over a WebSocket connection and waits for the response.
+     *
+     * @param {JsonRpcRequest} request - The JSON-RPC request object to be sent.
+     * @returns {Promise<JsonRpcResponse<TResult>>} A promise that resolves with the JSON-RPC response.
+     * @throws Will throw an error if the response cannot be parsed or if the connection fails.
+     */
     async request(request) {
         await this.waitForConnection();
         return new Promise((resolve, reject) => {
@@ -110,6 +117,11 @@ class WebsocketTransport extends events_1.default {
             this.send(request);
         });
     }
+    /**
+     * Closes the WebSocket connection.
+     *
+     * @throws {Error} If the WebSocket is not initialized.
+     */
     close() {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");

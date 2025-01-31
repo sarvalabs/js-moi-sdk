@@ -15,6 +15,17 @@ of connecting to MOI nodes and fetching data, making it easier
 for developers to build applications that interact with the MOI
 network.
 
+Classes
+*******
+
+.. js:autoclass:: JsonRpcProvider
+    :members:
+
+.. js:autoclass:: HttpProvider
+    :members:
+
+
+
 Transport
 ---------
 
@@ -71,11 +82,13 @@ interactions with the MOI network.
 
 Currently, the `js-moi-provider` package provides built-in HTTP and WebSocket
 transports for connecting to MOI nodes. Developers can use these transports
-to establish connections with the MOI network and retrieve data from the blockchain.
+to establish connections with the MOI network and retrieve data from the network.
 
 Classes
 *******
 
 .. js:autoclass:: HttpTransport
+    :members:
 
-   Documentation for HttpTransport.
+.. js:autoclass:: WebsocketTransport
+    :members:

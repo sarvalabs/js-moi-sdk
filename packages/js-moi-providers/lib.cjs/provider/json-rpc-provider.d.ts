@@ -24,16 +24,6 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * The transport used to communicate with the network.
      */
     get transport(): Transport;
-    /**
-     * Calls a JSON-RPC method on the network using the `request` method and processes the response.
-     *
-     * @param method - The name of the method to invoke.
-     * @param params - The parameters to pass to the method.
-     *
-     * @returns A promise that resolves processed result from the JSON-RPC response.
-     *
-     * @throws Will throw an error if the response contains an error.
-     */
     protected call<TMethod extends NetworkMethod, TResponse extends any = MethodResponse<TMethod>>(method: TMethod, ...params: MethodParams<TMethod>): Promise<TResponse>;
     /**
      * Sends a JSON-RPC request to the network.

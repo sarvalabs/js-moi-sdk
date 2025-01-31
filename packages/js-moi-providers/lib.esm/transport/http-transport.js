@@ -17,7 +17,7 @@ export class HttpTransport {
         this.host = host;
     }
     /**
-     * Sends a JSON-RPC request to the client.
+     * Sends a JSON-RPC request using `fetch`.
      *
      * @param request The JSON-RPC request to send.
      * @returns The JSON-RPC response
