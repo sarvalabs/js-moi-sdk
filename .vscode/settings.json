@@ -5,7 +5,9 @@
         "**/node_modules": true,
         "**/bower_components": true,
         "**/*.code-search": true,
-        "packages/*/lib.*/": true
+        "packages/*/lib.*/": true,
+        "docs/build/": true,
+        "coverage/": true
     },
     "cSpell.words": ["callsite", "Callsites", "POLO", "polorizer"],
     "typescript.tsdk": "node_modules/typescript/lib",
