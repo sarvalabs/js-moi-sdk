@@ -1,5 +1,5 @@
-Provider
-========
+Providers
+=========
 
 A Provider is a convenient interface for connecting to MOI nodes
 and retrieving data from the blockchain. With the providers module,
@@ -15,15 +15,24 @@ of connecting to MOI nodes and fetching data, making it easier
 for developers to build applications that interact with the MOI
 network.
 
+Provider
+--------
+
 Classes
 *******
 
 .. js:autoclass:: JsonRpcProvider
     :members:
+    :undoc-members:
 
 .. js:autoclass:: HttpProvider
     :members:
 
+.. js:autoclass:: WebsocketProvider
+    :members:
+
+Events
+******
 
 
 Transport

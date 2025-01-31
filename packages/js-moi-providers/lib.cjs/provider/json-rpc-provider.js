@@ -68,6 +68,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
     async getNetworkInfo(option) {
         return await this.call("moi.Protocol", option);
     }
+    /**
+     * Simulates an interaction on the MOI network.
+     *
+     * @param ix - interaction object or POLO encoded interaction to simulate.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the result of the simulation.
+     */
     async simulate(ix, option) {
         let encodedIxArgs;
         switch (true) {
@@ -99,6 +107,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
             ...option,
         });
     }
+    /**
+     * Retrieves an account from the MOI network.
+     *
+     * @param participant - The identifier of the account to retrieve.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the account information.
+     */
     async getAccount(participant, option) {
         return await this.call("moi.Account", { id: new js_moi_identifiers_1.Identifier(participant), ...option });
     }
@@ -108,6 +124,13 @@ class JsonRpcProvider extends events_1.EventEmitter {
             ...option,
         });
     }
+    /**
+     * Retrieves a tesseract from the MOI network.
+     *
+     * This is polymorphic method that can accept different combinations of arguments to retrieve a tesseract.
+     *
+     * @returns A promise that resolves to the tesseract information.
+     */
     async getTesseract(identifier, height, option) {
         const isValidOption = (option) => typeof option === "undefined" || typeof option === "object";
         switch (true) {
@@ -129,9 +152,24 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid arguments passed to get correct method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }
+    /**
+     * Retrieves a logic from the MOI network.
+     *
+     * @param identifier - The identifier of the logic to retrieve.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the logic information.
+     */
     getLogic(identifier, option) {
         return this.call("moi.Logic", { id: new js_moi_identifiers_1.Identifier(identifier), ...option });
     }
+    /**
+     * Retrieves the storage value of a logic from the MOI network.
+     *
+     * This is a polymorphic method that can accept different combinations of arguments to retrieve a logic storage value.
+     *
+     * @returns A promise that resolves to the storage value.
+     */
     async getLogicStorage(logic, participantOrStorage, storageId, option) {
         let params;
         switch (true) {
@@ -158,6 +196,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return await this.call("moi.LogicStorage", ...params);
     }
+    /**
+     * Retrieves an asset from the MOI network.
+     *
+     * @param asset - The identifier of the asset to retrieve.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the asset information.
+     */
     async getAsset(asset, option) {
         return await this.call("moi.Asset", { id: new js_moi_identifiers_1.AssetId(asset), ...option });
     }
@@ -175,6 +221,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
         }
         return encodedTopics;
     }
+    /**
+     * Retrieves logic messages from the MOI network.
+     *
+     * @param logic - The identifier of the logic to retrieve messages for.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the logic messages.
+     */
     async getLogicMessage(logic, options) {
         return await this.call("moi.LogicMessage", {
             logic_id: new js_moi_identifiers_1.LogicId(logic),
@@ -182,9 +236,27 @@ class JsonRpcProvider extends events_1.EventEmitter {
             topics: this.encodeTopics(options?.topics ?? []),
         });
     }
+    /**
+     * Retrieves an account asset from the MOI network.
+     *
+     * @param participant - The identifier of the account to retrieve the asset for.
+     * @param asset - The identifier of the asset to retrieve.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the account asset information.
+     */
     async getAccountAsset(participant, asset, option) {
         return await this.call("moi.AccountAsset", { id: new js_moi_identifiers_1.Identifier(participant), asset_id: new js_moi_identifiers_1.AssetId(asset), ...option });
     }
+    /**
+     * Retrieves an account key information from the MOI network.
+     *
+     * @param participant - The identifier of the account to retrieve the key for.
+     * @param index - The index of the key to retrieve.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the account key information.
+     */
     async getAccountKey(participant, index, option) {
         if (Number.isNaN(index) || index < 0) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
@@ -195,6 +267,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
             ...option,
         });
     }
+    /**
+     * Executes an interaction on the MOI network.
+     *
+     * @param ix - The interaction to execute.
+     * @param signatures - The signatures to include in the request.
+     *
+     * @returns A promise that resolves to the result of the InteractionResponse.
+     */
     async execute(ix, signatures) {
         let params;
         switch (true) {
@@ -222,12 +302,27 @@ class JsonRpcProvider extends events_1.EventEmitter {
         const hash = await this.call("moi.Execute", ...params);
         return new interaction_response_1.InteractionResponse(hash, this);
     }
+    /**
+     * Retrieves an interaction from the MOI network.
+     *
+     * @param hash - The hash of the interaction to retrieve.
+     * @param option - Additional options to include in the request.
+     *
+     * @returns A promise that resolves to the interaction information.
+     */
     getInteraction(hash, option) {
         return this.call("moi.Interaction", { hash, ...option });
     }
+    /**
+     * Subscribes to an event on the MOI network.
+     *
+     * @param event - The event to subscribe to.
+     * @param params - Additional parameters to include in the request.
+     *
+     * @returns A promise that resolves when the subscription is complete.
+     */
     async subscribe(event, params) {
         throw new Error("Method not implemented. Return type needs to be updated");
-        // return await this.call("moi.Subscribe", event, params);
     }
     /**
      * Processes a JSON-RPC response and returns the result.

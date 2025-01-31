@@ -36,17 +36,47 @@ type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends Webs
 type ProviderEventListener<TEvent extends ProviderEvent> = TEvent extends string ? TEvent extends WebsocketEvent ? WebsocketEventListener<TEvent> : BaseListener : TEvent extends symbol ? BaseListener : TEvent extends {
     event: infer TEventType;
 } ? TEventType extends WebsocketEvent ? WebsocketEventListener<TEventType> : never : never;
+/**
+ * WebsocketProvider is a provider that connects to a network via a websocket connection.
+ *
+ * It extends the JsonRpcProvider and adds the ability to subscribe to network events.
+ */
 export declare class WebsocketProvider extends JsonRpcProvider {
     private static events;
     private readonly subscriptions;
     constructor(address: string, options?: WebsocketTransportOptions);
+    /**
+     * Retrieves the current list of subscriptions.
+     *
+     * @returns An array of subscription objects, each containing an `id` and an `event`.
+     */
     getSubscriptions(): {
         id: string;
         event: ProviderEvent;
     }[];
+    /**
+     * Closes the WebSocket connection if the transport is an instance of WebsocketTransport.
+     * This method ensures that the WebSocket connection is properly terminated.
+     *
+     * @returns {void}
+     */
     close(): void;
     private handleOnNetworkEventSubscription;
+    /**
+     * Registers an event listener for a specified provider event.
+     *
+     * @param event - The event to listen for.
+     * @param listener - The callback function to be invoked when the event occurs.
+     * @returns The current instance to allow method chaining.
+     */
     on<K, T extends ProviderEvent>(event: T, listener: ProviderEventListener<T>): this;
+    /**
+     * Registers an event listener for a specified provider event that will only be called once.
+     *
+     * @param event - The event to listen for.
+     * @param listener - The callback function to be invoked when the event occurs.
+     * @returns The current instance to allow method chaining.
+     */
     once<K, T extends ProviderEvent>(eventName: T, listener: ProviderEventListener<T>): this;
     private subscribeToEvent;
     private static isWebsocketEmittedResponse;
