@@ -2,6 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpTransport = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+/**
+ * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
+ */
 class HttpTransport {
     host;
     static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
@@ -14,6 +17,12 @@ class HttpTransport {
         }
         this.host = host;
     }
+    /**
+     * Sends a JSON-RPC request to the client.
+     *
+     * @param request The JSON-RPC request to send.
+     * @returns The JSON-RPC response
+     */
     async request(request) {
         let result;
         try {
@@ -43,7 +52,9 @@ class HttpTransport {
         }
         catch (error) {
             const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error?.message === "Failed to fetch" || error?.code === "ConnectionRefused";
-            const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
+            const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}`
+                : "message" in error ? error.message
+                    : "Unknown error occurred";
             result = {
                 jsonrpc: "2.0",
                 id: request.id,

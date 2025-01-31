@@ -21,6 +21,7 @@ full potential of the MOI Protocol.
    bip39
    identifiers
    manifest-coder
+   providers
    hierarchical-deterministic-node
    signer
    hierarchical-deterministic-wallet

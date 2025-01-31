@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketTransport = void 0;
 const events_1 = __importDefault(require("events"));
 const ws_1 = require("../provider/ws/ws");
+/**
+ * WebsocketTransport is a transport that sends JSON-RPC messages over Websocket.
+ */
 class WebsocketTransport extends events_1.default {
     options;
     address;

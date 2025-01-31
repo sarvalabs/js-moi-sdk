@@ -3,6 +3,9 @@ import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }
+/**
+ * WebsocketTransport is a transport that sends JSON-RPC messages over Websocket.
+ */
 export declare class WebsocketTransport extends EventEmitter implements Transport {
     private readonly options;
     private readonly address;

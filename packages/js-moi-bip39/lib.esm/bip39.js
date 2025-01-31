@@ -300,7 +300,7 @@ export const validateMnemonic = (mnemonic, wordlist) => {
  *
  * console.log(wordlist);
  *
- * >> "engli"
+ * >> "english"
  */
 export const getDefaultWordlist = () => {
     if (!DEFAULT_WORDLIST) {

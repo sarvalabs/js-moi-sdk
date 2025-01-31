@@ -123,7 +123,7 @@ export declare const validateMnemonic: (mnemonic: string, wordlist?: string[]) =
  *
  * console.log(wordlist);
  *
- * >> "engli"
+ * >> "english"
  */
 export declare const getDefaultWordlist: () => string;
 //# sourceMappingURL=bip39.d.ts.map

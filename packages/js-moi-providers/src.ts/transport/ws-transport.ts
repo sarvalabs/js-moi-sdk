@@ -6,6 +6,9 @@ export interface WebsocketTransportOptions {
     reconnect?: number;
 }
 
+/**
+ * WebsocketTransport is a transport that sends JSON-RPC messages over Websocket.
+ */
 export class WebsocketTransport extends EventEmitter implements Transport {
     private readonly options: WebsocketTransportOptions;
 

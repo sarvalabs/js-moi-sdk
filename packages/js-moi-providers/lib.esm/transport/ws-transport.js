@@ -1,5 +1,8 @@
 import EventEmitter from "events";
 import { Websocket } from "../provider/ws/ws";
+/**
+ * WebsocketTransport is a transport that sends JSON-RPC messages over Websocket.
+ */
 export class WebsocketTransport extends EventEmitter {
     options;
     address;
