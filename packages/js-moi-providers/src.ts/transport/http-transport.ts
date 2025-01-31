@@ -2,6 +2,8 @@ import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport }
 
 /**
  * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
+ *
+ * @param host The URL of the HTTP server to send requests to.
  */
 export class HttpTransport implements Transport {
     private readonly host: string;

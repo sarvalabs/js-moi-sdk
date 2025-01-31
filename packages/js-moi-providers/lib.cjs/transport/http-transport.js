@@ -4,6 +4,8 @@ exports.HttpTransport = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 /**
  * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
+ *
+ * @param host The URL of the HTTP server to send requests to.
  */
 class HttpTransport {
     host;
