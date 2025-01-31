@@ -6,6 +6,14 @@ const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const interaction_response_1 = require("../utils/interaction-response");
+/**
+ * A provider that communicates with the MOI protocol network using JSON-RPC.
+ *
+ * @extends EventEmitter
+ * @implements Provider
+ *
+ * @param {Transport} transport - The transport to use for communication with the network.
+ */
 class JsonRpcProvider extends events_1.EventEmitter {
     _transport;
     /**
@@ -244,7 +252,11 @@ class JsonRpcProvider extends events_1.EventEmitter {
     processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
-            const params = data ? (typeof data === "object" ? data : { data }) : {};
+            const params = data ?
+                typeof data === "object" ?
+                    data
+                    : { data }
+                : {};
             js_moi_utils_1.ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
         return response.result;

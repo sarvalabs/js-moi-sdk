@@ -48,6 +48,14 @@ import type {
 } from "../types/provider";
 import { InteractionResponse } from "../utils/interaction-response";
 
+/**
+ * A provider that communicates with the MOI protocol network using JSON-RPC.
+ *
+ * @extends EventEmitter
+ * @implements Provider
+ *
+ * @param {Transport} transport - The transport to use for communication with the network.
+ */
 export class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport: Transport;
 
@@ -370,7 +378,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     public processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
         if ("error" in response) {
             const { data } = response.error;
-            const params = data ? (typeof data === "object" ? data : { data }) : {};
+            const params =
+                data ?
+                    typeof data === "object" ?
+                        data
+                    :   { data }
+                :   {};
             ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
 

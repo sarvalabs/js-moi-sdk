@@ -3,6 +3,14 @@ import { AssetId, Identifier, isIdentifier, LogicId } from "js-moi-identifiers";
 import { bytesToHex, ErrorCode, ErrorUtils, hexToHash, interaction, isHex, StorageKey, validateIxRequest, } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 import { InteractionResponse } from "../utils/interaction-response";
+/**
+ * A provider that communicates with the MOI protocol network using JSON-RPC.
+ *
+ * @extends EventEmitter
+ * @implements Provider
+ *
+ * @param {Transport} transport - The transport to use for communication with the network.
+ */
 export class JsonRpcProvider extends EventEmitter {
     _transport;
     /**
@@ -241,7 +249,11 @@ export class JsonRpcProvider extends EventEmitter {
     processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
-            const params = data ? (typeof data === "object" ? data : { data }) : {};
+            const params = data ?
+                typeof data === "object" ?
+                    data
+                    : { data }
+                : {};
             ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
         return response.result;

@@ -30,7 +30,7 @@ js_source_path = [
     '../../packages/js-moi-bip39/lib.cjs',
     '../../packages/js-moi-wallet/lib.cjs',
     '../../packages/js-moi-signer/lib.cjs',
-    '../../packages/js-moi-provider/lib.cjs',
+    '../../packages/js-moi-providers/lib.cjs',
     '../../packages/js-moi-manifest/lib.cjs',
     '../../packages/js-moi-logic/lib.cjs',
     '../../packages/js-moi-utils/lib.cjs',

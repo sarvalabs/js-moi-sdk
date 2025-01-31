@@ -74,6 +74,8 @@ transports for connecting to MOI nodes. Developers can use these transports
 to establish connections with the MOI network and retrieve data from the blockchain.
 
 Classes
--------
+*******
 
-.. autoclass:: HttpProvider
+.. js:autoclass:: HttpTransport
+
+   Documentation for HttpTransport.

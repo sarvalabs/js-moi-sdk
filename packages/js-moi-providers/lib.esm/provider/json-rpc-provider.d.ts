@@ -4,6 +4,14 @@ import { StorageKey, type Account, type AccountAsset, type AccountKey, type Asse
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
 import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateInteractionRequest, SimulateOption, TesseractRequestOption } from "../types/provider";
 import { InteractionResponse } from "../utils/interaction-response";
+/**
+ * A provider that communicates with the MOI protocol network using JSON-RPC.
+ *
+ * @extends EventEmitter
+ * @implements Provider
+ *
+ * @param {Transport} transport - The transport to use for communication with the network.
+ */
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
     /**
