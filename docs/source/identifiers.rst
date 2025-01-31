@@ -12,14 +12,14 @@ validation for multiple versions of each identifier.
 Identifier Tag
 --------------
 .. autoclass:: IdentifierTag
-    :members: value, getKind, getVersion, getTag, getMaxSupportedVersion, validate
+    :members:
 
 
 Identifier
 ----------
 
 .. autoclass:: Identifier
-    :members: getFingerprint, getVersion,getFlags, createNewVariant, getMetadata, getVariant, getTag, toBytes, toHex, toString, toJSON
+    :members:
 
 .. autofunction:: isIdentifier
 
@@ -27,7 +27,7 @@ Participant Id
 --------------
 
 .. autoclass:: ParticipantId
-    :members: validate, isValid
+    :members:
 
 
 .. autofunction:: createParticipantId
@@ -37,11 +37,11 @@ Logic Id
 --------
 
 .. autoclass:: LogicId
-    :members: validate, isValid
+    :members:
 
 
 Asset Id
 --------
 
 .. autoclass:: AssetId
-    :members: validate, isValid
+    :members:
