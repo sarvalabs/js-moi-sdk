@@ -217,3 +217,22 @@ Storage Keys
     :members:
 
 .. autofunction:: generateStorageKey
+
+Properties
+----------
+
+.. autofunction:: defineReadOnly
+
+Object
+------
+
+.. autofunction:: deepCopy
+
+Error
+-----
+
+.. autoclass:: CustomError
+   :members:
+
+.. autoclass:: ErrorUtils
+   :members:
