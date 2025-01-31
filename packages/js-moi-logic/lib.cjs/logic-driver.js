@@ -299,14 +299,29 @@ exports.LogicDriver = LogicDriver;
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  *
- * **Creating a LogicDriver instance using a logic manifest:**
  * @example
+ * // Creating a LogicDriver instance using a logic manifest
+ *
  * import { getLogicDriver, Wallet } from "js-moi-sdk";
  * import { provider } from "./provider";
  * import manifest from "./token-ledger.json";
  *
  * const wallet = await Wallet.fromMnemonic("...", { provider });
  * const driver = await getLogicDriver(manifest, wallet);
+ *
+ * console.log(driver);
+ *
+ * >> LogicDriver {  }
+ *
+ * @example
+ * // Creating a LogicDriver instance using a logic id
+ *
+ * import { getLogicDriver, Wallet } from "js-moi-sdk";
+ * import { provider } from "./provider";
+ *
+ * const logicId = "0x1234567890abcdef...";
+ * const wallet = await Wallet.fromMnemonic("...", { provider });
+ * const driver = await getLogicDriver(logicId, wallet);
  *
  * console.log(driver);
  *
