@@ -7,7 +7,10 @@ import type { LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types
 /**
  * It is class that is used to interact with the logic.
  *
- * @class LogicDriver
+ * It provides methods to interact with the logic, such
+ * as invoking callsites, deploying the logic, and retrieving logic storage.
+ *
+ * Inherit from `LogicDescriptor` class.
  */
 export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
     private signer;
@@ -52,16 +55,22 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      */
     createIxOperation(callsite: string, args: unknown[]): Promise<IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicEnlist>>;
     /**
-     * Creates an interaction request for a given callsite and its arguments.
+     * Creates an interaction request for the specified callsite.
      *
-     * @param callsite - The name of the callsite function to be invoked.
-     * @param callsiteArguments - An array of arguments to be passed to the callsite function.
-     * @param option - Optional parameters for the callsite, including fuel price and fuel limit.
-     * @returns A promise that resolves to a SignerIx object, which can be either a SimulateInteractionRequest or an InteractionRequest.
-     *
-     * @throws Will throw an error if the provided fuel limit is less than the required simulation effort.
+     * @param method - name of the method to create the interaction request.
+     * @param callsite - name of the callsite.
+     * @param callsiteArguments - arguments to pass to the callsite.
+     * @param params - interaction request parameters.
      */
     createIxRequest(method: "moi.Simulate", callsite: string, callsiteArguments: unknown[], params?: Omit<Partial<SignerIx<SimulateInteractionRequest>>, "operations">): Promise<SimulateInteractionRequest>;
+    /**
+     * Creates an interaction request for the specified callsite.
+     *
+     * @param method - name of the method to create the interaction request.
+     * @param callsite - name of the callsite.
+     * @param callsiteArguments - arguments to pass to the callsite.
+     * @param params - interaction request parameters.
+     */
     createIxRequest(method: "moi.Execute", callsite: string, callsiteArguments: unknown[], params?: Omit<Partial<SignerIx<InteractionRequest>>, "operations">): Promise<InteractionRequest>;
     /**
      * Retrieves the logic ID associated with this instance. If the logic ID is already set, it returns the existing logic ID.
@@ -141,6 +150,19 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
  * @returns A promise that resolves to a LogicDriver instance.
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
+ *
+ * **Creating a LogicDriver instance using a logic manifest:**
+ * @example
+ * import { getLogicDriver, Wallet } from "js-moi-sdk";
+ * import { provider } from "./provider";
+ * import manifest from "./token-ledger.json";
+ *
+ * const wallet = await Wallet.fromMnemonic("...", { provider });
+ * const driver = await getLogicDriver(manifest, wallet);
+ *
+ * console.log(driver);
+ *
+ * >> LogicDriver {  }
  */
 export declare const getLogicDriver: <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
 //# sourceMappingURL=logic-driver.d.ts.map

@@ -4,6 +4,11 @@ exports.LogicDescriptor = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const yaml_1 = require("yaml");
+/**
+ * The `LogicDescriptor` class represents a logic descriptor.
+ *
+ * It provides methods to get information about the logic and its elements.
+ */
 class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
     logicId;
     manifest;
@@ -25,24 +30,56 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
     setLogicId(logicId) {
         this.logicId = logicId;
     }
+    /**
+     * Retrieves the engine from the logic manifest.
+     *
+     * @returns The engine specified in the logic manifest.
+     */
     getEngine() {
         return this.manifest.engine;
     }
+    /**
+     * Retrieves the syntax from the logic manifest.
+     *
+     * @returns The syntax specified in the logic manifest.
+     */
     getSyntax() {
         return this.manifest.syntax;
     }
+    /**
+     * Retrieves the logic ID.
+     *
+     * @returns The logic ID.
+     *
+     * @throws Will throw an error if the logic ID is not found.
+     */
     async getLogicId() {
         if (this.logicId == null) {
             js_moi_utils_1.ErrorUtils.throwError("Logic id not found. This can happen if the logic is not deployed.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
         return this.logicId;
     }
+    /**
+     * Checks if the logic is ephemeral.
+     *
+     * @returns `true` if the logic is ephemeral, `false` otherwise.
+     */
     isEphemeral() {
         return this.state.has(js_moi_utils_1.LogicState.Ephemeral);
     }
+    /**
+     * Checks if the logic is persistent.
+     *
+     * @returns `true` if the logic is persistent, `false` otherwise.
+     */
     isPersistent() {
         return this.state.has(js_moi_utils_1.LogicState.Persistent);
     }
+    /**
+     * Retrieves the instance manifest coder.
+     *
+     * @returns The manifest coder.
+     */
     getManifestCoder() {
         if (this.coder == null) {
             this.coder = new js_moi_manifest_1.ManifestCoder(this.manifest);
@@ -61,6 +98,14 @@ class LogicDescriptor extends js_moi_manifest_1.ElementDescriptor {
                 js_moi_utils_1.ErrorUtils.throwArgumentError(`Unsupported format: ${format}`, "format", format);
         }
     }
+    /**
+     * Retrieves the logic state element.
+     *
+     * @param state - The logic state to retrieve the element for.
+     * @returns The logic state element.
+     *
+     * @throws Will throw an error if the state is not found.
+     */
     getStateElement(state) {
         const ptr = this.state.get(state);
         if (ptr == null) {
