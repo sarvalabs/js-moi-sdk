@@ -42,13 +42,19 @@ export declare class WebsocketProvider extends JsonRpcProvider {
     constructor(address: string, options?: WebsocketTransportOptions);
     getSubscriptions(): {
         id: string;
-        event: ProviderEvent;
+        event: {
+            event: ProviderEvent;
+            listener: BaseListener;
+        };
     }[];
     close(): void;
     private handleOnNetworkEventSubscription;
     on<K, T extends ProviderEvent>(event: T, listener: ProviderEventListener<T>): this;
     once<K, T extends ProviderEvent>(eventName: T, listener: ProviderEventListener<T>): this;
     private subscribeToEvent;
+    off<K>(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    private unsubscribeFromEvent;
+    unsubscribeFromNetworkEvent(event: ProviderEvent, listener: (...args: any[]) => void): Promise<void>;
     private static isWebsocketEmittedResponse;
     private static getEventName;
 }

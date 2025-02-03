@@ -93,6 +93,7 @@ export interface NetworkActionApi {
     "moi.Execute": ApiMethod<[param: ExecuteRequestParam], Hex>;
     "moi.Interaction": ApiMethod<[param: InteractionRequestParam]>;
     "moi.Subscribe": ApiMethod<[event: string, params?: unknown], string>;
+    "moi.Unsubscribe": ApiMethod<[subscription: string], boolean>;
 }
 
 /**

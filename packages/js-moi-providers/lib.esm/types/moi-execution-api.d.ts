@@ -71,6 +71,7 @@ export interface NetworkActionApi {
     "moi.Execute": ApiMethod<[param: ExecuteRequestParam], Hex>;
     "moi.Interaction": ApiMethod<[param: InteractionRequestParam]>;
     "moi.Subscribe": ApiMethod<[event: string, params?: unknown], string>;
+    "moi.Unsubscribe": ApiMethod<[subscription: string], boolean>;
 }
 /**
  * The `NetworkMethod` type is used to extract the method names from the `NetworkActionApi`.

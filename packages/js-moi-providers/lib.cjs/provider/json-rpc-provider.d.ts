@@ -64,6 +64,12 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
     subscribe(event: string, params?: unknown[]): Promise<string>;
     /**
+     * Unsubscribes from a subscription.
+     * @param subscription id of the subscription to unsubscribe from.
+     * @returns a promise that resolves when the un-subscription is successful.
+     */
+    unsubscribe(subscription: string): Promise<boolean>;
+    /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
      *

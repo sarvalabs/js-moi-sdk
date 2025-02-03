@@ -29,15 +29,14 @@ type NonOptionalKeys<T extends Record<string, any>> = {
 
 type NonUndefined<T> = T extends undefined ? never : T;
 
-export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>>
-    ? K extends keyof TObject
-        ? TModifier extends { modifier: ExtractModifier<infer E> }
-            ? NonUndefined<TObject[E]>
-            : TModifier extends { modifier: IncludeModifier<infer E> }
-            ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionalKeys<TObject>>
+export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> =
+    TModifier extends Required<ResponseModifierParam<infer K>> ?
+        K extends keyof TObject ?
+            TModifier extends { modifier: ExtractModifier<infer E> } ? NonUndefined<TObject[E]>
+            : TModifier extends { modifier: IncludeModifier<infer E> } ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionalKeys<TObject>>
             : Pick<TObject, NonOptionalKeys<TObject>>
-        : Pick<TObject, NonOptionalKeys<TObject>>
-    : Pick<TObject, NonOptionalKeys<TObject>>;
+        :   Pick<TObject, NonOptionalKeys<TObject>>
+    :   Pick<TObject, NonOptionalKeys<TObject>>;
 
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
 
@@ -279,6 +278,17 @@ interface SubscribeRequest {
     subscribe(event: string, params?: unknown): Promise<string>;
 }
 
+interface UnsubscribeRequest {
+    /**
+     * Unsubscribe from an event.
+     *
+     * @param subscription - subscription ID.
+     *
+     * @returns a promise that resolves to a boolean indicating if the unsubscription was successful.
+     */
+    unsubscribe(subscription: string): Promise<boolean>;
+}
+
 export interface Provider
     extends EventEmitter,
         AccountAssetRequest,
@@ -293,4 +303,5 @@ export interface Provider
         ProtocolRequest,
         SimulateRequest,
         SubscribeRequest,
-        TesseractRequest {}
+        TesseractRequest,
+        UnsubscribeRequest {}

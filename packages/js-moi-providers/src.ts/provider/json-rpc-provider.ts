@@ -357,6 +357,15 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     /**
+     * Unsubscribes from a subscription.
+     * @param subscription id of the subscription to unsubscribe from.
+     * @returns a promise that resolves when the un-subscription is successful.
+     */
+    async unsubscribe(subscription: string): Promise<boolean> {
+        return await this.call("moi.Unsubscribe", subscription);
+    }
+
+    /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.
      *
