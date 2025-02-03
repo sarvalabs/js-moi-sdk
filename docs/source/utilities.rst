@@ -162,8 +162,6 @@ Hex
 
 .. autofunction:: hexToHash
 
-.. autofunction:: isAddress
-
 .. autofunction:: isHex
 
 .. autofunction:: isNullBytes

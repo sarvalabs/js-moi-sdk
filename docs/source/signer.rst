@@ -14,26 +14,8 @@ which derived classes must implement. These methods handle the signing process a
 address retrieval. By adhering to the Signer class's interface, derived classes
 ensure compatibility and consistency when working with different types of signers.
 
-Abstract Methods
-~~~~~~~~~~~~~~~~
-
-**getIdentifier**
-
-This method is used to retrieve the moi identifier address associated with 
-the signer. Concrete classes that inherit from Signer must implement this method 
-to provide the functionality of retrieving the address.
-
-**sign**
-
-This method is responsible for signing arbitrary messages using the 
-MOI signing scheme. Concrete classes need to implement this method to 
-enable the functionality of signing messages.
-
-**signInteraction**
-
-This method is used to sign MOI interactions. Concrete classes must 
-implement this method to provide the logic for signing the interactions using 
-the signer's private key.
+Classes
+-------
 
 .. autoclass:: Signer
     :members:

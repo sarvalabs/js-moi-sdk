@@ -1,5 +1,10 @@
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
+/**
+ * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
+ *
+ * @param host The URL of the HTTP server to send requests to.
+ */
 export class HttpTransport implements Transport {
     private readonly host: string;
 
@@ -17,6 +22,12 @@ export class HttpTransport implements Transport {
         this.host = host;
     }
 
+    /**
+     * Sends a JSON-RPC request using `fetch`.
+     *
+     * @param request The JSON-RPC request to send.
+     * @returns The JSON-RPC response
+     */
     public async request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>> {
         let result: JsonRpcResponse<TResult>;
 
@@ -49,7 +60,10 @@ export class HttpTransport implements Transport {
             result = await response.json();
         } catch (error: any) {
             const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error?.message === "Failed to fetch" || error?.code === "ConnectionRefused";
-            const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
+            const errMessage =
+                isNetworkError ? `Network error. Cannot connect to ${this.host}`
+                : "message" in error ? error.message
+                : "Unknown error occurred";
 
             result = {
                 jsonrpc: "2.0",

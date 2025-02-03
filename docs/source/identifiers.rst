@@ -9,39 +9,28 @@ This package provides functionality to extract flags, metadata,
 variant IDs, and account IDs from an identifier. It also includes
 validation for multiple versions of each identifier.
 
-Identifier Tag
---------------
+Classes
+-------
+
 .. autoclass:: IdentifierTag
-    :members: value, getKind, getVersion, getTag, getMaxSupportedVersion, validate
+    :members:
 
-
-Identifier
-----------
 
 .. autoclass:: Identifier
-    :members: getFingerprint, getVersion,getFlags, createNewVariant, getMetadata, getVariant, getTag, toBytes, toHex, toString, toJSON
-
-.. autofunction:: isIdentifier
-
-Participant Id
---------------
+    :members:
 
 .. autoclass:: ParticipantId
-    :members: validate, isValid
+    :members:
 
+.. autoclass:: LogicId
+    :members:
+
+.. autoclass:: AssetId
+    :members:
+
+Functions
+---------
 
 .. autofunction:: createParticipantId
 
-
-Logic Id
---------
-
-.. autoclass:: LogicId
-    :members: validate, isValid
-
-
-Asset Id
---------
-
-.. autoclass:: AssetId
-    :members: validate, isValid
+.. autofunction:: isIdentifier
