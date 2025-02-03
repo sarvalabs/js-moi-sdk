@@ -181,7 +181,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.LogicMessage", {
             logic_id: new js_moi_identifiers_1.LogicId(logic),
             ...options,
-            topics: this.encodeTopics(options?.topics ?? []),
+            topics: options?.topics ? this.encodeTopics(options.topics) : undefined,
         });
     }
     async getAccountAsset(participant, asset, option) {
