@@ -87,7 +87,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     /**
-     * Sends a JSON-RPC request to the network.
+     * Sends a JSON-RPC request to the network. This method is used internally
+     * to send requests to the network.
+     *
+     * Developers can use this method to send custom requests to the network that
+     * are supported by ``Provider``. Please refer to the `MOI protocol documentation <https://docs.moi.technology/docs/build/json-rpc/>`_
+     * for a list of supported methods.
      *
      * @param method - name of the method to invoke.
      * @param params - parameters to pass to the method.
@@ -95,6 +100,18 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @returns A promise that resolves to the JSON-RPC response.
      *
      * @throws Will throw an error if the response contains an error.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const version = await provider.request("moi.Protocol", {
+     *      modifier: { extract: "version" }
+     * });
+     *
+     * console.log(response);
+     *
+     * >>> { jsonrpc: "2.0", id: "2fb48ce4-3d38-45e4-87a5-0aa9d3d70299", result: "0.12.0" }
      */
     public async request<T>(method: string, params: unknown[] = []): Promise<JsonRpcResponse<T>> {
         const payload: JsonRpcRequest = {
@@ -115,6 +132,18 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * Retrieves the version and chain id of the MOI protocol network.
      *
      * @returns A promise that resolves to the Moi client version.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const version = await provider.getNetworkInfo({
+     *    modifier: { extract: "version" },
+     * });
+     *
+     * console.log(version);
+     *
+     * >>> "0.12.0"
      */
     public async getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>> {
         return await this.call<"moi.Protocol", SelectFromResponseModifier<NetworkInfo, TOption>>("moi.Protocol", option);
@@ -145,6 +174,31 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the result of the simulation.
+     *
+     * @example
+     * import { AssetStandard, HttpProvider, OpType } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const result = await provider.simulate({
+     *     sender: {
+     *         address: "0x...fff",
+     *         key_id: 0,
+     *         sequence_id: 0,
+     *     },
+     *     fuel_price: 1,
+     *     operations: [
+     *         {
+     *             type: OpType.AssetCreate,
+     *             payload: {
+     *                 standard: AssetStandard.MAS0,
+     *                 supply: 1000,
+     *                 symbol: "TST",
+     *             },
+     *         },
+     *     ],
+     * });
+     *
+     * console.log(result);
      */
     public async simulate(ix: SimulateInteractionRequest | Uint8Array | Hex, option?: SimulateOption): Promise<Simulate> {
         let encodedIxArgs: Hex;
@@ -193,6 +247,14 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the account information.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const account = await provider.getAccount("0x..123");
+     *
+     * console.log(account);
      */
     async getAccount<TOption extends AccountRequestOption>(participant: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>> {
         return await this.call("moi.Account", { id: new Identifier(participant), ...option });
@@ -246,6 +308,35 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * This is polymorphic method that can accept different combinations of arguments to retrieve a tesseract.
      *
      * @returns A promise that resolves to the tesseract information.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * // Get tesseract by address and height
+     * const tesseract = await provider.getTesseract("0x...123", 10);
+     *
+     * console.log(tesseract);
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * // Get tesseract by tesseract hash
+     * const tesseract = await provider.getTesseract("0x...123");
+     *
+     * console.log(tesseract);
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * // Get tesseract by reference modifier
+     * const tesseract = await provider.getTesseract({
+     *     relative: { id: "0x...123", height: 10 },
+     * });
+     *
+     * console.log(tesseract);
      */
     public async getTesseract<TOption extends TesseractRequestOption>(
         identifier: Identifier | Hex | TesseractReference,
@@ -285,6 +376,17 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the logic information.
+     * 
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     * 
+     * const provider = new HttpProvider("...");
+     * const manifest = await provider.getLogic("0x..123", {
+     *     modifier: { extract: "manifest" },
+     * });
+     * 
+     * console.log(manifest);
+
      */
     getLogic<TOption extends LogicRequestOption>(identifier: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>> {
         return this.call("moi.Logic", { id: new Identifier(identifier), ...option });
@@ -465,6 +567,29 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @param signatures - The signatures to include in the request.
      *
      * @returns A promise that resolves to the result of the InteractionResponse.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const ix = await provider.execute({
+     *     interaction: "0xf12...123",
+     *     signatures: [
+     *         {
+     *             id: "0x123..123",
+     *             key_id: 0,
+     *             signature: "0x4ac..f1a",
+     *         },
+     *     ],
+     * });
+     *
+     * console.log(ix.hash); // 0x123...123;
+     *
+     * // Wait for the confirmation of the interaction
+     * const confirmation = await ix.wait();
+     * // This will wait for the confirmation of the interaction and return the result
+     * // of the interaction
+     * const result = await ix.result();
      */
     async execute(ix: Uint8Array | Hex | ExecuteIx, signatures?: Signature[]): Promise<InteractionResponse> {
         let params: MethodParams<"moi.Execute">;
@@ -508,6 +633,16 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the interaction information.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const interaction = await provider.getInteraction("0x..123", {
+     *     modifier: { include: ["confirmation"] },
+     * });
+     *
+     * console.log(interaction.confirmation);
      */
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {
         return this.call("moi.Interaction", { hash, ...option });

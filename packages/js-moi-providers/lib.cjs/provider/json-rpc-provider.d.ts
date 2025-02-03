@@ -26,7 +26,12 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     get transport(): Transport;
     protected call<TMethod extends NetworkMethod, TResponse extends any = MethodResponse<TMethod>>(method: TMethod, ...params: MethodParams<TMethod>): Promise<TResponse>;
     /**
-     * Sends a JSON-RPC request to the network.
+     * Sends a JSON-RPC request to the network. This method is used internally
+     * to send requests to the network.
+     *
+     * Developers can use this method to send custom requests to the network that
+     * are supported by ``Provider``. Please refer to the `MOI protocol documentation <https://docs.moi.technology/docs/build/json-rpc/>`_
+     * for a list of supported methods.
      *
      * @param method - name of the method to invoke.
      * @param params - parameters to pass to the method.
@@ -34,12 +39,36 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * @returns A promise that resolves to the JSON-RPC response.
      *
      * @throws Will throw an error if the response contains an error.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const version = await provider.request("moi.Protocol", {
+     *      modifier: { extract: "version" }
+     * });
+     *
+     * console.log(response);
+     *
+     * >>> { jsonrpc: "2.0", id: "2fb48ce4-3d38-45e4-87a5-0aa9d3d70299", result: "0.12.0" }
      */
     request<T>(method: string, params?: unknown[]): Promise<JsonRpcResponse<T>>;
     /**
      * Retrieves the version and chain id of the MOI protocol network.
      *
      * @returns A promise that resolves to the Moi client version.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const version = await provider.getNetworkInfo({
+     *    modifier: { extract: "version" },
+     * });
+     *
+     * console.log(version);
+     *
+     * >>> "0.12.0"
      */
     getNetworkInfo<TOption extends GetNetworkInfoOption>(option?: TOption): Promise<SelectFromResponseModifier<NetworkInfo, TOption>>;
     /**
@@ -67,6 +96,14 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the account information.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const account = await provider.getAccount("0x..123");
+     *
+     * console.log(account);
      */
     getAccount<TOption extends AccountRequestOption>(participant: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Account, TOption>>;
     private getTesseractByReference;
@@ -105,6 +142,17 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the logic information.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const manifest = await provider.getLogic("0x..123", {
+     *     modifier: { extract: "manifest" },
+     * });
+     *
+     * console.log(manifest);
+
      */
     getLogic<TOption extends LogicRequestOption>(identifier: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Logic, TOption>>;
     /**
@@ -191,6 +239,16 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * @param option - Additional options to include in the request.
      *
      * @returns A promise that resolves to the interaction information.
+     *
+     * @example
+     * import { HttpProvider } from "js-moi-sdk";
+     *
+     * const provider = new HttpProvider("...");
+     * const interaction = await provider.getInteraction("0x..123", {
+     *     modifier: { include: ["confirmation"] },
+     * });
+     *
+     * console.log(interaction.confirmation);
      */
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
     /**
