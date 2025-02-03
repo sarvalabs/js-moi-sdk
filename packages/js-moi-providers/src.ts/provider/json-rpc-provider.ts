@@ -348,13 +348,12 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return new InteractionResponse(hash, this);
     }
 
-    getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {
-        return this.call("moi.Interaction", { hash, ...option });
+    async getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {
+        return await this.call("moi.Interaction", { hash, ...option });
     }
 
-    async subscribe(event: string, params?: unknown): Promise<void> {
-        throw new Error("Method not implemented. Return type needs to be updated");
-        // return await this.call("moi.Subscribe", event, params);
+    async subscribe(event: string, params?: unknown[]): Promise<string> {
+        return await this.call("moi.subscribe", event, params);
     }
 
     /**

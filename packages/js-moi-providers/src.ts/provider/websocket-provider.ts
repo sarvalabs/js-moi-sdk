@@ -1,4 +1,4 @@
-import type { Hex, Tesseract } from "js-moi-utils";
+import { ErrorUtils, type Hex, type Tesseract } from "js-moi-utils";
 import { WebsocketTransport, type WebsocketTransportOptions } from "../transport/ws-transport";
 import { JsonRpcProvider } from "./json-rpc-provider";
 
@@ -99,8 +99,12 @@ export class WebsocketProvider extends JsonRpcProvider {
     private async handleOnNetworkEventSubscription(type: "on" | "once", event: ProviderEvent, listener: (...args: any[]) => void): Promise<void> {
         const params = typeof event === "object" ? event.params ?? [] : [];
         const eventName = WebsocketProvider.getEventName(event);
-        const response = await this.request<string>("moi.subscribe", [eventName, ...params]);
-        const id = this.processJsonRpcResponse(response);
+
+        if (typeof eventName === "symbol") {
+            ErrorUtils.throwArgumentError("Cannot subscribe to a symbol event", "event", event);
+        }
+
+        const id = await this.subscribe(eventName, params);
         const transport = this.transport as WebsocketTransport;
 
         super[type](eventName, listener);

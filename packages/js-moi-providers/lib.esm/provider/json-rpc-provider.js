@@ -221,12 +221,11 @@ export class JsonRpcProvider extends EventEmitter {
         const hash = await this.call("moi.Execute", ...params);
         return new InteractionResponse(hash, this);
     }
-    getInteraction(hash, option) {
-        return this.call("moi.Interaction", { hash, ...option });
+    async getInteraction(hash, option) {
+        return await this.call("moi.Interaction", { hash, ...option });
     }
     async subscribe(event, params) {
-        throw new Error("Method not implemented. Return type needs to be updated");
-        // return await this.call("moi.Subscribe", event, params);
+        return await this.call("moi.subscribe", event, params);
     }
     /**
      * Processes a JSON-RPC response and returns the result.
