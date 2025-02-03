@@ -335,7 +335,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.LogicMessage", {
             logic_id: new js_moi_identifiers_1.LogicId(logic),
             ...options,
-            topics: this.encodeTopics(options?.topics ?? []),
+            topics: options?.topics ? this.encodeTopics(options.topics) : undefined,
         });
     }
     /**
@@ -457,7 +457,15 @@ class JsonRpcProvider extends events_1.EventEmitter {
      * @returns A promise that resolves when the subscription is complete.
      */
     async subscribe(event, params) {
-        return await this.call("moi.subscribe", event, params);
+        return await this.call("moi.Subscribe", event, params);
+    }
+    /**
+     * Unsubscribes from a subscription.
+     * @param subscription id of the subscription to unsubscribe from.
+     * @returns a promise that resolves when the un-subscription is successful.
+     */
+    async unsubscribe(subscription) {
+        return await this.call("moi.Unsubscribe", subscription);
     }
     /**
      * Processes a JSON-RPC response and returns the result.
@@ -472,7 +480,11 @@ class JsonRpcProvider extends events_1.EventEmitter {
     processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
-            const params = data ? (typeof data === "object" ? data : { data }) : {};
+            const params = data ?
+                typeof data === "object" ?
+                    data
+                    : { data }
+                : {};
             js_moi_utils_1.ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
         return response.result;

@@ -223,7 +223,17 @@ interface SubscribeRequest {
      */
     subscribe(event: string, params?: unknown): Promise<string>;
 }
-export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
+interface UnsubscribeRequest {
+    /**
+     * Unsubscribe from an event.
+     *
+     * @param subscription - subscription ID.
+     *
+     * @returns a promise that resolves to a boolean indicating if the unsubscription was successful.
+     */
+    unsubscribe(subscription: string): Promise<boolean>;
+}
+export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest, UnsubscribeRequest {
 }
 export {};
 //# sourceMappingURL=provider.d.ts.map

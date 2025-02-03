@@ -25,6 +25,7 @@ export class WebsocketProvider extends JsonRpcProvider {
         internal: new Set(["message"]),
         network: new Set(["newPendingInteractions", "newTesseracts", "newTesseractsByAccount", "newLogs"]),
     };
+    // mapping of subscription id to event, listener
     subscriptions = new Map();
     constructor(address, options) {
         super(new WebsocketTransport(address, options));
@@ -62,7 +63,7 @@ export class WebsocketProvider extends JsonRpcProvider {
         const id = await this.subscribe(eventName, params);
         const transport = this.transport;
         super[type](eventName, listener);
-        this.subscriptions.set(id, event);
+        this.subscriptions.set(id, { event, listener });
         transport.on("message", (message) => {
             const data = JSON.parse(message);
             const isValidMessage = WebsocketProvider.isWebsocketEmittedResponse(data) && data.params.subscription === id;
@@ -100,6 +101,26 @@ export class WebsocketProvider extends JsonRpcProvider {
         }
         super[type](eventName, listener);
         return this;
+    }
+    off(eventName, listener) {
+        return this.unsubscribeFromEvent(eventName, listener);
+    }
+    unsubscribeFromEvent(event, listener) {
+        const eventName = WebsocketProvider.getEventName(event);
+        if (WebsocketProvider.events.network.has(eventName)) {
+            void this.unsubscribeFromNetworkEvent(event, listener);
+        }
+        return super.off(eventName, listener);
+    }
+    async unsubscribeFromNetworkEvent(event, listener) {
+        const entry = this.subscriptions.entries().find((value) => value[1].listener === listener);
+        const eventName = WebsocketProvider.getEventName(event);
+        if (entry == null) {
+            super.off(eventName, listener);
+            return;
+        }
+        await this.unsubscribe(entry[0]);
+        super.off(eventName, listener);
     }
     static isWebsocketEmittedResponse(response) {
         return "params" in response && "subscription" in response.params && "result" in response.params;

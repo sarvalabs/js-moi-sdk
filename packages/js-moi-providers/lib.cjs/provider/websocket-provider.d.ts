@@ -52,7 +52,10 @@ export declare class WebsocketProvider extends JsonRpcProvider {
      */
     getSubscriptions(): {
         id: string;
-        event: ProviderEvent;
+        event: {
+            event: ProviderEvent;
+            listener: BaseListener;
+        };
     }[];
     /**
      * Closes the WebSocket connection if the transport is an instance of WebsocketTransport.
@@ -79,6 +82,9 @@ export declare class WebsocketProvider extends JsonRpcProvider {
      */
     once<K, T extends ProviderEvent>(eventName: T, listener: ProviderEventListener<T>): this;
     private subscribeToEvent;
+    off<K>(eventName: string | symbol, listener: (...args: any[]) => void): this;
+    private unsubscribeFromEvent;
+    unsubscribeFromNetworkEvent(event: ProviderEvent, listener: (...args: any[]) => void): Promise<void>;
     private static isWebsocketEmittedResponse;
     private static getEventName;
 }
