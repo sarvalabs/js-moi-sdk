@@ -228,7 +228,7 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.Interaction", { hash, ...option });
     }
     async subscribe(event, params) {
-        return await this.call("moi.subscribe", event, params);
+        return await this.call("moi.Subscribe", event, params);
     }
     /**
      * Processes a JSON-RPC response and returns the result.
@@ -243,7 +243,11 @@ class JsonRpcProvider extends events_1.EventEmitter {
     processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
-            const params = data ? (typeof data === "object" ? data : { data }) : {};
+            const params = data ?
+                typeof data === "object" ?
+                    data
+                    : { data }
+                : {};
             js_moi_utils_1.ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
         return response.result;
