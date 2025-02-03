@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebsocketProvider = exports.WebsocketEvent = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 const ws_transport_1 = require("../transport/ws-transport");
 const json_rpc_provider_1 = require("./json-rpc-provider");
 var WebsocketEvent;
@@ -58,8 +59,10 @@ class WebsocketProvider extends json_rpc_provider_1.JsonRpcProvider {
     async handleOnNetworkEventSubscription(type, event, listener) {
         const params = typeof event === "object" ? (event.params ?? []) : [];
         const eventName = WebsocketProvider.getEventName(event);
-        const response = await this.request("moi.subscribe", [eventName, ...params]);
-        const id = this.processJsonRpcResponse(response);
+        if (typeof eventName === "symbol") {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Cannot subscribe to a symbol event", "event", event);
+        }
+        const id = await this.subscribe(eventName, params);
         const transport = this.transport;
         super[type](eventName, listener);
         this.subscriptions.set(id, event);

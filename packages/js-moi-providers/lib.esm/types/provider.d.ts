@@ -219,9 +219,9 @@ interface SubscribeRequest {
      * @param event - event to subscribe to.
      * @param params - parameters for the subscription.
      *
-     * @returns a promise that resolves when the subscription is successful.
+     * @returns a promise that resolves to the subscription ID.
      */
-    subscribe(event: string, params?: unknown): Promise<void>;
+    subscribe(event: string, params?: unknown): Promise<string>;
 }
 export interface Provider extends EventEmitter, AccountAssetRequest, AccountKeyRequest, AccountRequest, AssetRequest, ExecuteRequest, InteractionRequestMethod, LogicMessageRequest, LogicRequest, LogicStorageRequest, ProtocolRequest, SimulateRequest, SubscribeRequest, TesseractRequest {
 }

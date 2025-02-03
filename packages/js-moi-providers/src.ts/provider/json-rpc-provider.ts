@@ -644,8 +644,8 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      *
      * console.log(interaction.confirmation);
      */
-    getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {
-        return this.call("moi.Interaction", { hash, ...option });
+    async getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>> {
+        return await this.call("moi.Interaction", { hash, ...option });
     }
 
     /**
@@ -656,8 +656,9 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      *
      * @returns A promise that resolves when the subscription is complete.
      */
-    async subscribe(event: string, params?: unknown): Promise<void> {
-        throw new Error("Method not implemented. Return type needs to be updated");
+
+    async subscribe(event: string, params?: unknown[]): Promise<string> {
+        return await this.call("moi.subscribe", event, params);
     }
 
     /**
@@ -673,12 +674,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     public processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
         if ("error" in response) {
             const { data } = response.error;
-            const params =
-                data ?
-                    typeof data === "object" ?
-                        data
-                    :   { data }
-                :   {};
+            const params = data ? (typeof data === "object" ? data : { data }) : {};
             ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
 

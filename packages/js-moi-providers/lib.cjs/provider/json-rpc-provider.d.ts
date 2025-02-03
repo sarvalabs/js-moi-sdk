@@ -259,7 +259,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      *
      * @returns A promise that resolves when the subscription is complete.
      */
-    subscribe(event: string, params?: unknown): Promise<void>;
+    subscribe(event: string, params?: unknown[]): Promise<string>;
     /**
      * Processes a JSON-RPC response and returns the result.
      * If the response contains an error, it throws an error with the provided message, code, and data.

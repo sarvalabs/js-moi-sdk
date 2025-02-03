@@ -442,8 +442,8 @@ export class JsonRpcProvider extends EventEmitter {
      *
      * console.log(interaction.confirmation);
      */
-    getInteraction(hash, option) {
-        return this.call("moi.Interaction", { hash, ...option });
+    async getInteraction(hash, option) {
+        return await this.call("moi.Interaction", { hash, ...option });
     }
     /**
      * Subscribes to an event on the MOI network.
@@ -454,7 +454,7 @@ export class JsonRpcProvider extends EventEmitter {
      * @returns A promise that resolves when the subscription is complete.
      */
     async subscribe(event, params) {
-        throw new Error("Method not implemented. Return type needs to be updated");
+        return await this.call("moi.subscribe", event, params);
     }
     /**
      * Processes a JSON-RPC response and returns the result.
@@ -469,11 +469,7 @@ export class JsonRpcProvider extends EventEmitter {
     processJsonRpcResponse(response) {
         if ("error" in response) {
             const { data } = response.error;
-            const params = data ?
-                typeof data === "object" ?
-                    data
-                    : { data }
-                : {};
+            const params = data ? (typeof data === "object" ? data : { data }) : {};
             ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
         return response.result;

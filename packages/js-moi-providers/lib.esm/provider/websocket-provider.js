@@ -1,3 +1,4 @@
+import { ErrorUtils } from "js-moi-utils";
 import { WebsocketTransport } from "../transport/ws-transport";
 import { JsonRpcProvider } from "./json-rpc-provider";
 export var WebsocketEvent;
@@ -55,8 +56,10 @@ export class WebsocketProvider extends JsonRpcProvider {
     async handleOnNetworkEventSubscription(type, event, listener) {
         const params = typeof event === "object" ? (event.params ?? []) : [];
         const eventName = WebsocketProvider.getEventName(event);
-        const response = await this.request("moi.subscribe", [eventName, ...params]);
-        const id = this.processJsonRpcResponse(response);
+        if (typeof eventName === "symbol") {
+            ErrorUtils.throwArgumentError("Cannot subscribe to a symbol event", "event", event);
+        }
+        const id = await this.subscribe(eventName, params);
         const transport = this.transport;
         super[type](eventName, listener);
         this.subscriptions.set(id, event);

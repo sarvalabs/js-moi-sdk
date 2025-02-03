@@ -1,4 +1,4 @@
-import type { Hex, Tesseract } from "js-moi-utils";
+import { type Hex, type Tesseract } from "js-moi-utils";
 import { type WebsocketTransportOptions } from "../transport/ws-transport";
 import { JsonRpcProvider } from "./json-rpc-provider";
 export declare enum WebsocketEvent {
