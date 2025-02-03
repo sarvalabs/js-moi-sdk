@@ -12,13 +12,14 @@ module, users can seamlessly manage tasks such as checking nonce, sending
 interactions, and interacting with logic objects, providing a streamlined 
 experience for MOI applications.
 
-Wallet
+Usage
 -----
 
 A wallet can be created using a private key, mnemonic, or keystore. The ``Wallet``
 class provides methods to instantiate a wallet.
 
-**Creating a Wallet from a Private Key**
+Creating a Wallet from a Private Key
+*************************************
 
 .. code-block:: javascript
     
@@ -31,7 +32,8 @@ class provides methods to instantiate a wallet.
 
     >> Wallet
 
-**Creating a Wallet from a Mnemonic**
+Creating a Wallet from a Mnemonic
+**********************************
 
 .. code-block:: javascript
 
@@ -44,7 +46,8 @@ class provides methods to instantiate a wallet.
 
     >> Wallet
 
-**Creating a Wallet from a Keystore**
+Creating a Wallet from a Keystore
+**********************************
 
 .. code-block:: javascript
 
@@ -57,6 +60,9 @@ class provides methods to instantiate a wallet.
     console.log(wallet);
 
     >> Wallet
+
+Classes
+-------
 
 .. autoclass:: Wallet(privateKey, curve, [provider])
     :members:

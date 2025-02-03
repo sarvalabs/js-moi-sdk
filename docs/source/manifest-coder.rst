@@ -18,7 +18,8 @@ data structures, enabling them to extract meaningful information. This
 capability greatly aids in the efficient processing and interpretation of data 
 obtained from the MOI network.
 
---------------------------------------------------------------------------------
+Classes
+-------
 
 .. autoclass:: ElementDescriptor
    :members:
@@ -28,6 +29,9 @@ obtained from the MOI network.
 
 .. autoclass:: Schema
    :members:
+
+Functions
+---------
 
 .. autofunction:: isPrimitiveType
 

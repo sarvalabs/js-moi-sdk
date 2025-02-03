@@ -27,13 +27,19 @@ Installing
 Install the latest `release <https://www.npmjs.com/package/js-moi-sdk>`_ 
 using the following command:
 
+**Using NPM**
+
 .. code-block:: shell
 
     npm install js-moi-sdk
 
+**Using Yarn**
+
 .. code-block:: shell
 
     yarn add js-moi-sdk
+
+**Using PNPM**
 
 .. code-block:: shell
 
