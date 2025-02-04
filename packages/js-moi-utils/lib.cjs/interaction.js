@@ -26,7 +26,7 @@ const getInteractionRequestSchema = () => {
         fuel_price: polo_schema_1.polo.integer,
         fuel_limit: polo_schema_1.polo.integer,
         funds: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            asset_id: polo_schema_1.polo.string,
+            asset_id: polo_schema_1.polo.bytes,
             amount: polo_schema_1.polo.integer,
         })),
         ix_operations: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
@@ -64,6 +64,7 @@ const transformInteraction = (ix) => {
         participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,
+        funds: ix.funds?.map((fund) => ({ ...fund, asset_id: (0, hex_1.hexToBytes)(fund.asset_id) })),
     };
 };
 exports.transformInteraction = transformInteraction;

@@ -1,6 +1,17 @@
 import type { Identifier } from "js-moi-identifiers";
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest, type AnyIxOperation, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
+import {
+    ErrorCode,
+    ErrorUtils,
+    hexToBytes,
+    isHex,
+    validateIxRequest,
+    type AnyIxOperation,
+    type Hex,
+    type InteractionRequest,
+    type Sender,
+    type Simulate,
+} from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
@@ -65,7 +76,9 @@ export abstract class Signer {
         };
     }
 
-    private async createSimulateIxRequest(arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation | AnyIxOperation[]): Promise<SimulateInteractionRequest> {
+    private async createSimulateIxRequest(
+        arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation | AnyIxOperation[]
+    ): Promise<SimulateInteractionRequest> {
         // request was array of operations
         if (Array.isArray(arg)) {
             return {
@@ -92,8 +105,14 @@ export abstract class Signer {
         };
     }
 
-    public async createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<SimulateInteractionRequest>;
-    public async createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<InteractionRequest>;
+    public async createIxRequest(
+        type: "moi.Simulate",
+        args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
+    ): Promise<SimulateInteractionRequest>;
+    public async createIxRequest(
+        type: "moi.Execute",
+        args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation
+    ): Promise<InteractionRequest>;
     public async createIxRequest(
         type: "moi.Simulate" | "moi.Execute",
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation

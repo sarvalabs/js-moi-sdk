@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest, } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 export class Signer {

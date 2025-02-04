@@ -180,6 +180,7 @@ const createAssetActionDescriptor = () => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
+                asset_id: hexToBytes(payload.asset_id),
                 benefactor: "benefactor" in payload && isHex(payload.benefactor, 32) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
