@@ -128,6 +128,10 @@ const createAssetSupplyDescriptorFor = () => {
             asset_id: polo_schema_1.polo.string,
             amount: polo_schema_1.polo.integer,
         }),
+        transform: ({ payload }) => ({
+            ...payload,
+            asset_id: (0, hex_1.hexToBytes)(payload.asset_id),
+        }),
         validator: (operation) => {
             const { payload } = operation;
             if (payload.amount < 0) {
