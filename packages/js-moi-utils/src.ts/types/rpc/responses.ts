@@ -218,8 +218,6 @@ export interface InteractionInfo {
     sponsor: Hex;
     fuel_limit: number;
     fuel_bonus: number;
-    // TODO: There is difference between the protocol response and protocol response
-    // for example, supply in request is numerical value but in response it is Quantity(HEX string)
     operations: OperationItem[];
     accounts: IxParticipant[];
     metadata: Hex;

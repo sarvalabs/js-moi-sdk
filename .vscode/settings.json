@@ -3,11 +3,13 @@
     "prettier.tabWidth": 4,
     "prettier.printWidth": 180,
     "prettier.experimentalTernaries": true,
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/bower_components": true,
-        "**/*.code-search": true,
-        "packages/*/lib.*/": true
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
     },
     "cSpell.words": ["callsite", "Callsites", "depolorize", "Depolorizer", "POLO", "polorizer"],
     "typescript.tsdk": "node_modules/typescript/lib"
