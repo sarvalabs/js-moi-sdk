@@ -128,6 +128,10 @@ const createAssetSupplyDescriptorFor = () => {
             asset_id: polo_schema_1.polo.string,
             amount: polo_schema_1.polo.integer,
         }),
+        transform: ({ payload }) => ({
+            ...payload,
+            asset_id: (0, hex_1.hexToBytes)(payload.asset_id),
+        }),
         validator: (operation) => {
             const { payload } = operation;
             if (payload.amount < 0) {
@@ -183,6 +187,7 @@ const createAssetActionDescriptor = () => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
+                asset_id: (0, hex_1.hexToBytes)(payload.asset_id),
                 benefactor: "benefactor" in payload && (0, hex_1.isHex)(payload.benefactor, 32) ? (0, hex_1.hexToBytes)(payload.benefactor) : new Uint8Array(32),
                 beneficiary: (0, hex_1.hexToBytes)(payload.beneficiary),
             };

@@ -19,5 +19,5 @@ export interface IxResult<TOpType extends OpType> {
     status: OperationStatus;
     data: IxOpResult<TOpType>;
 }
-export type AnyIxOperationResult = IxResult<OpType.AssetCreate> | IxResult<OpType.AssetTransfer> | IxResult<OpType.AssetApprove> | IxResult<OpType.AssetRevoke> | IxResult<OpType.AssetLockup> | IxResult<OpType.AssetRelease> | IxResult<OpType.LogicDeploy> | IxResult<OpType.LogicEnlist> | IxResult<OpType.LogicInvoke> | IxResult<OpType.AccountConfigure>;
+export type AnyIxOperationResult = IxResult<OpType.AssetCreate> | IxResult<OpType.AssetTransfer> | IxResult<OpType.AssetApprove> | IxResult<OpType.AssetRevoke> | IxResult<OpType.AssetLockup> | IxResult<OpType.AssetRelease> | IxResult<OpType.LogicDeploy> | IxResult<OpType.LogicEnlist> | IxResult<OpType.LogicInvoke> | IxResult<OpType.AccountConfigure> | IxResult<OpType.ParticipantCreate>;
 //# sourceMappingURL=ix-result.d.ts.map
