@@ -8,16 +8,16 @@ your application development.
 It consists of several modules that provide a wide range of functionalities
 to interact with the MOI Protocol and its ecosystem. These modules include
 
-- `js-moi-bip39 <https://www.npmjs.com/package/js-moi-bip39>`_: Package for deterministic key generation using mnemonic code.
-- `js-moi-constants <https://www.npmjs.com/package/js-moi-constants>`_: Package contains collection of constant variables.
-- `js-moi-hdnode <https://www.npmjs.com/package/js-moi-hdnode>`_: BIP32 HD Node package for cryptocurrency key management.
-- `js-moi-signer <https://www.npmjs.com/package/js-moi-signer>`_: Package enables users to sign and verify messages in their applications.
-- `js-moi-provider <https://www.npmjs.com/package/js-moi-provider>`_: Package to connect and interact with MOI network
-- `js-moi-wallet <https://www.npmjs.com/package/js-moi-wallet>`_: Package to interact with the MOI accounts.
-- `js-moi-logic <https://www.npmjs.com/package/js-moi-logic>`_: Package to interact with MOI logics.
-- `js-moi-manifest <https://www.npmjs.com/package/js-moi-manifest>`_: Package to encode and decode MOI Logic manifest, calldata.
-- `js-moi-identifiers <https://www.npmjs.com/package/js-moi-identifiers>`_: Package that contains implementations for all account identifiers used in the MOI Protocol such as the `AssetID`, `LogicID` and `ParticipantID` identifiers
-- `js-moi-utils <https://www.npmjs.com/package/js-moi-utils>`_: Package of utility functions used in other packages.
+- `js-moi-bip39 <https://www.npmjs.com/package/js-moi-bip39>`_: This package offers the features necessary for generating and handling mnemonic phrases in accordance with the BIP39 standard.
+- `js-moi-constants <https://www.npmjs.com/package/js-moi-constants>`_: This package includes common constants used within the js-moi-sdk ecosystem. These constants provide predefined values for various aspects of MOI, making it easier to work with the protocol.
+- `js-moi-hdnode <https://www.npmjs.com/package/js-moi-hdnode>`_: This package represents a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation. It allows you to generate and manage keys within a hierarchical structure, providing enhanced security and flexibility.
+- `js-moi-signer <https://www.npmjs.com/package/js-moi-signer>`_: This package represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign interactions securely and authenticate interactions on the MOI network.
+- `js-moi-provider <https://www.npmjs.com/package/js-moi-provider>`_: This package enables you to connect to MOI nodes and retrieve blockchain data, such as account balances and interaction history. It provides an interface for interacting with the MOI protocol and fetching information from the network.
+- `js-moi-wallet <https://www.npmjs.com/package/js-moi-wallet>`_: This package represents a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
+- `js-moi-logic <https://www.npmjs.com/package/js-moi-logic>`_: This package simplifies interaction with MOI logic objects by offering deployment, interaction, and querying capabilities. It provides a higher-level interface for working with MOI logic, allowing you to deploy logic objects, send interactions, and retrieve results.
+- `js-moi-manifest <https://www.npmjs.com/package/js-moi-manifest>`_: This package encodes and decodes data according to the MOI Manifest specification, facilitating interaction with logic objects. It simplifies the process of encoding and decoding data structures, making it easier to work with MOI logic objects.
+- `js-moi-identifiers <https://www.npmjs.com/package/js-moi-identifiers>`_: PThis package provides utils for working with various identifiers used in the MOI ecosystem. It offers functions for getting and setting identifiers, as well as validating and formatting them according to the MOI standard.
+- `js-moi-utils <https://www.npmjs.com/package/js-moi-utils>`_: This package offers a comprehensive set of tools and functions to enhance development with MOI. It provides utility functions that simplify common tasks, making your development experience smoother and more efficient.
 
 All of these modules come pre-installed with ``js-moi-sdk``. However, if you
 prefer, you can also install them individually based on your needs.
