@@ -73,7 +73,8 @@ export class WebsocketProvider extends JsonRpcProvider {
         network: new Set<string>(["newPendingInteractions", "newTesseracts", "newTesseractsByAccount", "newLogs"]),
     };
 
-    private readonly subscriptions = new Map<string, ProviderEvent>();
+    // mapping of subscription id to event, listener
+    private readonly subscriptions = new Map<string, { event: ProviderEvent; listener: BaseListener }>();
 
     constructor(address: string, options?: WebsocketTransportOptions) {
         super(new WebsocketTransport(address, options));
@@ -118,7 +119,7 @@ export class WebsocketProvider extends JsonRpcProvider {
         const transport = this.transport as WebsocketTransport;
 
         super[type](eventName, listener);
-        this.subscriptions.set(id, event);
+        this.subscriptions.set(id, { event, listener });
 
         transport.on("message", (message: string) => {
             const data = JSON.parse(message);
@@ -166,6 +167,33 @@ export class WebsocketProvider extends JsonRpcProvider {
         super[type](eventName, listener);
 
         return this;
+    }
+
+    off<K>(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        return this.unsubscribeFromEvent(eventName, listener);
+    }
+
+    private unsubscribeFromEvent(event: ProviderEvent, listener: (...args: any[]) => void) {
+        const eventName = WebsocketProvider.getEventName(event);
+
+        if (WebsocketProvider.events.network.has(eventName)) {
+            void this.unsubscribeFromNetworkEvent(event, listener);
+        }
+
+        return super.off(eventName, listener);
+    }
+
+    async unsubscribeFromNetworkEvent(event: ProviderEvent, listener: (...args: any[]) => void) {
+        const entry = this.subscriptions.entries().find((value) => value[1].listener === listener);
+        const eventName = WebsocketProvider.getEventName(event);
+
+        if (entry == null) {
+            super.off(eventName, listener);
+            return;
+        }
+
+        await this.unsubscribe(entry[0]);
+        super.off(eventName, listener);
     }
 
     private static isWebsocketEmittedResponse(response: any): response is WebsocketEmittedResponse {

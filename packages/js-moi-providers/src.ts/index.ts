@@ -5,6 +5,8 @@ export { WebsocketEvent, WebsocketProvider, type ProviderEvent } from "./provide
 export { HttpTransport } from "./transport/http-transport";
 export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/ws-transport";
 
+export { NetworkType, VoyageProvider } from "./provider/voyage-provider";
+
 export type { ApiMethod, MethodParams, MethodResponse, NetworkActionApi, NetworkMethod } from "./types/moi-execution-api";
 export type {
     AccountAssetRequestOption,

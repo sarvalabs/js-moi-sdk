@@ -2,19 +2,21 @@ import elliptic from "elliptic";
 import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
-import { type ExecuteIx, type Provider, type Signature } from "js-moi-providers";
+import { type ExecuteIx, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest, type Hex, type InteractionRequest } from "js-moi-utils";
 
 import { Identifier, IdentifierVersion, createParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
-import { FromMnemonicOptions } from "../types/wallet";
+import { FromMnemonicOptions, type WalletOption } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 
 export enum CURVE {
     SECP256K1 = "secp256k1",
 }
+
+const DEFAULT_KEY_ID = 0;
 
 /**
  * Retrieves the value associated with the receiver from a private map.
@@ -68,11 +70,11 @@ const __vault = new WeakMap();
  * `Signer` is expected and has all the required properties.
  */
 export class Wallet extends Signer {
-    private readonly key_index: number = 0;
+    private readonly key_index: number;
 
-    constructor(pKey: Uint8Array | string, curve: CURVE, provider?: Provider) {
+    constructor(pKey: Uint8Array | string, curve: CURVE, options?: WalletOption) {
         try {
-            super(provider);
+            super(options?.provider);
 
             if (!pKey || !(pKey instanceof Uint8Array || typeof pKey === "string")) {
                 ErrorUtils.throwError("Key must be a Uint8Array or a string", ErrorCode.INVALID_ARGUMENT);
@@ -98,6 +100,8 @@ export class Wallet extends Signer {
                 _public: trimHexPrefix(bytesToHex(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
+
+            this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet", ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
@@ -326,7 +330,7 @@ export class Wallet extends Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, { ...option });
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -378,7 +382,7 @@ export class Wallet extends Signer {
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
 
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, { ...option });
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -404,10 +408,10 @@ export class Wallet extends Signer {
      *
      * @throws Will throw an error if the wallet cannot be loaded from the keystore.
      */
-    public static fromKeystore(keystore: string, password: string, provider?: Provider): Wallet {
+    public static fromKeystore(keystore: string, password: string, option?: WalletOption): Wallet {
         try {
             const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
-            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, provider);
+            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         } catch (err) {
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
                 originalError: err,
@@ -422,10 +426,10 @@ export class Wallet extends Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    public static async createRandom(provider?: Provider): Promise<Wallet> {
+    public static async createRandom(option?: WalletOption): Promise<Wallet> {
         try {
             var mnemonic = bip39.entropyToMnemonic(randomBytes(16));
-            return await Wallet.fromMnemonic(mnemonic, { provider });
+            return await Wallet.fromMnemonic(mnemonic, option);
         } catch (err) {
             ErrorUtils.throwError("Failed to create random mnemonic", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
@@ -438,10 +442,10 @@ export class Wallet extends Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    public static createRandomSync(provider?: Provider): Wallet {
+    public static createRandomSync(option?: WalletOption): Wallet {
         try {
             const mnemonic = bip39.entropyToMnemonic(randomBytes(16));
-            return Wallet.fromMnemonicSync(mnemonic, { provider });
+            return Wallet.fromMnemonicSync(mnemonic, option);
         } catch (err) {
             ErrorUtils.throwError("Failed to create random mnemonic", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
