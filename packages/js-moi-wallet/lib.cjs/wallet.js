@@ -50,6 +50,7 @@ var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
 })(CURVE || (exports.CURVE = CURVE = {}));
+const DEFAULT_KEY_ID = 0;
 /**
  * Retrieves the value associated with the receiver from a private map.
  * Throws an error if the receiver is not found in the map.
@@ -118,10 +119,10 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 class Wallet extends js_moi_signer_1.Signer {
-    key_index = 0;
-    constructor(pKey, curve, provider) {
+    key_index;
+    constructor(pKey, curve, options) {
         try {
-            super(provider);
+            super(options?.provider);
             if (!pKey || !(pKey instanceof Uint8Array || typeof pKey === "string")) {
                 js_moi_utils_1.ErrorUtils.throwError("Key must be a Uint8Array or a string", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
@@ -141,6 +142,7 @@ class Wallet extends js_moi_signer_1.Signer {
                 _public: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
+            this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
         }
         catch (error) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: error });
@@ -260,7 +262,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : js_moi_constants_1.MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, { ...option });
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -280,7 +282,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
             const masterNode = js_moi_hdnode_1.HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : js_moi_constants_1.MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, { ...option });
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -302,10 +304,10 @@ class Wallet extends js_moi_signer_1.Signer {
      * @returns {Wallet} a instance of `Wallet`.
      * @throws {Error} if there is an error during initialization.
      */
-    static fromKeystore(keystore, password, provider) {
+    static fromKeystore(keystore, password, option) {
         try {
             const privateKey = (0, keystore_1.decryptKeystoreData)(JSON.parse(keystore), password);
-            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, provider);
+            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet from keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, {
@@ -320,10 +322,10 @@ class Wallet extends js_moi_signer_1.Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    static async createRandom(provider) {
+    static async createRandom(option) {
         try {
             var mnemonic = bip39.entropyToMnemonic((0, js_moi_utils_1.randomBytes)(16));
-            return await Wallet.fromMnemonic(mnemonic, { provider });
+            return await Wallet.fromMnemonic(mnemonic, option);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -336,10 +338,10 @@ class Wallet extends js_moi_signer_1.Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    static createRandomSync(provider) {
+    static createRandomSync(option) {
         try {
             const mnemonic = bip39.entropyToMnemonic((0, js_moi_utils_1.randomBytes)(16));
-            return Wallet.fromMnemonicSync(mnemonic, { provider });
+            return Wallet.fromMnemonicSync(mnemonic, option);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to create random mnemonic", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });

@@ -1,9 +1,9 @@
-import { type ExecuteIx, type Provider } from "js-moi-providers";
+import { type ExecuteIx } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { type Hex, type InteractionRequest } from "js-moi-utils";
 import { Identifier } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
-import { FromMnemonicOptions } from "../types/wallet";
+import { FromMnemonicOptions, type WalletOption } from "../types/wallet";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"
 }
@@ -33,7 +33,7 @@ export declare enum CURVE {
  */
 export declare class Wallet extends Signer {
     private readonly key_index;
-    constructor(pKey: Uint8Array | string, curve: CURVE, provider?: Provider);
+    constructor(pKey: Uint8Array | string, curve: CURVE, options?: WalletOption);
     /**
      * Generates a keystore file from the wallet's private key, encrypted with a password.
      *
@@ -91,7 +91,7 @@ export declare class Wallet extends Signer {
      * @returns {Wallet} a instance of `Wallet`.
      * @throws {Error} if there is an error during initialization.
      */
-    static fromKeystore(keystore: string, password: string, provider?: Provider): Wallet;
+    static fromKeystore(keystore: string, password: string, option?: WalletOption): Wallet;
     /**
      * Generates a random mnemonic and initializes the wallet from it.
      *
@@ -99,7 +99,7 @@ export declare class Wallet extends Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    static createRandom(provider?: Provider): Promise<Wallet>;
+    static createRandom(option?: WalletOption): Promise<Wallet>;
     /**
      * Generates a random mnemonic and initializes the wallet from it.
      *
@@ -107,6 +107,6 @@ export declare class Wallet extends Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    static createRandomSync(provider?: Provider): Wallet;
+    static createRandomSync(option?: WalletOption): Wallet;
 }
 //# sourceMappingURL=wallet.d.ts.map

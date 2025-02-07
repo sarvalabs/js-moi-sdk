@@ -22,7 +22,7 @@ export const createWallet = (): Wallet => {
     const privateKey = process.env.WALLET_PRIVATE_KEY;
 
     if (!privateKey) {
-        return Wallet.createRandomSync(new HttpProvider("http://localhost:1600"));
+        return Wallet.createRandomSync({ provider: new HttpProvider("http://localhost:1600") });
     }
 
     const curve = process.env.WALLET_CURVE as CURVE | undefined;
@@ -31,5 +31,5 @@ export const createWallet = (): Wallet => {
         throw new Error("Wallet curve not found");
     }
 
-    return new Wallet(privateKey, curve, createProvider());
+    return new Wallet(privateKey, curve, { provider: createProvider() });
 };

@@ -7,15 +7,29 @@ exports.Signer = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const ecdsa_1 = __importDefault(require("./ecdsa"));
 const signature_1 = __importDefault(require("./signature"));
+const DEFAULT_FUEL_PRICE = 1;
 class Signer {
     provider;
     signingAlgorithms;
-    static DEFAULT_FUEL_PRICE = 1;
+    fuelPrice = DEFAULT_FUEL_PRICE;
     constructor(provider, signingAlgorithms) {
         this.provider = provider;
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ecdsa_1.default(),
         };
+    }
+    /**
+     * Sets the fuel price for the signer.
+     *
+     * @param {number} fuelPrice - The fuel price to set.
+     * @returns {void}
+     * @throws {Error} if the fuel price is less than 1.
+     */
+    setFuelPrice(fuelPrice) {
+        if (fuelPrice < 1) {
+            js_moi_utils_1.ErrorUtils.throwError("Fuel price must be greater than or equal to 1", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, { fuelPrice });
+        }
+        this.fuelPrice = fuelPrice;
     }
     connect(provider) {
         this.provider = provider;
@@ -47,7 +61,7 @@ class Signer {
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: arg,
             };
         }
@@ -55,7 +69,7 @@ class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: [arg],
             };
         }
@@ -63,7 +77,7 @@ class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
+            fuel_price: arg.fuel_price ?? this.fuelPrice,
         };
     }
     async createIxRequest(type, args) {

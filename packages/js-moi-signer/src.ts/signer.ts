@@ -1,17 +1,6 @@
 import type { Identifier } from "js-moi-identifiers";
 import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type SimulateInteractionRequest } from "js-moi-providers";
-import {
-    ErrorCode,
-    ErrorUtils,
-    hexToBytes,
-    isHex,
-    validateIxRequest,
-    type AnyIxOperation,
-    type Hex,
-    type InteractionRequest,
-    type Sender,
-    type Simulate,
-} from "js-moi-utils";
+import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest, type AnyIxOperation, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
@@ -21,12 +10,14 @@ export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> 
     fuel_price?: InteractionRequest["fuel_price"];
 } & (T extends InteractionRequest ? { fuel_limit?: InteractionRequest["fuel_limit"] } : {});
 
+const DEFAULT_FUEL_PRICE = 1;
+
 export abstract class Signer {
     private provider?: Provider;
 
     public signingAlgorithms: SigningAlgorithms;
 
-    private static DEFAULT_FUEL_PRICE = 1;
+    private fuelPrice = DEFAULT_FUEL_PRICE;
 
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
         this.provider = provider;
@@ -34,6 +25,21 @@ export abstract class Signer {
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
+    }
+
+    /**
+     * Sets the fuel price for the signer.
+     *
+     * @param {number} fuelPrice - The fuel price to set.
+     * @returns {void}
+     * @throws {Error} if the fuel price is less than 1.
+     */
+    public setFuelPrice(fuelPrice: number): void {
+        if (fuelPrice < 1) {
+            ErrorUtils.throwError("Fuel price must be greater than or equal to 1", ErrorCode.INVALID_ARGUMENT, { fuelPrice });
+        }
+
+        this.fuelPrice = fuelPrice;
     }
 
     public abstract getKeyId(): Promise<number>;
@@ -76,14 +82,12 @@ export abstract class Signer {
         };
     }
 
-    private async createSimulateIxRequest(
-        arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation | AnyIxOperation[]
-    ): Promise<SimulateInteractionRequest> {
+    private async createSimulateIxRequest(arg: SignerIx<SimulateInteractionRequest> | AnyIxOperation | AnyIxOperation[]): Promise<SimulateInteractionRequest> {
         // request was array of operations
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: arg,
             };
         }
@@ -92,7 +96,7 @@ export abstract class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: [arg],
             };
         }
@@ -101,18 +105,12 @@ export abstract class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
+            fuel_price: arg.fuel_price ?? this.fuelPrice,
         };
     }
 
-    public async createIxRequest(
-        type: "moi.Simulate",
-        args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
-    ): Promise<SimulateInteractionRequest>;
-    public async createIxRequest(
-        type: "moi.Execute",
-        args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation
-    ): Promise<InteractionRequest>;
+    public async createIxRequest(type: "moi.Simulate", args: SignerIx<SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<SimulateInteractionRequest>;
+    public async createIxRequest(type: "moi.Execute", args: SignerIx<InteractionRequest> | AnyIxOperation[] | AnyIxOperation): Promise<InteractionRequest>;
     public async createIxRequest(
         type: "moi.Simulate" | "moi.Execute",
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
