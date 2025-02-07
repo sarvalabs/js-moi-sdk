@@ -55,4 +55,5 @@ export type AnyIxOperationResult =
     | IxResult<OpType.LogicDeploy>
     | IxResult<OpType.LogicEnlist>
     | IxResult<OpType.LogicInvoke>
-    | IxResult<OpType.AccountConfigure>;
+    | IxResult<OpType.AccountConfigure>
+    | IxResult<OpType.ParticipantCreate>;

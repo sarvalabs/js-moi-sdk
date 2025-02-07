@@ -14,7 +14,7 @@ const runNetworkTest = process.env["RUN_NETWORK_TEST"] === "true";
 const TEST_TIMEOUT = 2 * 60000; // 2 minutes
 
 describe(getLogicDriver, () => {
-    const wallet = Wallet.createRandomSync(new HttpProvider("http://localhost:1600"));
+    const wallet = Wallet.createRandomSync({ provider: new HttpProvider("http://localhost:1600") });
     const manifest = loadManifestFromFile("flipper");
 
     beforeAll(() => {

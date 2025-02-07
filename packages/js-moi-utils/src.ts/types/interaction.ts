@@ -19,6 +19,11 @@ export interface IxFund {
     amount: number;
 }
 
+export interface RawIxFund {
+    asset_id: Uint8Array;
+    amount: number;
+}
+
 export interface RawParticipants {
     address: Uint8Array;
     lock_type: LockType;
@@ -51,7 +56,7 @@ export interface RawInteractionRequest {
     payer: Uint8Array;
     fuel_price: number;
     fuel_limit: number;
-    funds?: IxFund[];
+    funds?: RawIxFund[];
     ix_operations: IxRawOperation[];
     participants?: RawParticipants[];
     preferences?: RawPreference;

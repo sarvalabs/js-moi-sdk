@@ -24,7 +24,7 @@ export const getInteractionRequestSchema = (): Schema => {
         fuel_limit: polo.integer,
         funds: polo.arrayOf(
             polo.struct({
-                asset_id: polo.string,
+                asset_id: polo.bytes,
                 amount: polo.integer,
             })
         ),
@@ -67,6 +67,7 @@ export const transformInteraction = (ix: InteractionRequest): RawInteractionRequ
         participants: ix.participants?.map((participant) => ({ ...participant, address: hexToBytes(participant.address) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: hexToBytes(ix.preferences.compute) } : undefined,
+        funds: ix.funds?.map((fund) => ({ ...fund, asset_id: hexToBytes(fund.asset_id) })),
     };
 };
 

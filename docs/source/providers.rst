@@ -30,6 +30,9 @@ Classes
 .. js:autoclass:: WebsocketProvider
     :members:
 
+.. js:autoclass:: VoyageProvider
+    :members:
+
 Events
 ******
 
