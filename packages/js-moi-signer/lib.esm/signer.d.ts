@@ -66,8 +66,16 @@ export declare abstract class Signer {
      * By default, the signer supports the `ecdsa_secp256k1` algorithm.
      */
     signingAlgorithms: SigningAlgorithms;
-    private static DEFAULT_FUEL_PRICE;
+    private fuelPrice;
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms);
+    /**
+     * Sets the fuel price for the signer.
+     *
+     * @param {number} fuelPrice - The fuel price to set.
+     * @returns {void}
+     * @throws {Error} if the fuel price is less than 1.
+     */
+    setFuelPrice(fuelPrice: number): void;
     /**
      * Returns the key ID of the signer.
      *

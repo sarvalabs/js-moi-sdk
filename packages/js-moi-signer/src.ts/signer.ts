@@ -10,6 +10,8 @@ export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> 
     fuel_price?: InteractionRequest["fuel_price"];
 } & (T extends InteractionRequest ? { fuel_limit?: InteractionRequest["fuel_limit"] } : {});
 
+const DEFAULT_FUEL_PRICE = 1;
+
 /**
  * This is an abstract class that provides the base functionality for
  * signing and verifying messages and interactions. It also provides the ability to
@@ -70,7 +72,7 @@ export abstract class Signer {
      */
     public signingAlgorithms: SigningAlgorithms;
 
-    private static DEFAULT_FUEL_PRICE = 1;
+    private fuelPrice = DEFAULT_FUEL_PRICE;
 
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
         this.provider = provider;
@@ -78,6 +80,21 @@ export abstract class Signer {
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
+    }
+
+    /**
+     * Sets the fuel price for the signer.
+     *
+     * @param {number} fuelPrice - The fuel price to set.
+     * @returns {void}
+     * @throws {Error} if the fuel price is less than 1.
+     */
+    public setFuelPrice(fuelPrice: number): void {
+        if (fuelPrice < 1) {
+            ErrorUtils.throwError("Fuel price must be greater than or equal to 1", ErrorCode.INVALID_ARGUMENT, { fuelPrice });
+        }
+
+        this.fuelPrice = fuelPrice;
     }
 
     /**
@@ -163,7 +180,7 @@ export abstract class Signer {
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: arg,
             };
         }
@@ -172,7 +189,7 @@ export abstract class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: [arg],
             };
         }
@@ -181,7 +198,7 @@ export abstract class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
+            fuel_price: arg.fuel_price ?? this.fuelPrice,
         };
     }
 

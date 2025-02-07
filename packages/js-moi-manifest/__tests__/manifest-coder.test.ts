@@ -165,7 +165,6 @@ describe(ManifestCoder, () => {
             },
         ];
 
-        // TODO: Provide a better support to encode manifest to formats
         await Promise.all(
             testCases.map(async (testCase) => {
                 const polo = await loadFile(testCase.manifest);

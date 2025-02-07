@@ -1,6 +1,7 @@
 import { ErrorCode, ErrorUtils, hexToBytes, isHex, validateIxRequest } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
+const DEFAULT_FUEL_PRICE = 1;
 /**
  * This is an abstract class that provides the base functionality for
  * signing and verifying messages and interactions. It also provides the ability to
@@ -59,12 +60,25 @@ export class Signer {
      * By default, the signer supports the `ecdsa_secp256k1` algorithm.
      */
     signingAlgorithms;
-    static DEFAULT_FUEL_PRICE = 1;
+    fuelPrice = DEFAULT_FUEL_PRICE;
     constructor(provider, signingAlgorithms) {
         this.provider = provider;
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
+    }
+    /**
+     * Sets the fuel price for the signer.
+     *
+     * @param {number} fuelPrice - The fuel price to set.
+     * @returns {void}
+     * @throws {Error} if the fuel price is less than 1.
+     */
+    setFuelPrice(fuelPrice) {
+        if (fuelPrice < 1) {
+            ErrorUtils.throwError("Fuel price must be greater than or equal to 1", ErrorCode.INVALID_ARGUMENT, { fuelPrice });
+        }
+        this.fuelPrice = fuelPrice;
     }
     /**
      * Connects the signer to a provider.
@@ -108,7 +122,7 @@ export class Signer {
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: arg,
             };
         }
@@ -116,7 +130,7 @@ export class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: Signer.DEFAULT_FUEL_PRICE,
+                fuel_price: this.fuelPrice,
                 operations: [arg],
             };
         }
@@ -124,7 +138,7 @@ export class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? Signer.DEFAULT_FUEL_PRICE,
+            fuel_price: arg.fuel_price ?? this.fuelPrice,
         };
     }
     /**

@@ -10,23 +10,19 @@ export declare enum AssetStandard {
  * Enumerates the types of Operations in the system.
  */
 export declare enum OpType {
-    Invalid = 0,
-    ParticipantCreate = 1,
-    AccountConfigure = 2,
-    AssetTransfer = 3,
-    FuelSupply = 4,// TODO: Remove this
-    AssetCreate = 5,
-    AssetApprove = 6,
-    AssetRevoke = 7,
-    AssetMint = 8,
-    AssetBurn = 9,
-    AssetLockup = 10,
-    AssetRelease = 11,
-    LogicDeploy = 12,
-    LogicInvoke = 13,
-    LogicEnlist = 14,
-    LogicInteract = 15,
-    LogicUpgrade = 16
+    ParticipantCreate = 0,
+    AccountConfigure = 1,
+    AssetTransfer = 2,
+    AssetCreate = 3,
+    AssetApprove = 4,
+    AssetRevoke = 5,
+    AssetMint = 6,
+    AssetBurn = 7,
+    AssetLockup = 8,
+    AssetRelease = 9,
+    LogicDeploy = 10,
+    LogicInvoke = 11,
+    LogicEnlist = 12
 }
 /**
  * Enumerates the types of participant locks in the system.

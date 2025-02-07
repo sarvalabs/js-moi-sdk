@@ -11,6 +11,7 @@ export var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
 })(CURVE || (CURVE = {}));
+const DEFAULT_KEY_ID = 0;
 /**
  * Retrieves the value associated with the receiver from a private map.
  * Throws an error if the receiver is not found in the map.
@@ -61,10 +62,10 @@ const __vault = new WeakMap();
  * `Signer` is expected and has all the required properties.
  */
 export class Wallet extends Signer {
-    key_index = 0;
-    constructor(pKey, curve, provider) {
+    key_index;
+    constructor(pKey, curve, options) {
         try {
-            super(provider);
+            super(options?.provider);
             if (!pKey || !(pKey instanceof Uint8Array || typeof pKey === "string")) {
                 ErrorUtils.throwError("Key must be a Uint8Array or a string", ErrorCode.INVALID_ARGUMENT);
             }
@@ -84,6 +85,7 @@ export class Wallet extends Signer {
                 _public: trimHexPrefix(bytesToHex(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1)))),
                 _curve: curve,
             });
+            this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
         }
         catch (error) {
             ErrorUtils.throwError("Failed to load wallet", ErrorCode.UNKNOWN_ERROR, { originalError: error });
@@ -275,7 +277,7 @@ export class Wallet extends Signer {
             const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, { ...option });
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -303,7 +305,7 @@ export class Wallet extends Signer {
             const seed = bip39.mnemonicToSeedSync(mnemonic, undefined);
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(typeof optionOrPath === "string" ? optionOrPath : MOI_DERIVATION_PATH);
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, option?.provider);
+            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1, { ...option });
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
                 _mnemonic: mnemonic,
@@ -327,10 +329,10 @@ export class Wallet extends Signer {
      *
      * @throws Will throw an error if the wallet cannot be loaded from the keystore.
      */
-    static fromKeystore(keystore, password, provider) {
+    static fromKeystore(keystore, password, option) {
         try {
             const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
-            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, provider);
+            return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         }
         catch (err) {
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
@@ -345,10 +347,10 @@ export class Wallet extends Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    static async createRandom(provider) {
+    static async createRandom(option) {
         try {
             var mnemonic = bip39.entropyToMnemonic(randomBytes(16));
-            return await Wallet.fromMnemonic(mnemonic, { provider });
+            return await Wallet.fromMnemonic(mnemonic, option);
         }
         catch (err) {
             ErrorUtils.throwError("Failed to create random mnemonic", ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -361,10 +363,10 @@ export class Wallet extends Signer {
      *
      * @throws {Error} if there is an error generating the random mnemonic.
      */
-    static createRandomSync(provider) {
+    static createRandomSync(option) {
         try {
             const mnemonic = bip39.entropyToMnemonic(randomBytes(16));
-            return Wallet.fromMnemonicSync(mnemonic, { provider });
+            return Wallet.fromMnemonicSync(mnemonic, option);
         }
         catch (err) {
             ErrorUtils.throwError("Failed to create random mnemonic", ErrorCode.UNKNOWN_ERROR, { originalError: err });

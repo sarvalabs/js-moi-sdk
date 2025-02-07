@@ -11,11 +11,9 @@ export enum AssetStandard {
  * Enumerates the types of Operations in the system.
  */
 export enum OpType {
-    Invalid,
     ParticipantCreate,
     AccountConfigure,
     AssetTransfer,
-    FuelSupply, // TODO: Remove this
     AssetCreate,
     AssetApprove,
     AssetRevoke,
@@ -27,8 +25,6 @@ export enum OpType {
     LogicDeploy,
     LogicInvoke,
     LogicEnlist,
-    LogicInteract,
-    LogicUpgrade,
 }
 
 /**

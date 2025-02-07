@@ -15,23 +15,19 @@ var AssetStandard;
  */
 var OpType;
 (function (OpType) {
-    OpType[OpType["Invalid"] = 0] = "Invalid";
-    OpType[OpType["ParticipantCreate"] = 1] = "ParticipantCreate";
-    OpType[OpType["AccountConfigure"] = 2] = "AccountConfigure";
-    OpType[OpType["AssetTransfer"] = 3] = "AssetTransfer";
-    OpType[OpType["FuelSupply"] = 4] = "FuelSupply";
-    OpType[OpType["AssetCreate"] = 5] = "AssetCreate";
-    OpType[OpType["AssetApprove"] = 6] = "AssetApprove";
-    OpType[OpType["AssetRevoke"] = 7] = "AssetRevoke";
-    OpType[OpType["AssetMint"] = 8] = "AssetMint";
-    OpType[OpType["AssetBurn"] = 9] = "AssetBurn";
-    OpType[OpType["AssetLockup"] = 10] = "AssetLockup";
-    OpType[OpType["AssetRelease"] = 11] = "AssetRelease";
-    OpType[OpType["LogicDeploy"] = 12] = "LogicDeploy";
-    OpType[OpType["LogicInvoke"] = 13] = "LogicInvoke";
-    OpType[OpType["LogicEnlist"] = 14] = "LogicEnlist";
-    OpType[OpType["LogicInteract"] = 15] = "LogicInteract";
-    OpType[OpType["LogicUpgrade"] = 16] = "LogicUpgrade";
+    OpType[OpType["ParticipantCreate"] = 0] = "ParticipantCreate";
+    OpType[OpType["AccountConfigure"] = 1] = "AccountConfigure";
+    OpType[OpType["AssetTransfer"] = 2] = "AssetTransfer";
+    OpType[OpType["AssetCreate"] = 3] = "AssetCreate";
+    OpType[OpType["AssetApprove"] = 4] = "AssetApprove";
+    OpType[OpType["AssetRevoke"] = 5] = "AssetRevoke";
+    OpType[OpType["AssetMint"] = 6] = "AssetMint";
+    OpType[OpType["AssetBurn"] = 7] = "AssetBurn";
+    OpType[OpType["AssetLockup"] = 8] = "AssetLockup";
+    OpType[OpType["AssetRelease"] = 9] = "AssetRelease";
+    OpType[OpType["LogicDeploy"] = 10] = "LogicDeploy";
+    OpType[OpType["LogicInvoke"] = 11] = "LogicInvoke";
+    OpType[OpType["LogicEnlist"] = 12] = "LogicEnlist";
 })(OpType || (exports.OpType = OpType = {}));
 /**
  * Enumerates the types of participant locks in the system.
