@@ -3,6 +3,7 @@
     "prettier.tabWidth": 4,
     "prettier.printWidth": 180,
     "prettier.experimentalTernaries": true,
+    "editor.tabSize": 4,
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
