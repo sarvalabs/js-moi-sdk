@@ -142,8 +142,8 @@ export interface AssetActionPayload {
     timestamp: number;
 }
 
-export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp" | "benefactor">;
-export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp" | "benefactor">;
+export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<AssetActionPayload, "benefactor">>;
+export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<PoloAssetActionPayload, "benefactor">>;
 
 export type AssetApprovePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
 export type PoloAssetApprovePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
@@ -209,32 +209,52 @@ export interface PoloAssetSupplyPayload {
  *  const operation: Operation<OpType.AssetCreate> = { ... }
  * ```
  */
-export type IxOperationPayload<T extends OpType> =
-    T extends OpType.ParticipantCreate ? ParticipantCreatePayload
-    : T extends OpType.AssetCreate ? AssetCreatePayload
-    : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload
-    : T extends OpType.AssetTransfer ? AssetTransferPayload
-    : T extends OpType.AssetApprove ? AssetApprovePayload
-    : T extends OpType.AssetRelease ? AssetReleasePayload
-    : T extends OpType.AssetRevoke ? AssetRevokePayload
-    : T extends OpType.AssetLockup ? AssetLockupPayload
-    : T extends OpType.LogicDeploy ? LogicDeployPayload
-    : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload
-    : T extends OpType.AccountConfigure ? AccountConfigurePayload
+export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
+    ? ParticipantCreatePayload
+    : T extends OpType.AssetCreate
+    ? AssetCreatePayload
+    : T extends OpType.AssetBurn | OpType.AssetMint
+    ? AssetSupplyPayload
+    : T extends OpType.AssetTransfer
+    ? AssetTransferPayload
+    : T extends OpType.AssetApprove
+    ? AssetApprovePayload
+    : T extends OpType.AssetRelease
+    ? AssetReleasePayload
+    : T extends OpType.AssetRevoke
+    ? AssetRevokePayload
+    : T extends OpType.AssetLockup
+    ? AssetLockupPayload
+    : T extends OpType.LogicDeploy
+    ? LogicDeployPayload
+    : T extends OpType.LogicInvoke | OpType.LogicEnlist
+    ? LogicActionPayload
+    : T extends OpType.AccountConfigure
+    ? AccountConfigurePayload
     : never;
 
-export type PoloIxOperationPayload<T extends OpType> =
-    T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload
-    : T extends OpType.AssetCreate ? AssetCreatePayload
-    : T extends OpType.AssetBurn | OpType.AssetMint ? PoloAssetSupplyPayload
-    : T extends OpType.AssetTransfer ? PoloAssetTransferPayload
-    : T extends OpType.AssetApprove ? PoloAssetApprovePayload
-    : T extends OpType.AssetRelease ? PoloAssetReleasePayload
-    : T extends OpType.AssetRevoke ? PoloAssetRevokePayload
-    : T extends OpType.AssetLockup ? PoloAssetLockupPayload
-    : T extends OpType.LogicDeploy ? PoloLogicDeployPayload
-    : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload
-    : T extends OpType.AccountConfigure ? PoloAccountConfigurePayload
+export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
+    ? PoloParticipantCreatePayload
+    : T extends OpType.AssetCreate
+    ? AssetCreatePayload
+    : T extends OpType.AssetBurn | OpType.AssetMint
+    ? PoloAssetSupplyPayload
+    : T extends OpType.AssetTransfer
+    ? PoloAssetTransferPayload
+    : T extends OpType.AssetApprove
+    ? PoloAssetApprovePayload
+    : T extends OpType.AssetRelease
+    ? PoloAssetReleasePayload
+    : T extends OpType.AssetRevoke
+    ? PoloAssetRevokePayload
+    : T extends OpType.AssetLockup
+    ? PoloAssetLockupPayload
+    : T extends OpType.LogicDeploy
+    ? PoloLogicDeployPayload
+    : T extends OpType.LogicInvoke | OpType.LogicEnlist
+    ? PoloLogicActionPayload
+    : T extends OpType.AccountConfigure
+    ? PoloAccountConfigurePayload
     : never;
 
 /**
