@@ -135,8 +135,8 @@ export interface AssetActionPayload {
      */
     timestamp: number;
 }
-export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp" | "benefactor">;
-export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp" | "benefactor">;
+export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<AssetActionPayload, "benefactor">>;
+export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<PoloAssetActionPayload, "benefactor">>;
 export type AssetApprovePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
 export type PoloAssetApprovePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
 export type AssetRevokePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id">;
