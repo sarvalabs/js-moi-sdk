@@ -205,8 +205,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case js_moi_utils_1.LogicState.Ephemeral: {
-                const address = await this.signer.getIdentifier();
-                return await this.signer.getProvider().getLogicStorage(logicId, address, storageKey);
+                const identifier = await this.signer.getIdentifier();
+                return await this.signer.getProvider().getLogicStorage(logicId, identifier, storageKey);
             }
             default:
                 js_moi_utils_1.ErrorUtils.throwError("Invalid logic state.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);

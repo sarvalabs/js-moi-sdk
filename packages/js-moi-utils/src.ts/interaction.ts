@@ -61,10 +61,10 @@ export const getInteractionRequestSchema = (): Schema => {
 export const transformInteraction = (ix: InteractionRequest): RawInteractionRequest => {
     return {
         ...ix,
-        sender: { ...ix.sender, address: new ParticipantId(ix.sender.address).toBytes() },
+        sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
         payer: hexToBytes(ix.payer ?? ZERO_ADDRESS),
         ix_operations: ix.operations.map(encodeOperation),
-        participants: ix.participants?.map((participant) => ({ ...participant, address: hexToBytes(participant.address) })),
+        participants: ix.participants?.map((participant) => ({ ...participant, id: hexToBytes(participant.id) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: hexToBytes(ix.preferences.compute) } : undefined,
         funds: ix.funds?.map((fund) => ({ ...fund, asset_id: hexToBytes(fund.asset_id) })),
@@ -94,9 +94,9 @@ export function encodeInteraction(ix: InteractionRequest | RawInteractionRequest
 const gatherIxParticipants = (interaction: InteractionRequest) => {
     const participants = new Map<Hex, IxParticipant>([
         [
-            interaction.sender.address,
+            interaction.sender.id,
             {
-                address: interaction.sender.address,
+                id: interaction.sender.id,
                 lock_type: LockType.MutateLock,
                 notary: false,
             },
@@ -105,7 +105,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
 
     if (interaction.payer != null) {
         participants.set(interaction.payer, {
-            address: interaction.payer,
+            id: interaction.payer,
             lock_type: LockType.MutateLock,
             notary: false,
         });
@@ -115,7 +115,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
         switch (type) {
             case OpType.ParticipantCreate: {
                 participants.set(payload.address, {
-                    address: payload.address,
+                    id: payload.address,
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
@@ -126,7 +126,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
             case OpType.AssetBurn: {
                 const identifier = new AssetId(payload.asset_id);
                 participants.set(identifier.toHex(), {
-                    address: identifier.toHex(),
+                    id: identifier.toHex(),
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
@@ -135,7 +135,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
 
             case OpType.AssetTransfer: {
                 participants.set(payload.beneficiary, {
-                    address: payload.beneficiary,
+                    id: payload.beneficiary,
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
@@ -146,7 +146,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
             case OpType.LogicEnlist: {
                 const identifier = new LogicId(payload.logic_id);
                 participants.set(identifier.toHex(), {
-                    address: identifier.toHex(),
+                    id: identifier.toHex(),
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
@@ -156,11 +156,11 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
     }
 
     for (const participant of interaction.participants ?? []) {
-        if (participants.has(participant.address)) {
+        if (participants.has(participant.id)) {
             continue;
         }
 
-        participants.set(participant.address, participant);
+        participants.set(participant.id, participant);
     }
 
     return Array.from(participants.values());
@@ -234,8 +234,8 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
         return createInvalidResult(ix, "sender", "Sender is required");
     }
 
-    if (!isHex(ix.sender.address, 32)) {
-        return createInvalidResult(ix.sender, "address", "Invalid sender address");
+    if (!isHex(ix.sender.id, 32)) {
+        return createInvalidResult(ix.sender, "id", "Invalid sender address");
     }
 
     if (ix.fuel_price == null) {
@@ -270,8 +270,8 @@ export function validateIxRequest<TType extends "moi.Execute" | "moi.Simulate">(
                 return error;
             }
 
-            if (!isHex(participant.address, 32)) {
-                error = createInvalidResult(participant, "address", "Invalid participant address");
+            if (!isHex(participant.id, 32)) {
+                error = createInvalidResult(participant, "id", "Invalid participant address");
                 break;
             }
         }

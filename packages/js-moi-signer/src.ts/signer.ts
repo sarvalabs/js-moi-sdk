@@ -6,7 +6,7 @@ import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 
 export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender" | "fuel_price" | "fuel_limit"> & {
-    sender?: Partial<Omit<Sender, "address">>;
+    sender?: Partial<Omit<Sender, "id">>;
     fuel_price?: InteractionRequest["fuel_price"];
 } & (T extends InteractionRequest ? { fuel_limit?: InteractionRequest["fuel_limit"] } : {});
 
@@ -72,11 +72,11 @@ export abstract class Signer {
         if (sender == null) {
             const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
 
-            return { address: participant.toHex(), key_id: index, sequence_id: sequenceId };
+            return { id: participant.toHex(), key_id: index, sequence_id: sequenceId };
         }
 
         return {
-            address: (await this.getIdentifier()).toHex(),
+            id: (await this.getIdentifier()).toHex(),
             key_id: sender.key_id ?? (await this.getKeyId()),
             sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
         };
