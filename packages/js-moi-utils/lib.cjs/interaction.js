@@ -18,7 +18,7 @@ const operations_1 = require("./operations");
 const getInteractionRequestSchema = () => {
     return polo_schema_1.polo.struct({
         sender: polo_schema_1.polo.struct({
-            address: polo_schema_1.polo.bytes,
+            id: polo_schema_1.polo.bytes,
             sequence_id: polo_schema_1.polo.integer,
             key_id: polo_schema_1.polo.integer,
         }),
@@ -34,7 +34,7 @@ const getInteractionRequestSchema = () => {
             payload: polo_schema_1.polo.bytes,
         })),
         participants: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            address: polo_schema_1.polo.bytes,
+            id: polo_schema_1.polo.bytes,
             lock_type: polo_schema_1.polo.integer,
             notary: polo_schema_1.polo.boolean,
         })),
@@ -107,8 +107,8 @@ const gatherIxParticipants = (interaction) => {
     for (const { type, payload } of interaction.operations) {
         switch (type) {
             case enums_1.OpType.ParticipantCreate: {
-                participants.set(payload.address, {
-                    id: payload.address,
+                participants.set(payload.id, {
+                    id: payload.id,
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });

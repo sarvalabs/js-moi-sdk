@@ -15,7 +15,7 @@ import type { InteractionRequest, IxFund, IxParticipant, RawInteractionRequest }
 export const getInteractionRequestSchema = (): Schema => {
     return polo.struct({
         sender: polo.struct({
-            address: polo.bytes,
+            id: polo.bytes,
             sequence_id: polo.integer,
             key_id: polo.integer,
         }),
@@ -36,7 +36,7 @@ export const getInteractionRequestSchema = (): Schema => {
         ),
         participants: polo.arrayOf(
             polo.struct({
-                address: polo.bytes,
+                id: polo.bytes,
                 lock_type: polo.integer,
                 notary: polo.boolean,
             })
@@ -114,8 +114,8 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
     for (const { type, payload } of interaction.operations) {
         switch (type) {
             case OpType.ParticipantCreate: {
-                participants.set(payload.address, {
-                    id: payload.address,
+                participants.set(payload.id, {
+                    id: payload.id,
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });

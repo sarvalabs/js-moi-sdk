@@ -214,7 +214,7 @@ describe(Wallet, () => {
     describe(wallet.signInteraction, () => {
         const interaction: InteractionRequest = {
             sender: {
-                address: ID_STR,
+                id: ID_STR,
                 key_id: 0,
                 sequence_id: 0,
             },
@@ -246,7 +246,7 @@ describe(Wallet, () => {
         });
 
         it.concurrent("should throw an error if sender address is not the same as wallet address", async () => {
-            const ix: InteractionRequest = { ...interaction, sender: { ...interaction.sender, address: "0x123" } };
+            const ix: InteractionRequest = { ...interaction, sender: { ...interaction.sender, id: "0x123" } };
             const signing = async () => await wallet.signInteraction(ix, algorithm);
 
             expect(signing).rejects.toThrow();

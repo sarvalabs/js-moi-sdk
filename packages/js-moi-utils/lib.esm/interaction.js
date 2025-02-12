@@ -13,7 +13,7 @@ import { encodeOperation, validateOperation } from "./operations";
 export const getInteractionRequestSchema = () => {
     return polo.struct({
         sender: polo.struct({
-            address: polo.bytes,
+            id: polo.bytes,
             sequence_id: polo.integer,
             key_id: polo.integer,
         }),
@@ -29,7 +29,7 @@ export const getInteractionRequestSchema = () => {
             payload: polo.bytes,
         })),
         participants: polo.arrayOf(polo.struct({
-            address: polo.bytes,
+            id: polo.bytes,
             lock_type: polo.integer,
             notary: polo.boolean,
         })),
@@ -100,8 +100,8 @@ const gatherIxParticipants = (interaction) => {
     for (const { type, payload } of interaction.operations) {
         switch (type) {
             case OpType.ParticipantCreate: {
-                participants.set(payload.address, {
-                    id: payload.address,
+                participants.set(payload.id, {
+                    id: payload.id,
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
