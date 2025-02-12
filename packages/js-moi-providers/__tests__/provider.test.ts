@@ -263,7 +263,7 @@ describe(JsonRpcProvider, () => {
                 expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
             });
 
-            it.concurrent("[ERROR HAPPENING HERE] should return the logic with included fields", async () => {
+            it.concurrent("should return the logic with included fields", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id), {
                     modifier: { include: ["manifest", "controller", "edition"] },
                 });
@@ -340,10 +340,10 @@ describe(JsonRpcProvider, () => {
 
                 expect(asset).toBeDefined();
                 expect(asset.metadata.latest_id).toBe(assetId.toHex());
-                expect(asset.metadata.supply).toBe(expect.any(String));
+                expect(typeof asset.metadata.supply).toBe("string");
             });
 
-            it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with included fields", async () => {
+            it.concurrent("should return the asset with included fields", async () => {
                 const asset = await provider.getAsset(assetId, {
                     modifier: { include: ["controller", "creator", "edition"] },
                 });
