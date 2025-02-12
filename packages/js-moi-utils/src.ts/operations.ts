@@ -296,6 +296,10 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
                     return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
                 }
 
+                case isOperationType(OpType.AssetRevoke, operation): {
+                    return null;
+                }
+
                 default: {
                     ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, ErrorCode.INVALID_ARGUMENT);
                 }

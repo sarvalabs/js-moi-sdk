@@ -214,6 +214,9 @@ const createAssetActionDescriptor = () => {
                 case isOperationType(enums_1.OpType.AssetRelease, operation): {
                     return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
                 }
+                case isOperationType(enums_1.OpType.AssetRevoke, operation): {
+                    return null;
+                }
                 default: {
                     errors_1.ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, errors_1.ErrorCode.INVALID_ARGUMENT);
                 }
