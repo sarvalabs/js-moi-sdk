@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
+import type { JsonRpcResponse, Transport } from "js-moi-utils";
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }
@@ -12,7 +12,7 @@ export declare class WebsocketTransport extends EventEmitter implements Transpor
     constructor(socket: string, options?: WebsocketTransportOptions);
     protected createNewConnection(): void;
     private waitForConnection;
-    request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>>;
+    request<TResult = unknown>(method: string, param?: unknown[]): Promise<JsonRpcResponse<TResult>>;
     close(): void;
     protected send(data: unknown): void;
     private static validateOptions;

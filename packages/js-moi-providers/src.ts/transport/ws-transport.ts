@@ -112,10 +112,19 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         return this.waitForConnectionPromise;
     }
 
-    public async request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>> {
+    public async request<TResult = unknown>(method: string, param: unknown[] = []): Promise<JsonRpcResponse<TResult>> {
         await this.waitForConnection();
 
         return new Promise((resolve, reject) => {
+            const request: JsonRpcRequest = {
+                id: globalThis.crypto.randomUUID(),
+                jsonrpc: "2.0",
+                method: method,
+                params: param,
+            };
+
+            this.emit("debug", request);
+
             const listener = (data: string) => {
                 try {
                     const response = JSON.parse(data) as JsonRpcResponse;
@@ -125,6 +134,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
                     }
 
                     resolve(response as JsonRpcResponse<TResult>);
+                    this.emit("debug", response);
                     this.off("message", listener);
                 } catch (error) {
                     reject(error);

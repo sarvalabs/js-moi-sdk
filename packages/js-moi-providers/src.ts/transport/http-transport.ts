@@ -1,6 +1,7 @@
+import EventEmitter from "events";
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
-export class HttpTransport implements Transport {
+export class HttpTransport extends EventEmitter implements Transport {
     private readonly host: string;
 
     private static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
@@ -14,10 +15,20 @@ export class HttpTransport implements Transport {
             ErrorUtils.throwArgumentError(`Invalid host url "${host}"`, "host", host);
         }
 
+        super();
         this.host = host;
     }
 
-    public async request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>> {
+    public async request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>> {
+        const request: JsonRpcRequest = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method: method,
+            params: params,
+        };
+
+        this.emit("debug", request);
+
         let result: JsonRpcResponse<TResult>;
 
         try {
@@ -49,7 +60,10 @@ export class HttpTransport implements Transport {
             result = await response.json();
         } catch (error: any) {
             const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error?.message === "Failed to fetch" || error?.code === "ConnectionRefused";
-            const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}` : "message" in error ? error.message : "Unknown error occurred";
+            const errMessage =
+                isNetworkError ? `Network error. Cannot connect to ${this.host}`
+                : "message" in error ? error.message
+                : "Unknown error occurred";
 
             result = {
                 jsonrpc: "2.0",
@@ -58,6 +72,7 @@ export class HttpTransport implements Transport {
             };
         }
 
+        this.emit("debug", result);
         return result;
     }
 }

@@ -86,9 +86,16 @@ class WebsocketTransport extends events_1.default {
         });
         return this.waitForConnectionPromise;
     }
-    async request(request) {
+    async request(method, param = []) {
         await this.waitForConnection();
         return new Promise((resolve, reject) => {
+            const request = {
+                id: globalThis.crypto.randomUUID(),
+                jsonrpc: "2.0",
+                method: method,
+                params: param,
+            };
+            this.emit("debug", request);
             const listener = (data) => {
                 try {
                     const response = JSON.parse(data);
@@ -96,6 +103,7 @@ class WebsocketTransport extends events_1.default {
                         return;
                     }
                     resolve(response);
+                    this.emit("debug", response);
                     this.off("message", listener);
                 }
                 catch (error) {
