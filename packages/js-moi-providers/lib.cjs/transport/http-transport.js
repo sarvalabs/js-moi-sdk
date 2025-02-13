@@ -1,13 +1,17 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpTransport = void 0;
+const events_1 = __importDefault(require("events"));
 const js_moi_utils_1 = require("js-moi-utils");
 /**
  * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
  *
  * @param host The URL of the HTTP server to send requests to.
  */
-class HttpTransport {
+class HttpTransport extends events_1.default {
     host;
     static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
     constructor(host) {
@@ -17,6 +21,7 @@ class HttpTransport {
         if (!HttpTransport.HOST_REGEX.test(host)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid host url "${host}"`, "host", host);
         }
+        super();
         this.host = host;
     }
     /**
@@ -25,7 +30,14 @@ class HttpTransport {
      * @param request The JSON-RPC request to send.
      * @returns The JSON-RPC response
      */
-    async request(request) {
+    async request(method, params) {
+        const request = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method: method,
+            params: params,
+        };
+        this.emit("debug", request);
         let result;
         try {
             const content = JSON.stringify(request);
@@ -63,6 +75,7 @@ class HttpTransport {
                 error: { code: -1, message: errMessage, data: error },
             };
         }
+        this.emit("debug", result);
         return result;
     }
 }

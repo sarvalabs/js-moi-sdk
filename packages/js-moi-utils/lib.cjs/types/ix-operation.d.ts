@@ -78,7 +78,7 @@ export interface KeyAddPayload {
     signature_algorithm: 0;
 }
 export interface PoloParticipantCreatePayload {
-    address: Uint8Array;
+    id: Uint8Array;
     amount: number;
     keys_payload: (Omit<KeyAddPayload, "public_key"> & {
         public_key: Uint8Array;
@@ -91,7 +91,7 @@ export interface ParticipantCreatePayload {
     /**
      * The `address` of the participant that is used to create a participant in network.
      */
-    address: Address;
+    id: Address;
     /**
      * The amount that is provided to newly created address.
      *

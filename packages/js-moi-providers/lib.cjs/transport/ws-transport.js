@@ -90,15 +90,23 @@ class WebsocketTransport extends events_1.default {
         return this.waitForConnectionPromise;
     }
     /**
-     * Sends a JSON-RPC request over a WebSocket connection and waits for the response.
+     * Sends a JSON-RPC request over a WebSocket connection and returns the response.
      *
-     * @param {JsonRpcRequest} request - The JSON-RPC request object to be sent.
-     * @returns {Promise<JsonRpcResponse<TResult>>} A promise that resolves with the JSON-RPC response.
-     * @throws Will throw an error if the response cannot be parsed or if the connection fails.
+     * @param {string} method - The JSON-RPC method to be invoked.
+     * @param {unknown[]} [param=[]] - The parameters to be sent with the JSON-RPC request.
+     * @returns {Promise<JsonRpcResponse<TResult>>} - A promise that resolves with the JSON-RPC response.
+     * @throws Will throw an error if the response cannot be parsed or if the request fails.
      */
-    async request(request) {
+    async request(method, param = []) {
         await this.waitForConnection();
         return new Promise((resolve, reject) => {
+            const request = {
+                id: globalThis.crypto.randomUUID(),
+                jsonrpc: "2.0",
+                method: method,
+                params: param,
+            };
+            this.emit("debug", request);
             const listener = (data) => {
                 try {
                     const response = JSON.parse(data);
@@ -106,6 +114,7 @@ class WebsocketTransport extends events_1.default {
                         return;
                     }
                     resolve(response);
+                    this.emit("debug", response);
                     this.off("message", listener);
                 }
                 catch (error) {

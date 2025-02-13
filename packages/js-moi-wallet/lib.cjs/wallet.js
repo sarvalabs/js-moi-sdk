@@ -284,12 +284,12 @@ class Wallet extends js_moi_signer_1.Signer {
                 js_moi_utils_1.ErrorUtils.throwArgumentError(`Invalid interaction request: ${error.message}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT, error);
             }
             const identifier = await this.getIdentifier();
-            if (ix.sender.address !== identifier.toHex()) {
+            if (ix.sender.id !== identifier.toHex()) {
                 js_moi_utils_1.ErrorUtils.throwError("Sender identifier does not match signer identifier", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
             }
             const encoded = (0, js_moi_utils_1.interaction)(ix);
             const signatures = {
-                id: ix.sender.address,
+                id: ix.sender.id,
                 key_id: ix.sender.key_id,
                 signature: await this.sign(encoded, sig),
             };

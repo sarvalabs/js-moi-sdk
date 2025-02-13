@@ -1,10 +1,11 @@
+import EventEmitter from "events";
 import { ErrorUtils } from "js-moi-utils";
 /**
  * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
  *
  * @param host The URL of the HTTP server to send requests to.
  */
-export class HttpTransport {
+export class HttpTransport extends EventEmitter {
     host;
     static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
     constructor(host) {
@@ -14,6 +15,7 @@ export class HttpTransport {
         if (!HttpTransport.HOST_REGEX.test(host)) {
             ErrorUtils.throwArgumentError(`Invalid host url "${host}"`, "host", host);
         }
+        super();
         this.host = host;
     }
     /**
@@ -22,7 +24,14 @@ export class HttpTransport {
      * @param request The JSON-RPC request to send.
      * @returns The JSON-RPC response
      */
-    async request(request) {
+    async request(method, params) {
+        const request = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method: method,
+            params: params,
+        };
+        this.emit("debug", request);
         let result;
         try {
             const content = JSON.stringify(request);
@@ -60,6 +69,7 @@ export class HttpTransport {
                 error: { code: -1, message: errMessage, data: error },
             };
         }
+        this.emit("debug", result);
         return result;
     }
 }

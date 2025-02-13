@@ -315,8 +315,8 @@ export class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> ext
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case LogicState.Ephemeral: {
-                const address = await this.signer.getIdentifier();
-                return await this.signer.getProvider().getLogicStorage(logicId, address, storageKey);
+                const identifier = await this.signer.getIdentifier();
+                return await this.signer.getProvider().getLogicStorage(logicId, identifier, storageKey);
             }
             default:
                 ErrorUtils.throwError("Invalid logic state.", ErrorCode.INVALID_ARGUMENT);

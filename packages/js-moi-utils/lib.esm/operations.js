@@ -20,7 +20,7 @@ const isOperationType = (type, operation) => {
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
         schema: polo.struct({
-            address: polo.bytes,
+            id: polo.bytes,
             keys_payload: polo.arrayOf(polo.struct({
                 public_key: polo.bytes,
                 weight: polo.integer,
@@ -35,14 +35,14 @@ const createParticipantCreateDescriptor = () => {
             }));
             return {
                 ...payload,
-                address: hexToBytes(payload.address),
+                id: hexToBytes(payload.id),
                 keys_payload: poloKeysPayload,
             };
         },
         validator: (operation) => {
             const { payload } = operation;
-            if (!isHex(payload.address, 32)) {
-                return createInvalidResult(payload, "address", "Invalid identifier");
+            if (!isHex(payload.id, 32)) {
+                return createInvalidResult(payload, "id", "Invalid identifier");
             }
             if (payload.amount < 0) {
                 return createInvalidResult(payload, "amount", "Amount cannot be negative");
@@ -210,6 +210,9 @@ const createAssetActionDescriptor = () => {
                 }
                 case isOperationType(OpType.AssetRelease, operation): {
                     return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
+                }
+                case isOperationType(OpType.AssetRevoke, operation): {
+                    return null;
                 }
                 default: {
                     ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, ErrorCode.INVALID_ARGUMENT);

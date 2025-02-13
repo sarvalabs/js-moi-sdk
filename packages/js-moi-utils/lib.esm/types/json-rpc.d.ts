@@ -10,9 +10,9 @@ export interface JsonRpcRequest extends JsonRpcCommon {
     params: unknown[];
 }
 interface ErrorPayload {
-    code: number;
+    code: number | string;
     message: string;
-    data: any;
+    data?: unknown;
 }
 /**
  * Represents a JSON-RPC error.

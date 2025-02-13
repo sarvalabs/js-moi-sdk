@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import type { JsonRpcRequest, JsonRpcResponse, Transport } from "js-moi-utils";
+import type { JsonRpcResponse, Transport } from "js-moi-utils";
 export interface WebsocketTransportOptions {
     reconnect?: number;
 }
@@ -16,13 +16,14 @@ export declare class WebsocketTransport extends EventEmitter implements Transpor
     protected createNewConnection(): void;
     private waitForConnection;
     /**
-     * Sends a JSON-RPC request over a WebSocket connection and waits for the response.
+     * Sends a JSON-RPC request over a WebSocket connection and returns the response.
      *
-     * @param {JsonRpcRequest} request - The JSON-RPC request object to be sent.
-     * @returns {Promise<JsonRpcResponse<TResult>>} A promise that resolves with the JSON-RPC response.
-     * @throws Will throw an error if the response cannot be parsed or if the connection fails.
+     * @param {string} method - The JSON-RPC method to be invoked.
+     * @param {unknown[]} [param=[]] - The parameters to be sent with the JSON-RPC request.
+     * @returns {Promise<JsonRpcResponse<TResult>>} - A promise that resolves with the JSON-RPC response.
+     * @throws Will throw an error if the response cannot be parsed or if the request fails.
      */
-    request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>>;
+    request<TResult = unknown>(method: string, param?: unknown[]): Promise<JsonRpcResponse<TResult>>;
     /**
      * Closes the WebSocket connection.
      *

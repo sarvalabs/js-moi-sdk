@@ -1,5 +1,5 @@
 import type { Identifier, LogicId } from "js-moi-identifiers";
-import type { Account, AccountAsset, AccountKey, Address, Asset, Hex, Interaction, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
+import type { Account, AccountAsset, AccountKey, Asset, Hex, Interaction, Logic, LogicMessage, NetworkInfo, ResponseModifierParam, Simulate, Tesseract, TesseractReference, TesseractReferenceParam } from "js-moi-utils";
 export type ApiMethod<TParams extends any[], TResponse = any> = {
     params: TParams;
     response: TResponse;
@@ -12,7 +12,7 @@ interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> 
 interface SimulateRequestParam {
     interaction: Hex;
     references?: {
-        address: Address;
+        id: Identifier;
         reference: TesseractReference;
     };
 }

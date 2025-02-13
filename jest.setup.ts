@@ -57,13 +57,13 @@ const createNewParticipant = async () => {
     log("Creating new participant for testing");
 
     const wallet = await createWallet();
-    const newWallet = await Wallet.createRandom(wallet.getProvider());
+    const newWallet = await Wallet.createRandom({ provider: wallet.getProvider() });
     const newWalletIdentifier = await newWallet.getIdentifier();
 
     const ix = await wallet.execute({
         type: OpType.ParticipantCreate,
         payload: {
-            address: newWalletIdentifier.toHex(),
+            id: newWalletIdentifier.toHex(),
             amount: 10000000,
             keys_payload: [
                 {

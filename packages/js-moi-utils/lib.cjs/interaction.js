@@ -18,7 +18,7 @@ const operations_1 = require("./operations");
 const getInteractionRequestSchema = () => {
     return polo_schema_1.polo.struct({
         sender: polo_schema_1.polo.struct({
-            address: polo_schema_1.polo.bytes,
+            id: polo_schema_1.polo.bytes,
             sequence_id: polo_schema_1.polo.integer,
             key_id: polo_schema_1.polo.integer,
         }),
@@ -34,7 +34,7 @@ const getInteractionRequestSchema = () => {
             payload: polo_schema_1.polo.bytes,
         })),
         participants: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            address: polo_schema_1.polo.bytes,
+            id: polo_schema_1.polo.bytes,
             lock_type: polo_schema_1.polo.integer,
             notary: polo_schema_1.polo.boolean,
         })),
@@ -58,10 +58,10 @@ exports.getInteractionRequestSchema = getInteractionRequestSchema;
 const transformInteraction = (ix) => {
     return {
         ...ix,
-        sender: { ...ix.sender, address: new js_moi_identifiers_1.ParticipantId(ix.sender.address).toBytes() },
+        sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
         payer: (0, hex_1.hexToBytes)(ix.payer ?? js_moi_constants_1.ZERO_ADDRESS),
         ix_operations: ix.operations.map(operations_1.encodeOperation),
-        participants: ix.participants?.map((participant) => ({ ...participant, address: (0, hex_1.hexToBytes)(participant.address) })),
+        participants: ix.participants?.map((participant) => ({ ...participant, id: (0, hex_1.hexToBytes)(participant.id) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,
         funds: ix.funds?.map((fund) => ({ ...fund, asset_id: (0, hex_1.hexToBytes)(fund.asset_id) })),
@@ -89,9 +89,9 @@ function encodeInteraction(ix) {
 const gatherIxParticipants = (interaction) => {
     const participants = new Map([
         [
-            interaction.sender.address,
+            interaction.sender.id,
             {
-                address: interaction.sender.address,
+                id: interaction.sender.id,
                 lock_type: enums_1.LockType.MutateLock,
                 notary: false,
             },
@@ -99,7 +99,7 @@ const gatherIxParticipants = (interaction) => {
     ]);
     if (interaction.payer != null) {
         participants.set(interaction.payer, {
-            address: interaction.payer,
+            id: interaction.payer,
             lock_type: enums_1.LockType.MutateLock,
             notary: false,
         });
@@ -107,8 +107,8 @@ const gatherIxParticipants = (interaction) => {
     for (const { type, payload } of interaction.operations) {
         switch (type) {
             case enums_1.OpType.ParticipantCreate: {
-                participants.set(payload.address, {
-                    address: payload.address,
+                participants.set(payload.id, {
+                    id: payload.id,
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });
@@ -118,7 +118,7 @@ const gatherIxParticipants = (interaction) => {
             case enums_1.OpType.AssetBurn: {
                 const identifier = new js_moi_identifiers_1.AssetId(payload.asset_id);
                 participants.set(identifier.toHex(), {
-                    address: identifier.toHex(),
+                    id: identifier.toHex(),
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });
@@ -126,7 +126,7 @@ const gatherIxParticipants = (interaction) => {
             }
             case enums_1.OpType.AssetTransfer: {
                 participants.set(payload.beneficiary, {
-                    address: payload.beneficiary,
+                    id: payload.beneficiary,
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });
@@ -136,7 +136,7 @@ const gatherIxParticipants = (interaction) => {
             case enums_1.OpType.LogicEnlist: {
                 const identifier = new js_moi_identifiers_1.LogicId(payload.logic_id);
                 participants.set(identifier.toHex(), {
-                    address: identifier.toHex(),
+                    id: identifier.toHex(),
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });
@@ -145,10 +145,10 @@ const gatherIxParticipants = (interaction) => {
         }
     }
     for (const participant of interaction.participants ?? []) {
-        if (participants.has(participant.address)) {
+        if (participants.has(participant.id)) {
             continue;
         }
-        participants.set(participant.address, participant);
+        participants.set(participant.id, participant);
     }
     return Array.from(participants.values());
 };
@@ -209,8 +209,8 @@ function validateIxRequest(type, ix) {
     if (ix.sender == null) {
         return createInvalidResult(ix, "sender", "Sender is required");
     }
-    if (!(0, hex_1.isHex)(ix.sender.address, 32)) {
-        return createInvalidResult(ix.sender, "address", "Invalid sender address");
+    if (!(0, hex_1.isHex)(ix.sender.id, 32)) {
+        return createInvalidResult(ix.sender, "id", "Invalid sender address");
     }
     if (ix.fuel_price == null) {
         return createInvalidResult(ix, "fuel_price", "Fuel price is required");
@@ -236,8 +236,8 @@ function validateIxRequest(type, ix) {
             if (error != null) {
                 return error;
             }
-            if (!(0, hex_1.isHex)(participant.address, 32)) {
-                error = createInvalidResult(participant, "address", "Invalid participant address");
+            if (!(0, hex_1.isHex)(participant.id, 32)) {
+                error = createInvalidResult(participant, "id", "Invalid participant address");
                 break;
             }
         }

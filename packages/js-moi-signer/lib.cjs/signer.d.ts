@@ -3,7 +3,7 @@ import { ExecuteIx, InteractionResponse, Provider, SimulateOption, type Simulate
 import { type AnyIxOperation, type Hex, type InteractionRequest, type Sender, type Simulate } from "js-moi-utils";
 import type { SigningAlgorithms, SigType } from "../types";
 export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> = Omit<T, "sender" | "fuel_price" | "fuel_limit"> & {
-    sender?: Partial<Omit<Sender, "address">>;
+    sender?: Partial<Omit<Sender, "id">>;
     fuel_price?: InteractionRequest["fuel_price"];
 } & (T extends InteractionRequest ? {
     fuel_limit?: InteractionRequest["fuel_limit"];

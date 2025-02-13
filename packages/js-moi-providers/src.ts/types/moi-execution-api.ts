@@ -3,7 +3,6 @@ import type {
     Account,
     AccountAsset,
     AccountKey,
-    Address,
     Asset,
     Hex,
     Interaction,
@@ -30,7 +29,7 @@ interface ProtocolRequestParam extends ResponseModifierParam<keyof NetworkInfo> 
 
 interface SimulateRequestParam {
     interaction: Hex;
-    references?: { address: Address; reference: TesseractReference };
+    references?: { id: Identifier; reference: TesseractReference };
 }
 
 interface AccountRequestParam extends IdentifierParam<Identifier | Hex>, ResponseModifierParam<Exclude<keyof Account, "metadata">>, TesseractReferenceParam {}

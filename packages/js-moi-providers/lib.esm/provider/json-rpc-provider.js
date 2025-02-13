@@ -24,6 +24,7 @@ export class JsonRpcProvider extends EventEmitter {
             ErrorUtils.throwError("Transport is required", ErrorCode.INVALID_ARGUMENT);
         }
         this._transport = transport;
+        this._transport.on("debug", (data) => this.emit("debug", data));
     }
     /**
      * The transport used to communicate with the network.
@@ -63,15 +64,7 @@ export class JsonRpcProvider extends EventEmitter {
      * >>> { jsonrpc: "2.0", id: "2fb48ce4-3d38-45e4-87a5-0aa9d3d70299", result: "0.12.0" }
      */
     async request(method, params = []) {
-        const payload = {
-            jsonrpc: "2.0",
-            id: globalThis.crypto.randomUUID(),
-            method,
-            params,
-        };
-        this.emit("debug", { action: "json-rpc-request", payload });
-        const response = await this.transport.request(payload);
-        this.emit("debug", { action: "json-rpc-response", payload: response });
+        const response = await this.transport.request(method, params);
         return response;
     }
     /**

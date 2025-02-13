@@ -269,7 +269,7 @@ export interface Logic {
 }
 
 export interface AssetMetadata {
-    asset_id: Hex;
+    latest_id: Hex;
     standard: AssetStandard;
     logical: boolean;
     supply: Quantity;
