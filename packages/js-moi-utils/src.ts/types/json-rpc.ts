@@ -12,7 +12,7 @@ export interface JsonRpcRequest extends JsonRpcCommon {
 }
 
 interface ErrorPayload {
-    code: number;
+    code: number | string;
     message: string;
     data: any;
 }
