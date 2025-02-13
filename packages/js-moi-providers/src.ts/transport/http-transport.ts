@@ -1,3 +1,4 @@
+import EventEmitter from "events";
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
 /**
@@ -5,7 +6,7 @@ import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport }
  *
  * @param host The URL of the HTTP server to send requests to.
  */
-export class HttpTransport implements Transport {
+export class HttpTransport extends EventEmitter implements Transport {
     private readonly host: string;
 
     private static HOST_REGEX = /^https?:\/\/(?:(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}|localhost(?::\d+)?)\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
@@ -19,6 +20,7 @@ export class HttpTransport implements Transport {
             ErrorUtils.throwArgumentError(`Invalid host url "${host}"`, "host", host);
         }
 
+        super();
         this.host = host;
     }
 
@@ -28,7 +30,16 @@ export class HttpTransport implements Transport {
      * @param request The JSON-RPC request to send.
      * @returns The JSON-RPC response
      */
-    public async request<TResult = unknown>(request: JsonRpcRequest): Promise<JsonRpcResponse<TResult>> {
+    public async request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>> {
+        const request: JsonRpcRequest = {
+            jsonrpc: "2.0",
+            id: globalThis.crypto.randomUUID(),
+            method: method,
+            params: params,
+        };
+
+        this.emit("debug", request);
+
         let result: JsonRpcResponse<TResult>;
 
         try {
@@ -72,6 +83,7 @@ export class HttpTransport implements Transport {
             };
         }
 
+        this.emit("debug", result);
         return result;
     }
 }

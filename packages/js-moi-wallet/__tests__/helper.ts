@@ -31,5 +31,5 @@ export const createWallet = (): Wallet => {
         throw new Error("Wallet curve not found");
     }
 
-    return new Wallet(privateKey, curve, createProvider());
+    return new Wallet(privateKey, curve, { provider: createProvider() });
 };
