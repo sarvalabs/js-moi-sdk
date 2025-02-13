@@ -14,7 +14,7 @@ export interface JsonRpcRequest extends JsonRpcCommon {
 interface ErrorPayload {
     code: number | string;
     message: string;
-    data: any;
+    data?: unknown;
 }
 
 /**
