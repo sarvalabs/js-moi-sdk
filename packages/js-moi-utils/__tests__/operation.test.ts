@@ -25,7 +25,7 @@ describe(encodeOperation, () => {
             operation: {
                 type: OpType.ParticipantCreate,
                 payload: {
-                    address: "0x28027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d64",
+                    id: "0x28027ab68bd59c6cf54c83b32e02126859809436cd141b341d5fcb02bf7f6d64",
                     amount: 100,
                     keys_payload: [],
                 },

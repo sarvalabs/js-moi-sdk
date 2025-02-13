@@ -3,13 +3,13 @@ import type { Hex } from "../hex";
 import type { AnyIxOperation, IxRawOperation } from "./ix-operation";
 
 export interface RawSender {
-    address: Uint8Array;
+    id: Uint8Array;
     sequence_id: number;
     key_id: number;
 }
 
 export interface Sender {
-    address: Hex;
+    id: Hex;
     sequence_id: number;
     key_id: number;
 }
@@ -25,13 +25,13 @@ export interface RawIxFund {
 }
 
 export interface RawParticipants {
-    address: Uint8Array;
+    id: Uint8Array;
     lock_type: LockType;
     notary: boolean;
 }
 
 export interface IxParticipant {
-    address: Hex;
+    id: Hex;
     lock_type: LockType;
     notary: boolean;
 }

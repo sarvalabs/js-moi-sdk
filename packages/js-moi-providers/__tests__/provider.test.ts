@@ -118,7 +118,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.simulate, () => {
             it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
                 const result = await provider.simulate({
-                    sender: { address: participant, key_id: 0, sequence_id: 0 },
+                    sender: { id: participant, key_id: 0, sequence_id: 0 },
                     fuel_price: 1,
                     operations: [
                         {
@@ -135,7 +135,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
                 const args = interaction({
-                    sender: { address: participant, key_id: 0, sequence_id: 0 },
+                    sender: { id: participant, key_id: 0, sequence_id: 0 },
                     fuel_price: 1,
                     fuel_limit: 1000,
                     operations: [
@@ -263,7 +263,7 @@ describe(JsonRpcProvider, () => {
                 expect(logic.metadata.logic_id.includes(trimHexPrefix(logic_id))).toBeTruthy();
             });
 
-            it.concurrent("[ERROR HAPPENING HERE] should return the logic with included fields", async () => {
+            it.concurrent("should return the logic with included fields", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id), {
                     modifier: { include: ["manifest", "controller", "edition"] },
                 });
@@ -317,19 +317,19 @@ describe(JsonRpcProvider, () => {
         describe(provider.getAsset, () => {
             const assetId = new AssetId(asset_id);
 
-            it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset address", async () => {
+            it.concurrent("should return the asset when retrieved using asset address", async () => {
                 const asset = await provider.getAsset(assetId);
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(assetId.toHex());
+                expect(asset.metadata.latest_id).toBe(assetId.toHex());
                 expect(asset.metadata.standard).toBe(assetId.getStandard());
             });
 
-            it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset when retrieved using asset id", async () => {
+            it.concurrent("should return the asset when retrieved using asset id", async () => {
                 const asset = await provider.getAsset(assetId);
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(assetId.toHex());
+                expect(asset.metadata.latest_id).toBe(assetId.toHex());
                 expect(asset.metadata.logical).toBe(false);
             });
 
@@ -339,11 +339,11 @@ describe(JsonRpcProvider, () => {
                 });
 
                 expect(asset).toBeDefined();
-                expect(asset.metadata.asset_id).toBe(assetId.toHex());
-                expect(asset.metadata.supply).toBe(expect.any(String));
+                expect(asset.metadata.latest_id).toBe(assetId.toHex());
+                expect(typeof asset.metadata.supply).toBe("string");
             });
 
-            it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with included fields", async () => {
+            it.concurrent("should return the asset with included fields", async () => {
                 const asset = await provider.getAsset(assetId, {
                     modifier: { include: ["controller", "creator", "edition"] },
                 });
