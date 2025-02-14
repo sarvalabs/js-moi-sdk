@@ -1,0 +1,1 @@
+{"version":3,"file":"KramaIdMetadata.d.ts","sourceRoot":"","sources":["../../src.ts/krama-id/KramaIdMetadata.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,kBAAkB,CAAC;AAEpD,qBAAa,eAAe;IACxB,SAAgB,KAAK,EAAE,MAAM,CAAC;gBAElB,KAAK,EAAE,MAAM;IAQlB,OAAO,IAAI,WAAW;CAGhC"}
