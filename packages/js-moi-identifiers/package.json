@@ -29,7 +29,6 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "bs58": "^6.0.0",
     "elliptic": "^6.6.1",
     "peer-id": "^0.16.0"
   },

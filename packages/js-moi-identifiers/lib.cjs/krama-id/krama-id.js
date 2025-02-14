@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KramaId = void 0;
-const bs58_1 = __importDefault(require("bs58"));
 const elliptic_1 = __importDefault(require("elliptic"));
 const peer_id_1 = require("peer-id");
 const utils_1 = require("../utils");
@@ -33,7 +32,7 @@ class KramaId {
      * @returns {KramaIdTag} The tag derived from the first byte of the decoded value.
      */
     getTag() {
-        const decoded = bs58_1.default.decode(this.value.slice(0, 2));
+        const decoded = (0, utils_1.decodeBase58)(this.value.slice(0, 2));
         return new krama_id_tag_1.KramaIdTag(decoded[0]);
     }
     /**
@@ -42,7 +41,7 @@ class KramaId {
      * @returns {KramaIdMetadata} The metadata object containing information about the Krama ID.
      */
     getMetadata() {
-        const decoded = bs58_1.default.decode(this.value.slice(0, 2));
+        const decoded = (0, utils_1.decodeBase58)(this.value.slice(0, 2));
         return new krama_id_metadata_1.KramaIdMetadata(decoded[1]);
     }
     /**
@@ -103,7 +102,7 @@ class KramaId {
     static fromPeerId(kind, version, zone, peerId) {
         const tag = new krama_id_tag_1.KramaIdTag((kind << 4) | version);
         const metadata = zone << 4;
-        const encoded = bs58_1.default.encode([tag.value, metadata]);
+        const encoded = (0, utils_1.encodeBase58)(new Uint8Array([tag.value, metadata]));
         const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
         return new KramaId(encoded + peerIdString);
     }

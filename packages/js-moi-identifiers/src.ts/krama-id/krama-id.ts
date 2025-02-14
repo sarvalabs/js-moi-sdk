@@ -1,8 +1,7 @@
-import bs58 from "bs58";
 import elliptic from "elliptic";
 import PeerId, { createFromB58String, createFromPubKey } from "peer-id";
 
-import { hexToBytes, type Hex } from "../utils";
+import { decodeBase58, encodeBase58, hexToBytes, type Hex } from "../utils";
 import { KramaIdKind, KramaIdVersion, NetworkZone } from "./krama-id-enums";
 import { KramaIdMetadata } from "./krama-id-metadata";
 import { KramaIdTag } from "./krama-id-tag";
@@ -32,7 +31,7 @@ export class KramaId {
      * @returns {KramaIdTag} The tag derived from the first byte of the decoded value.
      */
     public getTag(): KramaIdTag {
-        const decoded = bs58.decode(this.value.slice(0, 2));
+        const decoded = decodeBase58(this.value.slice(0, 2));
         return new KramaIdTag(decoded[0]);
     }
 
@@ -42,7 +41,7 @@ export class KramaId {
      * @returns {KramaIdMetadata} The metadata object containing information about the Krama ID.
      */
     public getMetadata(): KramaIdMetadata {
-        const decoded = bs58.decode(this.value.slice(0, 2));
+        const decoded = decodeBase58(this.value.slice(0, 2));
         return new KramaIdMetadata(decoded[1]);
     }
 
@@ -113,7 +112,7 @@ export class KramaId {
     public static fromPeerId(kind: KramaIdKind, version: KramaIdVersion, zone: NetworkZone, peerId: string | PeerId): KramaId {
         const tag = new KramaIdTag((kind << 4) | version);
         const metadata = zone << 4;
-        const encoded = bs58.encode([tag.value, metadata]);
+        const encoded = encodeBase58(new Uint8Array([tag.value, metadata]));
         const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
 
         return new KramaId(encoded + peerIdString);

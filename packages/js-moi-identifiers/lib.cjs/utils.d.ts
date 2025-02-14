@@ -14,4 +14,6 @@ export declare const hexToBytes: (str: string) => Uint8Array;
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 export declare const bytesToHex: (data: Uint8Array) => Hex;
+export declare const encodeBase58: (uint8Array: Uint8Array) => string;
+export declare const decodeBase58: (base58String: string) => Uint8Array;
 //# sourceMappingURL=utils.d.ts.map
