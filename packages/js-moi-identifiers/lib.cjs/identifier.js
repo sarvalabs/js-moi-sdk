@@ -148,6 +148,9 @@ class Identifier {
     toJSON() {
         return this.toString();
     }
+    [Symbol.for("nodejs.util.inspect.custom")]() {
+        return `Identifier(${this.toString()})`;
+    }
     /**
      * Retrieves the tag from the given identifier value.
      *

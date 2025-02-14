@@ -173,6 +173,10 @@ export class Identifier {
         return this.toString();
     }
 
+    [Symbol.for("nodejs.util.inspect.custom")](): string {
+        return `Identifier(${this.toString()})`;
+    }
+
     /**
      * Retrieves the tag from the given identifier value.
      *
