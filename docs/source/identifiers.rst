@@ -28,6 +28,9 @@ Classes
 .. autoclass:: AssetId
     :members:
 
+.. autoclass:: KramaId
+    :members:
+
 Functions
 ---------
 

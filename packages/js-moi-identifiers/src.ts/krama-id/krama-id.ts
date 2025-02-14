@@ -98,7 +98,7 @@ export class KramaId {
         const pKey = typeof privateKey === "string" ? hexToBytes(privateKey) : privateKey;
         const peerId = await KramaId.peerIdFromPrivateKey(pKey);
 
-        return this.fromPeerId(KramaIdKind.Guardian, KramaIdVersion.V0, zone, peerId.toB58String());
+        return this.fromPeerId(KramaIdKind.Guardian, KramaIdVersion.V0, zone, peerId);
     }
 
     /**
