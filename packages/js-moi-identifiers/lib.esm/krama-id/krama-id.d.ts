@@ -1,6 +1,6 @@
 import PeerId from "peer-id";
 import { type Hex } from "../utils";
-import { KramaIdKind, NetworkZone } from "./krama-id-enums";
+import { KramaIdKind, KramaIdVersion, NetworkZone } from "./krama-id-enums";
 import { KramaIdMetadata } from "./krama-id-metadata";
 import { KramaIdTag } from "./krama-id-tag";
 /**
@@ -25,7 +25,7 @@ export declare class KramaId {
     /**
      * Retrieves the peer ID by slicing the value based on the calculated peer ID length.
      *
-     * @returns {string} The peer ID extracted from the value.
+     * @returns The peer ID extracted from the value.
      */
     getPeerId(): string;
     /**
@@ -54,6 +54,6 @@ export declare class KramaId {
      * @param peerId - The peer ID string.
      * @returns A new KramaId instance.
      */
-    static fromPeerId(kind: KramaIdKind, version: number, zone: NetworkZone, peerId: string): KramaId;
+    static fromPeerId(kind: KramaIdKind, version: KramaIdVersion, zone: NetworkZone, peerId: string | PeerId): KramaId;
 }
 //# sourceMappingURL=krama-id.d.ts.map

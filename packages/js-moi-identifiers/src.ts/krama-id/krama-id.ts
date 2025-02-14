@@ -1,6 +1,6 @@
 import bs58 from "bs58";
 import elliptic from "elliptic";
-import PeerId, { createFromPubKey, parse } from "peer-id";
+import PeerId, { createFromB58String, createFromPubKey } from "peer-id";
 
 import { hexToBytes, type Hex } from "../utils";
 import { KramaIdKind, KramaIdVersion, NetworkZone } from "./krama-id-enums";
@@ -49,9 +49,9 @@ export class KramaId {
     /**
      * Retrieves the peer ID by slicing the value based on the calculated peer ID length.
      *
-     * @returns {string} The peer ID extracted from the value.
+     * @returns The peer ID extracted from the value.
      */
-    public getPeerId() {
+    public getPeerId(): string {
         const length = this.getPeerIdLength(this.getTag());
         return this.value.slice(-length);
     }
@@ -61,8 +61,8 @@ export class KramaId {
      *
      * @returns A promise that resolves to the decoded peer ID.
      */
-    public getDecodedPeerId() {
-        return parse(this.getPeerId());
+    public getDecodedPeerId(): PeerId {
+        return createFromB58String(this.getPeerId());
     }
 
     public toString() {
@@ -110,11 +110,12 @@ export class KramaId {
      * @param peerId - The peer ID string.
      * @returns A new KramaId instance.
      */
-    public static fromPeerId(kind: KramaIdKind, version: number, zone: NetworkZone, peerId: string): KramaId {
+    public static fromPeerId(kind: KramaIdKind, version: KramaIdVersion, zone: NetworkZone, peerId: string | PeerId): KramaId {
         const tag = new KramaIdTag((kind << 4) | version);
         const metadata = zone << 4;
         const encoded = bs58.encode([tag.value, metadata]);
+        const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
 
-        return new KramaId(encoded + peerId);
+        return new KramaId(encoded + peerIdString);
     }
 }

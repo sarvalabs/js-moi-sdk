@@ -48,7 +48,7 @@ class KramaId {
     /**
      * Retrieves the peer ID by slicing the value based on the calculated peer ID length.
      *
-     * @returns {string} The peer ID extracted from the value.
+     * @returns The peer ID extracted from the value.
      */
     getPeerId() {
         const length = this.getPeerIdLength(this.getTag());
@@ -60,7 +60,7 @@ class KramaId {
      * @returns A promise that resolves to the decoded peer ID.
      */
     getDecodedPeerId() {
-        return (0, peer_id_1.parse)(this.getPeerId());
+        return (0, peer_id_1.createFromB58String)(this.getPeerId());
     }
     toString() {
         return this.value;
@@ -104,7 +104,8 @@ class KramaId {
         const tag = new krama_id_tag_1.KramaIdTag((kind << 4) | version);
         const metadata = zone << 4;
         const encoded = bs58_1.default.encode([tag.value, metadata]);
-        return new KramaId(encoded + peerId);
+        const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
+        return new KramaId(encoded + peerIdString);
     }
 }
 exports.KramaId = KramaId;
