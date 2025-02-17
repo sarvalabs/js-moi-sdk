@@ -117,12 +117,23 @@ const gatherIxParticipants = (interaction) => {
                 });
                 break;
             }
-            case OpType.AssetTransfer: {
+            case OpType.AssetTransfer:
+            case OpType.AssetApprove:
+            case OpType.AssetRevoke:
+            case OpType.AssetLockup:
+            case OpType.AssetRelease: {
                 participants.set(payload.beneficiary, {
                     id: payload.beneficiary,
                     lock_type: LockType.MutateLock,
                     notary: false,
                 });
+                if ("benefactor" in payload && payload.benefactor != null) {
+                    participants.set(payload.benefactor, {
+                        id: payload.benefactor,
+                        lock_type: LockType.MutateLock,
+                        notary: false,
+                    });
+                }
                 break;
             }
             case OpType.LogicInvoke:
@@ -149,10 +160,15 @@ const gatherIxFunds = (interaction) => {
     const funds = new Map();
     for (const { type, payload } of interaction.operations) {
         switch (type) {
+            // TODO: Should revoke be here or not?
             case OpType.AssetTransfer:
             case OpType.AssetMint:
-            case OpType.AssetBurn: {
-                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount });
+            case OpType.AssetBurn:
+            case OpType.AssetLockup:
+            case OpType.AssetRelease:
+            case OpType.AssetApprove: {
+                const accumulated = funds.get(payload.asset_id)?.amount ?? 0;
+                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount + accumulated });
             }
         }
     }
@@ -178,6 +194,7 @@ export const interaction = (ix) => {
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
     };
+    console.log(JSON.stringify(interaction, null, 2));
     return encodeInteraction(interaction);
 };
 const createInvalidResult = (value, field, message) => {
