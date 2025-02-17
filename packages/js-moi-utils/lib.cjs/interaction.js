@@ -124,12 +124,23 @@ const gatherIxParticipants = (interaction) => {
                 });
                 break;
             }
-            case enums_1.OpType.AssetTransfer: {
+            case enums_1.OpType.AssetTransfer:
+            case enums_1.OpType.AssetApprove:
+            case enums_1.OpType.AssetRevoke:
+            case enums_1.OpType.AssetLockup:
+            case enums_1.OpType.AssetRelease: {
                 participants.set(payload.beneficiary, {
                     id: payload.beneficiary,
                     lock_type: enums_1.LockType.MutateLock,
                     notary: false,
                 });
+                if ("benefactor" in payload && payload.benefactor != null) {
+                    participants.set(payload.benefactor, {
+                        id: payload.benefactor,
+                        lock_type: enums_1.LockType.MutateLock,
+                        notary: false,
+                    });
+                }
                 break;
             }
             case enums_1.OpType.LogicInvoke:
@@ -156,10 +167,15 @@ const gatherIxFunds = (interaction) => {
     const funds = new Map();
     for (const { type, payload } of interaction.operations) {
         switch (type) {
+            // TODO: Should revoke be here or not?
             case enums_1.OpType.AssetTransfer:
             case enums_1.OpType.AssetMint:
-            case enums_1.OpType.AssetBurn: {
-                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount });
+            case enums_1.OpType.AssetBurn:
+            case enums_1.OpType.AssetLockup:
+            case enums_1.OpType.AssetRelease:
+            case enums_1.OpType.AssetApprove: {
+                const accumulated = funds.get(payload.asset_id)?.amount ?? 0;
+                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount + accumulated });
             }
         }
     }
@@ -185,6 +201,7 @@ const interaction = (ix) => {
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
     };
+    console.log(JSON.stringify(interaction, null, 2));
     return encodeInteraction(interaction);
 };
 exports.interaction = interaction;
