@@ -44,7 +44,7 @@ export declare class KramaId {
      * @param privateKey - The private key used to generate the `KramaId`. It can be a `Uint8Array` or a hexadecimal string.
      * @returns A promise that resolves to a `KramaId` instance.
      */
-    static fromPrivateKey(zone: NetworkZone, privateKey: Uint8Array | Hex): Promise<KramaId>;
+    static fromPrivateKey(kind: KramaIdKind, version: KramaIdVersion.V0, zone: NetworkZone, privateKey: Uint8Array | Hex): Promise<KramaId>;
     /**
      * Creates a new KramaId instance from the given peer ID.
      *

@@ -1,7 +1,7 @@
 import elliptic from "elliptic";
 import { createFromB58String, createFromPubKey } from "peer-id";
 import { decodeBase58, encodeBase58, hexToBytes } from "../utils";
-import { KramaIdKind, KramaIdVersion } from "./krama-id-enums";
+import { KramaIdKind } from "./krama-id-enums";
 import { KramaIdMetadata } from "./krama-id-metadata";
 import { KramaIdTag } from "./krama-id-tag";
 /**
@@ -79,10 +79,9 @@ export class KramaId {
      * @param privateKey - The private key used to generate the `KramaId`. It can be a `Uint8Array` or a hexadecimal string.
      * @returns A promise that resolves to a `KramaId` instance.
      */
-    static async fromPrivateKey(zone, privateKey) {
+    static async fromPrivateKey(kind, version, zone, privateKey) {
         const pKey = typeof privateKey === "string" ? hexToBytes(privateKey) : privateKey;
-        const peerId = await KramaId.peerIdFromPrivateKey(pKey);
-        return this.fromPeerId(KramaIdKind.Guardian, KramaIdVersion.V0, zone, peerId);
+        return this.fromPeerId(kind, version, zone, await KramaId.peerIdFromPrivateKey(pKey));
     }
     /**
      * Creates a new KramaId instance from the given peer ID.

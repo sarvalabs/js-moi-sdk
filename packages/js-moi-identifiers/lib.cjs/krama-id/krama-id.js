@@ -85,10 +85,9 @@ class KramaId {
      * @param privateKey - The private key used to generate the `KramaId`. It can be a `Uint8Array` or a hexadecimal string.
      * @returns A promise that resolves to a `KramaId` instance.
      */
-    static async fromPrivateKey(zone, privateKey) {
+    static async fromPrivateKey(kind, version, zone, privateKey) {
         const pKey = typeof privateKey === "string" ? (0, utils_1.hexToBytes)(privateKey) : privateKey;
-        const peerId = await KramaId.peerIdFromPrivateKey(pKey);
-        return this.fromPeerId(krama_id_enums_1.KramaIdKind.Guardian, krama_id_enums_1.KramaIdVersion.V0, zone, peerId);
+        return this.fromPeerId(kind, version, zone, await KramaId.peerIdFromPrivateKey(pKey));
     }
     /**
      * Creates a new KramaId instance from the given peer ID.
