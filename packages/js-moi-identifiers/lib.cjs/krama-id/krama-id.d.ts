@@ -8,7 +8,7 @@ import { KramaIdTag } from "./krama-id-tag";
  */
 export declare class KramaId {
     private readonly value;
-    private constructor();
+    constructor(value: string);
     private getPeerIdLength;
     /**
      * Retrieves the tag associated with the Krama ID.

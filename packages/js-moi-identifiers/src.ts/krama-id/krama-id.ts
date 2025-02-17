@@ -12,7 +12,7 @@ import { KramaIdTag } from "./krama-id-tag";
 export class KramaId {
     private readonly value: string;
 
-    private constructor(value: string) {
+    public constructor(value: string) {
         this.value = value;
     }
 
