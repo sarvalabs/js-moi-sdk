@@ -368,12 +368,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     public processJsonRpcResponse<T>(response: JsonRpcResponse<T>): T {
         if ("error" in response) {
             const { data } = response.error;
-            const params =
-                data ?
-                    typeof data === "object" ?
-                        data
-                    :   { data }
-                :   {};
+            const params = data ? (typeof data === "object" ? data : { data }) : {};
             ErrorUtils.throwError(response.error.message, response.error.code, params);
         }
 
