@@ -46,7 +46,7 @@ const createInvalidResult = <T extends Record<any, any>>(value: T, field: keyof 
  * @param operation - The operation to check.
  * @returns True if the operation is of the specified type, otherwise false.
  */
-const isOperationType = <TOpType extends OpType>(type: TOpType, operation: IxOperation<OpType>): operation is IxOperation<TOpType> => {
+export const isOperationType = <TOpType extends OpType>(type: TOpType, operation: IxOperation<OpType>): operation is IxOperation<TOpType> => {
     return operation.type === type;
 };
 
