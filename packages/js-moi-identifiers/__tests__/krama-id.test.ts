@@ -8,19 +8,19 @@ describe(KramaId, () => {
     let kramaId: KramaId;
 
     beforeAll(async () => {
-        kramaId = await KramaId.fromPrivateKey(NetworkZone.Zone0, PRIVATE_KEY);
+        kramaId = await KramaId.fromPrivateKey(KramaIdKind.Guardian, KramaIdVersion.V0, NetworkZone.Zone0, PRIVATE_KEY);
     });
 
     it.concurrent("should create a krama id with any random private key", async () => {
         for (let i = 0; i < 10; i++) {
             const pKey = globalThis.crypto.getRandomValues(new Uint8Array(32));
-            const kramaId = await KramaId.fromPrivateKey(NetworkZone.Zone0, pKey);
+            const kramaId = await KramaId.fromPrivateKey(KramaIdKind.Guardian, KramaIdVersion.V0, NetworkZone.Zone0, pKey);
             expect(kramaId).toBeInstanceOf(KramaId);
         }
     });
 
     it.concurrent("should create a Krama ID with the private key", async () => {
-        const kramaId = await KramaId.fromPrivateKey(NetworkZone.Zone0, PRIVATE_KEY);
+        const kramaId = await KramaId.fromPrivateKey(KramaIdKind.Guardian, KramaIdVersion.V0, NetworkZone.Zone0, PRIVATE_KEY);
 
         expect(kramaId).toBeInstanceOf(KramaId);
         expect(kramaId.toString()).toBe(KRAMA_ID);
