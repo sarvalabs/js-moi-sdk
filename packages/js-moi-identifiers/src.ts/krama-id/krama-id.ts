@@ -12,7 +12,7 @@ import { KramaIdTag } from "./krama-id-tag";
 export class KramaId {
     private readonly value: string;
 
-    private constructor(value: string) {
+    public constructor(value: string) {
         this.value = value;
     }
 
@@ -93,11 +93,9 @@ export class KramaId {
      * @param privateKey - The private key used to generate the `KramaId`. It can be a `Uint8Array` or a hexadecimal string.
      * @returns A promise that resolves to a `KramaId` instance.
      */
-    public static async fromPrivateKey(zone: NetworkZone, privateKey: Uint8Array | Hex): Promise<KramaId> {
+    public static async fromPrivateKey(kind: KramaIdKind, version: KramaIdVersion.V0, zone: NetworkZone, privateKey: Uint8Array | Hex): Promise<KramaId> {
         const pKey = typeof privateKey === "string" ? hexToBytes(privateKey) : privateKey;
-        const peerId = await KramaId.peerIdFromPrivateKey(pKey);
-
-        return this.fromPeerId(KramaIdKind.Guardian, KramaIdVersion.V0, zone, peerId);
+        return this.fromPeerId(kind, version, zone, await KramaId.peerIdFromPrivateKey(pKey));
     }
 
     /**
