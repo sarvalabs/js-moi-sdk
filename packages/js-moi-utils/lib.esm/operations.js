@@ -14,7 +14,7 @@ const createInvalidResult = (value, field, message) => {
  * @param operation - The operation to check.
  * @returns True if the operation is of the specified type, otherwise false.
  */
-const isOperationType = (type, operation) => {
+export const isOperationType = (type, operation) => {
     return operation.type === type;
 };
 const createParticipantCreateDescriptor = () => {

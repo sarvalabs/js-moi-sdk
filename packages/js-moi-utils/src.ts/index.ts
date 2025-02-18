@@ -39,6 +39,7 @@ export {
     listIxOperationDescriptors,
     transformOperationPayload,
     validateOperation,
+    isOperationType,
     type IxOperationDescriptor,
 } from "./operations";
 export { defineReadOnly } from "./properties";
