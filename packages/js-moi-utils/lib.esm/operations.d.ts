@@ -28,6 +28,14 @@ declare const createInvalidResult: <T extends Record<any, any>>(value: T, field:
     message: string;
     value: T[keyof T];
 };
+/**
+ * Checks if a given operation is of a specified type.
+ *
+ * @param type - The type to check the operation against.
+ * @param operation - The operation to check.
+ * @returns True if the operation is of the specified type, otherwise false.
+ */
+export declare const isOperationType: <TOpType extends OpType>(type: TOpType, operation: IxOperation<OpType>) => operation is IxOperation<TOpType>;
 type OperationDescriptorRecord<T extends OpType = OpType> = {
     type: T;
     descriptor: IxOperationDescriptor<T>;

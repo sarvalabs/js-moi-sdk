@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = void 0;
+exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = exports.isOperationType = void 0;
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
@@ -20,6 +20,7 @@ const createInvalidResult = (value, field, message) => {
 const isOperationType = (type, operation) => {
     return operation.type === type;
 };
+exports.isOperationType = isOperationType;
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
         schema: polo_schema_1.polo.struct({
@@ -204,17 +205,17 @@ const createAssetActionDescriptor = () => {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
             switch (true) {
-                case isOperationType(enums_1.OpType.AssetLockup, operation):
-                case isOperationType(enums_1.OpType.AssetTransfer, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.AssetLockup, operation):
+                case (0, exports.isOperationType)(enums_1.OpType.AssetTransfer, operation): {
                     return validateAmount(operation.payload);
                 }
-                case isOperationType(enums_1.OpType.AssetApprove, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.AssetApprove, operation): {
                     return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
                 }
-                case isOperationType(enums_1.OpType.AssetRelease, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.AssetRelease, operation): {
                     return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
                 }
-                case isOperationType(enums_1.OpType.AssetRevoke, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.AssetRevoke, operation): {
                     return null;
                 }
                 default: {
@@ -282,11 +283,11 @@ const createLogicActionDescriptor = () => {
                 return createInvalidResult(operation.payload, "callsite", "Callsite is required");
             }
             switch (true) {
-                case isOperationType(enums_1.OpType.LogicDeploy, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.LogicDeploy, operation): {
                     return validateManifest(operation.payload) ?? validateCalldata(operation.payload);
                 }
-                case isOperationType(enums_1.OpType.LogicInvoke, operation):
-                case isOperationType(enums_1.OpType.LogicEnlist, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.LogicInvoke, operation):
+                case (0, exports.isOperationType)(enums_1.OpType.LogicEnlist, operation): {
                     return validateLogicId(operation.payload) ?? validateCalldata(operation.payload);
                 }
                 default: {
