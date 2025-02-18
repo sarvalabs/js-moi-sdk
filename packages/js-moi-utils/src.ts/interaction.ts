@@ -183,8 +183,6 @@ const gatherIxFunds = (interaction: InteractionRequest) => {
 
     for (const { type, payload } of interaction.operations) {
         switch (type) {
-            // TODO: Should revoke be here or not?
-
             case OpType.AssetTransfer:
             case OpType.AssetMint:
             case OpType.AssetBurn:
@@ -208,6 +206,10 @@ const gatherIxFunds = (interaction: InteractionRequest) => {
     return Array.from(funds.values());
 };
 
+export function interaction(ix: InteractionRequest): Uint8Array;
+export function interaction(ix: InteractionRequest, format: "raw"): RawInteractionRequest;
+export function interaction(ix: InteractionRequest, format: "polo"): Uint8Array;
+export function interaction(ix: InteractionRequest, format: "minimal"): InteractionRequest;
 /**
  * Creates a POLO bytes from an interaction request.
  *
@@ -216,17 +218,24 @@ const gatherIxFunds = (interaction: InteractionRequest) => {
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export const interaction = (ix: InteractionRequest): Uint8Array => {
+export function interaction(ix: InteractionRequest, format: "raw" | "polo" | "minimal" = "polo"): RawInteractionRequest | Uint8Array | InteractionRequest {
     const interaction: InteractionRequest = {
         ...ix,
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
     };
 
-    console.log(JSON.stringify(interaction, null, 2));
-
-    return encodeInteraction(interaction);
-};
+    switch (format) {
+        case "minimal":
+            return interaction;
+        case "raw":
+            return transformInteraction(interaction);
+        case "polo":
+            return encodeInteraction(interaction);
+        default:
+            throw new Error(`Invalid format: ${format}`);
+    }
+}
 
 const createInvalidResult = <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     return { field, message, value: value[field] };

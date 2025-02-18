@@ -26,15 +26,10 @@ export declare const transformInteraction: (ix: InteractionRequest) => RawIntera
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export declare function encodeInteraction(ix: InteractionRequest | RawInteractionRequest): Uint8Array;
-/**
- * Creates a POLO bytes from an interaction request.
- *
- * It smartly gathers the participants and funds from the interaction request and then encodes the interaction request.
- *
- * @param ix - The interaction request to encode.
- * @returns A POLO bytes representing the encoded interaction request.
- */
-export declare const interaction: (ix: InteractionRequest) => Uint8Array;
+export declare function interaction(ix: InteractionRequest): Uint8Array;
+export declare function interaction(ix: InteractionRequest, format: "raw"): RawInteractionRequest;
+export declare function interaction(ix: InteractionRequest, format: "polo"): Uint8Array;
+export declare function interaction(ix: InteractionRequest, format: "minimal"): InteractionRequest;
 declare const createInvalidResult: <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     field: keyof T;
     message: string;
