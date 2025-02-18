@@ -160,7 +160,6 @@ const gatherIxFunds = (interaction) => {
     const funds = new Map();
     for (const { type, payload } of interaction.operations) {
         switch (type) {
-            // TODO: Should revoke be here or not?
             case OpType.AssetTransfer:
             case OpType.AssetMint:
             case OpType.AssetBurn:
@@ -188,15 +187,23 @@ const gatherIxFunds = (interaction) => {
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export const interaction = (ix) => {
+export function interaction(ix, format = "polo") {
     const interaction = {
         ...ix,
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
     };
-    console.log(JSON.stringify(interaction, null, 2));
-    return encodeInteraction(interaction);
-};
+    switch (format) {
+        case "minimal":
+            return interaction;
+        case "raw":
+            return transformInteraction(interaction);
+        case "polo":
+            return encodeInteraction(interaction);
+        default:
+            throw new Error(`Invalid format: ${format}`);
+    }
+}
 const createInvalidResult = (value, field, message) => {
     return { field, message, value: value[field] };
 };

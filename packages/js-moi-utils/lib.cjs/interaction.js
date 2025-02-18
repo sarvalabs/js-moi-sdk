@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.interaction = exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
+exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
+exports.interaction = interaction;
 exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
@@ -167,7 +168,6 @@ const gatherIxFunds = (interaction) => {
     const funds = new Map();
     for (const { type, payload } of interaction.operations) {
         switch (type) {
-            // TODO: Should revoke be here or not?
             case enums_1.OpType.AssetTransfer:
             case enums_1.OpType.AssetMint:
             case enums_1.OpType.AssetBurn:
@@ -195,16 +195,23 @@ const gatherIxFunds = (interaction) => {
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-const interaction = (ix) => {
+function interaction(ix, format = "polo") {
     const interaction = {
         ...ix,
         participants: gatherIxParticipants(ix),
         funds: gatherIxFunds(ix),
     };
-    console.log(JSON.stringify(interaction, null, 2));
-    return encodeInteraction(interaction);
-};
-exports.interaction = interaction;
+    switch (format) {
+        case "minimal":
+            return interaction;
+        case "raw":
+            return (0, exports.transformInteraction)(interaction);
+        case "polo":
+            return encodeInteraction(interaction);
+        default:
+            throw new Error(`Invalid format: ${format}`);
+    }
+}
 const createInvalidResult = (value, field, message) => {
     return { field, message, value: value[field] };
 };
