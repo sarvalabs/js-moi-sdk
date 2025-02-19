@@ -184,7 +184,6 @@ const gatherIxFunds = (interaction: InteractionRequest) => {
     for (const { type, payload } of interaction.operations) {
         switch (type) {
             case OpType.AssetTransfer:
-            case OpType.AssetMint:
             case OpType.AssetBurn:
             case OpType.AssetLockup:
             case OpType.AssetRelease:
