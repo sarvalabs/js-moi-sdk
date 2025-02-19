@@ -169,7 +169,6 @@ const gatherIxFunds = (interaction) => {
     for (const { type, payload } of interaction.operations) {
         switch (type) {
             case enums_1.OpType.AssetTransfer:
-            case enums_1.OpType.AssetMint:
             case enums_1.OpType.AssetBurn:
             case enums_1.OpType.AssetLockup:
             case enums_1.OpType.AssetRelease:
