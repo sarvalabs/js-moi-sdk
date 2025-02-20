@@ -44,7 +44,7 @@ declare const createInvalidResult: <T extends Record<any, any>>(value: T, field:
  * The function performs the following validations:
  * - Checks if the sender is present and has a valid address.
  * - Checks if the fuel price and fuel limit are present and non-negative.
- * - Checks if the payer, if present, has a valid address.
+ * - Checks if the sponsor, if present, has a valid address.
  * - Checks if the participants, if present, is an array and each participant has a valid address.
  * - Checks if the operations are present, is an array, and contains at least one operation.
  * - Checks each operation to ensure it has a type and payload, and validates the operation.

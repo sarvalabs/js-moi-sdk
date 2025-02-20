@@ -4,7 +4,6 @@ exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
 exports.interaction = interaction;
 exports.validateIxRequest = validateIxRequest;
-const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
@@ -23,7 +22,11 @@ const getInteractionRequestSchema = () => {
             sequence_id: polo_schema_1.polo.integer,
             key_id: polo_schema_1.polo.integer,
         }),
-        payer: polo_schema_1.polo.bytes,
+        sponsor: polo_schema_1.polo.struct({
+            id: polo_schema_1.polo.bytes,
+            sequence_id: polo_schema_1.polo.integer,
+            key_id: polo_schema_1.polo.integer,
+        }),
         fuel_price: polo_schema_1.polo.integer,
         fuel_limit: polo_schema_1.polo.integer,
         funds: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
@@ -60,7 +63,7 @@ const transformInteraction = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
-        payer: (0, hex_1.hexToBytes)(ix.payer ?? js_moi_constants_1.ZERO_ADDRESS),
+        sponsor: ix.sponsor ? { ...ix.sponsor, id: new js_moi_identifiers_1.ParticipantId(ix.sponsor.id).toBytes() } : undefined,
         ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, id: (0, hex_1.hexToBytes)(participant.id) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
@@ -98,9 +101,9 @@ const gatherIxParticipants = (interaction) => {
             },
         ],
     ]);
-    if (interaction.payer != null) {
-        participants.set(interaction.payer, {
-            id: interaction.payer,
+    if (interaction.sponsor != null) {
+        participants.set(interaction.sponsor.id, {
+            id: interaction.sponsor.id,
             lock_type: enums_1.LockType.MutateLock,
             notary: false,
         });
@@ -223,7 +226,7 @@ const createInvalidResult = (value, field, message) => {
  * The function performs the following validations:
  * - Checks if the sender is present and has a valid address.
  * - Checks if the fuel price and fuel limit are present and non-negative.
- * - Checks if the payer, if present, has a valid address.
+ * - Checks if the sponsor, if present, has a valid address.
  * - Checks if the participants, if present, is an array and each participant has a valid address.
  * - Checks if the operations are present, is an array, and contains at least one operation.
  * - Checks each operation to ensure it has a type and payload, and validates the operation.
@@ -247,8 +250,8 @@ function validateIxRequest(type, ix) {
     if (type === "moi.Execute" && ix["fuel_limit"] < 0) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
-    if (ix.payer != null && !(0, hex_1.isHex)(ix.payer, 32)) {
-        return createInvalidResult(ix, "payer", "Invalid payer address");
+    if (ix.sponsor != null && !(0, hex_1.isHex)(ix.sender.id, 32)) {
+        return createInvalidResult(ix, "sponsor", "Invalid sponser address");
     }
     if (ix.participants != null) {
         if (!Array.isArray(ix.participants)) {
