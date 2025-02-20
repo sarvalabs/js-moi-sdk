@@ -53,7 +53,7 @@ export interface IxPreference {
 
 export interface RawInteractionRequest {
     sender: RawSender;
-    payer: Uint8Array;
+    sponsor?: RawSender;
     fuel_price: number;
     fuel_limit: number;
     funds?: RawIxFund[];
@@ -71,7 +71,7 @@ export interface InteractionRequest {
     /**
      * The entity responsible for paying for the interaction.
      */
-    payer?: Hex;
+    sponsor?: Sender;
     /**
      * The price multiplier for fuel for the interaction.
      */
