@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from "js-moi-constants";
 import { AssetId, LogicId, ParticipantId } from "js-moi-identifiers";
 import { Polorizer, type Schema } from "js-polo";
 import { polo } from "polo-schema";
@@ -65,7 +66,7 @@ export const transformInteraction = (ix: InteractionRequest): RawInteractionRequ
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
-        sponsor: ix.sponsor ? { ...ix.sponsor, id: new ParticipantId(ix.sponsor.id).toBytes() } : undefined,
+        sponsor: ix.sponsor ? { ...ix.sponsor, id: new ParticipantId(ix.sponsor.id).toBytes() } : { id: hexToBytes(ZERO_ADDRESS), key_id: 0, sequence_id: 0 },
         ix_operations: ix.operations.map(encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, id: hexToBytes(participant.id) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
