@@ -4,6 +4,7 @@ exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
 exports.interaction = interaction;
 exports.validateIxRequest = validateIxRequest;
+const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
 const polo_schema_1 = require("polo-schema");
@@ -63,7 +64,7 @@ const transformInteraction = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
-        sponsor: ix.sponsor ? { ...ix.sponsor, id: new js_moi_identifiers_1.ParticipantId(ix.sponsor.id).toBytes() } : undefined,
+        sponsor: ix.sponsor ? { ...ix.sponsor, id: new js_moi_identifiers_1.ParticipantId(ix.sponsor.id).toBytes() } : { id: (0, hex_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS), key_id: 0, sequence_id: 0 },
         ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, id: (0, hex_1.hexToBytes)(participant.id) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
