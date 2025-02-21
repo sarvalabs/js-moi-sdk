@@ -30,10 +30,6 @@ const getInteractionRequestSchema = () => {
         }),
         fuel_price: polo_schema_1.polo.integer,
         fuel_limit: polo_schema_1.polo.integer,
-        funds: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            asset_id: polo_schema_1.polo.bytes,
-            amount: polo_schema_1.polo.integer,
-        })),
         ix_operations: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
             type: polo_schema_1.polo.integer,
             payload: polo_schema_1.polo.bytes,
@@ -69,7 +65,6 @@ const transformInteraction = (ix) => {
         participants: ix.participants?.map((participant) => ({ ...participant, id: (0, hex_1.hexToBytes)(participant.id) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,
-        funds: ix.funds?.map((fund) => ({ ...fund, asset_id: (0, hex_1.hexToBytes)(fund.asset_id) })),
     };
 };
 exports.transformInteraction = transformInteraction;
@@ -168,28 +163,6 @@ const gatherIxParticipants = (interaction) => {
     }
     return Array.from(participants.values());
 };
-const gatherIxFunds = (interaction) => {
-    const funds = new Map();
-    for (const { type, payload } of interaction.operations) {
-        switch (type) {
-            case enums_1.OpType.AssetTransfer:
-            case enums_1.OpType.AssetBurn:
-            case enums_1.OpType.AssetLockup:
-            case enums_1.OpType.AssetRelease:
-            case enums_1.OpType.AssetApprove: {
-                const accumulated = funds.get(payload.asset_id)?.amount ?? 0;
-                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount + accumulated });
-            }
-        }
-    }
-    for (const { asset_id, amount } of interaction.funds ?? []) {
-        if (funds.has(asset_id)) {
-            continue;
-        }
-        funds.set(asset_id, { asset_id, amount });
-    }
-    return Array.from(funds.values());
-};
 /**
  * Creates a POLO bytes from an interaction request.
  *
@@ -202,7 +175,6 @@ function interaction(ix, format = "polo") {
     const interaction = {
         ...ix,
         participants: gatherIxParticipants(ix),
-        funds: gatherIxFunds(ix),
     };
     switch (format) {
         case "minimal":

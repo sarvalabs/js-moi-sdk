@@ -46,7 +46,6 @@ export interface RawInteractionRequest {
     sponsor?: RawSender;
     fuel_price: number;
     fuel_limit: number;
-    funds?: RawIxFund[];
     ix_operations: IxRawOperation[];
     participants?: RawParticipants[];
     preferences?: RawPreference;
@@ -69,10 +68,6 @@ export interface InteractionRequest {
      * The maximum amount of fuel that can be used for the interaction.
      */
     fuel_limit: number;
-    /**
-     * Represents an array of asset id and their amount associated with the interaction.
-     */
-    funds?: IxFund[];
     /**
      * Represents an array of raw operations to be executed in the interaction
      */
