@@ -35,6 +35,7 @@ export { deepCopy } from "./object";
 export {
     encodeOperation,
     getIxOperationDescriptor,
+    isOperationType,
     isValidOperation,
     listIxOperationDescriptors,
     transformOperationPayload,
@@ -46,7 +47,6 @@ export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStora
 export type {
     InteractionRequest,
     IxConsensusPreference,
-    IxFund,
     IxParticipant,
     IxPreference,
     RawInteractionRequest,
