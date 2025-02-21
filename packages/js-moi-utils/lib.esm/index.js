@@ -5,7 +5,7 @@ export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, hexToHash, isAddress, isHex, isNullBytes, numToHex, trimHexPrefix, } from "./hex";
 export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
-export { encodeOperation, getIxOperationDescriptor, isValidOperation, listIxOperationDescriptors, transformOperationPayload, validateOperation, isOperationType, } from "./operations";
+export { encodeOperation, getIxOperationDescriptor, isOperationType, isValidOperation, listIxOperationDescriptors, transformOperationPayload, validateOperation, } from "./operations";
 export { defineReadOnly } from "./properties";
 export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey } from "./storage-key";
 //# sourceMappingURL=index.js.map

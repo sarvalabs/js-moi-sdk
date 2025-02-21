@@ -14,16 +14,6 @@ export interface Sender {
     key_id: number;
 }
 
-export interface IxFund {
-    asset_id: Hex;
-    amount: number;
-}
-
-export interface RawIxFund {
-    asset_id: Uint8Array;
-    amount: number;
-}
-
 export interface RawParticipants {
     id: Uint8Array;
     lock_type: LockType;
