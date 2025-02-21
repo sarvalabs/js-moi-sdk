@@ -229,7 +229,7 @@ export interface Asset {
     metadata: AssetMetadata;
     controller?: AssetController;
     creator?: AssetCreator;
-    edition?: string[];
+    editions?: Hex[];
 }
 export interface LogicEvent {
     logic_id: Hex;
