@@ -226,8 +226,8 @@ export interface InteractionInfo {
 }
 
 export interface TesseractInfo {
-    hash?: Hex;
-    index?: number;
+    hash: Hex;
+    ix_index: number;
 }
 
 export interface InteractionConfirmation {

@@ -176,8 +176,8 @@ export interface InteractionInfo {
     perception: Hex;
 }
 export interface TesseractInfo {
-    hash?: Hex;
-    index?: number;
+    hash: Hex;
+    ix_index: number;
 }
 export interface InteractionConfirmation {
     status: ReceiptStatus;
