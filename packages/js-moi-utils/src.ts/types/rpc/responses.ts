@@ -1,6 +1,6 @@
 import type { AccountType, AssetStandard, InteractionStatus, LockType, OpType, ReceiptStatus } from "../../enums";
 import type { Address, Hex, Quantity } from "../../hex";
-import type { IxParticipant } from "../interaction";
+import type { IxParticipant, Sender } from "../interaction";
 import type { LogicActionPayload, LogicDeployPayload, LogicPayload } from "../ix-operation";
 import type { AnyIxOperationResult } from "./ix-result";
 
@@ -185,16 +185,12 @@ export interface AssetSupplyOperation {
     amount: Quantity;
 }
 
-export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
-    ? ParticipantCreateOperation
-    : T extends OpType.AssetCreate
-    ? AssetCreateOperation
-    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
-    ? AssetActionOperation
-    : T extends OpType.LogicDeploy
-    ? LogicDeployPayload
-    : T extends OpType.LogicEnlist | OpType.LogicInvoke
-    ? LogicActionPayload
+export type OperationPayload<T extends OpType> =
+    T extends OpType.ParticipantCreate ? ParticipantCreateOperation
+    : T extends OpType.AssetCreate ? AssetCreateOperation
+    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease ? AssetActionOperation
+    : T extends OpType.LogicDeploy ? LogicDeployPayload
+    : T extends OpType.LogicEnlist | OpType.LogicInvoke ? LogicActionPayload
     : never;
 
 export interface Operation<T extends OpType> {
@@ -214,8 +210,9 @@ export type OperationItem =
     | Operation<OpType.LogicInvoke>;
 
 export interface InteractionInfo {
-    sender: Hex;
-    sponsor: Hex;
+    sender: Sender;
+    sponsor: Sender;
+    fuel_price: number;
     fuel_limit: number;
     fuel_bonus: number;
     operations: OperationItem[];
