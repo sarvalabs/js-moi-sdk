@@ -48,12 +48,12 @@ class Signer {
     async createIxRequestSender(sender) {
         if (sender == null) {
             const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
-            return { id: participant.toHex(), key_id: index, sequence_id: sequenceId };
+            return { id: participant.toHex(), key_id: index, sequence: sequenceId };
         }
         return {
             id: (await this.getIdentifier()).toHex(),
             key_id: sender.key_id ?? (await this.getKeyId()),
-            sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
+            sequence: sender.sequence ?? (await this.getLatestSequence()),
         };
     }
     async createSimulateIxRequest(arg) {
@@ -120,7 +120,7 @@ class Signer {
             return await this.getProvider().execute(arg);
         }
         const request = await this.createIxRequest("moi.Execute", arg);
-        if (request.sender.sequence_id < (await this.getLatestSequence())) {
+        if (request.sender.sequence < (await this.getLatestSequence())) {
             js_moi_utils_1.ErrorUtils.throwError("Sequence number is outdated", js_moi_utils_1.ErrorCode.SEQUENCE_EXPIRED);
         }
         const error = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", request);

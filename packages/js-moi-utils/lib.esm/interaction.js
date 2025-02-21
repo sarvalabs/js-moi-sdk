@@ -14,12 +14,12 @@ export const getInteractionRequestSchema = () => {
     return polo.struct({
         sender: polo.struct({
             id: polo.bytes,
-            sequence_id: polo.integer,
+            sequence: polo.integer,
             key_id: polo.integer,
         }),
         sponsor: polo.struct({
             id: polo.bytes,
-            sequence_id: polo.integer,
+            sequence: polo.integer,
             key_id: polo.integer,
         }),
         fuel_price: polo.integer,
@@ -53,7 +53,7 @@ export const transformInteraction = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
-        sponsor: ix.sponsor ? { ...ix.sponsor, id: new ParticipantId(ix.sponsor.id).toBytes() } : { id: hexToBytes(ZERO_ADDRESS), key_id: 0, sequence_id: 0 },
+        sponsor: ix.sponsor ? { ...ix.sponsor, id: new ParticipantId(ix.sponsor.id).toBytes() } : { id: hexToBytes(ZERO_ADDRESS), key_id: 0, sequence: 0 },
         ix_operations: ix.operations.map(encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, id: hexToBytes(participant.id) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,

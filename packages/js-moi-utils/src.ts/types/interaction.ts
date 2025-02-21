@@ -4,13 +4,13 @@ import type { AnyIxOperation, IxRawOperation } from "./ix-operation";
 
 export interface RawSender {
     id: Uint8Array;
-    sequence_id: number;
+    sequence: number;
     key_id: number;
 }
 
 export interface Sender {
     id: Hex;
-    sequence_id: number;
+    sequence: number;
     key_id: number;
 }
 

@@ -20,12 +20,12 @@ const getInteractionRequestSchema = () => {
     return polo_schema_1.polo.struct({
         sender: polo_schema_1.polo.struct({
             id: polo_schema_1.polo.bytes,
-            sequence_id: polo_schema_1.polo.integer,
+            sequence: polo_schema_1.polo.integer,
             key_id: polo_schema_1.polo.integer,
         }),
         sponsor: polo_schema_1.polo.struct({
             id: polo_schema_1.polo.bytes,
-            sequence_id: polo_schema_1.polo.integer,
+            sequence: polo_schema_1.polo.integer,
             key_id: polo_schema_1.polo.integer,
         }),
         fuel_price: polo_schema_1.polo.integer,
@@ -60,7 +60,7 @@ const transformInteraction = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
-        sponsor: ix.sponsor ? { ...ix.sponsor, id: new js_moi_identifiers_1.ParticipantId(ix.sponsor.id).toBytes() } : { id: (0, hex_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS), key_id: 0, sequence_id: 0 },
+        sponsor: ix.sponsor ? { ...ix.sponsor, id: new js_moi_identifiers_1.ParticipantId(ix.sponsor.id).toBytes() } : { id: (0, hex_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS), key_id: 0, sequence: 0 },
         ix_operations: ix.operations.map(operations_1.encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, id: (0, hex_1.hexToBytes)(participant.id) })),
         perception: ix.perception ? (0, hex_1.hexToBytes)(ix.perception) : undefined,
