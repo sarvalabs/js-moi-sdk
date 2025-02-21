@@ -161,17 +161,17 @@ export abstract class Signer {
         return sequence;
     }
 
-    private async createIxRequestSender(sender?: Partial<Omit<Sender, "address">>): Promise<Sender> {
+    private async createIxRequestSender(sender?: Partial<Omit<Sender, "id">>): Promise<Sender> {
         if (sender == null) {
             const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
 
-            return { id: participant.toHex(), key_id: index, sequence_id: sequenceId };
+            return { id: participant.toHex(), key_id: index, sequence: sequenceId };
         }
 
         return {
             id: (await this.getIdentifier()).toHex(),
             key_id: sender.key_id ?? (await this.getKeyId()),
-            sequence_id: sender.sequence_id ?? (await this.getLatestSequence()),
+            sequence: sender.sequence ?? (await this.getLatestSequence()),
         };
     }
 
@@ -233,7 +233,7 @@ export abstract class Signer {
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
     ): Promise<SimulateInteractionRequest | InteractionRequest> {
         const simulateIxRequest = await this.createSimulateIxRequest(args);
-
+        
         if (type === "moi.Simulate") {
             return simulateIxRequest;
         }
@@ -398,7 +398,7 @@ export abstract class Signer {
 
         const request = await this.createIxRequest("moi.Execute", arg);
 
-        if (request.sender.sequence_id < (await this.getLatestSequence())) {
+        if (request.sender.sequence < (await this.getLatestSequence())) {
             ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
         }
 

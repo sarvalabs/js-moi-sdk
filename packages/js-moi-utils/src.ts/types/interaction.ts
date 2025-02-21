@@ -4,24 +4,14 @@ import type { AnyIxOperation, IxRawOperation } from "./ix-operation";
 
 export interface RawSender {
     id: Uint8Array;
-    sequence_id: number;
+    sequence: number;
     key_id: number;
 }
 
 export interface Sender {
     id: Hex;
-    sequence_id: number;
+    sequence: number;
     key_id: number;
-}
-
-export interface IxFund {
-    asset_id: Hex;
-    amount: number;
-}
-
-export interface RawIxFund {
-    asset_id: Uint8Array;
-    amount: number;
 }
 
 export interface RawParticipants {
@@ -53,10 +43,9 @@ export interface IxPreference {
 
 export interface RawInteractionRequest {
     sender: RawSender;
-    payer: Uint8Array;
+    sponsor?: RawSender;
     fuel_price: number;
     fuel_limit: number;
-    funds?: RawIxFund[];
     ix_operations: IxRawOperation[];
     participants?: RawParticipants[];
     preferences?: RawPreference;
@@ -71,7 +60,7 @@ export interface InteractionRequest {
     /**
      * The entity responsible for paying for the interaction.
      */
-    payer?: Hex;
+    sponsor?: Sender;
     /**
      * The price multiplier for fuel for the interaction.
      */
@@ -80,10 +69,6 @@ export interface InteractionRequest {
      * The maximum amount of fuel that can be used for the interaction.
      */
     fuel_limit: number;
-    /**
-     * Represents an array of asset id and their amount associated with the interaction.
-     */
-    funds?: IxFund[];
     /**
      * Represents an array of raw operations to be executed in the interaction
      */
