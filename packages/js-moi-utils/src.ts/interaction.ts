@@ -5,7 +5,7 @@ import { polo } from "polo-schema";
 import { LockType, OpType } from "./enums";
 import { hexToBytes, isHex, type Hex } from "./hex";
 import { encodeOperation, validateOperation } from "./operations";
-import type { InteractionRequest, IxFund, IxParticipant, RawInteractionRequest } from "./types/interaction";
+import type { InteractionRequest, IxParticipant, RawInteractionRequest } from "./types/interaction";
 
 /**
  * Generates and returns the POLO schema for an interaction request.
@@ -16,22 +16,16 @@ export const getInteractionRequestSchema = (): Schema => {
     return polo.struct({
         sender: polo.struct({
             id: polo.bytes,
-            sequence_id: polo.integer,
+            sequence: polo.integer,
             key_id: polo.integer,
         }),
         sponsor: polo.struct({
             id: polo.bytes,
-            sequence_id: polo.integer,
+            sequence: polo.integer,
             key_id: polo.integer,
         }),
         fuel_price: polo.integer,
         fuel_limit: polo.integer,
-        funds: polo.arrayOf(
-            polo.struct({
-                asset_id: polo.bytes,
-                amount: polo.integer,
-            })
-        ),
         ix_operations: polo.arrayOf(
             polo.struct({
                 type: polo.integer,
@@ -66,12 +60,11 @@ export const transformInteraction = (ix: InteractionRequest): RawInteractionRequ
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
-        sponsor: ix.sponsor ? { ...ix.sponsor, id: new ParticipantId(ix.sponsor.id).toBytes() } : { id: hexToBytes(ZERO_ADDRESS), key_id: 0, sequence_id: 0 },
+        sponsor: ix.sponsor ? { ...ix.sponsor, id: new ParticipantId(ix.sponsor.id).toBytes() } : { id: hexToBytes(ZERO_ADDRESS), key_id: 0, sequence: 0 },
         ix_operations: ix.operations.map(encodeOperation),
         participants: ix.participants?.map((participant) => ({ ...participant, id: hexToBytes(participant.id) })),
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
         preferences: ix.preferences ? { ...ix.preferences, compute: hexToBytes(ix.preferences.compute) } : undefined,
-        funds: ix.funds?.map((fund) => ({ ...fund, asset_id: hexToBytes(fund.asset_id) })),
     };
 };
 
@@ -182,33 +175,6 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
     return Array.from(participants.values());
 };
 
-const gatherIxFunds = (interaction: InteractionRequest) => {
-    const funds = new Map<Hex, IxFund>();
-
-    for (const { type, payload } of interaction.operations) {
-        switch (type) {
-            case OpType.AssetTransfer:
-            case OpType.AssetBurn:
-            case OpType.AssetLockup:
-            case OpType.AssetRelease:
-            case OpType.AssetApprove: {
-                const accumulated = funds.get(payload.asset_id)?.amount ?? 0;
-                funds.set(payload.asset_id, { asset_id: payload.asset_id, amount: payload.amount + accumulated });
-            }
-        }
-    }
-
-    for (const { asset_id, amount } of interaction.funds ?? []) {
-        if (funds.has(asset_id)) {
-            continue;
-        }
-
-        funds.set(asset_id, { asset_id, amount });
-    }
-
-    return Array.from(funds.values());
-};
-
 export function interaction(ix: InteractionRequest): Uint8Array;
 export function interaction(ix: InteractionRequest, format: "raw"): RawInteractionRequest;
 export function interaction(ix: InteractionRequest, format: "polo"): Uint8Array;
@@ -225,7 +191,6 @@ export function interaction(ix: InteractionRequest, format: "raw" | "polo" | "mi
     const interaction: InteractionRequest = {
         ...ix,
         participants: gatherIxParticipants(ix),
-        funds: gatherIxFunds(ix),
     };
 
     switch (format) {
