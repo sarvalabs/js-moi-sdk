@@ -68,7 +68,7 @@ export abstract class Signer {
         return sequence;
     }
 
-    private async createIxRequestSender(sender?: Partial<Omit<Sender, "address">>): Promise<Sender> {
+    private async createIxRequestSender(sender?: Partial<Omit<Sender, "id">>): Promise<Sender> {
         if (sender == null) {
             const [participant, index, sequenceId] = await Promise.all([this.getIdentifier(), this.getKeyId(), this.getLatestSequence()]);
 
@@ -116,7 +116,7 @@ export abstract class Signer {
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
     ): Promise<SimulateInteractionRequest | InteractionRequest> {
         const simulateIxRequest = await this.createSimulateIxRequest(args);
-
+        
         if (type === "moi.Simulate") {
             return simulateIxRequest;
         }
