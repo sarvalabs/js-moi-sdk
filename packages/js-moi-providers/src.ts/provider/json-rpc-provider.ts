@@ -250,7 +250,7 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         return await this.call("moi.LogicStorage", ...params);
     }
 
-    async getAsset<TOption extends AssetRequestOption>(asset: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
+    async getAsset<TOption extends AssetRequestOption>(asset: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>> {
         return await this.call("moi.Asset", { id: new AssetId(asset), ...option });
     }
 
