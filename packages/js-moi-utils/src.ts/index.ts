@@ -133,7 +133,6 @@ export type {
     Commits,
     Consensus,
     ConsensusInfo,
-    Controls,
     Enlisted,
     FuelInfo,
     Guardians,
