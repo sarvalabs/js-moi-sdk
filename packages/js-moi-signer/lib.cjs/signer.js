@@ -91,7 +91,7 @@ class Signer {
         const simulation = await this.simulate(simulateIxRequest);
         const executeIxRequest = {
             ...simulateIxRequest,
-            fuel_limit: simulation.effort,
+            fuel_limit: simulation.fuel_spent,
         };
         const err = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", executeIxRequest);
         if (err != null) {

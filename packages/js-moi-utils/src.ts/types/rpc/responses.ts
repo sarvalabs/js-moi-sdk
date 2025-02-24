@@ -24,7 +24,7 @@ export interface Simulate {
     hash: Hex;
     status: ReceiptStatus;
     results: AnyIxOperationResult[];
-    effort: number;
+    fuel_spent: number;
     effects: SimulationEffects[] | null;
 }
 
@@ -183,12 +183,16 @@ export interface AssetSupplyOperation {
     amount: Quantity;
 }
 
-export type OperationPayload<T extends OpType> =
-    T extends OpType.ParticipantCreate ? ParticipantCreateOperation
-    : T extends OpType.AssetCreate ? AssetCreateOperation
-    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease ? AssetActionOperation
-    : T extends OpType.LogicDeploy ? LogicDeployPayload
-    : T extends OpType.LogicEnlist | OpType.LogicInvoke ? LogicActionPayload
+export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
+    ? ParticipantCreateOperation
+    : T extends OpType.AssetCreate
+    ? AssetCreateOperation
+    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
+    ? AssetActionOperation
+    : T extends OpType.LogicDeploy
+    ? LogicDeployPayload
+    : T extends OpType.LogicEnlist | OpType.LogicInvoke
+    ? LogicActionPayload
     : never;
 
 export interface Operation<T extends OpType> {

@@ -21,7 +21,7 @@ export interface Simulate {
     hash: Hex;
     status: ReceiptStatus;
     results: AnyIxOperationResult[];
-    effort: number;
+    fuel_spent: number;
     effects: SimulationEffects[] | null;
 }
 export interface AccountMetaData {

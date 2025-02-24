@@ -116,7 +116,7 @@ export abstract class Signer {
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
     ): Promise<SimulateInteractionRequest | InteractionRequest> {
         const simulateIxRequest = await this.createSimulateIxRequest(args);
-        
+
         if (type === "moi.Simulate") {
             return simulateIxRequest;
         }
@@ -128,7 +128,7 @@ export abstract class Signer {
         const simulation = await this.simulate(simulateIxRequest);
         const executeIxRequest = {
             ...simulateIxRequest,
-            fuel_limit: simulation.effort,
+            fuel_limit: simulation.fuel_spent,
         };
 
         const err = validateIxRequest("moi.Execute", executeIxRequest);
