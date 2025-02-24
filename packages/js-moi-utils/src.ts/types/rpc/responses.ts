@@ -76,8 +76,6 @@ export interface Guardians {
     stochastic: KramaID[];
 }
 
-export interface Controls {}
-
 export interface Enlisted {}
 
 export interface Account {
@@ -270,6 +268,9 @@ export interface AssetMetadata {
     standard: AssetStandard;
     logical: boolean;
     supply: Quantity;
+    dimension: number;
+    stateful: boolean;
+    symbol: string;
 }
 
 export interface AssetController {}
