@@ -184,7 +184,7 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      *
      * @returns A promise that resolves to the asset information.
      */
-    getAsset<TOption extends AssetRequestOption>(asset: Identifier, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
+    getAsset<TOption extends AssetRequestOption>(asset: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<Asset, TOption>>;
     private encodeTopics;
     /**
      * Retrieves logic messages from the MOI network.
