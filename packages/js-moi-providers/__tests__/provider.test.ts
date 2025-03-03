@@ -118,7 +118,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.simulate, () => {
             it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
                 const result = await provider.simulate({
-                    sender: { id: participant, key_id: 0, sequence_id: 0 },
+                    sender: { id: participant, key_id: 0, sequence: 0 },
                     fuel_price: 1,
                     operations: [
                         {
@@ -135,7 +135,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
                 const args = interaction({
-                    sender: { id: participant, key_id: 0, sequence_id: 0 },
+                    sender: { id: participant, key_id: 0, sequence: 0 },
                     fuel_price: 1,
                     fuel_limit: 1000,
                     operations: [
@@ -345,13 +345,13 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the asset with included fields", async () => {
                 const asset = await provider.getAsset(assetId, {
-                    modifier: { include: ["controller", "creator", "edition"] },
+                    modifier: { include: ["controller", "creator", "editions"] },
                 });
 
                 expect(asset).toBeDefined();
                 expect(asset.metadata).toBeDefined();
                 expect(asset.controller).toBeDefined();
-                expect(asset.edition).toBeDefined();
+                expect(asset.editions).toBeDefined();
             });
 
             it.concurrent("should return the asset with extracted fields", async () => {
@@ -364,14 +364,14 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with modifier and reference", async () => {
                 const asset = await provider.getAsset(assetId, {
-                    modifier: { include: ["controller", "creator", "edition"] },
+                    modifier: { include: ["controller", "creator", "editions"] },
                     reference: { relative: { id: assetId.toHex(), height: -1 } },
                 });
 
                 expect(asset).toBeDefined();
                 expect(asset.metadata).toBeDefined();
                 expect(asset.controller).toBeDefined();
-                expect(asset.edition).toBeDefined();
+                expect(asset.editions).toBeDefined();
             });
         });
 
