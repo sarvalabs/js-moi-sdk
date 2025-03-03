@@ -216,7 +216,7 @@ describe(Wallet, () => {
             sender: {
                 id: ID_STR,
                 key_id: 0,
-                sequence_id: 0,
+                sequence: 0,
             },
             fuel_price: 1,
             fuel_limit: 100,
@@ -255,7 +255,7 @@ describe(Wallet, () => {
         it.concurrent("should sign an interaction using ECDSA secp256k1", async () => {
             const { interaction: encoded, signatures } = await wallet.signInteraction(interaction, algorithm);
             const expectedSignature =
-                "0x01463044022011685f268b531472b68b2f0d5074437a5571a4326877281503a63877d458dc0402206899acfcdc388535e2a8f2f857ea9d6e99ca145fdfabb679b473496f2af1af5e02";
+                "0x01473045022100c7beee0e9ae79cf81242aa23b5ee27c66ce16e4c238985747d0e79252640f0810220151c7c41c7a5b3b7ee2a08bf881659bf8212ad97f7c3fc09b837e41c3a6a3b3402";
             const verify = wallet.verify(hexToBytes(encoded), signatures[0].signature, await wallet.getPublicKey());
 
             expect(isHex(encoded)).toBeTruthy();
@@ -299,7 +299,7 @@ describe("Provider integration test", () => {
 
             ix = await wallet.execute({
                 sender: {
-                    sequence_id: sequenceId ? parseInt(sequenceId) : undefined,
+                    sequence: sequenceId ? parseInt(sequenceId) : undefined,
                 },
                 fuel_price: 1,
                 fuel_limit: 100,
