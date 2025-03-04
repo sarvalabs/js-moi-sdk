@@ -81,6 +81,21 @@ export interface FuelInfo {
     bonus: number;
     spent: number;
 }
+export interface TesseractAccountContextData {
+    latest: Hex;
+    previous: Hex;
+    delta: {
+        consensus: null;
+        replaced: null;
+    };
+}
+export interface TesseractAccounts {
+    id: Hex;
+    transition: Hex;
+    height: number;
+    state: Hex;
+    context_data: TesseractAccountContextData;
+}
 export interface TesseractData {
     seal: Hex;
     epoch: Quantity;
@@ -88,7 +103,7 @@ export interface TesseractData {
     fuel: FuelInfo;
     interactions: Hex;
     confirmations: Hex;
-    accounts: Hex;
+    accounts: TesseractAccounts[];
 }
 export interface Stochastic {
     size: number;
