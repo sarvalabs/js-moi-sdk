@@ -162,6 +162,8 @@ export type {
     SimulationEffects,
     Stochastic,
     Tesseract,
+    TesseractAccountContextData,
+    TesseractAccounts,
     TesseractData,
     TesseractInfo,
 } from "./types/rpc/responses";
