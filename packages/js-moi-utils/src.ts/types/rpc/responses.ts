@@ -99,8 +99,8 @@ export interface TesseractAccountContextData {
     latest: Hex;
     previous: Hex;
     delta: {
-        consensus: null;
-        replaced: null;
+        consensus: null | string[];
+        replaced: null | string[];
     };
 }
 
