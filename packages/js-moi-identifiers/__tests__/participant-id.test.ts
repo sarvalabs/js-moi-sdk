@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { createParticipantId, Flag, Identifier, IdentifierKind, IdentifierVersion, ParticipantId } from "../src.ts";
 import { hexToBytes } from "../src.ts/utils";
 
@@ -55,5 +56,27 @@ describe(createParticipantId, () => {
                 flags: [new Flag(IdentifierKind.Participant, 2, 3)],
             })
         ).toThrow();
+    });
+
+    it.concurrent.each([
+        {
+            value: new Uint8Array(randomBytes(5)),
+            expected: "Invalid identifier length. Expected 32 bytes.",
+        },
+        {
+            value: 5 as any,
+        },
+        {
+            value: "invalid value",
+            expected: "Invalid hex string",
+        },
+        {
+            value: null!, // ! is used to make value as any
+        },
+        {
+            value: undefined!, // ! is used to make value as any,
+        },
+    ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
+        expect(() => new ParticipantId(value)).toThrow(expected);
     });
 });

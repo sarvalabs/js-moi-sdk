@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { AssetId, Identifier, IdentifierKind } from "../src.ts";
 import { hexToBytes } from "../src.ts/utils";
 
@@ -32,5 +33,27 @@ describe(AssetId, () => {
         it.concurrent("should return error for invalid asset id", () => {
             expect(AssetId.validate(hexToBytes(INVALID_ASSET_ID))).not.toBeNull();
         });
+    });
+
+    it.concurrent.each([
+        {
+            value: new Uint8Array(randomBytes(5)),
+            expected: "Invalid identifier length. Expected 32 bytes.",
+        },
+        {
+            value: 5 as any,
+        },
+        {
+            value: "invalid value",
+            expected: "Invalid hex string",
+        },
+        {
+            value: null!, // ! is used to make value as any
+        },
+        {
+            value: undefined!, // ! is used to make value as any,
+        },
+    ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
+        expect(() => new AssetId(value)).toThrow(expected);
     });
 });
