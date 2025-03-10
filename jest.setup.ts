@@ -24,21 +24,18 @@ const createProvider = () => {
         throw new Error(`Value for 'PROVIDER_TYPE' is not defined.`);
     }
 
-    log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
+    let p: Provider = (() => {
+        log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
 
-    let p: Provider | undefined = undefined;
-
-    if (PROVIDER_TYPE === "websocket") {
-        p = new WebsocketProvider(provider["websocket"]);
-    }
-
-    if (PROVIDER_TYPE === "http") {
-        p = new HttpProvider(provider["http"]);
-    }
-
-    if (p == null) {
-        throw new Error("Provider not created");
-    }
+        switch (PROVIDER_TYPE) {
+            case "http":
+                return new HttpProvider(provider.http);
+            case "websocket":
+                return new WebsocketProvider(provider.websocket);
+            default:
+                throw new Error(`No provider defined for type '${PROVIDER_TYPE}'`);
+        }
+    })();
 
     p.on("debug", (message) => {
         log(`DEBUG: ${JSON.stringify(message)}`);
