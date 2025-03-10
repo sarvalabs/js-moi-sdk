@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { Identifier, IdentifierKind, IdentifierTag } from "../src.ts";
 import { hexToBytes } from "../src.ts/utils";
 
@@ -35,5 +36,27 @@ describe(Identifier, () => {
                 expect(identifier.toString()).toBe(value);
             });
         });
+    });
+
+    it.concurrent.each([
+        {
+            value: new Uint8Array(randomBytes(5)),
+            expected: "Invalid identifier length. Expected 32 bytes.",
+        },
+        {
+            value: 5 as any,
+        },
+        {
+            value: "invalid value",
+            expected: "Invalid hex string",
+        },
+        {
+            value: null!, // ! is used to make value as any
+        },
+        {
+            value: undefined!, // ! is used to make value as any,
+        },
+    ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
+        expect(() => new Identifier(value)).toThrow(expected);
     });
 });
