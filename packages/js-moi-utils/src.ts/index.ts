@@ -8,8 +8,8 @@ export {
     InteractionStatus,
     LockType,
     LogicState,
-    OperationStatus,
     OpType,
+    OperationStatus,
     ReceiptStatus,
     RoutineKind,
     RoutineType,
@@ -44,7 +44,7 @@ export {
     type IxOperationDescriptor,
 } from "./operations";
 export { defineReadOnly } from "./properties";
-export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, generateStorageKey, LengthAccessor, PropertyAccessor, StorageKey, type Accessor } from "./storage-key";
+export { AbstractAccessor, ArrayIndexAccessor, ClassFieldAccessor, LengthAccessor, PropertyAccessor, StorageKey, generateStorageKey, type Accessor } from "./storage-key";
 export type {
     InteractionRequest,
     IxConsensusPreference,
@@ -91,7 +91,7 @@ export type {
     PoloParticipantCreatePayload,
 } from "./types/ix-operation";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
-export type { CocoPrimitiveType, Element, ElementData, EngineConfig, LogicElement, LogicManifest, TypeField } from "./types/manifest";
+export type { PrimitiveType as CocoPrimitiveType, Element, ElementData, EngineConfig, LogicElement, LogicManifest, TypeField } from "./types/manifest";
 export type {
     AbsoluteTesseractReference,
     ExtractModifier,
