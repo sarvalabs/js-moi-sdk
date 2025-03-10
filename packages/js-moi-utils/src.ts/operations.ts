@@ -217,8 +217,8 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             return createInvalidResult(payload, "amount", "Amount must be a number");
         }
 
-        if (payload.amount < 0) {
-            return createInvalidResult(payload, "amount", "Amount cannot be negative");
+        if (payload.amount <= 0) {
+            return createInvalidResult(payload, "amount", "Amount cannot be greater than zero");
         }
 
         return null;
