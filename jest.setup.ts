@@ -21,7 +21,7 @@ const log = (message: string) => {
 
 const createProvider = () => {
     if (!provider[PROVIDER_TYPE]) {
-        throw new Error("PROVIDER_URL is not set");
+        throw new Error(`Value for 'PROVIDER_TYPE' is not defined.`);
     }
 
     log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
