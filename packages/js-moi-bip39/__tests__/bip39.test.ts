@@ -65,7 +65,6 @@ describe("Mnemonic Utils", () => {
 
     describe("validateMnemonic", () => {
         it.concurrent("should return true for a valid mnemonic", () => {
-            const mnemonic = "hollow appear story text start mask salt social child space aspect hurdle";
             const isValid = validateMnemonic(mnemonic);
             expect(isValid).toBe(true);
         });
