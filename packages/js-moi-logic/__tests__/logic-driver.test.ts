@@ -7,7 +7,7 @@ import { loadManifestFromFile } from "./manifests";
 import { LogicId } from "js-moi-identifiers";
 import { Wallet } from "../../js-moi-wallet/src.ts";
 import { createWallet } from "./helpers";
-import { mockConfirmedInteraction } from "./utils.ts";
+import { mockConfirmedInteraction } from "./utils";
 
 const TEST_LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 
@@ -148,7 +148,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
             );
             const logicId = await driver.getLogicId();
 
-            expect(logicId.toString()).toEqual(result.data.logic_id);
+            expect(logicId.toString()).toEqual(TEST_LOGIC_ID);
 
             // cleanup
             interactionResponseMock.restore();
