@@ -283,9 +283,12 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             }
 
             switch (true) {
-                case isOperationType(OpType.AssetLockup, operation):
-                case isOperationType(OpType.AssetTransfer, operation): {
+                case isOperationType(OpType.AssetLockup, operation): {
                     return validateAmount(operation.payload);
+                }
+
+                case isOperationType(OpType.AssetTransfer, operation): {
+                    return validateAmount(operation.payload) ?? (operation.payload.benefactor != null ? validateBenefactor(operation.payload) : null);
                 }
 
                 case isOperationType(OpType.AssetApprove, operation): {
