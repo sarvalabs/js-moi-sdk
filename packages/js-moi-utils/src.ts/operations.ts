@@ -26,7 +26,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the transformed operation payload.
      */
-    transform?: (payload: IxOperation<TOpType>) => RawIxOperationPayload<TOpType>;
+    encode?: (payload: IxOperation<TOpType>) => RawIxOperationPayload<TOpType>;
 }
 
 type IxOperationDescriptorLookup = {
@@ -64,7 +64,7 @@ const createParticipantCreateDescriptor = () => {
             amount: polo.integer,
         }),
 
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             const poloKeysPayload = payload.keys_payload.map((payload) => ({
                 ...payload,
                 public_key: hexToBytes(payload.public_key),
@@ -165,7 +165,7 @@ const createAccountConfigureDescriptor = () => {
             return null;
         },
 
-        transform: ({ payload }): RawIxOperationPayload<OpType.AccountConfigure> => {
+        encode: ({ payload }): RawIxOperationPayload<OpType.AccountConfigure> => {
             return {
                 add: payload.add?.map((key) => ({
                     ...key,
@@ -184,7 +184,7 @@ const createAssetSupplyDescriptorFor = () => {
             amount: polo.integer,
         }),
 
-        transform: ({ payload }) => ({
+        encode: ({ payload }) => ({
             ...payload,
             asset_id: hexToBytes(payload.asset_id),
         }),
@@ -257,7 +257,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             timestamp: polo.integer,
         }),
 
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw: RawIxOperationPayload<TOpType> = {
                 ...payload,
@@ -351,7 +351,7 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
             }),
         }),
 
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             if ("manifest" in payload) {
                 const raw = {
                     ...payload,
@@ -450,14 +450,14 @@ export const getIxOperationDescriptor = <TOpType extends OpType>(type: TOpType):
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export const transformOperationPayload = <TOpType extends OpType>(operation: IxOperation<TOpType>): RawIxOperationPayload<TOpType> => {
+export const encodeOperationPayload = <TOpType extends OpType>(operation: IxOperation<TOpType>): RawIxOperationPayload<TOpType> => {
     const descriptor = getIxOperationDescriptor(operation.type);
 
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
     }
 
-    return descriptor.transform?.(operation) ?? (operation.payload as unknown as RawIxOperationPayload<TOpType>);
+    return descriptor.encode?.(operation) ?? (operation.payload as unknown as RawIxOperationPayload<TOpType>);
 };
 
 /**
@@ -476,7 +476,7 @@ export const encodeOperation = <TOpType extends OpType>(operation: IxOperation<T
     }
 
     const polorizer = new Polorizer();
-    const data = transformOperationPayload(operation);
+    const data = encodeOperationPayload(operation);
 
     polorizer.polorize(data, descriptor.schema);
 

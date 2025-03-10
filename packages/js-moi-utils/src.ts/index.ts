@@ -35,11 +35,11 @@ export { encodeInteraction, getInteractionRequestSchema, interaction, transformI
 export { deepCopy } from "./object";
 export {
     encodeOperation,
+    encodeOperationPayload,
     getIxOperationDescriptor,
     isOperationType,
     isValidOperation,
     listIxOperationDescriptors,
-    transformOperationPayload,
     validateOperation,
     type IxOperationDescriptor,
 } from "./operations";
