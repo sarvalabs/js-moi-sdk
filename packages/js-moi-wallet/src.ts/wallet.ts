@@ -8,7 +8,7 @@ import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, rand
 
 import { Identifier, IdentifierVersion, createParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
-import { FromMnemonicOptions, type WalletOption } from "../types/wallet";
+import { MnemonicImportOptions, type WalletOption } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 
@@ -250,9 +250,9 @@ export class Wallet extends Signer {
         }
     }
 
-    static async fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    static async fromMnemonic(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Promise<Wallet> {
+    static async fromMnemonic(mnemonic: string, path?: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, optionOrPath?: MnemonicImportOptions | string, options?: MnemonicImportOptions): Promise<Wallet> {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
 
@@ -275,9 +275,9 @@ export class Wallet extends Signer {
         }
     }
 
-    public static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
-    public static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
-    public static fromMnemonicSync(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Wallet {
+    public static fromMnemonicSync(mnemonic: string, path?: string, options?: MnemonicImportOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, options?: MnemonicImportOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, optionOrPath?: MnemonicImportOptions | string, options?: MnemonicImportOptions): Wallet {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
             mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, option?.words), option?.words);
