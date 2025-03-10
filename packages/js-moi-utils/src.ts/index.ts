@@ -91,7 +91,7 @@ export type {
     RawParticipantCreatePayload,
 } from "./types/ix-operation";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
-export type { PrimitiveType as CocoPrimitiveType, Element, ElementData, EngineConfig, LogicElement, LogicManifest, TypeField } from "./types/manifest";
+export type { Element, ElementData, EngineConfig, LogicElement, LogicManifest, PrimitiveType, TypeField } from "./types/manifest";
 export type {
     AbsoluteTesseractReference,
     ExtractModifier,
