@@ -151,7 +151,7 @@ const createAccountConfigureDescriptor = () => {
 
         validator: ({ payload }) => {
             if (payload.add == null || payload.revoke == null) {
-                createInvalidResult(payload, "add", "Add and revoke are required");
+                createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
 
             for (const key in payload) {
