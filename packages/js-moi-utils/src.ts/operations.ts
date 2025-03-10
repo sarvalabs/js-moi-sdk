@@ -210,7 +210,7 @@ type AssetActionOpType = OpType.AssetTransfer | OpType.AssetApprove | OpType.Ass
 const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
     const validateAmount = (payload: Partial<Record<"amount", number>>) => {
         if (payload.amount == null) {
-            return createInvalidResult(payload, "amount", "Amount is required for transfer operation");
+            return createInvalidResult(payload, "amount", "Amount is required for operation");
         }
 
         if (typeof payload.amount !== "number" || Number.isNaN(payload.amount)) {
