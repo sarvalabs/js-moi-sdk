@@ -293,7 +293,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
                 }
 
                 case isOperationType(OpType.AssetRelease, operation): {
-                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
+                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload);
                 }
 
                 case isOperationType(OpType.AssetRevoke, operation): {
