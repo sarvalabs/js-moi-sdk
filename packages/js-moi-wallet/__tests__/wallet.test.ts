@@ -183,7 +183,7 @@ describe(Wallet, () => {
     });
 
     describe(wallet.verify, () => {
-        it.concurrent("should be verify a signature using ECDSA secp256k1", async () => {
+        it.concurrent("should be verify a signature of when public key is in hex format", async () => {
             const message = "Hello, MOI";
             const signature =
                 "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
@@ -195,7 +195,7 @@ describe(Wallet, () => {
         it.concurrent("should verify a signature when public key is in byte array", async () => {
             const message = new TextEncoder().encode("Hello, MOI");
             const signature =
-            "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
+                "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
             const ok = wallet.verify(message, signature, hexToBytes(await wallet.getPublicKey()));
 
             expect(ok).toBeTruthy();
