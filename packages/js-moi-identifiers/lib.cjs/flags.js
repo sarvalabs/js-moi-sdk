@@ -41,12 +41,9 @@ exports.Flag = Flag;
  */
 const setFlag = (value, index, flag) => {
     if (flag) {
-        value |= 1 << index;
+        return value | (1 << index);
     }
-    else {
-        value = value & ~(1 << index);
-    }
-    return value;
+    return value & ~(1 << index);
 };
 exports.setFlag = setFlag;
 /**

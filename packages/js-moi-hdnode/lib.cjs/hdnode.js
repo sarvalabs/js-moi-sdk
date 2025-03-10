@@ -94,7 +94,7 @@ class HDNode {
      */
     publicKey() {
         if (this.node.publicKey == null) {
-            js_moi_utils_1.ErrorUtils.throwError("HDNode not initialized", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
+            js_moi_utils_1.ErrorUtils.throwError("Public key not available in the HDNode", js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED);
         }
         return this.node.publicKey;
     }
@@ -105,10 +105,7 @@ class HDNode {
      * @throws {Error} If the HDNode is not initialized or private key is not available.
      */
     privateKey() {
-        if (!this.node) {
-            js_moi_utils_1.ErrorUtils.throwError("HDNode not initialized", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
-        }
-        if (!this.node.privateKey) {
+        if (this.node.privateKey == null) {
             js_moi_utils_1.ErrorUtils.throwError("Private key not available in the HDNode", js_moi_utils_1.ErrorCode.PROPERTY_NOT_DEFINED);
         }
         return this.node.privateKey;

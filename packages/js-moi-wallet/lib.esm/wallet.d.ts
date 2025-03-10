@@ -3,7 +3,7 @@ import { SigType, Signer } from "js-moi-signer";
 import { type Hex, type InteractionRequest } from "js-moi-utils";
 import { Identifier } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
-import { FromMnemonicOptions, type WalletOption } from "../types/wallet";
+import { MnemonicImportOptions, type WalletOption } from "../types/wallet";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"
 }
@@ -78,10 +78,10 @@ export declare class Wallet extends Signer {
      */
     sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
     signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
-    static fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    static fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
-    static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
+    static fromMnemonic(mnemonic: string, path?: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static fromMnemonic(mnemonic: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static fromMnemonicSync(mnemonic: string, path?: string, options?: MnemonicImportOptions): Wallet;
+    static fromMnemonicSync(mnemonic: string, options?: MnemonicImportOptions): Wallet;
     /**
      * Initializes the wallet from a provided keystore.
      *

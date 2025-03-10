@@ -2,7 +2,7 @@ import { IdentifierKind, type IdentifierVersion } from "./enums";
 import type { InvalidReason } from "./identifier";
 export declare class IdentifierTag {
     readonly value: number;
-    private static MAX_IDENTIFIER_KIND;
+    private static maxIdentifierKind;
     private static kindMaxSupportedVersion;
     constructor(value: number);
     getKind(): IdentifierKind;

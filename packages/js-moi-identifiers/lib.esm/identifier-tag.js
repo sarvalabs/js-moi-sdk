@@ -1,7 +1,7 @@
 import { IdentifierKind } from "./enums";
 export class IdentifierTag {
     value;
-    static MAX_IDENTIFIER_KIND = IdentifierKind.Logic;
+    static maxIdentifierKind = IdentifierKind.Logic;
     static kindMaxSupportedVersion = {
         [IdentifierKind.Participant]: 0,
         [IdentifierKind.Asset]: 0,
@@ -33,7 +33,7 @@ export class IdentifierTag {
         return new IdentifierTag((kind << 4) | version);
     }
     static validate(value) {
-        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+        if (IdentifierTag.getKind(value) > this.maxIdentifierKind) {
             return { why: "Unsupported identifier kind." };
         }
         if (IdentifierTag.getVersion(value) > IdentifierTag.getMaxSupportedVersion(IdentifierTag.getKind(value))) {

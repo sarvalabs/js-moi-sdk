@@ -6,7 +6,7 @@ import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest } from "js-moi-utils";
 import { IdentifierVersion, createParticipantId } from "js-moi-identifiers";
 import * as SigningKeyErrors from "./errors";
-import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
+import { decryptKeystore, encryptKeystore } from "./keystore";
 export var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
@@ -120,7 +120,7 @@ export class Wallet extends Signer {
     async generateKeystore(password) {
         try {
             const data = hexToBytes(await this.getPrivateKey());
-            return encryptKeystoreData(data, password);
+            return encryptKeystore(data, password);
         }
         catch (err) {
             ErrorUtils.throwError("Failed to generate keystore", ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -267,7 +267,7 @@ export class Wallet extends Signer {
      */
     static fromKeystore(keystore, password, option) {
         try {
-            const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
+            const privateKey = decryptKeystore(JSON.parse(keystore), password);
             return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         }
         catch (err) {

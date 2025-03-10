@@ -4,7 +4,7 @@ exports.IdentifierTag = void 0;
 const enums_1 = require("./enums");
 class IdentifierTag {
     value;
-    static MAX_IDENTIFIER_KIND = enums_1.IdentifierKind.Logic;
+    static maxIdentifierKind = enums_1.IdentifierKind.Logic;
     static kindMaxSupportedVersion = {
         [enums_1.IdentifierKind.Participant]: 0,
         [enums_1.IdentifierKind.Asset]: 0,
@@ -36,7 +36,7 @@ class IdentifierTag {
         return new IdentifierTag((kind << 4) | version);
     }
     static validate(value) {
-        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+        if (IdentifierTag.getKind(value) > this.maxIdentifierKind) {
             return { why: "Unsupported identifier kind." };
         }
         if (IdentifierTag.getVersion(value) > IdentifierTag.getMaxSupportedVersion(IdentifierTag.getKind(value))) {

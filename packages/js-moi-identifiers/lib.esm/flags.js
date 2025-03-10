@@ -37,12 +37,9 @@ export class Flag {
  */
 export const setFlag = (value, index, flag) => {
     if (flag) {
-        value |= 1 << index;
+        return value | (1 << index);
     }
-    else {
-        value = value & ~(1 << index);
-    }
-    return value;
+    return value & ~(1 << index);
 };
 /**
  * Determines if a specific flag is set in a given value.

@@ -159,7 +159,7 @@ class Wallet extends js_moi_signer_1.Signer {
     async generateKeystore(password) {
         try {
             const data = (0, js_moi_utils_1.hexToBytes)(await this.getPrivateKey());
-            return (0, keystore_1.encryptKeystoreData)(data, password);
+            return (0, keystore_1.encryptKeystore)(data, password);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to generate keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -306,7 +306,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static fromKeystore(keystore, password, option) {
         try {
-            const privateKey = (0, keystore_1.decryptKeystoreData)(JSON.parse(keystore), password);
+            const privateKey = (0, keystore_1.decryptKeystore)(JSON.parse(keystore), password);
             return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         }
         catch (err) {
