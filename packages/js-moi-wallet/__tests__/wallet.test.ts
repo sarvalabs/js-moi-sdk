@@ -73,16 +73,16 @@ describe(Wallet, () => {
     const keystore =
         '{"cipher":"aes-128-ctr","ciphertext":"d2574897079cf82af2b48848cdc44ec40bd0d383562978eb50dd032e38b1c90e","cipherparams":{"IV":"5d98f0c4d8562244ee48d063a3d6ce07"},"kdf":"scrypt","kdfparams":{"n":4096,"r":8,"p":1,"dklen":32,"salt":"a99102406c29fdbc79793be3e4e4cae2bbc5c38a05a6e2917228fd6eea2244d9"},"mac":"33d1569f411526447edf1970cb5d61ed097543521024ebafbdd497c1017126f8"}';
 
-    // it.concurrent("should create a wallet using keystore and password", async () => {
-    //     const password = "password";
-    //     const wallet = Wallet.fromKeystore(keystore, password);
+    it.concurrent("should create a wallet using keystore and password", async () => {
+        const password = "password";
+        const wallet = Wallet.fromKeystore(keystore, password);
 
-    //     expect(wallet).toBeInstanceOf(Wallet);
-    //     expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
-    //     expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
-    //     expect(await wallet.getMnemonic()).not.toBeDefined();
-    //     expect(await wallet.getCurve()).toEqual(CURVE.SECP256K1);
-    // });
+        expect(wallet).toBeInstanceOf(Wallet);
+        expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
+        expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
+        expect(await wallet.getMnemonic()).not.toBeDefined();
+        expect(await wallet.getCurve()).toEqual(CURVE.SECP256K1);
+    });
 
     it.concurrent("should throw an error if password is incorrect", async () => {
         const password = "wrong";
