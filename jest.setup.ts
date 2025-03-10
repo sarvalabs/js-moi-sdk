@@ -41,7 +41,7 @@ const createProvider = () => {
     }
 
     p.on("debug", (message) => {
-        console.log(styleText("yellow", `DEBUG: ${JSON.stringify(message)}`));
+        log(`DEBUG: ${JSON.stringify(message)}`);
     });
 
     return p;
