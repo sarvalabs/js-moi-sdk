@@ -45,9 +45,9 @@ describe(Wallet, () => {
     });
 
     it.concurrent.each([
-        { name: "synchronously when path and option are passed", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH, {}) },
-        { name: "asynchronously when path and option are provided", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {}) },
-    ])("should create a wallet from a mnemonic $name", async ({ createWallet }) => {
+        { type: "synchronously", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH, {}) },
+        { type: "asynchronously", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {}) },
+    ])("should create a wallet from a mnemonic when path and option are passed ($type)", async ({ createWallet }) => {
         const wallet = await createWallet();
 
         expect(wallet).toBeInstanceOf(Wallet);
