@@ -162,6 +162,30 @@ const createAccountConfigureDescriptor = () => {
                 }
             }
 
+            if (payload.add != null) {
+                for (const item of payload.add) {
+                    if (item.weight == null) {
+                        return createInvalidResult(item, "weight", "Weight is required");
+                    }
+
+                    if (item.weight < 0) {
+                        return createInvalidResult(item, "weight", "Weight cannot be negative");
+                    }
+
+                    if (item.signature_algorithm == null) {
+                        return createInvalidResult(item, "signature_algorithm", "Signature algorithm is required");
+                    }
+                }
+            }
+
+            if (payload.revoke != null) {
+                for (const item of payload.revoke) {
+                    if (item.key_id == null) {
+                        return createInvalidResult(item, "key_id", "Key ID is required");
+                    }
+                }
+            }
+
             return null;
         },
 
