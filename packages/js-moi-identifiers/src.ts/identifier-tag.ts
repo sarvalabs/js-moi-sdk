@@ -4,7 +4,7 @@ import type { InvalidReason } from "./identifier";
 export class IdentifierTag {
     public readonly value: number;
 
-    private static MAX_IDENTIFIER_KIND = IdentifierKind.Logic;
+    private static maxIdentifierKind = IdentifierKind.Logic;
 
     private static kindMaxSupportedVersion: Record<IdentifierKind, number> = {
         [IdentifierKind.Participant]: 0,
@@ -47,7 +47,7 @@ export class IdentifierTag {
     }
 
     public static validate(value: number): InvalidReason | null {
-        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+        if (IdentifierTag.getKind(value) > this.maxIdentifierKind) {
             return { why: "Unsupported identifier kind." };
         }
 
