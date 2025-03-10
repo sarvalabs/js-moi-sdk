@@ -233,6 +233,10 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             return createInvalidResult(payload, "timestamp", "Timestamp must be a number");
         }
 
+        if (payload.timestamp <= Date.now()) {
+            return createInvalidResult(payload, "timestamp", "Timestamp must be of the future");
+        }
+
         return null;
     };
 
