@@ -45,12 +45,10 @@ export class Flag {
  */
 export const setFlag = (value: number, index: number, flag: boolean): number => {
     if (flag) {
-        value |= 1 << index;
-    } else {
-        value = value & ~(1 << index);
+        return value | (1 << index);
     }
 
-    return value;
+    return value & ~(1 << index);
 };
 
 /**
