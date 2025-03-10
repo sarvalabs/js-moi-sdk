@@ -4,7 +4,7 @@ import { polo, type PoloSchema } from "polo-schema";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isHex } from "./hex";
-import type { IxOperation, IxRawOperation, RawIxOperationPayload } from "./types/ix-operation";
+import type { IxOperation, RawIxOperation, RawIxOperationPayload } from "./types/ix-operation";
 
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
@@ -468,7 +468,7 @@ export const transformOperationPayload = <TOpType extends OpType>(operation: IxO
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export const encodeOperation = <TOpType extends OpType>(operation: IxOperation<TOpType>): IxRawOperation => {
+export const encodeOperation = <TOpType extends OpType>(operation: IxOperation<TOpType>): RawIxOperation => {
     const descriptor = ixOpDescriptor[operation.type];
 
     if (descriptor == null) {

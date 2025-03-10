@@ -260,7 +260,7 @@ export type RawIxOperationPayload<T extends OpType> = T extends OpType.Participa
 /**
  * `IxRawOperation` is a type that holds the raw operation data.
  */
-export interface IxRawOperation {
+export interface RawIxOperation {
     /**
      * The type of the operation.
      */

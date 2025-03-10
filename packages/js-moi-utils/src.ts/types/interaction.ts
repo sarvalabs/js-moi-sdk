@@ -1,6 +1,6 @@
 import type { LockType } from "../enums";
 import type { Hex } from "../hex";
-import type { AnyIxOperation, IxRawOperation } from "./ix-operation";
+import type { AnyIxOperation, RawIxOperation } from "./ix-operation";
 
 export interface RawSender {
     id: Uint8Array;
@@ -14,7 +14,7 @@ export interface Sender {
     key_id: number;
 }
 
-export interface RawParticipants {
+export interface RawIxParticipants {
     id: Uint8Array;
     lock_type: LockType;
     notary: boolean;
@@ -31,7 +31,7 @@ export interface IxConsensusPreference {
     trust_nodes: string[];
 }
 
-export interface RawPreference {
+export interface RawIxPreference {
     compute: Uint8Array;
     consensus: IxConsensusPreference;
 }
@@ -46,9 +46,9 @@ export interface RawInteractionRequest {
     sponsor?: RawSender;
     fuel_price: number;
     fuel_limit: number;
-    ix_operations: IxRawOperation[];
-    participants?: RawParticipants[];
-    preferences?: RawPreference;
+    ix_operations: RawIxOperation[];
+    participants?: RawIxParticipants[];
+    preferences?: RawIxPreference;
     perception?: Uint8Array;
 }
 
