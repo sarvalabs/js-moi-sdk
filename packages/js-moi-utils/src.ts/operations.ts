@@ -125,6 +125,10 @@ const createAssetCreateDescriptor = () => {
                 return createInvalidResult(payload, "dimension", "Dimension cannot be negative");
             }
 
+            if (typeof payload.symbol !== "string") {
+                return createInvalidResult(payload, "symbol", "Symbol must be a string");
+            }
+
             return null;
         },
     });
