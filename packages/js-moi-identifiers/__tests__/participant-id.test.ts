@@ -25,7 +25,7 @@ describe(ParticipantId, () => {
     });
 
     describe(ParticipantId.validate, () => {
-        it.concurrent("should invalid result for invalid participant id", () => {
+        it.concurrent("should return reason for invalid participant id", () => {
             expect(ParticipantId.validate(INVALID_PARTICIPANT_ID)).not.toBeNull();
         });
 
