@@ -77,7 +77,7 @@ export class InteractionResponse {
                     return ix.confirmation;
                 }
             } catch (error) {
-                if (error instanceof CustomError && error.message === "error fetching interaction") {
+                if (error instanceof CustomError && error.message === "failed to get receipt: tesseract hash not found: key not found") {
                     if (this.notFoundRetries <= 0) {
                         ErrorUtils.throwError(`Interaction not found. Hash ${this.hash}`, ErrorCode.ACTION_REJECTED, {
                             hash: this.hash,
@@ -108,3 +108,11 @@ export class InteractionResponse {
         return confirmation.operations;
     }
 }
+
+const a = {
+    method: function () {
+        console.log(this);
+    },
+};
+
+a.method.bind(null);
