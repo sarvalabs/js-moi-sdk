@@ -10,7 +10,7 @@ import { Identifier, IdentifierVersion, createParticipantId } from "js-moi-ident
 import { Keystore } from "../types/keystore";
 import { MnemonicImportOptions, type WalletOption } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
-import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
+import { decryptKeystore, encryptKeystore } from "./keystore";
 
 export enum CURVE {
     SECP256K1 = "secp256k1",
@@ -136,7 +136,7 @@ export class Wallet extends Signer {
     public async generateKeystore(password: string): Promise<Keystore> {
         try {
             const data = hexToBytes(await this.getPrivateKey());
-            return encryptKeystoreData(data, password);
+            return encryptKeystore(data, password);
         } catch (err) {
             ErrorUtils.throwError("Failed to generate keystore", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
@@ -311,7 +311,7 @@ export class Wallet extends Signer {
      */
     public static fromKeystore(keystore: string, password: string, option?: WalletOption): Wallet {
         try {
-            const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
+            const privateKey = decryptKeystore(JSON.parse(keystore), password);
             return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         } catch (err) {
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
