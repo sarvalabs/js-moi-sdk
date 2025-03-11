@@ -72,12 +72,12 @@ export const toRawInteractionRequest = (ix) => {
  * @param ix - The interaction request to encode. It can be of type `InteractionRequest` or `RawInteractionRequest`.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export function encodeInteraction(ix) {
+export const encodeInteraction = (ix) => {
     const data = "operations" in ix ? toRawInteractionRequest(ix) : ix;
     const polorizer = new Polorizer();
     polorizer.polorize(data, getInteractionRequestSchema());
     return polorizer.bytes();
-}
+};
 const gatherIxParticipants = (interaction) => {
     const participants = new Map([
         [

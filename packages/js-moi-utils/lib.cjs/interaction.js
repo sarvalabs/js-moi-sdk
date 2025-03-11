@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toRawInteractionRequest = exports.getInteractionRequestSchema = void 0;
-exports.encodeInteraction = encodeInteraction;
+exports.encodeInteraction = exports.toRawInteractionRequest = exports.getInteractionRequestSchema = void 0;
 exports.interaction = interaction;
 exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
@@ -80,12 +79,13 @@ exports.toRawInteractionRequest = toRawInteractionRequest;
  * @param ix - The interaction request to encode. It can be of type `InteractionRequest` or `RawInteractionRequest`.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-function encodeInteraction(ix) {
+const encodeInteraction = (ix) => {
     const data = "operations" in ix ? (0, exports.toRawInteractionRequest)(ix) : ix;
     const polorizer = new js_polo_1.Polorizer();
     polorizer.polorize(data, (0, exports.getInteractionRequestSchema)());
     return polorizer.bytes();
-}
+};
+exports.encodeInteraction = encodeInteraction;
 const gatherIxParticipants = (interaction) => {
     const participants = new Map([
         [
@@ -182,7 +182,7 @@ function interaction(ix, format = "polo") {
         case "raw":
             return (0, exports.toRawInteractionRequest)(interaction);
         case "polo":
-            return encodeInteraction(interaction);
+            return (0, exports.encodeInteraction)(interaction);
         default:
             throw new Error(`Invalid format: ${format}`);
     }
