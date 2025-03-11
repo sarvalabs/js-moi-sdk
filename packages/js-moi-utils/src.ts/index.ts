@@ -1,5 +1,5 @@
 export { decodeBase64, encodeBase64 } from "./base64";
-export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isHexString, isInteger, randomBytes, type Bytes } from "./bytes";
+export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isInteger, randomBytes, type Bytes } from "./bytes";
 export {
     AccountType,
     AssetStandard,

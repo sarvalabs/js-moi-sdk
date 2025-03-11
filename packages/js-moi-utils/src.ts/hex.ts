@@ -151,7 +151,7 @@ export const bytesToHex = (data: Uint8Array): Hex => {
  * @param {number} byteLength - The length of the in terms of bytes l.
  * @returns {boolean} True if the value is a hexadecimal string, false otherwise.
  */
-export const isHex = (value: unknown, byteLength?: number): value is Hex => {
+export const isHex = (value: string, byteLength?: number): value is Hex => {
     if (typeof value !== "string" || value === "0x") {
         return false;
     }

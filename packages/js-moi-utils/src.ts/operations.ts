@@ -294,7 +294,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             const raw: RawIxOperationPayload<TOpType> = {
                 ...payload,
                 asset_id: hexToBytes(payload.asset_id),
-                benefactor: "benefactor" in payload && isHex(payload.benefactor, 32) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
+                benefactor: "benefactor" in payload && isHex(payload.benefactor!, 32) ? hexToBytes(payload.benefactor) : new Uint8Array(32),
                 beneficiary: hexToBytes(payload.beneficiary),
             };
 
