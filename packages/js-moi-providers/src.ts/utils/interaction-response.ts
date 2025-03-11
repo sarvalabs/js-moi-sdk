@@ -1,8 +1,8 @@
 import { CustomError, ErrorCode, ErrorUtils, type AnyIxOperationResult, type Hex, type Interaction, type InteractionConfirmation } from "js-moi-utils";
 import type { Provider } from "../types/provider";
 
-const INITIAL_NOT_FOUND_RETRIES = 10;
-const ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO = 1500;
+const MAX_RETRIES_ON_NOT_FOUND = 10;
+const DEFAULT_IX_INFO_RETRIEVAL_TIME = 1500;
 
 export interface TimerOption {
     retries: number;
@@ -13,7 +13,7 @@ export class InteractionResponse {
     public readonly hash: Hex;
     private interaction?: Interaction;
     private readonly provider: Provider;
-    private notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+    private notFoundRetries = MAX_RETRIES_ON_NOT_FOUND;
 
     constructor(interaction: Interaction, provider: Provider);
     constructor(hash: Hex, provider: Provider);
@@ -61,8 +61,8 @@ export class InteractionResponse {
                     modifier: { include: ["confirmation"] },
                 });
 
-                if (this.notFoundRetries === INITIAL_NOT_FOUND_RETRIES) {
-                    this.notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+                if (this.notFoundRetries === MAX_RETRIES_ON_NOT_FOUND) {
+                    this.notFoundRetries = MAX_RETRIES_ON_NOT_FOUND;
                 }
 
                 if (ix.confirmation != null) {
@@ -78,7 +78,7 @@ export class InteractionResponse {
                     }
 
                     this.notFoundRetries--;
-                    await new Promise((resolve) => setTimeout(resolve, ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO));
+                    await new Promise((resolve) => setTimeout(resolve, DEFAULT_IX_INFO_RETRIEVAL_TIME));
                     continue;
                 }
             }
