@@ -74,10 +74,8 @@ export class WebsocketProvider extends JsonRpcProvider {
     constructor(address: string, options?: WebsocketTransportOptions) {
         super(new WebsocketTransport(address, options));
 
-        if (this.transport instanceof WebsocketTransport) {
-            for (const event of WebsocketProvider.events.client) {
-                this.transport.on(event, (...args) => this.emit(event, ...args));
-            }
+        for (const event of WebsocketProvider.events.client) {
+            this.transport.on(event, (...args) => this.emit(event, ...args));
         }
     }
 
