@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import type { LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
+import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
 import { LogicState, OpType, RoutineType, StorageKey, type Hex, type InteractionRequest, type IxOperation, type LogicManifest, type LogicMessage } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -42,13 +42,13 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
     isRoutineMutable(routine: string): boolean;
     private extractArgsAndOption;
     /**
-     * Creates an interaction operation for the specified callsite.
+     * Creates an interaction operation for the specified routine.
      *
-     * @param routine - The name of the callsite.
-     * @param args - The arguments to pass to the callsite.
+     * @param routine - The name of the routine.
+     * @param args - The arguments to pass to the routine.
      * @returns A promise that resolves to an interaction operation.
      *
-     * @throws an error if the callsite is not present.
+     * @throws an error if the routine is not present.
      */
     createIxOperation(routine: string, args: unknown[]): Promise<IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicEnlist>>;
     /**
@@ -76,6 +76,7 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
      * @throws If error occurs during the deployment process.
      */
     getLogicId(timer?: TimerOption): Promise<Identifier>;
+    protected obtainLogicIdFromResponse(response: InteractionResponse, timer?: TimerOption): Promise<void>;
     private newRoutine;
     private setupEndpoint;
     /**
@@ -83,11 +84,20 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
      *
      * @param state - The state of the logic storage, either Persistent or Ephemeral.
      * @param storageKey - The key used to access the storage, can be of type StorageKey or Hex.
+     *
      * @returns A promise that resolves to the logic storage data.
      *
      * @throws Will throw an error if the logic state is invalid.
      */
-    getLogicStorage(state: LogicState, storageKey: StorageKey | Hex): Promise<`0x${string}`>;
+    getLogicStorage(state: LogicState.Persistent, storageKey: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the logic storage based on the provided state, storage key, and identifier.
+     *
+     * @param state The state of the logic storage, either Persistent or Ephemeral.
+     * @param storageKey The key used to access the storage, can be of type StorageKey or Hex.
+     * @param identifier The identifier for which the storage is being accessed.
+     */
+    getLogicStorage(state: LogicState.Ephemeral, storageKey: StorageKey | Hex, identifier: Identifier): Promise<Hex>;
     /**
      * Retrieves the storage key for the provided state and accessor.
      *
@@ -96,7 +106,6 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
      * @returns The storage key for the provided state and accessor.
      */
     getStorageKey(state: LogicState, accessor: StateAccessorFn): StorageKey;
-    private getLogicStateValue;
     /**
      * Retrieves the persistent storage value based on the provided accessor.
      *
@@ -117,14 +126,14 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
      * @param storageKey - The storage key used to access the ephemeral storage.
      * @returns A promise that resolves to the ephemeral storage data in POLO encoding.
      */
-    ephemeral(storageKey: StorageKey | Hex): Promise<Hex>;
+    ephemeral(identifier: Identifier | Hex, storageKey: StorageKey | Hex): Promise<Hex>;
     /**
      * Retrieves the ephemeral storage value based on the provided accessor.
      *
      * @param accessor - The accessor used to generate the storage key.
      * @returns A promise that resolves to the ephemeral storage decoded value.
      */
-    ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
+    ephemeral<T>(identifier: Identifier | Hex, accessor: StateAccessorFn): Promise<T>;
     /**
      * Retrieves logic messages based on the provided options.
      *
@@ -136,11 +145,11 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
 /**
  * Retrieves a LogicDriver instance for the given logic ID.
  *
- * @param logicId - The ID of the logic to retrieve.
+ * @param source - The source of the logic, either an logic identifier or a logic manifest.
  * @param signer - The signer object used to interact with the logic.
  * @returns A promise that resolves to a LogicDriver instance.
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export declare const getLogicDriver: <TCallsites extends LogicRoutines = LogicRoutines>(logicId: Identifier | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
+export declare const getLogicDriver: <TRoutines extends LogicRoutines = LogicRoutines>(source: Identifier | LogicManifest, signer: Signer) => Promise<LogicDriver<TRoutines>>;
 //# sourceMappingURL=logic-driver.d.ts.map

@@ -1,4 +1,4 @@
-import { isIdentifier, LogicId } from "js-moi-identifiers";
+import { Identifier, isIdentifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
 import { ElementType, ErrorCode, ErrorUtils, generateStorageKey, hexToBytes, isHex, LogicState, OpType, RoutineKind, RoutineType, StorageKey, } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
@@ -66,18 +66,18 @@ export class LogicDriver extends LogicDescriptor {
         return { option, args };
     }
     /**
-     * Creates an interaction operation for the specified callsite.
+     * Creates an interaction operation for the specified routine.
      *
-     * @param routine - The name of the callsite.
-     * @param args - The arguments to pass to the callsite.
+     * @param routine - The name of the routine.
+     * @param args - The arguments to pass to the routine.
      * @returns A promise that resolves to an interaction operation.
      *
-     * @throws an error if the callsite is not present.
+     * @throws an error if the routine is not present.
      */
     async createIxOperation(routine, args) {
         const element = this.getRoutineElement(routine);
         if (element.data.accepts.length !== args.length) {
-            ErrorUtils.throwError(`Invalid number of arguments for callsite "${routine}".`, ErrorCode.INVALID_ARGUMENT);
+            ErrorUtils.throwError(`Invalid number of arguments for routine "${routine}".`, ErrorCode.INVALID_ARGUMENT);
         }
         const calldata = this.getManifestCoder().encodeArguments(routine, ...args);
         const type = this.getRoutineType(routine);
@@ -128,18 +128,23 @@ export class LogicDriver extends LogicDescriptor {
      */
     async getLogicId(timer) {
         if (this.deployIxResponse != null) {
-            const results = await this.deployIxResponse.result(timer);
-            const result = results.at(0);
-            if (result?.type !== OpType.LogicDeploy) {
-                ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
-            }
-            const exception = ManifestCoder.decodeException(result.data.error);
-            if (exception != null) {
-                ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
-            }
-            this.setLogicId(new LogicId(result.data.logic_id));
+            // This is to handle the case where the logic id is not set but the deployIxResponse is available.
+            // handleLogicDeployResponse uses `InteractionResponse` which caches the result on confirmation preventing multiple calls.
+            await this.obtainLogicIdFromResponse(this.deployIxResponse, timer);
         }
         return super.getLogicId();
+    }
+    async obtainLogicIdFromResponse(response, timer) {
+        const results = await response.result(timer);
+        const result = results.at(0);
+        if (result?.type !== OpType.LogicDeploy) {
+            ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
+        }
+        const exception = ManifestCoder.decodeException(result.data.error);
+        if (exception != null) {
+            ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
+        }
+        this.setLogicId(new LogicId(result.data.logic_id));
     }
     newRoutine(routine) {
         const isDeployerRoutine = this.getRoutineType(routine) === RoutineType.Deploy;
@@ -195,14 +200,16 @@ export class LogicDriver extends LogicDescriptor {
      *
      * @throws Will throw an error if the logic state is invalid.
      */
-    async getLogicStorage(state, storageKey) {
+    async getLogicStorage(state, storageKey, identifier) {
         const logicId = await this.getLogicId();
         switch (state) {
             case LogicState.Persistent: {
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case LogicState.Ephemeral: {
-                const identifier = await this.signer.getIdentifier();
+                if (identifier == null) {
+                    ErrorUtils.throwError("Identifier is required for reading ephemeral storage.", ErrorCode.INVALID_ARGUMENT);
+                }
                 return await this.signer.getProvider().getLogicStorage(logicId, identifier, storageKey);
             }
             default:
@@ -224,7 +231,14 @@ export class LogicDriver extends LogicDescriptor {
         }
         return generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
     }
-    async getLogicStateValue(state, accessor) {
+    /**
+     * Retrieves the persistent storage value based on the provided accessor or storage key.
+     *
+     * @param accessor - This can storage key or accessor function.
+     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
+     */
+    async persistent(accessor) {
+        const state = LogicState.Persistent;
         if (accessor instanceof StorageKey || isHex(accessor)) {
             return await this.getLogicStorage(state, accessor);
         }
@@ -242,27 +256,27 @@ export class LogicDriver extends LogicDescriptor {
         return new Depolorizer(hexToBytes(value)).depolorize(schema);
     }
     /**
-     * Retrieves the persistent storage value based on the provided accessor or storage key.
-     *
-     * @param accessor - This can storage key or accessor function.
-     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
-     */
-    async persistent(accessor) {
-        if (typeof accessor === "function") {
-            return await this.getLogicStateValue(LogicState.Persistent, accessor);
-        }
-        return await this.getLogicStateValue(LogicState.Persistent, accessor);
-    }
-    /**
      * Retrieves the ephemeral storage value based on the provided accessor or storage key.
      * @param accessor - This can storage key or accessor function.
      * @returns A promise that resolves to the ephemeral storage data in POLO encoding or decoded value.
      */
-    async ephemeral(accessor) {
-        if (typeof accessor === "function") {
-            return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+    async ephemeral(identifier, accessor) {
+        const state = LogicState.Ephemeral;
+        if (accessor instanceof StorageKey || isHex(accessor)) {
+            return await this.getLogicStorage(state, accessor, new Identifier(identifier));
         }
-        return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+        const element = this.getStateElement(state);
+        const builder = accessor(new StateAccessorBuilder(element.ptr, this));
+        if (!(builder instanceof SlotAccessorBuilder)) {
+            ErrorUtils.throwError("Invalid accessor builder.", ErrorCode.UNKNOWN_ERROR);
+        }
+        const key = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
+        const value = await this.getLogicStorage(state, key, new Identifier(identifier));
+        if (!isPrimitiveType(builder.getStorageType())) {
+            return new Depolorizer(hexToBytes(value)).depolorizeInteger();
+        }
+        const schema = Schema.parseDataType(builder.getStorageType(), this.getClassDefs(), this.getElements());
+        return new Depolorizer(hexToBytes(value)).depolorize(schema);
     }
     /**
      * Retrieves logic messages based on the provided options.
@@ -278,21 +292,21 @@ export class LogicDriver extends LogicDescriptor {
 /**
  * Retrieves a LogicDriver instance for the given logic ID.
  *
- * @param logicId - The ID of the logic to retrieve.
+ * @param source - The source of the logic, either an logic identifier or a logic manifest.
  * @param signer - The signer object used to interact with the logic.
  * @returns A promise that resolves to a LogicDriver instance.
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export const getLogicDriver = async (logicId, signer) => {
-    if (isIdentifier(logicId)) {
+export const getLogicDriver = async (source, signer) => {
+    if (isIdentifier(source)) {
         const provider = signer.getProvider();
-        const manifestInPolo = await provider.getLogic(logicId, {
+        const manifestInPolo = await provider.getLogic(source, {
             modifier: { extract: "manifest" },
         });
         const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId, signer });
+        return new LogicDriver({ manifest, logicId: source, signer });
     }
-    return new LogicDriver({ manifest: logicId, signer });
+    return new LogicDriver({ manifest: source, signer });
 };
 //# sourceMappingURL=logic-driver.js.map

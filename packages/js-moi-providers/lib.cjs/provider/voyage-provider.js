@@ -19,9 +19,10 @@ class VoyageProvider extends http_provider_1.HttpProvider {
      * @param type The network type.
      */
     constructor(type) {
-        if (type !== NetworkType.Babylon) {
-            js_moi_utils_1.ErrorUtils.throwError("Unsupported network type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION, {
-                type,
+        if (!Object.values(NetworkType).includes(type)) {
+            throw js_moi_utils_1.ErrorUtils.throwError(`Unsupported network type "${type}"`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION, {
+                type: type,
+                supported: Object.keys(NetworkType),
             });
         }
         super(type);
