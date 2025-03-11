@@ -13,7 +13,7 @@ describe(HttpTransport, () => {
         expect(() => new HttpTransport(url)).toThrow();
     });
 
-    it.concurrent.each(["http://localhost:1600", "https://localhost:1600", "http://192.168.1.195:1600", "http://10.128.0.6:1600"])(
+    it.concurrent.each(["http://localhost:1600", "https://localhost:1600", "http://192.168.1.195:1600", "http://10.128.0.6:1600", "https://4g.dogotronghieu.com:1600"])(
         `should create instance with valid url %s`,
         async (url) => {
             expect(new HttpTransport(url)).toBeInstanceOf(HttpTransport);
