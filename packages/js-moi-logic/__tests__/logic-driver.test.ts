@@ -276,7 +276,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
 
             if (logic.ephemeral) {
                 it("should be able to retrieve from ephemeral storage", async () => {
-                    const value = await driver.ephemeral(logic.ephemeral.accessor);
+                    const value = await driver.ephemeral(await wallet.getIdentifier(), logic.ephemeral.accessor);
 
                     expect(value).toEqual(logic.ephemeral.expected);
                 });

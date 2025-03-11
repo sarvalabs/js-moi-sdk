@@ -290,18 +290,41 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
      *
      * @param state - The state of the logic storage, either Persistent or Ephemeral.
      * @param storageKey - The key used to access the storage, can be of type StorageKey or Hex.
+     *
      * @returns A promise that resolves to the logic storage data.
      *
      * @throws Will throw an error if the logic state is invalid.
      */
-    public async getLogicStorage(state: LogicState, storageKey: StorageKey | Hex) {
+    public async getLogicStorage(state: LogicState.Persistent, storageKey: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the logic storage based on the provided state, storage key, and identifier.
+     *
+     * @param state The state of the logic storage, either Persistent or Ephemeral.
+     * @param storageKey The key used to access the storage, can be of type StorageKey or Hex.
+     * @param identifier The identifier for which the storage is being accessed.
+     */
+    public async getLogicStorage(state: LogicState.Ephemeral, storageKey: StorageKey | Hex, identifier: Identifier): Promise<Hex>;
+    /**
+     * Retrieves the logic storage based on the provided state and storage key.
+     *
+     * @param state - The state of the logic storage, either Persistent or Ephemeral.
+     * @param storageKey - The key used to access the storage, can be of type StorageKey or Hex.
+     * @returns A promise that resolves to the logic storage data.
+     *
+     * @throws Will throw an error if the logic state is invalid.
+     */
+    public async getLogicStorage(state: LogicState, storageKey: StorageKey | Hex, identifier?: Identifier): Promise<Hex> {
         const logicId = await this.getLogicId();
+
         switch (state) {
             case LogicState.Persistent: {
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case LogicState.Ephemeral: {
-                const identifier = await this.signer.getIdentifier();
+                if (identifier == null) {
+                    ErrorUtils.throwError("Identifier is required for reading ephemeral storage.", ErrorCode.INVALID_ARGUMENT);
+                }
+
                 return await this.signer.getProvider().getLogicStorage(logicId, identifier, storageKey);
             }
             default:
@@ -327,9 +350,29 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
         return generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
     }
 
-    private async getLogicStateValue(state: LogicState, accessor: StorageKey | Hex): Promise<Hex>;
-    private async getLogicStateValue<T>(state: LogicState, accessor: StateAccessorFn): Promise<T>;
-    private async getLogicStateValue<T>(state: LogicState, accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
+    /**
+     * Retrieves the persistent storage value based on the provided accessor.
+     *
+     * @param storageKey - The storage key used to access the persistent storage.
+     * @returns A promise that resolves to the persistent storage data in POLO encoding.
+     */
+    public async persistent(storageKey: StorageKey | Hex): Promise<Hex>;
+    /**
+     * Retrieves the persistent storage value based on the provided accessor.
+     *
+     * @param accessor - The accessor used to generate the storage key.
+     * @returns A promise that resolves to the persistent storage decoded value.
+     */
+    public async persistent<T>(accessor: StateAccessorFn): Promise<T>;
+    /**
+     * Retrieves the persistent storage value based on the provided accessor or storage key.
+     *
+     * @param accessor - This can storage key or accessor function.
+     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
+     */
+    public async persistent<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
+        const state = LogicState.Persistent;
+
         if (accessor instanceof StorageKey || isHex(accessor)) {
             return await this.getLogicStorage(state, accessor);
         }
@@ -353,58 +396,47 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
     }
 
     /**
-     * Retrieves the persistent storage value based on the provided accessor.
-     *
-     * @param storageKey - The storage key used to access the persistent storage.
-     * @returns A promise that resolves to the persistent storage data in POLO encoding.
-     */
-    public async persistent(storageKey: StorageKey | Hex): Promise<Hex>;
-    /**
-     * Retrieves the persistent storage value based on the provided accessor.
-     *
-     * @param accessor - The accessor used to generate the storage key.
-     * @returns A promise that resolves to the persistent storage decoded value.
-     */
-    public async persistent<T>(accessor: StateAccessorFn): Promise<T>;
-    /**
-     * Retrieves the persistent storage value based on the provided accessor or storage key.
-     *
-     * @param accessor - This can storage key or accessor function.
-     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
-     */
-    public async persistent<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
-        if (typeof accessor === "function") {
-            return await this.getLogicStateValue(LogicState.Persistent, accessor);
-        }
-
-        return await this.getLogicStateValue(LogicState.Persistent, accessor);
-    }
-
-    /**
      * Retrieves the ephemeral storage value based on the provided accessor.
      *
      * @param storageKey - The storage key used to access the ephemeral storage.
      * @returns A promise that resolves to the ephemeral storage data in POLO encoding.
      */
-    public async ephemeral(storageKey: StorageKey | Hex): Promise<Hex>;
+    public async ephemeral(identifier: Identifier | Hex, storageKey: StorageKey | Hex): Promise<Hex>;
     /**
      * Retrieves the ephemeral storage value based on the provided accessor.
      *
      * @param accessor - The accessor used to generate the storage key.
      * @returns A promise that resolves to the ephemeral storage decoded value.
      */
-    public async ephemeral<T>(accessor: StateAccessorFn): Promise<T>;
+    public async ephemeral<T>(identifier: Identifier | Hex, accessor: StateAccessorFn): Promise<T>;
     /**
      * Retrieves the ephemeral storage value based on the provided accessor or storage key.
      * @param accessor - This can storage key or accessor function.
      * @returns A promise that resolves to the ephemeral storage data in POLO encoding or decoded value.
      */
-    public async ephemeral<T>(accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
-        if (typeof accessor === "function") {
-            return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+    public async ephemeral<T>(identifier: Identifier | Hex, accessor: StateAccessorFn | StorageKey | Hex): Promise<T | Hex> {
+        const state = LogicState.Ephemeral;
+
+        if (accessor instanceof StorageKey || isHex(accessor)) {
+            return await this.getLogicStorage(state, accessor, new Identifier(identifier));
         }
 
-        return await this.getLogicStateValue(LogicState.Ephemeral, accessor);
+        const element = this.getStateElement(state);
+        const builder = accessor(new StateAccessorBuilder(element.ptr, this));
+
+        if (!(builder instanceof SlotAccessorBuilder)) {
+            ErrorUtils.throwError("Invalid accessor builder.", ErrorCode.UNKNOWN_ERROR);
+        }
+
+        const key = generateStorageKey(builder.getBaseSlot(), builder.getAccessors());
+        const value = await this.getLogicStorage(state, key, new Identifier(identifier));
+
+        if (!isPrimitiveType(builder.getStorageType())) {
+            return new Depolorizer(hexToBytes(value)).depolorizeInteger() as T;
+        }
+
+        const schema = Schema.parseDataType(builder.getStorageType(), this.getClassDefs(), this.getElements());
+        return new Depolorizer(hexToBytes(value)).depolorize(schema) as T;
     }
 
     /**
