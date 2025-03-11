@@ -64,7 +64,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
         };
     }
 
-    private waitForConnection(): Promise<void> {
+    private async waitForConnection(): Promise<void> {
         this.waitForConnectionPromise ??= new Promise((resolve, reject) => {
             if (this.ws == null) {
                 reject(new Error("Websocket is not initialized"));
@@ -109,7 +109,7 @@ export class WebsocketTransport extends EventEmitter implements Transport {
             }
         });
 
-        return this.waitForConnectionPromise;
+        return await this.waitForConnectionPromise;
     }
 
     public async request<TResult = unknown>(method: string, param: unknown[] = []): Promise<JsonRpcResponse<TResult>> {
