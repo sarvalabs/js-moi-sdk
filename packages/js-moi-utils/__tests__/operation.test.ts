@@ -1,12 +1,7 @@
 import { AssetStandard, bytesToHex, encodeOperation, getIxOperationDescriptor, listIxOperationDescriptors, OpType, type AnyIxOperation } from "../src.ts";
 
-interface TestCase {
-    operation: AnyIxOperation;
-    expected: string;
-}
-
 describe(encodeOperation, () => {
-    const cases: TestCase[] = [
+    const cases: { operation: AnyIxOperation; expected: string }[] = [
         {
             operation: {
                 type: OpType.AssetCreate,
