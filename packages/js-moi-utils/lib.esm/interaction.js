@@ -216,21 +216,17 @@ export function validateIxRequest(type, ix) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
     if (ix.sponsor != null && !isHex(ix.sender.id, 32)) {
-        return createInvalidResult(ix, "sponsor", "Invalid sponser address");
+        return createInvalidResult(ix, "sponsor", "Invalid sponsor address");
     }
     if (ix.participants != null) {
         if (!Array.isArray(ix.participants)) {
             return createInvalidResult(ix, "participants", "Participants must be an array");
         }
-        let error = null;
-        for (const participant of ix.participants) {
-            if (error != null) {
-                return error;
+        for (const [index, participant] of ix.participants.entries()) {
+            if (isHex(participant.id, 32)) {
+                continue;
             }
-            if (!isHex(participant.id, 32)) {
-                error = createInvalidResult(participant, "id", "Invalid participant address");
-                break;
-            }
+            return createInvalidResult(participant, "id", `Invalid participant address at index ${index}`);
         }
     }
     if (ix.operations == null) {
@@ -242,32 +238,22 @@ export function validateIxRequest(type, ix) {
     if (ix.operations.length === 0) {
         return createInvalidResult(ix, "operations", "Operations must have at least one operation");
     }
-    let error = null;
-    for (let i = 0; i < ix.operations.length; i++) {
-        if (error != null) {
-            break;
-        }
-        const operation = ix.operations[i];
+    for (const [index, operation] of ix.operations.entries()) {
         if (operation.type == null) {
-            error = createInvalidResult(operation, "type", "Operation type is required");
-            break;
+            return createInvalidResult(operation, "type", `Operation type is required at index ${index}`);
         }
         if (operation.payload == null) {
-            error = createInvalidResult(operation, "payload", "Operation payload is required");
-            break;
+            return createInvalidResult(operation, "payload", `Operation payload is required at index ${index}`);
         }
         const result = validateOperation(operation);
         if (result == null) {
             continue;
         }
-        error = {
-            field: `operations[${i}].${result.field}`,
-            message: `Invalid operation payload at index ${i}: ${result.message}`,
+        return {
+            field: `operations[${index}].${result.field}`,
+            message: `Invalid operation payload at index ${index}: ${result.message}`,
             value: operation,
         };
-    }
-    if (error != null) {
-        return error;
     }
     return null;
 }
