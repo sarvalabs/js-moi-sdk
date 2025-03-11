@@ -80,7 +80,7 @@ export const toRawInteractionRequest = (ix: InteractionRequest): RawInteractionR
  * @param ix - The interaction request to encode. It can be of type `InteractionRequest` or `RawInteractionRequest`.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export function encodeInteraction(ix: InteractionRequest | RawInteractionRequest): Uint8Array {
+export const encodeInteraction = (ix: InteractionRequest | RawInteractionRequest): Uint8Array => {
     const data = "operations" in ix ? toRawInteractionRequest(ix) : ix;
     const polorizer = new Polorizer();
 
