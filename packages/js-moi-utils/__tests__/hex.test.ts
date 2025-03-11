@@ -1,4 +1,4 @@
-import { bytesToHex, encodeToString, hexToBN, hexToBytes, isAddress, isHex, numToHex, toQuantity, trimHexPrefix } from "../src.ts/hex";
+import { bytesToHex, encodeToString, hexToBN, hexToBytes, isHex, numToHex, toQuantity, trimHexPrefix } from "../src.ts/hex";
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -201,17 +201,5 @@ describe(trimHexPrefix.name, () => {
 
     test("should not remove the '0x' prefix from a non-hexadecimal string", () => {
         expect(trimHexPrefix("0x12345G")).toBe("0x12345G");
-    });
-});
-
-describe(isAddress.name, () => {
-    test("should return true for a valid address", () => {
-        const address = bytesToHex(globalThis.crypto.getRandomValues(new Uint8Array(32)));
-        expect(isAddress(address)).toBe(true);
-    });
-
-    test("should return false for an invalid address", () => {
-        const address = bytesToHex(globalThis.crypto.getRandomValues(new Uint8Array(12)));
-        expect(isAddress(address)).toBe(false);
     });
 });

@@ -21,7 +21,6 @@ export {
     hexToBN,
     hexToBytes,
     hexToHash,
-    isAddress,
     isHex,
     isNullBytes,
     numToHex,
