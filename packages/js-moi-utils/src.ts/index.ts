@@ -30,7 +30,7 @@ export {
     type NumberLike,
     type Quantity,
 } from "./hex";
-export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction, validateIxRequest } from "./interaction";
+export { encodeInteraction, getInteractionRequestSchema, interaction, toRawInteractionRequest, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export {
     encodeOperation,

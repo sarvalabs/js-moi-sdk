@@ -56,7 +56,7 @@ export const getInteractionRequestSchema = (): Schema => {
  * @param ix Interaction request
  * @returns a raw interaction request
  */
-export const transformInteraction = (ix: InteractionRequest): RawInteractionRequest => {
+export const toRawInteractionRequest = (ix: InteractionRequest): RawInteractionRequest => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
@@ -81,7 +81,7 @@ export const transformInteraction = (ix: InteractionRequest): RawInteractionRequ
  * @returns A POLO bytes representing the encoded interaction request.
  */
 export function encodeInteraction(ix: InteractionRequest | RawInteractionRequest): Uint8Array {
-    const data = "operations" in ix ? transformInteraction(ix) : ix;
+    const data = "operations" in ix ? toRawInteractionRequest(ix) : ix;
     const polorizer = new Polorizer();
 
     polorizer.polorize(data, getInteractionRequestSchema());
@@ -197,7 +197,7 @@ export function interaction(ix: InteractionRequest, format: "raw" | "polo" | "mi
         case "minimal":
             return interaction;
         case "raw":
-            return transformInteraction(interaction);
+            return toRawInteractionRequest(interaction);
         case "polo":
             return encodeInteraction(interaction);
         default:
