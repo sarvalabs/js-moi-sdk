@@ -454,22 +454,22 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
 /**
  * Retrieves a LogicDriver instance for the given logic ID.
  *
- * @param logicId - The ID of the logic to retrieve.
+ * @param source - The source of the logic, either an logic identifier or a logic manifest.
  * @param signer - The signer object used to interact with the logic.
  * @returns A promise that resolves to a LogicDriver instance.
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export const getLogicDriver = async <TRoutines extends LogicRoutines = LogicRoutines>(logicId: Identifier | LogicManifest, signer: Signer): Promise<LogicDriver<TRoutines>> => {
-    if (isIdentifier(logicId)) {
+export const getLogicDriver = async <TRoutines extends LogicRoutines = LogicRoutines>(source: Identifier | LogicManifest, signer: Signer): Promise<LogicDriver<TRoutines>> => {
+    if (isIdentifier(source)) {
         const provider = signer.getProvider();
-        const manifestInPolo = await provider.getLogic(logicId, {
+        const manifestInPolo = await provider.getLogic(source, {
             modifier: { extract: "manifest" },
         });
         const manifest = ManifestCoder.decodeManifest(manifestInPolo, ManifestCoderFormat.JSON);
 
-        return new LogicDriver({ manifest, logicId, signer });
+        return new LogicDriver({ manifest, logicId: source, signer });
     }
 
-    return new LogicDriver<TRoutines>({ manifest: logicId, signer });
+    return new LogicDriver<TRoutines>({ manifest: source, signer });
 };
