@@ -197,23 +197,29 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
      */
     public async getLogicId(timer?: TimerOption): Promise<Identifier> {
         if (this.deployIxResponse != null) {
-            const results = await this.deployIxResponse.result(timer);
-            const result = results.at(0);
-
-            if (result?.type !== OpType.LogicDeploy) {
-                ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
-            }
-
-            const exception = ManifestCoder.decodeException(result.data.error);
-
-            if (exception != null) {
-                ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
-            }
-
-            this.setLogicId(new LogicId(result.data.logic_id));
+            // This is to handle the case where the logic id is not set but the deployIxResponse is available.
+            // handleLogicDeployResponse uses `InteractionResponse` which caches the result on confirmation preventing multiple calls.
+            await this.obtainLogicIdFromResponse(this.deployIxResponse, timer);
         }
 
         return super.getLogicId();
+    }
+
+    protected async obtainLogicIdFromResponse(response: InteractionResponse, timer?: TimerOption) {
+        const results = await response.result(timer);
+        const result = results.at(0);
+
+        if (result?.type !== OpType.LogicDeploy) {
+            ErrorUtils.throwError("Expected result of logic deploy got something else.", ErrorCode.UNKNOWN_ERROR);
+        }
+
+        const exception = ManifestCoder.decodeException(result.data.error);
+
+        if (exception != null) {
+            ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
+        }
+
+        this.setLogicId(new LogicId(result.data.logic_id));
     }
 
     private newRoutine(routine: string) {
