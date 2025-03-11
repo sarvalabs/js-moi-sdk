@@ -61,10 +61,6 @@ export class InteractionResponse {
                     modifier: { include: ["confirmation"] },
                 });
 
-                if (this.notFoundRetries === MAX_RETRIES_ON_NOT_FOUND) {
-                    this.notFoundRetries = MAX_RETRIES_ON_NOT_FOUND;
-                }
-
                 if (ix.confirmation != null) {
                     this.interaction = ix;
                     return ix.confirmation;
