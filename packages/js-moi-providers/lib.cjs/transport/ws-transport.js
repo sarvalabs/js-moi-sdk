@@ -47,7 +47,7 @@ class WebsocketTransport extends events_1.default {
             this.emit("error", error);
         };
     }
-    waitForConnection() {
+    async waitForConnection() {
         this.waitForConnectionPromise ??= new Promise((resolve, reject) => {
             if (this.ws == null) {
                 reject(new Error("Websocket is not initialized"));
@@ -84,7 +84,7 @@ class WebsocketTransport extends events_1.default {
                 throw new Error("Websocket is closed, cannot reconnect");
             }
         });
-        return this.waitForConnectionPromise;
+        return await this.waitForConnectionPromise;
     }
     async request(method, param = []) {
         await this.waitForConnection();

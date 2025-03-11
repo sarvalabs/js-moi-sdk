@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isNullBytes = exports.hexToHash = exports.isAddress = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
+exports.isNullBytes = exports.hexToHash = exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.ensureHexPrefix = void 0;
 const blake2b_1 = require("@noble/hashes/blake2b");
 const bn_js_1 = __importDefault(require("bn.js"));
 const errors_1 = require("./errors");
@@ -157,14 +157,6 @@ const trimHexPrefix = (data) => {
     return (0, exports.isHex)(data) ? data.slice(2) : data;
 };
 exports.trimHexPrefix = trimHexPrefix;
-/**
- * Checks if a given value is an address.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} True if the value is an address, false otherwise.
- */
-const isAddress = (value) => (0, exports.isHex)(value, 32);
-exports.isAddress = isAddress;
 /**
  * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
  *

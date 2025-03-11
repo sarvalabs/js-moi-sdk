@@ -24,10 +24,8 @@ export class WebsocketProvider extends JsonRpcProvider {
     subscriptions = new Map();
     constructor(address, options) {
         super(new WebsocketTransport(address, options));
-        if (this.transport instanceof WebsocketTransport) {
-            for (const event of WebsocketProvider.events.client) {
-                this.transport.on(event, (...args) => this.emit(event, ...args));
-            }
+        for (const event of WebsocketProvider.events.client) {
+            this.transport.on(event, (...args) => this.emit(event, ...args));
         }
     }
     getSubscriptions() {
@@ -39,7 +37,7 @@ export class WebsocketProvider extends JsonRpcProvider {
         }
     }
     async handleOnNetworkEventSubscription(type, event, listener) {
-        const params = typeof event === "object" ? (event.params ?? []) : [];
+        const params = typeof event === "object" ? event.params : [];
         const eventName = WebsocketProvider.getEventName(event);
         if (typeof eventName === "symbol") {
             ErrorUtils.throwArgumentError("Cannot subscribe to a symbol event", "event", event);

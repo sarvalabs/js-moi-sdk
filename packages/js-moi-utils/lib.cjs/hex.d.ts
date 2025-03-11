@@ -77,7 +77,7 @@ export declare const bytesToHex: (data: Uint8Array) => Hex;
  * @param {number} byteLength - The length of the in terms of bytes l.
  * @returns {boolean} True if the value is a hexadecimal string, false otherwise.
  */
-export declare const isHex: (value: unknown, byteLength?: number) => value is Hex;
+export declare const isHex: (value: string, byteLength?: number) => value is Hex;
 /**
  * Removes the '0x' prefix from a hexadecimal string if present.
  *
@@ -85,13 +85,6 @@ export declare const isHex: (value: unknown, byteLength?: number) => value is He
  * @returns {string} The trimmed hexadecimal string.
  */
 export declare const trimHexPrefix: (data: string) => string;
-/**
- * Checks if a given value is an address.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} True if the value is an address, false otherwise.
- */
-export declare const isAddress: (value: unknown) => value is Address;
 /**
  * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
  *

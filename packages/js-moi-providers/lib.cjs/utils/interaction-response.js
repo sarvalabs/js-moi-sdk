@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionResponse = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
-const INITIAL_NOT_FOUND_RETRIES = 10;
-const ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO = 1500;
+const MAX_RETRIES_ON_NOT_FOUND = 10;
+const DEFAULT_IX_INFO_RETRIEVAL_TIME = 1500;
 class InteractionResponse {
     hash;
     interaction;
     provider;
-    notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+    notFoundRetries = MAX_RETRIES_ON_NOT_FOUND;
     constructor(hash, provider) {
         this.provider = provider;
         if (typeof hash === "string") {
@@ -45,9 +45,6 @@ class InteractionResponse {
                 const ix = await this.provider.getInteraction(this.hash, {
                     modifier: { include: ["confirmation"] },
                 });
-                if (this.notFoundRetries === INITIAL_NOT_FOUND_RETRIES) {
-                    this.notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
-                }
                 if (ix.confirmation != null) {
                     this.interaction = ix;
                     return ix.confirmation;
@@ -61,7 +58,7 @@ class InteractionResponse {
                         });
                     }
                     this.notFoundRetries--;
-                    await new Promise((resolve) => setTimeout(resolve, ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO));
+                    await new Promise((resolve) => setTimeout(resolve, DEFAULT_IX_INFO_RETRIEVAL_TIME));
                     continue;
                 }
             }

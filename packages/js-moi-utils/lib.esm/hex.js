@@ -143,13 +143,6 @@ export const trimHexPrefix = (data) => {
     return isHex(data) ? data.slice(2) : data;
 };
 /**
- * Checks if a given value is an address.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} True if the value is an address, false otherwise.
- */
-export const isAddress = (value) => isHex(value, 32);
-/**
  * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
  *
  * @param hex - The hexadecimal string to be hashed.

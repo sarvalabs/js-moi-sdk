@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AbstractAccessor = exports.defineReadOnly = exports.validateOperation = exports.listIxOperationDescriptors = exports.isValidOperation = exports.isOperationType = exports.getIxOperationDescriptor = exports.encodeOperationPayload = exports.encodeOperation = exports.deepCopy = exports.validateIxRequest = exports.transformInteraction = exports.interaction = exports.getInteractionRequestSchema = exports.encodeInteraction = exports.trimHexPrefix = exports.numToHex = exports.isNullBytes = exports.isHex = exports.isAddress = exports.hexToHash = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.RoutineType = exports.RoutineKind = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LogicState = exports.LockType = exports.InteractionStatus = exports.EngineKind = exports.ElementType = exports.AssetStandard = exports.AccountType = exports.randomBytes = exports.isInteger = exports.isHexString = exports.isBytes = exports.hexDataLength = exports.encodeText = exports.decodeText = exports.concatBytes = exports.encodeBase64 = exports.decodeBase64 = void 0;
-exports.StorageKey = exports.PropertyAccessor = exports.LengthAccessor = exports.generateStorageKey = exports.ClassFieldAccessor = exports.ArrayIndexAccessor = void 0;
+exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.AbstractAccessor = exports.defineReadOnly = exports.validateOperation = exports.listIxOperationDescriptors = exports.isValidOperation = exports.isOperationType = exports.getIxOperationDescriptor = exports.encodeOperationPayload = exports.encodeOperation = exports.deepCopy = exports.validateIxRequest = exports.transformInteraction = exports.interaction = exports.getInteractionRequestSchema = exports.encodeInteraction = exports.trimHexPrefix = exports.numToHex = exports.isNullBytes = exports.isHex = exports.hexToHash = exports.hexToBytes = exports.hexToBN = exports.ensureHexPrefix = exports.bytesToHex = exports.ErrorUtils = exports.ErrorCode = exports.CustomError = exports.RoutineType = exports.RoutineKind = exports.ReceiptStatus = exports.OpType = exports.OperationStatus = exports.LogicState = exports.LockType = exports.InteractionStatus = exports.EngineKind = exports.ElementType = exports.AssetStandard = exports.AccountType = exports.randomBytes = exports.isInteger = exports.isBytes = exports.hexDataLength = exports.encodeText = exports.decodeText = exports.concatBytes = exports.encodeBase64 = exports.decodeBase64 = void 0;
+exports.StorageKey = exports.PropertyAccessor = exports.LengthAccessor = exports.generateStorageKey = void 0;
 var base64_1 = require("./base64");
 Object.defineProperty(exports, "decodeBase64", { enumerable: true, get: function () { return base64_1.decodeBase64; } });
 Object.defineProperty(exports, "encodeBase64", { enumerable: true, get: function () { return base64_1.encodeBase64; } });
@@ -11,7 +11,6 @@ Object.defineProperty(exports, "decodeText", { enumerable: true, get: function (
 Object.defineProperty(exports, "encodeText", { enumerable: true, get: function () { return bytes_1.encodeText; } });
 Object.defineProperty(exports, "hexDataLength", { enumerable: true, get: function () { return bytes_1.hexDataLength; } });
 Object.defineProperty(exports, "isBytes", { enumerable: true, get: function () { return bytes_1.isBytes; } });
-Object.defineProperty(exports, "isHexString", { enumerable: true, get: function () { return bytes_1.isHexString; } });
 Object.defineProperty(exports, "isInteger", { enumerable: true, get: function () { return bytes_1.isInteger; } });
 Object.defineProperty(exports, "randomBytes", { enumerable: true, get: function () { return bytes_1.randomBytes; } });
 var enums_1 = require("./enums");
@@ -37,7 +36,6 @@ Object.defineProperty(exports, "ensureHexPrefix", { enumerable: true, get: funct
 Object.defineProperty(exports, "hexToBN", { enumerable: true, get: function () { return hex_1.hexToBN; } });
 Object.defineProperty(exports, "hexToBytes", { enumerable: true, get: function () { return hex_1.hexToBytes; } });
 Object.defineProperty(exports, "hexToHash", { enumerable: true, get: function () { return hex_1.hexToHash; } });
-Object.defineProperty(exports, "isAddress", { enumerable: true, get: function () { return hex_1.isAddress; } });
 Object.defineProperty(exports, "isHex", { enumerable: true, get: function () { return hex_1.isHex; } });
 Object.defineProperty(exports, "isNullBytes", { enumerable: true, get: function () { return hex_1.isNullBytes; } });
 Object.defineProperty(exports, "numToHex", { enumerable: true, get: function () { return hex_1.numToHex; } });
