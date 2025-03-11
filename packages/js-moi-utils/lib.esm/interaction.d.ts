@@ -12,7 +12,7 @@ export declare const getInteractionRequestSchema: () => Schema;
  * @param ix Interaction request
  * @returns a raw interaction request
  */
-export declare const transformInteraction: (ix: InteractionRequest) => RawInteractionRequest;
+export declare const toRawInteractionRequest: (ix: InteractionRequest) => RawInteractionRequest;
 /**
  * Encodes an interaction request into a POLO bytes.
  *

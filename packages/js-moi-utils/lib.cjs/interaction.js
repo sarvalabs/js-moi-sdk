@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
+exports.toRawInteractionRequest = exports.getInteractionRequestSchema = void 0;
 exports.encodeInteraction = encodeInteraction;
 exports.interaction = interaction;
 exports.validateIxRequest = validateIxRequest;
@@ -56,7 +56,7 @@ exports.getInteractionRequestSchema = getInteractionRequestSchema;
  * @param ix Interaction request
  * @returns a raw interaction request
  */
-const transformInteraction = (ix) => {
+const toRawInteractionRequest = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
@@ -67,7 +67,7 @@ const transformInteraction = (ix) => {
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,
     };
 };
-exports.transformInteraction = transformInteraction;
+exports.toRawInteractionRequest = toRawInteractionRequest;
 /**
  * Encodes an interaction request into a POLO bytes.
  *
@@ -81,7 +81,7 @@ exports.transformInteraction = transformInteraction;
  * @returns A POLO bytes representing the encoded interaction request.
  */
 function encodeInteraction(ix) {
-    const data = "operations" in ix ? (0, exports.transformInteraction)(ix) : ix;
+    const data = "operations" in ix ? (0, exports.toRawInteractionRequest)(ix) : ix;
     const polorizer = new js_polo_1.Polorizer();
     polorizer.polorize(data, (0, exports.getInteractionRequestSchema)());
     return polorizer.bytes();
@@ -180,7 +180,7 @@ function interaction(ix, format = "polo") {
         case "minimal":
             return interaction;
         case "raw":
-            return (0, exports.transformInteraction)(interaction);
+            return (0, exports.toRawInteractionRequest)(interaction);
         case "polo":
             return encodeInteraction(interaction);
         default:

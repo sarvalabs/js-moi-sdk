@@ -3,7 +3,7 @@ export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isInteger,
 export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineKind, RoutineType, } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, hexToHash, isHex, isNullBytes, numToHex, trimHexPrefix, } from "./hex";
-export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction, validateIxRequest } from "./interaction";
+export { encodeInteraction, getInteractionRequestSchema, interaction, toRawInteractionRequest, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export { encodeOperation, encodeOperationPayload, getIxOperationDescriptor, isOperationType, isValidOperation, listIxOperationDescriptors, validateOperation, } from "./operations";
 export { defineReadOnly } from "./properties";
