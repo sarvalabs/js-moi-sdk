@@ -36,64 +36,64 @@ export class LogicDriver extends LogicDescriptor {
         return logicId != null;
     }
     /**
-     * Retrieves the type of a callsite.
+     * Retrieves the type of a routine.
      *
-     * @param callsite - The name of the callsite.
-     * @returns The type of the specified callsite.
+     * @param routine - The name of the routine.
+     * @returns The type of the specified routine.
      */
-    getCallsiteType(callsite) {
-        return this.getRoutineElement(callsite).data.kind;
+    getRoutineType(routine) {
+        return this.getRoutineElement(routine).data.kind;
     }
     /**
-     * Determines if the callsite is mutable based on its routine kind.
+     * Determines if the routine is mutable based on its routine kind.
      *
-     * @param callsite - The identifier of the callsite to check.
-     * @returns A boolean indicating whether the callsite is mutable.
+     * @param routine - The identifier of the routine to check.
+     * @returns A boolean indicating whether the routine is mutable.
      */
-    isCallsiteMutable(callsite) {
+    isRoutineMutable(routine) {
         const kinds = [RoutineKind.Ephemeral, RoutineKind.Persistent];
-        const element = this.getRoutineElement(callsite);
+        const element = this.getRoutineElement(routine);
         return kinds.includes(element.data.mode);
     }
-    extractArgsAndOption(callsite, callsiteArguments) {
-        const element = this.getRoutineElement(callsite);
-        if (callsiteArguments.length < element.data.accepts.length) {
-            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
-            ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
+    extractArgsAndOption(routine, routineArguments) {
+        const element = this.getRoutineElement(routine);
+        if (routineArguments.length < element.data.accepts.length) {
+            const routineSignature = `Invalid number of arguments: ${routine}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
+            ErrorUtils.throwArgumentError(routineSignature, "args", routineArguments);
         }
-        const option = callsiteArguments.at(element.data.accepts.length);
-        const args = callsiteArguments.slice(0, element.data.accepts.length);
+        const option = routineArguments.at(element.data.accepts.length);
+        const args = routineArguments.slice(0, element.data.accepts.length);
         return { option, args };
     }
     /**
      * Creates an interaction operation for the specified callsite.
      *
-     * @param callsite - The name of the callsite.
+     * @param routine - The name of the callsite.
      * @param args - The arguments to pass to the callsite.
      * @returns A promise that resolves to an interaction operation.
      *
      * @throws an error if the callsite is not present.
      */
-    async createIxOperation(callsite, args) {
-        const routine = this.getRoutineElement(callsite);
-        if (routine.data.accepts.length !== args.length) {
-            ErrorUtils.throwError(`Invalid number of arguments for callsite "${callsite}".`, ErrorCode.INVALID_ARGUMENT);
+    async createIxOperation(routine, args) {
+        const element = this.getRoutineElement(routine);
+        if (element.data.accepts.length !== args.length) {
+            ErrorUtils.throwError(`Invalid number of arguments for callsite "${routine}".`, ErrorCode.INVALID_ARGUMENT);
         }
-        const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
-        const callsiteType = this.getCallsiteType(callsite);
-        switch (callsiteType) {
+        const calldata = this.getManifestCoder().encodeArguments(routine, ...args);
+        const type = this.getRoutineType(routine);
+        switch (type) {
             case RoutineType.Deploy: {
                 return {
                     type: OpType.LogicDeploy,
-                    payload: { manifest: this.getManifest(ManifestCoderFormat.POLO), callsite, calldata },
+                    payload: { manifest: this.getManifest(ManifestCoderFormat.POLO), callsite: routine, calldata },
                 };
             }
             case RoutineType.Invoke:
             case RoutineType.Enlist: {
                 const logicId = await this.getLogicId();
                 return {
-                    type: callsiteType === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
-                    payload: { logic_id: logicId.toHex(), callsite, calldata },
+                    type: type === RoutineType.Invoke ? OpType.LogicInvoke : OpType.LogicEnlist,
+                    payload: { logic_id: logicId.toHex(), callsite: routine, calldata },
                 };
             }
             default: {
@@ -101,8 +101,8 @@ export class LogicDriver extends LogicDescriptor {
             }
         }
     }
-    async createIxRequest(method, callsite, callsiteArguments, params) {
-        const operation = await this.createIxOperation(callsite, callsiteArguments);
+    async createIxRequest(method, routine, routineArguments, params) {
+        const operation = await this.createIxOperation(routine, routineArguments);
         if (method === "moi.Simulate") {
             return await this.signer.createIxRequest("moi.Simulate", {
                 ...params,
@@ -141,19 +141,19 @@ export class LogicDriver extends LogicDescriptor {
         }
         return super.getLogicId();
     }
-    newCallsite(callsite) {
-        const isDeployerCallsite = this.getCallsiteType(callsite) === RoutineType.Deploy;
+    newRoutine(routine) {
+        const isDeployerRoutine = this.getRoutineType(routine) === RoutineType.Deploy;
         const callback = async (...args) => {
             const isDeployed = await this.isDeployed();
-            if (isDeployerCallsite && isDeployed) {
+            if (isDeployerRoutine && isDeployed) {
                 ErrorUtils.throwError(`Logic is already deployed or deploying.`);
             }
-            if (!isDeployerCallsite && !isDeployed) {
-                ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
+            if (!isDeployerRoutine && !isDeployed) {
+                ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer routine.`);
             }
-            const { option, args: callsiteArgs } = this.extractArgsAndOption(callsite, args);
-            if (!this.isCallsiteMutable(callsite)) {
-                const simulateIxRequest = await this.createIxRequest("moi.Simulate", callsite, callsiteArgs, option);
+            const { option, args: routineArgs } = this.extractArgsAndOption(routine, args);
+            if (!this.isRoutineMutable(routine)) {
+                const simulateIxRequest = await this.createIxRequest("moi.Simulate", routine, routineArgs, option);
                 const simulation = await this.signer.simulate(simulateIxRequest);
                 const result = simulation.results.at(0);
                 if (result?.type !== OpType.LogicInvoke) {
@@ -164,11 +164,11 @@ export class LogicDriver extends LogicDescriptor {
                 if (exception != null) {
                     ErrorUtils.throwError(exception.error, ErrorCode.CALL_EXCEPTION, exception);
                 }
-                return this.getManifestCoder().decodeOutput(callsite, outputs);
+                return this.getManifestCoder().decodeOutput(routine, outputs);
             }
-            const request = await this.createIxRequest("moi.Execute", callsite, callsiteArgs, option);
+            const request = await this.createIxRequest("moi.Execute", routine, routineArgs, option);
             const response = await this.signer.execute(request);
-            if (isDeployerCallsite) {
+            if (isDeployerRoutine) {
                 this.deployIxResponse = response;
             }
             return response;
@@ -180,9 +180,9 @@ export class LogicDriver extends LogicDescriptor {
         for (const { ptr } of this.getCallsites().values()) {
             const element = this.getElement(ptr);
             if (element.kind !== ElementType.Routine) {
-                ErrorUtils.throwError(`Element at "${ptr}" is not a valid callsite.`);
+                ErrorUtils.throwError(`Element at "${ptr}" is not a valid routine.`);
             }
-            endpoint[element.data.name] = this.newCallsite(element.data.name);
+            endpoint[element.data.name] = this.newRoutine(element.data.name);
         }
         return Object.freeze(endpoint);
     }

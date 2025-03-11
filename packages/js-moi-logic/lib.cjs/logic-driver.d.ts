@@ -3,15 +3,15 @@ import type { LogicMessageRequestOption, SimulateInteractionRequest, TimerOption
 import type { Signer, SignerIx } from "js-moi-signer";
 import { LogicState, OpType, RoutineType, StorageKey, type Hex, type InteractionRequest, type IxOperation, type LogicManifest, type LogicMessage } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import type { LogicCallsites, LogicDriverOption, StateAccessorFn } from "./types";
+import type { LogicDriverOption, LogicRoutines, StateAccessorFn } from "./types";
 /**
  * It is class that is used to interact with the logic.
  *
  * @class LogicDriver
  */
-export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsites> extends LogicDescriptor {
+export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extends LogicDescriptor {
     private signer;
-    readonly endpoint: TCallsites;
+    readonly endpoint: TRoutines;
     private deployIxResponse?;
     constructor(option: Omit<LogicDriverOption, "logicId"> & {
         logicId?: Identifier;
@@ -27,42 +27,42 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      */
     isDeployed(): Promise<boolean>;
     /**
-     * Retrieves the type of a callsite.
+     * Retrieves the type of a routine.
      *
-     * @param callsite - The name of the callsite.
-     * @returns The type of the specified callsite.
+     * @param routine - The name of the routine.
+     * @returns The type of the specified routine.
      */
-    getCallsiteType(callsite: string): RoutineType;
+    getRoutineType(routine: string): RoutineType;
     /**
-     * Determines if the callsite is mutable based on its routine kind.
+     * Determines if the routine is mutable based on its routine kind.
      *
-     * @param callsite - The identifier of the callsite to check.
-     * @returns A boolean indicating whether the callsite is mutable.
+     * @param routine - The identifier of the routine to check.
+     * @returns A boolean indicating whether the routine is mutable.
      */
-    isCallsiteMutable(callsite: string): boolean;
+    isRoutineMutable(routine: string): boolean;
     private extractArgsAndOption;
     /**
      * Creates an interaction operation for the specified callsite.
      *
-     * @param callsite - The name of the callsite.
+     * @param routine - The name of the callsite.
      * @param args - The arguments to pass to the callsite.
      * @returns A promise that resolves to an interaction operation.
      *
      * @throws an error if the callsite is not present.
      */
-    createIxOperation(callsite: string, args: unknown[]): Promise<IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicEnlist>>;
+    createIxOperation(routine: string, args: unknown[]): Promise<IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.LogicEnlist>>;
     /**
-     * Creates an interaction request for a given callsite and its arguments.
+     * Creates an interaction request for a given routine and its arguments.
      *
-     * @param callsite - The name of the callsite function to be invoked.
-     * @param callsiteArguments - An array of arguments to be passed to the callsite function.
-     * @param option - Optional parameters for the callsite, including fuel price and fuel limit.
+     * @param routine - The name of the routine function to be invoked.
+     * @param routineArguments - An array of arguments to be passed to the routine function.
+     * @param option - Optional parameters for the routine, including fuel price and fuel limit.
      * @returns A promise that resolves to a SignerIx object, which can be either a SimulateInteractionRequest or an InteractionRequest.
      *
      * @throws Will throw an error if the provided fuel limit is less than the required simulation effort.
      */
-    createIxRequest(method: "moi.Simulate", callsite: string, callsiteArguments: unknown[], params?: Omit<Partial<SignerIx<SimulateInteractionRequest>>, "operations">): Promise<SimulateInteractionRequest>;
-    createIxRequest(method: "moi.Execute", callsite: string, callsiteArguments: unknown[], params?: Omit<Partial<SignerIx<InteractionRequest>>, "operations">): Promise<InteractionRequest>;
+    createIxRequest(method: "moi.Simulate", routine: string, routineArguments: unknown[], params?: Omit<Partial<SignerIx<SimulateInteractionRequest>>, "operations">): Promise<SimulateInteractionRequest>;
+    createIxRequest(method: "moi.Execute", routine: string, routineArguments: unknown[], params?: Omit<Partial<SignerIx<InteractionRequest>>, "operations">): Promise<InteractionRequest>;
     /**
      * Retrieves the logic ID associated with this instance. If the logic ID is already set, it returns the existing logic ID.
      *
@@ -76,7 +76,7 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
      * @throws If error occurs during the deployment process.
      */
     getLogicId(timer?: TimerOption): Promise<Identifier>;
-    private newCallsite;
+    private newRoutine;
     private setupEndpoint;
     /**
      * Retrieves the logic storage based on the provided state and storage key.
@@ -142,5 +142,5 @@ export declare class LogicDriver<TCallsites extends LogicCallsites = LogicCallsi
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
  */
-export declare const getLogicDriver: <TCallsites extends LogicCallsites = LogicCallsites>(logicId: Identifier | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
+export declare const getLogicDriver: <TCallsites extends LogicRoutines = LogicRoutines>(logicId: Identifier | LogicManifest, signer: Signer) => Promise<LogicDriver<TCallsites>>;
 //# sourceMappingURL=logic-driver.d.ts.map
