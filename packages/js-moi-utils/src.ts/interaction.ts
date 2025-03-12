@@ -86,7 +86,7 @@ export const encodeInteraction = (ix: InteractionRequest | RawInteractionRequest
 
     polorizer.polorize(data, getInteractionRequestSchema());
     return polorizer.bytes();
-}
+};
 
 const gatherIxParticipants = (interaction: InteractionRequest) => {
     const participants = new Map<Hex, IxParticipant>([
@@ -178,7 +178,7 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
 export function interaction(ix: InteractionRequest): Uint8Array;
 export function interaction(ix: InteractionRequest, format: "raw"): RawInteractionRequest;
 export function interaction(ix: InteractionRequest, format: "polo"): Uint8Array;
-export function interaction(ix: InteractionRequest, format: "minimal"): InteractionRequest;
+export function interaction(ix: InteractionRequest, format: "default"): InteractionRequest;
 /**
  * Creates a POLO bytes from an interaction request.
  *
@@ -187,14 +187,14 @@ export function interaction(ix: InteractionRequest, format: "minimal"): Interact
  * @param ix - The interaction request to encode.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-export function interaction(ix: InteractionRequest, format: "raw" | "polo" | "minimal" = "polo"): RawInteractionRequest | Uint8Array | InteractionRequest {
+export function interaction(ix: InteractionRequest, format: "raw" | "polo" | "default" = "polo"): RawInteractionRequest | Uint8Array | InteractionRequest {
     const interaction: InteractionRequest = {
         ...ix,
         participants: gatherIxParticipants(ix),
     };
 
     switch (format) {
-        case "minimal":
+        case "default":
             return interaction;
         case "raw":
             return toRawInteractionRequest(interaction);
