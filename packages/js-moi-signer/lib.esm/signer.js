@@ -5,25 +5,11 @@ const DEFAULT_FUEL_PRICE = 1;
 export class Signer {
     provider;
     signingAlgorithms;
-    fuelPrice = DEFAULT_FUEL_PRICE;
     constructor(provider, signingAlgorithms) {
         this.provider = provider;
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
-    }
-    /**
-     * Sets the fuel price for the signer.
-     *
-     * @param {number} fuelPrice - The fuel price to set.
-     * @returns {void}
-     * @throws {Error} if the fuel price is less than 1.
-     */
-    setFuelPrice(fuelPrice) {
-        if (fuelPrice < 1) {
-            ErrorUtils.throwError("Fuel price must be greater than or equal to 1", ErrorCode.INVALID_ARGUMENT, { fuelPrice });
-        }
-        this.fuelPrice = fuelPrice;
     }
     connect(provider) {
         this.provider = provider;
@@ -55,7 +41,7 @@ export class Signer {
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: this.fuelPrice,
+                fuel_price: DEFAULT_FUEL_PRICE,
                 operations: arg,
             };
         }
@@ -63,7 +49,7 @@ export class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: this.fuelPrice,
+                fuel_price: DEFAULT_FUEL_PRICE,
                 operations: [arg],
             };
         }
@@ -71,7 +57,7 @@ export class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? this.fuelPrice,
+            fuel_price: arg.fuel_price ?? DEFAULT_FUEL_PRICE,
         };
     }
     async createIxRequest(type, args) {

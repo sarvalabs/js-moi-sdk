@@ -29,7 +29,7 @@ export declare const encodeInteraction: (ix: InteractionRequest | RawInteraction
 export declare function interaction(ix: InteractionRequest): Uint8Array;
 export declare function interaction(ix: InteractionRequest, format: "raw"): RawInteractionRequest;
 export declare function interaction(ix: InteractionRequest, format: "polo"): Uint8Array;
-export declare function interaction(ix: InteractionRequest, format: "minimal"): InteractionRequest;
+export declare function interaction(ix: InteractionRequest, format: "default"): InteractionRequest;
 declare const createInvalidResult: <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     field: keyof T;
     message: string;

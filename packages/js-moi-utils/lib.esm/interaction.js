@@ -169,7 +169,7 @@ export function interaction(ix, format = "polo") {
         participants: gatherIxParticipants(ix),
     };
     switch (format) {
-        case "minimal":
+        case "default":
             return interaction;
         case "raw":
             return toRawInteractionRequest(interaction);

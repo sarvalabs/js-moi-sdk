@@ -104,8 +104,9 @@ const createAccountConfigureDescriptor = () => {
     return Object.freeze({
         schema: schema,
         validator: ({ payload }) => {
-            if (payload.add == null || payload.revoke == null) {
-                createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
+            console.log(payload);
+            if (payload.add == null && payload.revoke == null) {
+                return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
             for (const key in payload) {
                 const value = payload[key];
@@ -402,7 +403,12 @@ exports.encodeOperation = encodeOperation;
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
 const isValidOperation = (operation) => {
-    return (0, exports.validateOperation)(operation) == null;
+    try {
+        return (0, exports.validateOperation)(operation) == null;
+    }
+    catch {
+        return false;
+    }
 };
 exports.isValidOperation = isValidOperation;
 /**

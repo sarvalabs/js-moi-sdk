@@ -11,16 +11,7 @@ export type SignerIx<T extends InteractionRequest | SimulateInteractionRequest> 
 export declare abstract class Signer {
     private provider?;
     signingAlgorithms: SigningAlgorithms;
-    private fuelPrice;
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms);
-    /**
-     * Sets the fuel price for the signer.
-     *
-     * @param {number} fuelPrice - The fuel price to set.
-     * @returns {void}
-     * @throws {Error} if the fuel price is less than 1.
-     */
-    setFuelPrice(fuelPrice: number): void;
     abstract getKeyId(): Promise<number>;
     abstract getIdentifier(): Promise<Identifier>;
     abstract sign(message: Hex | Uint8Array, sig: SigType): Promise<Hex>;
