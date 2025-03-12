@@ -29,14 +29,15 @@ type NonOptionalKeys<T extends Record<string, any>> = {
 
 type NonUndefined<T> = T extends undefined ? never : T;
 
-export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> =
-    TModifier extends Required<ResponseModifierParam<infer K>> ?
-        K extends keyof TObject ?
-            TModifier extends { modifier: ExtractModifier<infer E> } ? NonUndefined<TObject[E]>
-            : TModifier extends { modifier: IncludeModifier<infer E> } ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionalKeys<TObject>>
+export type SelectFromResponseModifier<TObject extends Record<string, any>, TModifier extends ResponseModifierParam> = TModifier extends Required<ResponseModifierParam<infer K>>
+    ? K extends keyof TObject
+        ? TModifier extends { modifier: ExtractModifier<infer E> }
+            ? NonUndefined<TObject[E]>
+            : TModifier extends { modifier: IncludeModifier<infer E> }
+            ? Required<Pick<TObject, E>> & Pick<TObject, NonOptionalKeys<TObject>>
             : Pick<TObject, NonOptionalKeys<TObject>>
-        :   Pick<TObject, NonOptionalKeys<TObject>>
-    :   Pick<TObject, NonOptionalKeys<TObject>>;
+        : Pick<TObject, NonOptionalKeys<TObject>>
+    : Pick<TObject, NonOptionalKeys<TObject>>;
 
 export type GetNetworkInfoOption = ResponseModifierParam<keyof NetworkInfo>;
 
@@ -232,15 +233,6 @@ export type ExecuteIx = MethodParams<"moi.Execute">[0];
 export type Signature = ExecuteIx["signatures"][number];
 
 interface ExecuteRequest {
-    /**
-     * Send as interaction request to a network.
-     *
-     * @param ix - POLO encoded interaction to execute.
-     * @param signatures - Signatures for the interaction.
-     *
-     * @returns a promise that resolves to the interaction response.
-     */
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
     /**
      * Send as interaction request to a network.
      *

@@ -1,4 +1,4 @@
-import { AssetId, createParticipantId, IdentifierVersion, LogicId } from "js-moi-identifiers";
+import { AssetId, createParticipantId, IdentifierVersion, LogicId, ParticipantTagV0 } from "js-moi-identifiers";
 import {
     ArrayIndexAccessor,
     AssetStandard,
@@ -101,7 +101,7 @@ describe(JsonRpcProvider, () => {
                 createParticipantId({
                     fingerprint: randomBytes(24),
                     variant: 0,
-                    version: IdentifierVersion.V0,
+                    tag: ParticipantTagV0,
                 }).toHex()
         );
         const logic_id = ensureHexPrefix(process.env["LOGIC_ID"] ?? FALLBACK_LOGIC_ID);
