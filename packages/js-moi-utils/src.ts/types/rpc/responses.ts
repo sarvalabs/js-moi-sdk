@@ -17,7 +17,7 @@ export interface NetworkInfo {
 
 export interface SimulationEffects {
     events: unknown[];
-    BalanceChanges: unknown;
+    balance_changes: unknown;
 }
 
 export interface Simulate {
