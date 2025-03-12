@@ -187,31 +187,14 @@ class JsonRpcProvider extends events_1.EventEmitter {
             ...option,
         });
     }
-    async execute(ix, signatures) {
-        let params;
-        switch (true) {
-            case ix instanceof Uint8Array: {
-                if (!signatures || !Array.isArray(signatures)) {
-                    js_moi_utils_1.ErrorUtils.throwError("No signatures provided", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-                }
-                params = [{ interaction: (0, js_moi_utils_1.bytesToHex)(ix), signatures }];
-                break;
-            }
-            case typeof ix === "object": {
-                if (ix.interaction == null) {
-                    js_moi_utils_1.ErrorUtils.throwError("No interaction provided", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-                }
-                if (!ix.signatures || !Array.isArray(ix.signatures)) {
-                    js_moi_utils_1.ErrorUtils.throwError("No signatures provided", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-                }
-                params = [ix];
-                break;
-            }
-            default: {
-                js_moi_utils_1.ErrorUtils.throwError("Invalid argument for method signature", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-            }
+    async execute(ix) {
+        if (ix.interaction == null) {
+            js_moi_utils_1.ErrorUtils.throwError("No interaction provided", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        const hash = await this.call("moi.Execute", ...params);
+        if (!ix.signatures || !Array.isArray(ix.signatures)) {
+            js_moi_utils_1.ErrorUtils.throwError("No signatures provided", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        const hash = await this.call("moi.Execute", ix);
         return new interaction_response_1.InteractionResponse(hash, this);
     }
     async getInteraction(hash, option) {

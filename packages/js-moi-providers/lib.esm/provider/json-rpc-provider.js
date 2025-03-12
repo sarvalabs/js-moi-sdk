@@ -184,31 +184,14 @@ export class JsonRpcProvider extends EventEmitter {
             ...option,
         });
     }
-    async execute(ix, signatures) {
-        let params;
-        switch (true) {
-            case ix instanceof Uint8Array: {
-                if (!signatures || !Array.isArray(signatures)) {
-                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
-                }
-                params = [{ interaction: bytesToHex(ix), signatures }];
-                break;
-            }
-            case typeof ix === "object": {
-                if (ix.interaction == null) {
-                    ErrorUtils.throwError("No interaction provided", ErrorCode.INVALID_ARGUMENT);
-                }
-                if (!ix.signatures || !Array.isArray(ix.signatures)) {
-                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
-                }
-                params = [ix];
-                break;
-            }
-            default: {
-                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
-            }
+    async execute(ix) {
+        if (ix.interaction == null) {
+            ErrorUtils.throwError("No interaction provided", ErrorCode.INVALID_ARGUMENT);
         }
-        const hash = await this.call("moi.Execute", ...params);
+        if (!ix.signatures || !Array.isArray(ix.signatures)) {
+            ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
+        }
+        const hash = await this.call("moi.Execute", ix);
         return new InteractionResponse(hash, this);
     }
     async getInteraction(hash, option) {

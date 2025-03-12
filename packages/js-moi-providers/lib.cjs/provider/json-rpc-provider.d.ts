@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { Identifier } from "js-moi-identifiers";
 import { StorageKey, type Account, type AccountAsset, type AccountKey, type Asset, type Hex, type Interaction, type JsonRpcResponse, type Logic, type LogicMessage, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateInteractionRequest, SimulateOption, TesseractRequestOption } from "../types/provider";
+import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, SimulateInteractionRequest, SimulateOption, TesseractRequestOption } from "../types/provider";
 import { InteractionResponse } from "../utils/interaction-response";
 export declare class JsonRpcProvider extends EventEmitter implements Provider {
     private readonly _transport;
@@ -59,7 +59,6 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
     getLogicMessage(logic: Identifier | Hex, options?: LogicMessageRequestOption): Promise<LogicMessage[]>;
     getAccountAsset<TOption extends AccountAssetRequestOption>(participant: Identifier | Hex, asset: Identifier | Hex, option?: TOption): Promise<SelectFromResponseModifier<AccountAsset, TOption>>;
     getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
     execute(ix: ExecuteIx): Promise<InteractionResponse>;
     getInteraction<TOption extends InteractionRequestOption>(hash: Hex, option?: TOption): Promise<SelectFromResponseModifier<Interaction, TOption>>;
     subscribe(event: string, params?: unknown[]): Promise<string>;

@@ -185,15 +185,6 @@ interface ExecuteRequest {
     /**
      * Send as interaction request to a network.
      *
-     * @param ix - POLO encoded interaction to execute.
-     * @param signatures - Signatures for the interaction.
-     *
-     * @returns a promise that resolves to the interaction response.
-     */
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
-    /**
-     * Send as interaction request to a network.
-     *
      * @param ix - Interaction to execute.
      *
      * @returns a promise that resolves to the interaction response.
