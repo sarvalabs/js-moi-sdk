@@ -154,8 +154,9 @@ const createAccountConfigureDescriptor = () => {
         schema: schema,
 
         validator: ({ payload }) => {
-            if (payload.add == null || payload.revoke == null) {
-                createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
+            console.log(payload);
+            if (payload.add == null && payload.revoke == null) {
+                return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
 
             for (const key in payload) {
@@ -526,7 +527,11 @@ export const encodeOperation = <TOpType extends OpType>(operation: IxOperation<T
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
 export const isValidOperation = <TOpType extends OpType>(operation: IxOperation<TOpType>): boolean => {
-    return validateOperation(operation) == null;
+    try {
+        return validateOperation(operation) == null;
+    } catch {
+        return false;
+    }
 };
 
 /**
