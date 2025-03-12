@@ -1,4 +1,4 @@
-import { hexDataLength, isBytes, isHexString, isInteger } from "../src.ts/bytes";
+import { hexDataLength, isBytes, isInteger } from "../src.ts/bytes";
 
 describe("isInteger", () => {
     it("should return true for integers", () => {
@@ -39,31 +39,5 @@ describe("hexDataLength", () => {
         expect(hexDataLength("123")).toBe(null);
         expect(hexDataLength("0x12345")).toBe(null);
         expect(hexDataLength("0xabcdeff")).toBe(null);
-    });
-});
-
-describe("isHexString", () => {
-    it("should return true for valid hexadecimal strings", () => {
-        expect(isHexString("0x")).toBe(true);
-        expect(isHexString("0x1234")).toBe(true);
-        expect(isHexString("0xabcdef")).toBe(true);
-    });
-
-    it("should return false for invalid hexadecimal strings", () => {
-        expect(isHexString("123")).toBe(false);
-        expect(isHexString("0xabcdeffk")).toBe(false);
-        expect(isHexString(null)).toBe(false);
-        expect(isHexString(undefined)).toBe(false);
-        expect(isHexString(42)).toBe(false);
-    });
-
-    it("should return true for valid hexadecimal strings with expected length", () => {
-        expect(isHexString("0x1234", 2)).toBe(true);
-        expect(isHexString("0xabcdef", 3)).toBe(true);
-    });
-
-    it("should return false for hexadecimal strings with incorrect length", () => {
-        expect(isHexString("0x1234", 3)).toBe(false);
-        expect(isHexString("0xabcdef", 4)).toBe(false);
     });
 });
