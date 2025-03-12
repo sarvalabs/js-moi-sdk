@@ -53,7 +53,11 @@ export const isBytes = (value: any): value is Bytes => {
  */
 export const hexDataLength = (data: string) => {
     // Check if the input is a valid hexadecimal string and has an even length
-    if (!isHex(data) || data.length % 2) {
+    if (data === "0x") {
+        return 0;
+    }
+
+    if (!isHex(data) || data.length % 2 !== 0) {
         return null;
     }
 
