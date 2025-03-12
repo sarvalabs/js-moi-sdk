@@ -1,11 +1,11 @@
-import { IdentifierKind, IdentifierVersion } from "./enums";
+import { IdentifierKind } from "./enums";
 import { flagMasks, setFlag, type Flag } from "./flags";
 import { Identifier, type InvalidReason } from "./identifier";
 import { IdentifierTag } from "./identifier-tag";
 import { hexToBytes, type Hex } from "./utils";
 
 export interface GenerateParticipantOption {
-    version: IdentifierVersion;
+    tag: IdentifierTag;
     fingerprint: Uint8Array;
     variant: number;
     flags?: Flag[];
@@ -63,20 +63,15 @@ export class ParticipantId extends Identifier {
  * @throws {Error} If any flag is unsupported for the participant identifier.
  */
 export const createParticipantId = (option: GenerateParticipantOption): ParticipantId => {
-    if (option.version !== IdentifierVersion.V0) {
-        throw new TypeError("Invalid identifier version. Expected V0.");
-    }
-
     if (option.fingerprint.length !== 24) {
         throw new TypeError("Invalid fingerprint length. Expected 24 bytes.");
     }
 
     const metadata = new Uint8Array(4);
-    const participantTag = IdentifierTag.getTag(IdentifierKind.Participant, option.version);
-    metadata[0] = participantTag.value;
+    metadata[0] = option.tag.value;
 
     for (const flag of option.flags ?? []) {
-        if (!flag.supports(participantTag)) {
+        if (!flag.supports(option.tag)) {
             throw new Error(`Invalid flag. Unsupported flag for participant identifier.`);
         }
 

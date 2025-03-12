@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { createParticipantId, Flag, Identifier, IdentifierKind, IdentifierVersion, ParticipantId } from "../src.ts";
+import { createParticipantId, Flag, Identifier, IdentifierKind, ParticipantId, ParticipantTagV0 } from "../src.ts";
 import { hexToBytes } from "../src.ts/utils";
 
 const VALID_PARTICIPANT_ID = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000";
@@ -71,7 +71,7 @@ describe(createParticipantId, () => {
         const participant = createParticipantId({
             fingerprint: globalThis.crypto.getRandomValues(new Uint8Array(24)),
             variant: 0,
-            version: IdentifierVersion.V0,
+            tag: ParticipantTagV0,
         });
 
         expect(participant).toBeInstanceOf(ParticipantId);
@@ -82,7 +82,7 @@ describe(createParticipantId, () => {
             createParticipantId({
                 fingerprint: globalThis.crypto.getRandomValues(new Uint8Array(24)),
                 variant: 0,
-                version: IdentifierVersion.V0,
+                tag: ParticipantTagV0,
                 flags: [new Flag(IdentifierKind.Participant, 2, 3)],
             })
         ).toThrow();

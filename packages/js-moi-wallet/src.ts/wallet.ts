@@ -6,7 +6,7 @@ import { type ExecuteIx, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest, type Hex, type InteractionRequest } from "js-moi-utils";
 
-import { Identifier, IdentifierVersion, createParticipantId } from "js-moi-identifiers";
+import { Identifier, ParticipantTagV0, createParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
 import { MnemonicImportOptions, type WalletOption } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
@@ -179,7 +179,7 @@ export class Wallet extends Signer {
         const publickey = await this.getPublicKey();
         const fingerprint = hexToBytes(publickey).slice(0, 24);
 
-        return createParticipantId({ fingerprint, variant: 0, version: IdentifierVersion.V0 });
+        return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
     }
 
     public getKeyId(): Promise<number> {
