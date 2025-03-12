@@ -15,7 +15,7 @@ export interface NetworkInfo {
 }
 export interface SimulationEffects {
     events: unknown[];
-    BalanceChanges: unknown;
+    balance_changes: unknown;
 }
 export interface Simulate {
     hash: Hex;
@@ -26,7 +26,7 @@ export interface Simulate {
 }
 export interface AccountMetaData {
     type: AccountType;
-    address: Hex;
+    id: Hex;
     height: number;
     tesseract: Hex;
 }
@@ -224,7 +224,7 @@ export interface Logic {
     metadata: LogicMetadata;
     manifest?: Hex;
     controller?: LogicController;
-    edition?: string[];
+    editions?: string[];
 }
 export interface AssetMetadata {
     latest_id: Hex;
@@ -271,7 +271,7 @@ export interface Lockup {
 }
 export interface AccountAsset {
     balance: Quantity;
-    mandate?: Mandate[];
-    lockup?: Lockup[];
+    mandates?: Mandate[];
+    lockups?: Lockup[];
 }
 //# sourceMappingURL=responses.d.ts.map
