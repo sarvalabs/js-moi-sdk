@@ -33,6 +33,36 @@ describe(ParticipantId, () => {
         it.concurrent("should return null for valid participant id", () => {
             expect(ParticipantId.validate(VALID_PARTICIPANT_ID)).toBeNull();
         });
+
+        it.concurrent("should return a reason for when has invalid flag", () => {
+            const participant = hexToBytes(VALID_PARTICIPANT_ID);
+            participant[1] = 0x08;
+
+            expect(ParticipantId.validate(participant)).not.toBeNull();
+        });
+
+        it.concurrent.each([
+            {
+                value: new Uint8Array(randomBytes(5)),
+                expected: "Invalid identifier length. Expected 32 bytes.",
+            },
+            {
+                value: 5 as any,
+            },
+            {
+                value: "invalid value",
+                expected: "Invalid hex string",
+            },
+            {
+                value: null!, // ! is used to make value as any
+            },
+            {
+                value: undefined!, // ! is used to make value as any,
+            },
+        ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
+            expect(() => new ParticipantId(value)).toThrow(expected);
+            expect(ParticipantId.isValid(value)).toBe(false);
+        });
     });
 });
 
@@ -56,27 +86,5 @@ describe(createParticipantId, () => {
                 flags: [new Flag(IdentifierKind.Participant, 2, 3)],
             })
         ).toThrow();
-    });
-
-    it.concurrent.each([
-        {
-            value: new Uint8Array(randomBytes(5)),
-            expected: "Invalid identifier length. Expected 32 bytes.",
-        },
-        {
-            value: 5 as any,
-        },
-        {
-            value: "invalid value",
-            expected: "Invalid hex string",
-        },
-        {
-            value: null!, // ! is used to make value as any
-        },
-        {
-            value: undefined!, // ! is used to make value as any,
-        },
-    ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
-        expect(() => new ParticipantId(value)).toThrow(expected);
     });
 });

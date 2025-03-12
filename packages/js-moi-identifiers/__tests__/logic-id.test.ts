@@ -33,6 +33,13 @@ describe(LogicId, () => {
         it.concurrent("should return error for invalid logic id", () => {
             expect(LogicId.validate(INVALID_LOGIC_ID)).not.toBeNull();
         });
+
+        it.concurrent("should return error if the flag is invalid", () => {
+            const logicId = hexToBytes(VALID_LOGIC_ID);
+            logicId[1] = 0x08;
+
+            expect(LogicId.validate(logicId)).not.toBeNull();
+        });
     });
 
     it.concurrent.each([
@@ -55,5 +62,6 @@ describe(LogicId, () => {
         },
     ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
         expect(() => new LogicId(value)).toThrow(expected);
+        expect(LogicId.isValid(value)).toBeFalsy();
     });
 });

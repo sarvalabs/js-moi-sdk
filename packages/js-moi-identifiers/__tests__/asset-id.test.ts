@@ -33,6 +33,13 @@ describe(AssetId, () => {
         it.concurrent("should return error for invalid asset id", () => {
             expect(AssetId.validate(hexToBytes(INVALID_ASSET_ID))).not.toBeNull();
         });
+
+        it.concurrent("should return error if the flag is invalid", () => {
+            const asset = hexToBytes(VALID_ASSET_ID);
+            asset[1] = 0x01; // appending invalid flag
+
+            expect(AssetId.validate(asset)).not.toBeNull();
+        });
     });
 
     it.concurrent.each([
@@ -55,5 +62,6 @@ describe(AssetId, () => {
         },
     ])(`should throw an error when value is "$value"`, ({ value, expected }) => {
         expect(() => new AssetId(value)).toThrow(expected);
+        expect(AssetId.isValid(value)).toBeFalsy();
     });
 });

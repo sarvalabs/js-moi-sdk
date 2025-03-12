@@ -23,12 +23,11 @@ export class ParticipantId extends Identifier {
     }
 
     public static validate(value: Uint8Array | Hex): InvalidReason | null {
-        const participant = value instanceof Uint8Array ? value : hexToBytes(value);
-
-        if (participant.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
 
+        const participant = value instanceof Uint8Array ? value : hexToBytes(value);
         const tag = this.getTag(participant);
         const kind = tag.getKind();
 
@@ -46,7 +45,11 @@ export class ParticipantId extends Identifier {
     }
 
     public static isValid(value: Uint8Array | Hex): boolean {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        } catch (error) {
+            return false;
+        }
     }
 }
 
