@@ -49,7 +49,10 @@ exports.isBytes = isBytes;
  */
 const hexDataLength = (data) => {
     // Check if the input is a valid hexadecimal string and has an even length
-    if (!(0, hex_1.isHex)(data) || data.length % 2) {
+    if (data === "0x") {
+        return 0;
+    }
+    if (!(0, hex_1.isHex)(data) || data.length % 2 !== 0) {
         return null;
     }
     // Calculate the length of the data excluding the "0x" prefix

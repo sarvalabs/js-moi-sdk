@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IdentifierTag = void 0;
+exports.LogicTagV0 = exports.AssetTagV0 = exports.ParticipantTagV0 = exports.IdentifierTag = void 0;
 const enums_1 = require("./enums");
 class IdentifierTag {
     value;
@@ -46,4 +46,7 @@ class IdentifierTag {
     }
 }
 exports.IdentifierTag = IdentifierTag;
+exports.ParticipantTagV0 = IdentifierTag.getTag(enums_1.IdentifierKind.Participant, enums_1.IdentifierVersion.V0);
+exports.AssetTagV0 = IdentifierTag.getTag(enums_1.IdentifierKind.Asset, enums_1.IdentifierVersion.V0);
+exports.LogicTagV0 = IdentifierTag.getTag(enums_1.IdentifierKind.Logic, enums_1.IdentifierVersion.V0);
 //# sourceMappingURL=identifier-tag.js.map

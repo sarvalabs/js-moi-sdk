@@ -1,4 +1,4 @@
-import { IdentifierKind } from "./enums";
+import { IdentifierKind, IdentifierVersion } from "./enums";
 export class IdentifierTag {
     value;
     static maxIdentifierKind = IdentifierKind.Logic;
@@ -42,4 +42,7 @@ export class IdentifierTag {
         return null;
     }
 }
+export const ParticipantTagV0 = IdentifierTag.getTag(IdentifierKind.Participant, IdentifierVersion.V0);
+export const AssetTagV0 = IdentifierTag.getTag(IdentifierKind.Asset, IdentifierVersion.V0);
+export const LogicTagV0 = IdentifierTag.getTag(IdentifierKind.Logic, IdentifierVersion.V0);
 //# sourceMappingURL=identifier-tag.js.map

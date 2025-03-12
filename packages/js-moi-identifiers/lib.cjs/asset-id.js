@@ -26,10 +26,10 @@ class AssetId extends identifier_1.Identifier {
         return new DataView(this.toBytes().slice(2, 4).buffer).getUint16(0, false);
     }
     static validate(value) {
-        const asset = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
-        if (asset.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
+        const asset = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
         const tag = this.getTag(asset);
         const kind = tag.getKind();
         if (kind !== enums_1.IdentifierKind.Asset) {
@@ -42,7 +42,12 @@ class AssetId extends identifier_1.Identifier {
         return null;
     }
     static isValid(value) {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        }
+        catch (error) {
+            return false;
+        }
     }
 }
 exports.AssetId = AssetId;

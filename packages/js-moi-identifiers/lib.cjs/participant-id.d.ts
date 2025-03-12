@@ -1,9 +1,9 @@
-import { IdentifierVersion } from "./enums";
 import { type Flag } from "./flags";
 import { Identifier, type InvalidReason } from "./identifier";
+import { IdentifierTag } from "./identifier-tag";
 import { type Hex } from "./utils";
 export interface GenerateParticipantOption {
-    version: IdentifierVersion;
+    tag: IdentifierTag;
     fingerprint: Uint8Array;
     variant: number;
     flags?: Flag[];

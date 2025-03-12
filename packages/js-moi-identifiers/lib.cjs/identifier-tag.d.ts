@@ -1,4 +1,4 @@
-import { IdentifierKind, type IdentifierVersion } from "./enums";
+import { IdentifierKind, IdentifierVersion } from "./enums";
 import type { InvalidReason } from "./identifier";
 export declare class IdentifierTag {
     readonly value: number;
@@ -13,4 +13,7 @@ export declare class IdentifierTag {
     static getTag(kind: IdentifierKind, version: IdentifierVersion): IdentifierTag;
     static validate(value: number): InvalidReason | null;
 }
+export declare const ParticipantTagV0: IdentifierTag;
+export declare const AssetTagV0: IdentifierTag;
+export declare const LogicTagV0: IdentifierTag;
 //# sourceMappingURL=identifier-tag.d.ts.map

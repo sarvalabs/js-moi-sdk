@@ -1,7 +1,6 @@
-import { IdentifierKind, IdentifierVersion } from "./enums";
+import { IdentifierKind } from "./enums";
 import { flagMasks, setFlag } from "./flags";
 import { Identifier } from "./identifier";
-import { IdentifierTag } from "./identifier-tag";
 import { hexToBytes } from "./utils";
 export class ParticipantId extends Identifier {
     constructor(value) {
@@ -12,10 +11,10 @@ export class ParticipantId extends Identifier {
         }
     }
     static validate(value) {
-        const participant = value instanceof Uint8Array ? value : hexToBytes(value);
-        if (participant.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
+        const participant = value instanceof Uint8Array ? value : hexToBytes(value);
         const tag = this.getTag(participant);
         const kind = tag.getKind();
         if (kind !== IdentifierKind.Participant) {
@@ -28,7 +27,12 @@ export class ParticipantId extends Identifier {
         return null;
     }
     static isValid(value) {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        }
+        catch (error) {
+            return false;
+        }
     }
 }
 /**
@@ -41,17 +45,13 @@ export class ParticipantId extends Identifier {
  * @throws {Error} If any flag is unsupported for the participant identifier.
  */
 export const createParticipantId = (option) => {
-    if (option.version !== IdentifierVersion.V0) {
-        throw new TypeError("Invalid identifier version. Expected V0.");
-    }
     if (option.fingerprint.length !== 24) {
         throw new TypeError("Invalid fingerprint length. Expected 24 bytes.");
     }
     const metadata = new Uint8Array(4);
-    const participantTag = IdentifierTag.getTag(IdentifierKind.Participant, option.version);
-    metadata[0] = participantTag.value;
+    metadata[0] = option.tag.value;
     for (const flag of option.flags ?? []) {
-        if (!flag.supports(participantTag)) {
+        if (!flag.supports(option.tag)) {
             throw new Error(`Invalid flag. Unsupported flag for participant identifier.`);
         }
         metadata[1] = setFlag(metadata[1], flag.index, true);
