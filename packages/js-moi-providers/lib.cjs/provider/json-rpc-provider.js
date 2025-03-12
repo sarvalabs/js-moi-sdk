@@ -181,9 +181,6 @@ class JsonRpcProvider extends events_1.EventEmitter {
         return await this.call("moi.AccountAsset", { id: new js_moi_identifiers_1.Identifier(participant), asset_id: new js_moi_identifiers_1.AssetId(asset), ...option });
     }
     async getAccountKey(participant, index, option) {
-        if (Number.isNaN(index) || index < 0) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
-        }
         return await this.call("moi.AccountKey", {
             id: new js_moi_identifiers_1.Identifier(participant),
             key_id: index,

@@ -290,10 +290,6 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
     }
 
     async getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
-        if (Number.isNaN(index) || index < 0) {
-            ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
-        }
-
         return await this.call("moi.AccountKey", {
             id: new Identifier(participant),
             key_id: index,

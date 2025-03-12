@@ -178,9 +178,6 @@ export class JsonRpcProvider extends EventEmitter {
         return await this.call("moi.AccountAsset", { id: new Identifier(participant), asset_id: new AssetId(asset), ...option });
     }
     async getAccountKey(participant, index, option) {
-        if (Number.isNaN(index) || index < 0) {
-            ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
-        }
         return await this.call("moi.AccountKey", {
             id: new Identifier(participant),
             key_id: index,
