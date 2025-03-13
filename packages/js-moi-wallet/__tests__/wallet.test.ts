@@ -294,13 +294,9 @@ describe("Provider integration test", () => {
         let ix: InteractionResponse;
 
         beforeAll(async () => {
-            const sequenceId = process.env["WALLET_SEQUENCE_CURRENT"] ?? undefined;
-            process.env["WALLET_SEQUENCE_CURRENT"] = process.env["WALLET_SEQUENCE_CURRENT"] ? (parseInt(process.env["WALLET_SEQUENCE_CURRENT"]) + 1).toString() : "1";
-
+            // just a delay to sync with logic tests
+            await new Promise((resolve) => setTimeout(resolve, 5000));
             ix = await wallet.execute({
-                sender: {
-                    sequence: sequenceId ? parseInt(sequenceId) : undefined,
-                },
                 fuel_price: 1,
                 fuel_limit: 100,
                 operations,

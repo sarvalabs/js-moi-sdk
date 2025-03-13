@@ -106,8 +106,9 @@ class Signer {
             return await this.getProvider().execute(arg);
         }
         const request = await this.createIxRequest("moi.Execute", arg);
-        if (request.sender.sequence < (await this.getLatestSequence())) {
-            js_moi_utils_1.ErrorUtils.throwError("Sequence number is outdated", js_moi_utils_1.ErrorCode.SEQUENCE_EXPIRED);
+        const latestSequence = await this.getLatestSequence();
+        if (request.sender.sequence < latestSequence) {
+            js_moi_utils_1.ErrorUtils.throwError(`The provided sequence number (${request.sender.sequence}) is outdated. The latest sequence is ${latestSequence}.`, js_moi_utils_1.ErrorCode.SEQUENCE_EXPIRED);
         }
         const error = (0, js_moi_utils_1.validateIxRequest)("moi.Execute", request);
         if (error != null) {

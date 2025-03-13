@@ -157,9 +157,9 @@ export abstract class Signer {
         }
 
         const request = await this.createIxRequest("moi.Execute", arg);
-
-        if (request.sender.sequence < (await this.getLatestSequence())) {
-            ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
+        const latestSequence = await this.getLatestSequence();
+        if (request.sender.sequence < latestSequence) {
+            ErrorUtils.throwError(`The provided sequence number (${request.sender.sequence}) is outdated. The latest sequence is ${latestSequence}.`, ErrorCode.SEQUENCE_EXPIRED);
         }
 
         const error = validateIxRequest("moi.Execute", request);
