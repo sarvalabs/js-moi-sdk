@@ -1,4 +1,4 @@
-import { type PoloSchema } from "polo-schema";
+import { type Schema } from "js-polo";
 import { OpType } from "./enums";
 import type { IxOperation, RawIxOperation, RawIxOperationPayload } from "./types/ix-operation";
 export interface IxOperationDescriptor<TOpType extends OpType> {
@@ -7,7 +7,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      *
      * @returns Returns the POLO schema for the operation payload.
      */
-    schema: PoloSchema;
+    schema: Schema;
     /**
      * Validates the operation payload.
      *

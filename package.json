@@ -42,7 +42,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "js-polo": "^0.1.4"
+    "js-polo": "../js-polo"
   },
   "sideEffects": false
 }

@@ -32,8 +32,7 @@
     "@noble/hashes": "^1.7.1",
     "bn.js": "^5.2.1",
     "js-moi-constants": "0.6.0",
-    "js-moi-identifiers": "^0.6.0",
-    "polo-schema": "^1.0.3"
+    "js-moi-identifiers": "^0.6.0"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5"

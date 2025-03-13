@@ -1,7 +1,6 @@
 import { ZERO_ADDRESS } from "js-moi-constants";
 import { AssetId, LogicId, ParticipantId } from "js-moi-identifiers";
-import { Polorizer } from "js-polo";
-import { polo } from "polo-schema";
+import { Polorizer, schema } from "js-polo";
 import { LockType, OpType } from "./enums";
 import { hexToBytes, isHex } from "./hex";
 import { encodeOperation, validateOperation } from "./operations";
@@ -11,36 +10,36 @@ import { encodeOperation, validateOperation } from "./operations";
  * @returns The POLO schema for an interaction request.
  */
 export const getInteractionRequestSchema = () => {
-    return polo.struct({
-        sender: polo.struct({
-            id: polo.bytes,
-            sequence: polo.integer,
-            key_id: polo.integer,
+    return schema.struct({
+        sender: schema.struct({
+            id: schema.bytes,
+            sequence: schema.integer,
+            key_id: schema.integer,
         }),
-        sponsor: polo.struct({
-            id: polo.bytes,
-            sequence: polo.integer,
-            key_id: polo.integer,
+        sponsor: schema.struct({
+            id: schema.bytes,
+            sequence: schema.integer,
+            key_id: schema.integer,
         }),
-        fuel_price: polo.integer,
-        fuel_limit: polo.integer,
-        ix_operations: polo.arrayOf(polo.struct({
-            type: polo.integer,
-            payload: polo.bytes,
+        fuel_price: schema.integer,
+        fuel_limit: schema.integer,
+        ix_operations: schema.arrayOf(schema.struct({
+            type: schema.integer,
+            payload: schema.bytes,
         })),
-        participants: polo.arrayOf(polo.struct({
-            id: polo.bytes,
-            lock_type: polo.integer,
-            notary: polo.boolean,
+        participants: schema.arrayOf(schema.struct({
+            id: schema.bytes,
+            lock_type: schema.integer,
+            notary: schema.boolean,
         })),
-        preferences: polo.struct({
-            compute: polo.bytes,
-            consensus: polo.struct({
-                mtq: polo.integer,
-                trust_nodes: polo.arrayOf(polo.string),
+        preferences: schema.struct({
+            compute: schema.bytes,
+            consensus: schema.struct({
+                mtq: schema.integer,
+                trust_nodes: schema.arrayOf(schema.string),
             }),
         }),
-        perception: polo.bytes,
+        perception: schema.bytes,
     });
 };
 /**
