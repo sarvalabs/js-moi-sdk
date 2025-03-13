@@ -1,4 +1,5 @@
 import { ElementType, ErrorCode, ErrorUtils } from "js-moi-utils";
+import { schema } from "js-polo";
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
 export const isPrimitiveType = (type) => {
@@ -28,241 +29,85 @@ export class Schema {
         this.elements = elements;
         this.classDefs = classDefs;
     }
-    static PISA_ENGINE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            kind: {
-                kind: "string",
-            },
-            flags: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_DEPS_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "integer",
-            },
-        },
-    };
-    static PISA_TYPE_FIELD_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "struct",
-                fields: {
-                    slot: {
-                        kind: "integer",
-                    },
-                    label: {
-                        kind: "string",
-                    },
-                    type: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_METHOD_FIELD_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "struct",
-                fields: {
-                    ptr: {
-                        kind: "integer",
-                    },
-                    code: {
-                        kind: "integer",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_INSTRUCTIONS_SCHEMA = {
-        kind: "struct",
-        fields: {
-            bin: {
-                kind: "bytes",
-            },
-            hex: {
-                kind: "string",
-            },
-            asm: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_STATE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            mode: {
-                kind: "string",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-        },
-    };
-    static PISA_CONSTANT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            type: {
-                kind: "string",
-            },
-            value: {
-                kind: "string",
-            },
-        },
-    };
-    static PISA_TYPEDEF_SCHEMA = {
-        kind: "string",
-        fields: {},
-    };
-    static PISA_CLASS_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            methods: {
-                ...Schema.PISA_METHOD_FIELD_SCHEMA,
-            },
-        },
-    };
-    static PISA_ROUTINE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            mode: {
-                kind: "string",
-            },
-            kind: {
-                kind: "string",
-            },
-            accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
-            },
-            catches: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_METHOD_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            class: {
-                kind: "string",
-            },
-            mutable: {
-                kind: "bool",
-            },
-            accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
-            },
-            catches: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_EVENT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            topics: {
-                kind: "integer",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-        },
-    };
-    static PISA_EXCEPTION_SCHEMA = {
-        kind: "struct",
-        fields: {
-            class: {
-                kind: "string",
-            },
-            error: {
-                kind: "string",
-            },
-            revert: {
-                kind: "bool",
-            },
-            trace: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    static PISA_RESULT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            outputs: {
-                kind: "bytes",
-            },
-            error: {
-                kind: "bytes",
-            },
-        },
-    };
-    static PISA_BUILT_IN_LOG_SCHEMA = {
-        kind: "struct",
-        fields: {
-            value: {
-                kind: "string",
-            },
-        },
-    };
+    static PISA_ENGINE_SCHEMA = schema.struct({
+        kind: schema.string,
+        flags: schema.arrayOf(schema.struct({
+            values: schema.string,
+        })),
+    });
+    static PISA_DEPS_SCHEMA = schema.arrayOf(schema.integer);
+    static PISA_TYPE_FIELD_SCHEMA = schema.arrayOf(schema.struct({
+        slot: schema.integer,
+        label: schema.string,
+        type: schema.string,
+    }));
+    static PISA_METHOD_FIELD_SCHEMA = schema.arrayOf(schema.struct({
+        ptr: schema.integer,
+        code: schema.integer,
+    }));
+    static PISA_INSTRUCTIONS_SCHEMA = schema.struct({
+        bin: schema.bytes,
+        hex: schema.string,
+        asm: schema.arrayOf(schema.string),
+    });
+    static PISA_STATE_SCHEMA = schema.struct({
+        mode: schema.string,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+    });
+    static PISA_CONSTANT_SCHEMA = schema.struct({
+        type: schema.string,
+        value: schema.string,
+    });
+    static PISA_TYPEDEF_SCHEMA = schema.string;
+    static PISA_CLASS_SCHEMA = schema.struct({
+        name: schema.string,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        methods: { ...Schema.PISA_METHOD_FIELD_SCHEMA },
+    });
+    static PISA_ROUTINE_SCHEMA = schema.struct({
+        name: schema.string,
+        mode: schema.string,
+        kind: schema.string,
+        accepts: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        returns: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        executes: { ...Schema.PISA_INSTRUCTIONS_SCHEMA },
+        catches: schema.arrayOf(schema.string),
+    });
+    static PISA_METHOD_SCHEMA = schema.struct({
+        name: schema.string,
+        class: schema.string,
+        mutable: schema.boolean,
+        accepts: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        returns: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        executes: { ...Schema.PISA_INSTRUCTIONS_SCHEMA },
+        catches: schema.arrayOf(schema.string),
+    });
+    static PISA_EVENT_SCHEMA = schema.struct({
+        name: schema.string,
+        topics: schema.integer,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+    });
+    static PISA_EXCEPTION_SCHEMA = schema.struct({
+        class: schema.string,
+        error: schema.string,
+        revert: schema.boolean,
+        trace: schema.arrayOf(schema.string),
+    });
+    static PISA_RESULT_SCHEMA = schema.struct({
+        outputs: schema.bytes,
+        error: schema.bytes,
+    });
+    // public static PISA_BUILT_IN_LOG_SCHEMA = {
+    //     kind: "struct",
+    //     fields: {
+    //         value: {
+    //             kind: "string",
+    //         },
+    //     },
+    // };
+    static PISA_BUILT_IN_LOG_SCHEMA = schema.struct({
+        value: schema.string,
+    });
     /**
      * Extracts the array data type from the provided data type string.
      *
@@ -323,20 +168,20 @@ export class Schema {
     static convertPrimitiveDataType(type) {
         switch (type) {
             case "null":
-                return "null";
+                return schema.null;
             case "bool":
-                return "bool";
+                return schema.boolean;
             case "bytes":
             case "address":
-                return "bytes";
+                return schema.bytes;
             case "string":
-                return "string";
+                return schema.string;
             case "u64":
             case "u256":
             case "i64":
             case "i256":
             case "bigint":
-                return "integer";
+                return schema.integer;
             default:
                 ErrorUtils.throwError("Unsupported data type!", ErrorCode.UNSUPPORTED_OPERATION);
         }
@@ -377,26 +222,16 @@ export class Schema {
     static parseDataType(type, classDef, elements) {
         switch (true) {
             case isPrimitiveType(type):
-                return {
-                    kind: Schema.convertPrimitiveDataType(type),
-                };
+                return Schema.convertPrimitiveDataType(type);
             case isArray(type):
                 const values = Schema.extractArrayDataType(type);
-                return {
-                    kind: "array",
-                    fields: {
-                        values: Schema.parseDataType(values, classDef, elements),
-                    },
-                };
+                return schema.arrayOf(Schema.parseDataType(values, classDef, elements));
             case isMap(type):
                 const [key, value] = Schema.extractMapDataType(type);
-                return {
-                    kind: "map",
-                    fields: {
-                        keys: Schema.parseDataType(key, classDef, elements),
-                        values: Schema.parseDataType(value, classDef, elements),
-                    },
-                };
+                return schema.map({
+                    keys: Schema.parseDataType(key, classDef, elements),
+                    values: Schema.parseDataType(value, classDef, elements),
+                });
             case isClass(type, classDef):
                 return this.parseClassFields(type, classDef, elements);
             default:
