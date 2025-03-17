@@ -162,7 +162,7 @@ export class HDNode {
      */
     publicKey() {
         if (this.node.publicKey == null) {
-            ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
+            ErrorUtils.throwError("Public key not available in the HDNode", ErrorCode.PROPERTY_NOT_DEFINED);
         }
         return this.node.publicKey;
     }
@@ -183,10 +183,7 @@ export class HDNode {
      * >> Uint8Array(32) [4, 5, ... 35]
      */
     privateKey() {
-        if (!this.node) {
-            ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
-        }
-        if (!this.node.privateKey) {
+        if (this.node.privateKey == null) {
             ErrorUtils.throwError("Private key not available in the HDNode", ErrorCode.PROPERTY_NOT_DEFINED);
         }
         return this.node.privateKey;

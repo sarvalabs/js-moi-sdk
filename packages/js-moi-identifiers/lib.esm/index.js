@@ -2,7 +2,7 @@ export { AssetId } from "./asset-id";
 export { IdentifierKind, IdentifierVersion } from "./enums";
 export { Flag } from "./flags";
 export { Identifier, isIdentifier } from "./identifier";
-export { IdentifierTag } from "./identifier-tag";
+export { AssetTagV0, IdentifierTag, LogicTagV0, ParticipantTagV0 } from "./identifier-tag";
 export { KramaId } from "./krama-id/krama-id";
 export { KramaIdKind, KramaIdVersion, NetworkZone } from "./krama-id/krama-id-enums";
 export { KramaIdMetadata } from "./krama-id/krama-id-metadata";

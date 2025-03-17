@@ -1,5 +1,5 @@
 export { decodeBase64, encodeBase64 } from "./base64";
-export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isHexString, isInteger, randomBytes, type Bytes } from "./bytes";
+export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isInteger, randomBytes, type Bytes } from "./bytes";
 export {
     AccountType,
     AssetStandard,
@@ -30,15 +30,15 @@ export {
     type NumberLike,
     type Quantity,
 } from "./hex";
-export { encodeInteraction, getInteractionRequestSchema, interaction, transformInteraction, validateIxRequest } from "./interaction";
+export { encodeInteraction, getInteractionRequestSchema, interaction, toRawInteractionRequest, validateIxRequest } from "./interaction";
 export { deepCopy } from "./object";
 export {
     encodeOperation,
+    encodeOperationPayload,
     getIxOperationDescriptor,
     isOperationType,
     isValidOperation,
     listIxOperationDescriptors,
-    transformOperationPayload,
     validateOperation,
     type IxOperationDescriptor,
 } from "./operations";
@@ -50,8 +50,8 @@ export type {
     IxParticipant,
     IxPreference,
     RawInteractionRequest,
-    RawParticipants,
-    RawPreference,
+    RawIxParticipants,
+    RawIxPreference,
     RawSender,
     Sender,
 } from "./types/interaction";
@@ -68,29 +68,29 @@ export type {
     AssetTransferPayload,
     IxOperation,
     IxOperationPayload,
-    IxRawOperation,
     KeyAddPayload,
     KeyRevokePayload,
     LogicActionPayload,
     LogicDeployPayload,
     LogicPayload,
     ParticipantCreatePayload,
-    PoloAccountConfigurePayload,
-    PoloAssetActionPayload,
-    PoloAssetApprovePayload,
-    PoloAssetLockupPayload,
-    PoloAssetReleasePayload,
-    PoloAssetRevokePayload,
-    PoloAssetSupplyPayload,
-    PoloAssetTransferPayload,
-    PoloIxOperationPayload,
-    PoloLogicActionPayload,
-    PoloLogicDeployPayload,
-    PoloLogicPayload,
-    PoloParticipantCreatePayload,
+    RawAccountConfigurePayload,
+    RawAssetActionPayload,
+    RawAssetApprovePayload,
+    RawAssetLockupPayload,
+    RawAssetReleasePayload,
+    RawAssetRevokePayload,
+    RawAssetSupplyPayload,
+    RawAssetTransferPayload,
+    RawIxOperation,
+    RawIxOperationPayload,
+    RawLogicActionPayload,
+    RawLogicDeployPayload,
+    RawLogicPayload,
+    RawParticipantCreatePayload,
 } from "./types/ix-operation";
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResult } from "./types/json-rpc";
-export type { CocoPrimitiveType, Element, ElementData, EngineConfig, LogicElement, LogicManifest, TypeField } from "./types/manifest";
+export type { Element, ElementData, EngineConfig, LogicElement, LogicManifest, PrimitiveType, TypeField } from "./types/manifest";
 export type {
     AbsoluteTesseractReference,
     ExtractModifier,

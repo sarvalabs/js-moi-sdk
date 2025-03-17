@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.transformOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = exports.isOperationType = void 0;
+exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.encodeOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = exports.isOperationType = void 0;
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
-const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
 const errors_1 = require("./errors");
 const hex_1 = require("./hex");
@@ -23,16 +22,16 @@ const isOperationType = (type, operation) => {
 exports.isOperationType = isOperationType;
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            keys_payload: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-                public_key: polo_schema_1.polo.bytes,
-                weight: polo_schema_1.polo.integer,
-                signature_algorithm: polo_schema_1.polo.integer,
+        schema: js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            keys_payload: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+                public_key: js_polo_1.schema.bytes,
+                weight: js_polo_1.schema.integer,
+                signature_algorithm: js_polo_1.schema.integer,
             })),
-            amount: polo_schema_1.polo.integer,
+            amount: js_polo_1.schema.integer,
         }),
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             const poloKeysPayload = payload.keys_payload.map((payload) => ({
                 ...payload,
                 public_key: (0, hex_1.hexToBytes)(payload.public_key),
@@ -57,19 +56,19 @@ const createParticipantCreateDescriptor = () => {
 };
 const createAssetCreateDescriptor = () => {
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            symbol: polo_schema_1.polo.string,
-            supply: polo_schema_1.polo.integer,
-            standard: polo_schema_1.polo.integer,
-            dimension: polo_schema_1.polo.integer,
-            is_stateful: polo_schema_1.polo.boolean,
-            is_logical: polo_schema_1.polo.boolean,
-            logic_payload: polo_schema_1.polo.struct({
-                manifest: polo_schema_1.polo.bytes,
-                logic_id: polo_schema_1.polo.string,
-                callsite: polo_schema_1.polo.string,
-                calldata: polo_schema_1.polo.bytes,
-                interface: polo_schema_1.polo.map({ keys: polo_schema_1.polo.string, values: polo_schema_1.polo.string }),
+        schema: js_polo_1.schema.struct({
+            symbol: js_polo_1.schema.string,
+            supply: js_polo_1.schema.integer,
+            standard: js_polo_1.schema.integer,
+            dimension: js_polo_1.schema.integer,
+            is_stateful: js_polo_1.schema.boolean,
+            is_logical: js_polo_1.schema.boolean,
+            logic_payload: js_polo_1.schema.struct({
+                manifest: js_polo_1.schema.bytes,
+                logic_id: js_polo_1.schema.string,
+                callsite: js_polo_1.schema.string,
+                calldata: js_polo_1.schema.bytes,
+                interface: js_polo_1.schema.map({ keys: js_polo_1.schema.string, values: js_polo_1.schema.string }),
             }),
         }),
         validator: (operation) => {
@@ -83,26 +82,29 @@ const createAssetCreateDescriptor = () => {
             if (payload.dimension && payload.dimension < 0) {
                 return createInvalidResult(payload, "dimension", "Dimension cannot be negative");
             }
+            if (typeof payload.symbol !== "string") {
+                return createInvalidResult(payload, "symbol", "Symbol must be a string");
+            }
             return null;
         },
     });
 };
 const createAccountConfigureDescriptor = () => {
-    const schema = polo_schema_1.polo.struct({
-        add: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            public_key: polo_schema_1.polo.bytes,
-            weight: polo_schema_1.polo.integer,
-            signature_algorithm: polo_schema_1.polo.integer,
-        })),
-        revoke: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            key_id: polo_schema_1.polo.integer,
-        })),
-    });
     return Object.freeze({
-        schema: schema,
+        schema: js_polo_1.schema.struct({
+            add: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+                public_key: js_polo_1.schema.bytes,
+                weight: js_polo_1.schema.integer,
+                signature_algorithm: js_polo_1.schema.integer,
+            })),
+            revoke: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+                key_id: js_polo_1.schema.integer,
+            })),
+        }),
         validator: ({ payload }) => {
-            if (payload.add == null || payload.revoke == null) {
-                createInvalidResult(payload, "add", "Add and revoke are required");
+            console.log(payload);
+            if (payload.add == null && payload.revoke == null) {
+                return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
             for (const key in payload) {
                 const value = payload[key];
@@ -110,9 +112,29 @@ const createAccountConfigureDescriptor = () => {
                     return createInvalidResult(payload, key, `At least value is required in ${key}`);
                 }
             }
+            if (payload.add != null) {
+                for (const item of payload.add) {
+                    if (item.weight == null) {
+                        return createInvalidResult(item, "weight", "Weight is required");
+                    }
+                    if (item.weight < 0) {
+                        return createInvalidResult(item, "weight", "Weight cannot be negative");
+                    }
+                    if (item.signature_algorithm == null) {
+                        return createInvalidResult(item, "signature_algorithm", "Signature algorithm is required");
+                    }
+                }
+            }
+            if (payload.revoke != null) {
+                for (const item of payload.revoke) {
+                    if (item.key_id == null) {
+                        return createInvalidResult(item, "key_id", "Key ID is required");
+                    }
+                }
+            }
             return null;
         },
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             return {
                 add: payload.add?.map((key) => ({
                     ...key,
@@ -125,11 +147,11 @@ const createAccountConfigureDescriptor = () => {
 };
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            asset_id: polo_schema_1.polo.string,
-            amount: polo_schema_1.polo.integer,
+        schema: js_polo_1.schema.struct({
+            asset_id: js_polo_1.schema.string,
+            amount: js_polo_1.schema.integer,
         }),
-        transform: ({ payload }) => ({
+        encode: ({ payload }) => ({
             ...payload,
             asset_id: (0, hex_1.hexToBytes)(payload.asset_id),
         }),
@@ -148,13 +170,13 @@ const createAssetSupplyDescriptorFor = () => {
 const createAssetActionDescriptor = () => {
     const validateAmount = (payload) => {
         if (payload.amount == null) {
-            return createInvalidResult(payload, "amount", "Amount is required for transfer operation");
+            return createInvalidResult(payload, "amount", "Amount is required for operation");
         }
         if (typeof payload.amount !== "number" || Number.isNaN(payload.amount)) {
             return createInvalidResult(payload, "amount", "Amount must be a number");
         }
-        if (payload.amount < 0) {
-            return createInvalidResult(payload, "amount", "Amount cannot be negative");
+        if (payload.amount <= 0) {
+            return createInvalidResult(payload, "amount", "Amount cannot be greater than zero");
         }
         return null;
     };
@@ -164,6 +186,9 @@ const createAssetActionDescriptor = () => {
         }
         if (typeof payload.timestamp !== "number" || Number.isNaN(payload.timestamp)) {
             return createInvalidResult(payload, "timestamp", "Timestamp must be a number");
+        }
+        if (payload.timestamp <= Date.now()) {
+            return createInvalidResult(payload, "timestamp", "Timestamp must be of the future");
         }
         return null;
     };
@@ -177,14 +202,14 @@ const createAssetActionDescriptor = () => {
         return null;
     };
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            benefactor: polo_schema_1.polo.bytes,
-            beneficiary: polo_schema_1.polo.bytes,
-            asset_id: polo_schema_1.polo.string,
-            amount: polo_schema_1.polo.integer,
-            timestamp: polo_schema_1.polo.integer,
+        schema: js_polo_1.schema.struct({
+            benefactor: js_polo_1.schema.bytes,
+            beneficiary: js_polo_1.schema.bytes,
+            asset_id: js_polo_1.schema.string,
+            amount: js_polo_1.schema.integer,
+            timestamp: js_polo_1.schema.integer,
         }),
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
@@ -205,15 +230,17 @@ const createAssetActionDescriptor = () => {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
             switch (true) {
-                case (0, exports.isOperationType)(enums_1.OpType.AssetLockup, operation):
-                case (0, exports.isOperationType)(enums_1.OpType.AssetTransfer, operation): {
+                case (0, exports.isOperationType)(enums_1.OpType.AssetLockup, operation): {
                     return validateAmount(operation.payload);
+                }
+                case (0, exports.isOperationType)(enums_1.OpType.AssetTransfer, operation): {
+                    return validateAmount(operation.payload) ?? (operation.payload.benefactor != null ? validateBenefactor(operation.payload) : null);
                 }
                 case (0, exports.isOperationType)(enums_1.OpType.AssetApprove, operation): {
                     return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
                 }
                 case (0, exports.isOperationType)(enums_1.OpType.AssetRelease, operation): {
-                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
+                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload);
                 }
                 case (0, exports.isOperationType)(enums_1.OpType.AssetRevoke, operation): {
                     return null;
@@ -248,17 +275,17 @@ const createLogicActionDescriptor = () => {
         return null;
     };
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            manifest: polo_schema_1.polo.bytes,
-            logic_id: polo_schema_1.polo.bytes,
-            callsite: polo_schema_1.polo.string,
-            calldata: polo_schema_1.polo.bytes,
-            interfaces: polo_schema_1.polo.map({
-                keys: polo_schema_1.polo.string,
-                values: polo_schema_1.polo.string,
+        schema: js_polo_1.schema.struct({
+            manifest: js_polo_1.schema.bytes,
+            logic_id: js_polo_1.schema.bytes,
+            callsite: js_polo_1.schema.string,
+            calldata: js_polo_1.schema.bytes,
+            interfaces: js_polo_1.schema.map({
+                keys: js_polo_1.schema.string,
+                values: js_polo_1.schema.string,
             }),
         }),
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             if ("manifest" in payload) {
                 const raw = {
                     ...payload,
@@ -339,14 +366,14 @@ exports.getIxOperationDescriptor = getIxOperationDescriptor;
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-const transformOperationPayload = (operation) => {
+const encodeOperationPayload = (operation) => {
     const descriptor = (0, exports.getIxOperationDescriptor)(operation.type);
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
     }
-    return descriptor.transform?.(operation) ?? operation.payload;
+    return descriptor.encode?.(operation) ?? operation.payload;
 };
-exports.transformOperationPayload = transformOperationPayload;
+exports.encodeOperationPayload = encodeOperationPayload;
 /**
  * Encodes an operation payload to a POLO byte array.
  *
@@ -361,7 +388,7 @@ const encodeOperation = (operation) => {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
     const polorizer = new js_polo_1.Polorizer();
-    const data = (0, exports.transformOperationPayload)(operation);
+    const data = (0, exports.encodeOperationPayload)(operation);
     polorizer.polorize(data, descriptor.schema);
     return { type: operation.type, payload: polorizer.bytes() };
 };
@@ -374,7 +401,12 @@ exports.encodeOperation = encodeOperation;
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
 const isValidOperation = (operation) => {
-    return (0, exports.validateOperation)(operation) == null;
+    try {
+        return (0, exports.validateOperation)(operation) == null;
+    }
+    catch {
+        return false;
+    }
 };
 exports.isValidOperation = isValidOperation;
 /**

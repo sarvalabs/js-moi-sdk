@@ -6,35 +6,16 @@ const js_polo_1 = require("js-polo");
 const schema_1 = require("../schema");
 const base_manifest_coder_1 = require("./base-manifest-coder");
 class JsonManifestCoder extends base_manifest_coder_1.BaseManifestCoder {
-    static MANIFEST_SCHEMA = {
-        kind: "struct",
-        fields: {
-            syntax: {
-                kind: "integer",
-            },
-            engine: schema_1.Schema.PISA_ENGINE_SCHEMA,
-            elements: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "struct",
-                        fields: {
-                            ptr: {
-                                kind: "integer",
-                            },
-                            deps: schema_1.Schema.PISA_DEPS_SCHEMA,
-                            kind: {
-                                kind: "string",
-                            },
-                            data: {
-                                kind: "raw",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    };
+    static MANIFEST_SCHEMA = js_polo_1.schema.struct({
+        syntax: js_polo_1.schema.integer,
+        engine: schema_1.Schema.PISA_ENGINE_SCHEMA,
+        elements: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+            ptr: js_polo_1.schema.integer,
+            deps: schema_1.Schema.PISA_DEPS_SCHEMA,
+            kind: js_polo_1.schema.string,
+            data: js_polo_1.schema.raw,
+        })),
+    });
     static SCHEMA_CONFIG = {
         constant: {
             wireType: js_polo_1.WireType.WIRE_PACK,

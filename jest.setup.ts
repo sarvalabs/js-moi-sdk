@@ -5,7 +5,7 @@ type ProviderType = "http" | "websocket";
 
 //#region Constants
 const MNEMONIC: string = "keep board tiger clean island wisdom apology when anger doctor pencil volcano";
-const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+const DERIVATION_PATH = "m/44'/6174'/0'/0/1";
 const PROVIDER_TYPE = "http" as ProviderType;
 const LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 //#endregion
@@ -21,34 +21,31 @@ const log = (message: string) => {
 
 const createProvider = () => {
     if (!provider[PROVIDER_TYPE]) {
-        throw new Error("PROVIDER_URL is not set");
+        throw new Error(`Value for 'PROVIDER_TYPE' is not defined.`);
     }
 
-    log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
+    let p: Provider = (() => {
+        log(`Creating ${PROVIDER_TYPE} provider with url ${provider[PROVIDER_TYPE]}`);
 
-    let p: Provider | undefined = undefined;
-
-    if (PROVIDER_TYPE === "websocket") {
-        p = new WebsocketProvider(provider["websocket"]);
-    }
-
-    if (PROVIDER_TYPE === "http") {
-        p = new HttpProvider(provider["http"]);
-    }
-
-    if (p == null) {
-        throw new Error("Provider not created");
-    }
+        switch (PROVIDER_TYPE) {
+            case "http":
+                return new HttpProvider(provider.http);
+            case "websocket":
+                return new WebsocketProvider(provider.websocket);
+            default:
+                throw new Error(`No provider defined for type '${PROVIDER_TYPE}'`);
+        }
+    })();
 
     p.on("debug", (message) => {
-        console.log(styleText("yellow", `DEBUG: ${JSON.stringify(message)}`));
+        log(`DEBUG: ${JSON.stringify(message)}`);
     });
 
     return p;
 };
 
 const createWallet = async () => {
-    return await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {
+    return await Wallet.fromMnemonic(MNEMONIC, DERIVATION_PATH, {
         provider: createProvider(),
     });
 };
@@ -110,7 +107,6 @@ const setup = async () => {
     process.env["WALLET_PRIVATE_KEY"] = await wallet.getPrivateKey();
     process.env["WALLET_CURVE"] = await wallet.getCurve();
     process.env["WALLET_ADDRESS"] = (await wallet.getIdentifier()).toHex();
-    process.env["WALLET_SEQUENCE_CURRENT"] = (await wallet.getProvider().getAccountKey(await wallet.getIdentifier(), 0)).sequence.toString();
     process.env["ASSET_ID"] = await getAssetId(wallet);
 
     log("Testing setup complete\n");

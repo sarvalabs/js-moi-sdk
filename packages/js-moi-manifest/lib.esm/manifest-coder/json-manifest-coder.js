@@ -1,37 +1,18 @@
 import { ErrorCode, ErrorUtils, hexToBytes } from "js-moi-utils";
-import { Depolorizer, Polorizer, WireType } from "js-polo";
+import { Depolorizer, Polorizer, schema, WireType } from "js-polo";
 import { Schema } from "../schema";
 import { BaseManifestCoder } from "./base-manifest-coder";
 export class JsonManifestCoder extends BaseManifestCoder {
-    static MANIFEST_SCHEMA = {
-        kind: "struct",
-        fields: {
-            syntax: {
-                kind: "integer",
-            },
-            engine: Schema.PISA_ENGINE_SCHEMA,
-            elements: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "struct",
-                        fields: {
-                            ptr: {
-                                kind: "integer",
-                            },
-                            deps: Schema.PISA_DEPS_SCHEMA,
-                            kind: {
-                                kind: "string",
-                            },
-                            data: {
-                                kind: "raw",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    };
+    static MANIFEST_SCHEMA = schema.struct({
+        syntax: schema.integer,
+        engine: Schema.PISA_ENGINE_SCHEMA,
+        elements: schema.arrayOf(schema.struct({
+            ptr: schema.integer,
+            deps: Schema.PISA_DEPS_SCHEMA,
+            kind: schema.string,
+            data: schema.raw,
+        })),
+    });
     static SCHEMA_CONFIG = {
         constant: {
             wireType: WireType.WIRE_PACK,

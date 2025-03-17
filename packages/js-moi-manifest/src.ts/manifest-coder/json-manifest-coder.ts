@@ -1,42 +1,23 @@
 import { ErrorCode, ErrorUtils, hexToBytes, type LogicElement, type LogicManifest } from "js-moi-utils";
-import { Depolorizer, Polorizer, WireType } from "js-polo";
+import { Depolorizer, Polorizer, Schema as PoloSchema, schema, WireType } from "js-polo";
 import { Schema } from "../schema";
 import { BaseManifestCoder } from "./base-manifest-coder";
 
-type SchemaConfig = Record<string, { wireType: WireType; schema: any }>;
-
 export class JsonManifestCoder extends BaseManifestCoder {
-    private static MANIFEST_SCHEMA = {
-        kind: "struct",
-        fields: {
-            syntax: {
-                kind: "integer",
-            },
-            engine: Schema.PISA_ENGINE_SCHEMA,
-            elements: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "struct",
-                        fields: {
-                            ptr: {
-                                kind: "integer",
-                            },
-                            deps: Schema.PISA_DEPS_SCHEMA,
-                            kind: {
-                                kind: "string",
-                            },
-                            data: {
-                                kind: "raw",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    };
+    private static MANIFEST_SCHEMA = schema.struct({
+        syntax: schema.integer,
+        engine: Schema.PISA_ENGINE_SCHEMA,
+        elements: schema.arrayOf(
+            schema.struct({
+                ptr: schema.integer,
+                deps: Schema.PISA_DEPS_SCHEMA,
+                kind: schema.string,
+                data: schema.raw,
+            })
+        ),
+    });
 
-    private static readonly SCHEMA_CONFIG: SchemaConfig = {
+    private static readonly SCHEMA_CONFIG: Record<string, { wireType: WireType; schema: PoloSchema }> = {
         constant: {
             wireType: WireType.WIRE_PACK,
             schema: Schema.PISA_CONSTANT_SCHEMA,

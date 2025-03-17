@@ -23,10 +23,10 @@ class LogicId extends identifier_1.Identifier {
      * @returns An object containing the reason for invalidity if the identifier is invalid, or null if the identifier is valid.
      */
     static validate(value) {
-        const logic = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
-        if (logic.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
+        const logic = value instanceof Uint8Array ? value : (0, utils_1.hexToBytes)(value);
         const tag = this.getTag(logic);
         const kind = tag.getKind();
         if (kind !== enums_1.IdentifierKind.Logic) {
@@ -45,7 +45,12 @@ class LogicId extends identifier_1.Identifier {
      * @returns A boolean indicating whether the value is valid (true) or not (false).
      */
     static isValid(value) {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        }
+        catch (error) {
+            return false;
+        }
     }
 }
 exports.LogicId = LogicId;

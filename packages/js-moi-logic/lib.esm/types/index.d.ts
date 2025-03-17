@@ -9,26 +9,26 @@ export interface LogicDriverOption {
     signer: Signer;
     logicId?: Identifier;
 }
-export type CallsiteOption = Omit<Partial<SignerIx<InteractionRequest>>, "operations">;
-type CallsiteResult = InteractionResponse | Record<any, any>;
-export interface CallsiteCallback {
-    <TRes extends CallsiteResult = any>(option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, arg13: any, option?: CallsiteOption): Promise<TRes>;
-    <TRes extends CallsiteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, arg13: any, arg14: any, option?: CallsiteOption): Promise<TRes>;
+export type RoutineOption = Omit<Partial<SignerIx<InteractionRequest>>, "operations">;
+type RoutineExecuteResult = InteractionResponse | Record<any, any>;
+export interface RoutineCallback {
+    <TRes extends RoutineExecuteResult = any>(option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, arg13: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, arg13: any, arg14: any, option?: RoutineOption): Promise<TRes>;
 }
-export type LogicCallsites = Record<string, CallsiteCallback>;
+export type LogicRoutines = Record<string, RoutineCallback>;
 export type StateAccessorFn = (builder: StateAccessorBuilder) => AccessorBuilder;
 export {};
 //# sourceMappingURL=index.d.ts.map

@@ -1,5 +1,5 @@
-import { IdentifierKind, IdentifierVersion } from "./enums";
-import { IdentifierTag } from "./identifier-tag";
+import { IdentifierKind } from "./enums";
+import { AssetTagV0, IdentifierTag, LogicTagV0, ParticipantTagV0 } from "./identifier-tag";
 
 /**
  * Represents a flag specifier for an identifier.
@@ -45,12 +45,10 @@ export class Flag {
  */
 export const setFlag = (value: number, index: number, flag: boolean): number => {
     if (flag) {
-        value |= 1 << index;
-    } else {
-        value = value & ~(1 << index);
+        return value | (1 << index);
     }
 
-    return value;
+    return value & ~(1 << index);
 };
 
 /**
@@ -65,7 +63,7 @@ export const getFlag = (value: number, index: number): boolean => {
 };
 
 export const flagMasks = new Map<number, number>([
-    [IdentifierTag.getTag(IdentifierKind.Participant, IdentifierVersion.V0).value, 0b01111111],
-    [IdentifierTag.getTag(IdentifierKind.Logic, IdentifierVersion.V0).value, 0b01111000],
-    [IdentifierTag.getTag(IdentifierKind.Asset, IdentifierVersion.V0).value, 0b01111111],
+    [ParticipantTagV0.value, 0b01111111],
+    [LogicTagV0.value, 0b01111000],
+    [AssetTagV0.value, 0b01111111],
 ]);

@@ -1,6 +1,5 @@
 import { LogicId } from "js-moi-identifiers";
-import { Polorizer } from "js-polo";
-import { polo } from "polo-schema";
+import { Polorizer, schema } from "js-polo";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isHex } from "./hex";
@@ -19,16 +18,16 @@ export const isOperationType = (type, operation) => {
 };
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
-        schema: polo.struct({
-            id: polo.bytes,
-            keys_payload: polo.arrayOf(polo.struct({
-                public_key: polo.bytes,
-                weight: polo.integer,
-                signature_algorithm: polo.integer,
+        schema: schema.struct({
+            id: schema.bytes,
+            keys_payload: schema.arrayOf(schema.struct({
+                public_key: schema.bytes,
+                weight: schema.integer,
+                signature_algorithm: schema.integer,
             })),
-            amount: polo.integer,
+            amount: schema.integer,
         }),
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             const poloKeysPayload = payload.keys_payload.map((payload) => ({
                 ...payload,
                 public_key: hexToBytes(payload.public_key),
@@ -53,19 +52,19 @@ const createParticipantCreateDescriptor = () => {
 };
 const createAssetCreateDescriptor = () => {
     return Object.freeze({
-        schema: polo.struct({
-            symbol: polo.string,
-            supply: polo.integer,
-            standard: polo.integer,
-            dimension: polo.integer,
-            is_stateful: polo.boolean,
-            is_logical: polo.boolean,
-            logic_payload: polo.struct({
-                manifest: polo.bytes,
-                logic_id: polo.string,
-                callsite: polo.string,
-                calldata: polo.bytes,
-                interface: polo.map({ keys: polo.string, values: polo.string }),
+        schema: schema.struct({
+            symbol: schema.string,
+            supply: schema.integer,
+            standard: schema.integer,
+            dimension: schema.integer,
+            is_stateful: schema.boolean,
+            is_logical: schema.boolean,
+            logic_payload: schema.struct({
+                manifest: schema.bytes,
+                logic_id: schema.string,
+                callsite: schema.string,
+                calldata: schema.bytes,
+                interface: schema.map({ keys: schema.string, values: schema.string }),
             }),
         }),
         validator: (operation) => {
@@ -79,26 +78,29 @@ const createAssetCreateDescriptor = () => {
             if (payload.dimension && payload.dimension < 0) {
                 return createInvalidResult(payload, "dimension", "Dimension cannot be negative");
             }
+            if (typeof payload.symbol !== "string") {
+                return createInvalidResult(payload, "symbol", "Symbol must be a string");
+            }
             return null;
         },
     });
 };
 const createAccountConfigureDescriptor = () => {
-    const schema = polo.struct({
-        add: polo.arrayOf(polo.struct({
-            public_key: polo.bytes,
-            weight: polo.integer,
-            signature_algorithm: polo.integer,
-        })),
-        revoke: polo.arrayOf(polo.struct({
-            key_id: polo.integer,
-        })),
-    });
     return Object.freeze({
-        schema: schema,
+        schema: schema.struct({
+            add: schema.arrayOf(schema.struct({
+                public_key: schema.bytes,
+                weight: schema.integer,
+                signature_algorithm: schema.integer,
+            })),
+            revoke: schema.arrayOf(schema.struct({
+                key_id: schema.integer,
+            })),
+        }),
         validator: ({ payload }) => {
-            if (payload.add == null || payload.revoke == null) {
-                createInvalidResult(payload, "add", "Add and revoke are required");
+            console.log(payload);
+            if (payload.add == null && payload.revoke == null) {
+                return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
             for (const key in payload) {
                 const value = payload[key];
@@ -106,9 +108,29 @@ const createAccountConfigureDescriptor = () => {
                     return createInvalidResult(payload, key, `At least value is required in ${key}`);
                 }
             }
+            if (payload.add != null) {
+                for (const item of payload.add) {
+                    if (item.weight == null) {
+                        return createInvalidResult(item, "weight", "Weight is required");
+                    }
+                    if (item.weight < 0) {
+                        return createInvalidResult(item, "weight", "Weight cannot be negative");
+                    }
+                    if (item.signature_algorithm == null) {
+                        return createInvalidResult(item, "signature_algorithm", "Signature algorithm is required");
+                    }
+                }
+            }
+            if (payload.revoke != null) {
+                for (const item of payload.revoke) {
+                    if (item.key_id == null) {
+                        return createInvalidResult(item, "key_id", "Key ID is required");
+                    }
+                }
+            }
             return null;
         },
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             return {
                 add: payload.add?.map((key) => ({
                     ...key,
@@ -121,11 +143,11 @@ const createAccountConfigureDescriptor = () => {
 };
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze({
-        schema: polo.struct({
-            asset_id: polo.string,
-            amount: polo.integer,
+        schema: schema.struct({
+            asset_id: schema.string,
+            amount: schema.integer,
         }),
-        transform: ({ payload }) => ({
+        encode: ({ payload }) => ({
             ...payload,
             asset_id: hexToBytes(payload.asset_id),
         }),
@@ -144,13 +166,13 @@ const createAssetSupplyDescriptorFor = () => {
 const createAssetActionDescriptor = () => {
     const validateAmount = (payload) => {
         if (payload.amount == null) {
-            return createInvalidResult(payload, "amount", "Amount is required for transfer operation");
+            return createInvalidResult(payload, "amount", "Amount is required for operation");
         }
         if (typeof payload.amount !== "number" || Number.isNaN(payload.amount)) {
             return createInvalidResult(payload, "amount", "Amount must be a number");
         }
-        if (payload.amount < 0) {
-            return createInvalidResult(payload, "amount", "Amount cannot be negative");
+        if (payload.amount <= 0) {
+            return createInvalidResult(payload, "amount", "Amount cannot be greater than zero");
         }
         return null;
     };
@@ -160,6 +182,9 @@ const createAssetActionDescriptor = () => {
         }
         if (typeof payload.timestamp !== "number" || Number.isNaN(payload.timestamp)) {
             return createInvalidResult(payload, "timestamp", "Timestamp must be a number");
+        }
+        if (payload.timestamp <= Date.now()) {
+            return createInvalidResult(payload, "timestamp", "Timestamp must be of the future");
         }
         return null;
     };
@@ -173,14 +198,14 @@ const createAssetActionDescriptor = () => {
         return null;
     };
     return Object.freeze({
-        schema: polo.struct({
-            benefactor: polo.bytes,
-            beneficiary: polo.bytes,
-            asset_id: polo.string,
-            amount: polo.integer,
-            timestamp: polo.integer,
+        schema: schema.struct({
+            benefactor: schema.bytes,
+            beneficiary: schema.bytes,
+            asset_id: schema.string,
+            amount: schema.integer,
+            timestamp: schema.integer,
         }),
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
                 ...payload,
@@ -201,15 +226,17 @@ const createAssetActionDescriptor = () => {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
             switch (true) {
-                case isOperationType(OpType.AssetLockup, operation):
-                case isOperationType(OpType.AssetTransfer, operation): {
+                case isOperationType(OpType.AssetLockup, operation): {
                     return validateAmount(operation.payload);
+                }
+                case isOperationType(OpType.AssetTransfer, operation): {
+                    return validateAmount(operation.payload) ?? (operation.payload.benefactor != null ? validateBenefactor(operation.payload) : null);
                 }
                 case isOperationType(OpType.AssetApprove, operation): {
                     return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
                 }
                 case isOperationType(OpType.AssetRelease, operation): {
-                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload) ?? validateAmount(operation.payload);
+                    return validateAmount(operation.payload) ?? validateBenefactor(operation.payload);
                 }
                 case isOperationType(OpType.AssetRevoke, operation): {
                     return null;
@@ -244,17 +271,17 @@ const createLogicActionDescriptor = () => {
         return null;
     };
     return Object.freeze({
-        schema: polo.struct({
-            manifest: polo.bytes,
-            logic_id: polo.bytes,
-            callsite: polo.string,
-            calldata: polo.bytes,
-            interfaces: polo.map({
-                keys: polo.string,
-                values: polo.string,
+        schema: schema.struct({
+            manifest: schema.bytes,
+            logic_id: schema.bytes,
+            callsite: schema.string,
+            calldata: schema.bytes,
+            interfaces: schema.map({
+                keys: schema.string,
+                values: schema.string,
             }),
         }),
-        transform: ({ payload }) => {
+        encode: ({ payload }) => {
             if ("manifest" in payload) {
                 const raw = {
                     ...payload,
@@ -333,12 +360,12 @@ export const getIxOperationDescriptor = (type) => ixOpDescriptor[type] ?? null;
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export const transformOperationPayload = (operation) => {
+export const encodeOperationPayload = (operation) => {
     const descriptor = getIxOperationDescriptor(operation.type);
     if (descriptor == null) {
         throw new Error(`Descriptor for operation type "${operation.type}" is not supported`);
     }
-    return descriptor.transform?.(operation) ?? operation.payload;
+    return descriptor.encode?.(operation) ?? operation.payload;
 };
 /**
  * Encodes an operation payload to a POLO byte array.
@@ -354,7 +381,7 @@ export const encodeOperation = (operation) => {
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
     const polorizer = new Polorizer();
-    const data = transformOperationPayload(operation);
+    const data = encodeOperationPayload(operation);
     polorizer.polorize(data, descriptor.schema);
     return { type: operation.type, payload: polorizer.bytes() };
 };
@@ -366,7 +393,12 @@ export const encodeOperation = (operation) => {
  * @returns {boolean} - Returns `true` if the operation is valid, otherwise `false`.
  */
 export const isValidOperation = (operation) => {
-    return validateOperation(operation) == null;
+    try {
+        return validateOperation(operation) == null;
+    }
+    catch {
+        return false;
+    }
 };
 /**
  * Validates the payload of a given operation.

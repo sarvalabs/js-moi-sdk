@@ -65,14 +65,16 @@ class HttpTransport extends events_1.default {
             result = await response.json();
         }
         catch (error) {
+            // Check if the error is a network error in various environments like Node.js, browser, Bun etc.
             const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error?.message === "Failed to fetch" || error?.code === "ConnectionRefused";
-            const errMessage = isNetworkError ? `Network error. Cannot connect to ${this.host}`
-                : "message" in error ? error.message
-                    : "Unknown error occurred";
             result = {
                 jsonrpc: "2.0",
                 id: request.id,
-                error: { code: -1, message: errMessage, data: error },
+                error: {
+                    code: -1,
+                    message: isNetworkError ? `Network error. Cannot connect to ${this.host}` : error?.message ?? "Unknown error occurred",
+                    data: error,
+                },
             };
         }
         this.emit("debug", result);

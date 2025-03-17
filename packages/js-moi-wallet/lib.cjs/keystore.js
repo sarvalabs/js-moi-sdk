@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decryptKeystoreData = exports.encryptKeystoreData = exports.getKDFKeyForKeystore = exports.aesCTRWithXOR = void 0;
+exports.decryptKeystore = exports.encryptKeystore = exports.getKDFKeyForKeystore = exports.aesCTRWithXOR = void 0;
 const scrypt_1 = require("@noble/hashes/scrypt");
 const sha3_1 = require("@noble/hashes/sha3");
 const utils_1 = require("@noble/hashes/utils");
@@ -31,7 +31,14 @@ const getKDFKeyForKeystore = (keystore, password) => {
     js_moi_utils_1.ErrorUtils.throwError(`Unsupported KDF: ${keystore.kdf}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
 };
 exports.getKDFKeyForKeystore = getKDFKeyForKeystore;
-const encryptKeystoreData = (data, password) => {
+/**
+ * Encrypts the given data using the provided password and returns a keystore object.
+ *
+ * @param data - The data to be encrypted as a Uint8Array.
+ * @param password - The password used for encryption.
+ * @returns A Keystore object containing the encrypted data and encryption parameters.
+ */
+const encryptKeystore = (data, password) => {
     const salt = (0, js_moi_utils_1.randomBytes)(32);
     const derivedKey = (0, scrypt_1.scrypt)(password, salt, {
         N: 4096,
@@ -60,8 +67,18 @@ const encryptKeystoreData = (data, password) => {
         mac: (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(mac)),
     };
 };
-exports.encryptKeystoreData = encryptKeystoreData;
-const decryptKeystoreData = (keystore, password) => {
+exports.encryptKeystore = encryptKeystore;
+/**
+ * Decrypts a keystore using the provided password.
+ *
+ * @param keystore - The keystore object containing the encrypted data.
+ * @param password - The password used to decrypt the keystore.
+ * @returns The decrypted data as a Uint8Array.
+ *
+ * @throws If the cipher specified in the keystore is not supported.
+ * @throws If the password is incorrect and the keystore cannot be decrypted.
+ */
+const decryptKeystore = (keystore, password) => {
     if (keystore.cipher !== "aes-128-ctr") {
         js_moi_utils_1.ErrorUtils.throwError(`Cipher not supported: ${keystore.cipher}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }
@@ -74,5 +91,5 @@ const decryptKeystoreData = (keystore, password) => {
     }
     return (0, exports.aesCTRWithXOR)(derivedKey.slice(0, 16), cipherText, iv);
 };
-exports.decryptKeystoreData = decryptKeystoreData;
+exports.decryptKeystore = decryptKeystore;
 //# sourceMappingURL=keystore.js.map

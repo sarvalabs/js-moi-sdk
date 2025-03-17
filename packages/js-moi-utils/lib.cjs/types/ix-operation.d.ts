@@ -1,6 +1,6 @@
 import type { AssetStandard, OpType } from "../enums";
 import type { Address, Hex } from "../hex";
-export interface PoloLogicPayload {
+export interface RawLogicPayload {
     manifest: Uint8Array;
     logic_id: Hex;
     callsite: string;
@@ -77,7 +77,7 @@ export interface KeyAddPayload {
     weight: number;
     signature_algorithm: 0;
 }
-export interface PoloParticipantCreatePayload {
+export interface RawParticipantCreatePayload {
     id: Uint8Array;
     amount: number;
     keys_payload: (Omit<KeyAddPayload, "public_key"> & {
@@ -103,7 +103,7 @@ export interface ParticipantCreatePayload {
      */
     keys_payload: KeyAddPayload[];
 }
-export interface PoloAssetActionPayload {
+export interface RawAssetActionPayload {
     asset_id: Hex;
     beneficiary: Uint8Array;
     benefactor: Uint8Array;
@@ -136,15 +136,15 @@ export interface AssetActionPayload {
     timestamp: number;
 }
 export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<AssetActionPayload, "benefactor">>;
-export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<PoloAssetActionPayload, "benefactor">>;
+export type RawAssetTransferPayload = Omit<RawAssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<RawAssetActionPayload, "benefactor">>;
 export type AssetApprovePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
-export type PoloAssetApprovePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
+export type RawAssetApprovePayload = Pick<RawAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
 export type AssetRevokePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id">;
-export type PoloAssetRevokePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id">;
+export type RawAssetRevokePayload = Pick<RawAssetActionPayload, "beneficiary" | "asset_id">;
 export type AssetLockupPayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount">;
-export type PoloAssetLockupPayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount">;
+export type RawAssetLockupPayload = Pick<RawAssetActionPayload, "beneficiary" | "asset_id" | "amount">;
 export type AssetReleasePayload = Omit<AssetActionPayload, "timestamp">;
-export type PoloAssetReleasePayload = Omit<PoloAssetActionPayload, "timestamp">;
+export type RawAssetReleasePayload = Omit<RawAssetActionPayload, "timestamp">;
 export interface AssetSupplyPayload {
     /**
      * The asset id that is used to mint or burn an asset.
@@ -155,14 +155,14 @@ export interface AssetSupplyPayload {
      */
     amount: number;
 }
-export interface PoloLogicDeployPayload extends Omit<PoloLogicPayload, "logic_id"> {
+export interface RawLogicDeployPayload extends Omit<RawLogicPayload, "logic_id"> {
 }
 /**
  * `LogicDeployPayload` holds the data for deploying a new logic.
  */
 export interface LogicDeployPayload extends Omit<LogicPayload, "logic_id"> {
 }
-export interface PoloLogicActionPayload extends Omit<PoloLogicPayload, "manifest"> {
+export interface RawLogicActionPayload extends Omit<RawLogicPayload, "manifest"> {
 }
 /**
  * `LogicActionPayload` holds the data for invoking or enlisting a logic.
@@ -176,13 +176,13 @@ export interface AccountConfigurePayload {
     add?: Partial<KeyAddPayload>[];
     revoke?: KeyRevokePayload[];
 }
-export interface PoloAccountConfigurePayload {
+export interface RawAccountConfigurePayload {
     add?: Partial<Omit<KeyAddPayload, "public_key"> & {
         public_key: Uint8Array;
     }>[];
     revoke?: KeyRevokePayload[];
 }
-export interface PoloAssetSupplyPayload {
+export interface RawAssetSupplyPayload {
     asset_id: Uint8Array;
     amount: number;
 }
@@ -195,11 +195,11 @@ export interface PoloAssetSupplyPayload {
  * ```
  */
 export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetTransferPayload : T extends OpType.AssetApprove ? AssetApprovePayload : T extends OpType.AssetRelease ? AssetReleasePayload : T extends OpType.AssetRevoke ? AssetRevokePayload : T extends OpType.AssetLockup ? AssetLockupPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : T extends OpType.AccountConfigure ? AccountConfigurePayload : never;
-export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? PoloParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? PoloAssetSupplyPayload : T extends OpType.AssetTransfer ? PoloAssetTransferPayload : T extends OpType.AssetApprove ? PoloAssetApprovePayload : T extends OpType.AssetRelease ? PoloAssetReleasePayload : T extends OpType.AssetRevoke ? PoloAssetRevokePayload : T extends OpType.AssetLockup ? PoloAssetLockupPayload : T extends OpType.LogicDeploy ? PoloLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? PoloLogicActionPayload : T extends OpType.AccountConfigure ? PoloAccountConfigurePayload : never;
+export type RawIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? RawParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? RawAssetSupplyPayload : T extends OpType.AssetTransfer ? RawAssetTransferPayload : T extends OpType.AssetApprove ? RawAssetApprovePayload : T extends OpType.AssetRelease ? RawAssetReleasePayload : T extends OpType.AssetRevoke ? RawAssetRevokePayload : T extends OpType.AssetLockup ? RawAssetLockupPayload : T extends OpType.LogicDeploy ? RawLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? RawLogicActionPayload : T extends OpType.AccountConfigure ? RawAccountConfigurePayload : never;
 /**
  * `IxRawOperation` is a type that holds the raw operation data.
  */
-export interface IxRawOperation {
+export interface RawIxOperation {
     /**
      * The type of the operation.
      */

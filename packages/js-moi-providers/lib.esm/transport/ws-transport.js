@@ -44,7 +44,7 @@ export class WebsocketTransport extends EventEmitter {
             this.emit("error", error);
         };
     }
-    waitForConnection() {
+    async waitForConnection() {
         this.waitForConnectionPromise ??= new Promise((resolve, reject) => {
             if (this.ws == null) {
                 reject(new Error("Websocket is not initialized"));
@@ -81,7 +81,7 @@ export class WebsocketTransport extends EventEmitter {
                 throw new Error("Websocket is closed, cannot reconnect");
             }
         });
-        return this.waitForConnectionPromise;
+        return await this.waitForConnectionPromise;
     }
     /**
      * Sends a JSON-RPC request over a WebSocket connection and returns the response.

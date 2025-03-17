@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IdentifierTag = void 0;
+exports.LogicTagV0 = exports.AssetTagV0 = exports.ParticipantTagV0 = exports.IdentifierTag = void 0;
 const enums_1 = require("./enums");
 /**
  * Represents an identifier tag with a specific kind and version.
@@ -12,7 +12,7 @@ class IdentifierTag {
      * This value is read-only and cannot be modified after initialization.
      */
     value;
-    static MAX_IDENTIFIER_KIND = enums_1.IdentifierKind.Logic;
+    static maxIdentifierKind = enums_1.IdentifierKind.Logic;
     static kindMaxSupportedVersion = {
         [enums_1.IdentifierKind.Participant]: 0,
         [enums_1.IdentifierKind.Asset]: 0,
@@ -85,7 +85,7 @@ class IdentifierTag {
      * @returns An object containing the reason for invalidity if the identifier is invalid, or `null` if the identifier is valid.
      */
     static validate(value) {
-        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+        if (IdentifierTag.getKind(value) > this.maxIdentifierKind) {
             return { why: "Unsupported identifier kind." };
         }
         if (IdentifierTag.getVersion(value) > IdentifierTag.getMaxSupportedVersion(IdentifierTag.getKind(value))) {
@@ -95,4 +95,7 @@ class IdentifierTag {
     }
 }
 exports.IdentifierTag = IdentifierTag;
+exports.ParticipantTagV0 = IdentifierTag.getTag(enums_1.IdentifierKind.Participant, enums_1.IdentifierVersion.V0);
+exports.AssetTagV0 = IdentifierTag.getTag(enums_1.IdentifierKind.Asset, enums_1.IdentifierVersion.V0);
+exports.LogicTagV0 = IdentifierTag.getTag(enums_1.IdentifierKind.Logic, enums_1.IdentifierVersion.V0);
 //# sourceMappingURL=identifier-tag.js.map

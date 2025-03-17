@@ -22,14 +22,6 @@ export declare const isBytes: (value: any) => value is Bytes;
  */
 export declare const hexDataLength: (data: string) => number | null;
 /**
- * Checks if the given value is a valid hexadecimal string.
- *
- * @param {any} value - The value to check.
- * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
- */
-export declare const isHexString: (value: any, length?: number) => boolean;
-/**
  * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
  *
  * @param size - The number of random bytes to generate.

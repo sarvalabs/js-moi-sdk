@@ -42,64 +42,64 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         return logicId != null;
     }
     /**
-     * Retrieves the type of a callsite.
+     * Retrieves the type of a routine.
      *
-     * @param callsite - The name of the callsite.
-     * @returns The type of the specified callsite.
+     * @param routine - The name of the routine.
+     * @returns The type of the specified routine.
      */
-    getCallsiteType(callsite) {
-        return this.getRoutineElement(callsite).data.kind;
+    getRoutineType(routine) {
+        return this.getRoutineElement(routine).data.kind;
     }
     /**
-     * Determines if the callsite is mutable based on its routine kind.
+     * Determines if the routine is mutable based on its routine kind.
      *
-     * @param callsite - The identifier of the callsite to check.
-     * @returns A boolean indicating whether the callsite is mutable.
+     * @param routine - The identifier of the routine to check.
+     * @returns A boolean indicating whether the routine is mutable.
      */
-    isCallsiteMutable(callsite) {
+    isRoutineMutable(routine) {
         const kinds = [js_moi_utils_1.RoutineKind.Ephemeral, js_moi_utils_1.RoutineKind.Persistent];
-        const element = this.getRoutineElement(callsite);
+        const element = this.getRoutineElement(routine);
         return kinds.includes(element.data.mode);
     }
-    extractArgsAndOption(callsite, callsiteArguments) {
-        const element = this.getRoutineElement(callsite);
-        if (callsiteArguments.length < element.data.accepts.length) {
-            const callsiteSignature = `Invalid number of arguments: ${callsite}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
-            js_moi_utils_1.ErrorUtils.throwArgumentError(callsiteSignature, "args", callsiteArguments);
+    extractArgsAndOption(routine, routineArguments) {
+        const element = this.getRoutineElement(routine);
+        if (routineArguments.length < element.data.accepts.length) {
+            const routineSignature = `Invalid number of arguments: ${routine}(${element.data.accepts.map((accept) => `${accept.label} ${accept.type}`).join(", ")})`;
+            js_moi_utils_1.ErrorUtils.throwArgumentError(routineSignature, "args", routineArguments);
         }
-        const option = callsiteArguments.at(element.data.accepts.length);
-        const args = callsiteArguments.slice(0, element.data.accepts.length);
+        const option = routineArguments.at(element.data.accepts.length);
+        const args = routineArguments.slice(0, element.data.accepts.length);
         return { option, args };
     }
     /**
-     * Creates an interaction operation for the specified callsite.
+     * Creates an interaction operation for the specified routine.
      *
-     * @param callsite - The name of the callsite.
-     * @param args - The arguments to pass to the callsite.
+     * @param routine - The name of the routine.
+     * @param args - The arguments to pass to the routine.
      * @returns A promise that resolves to an interaction operation.
      *
-     * @throws an error if the callsite is not present.
+     * @throws an error if the routine is not present.
      */
-    async createIxOperation(callsite, args) {
-        const routine = this.getRoutineElement(callsite);
-        if (routine.data.accepts.length !== args.length) {
-            js_moi_utils_1.ErrorUtils.throwError(`Invalid number of arguments for callsite "${callsite}".`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    async createIxOperation(routine, args) {
+        const element = this.getRoutineElement(routine);
+        if (element.data.accepts.length !== args.length) {
+            js_moi_utils_1.ErrorUtils.throwError(`Invalid number of arguments for routine "${routine}".`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
-        const calldata = this.getManifestCoder().encodeArguments(callsite, ...args);
-        const callsiteType = this.getCallsiteType(callsite);
-        switch (callsiteType) {
+        const calldata = this.getManifestCoder().encodeArguments(routine, ...args);
+        const type = this.getRoutineType(routine);
+        switch (type) {
             case js_moi_utils_1.RoutineType.Deploy: {
                 return {
                     type: js_moi_utils_1.OpType.LogicDeploy,
-                    payload: { manifest: this.getManifest(js_moi_manifest_1.ManifestCoderFormat.POLO), callsite, calldata },
+                    payload: { manifest: this.getManifest(js_moi_manifest_1.ManifestCoderFormat.POLO), callsite: routine, calldata },
                 };
             }
             case js_moi_utils_1.RoutineType.Invoke:
             case js_moi_utils_1.RoutineType.Enlist: {
                 const logicId = await this.getLogicId();
                 return {
-                    type: callsiteType === js_moi_utils_1.RoutineType.Invoke ? js_moi_utils_1.OpType.LogicInvoke : js_moi_utils_1.OpType.LogicEnlist,
-                    payload: { logic_id: logicId.toHex(), callsite, calldata },
+                    type: type === js_moi_utils_1.RoutineType.Invoke ? js_moi_utils_1.OpType.LogicInvoke : js_moi_utils_1.OpType.LogicEnlist,
+                    payload: { logic_id: logicId.toHex(), callsite: routine, calldata },
                 };
             }
             default: {
@@ -115,8 +115,8 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * @param callsiteArguments - arguments to pass to the callsite.
      * @param params - interaction request parameters.
      */
-    async createIxRequest(method, callsite, callsiteArguments, params) {
-        const operation = await this.createIxOperation(callsite, callsiteArguments);
+    async createIxRequest(method, routine, routineArguments, params) {
+        const operation = await this.createIxOperation(routine, routineArguments);
         if (method === "moi.Simulate") {
             return await this.signer.createIxRequest("moi.Simulate", {
                 ...params,
@@ -142,32 +142,37 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     async getLogicId(timer) {
         if (this.deployIxResponse != null) {
-            const results = await this.deployIxResponse.result(timer);
-            const result = results.at(0);
-            if (result?.type !== js_moi_utils_1.OpType.LogicDeploy) {
-                js_moi_utils_1.ErrorUtils.throwError("Expected result of logic deploy got something else.", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
-            }
-            const exception = js_moi_manifest_1.ManifestCoder.decodeException(result.data.error);
-            if (exception != null) {
-                js_moi_utils_1.ErrorUtils.throwError(exception.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, exception);
-            }
-            this.setLogicId(new js_moi_identifiers_1.LogicId(result.data.logic_id));
+            // This is to handle the case where the logic id is not set but the deployIxResponse is available.
+            // handleLogicDeployResponse uses `InteractionResponse` which caches the result on confirmation preventing multiple calls.
+            await this.obtainLogicIdFromResponse(this.deployIxResponse, timer);
         }
         return super.getLogicId();
     }
-    newCallsite(callsite) {
-        const isDeployerCallsite = this.getCallsiteType(callsite) === js_moi_utils_1.RoutineType.Deploy;
+    async obtainLogicIdFromResponse(response, timer) {
+        const results = await response.result(timer);
+        const result = results.at(0);
+        if (result?.type !== js_moi_utils_1.OpType.LogicDeploy) {
+            js_moi_utils_1.ErrorUtils.throwError("Expected result of logic deploy got something else.", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
+        }
+        const exception = js_moi_manifest_1.ManifestCoder.decodeException(result.data.error);
+        if (exception != null) {
+            js_moi_utils_1.ErrorUtils.throwError(exception.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, exception);
+        }
+        this.setLogicId(new js_moi_identifiers_1.LogicId(result.data.logic_id));
+    }
+    newRoutine(routine) {
+        const isDeployerRoutine = this.getRoutineType(routine) === js_moi_utils_1.RoutineType.Deploy;
         const callback = async (...args) => {
             const isDeployed = await this.isDeployed();
-            if (isDeployerCallsite && isDeployed) {
+            if (isDeployerRoutine && isDeployed) {
                 js_moi_utils_1.ErrorUtils.throwError(`Logic is already deployed or deploying.`);
             }
-            if (!isDeployerCallsite && !isDeployed) {
-                js_moi_utils_1.ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer callsites.`);
+            if (!isDeployerRoutine && !isDeployed) {
+                js_moi_utils_1.ErrorUtils.throwError(`Logic is not deployed, deploy it first using deployer routine.`);
             }
-            const { option, args: callsiteArgs } = this.extractArgsAndOption(callsite, args);
-            if (!this.isCallsiteMutable(callsite)) {
-                const simulateIxRequest = await this.createIxRequest("moi.Simulate", callsite, callsiteArgs, option);
+            const { option, args: routineArgs } = this.extractArgsAndOption(routine, args);
+            if (!this.isRoutineMutable(routine)) {
+                const simulateIxRequest = await this.createIxRequest("moi.Simulate", routine, routineArgs, option);
                 const simulation = await this.signer.simulate(simulateIxRequest);
                 const result = simulation.results.at(0);
                 if (result?.type !== js_moi_utils_1.OpType.LogicInvoke) {
@@ -178,11 +183,11 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 if (exception != null) {
                     js_moi_utils_1.ErrorUtils.throwError(exception.error, js_moi_utils_1.ErrorCode.CALL_EXCEPTION, exception);
                 }
-                return this.getManifestCoder().decodeOutput(callsite, outputs);
+                return this.getManifestCoder().decodeOutput(routine, outputs);
             }
-            const request = await this.createIxRequest("moi.Execute", callsite, callsiteArgs, option);
+            const request = await this.createIxRequest("moi.Execute", routine, routineArgs, option);
             const response = await this.signer.execute(request);
-            if (isDeployerCallsite) {
+            if (isDeployerRoutine) {
                 this.deployIxResponse = response;
             }
             return response;
@@ -194,9 +199,9 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         for (const { ptr } of this.getCallsites().values()) {
             const element = this.getElement(ptr);
             if (element.kind !== js_moi_utils_1.ElementType.Routine) {
-                js_moi_utils_1.ErrorUtils.throwError(`Element at "${ptr}" is not a valid callsite.`);
+                js_moi_utils_1.ErrorUtils.throwError(`Element at "${ptr}" is not a valid routine.`);
             }
-            endpoint[element.data.name] = this.newCallsite(element.data.name);
+            endpoint[element.data.name] = this.newRoutine(element.data.name);
         }
         return Object.freeze(endpoint);
     }
@@ -209,14 +214,16 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      *
      * @throws Will throw an error if the logic state is invalid.
      */
-    async getLogicStorage(state, storageKey) {
+    async getLogicStorage(state, storageKey, identifier) {
         const logicId = await this.getLogicId();
         switch (state) {
             case js_moi_utils_1.LogicState.Persistent: {
                 return await this.signer.getProvider().getLogicStorage(logicId, storageKey);
             }
             case js_moi_utils_1.LogicState.Ephemeral: {
-                const identifier = await this.signer.getIdentifier();
+                if (identifier == null) {
+                    js_moi_utils_1.ErrorUtils.throwError("Identifier is required for reading ephemeral storage.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+                }
                 return await this.signer.getProvider().getLogicStorage(logicId, identifier, storageKey);
             }
             default:
@@ -238,7 +245,14 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         }
         return (0, js_moi_utils_1.generateStorageKey)(builder.getBaseSlot(), builder.getAccessors());
     }
-    async getLogicStateValue(state, accessor) {
+    /**
+     * Retrieves the persistent storage value based on the provided accessor or storage key.
+     *
+     * @param accessor - This can storage key or accessor function.
+     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
+     */
+    async persistent(accessor) {
+        const state = js_moi_utils_1.LogicState.Persistent;
         if (accessor instanceof js_moi_utils_1.StorageKey || (0, js_moi_utils_1.isHex)(accessor)) {
             return await this.getLogicStorage(state, accessor);
         }
@@ -256,27 +270,27 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(value)).depolorize(schema);
     }
     /**
-     * Retrieves the persistent storage value based on the provided accessor or storage key.
-     *
-     * @param accessor - This can storage key or accessor function.
-     * @returns A promise that resolves to the persistent storage data in POLO encoding or decoded value.
-     */
-    async persistent(accessor) {
-        if (typeof accessor === "function") {
-            return await this.getLogicStateValue(js_moi_utils_1.LogicState.Persistent, accessor);
-        }
-        return await this.getLogicStateValue(js_moi_utils_1.LogicState.Persistent, accessor);
-    }
-    /**
      * Retrieves the ephemeral storage value based on the provided accessor or storage key.
      * @param accessor - This can storage key or accessor function.
      * @returns A promise that resolves to the ephemeral storage data in POLO encoding or decoded value.
      */
-    async ephemeral(accessor) {
-        if (typeof accessor === "function") {
-            return await this.getLogicStateValue(js_moi_utils_1.LogicState.Ephemeral, accessor);
+    async ephemeral(identifier, accessor) {
+        const state = js_moi_utils_1.LogicState.Ephemeral;
+        if (accessor instanceof js_moi_utils_1.StorageKey || (0, js_moi_utils_1.isHex)(accessor)) {
+            return await this.getLogicStorage(state, accessor, new js_moi_identifiers_1.Identifier(identifier));
         }
-        return await this.getLogicStateValue(js_moi_utils_1.LogicState.Ephemeral, accessor);
+        const element = this.getStateElement(state);
+        const builder = accessor(new state_accessor_builder_1.StateAccessorBuilder(element.ptr, this));
+        if (!(builder instanceof accessor_builder_1.SlotAccessorBuilder)) {
+            js_moi_utils_1.ErrorUtils.throwError("Invalid accessor builder.", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR);
+        }
+        const key = (0, js_moi_utils_1.generateStorageKey)(builder.getBaseSlot(), builder.getAccessors());
+        const value = await this.getLogicStorage(state, key, new js_moi_identifiers_1.Identifier(identifier));
+        if (!(0, js_moi_manifest_1.isPrimitiveType)(builder.getStorageType())) {
+            return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(value)).depolorizeInteger();
+        }
+        const schema = js_moi_manifest_1.Schema.parseDataType(builder.getStorageType(), this.getClassDefs(), this.getElements());
+        return new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(value)).depolorize(schema);
     }
     /**
      * Retrieves logic messages based on the provided options.
@@ -293,7 +307,7 @@ exports.LogicDriver = LogicDriver;
 /**
  * Retrieves a LogicDriver instance for the given logic ID.
  *
- * @param logicId - The ID of the logic to retrieve.
+ * @param source - The source of the logic, either an logic identifier or a logic manifest.
  * @param signer - The signer object used to interact with the logic.
  * @returns A promise that resolves to a LogicDriver instance.
  *
@@ -327,16 +341,16 @@ exports.LogicDriver = LogicDriver;
  *
  * >> LogicDriver {  }
  */
-const getLogicDriver = async (logicId, signer) => {
-    if ((0, js_moi_identifiers_1.isIdentifier)(logicId)) {
+const getLogicDriver = async (source, signer) => {
+    if ((0, js_moi_identifiers_1.isIdentifier)(source)) {
         const provider = signer.getProvider();
-        const manifestInPolo = await provider.getLogic(logicId, {
+        const manifestInPolo = await provider.getLogic(source, {
             modifier: { extract: "manifest" },
         });
         const manifest = js_moi_manifest_1.ManifestCoder.decodeManifest(manifestInPolo, js_moi_manifest_1.ManifestCoderFormat.JSON);
-        return new LogicDriver({ manifest, logicId, signer });
+        return new LogicDriver({ manifest, logicId: source, signer });
     }
-    return new LogicDriver({ manifest: logicId, signer });
+    return new LogicDriver({ manifest: source, signer });
 };
 exports.getLogicDriver = getLogicDriver;
 //# sourceMappingURL=logic-driver.js.map

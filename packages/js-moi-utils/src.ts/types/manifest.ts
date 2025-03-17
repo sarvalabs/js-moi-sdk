@@ -6,10 +6,10 @@ export interface EngineConfig {
     flags: string[];
 }
 
-export type CocoPrimitiveType = "null" | "ptr" | "bool" | "bytes" | "string" | "address" | "u64" | "i64" | "u256";
+export type PrimitiveType = "null" | "ptr" | "bool" | "bytes" | "string" | "address" | "u64" | "i64" | "u256";
 
 interface Constant {
-    type: CocoPrimitiveType;
+    type: PrimitiveType;
     value: Hex;
 }
 
@@ -18,7 +18,7 @@ type TypeDef = string;
 export interface TypeField {
     slot: number;
     label: string;
-    type: CocoPrimitiveType | (TypeDef & {});
+    type: PrimitiveType | (TypeDef & {});
 }
 
 interface MethodField {

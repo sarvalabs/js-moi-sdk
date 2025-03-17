@@ -40,7 +40,6 @@ import type {
     LogicStorageRequestOption,
     Provider,
     SelectFromResponseModifier,
-    Signature,
     SimulateInteractionRequest,
     SimulateOption,
     TesseractRequestOption,
@@ -522,10 +521,6 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
      * @returns A promise that resolves to the account key information.
      */
     async getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey> {
-        if (Number.isNaN(index) || index < 0) {
-            ErrorUtils.throwArgumentError("Must be a non-negative integer", "index", index);
-        }
-
         return await this.call("moi.AccountKey", {
             id: new Identifier(participant),
             key_id: index,
@@ -533,86 +528,16 @@ export class JsonRpcProvider extends EventEmitter implements Provider {
         });
     }
 
-    /**
-     * Executes an interaction on the MOI network.
-     *
-     * @param ix - The interaction to execute.
-     * @param signatures - The signatures to include in the request.
-     *
-     * @returns A promise that resolves to the result of the InteractionResponse.
-     */
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
-    /**
-     * Executes an interaction on the MOI network.
-     *
-     * @param ix - The execution request object.
-     *
-     * @returns A promise that resolves to the InteractionResponse.
-     */
-    execute(ix: ExecuteIx): Promise<InteractionResponse>;
-    /**
-     * Executes an interaction on the MOI network.
-     *
-     * @param ix - The interaction to execute.
-     * @param signatures - The signatures to include in the request.
-     *
-     * @returns A promise that resolves to the result of the InteractionResponse.
-     *
-     * @example
-     * import { HttpProvider } from "js-moi-sdk";
-     *
-     * const provider = new HttpProvider("...");
-     * const ix = await provider.execute({
-     *     interaction: "0xf12...123",
-     *     signatures: [
-     *         {
-     *             id: "0x123..123",
-     *             key_id: 0,
-     *             signature: "0x4ac..f1a",
-     *         },
-     *     ],
-     * });
-     *
-     * console.log(ix.hash); // 0x123...123;
-     *
-     * // Wait for the confirmation of the interaction
-     * const confirmation = await ix.wait();
-     * // This will wait for the confirmation of the interaction and return the result
-     * // of the interaction
-     * const result = await ix.result();
-     */
-    async execute(ix: Uint8Array | Hex | ExecuteIx, signatures?: Signature[]): Promise<InteractionResponse> {
-        let params: MethodParams<"moi.Execute">;
-
-        switch (true) {
-            case ix instanceof Uint8Array: {
-                if (!signatures || !Array.isArray(signatures)) {
-                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
-                }
-
-                params = [{ interaction: bytesToHex(ix), signatures }];
-                break;
-            }
-
-            case typeof ix === "object": {
-                if (ix.interaction == null) {
-                    ErrorUtils.throwError("No interaction provided", ErrorCode.INVALID_ARGUMENT);
-                }
-
-                if (!ix.signatures || !Array.isArray(ix.signatures)) {
-                    ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
-                }
-
-                params = [ix];
-                break;
-            }
-
-            default: {
-                ErrorUtils.throwError("Invalid argument for method signature", ErrorCode.INVALID_ARGUMENT);
-            }
+    async execute(ix: ExecuteIx): Promise<InteractionResponse> {
+        if (ix.interaction == null) {
+            ErrorUtils.throwError("No interaction provided", ErrorCode.INVALID_ARGUMENT);
         }
 
-        const hash = await this.call("moi.Execute", ...params);
+        if (!ix.signatures || !Array.isArray(ix.signatures)) {
+            ErrorUtils.throwError("No signatures provided", ErrorCode.INVALID_ARGUMENT);
+        }
+
+        const hash = await this.call("moi.Execute", ix);
         return new InteractionResponse(hash, this);
     }
 

@@ -3,7 +3,7 @@ import { SigType, Signer } from "js-moi-signer";
 import { type Hex, type InteractionRequest } from "js-moi-utils";
 import { Identifier } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
-import { FromMnemonicOptions, type WalletOption } from "../types/wallet";
+import { MnemonicImportOptions, type WalletOption } from "../types/wallet";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"
 }
@@ -122,46 +122,10 @@ export declare class Wallet extends Signer {
      * const signedRequest = await wallet.signInteraction(request, algorithm);
      */
     signInteraction(ix: InteractionRequest, sig: SigType): Promise<ExecuteIx>;
-    /**
-     * Create a wallet from a mnemonic.
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {string} path - The optional derivation path to use.
-     * @param {FromMnemonicOptions | undefined} options - The optional options to use.
-     *
-     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
-     */
-    static fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    /**
-     * Create a wallet from mnemonic
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {FromMnemonicOptions | undefined} options - The optional derivation path to use.
-     *
-     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
-     */
-    static fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    /**
-     * Create a wallet from mnemonic synchronously.
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {string | undefined} path - The optional derivation path to use.
-     * @param {FromMnemonicOptions | undefined} options - The optional options to use.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
-     */
-    static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
-    /**
-     * Create a wallet from mnemonic synchronously.
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {FromMnemonicOptions | undefined} options - The optional options to use.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
-     */
-    static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
+    static fromMnemonic(mnemonic: string, path?: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static fromMnemonic(mnemonic: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static fromMnemonicSync(mnemonic: string, path?: string, options?: MnemonicImportOptions): Wallet;
+    static fromMnemonicSync(mnemonic: string, options?: MnemonicImportOptions): Wallet;
     /**
      * Creates a Wallet instance from a keystore JSON string and a password.
      *

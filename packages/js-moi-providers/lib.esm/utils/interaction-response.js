@@ -1,6 +1,6 @@
 import { CustomError, ErrorCode, ErrorUtils } from "js-moi-utils";
-const INITIAL_NOT_FOUND_RETRIES = 10;
-const ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO = 1500;
+const MAX_RETRIES_ON_NOT_FOUND = 10;
+const DEFAULT_IX_INFO_RETRIEVAL_TIME = 1500;
 /**
  * The `InteractionResponse` class represents the response of an interaction with the provider.
  * It provides methods to wait for the interaction to be finalized and to retrieve the result of the interaction.
@@ -12,7 +12,7 @@ export class InteractionResponse {
     hash;
     interaction;
     provider;
-    notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
+    notFoundRetries = MAX_RETRIES_ON_NOT_FOUND;
     constructor(hash, provider) {
         this.provider = provider;
         if (typeof hash === "string") {
@@ -49,9 +49,6 @@ export class InteractionResponse {
                 const ix = await this.provider.getInteraction(this.hash, {
                     modifier: { include: ["confirmation"] },
                 });
-                if (this.notFoundRetries === INITIAL_NOT_FOUND_RETRIES) {
-                    this.notFoundRetries = INITIAL_NOT_FOUND_RETRIES;
-                }
                 if (ix.confirmation != null) {
                     this.interaction = ix;
                     return ix.confirmation;
@@ -65,7 +62,7 @@ export class InteractionResponse {
                         });
                     }
                     this.notFoundRetries--;
-                    await new Promise((resolve) => setTimeout(resolve, ASSUMPTION_TIME_DURATION_FOR_GETTING_IX_INFO));
+                    await new Promise((resolve) => setTimeout(resolve, DEFAULT_IX_INFO_RETRIEVAL_TIME));
                     continue;
                 }
             }
