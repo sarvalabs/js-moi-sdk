@@ -151,6 +151,6 @@ interaction details, query logic event logs and state, and interact with the MOI
 
 **Identifier**
 
-An Identifier is a unique identifier that represents a participant, asset,
+An Identifier is a unique hex value that represents a participant, asset,
 or logic object in the MOI ecosystem. Identifiers are used to reference participant,
 asset, or logic in interactions and queries.
