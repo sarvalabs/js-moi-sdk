@@ -145,9 +145,9 @@ message's origin and integrity.
 
 **Provider**
 
-A provider is a convenient interface for connecting to MOI network.
-It allows developers to execute JSON-RPC calls to the MOI network and retrieve
-data from the network.
+A provider facilitates JSON-RPC communication with the MOI network, enabling
+blockchain queries. It allows developers to retrieve account, tesseract, and
+interaction details, query logic event logs and state, and interact with the MOI network.
 
 **Identifier**
 
