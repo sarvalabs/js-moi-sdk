@@ -30,8 +30,6 @@ Bytes
 
 .. autofunction:: isBytes
 
-.. autofunction:: isHexString
-
 .. autofunction:: isInteger
 
 .. autofunction:: randomBytes
@@ -179,7 +177,7 @@ Interaction
 
 .. autofunction:: interaction
 
-.. autofunction:: transformInteraction
+.. autofunction:: encodeInteraction
 
 .. autofunction:: validateIxRequest
 
@@ -192,7 +190,7 @@ Operation
 
 .. autofunction:: isValidOperation
 
-.. autofunction:: transformOperationPayload
+.. autofunction:: encodeOperationPayload
 
 .. autofunction:: validateOperation
 
