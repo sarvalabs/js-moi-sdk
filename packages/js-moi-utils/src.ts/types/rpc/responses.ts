@@ -17,20 +17,20 @@ export interface NetworkInfo {
 
 export interface SimulationEffects {
     events: unknown[];
-    BalanceChanges: unknown;
+    balance_changes: unknown;
 }
 
 export interface Simulate {
     hash: Hex;
     status: ReceiptStatus;
     results: AnyIxOperationResult[];
-    effort: number;
+    fuel_spent: number;
     effects: SimulationEffects[] | null;
 }
 
 export interface AccountMetaData {
     type: AccountType;
-    address: Hex;
+    id: Hex;
     height: number;
     tesseract: Hex;
 }
@@ -76,8 +76,6 @@ export interface Guardians {
     stochastic: KramaID[];
 }
 
-export interface Controls {}
-
 export interface Enlisted {}
 
 export interface Account {
@@ -97,6 +95,23 @@ export interface FuelInfo {
     spent: number;
 }
 
+export interface TesseractAccountContextData {
+    latest: Hex;
+    previous: Hex;
+    delta: {
+        consensus: null | string[];
+        replaced: null | string[];
+    };
+}
+
+export interface TesseractAccounts {
+    id: Hex;
+    transition: Hex;
+    height: number;
+    state: Hex;
+    context_data: TesseractAccountContextData;
+}
+
 export interface TesseractData {
     seal: Hex;
     epoch: Quantity;
@@ -104,7 +119,7 @@ export interface TesseractData {
     fuel: FuelInfo;
     interactions: Hex;
     confirmations: Hex;
-    accounts: Hex;
+    accounts: TesseractAccounts[];
 }
 
 export interface Stochastic {
@@ -185,12 +200,16 @@ export interface AssetSupplyOperation {
     amount: Quantity;
 }
 
-export type OperationPayload<T extends OpType> =
-    T extends OpType.ParticipantCreate ? ParticipantCreateOperation
-    : T extends OpType.AssetCreate ? AssetCreateOperation
-    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease ? AssetActionOperation
-    : T extends OpType.LogicDeploy ? LogicDeployPayload
-    : T extends OpType.LogicEnlist | OpType.LogicInvoke ? LogicActionPayload
+export type OperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
+    ? ParticipantCreateOperation
+    : T extends OpType.AssetCreate
+    ? AssetCreateOperation
+    : T extends OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRevoke | OpType.AssetLockup | OpType.AssetRelease
+    ? AssetActionOperation
+    : T extends OpType.LogicDeploy
+    ? LogicDeployPayload
+    : T extends OpType.LogicEnlist | OpType.LogicInvoke
+    ? LogicActionPayload
     : never;
 
 export interface Operation<T extends OpType> {
@@ -262,7 +281,7 @@ export interface Logic {
     metadata: LogicMetadata;
     manifest?: Hex;
     controller?: LogicController;
-    edition?: string[];
+    editions?: string[];
 }
 
 export interface AssetMetadata {
@@ -270,6 +289,9 @@ export interface AssetMetadata {
     standard: AssetStandard;
     logical: boolean;
     supply: Quantity;
+    dimension: number;
+    stateful: boolean;
+    symbol: string;
 }
 
 export interface AssetController {}
@@ -315,6 +337,6 @@ export interface Lockup {
 
 export interface AccountAsset {
     balance: Quantity;
-    mandate?: Mandate[];
-    lockup?: Lockup[];
+    mandates?: Mandate[];
+    lockups?: Lockup[];
 }

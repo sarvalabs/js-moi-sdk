@@ -32,27 +32,33 @@ export type ProviderEvent =
     | string
     | symbol;
 
-type WebsocketEventListener<TEvent extends WebsocketEvent> =
-    TEvent extends WebsocketEvent.NewPendingInteractions ? (hash: string) => void
-    : TEvent extends WebsocketEvent.NewTesseracts | WebsocketEvent.NewTesseractsByAccount ? (tesseracts: Tesseract) => void
-    : TEvent extends WebsocketEvent.Reconnect ? (reconnects: number) => void
-    : TEvent extends WebsocketEvent.Error ? (error: Error) => void
-    : TEvent extends WebsocketEvent.Message ? (message: any) => void
-    : TEvent extends WebsocketEvent.Debug ? (data: DebugParam) => void
-    : TEvent extends WebsocketEvent.Open | WebsocketEvent.Close ? () => void
+type WebsocketEventListener<TEvent extends WebsocketEvent> = TEvent extends WebsocketEvent.NewPendingInteractions
+    ? (hash: string) => void
+    : TEvent extends WebsocketEvent.NewTesseracts | WebsocketEvent.NewTesseractsByAccount
+    ? (tesseracts: Tesseract) => void
+    : TEvent extends WebsocketEvent.Reconnect
+    ? (reconnects: number) => void
+    : TEvent extends WebsocketEvent.Error
+    ? (error: Error) => void
+    : TEvent extends WebsocketEvent.Message
+    ? (message: any) => void
+    : TEvent extends WebsocketEvent.Debug
+    ? (data: DebugParam) => void
+    : TEvent extends WebsocketEvent.Open | WebsocketEvent.Close
+    ? () => void
     : BaseListener;
 
-type ProviderEventListener<TEvent extends ProviderEvent> =
-    TEvent extends string ?
-        TEvent extends WebsocketEvent ?
-            WebsocketEventListener<TEvent>
-        :   BaseListener
-    : TEvent extends symbol ? BaseListener
-    : TEvent extends { event: infer TEventType } ?
-        TEventType extends WebsocketEvent ?
-            WebsocketEventListener<TEventType>
-        :   never
-    :   never;
+type ProviderEventListener<TEvent extends ProviderEvent> = TEvent extends string
+    ? TEvent extends WebsocketEvent
+        ? WebsocketEventListener<TEvent>
+        : BaseListener
+    : TEvent extends symbol
+    ? BaseListener
+    : TEvent extends { event: infer TEventType }
+    ? TEventType extends WebsocketEvent
+        ? WebsocketEventListener<TEventType>
+        : never
+    : never;
 
 type WebsocketEmittedResponse = {
     params: {
@@ -79,10 +85,8 @@ export class WebsocketProvider extends JsonRpcProvider {
     constructor(address: string, options?: WebsocketTransportOptions) {
         super(new WebsocketTransport(address, options));
 
-        if (this.transport instanceof WebsocketTransport) {
-            for (const event of WebsocketProvider.events.client) {
-                this.transport.on(event, (...args) => this.emit(event, ...args));
-            }
+        for (const event of WebsocketProvider.events.client) {
+            this.transport.on(event, (...args) => this.emit(event, ...args));
         }
     }
 
@@ -108,7 +112,7 @@ export class WebsocketProvider extends JsonRpcProvider {
     }
 
     private async handleOnNetworkEventSubscription(type: "on" | "once", event: ProviderEvent, listener: (...args: any[]) => void): Promise<void> {
-        const params = typeof event === "object" ? (event.params ?? []) : [];
+        const params = typeof event === "object" ? event.params : [];
         const eventName = WebsocketProvider.getEventName(event);
 
         if (typeof eventName === "symbol") {

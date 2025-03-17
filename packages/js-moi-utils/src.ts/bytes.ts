@@ -1,3 +1,5 @@
+import { isHex } from "./hex";
+
 export type Bytes = ArrayLike<number>;
 
 /**
@@ -51,29 +53,16 @@ export const isBytes = (value: any): value is Bytes => {
  */
 export const hexDataLength = (data: string) => {
     // Check if the input is a valid hexadecimal string and has an even length
-    if (!isHexString(data) || data.length % 2) {
+    if (data === "0x") {
+        return 0;
+    }
+
+    if (!isHex(data) || data.length % 2 !== 0) {
         return null;
     }
 
     // Calculate the length of the data excluding the "0x" prefix
     return (data.length - 2) / 2;
-};
-
-/**
- * Checks if the given value is a valid hexadecimal string.
- *
- * @param {any} value - The value to check.
- * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
- */
-export const isHexString = (value: any, length?: number): boolean => {
-    if (typeof value !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
-        return false;
-    }
-    if (length && value.length !== 2 + 2 * length) {
-        return false;
-    }
-    return true;
 };
 
 /**

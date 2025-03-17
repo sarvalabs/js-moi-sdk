@@ -1,4 +1,4 @@
-import { IdentifierKind, type IdentifierVersion } from "./enums";
+import { IdentifierKind, IdentifierVersion } from "./enums";
 import type { InvalidReason } from "./identifier";
 
 /**
@@ -12,7 +12,7 @@ export class IdentifierTag {
      */
     public readonly value: number;
 
-    private static MAX_IDENTIFIER_KIND = IdentifierKind.Logic;
+    private static maxIdentifierKind = IdentifierKind.Logic;
 
     private static kindMaxSupportedVersion: Record<IdentifierKind, number> = {
         [IdentifierKind.Participant]: 0,
@@ -96,7 +96,7 @@ export class IdentifierTag {
      * @returns An object containing the reason for invalidity if the identifier is invalid, or `null` if the identifier is valid.
      */
     public static validate(value: number): InvalidReason | null {
-        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+        if (IdentifierTag.getKind(value) > this.maxIdentifierKind) {
             return { why: "Unsupported identifier kind." };
         }
 
@@ -107,3 +107,7 @@ export class IdentifierTag {
         return null;
     }
 }
+
+export const ParticipantTagV0 = IdentifierTag.getTag(IdentifierKind.Participant, IdentifierVersion.V0);
+export const AssetTagV0 = IdentifierTag.getTag(IdentifierKind.Asset, IdentifierVersion.V0);
+export const LogicTagV0 = IdentifierTag.getTag(IdentifierKind.Logic, IdentifierVersion.V0);

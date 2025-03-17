@@ -5,6 +5,6 @@ export interface WalletOption {
     provider?: Provider;
 }
 
-export interface FromMnemonicOptions extends WalletOption {
+export interface MnemonicImportOptions extends WalletOption {
     words?: string[];
 }

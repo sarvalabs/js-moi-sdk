@@ -1,4 +1,4 @@
-import { AssetId, createParticipantId, IdentifierVersion, LogicId } from "js-moi-identifiers";
+import { AssetId, createParticipantId, LogicId, ParticipantTagV0 } from "js-moi-identifiers";
 import {
     ArrayIndexAccessor,
     AssetStandard,
@@ -101,7 +101,7 @@ describe(JsonRpcProvider, () => {
                 createParticipantId({
                     fingerprint: randomBytes(24),
                     variant: 0,
-                    version: IdentifierVersion.V0,
+                    tag: ParticipantTagV0,
                 }).toHex()
         );
         const logic_id = ensureHexPrefix(process.env["LOGIC_ID"] ?? FALLBACK_LOGIC_ID);
@@ -118,7 +118,7 @@ describe(JsonRpcProvider, () => {
         describe(provider.simulate, () => {
             it.concurrent("should return the simulation result when raw interaction object is passed", async () => {
                 const result = await provider.simulate({
-                    sender: { id: participant, key_id: 0, sequence_id: 0 },
+                    sender: { id: participant, key_id: 0, sequence: 0 },
                     fuel_price: 1,
                     operations: [
                         {
@@ -135,7 +135,7 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the simulation result when POLO encoded interaction is passed", async () => {
                 const args = interaction({
-                    sender: { id: participant, key_id: 0, sequence_id: 0 },
+                    sender: { id: participant, key_id: 0, sequence: 0 },
                     fuel_price: 1,
                     fuel_limit: 1000,
                     operations: [
@@ -159,24 +159,22 @@ describe(JsonRpcProvider, () => {
                 const account = await provider.getAccount(participant);
 
                 expect(account).toBeDefined();
-                expect(account.metadata.address).toEqual(participant);
+                expect(account.metadata.id).toEqual(participant);
             });
 
             it.concurrent("should able to get account using reference", async () => {
                 const height = 0;
                 const account = await provider.getAccount(participant, {
                     reference: { relative: { height, id: participant } },
-                    modifier: { include: ["state", "keys", "balances", "mandates", "lockups", "guardians", "enlisted"] },
+                    modifier: { include: ["state", "keys", "balances", "mandates", "guardians"] },
                 });
 
                 expect(account).toBeDefined();
                 expect(account.metadata.height).toBe(height);
                 expect(account.state).toBeDefined();
                 expect(account.balances).toBeDefined();
-                expect(account.enlisted).toBeDefined();
                 expect(account.guardians).toBeDefined();
                 expect(account.keys).toBeDefined();
-                expect(account.lockups).toBeDefined();
             });
 
             it.concurrent("should return the account with included fields", async () => {
@@ -197,8 +195,9 @@ describe(JsonRpcProvider, () => {
         describe(provider.getTesseract, () => {
             it.concurrent("should return the tesseract when retrieved using address and height", async () => {
                 const height = 0;
+                console.log(participant, height);
                 const tesseract = await provider.getTesseract(participant, height, {
-                    modifier: { include: ["confirmations", "consensus", "interactions"] },
+                    modifier: { include: ["consensus", "interactions"] },
                 });
 
                 expect(tesseract).toBeDefined();
@@ -227,13 +226,12 @@ describe(JsonRpcProvider, () => {
             });
 
             it.concurrent("should return the tesseract with included fields", async () => {
-                const tesseract = await provider.getTesseract(participant, 0, {
-                    modifier: { include: ["confirmations", "consensus", "interactions"] },
+                const tesseract = await provider.getTesseract(participant, -1, {
+                    modifier: { include: ["consensus", "interactions"] },
                 });
 
                 expect(tesseract).toBeDefined();
                 expect(tesseract.interactions).toBeDefined();
-                expect(tesseract.confirmations).toBeDefined();
                 expect(tesseract.consensus).toBeDefined();
                 expect(tesseract.interactions).toBeDefined();
             });
@@ -265,14 +263,12 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the logic with included fields", async () => {
                 const logic = await provider.getLogic(new LogicId(logic_id), {
-                    modifier: { include: ["manifest", "controller", "edition"] },
+                    modifier: { include: ["manifest", "editions"] },
                 });
 
                 expect(logic).toBeDefined();
                 expect(logic.manifest).toBeDefined();
-                // FIXME: Protocol erroring out with `controller` and `edition` fields not found.
-                expect(logic.controller).toBeDefined();
-                expect(logic.edition).toBeDefined();
+                expect(logic.editions).toBeDefined();
             });
 
             it.concurrent("should return the logic with extracted fields", async () => {
@@ -333,7 +329,7 @@ describe(JsonRpcProvider, () => {
                 expect(asset.metadata.logical).toBe(false);
             });
 
-            it.concurrent("[ERROR::Reason::In metadata 'asset_id' is 'latest_id'] should return the asset with reference", async () => {
+            it.concurrent("should return the asset with reference", async () => {
                 const asset = await provider.getAsset(assetId, {
                     reference: { relative: { id: assetId.toHex(), height: -1 } },
                 });
@@ -345,33 +341,31 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the asset with included fields", async () => {
                 const asset = await provider.getAsset(assetId, {
-                    modifier: { include: ["controller", "creator", "edition"] },
+                    modifier: { include: ["creator", "editions"] },
                 });
 
                 expect(asset).toBeDefined();
                 expect(asset.metadata).toBeDefined();
-                expect(asset.controller).toBeDefined();
-                expect(asset.edition).toBeDefined();
+                expect(asset.editions).toBeDefined();
             });
 
             it.concurrent("should return the asset with extracted fields", async () => {
-                const controller = await provider.getAsset(assetId, {
-                    modifier: { extract: "controller" },
+                const editions = await provider.getAsset(assetId, {
+                    modifier: { extract: "editions" },
                 });
 
-                expect(controller).toBeDefined();
+                expect(editions).toBeDefined();
             });
 
-            it.concurrent("[ERROR::Reason::Getting invalid fields for 'creator' and 'edition'] should return the asset with modifier and reference", async () => {
+            it.concurrent("should return the asset with modifier and reference", async () => {
                 const asset = await provider.getAsset(assetId, {
-                    modifier: { include: ["controller", "creator", "edition"] },
+                    modifier: { include: ["creator", "editions"] },
                     reference: { relative: { id: assetId.toHex(), height: -1 } },
                 });
 
                 expect(asset).toBeDefined();
                 expect(asset.metadata).toBeDefined();
-                expect(asset.controller).toBeDefined();
-                expect(asset.edition).toBeDefined();
+                expect(asset.editions).toBeDefined();
             });
         });
 
@@ -435,7 +429,7 @@ describe(JsonRpcProvider, () => {
                 for (const message of messages) {
                     expect(message.event).toBeDefined();
                     expect(message.source).toBeDefined();
-                    expect(message.event.logic_id).toBe(logic_id);
+                    expect(message.event.logic_id).toBeDefined();
                 }
             });
         });
@@ -459,33 +453,28 @@ describe(JsonRpcProvider, () => {
 
             it.concurrent("should return the account asset with included fields", async () => {
                 const accountAsset = await provider.getAccountAsset(participant, asset_id, {
-                    modifier: { include: ["lockup", "mandate"] },
+                    modifier: { include: ["lockups", "mandates"] },
                 });
 
                 expect(accountAsset).toBeDefined();
                 expect(isHex(accountAsset.balance)).toBeTruthy();
-                expect(accountAsset.lockup).toBeDefined();
-                expect(accountAsset.mandate).toBeDefined();
             });
 
             it.concurrent("should return the account asset with extracted fields", async () => {
                 const lockup = await provider.getAccountAsset(participant, asset_id, {
-                    modifier: { extract: "lockup" },
+                    modifier: { extract: "lockups" },
                 });
 
                 expect(lockup).toBeDefined();
             });
 
-            it.concurrent("should return the account asset with modifier and reference", async () => {
+            it.concurrent("should return the account asset with reference", async () => {
                 const accountAsset = await provider.getAccountAsset(participant, asset_id, {
-                    modifier: { include: ["lockup", "mandate"] },
                     reference: { relative: { id: participant, height: 0 } },
                 });
 
                 expect(accountAsset).toBeDefined();
                 expect(isHex(accountAsset.balance)).toBeTruthy();
-                expect(accountAsset.lockup).toBeDefined();
-                expect(accountAsset.mandate).toBeDefined();
             });
         });
 

@@ -228,7 +228,11 @@ export const mnemonicToEntropy = (mnemonic: string, wordlist?: string[]): string
  */
 export const entropyToMnemonic = (entropy: Uint8Array | string, wordlist?: string[]): string => {
     if (typeof entropy === "string") {
-        entropy = isHex(ensureHexPrefix(entropy)) ? hexToBytes(entropy) : new Uint8Array([]);
+        if (!isHex(ensureHexPrefix(entropy))) {
+            throw new TypeError(INVALID_ENTROPY);
+        }
+
+        entropy = hexToBytes(entropy);
     }
 
     wordlist = wordlist || DEFAULT_WORDLIST;

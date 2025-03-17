@@ -6,11 +6,11 @@ import { type ExecuteIx, type Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, bytesToHex, hexToBytes, interaction, isHex, randomBytes, trimHexPrefix, validateIxRequest, type Hex, type InteractionRequest } from "js-moi-utils";
 
-import { Identifier, IdentifierVersion, createParticipantId } from "js-moi-identifiers";
+import { Identifier, ParticipantTagV0, createParticipantId } from "js-moi-identifiers";
 import { Keystore } from "../types/keystore";
-import { FromMnemonicOptions, type WalletOption } from "../types/wallet";
+import { MnemonicImportOptions, type WalletOption } from "../types/wallet";
 import * as SigningKeyErrors from "./errors";
-import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
+import { decryptKeystore, encryptKeystore } from "./keystore";
 
 export enum CURVE {
     SECP256K1 = "secp256k1",
@@ -116,7 +116,7 @@ export class Wallet extends Signer {
     public async generateKeystore(password: string): Promise<Keystore> {
         try {
             const data = hexToBytes(await this.getPrivateKey());
-            return encryptKeystoreData(data, password);
+            return encryptKeystore(data, password);
         } catch (err) {
             ErrorUtils.throwError("Failed to generate keystore", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
@@ -167,7 +167,7 @@ export class Wallet extends Signer {
         const publickey = await this.getPublicKey();
         const fingerprint = hexToBytes(publickey).slice(0, 24);
 
-        return createParticipantId({ fingerprint, variant: 0, version: IdentifierVersion.V0 });
+        return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
     }
 
     /**
@@ -293,36 +293,9 @@ export class Wallet extends Signer {
         }
     }
 
-    /**
-     * Create a wallet from a mnemonic.
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {string} path - The optional derivation path to use.
-     * @param {FromMnemonicOptions | undefined} options - The optional options to use.
-     *
-     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
-     */
-    static async fromMnemonic(mnemonic: string, path?: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    /**
-     * Create a wallet from mnemonic
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {FromMnemonicOptions | undefined} options - The optional derivation path to use.
-     *
-     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
-     */
-    static async fromMnemonic(mnemonic: string, options?: FromMnemonicOptions): Promise<Wallet>;
-    /**
-     * Create a wallet from mnemonic
-     *
-     * It is a polymorphic function that accepts mnemonic as first argument,
-     * if path is provided as second argument, it will use the path to derive the wallet.
-     *
-     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
-     *
-     * @throws {Error} if there is an error during initialization.
-     */
-    static async fromMnemonic(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Promise<Wallet> {
+    static async fromMnemonic(mnemonic: string, path?: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, options?: MnemonicImportOptions): Promise<Wallet>;
+    static async fromMnemonic(mnemonic: string, optionOrPath?: MnemonicImportOptions | string, options?: MnemonicImportOptions): Promise<Wallet> {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
 
@@ -345,36 +318,9 @@ export class Wallet extends Signer {
         }
     }
 
-    /**
-     * Create a wallet from mnemonic synchronously.
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {string | undefined} path - The optional derivation path to use.
-     * @param {FromMnemonicOptions | undefined} options - The optional options to use.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
-     */
-    public static fromMnemonicSync(mnemonic: string, path?: string, options?: FromMnemonicOptions): Wallet;
-    /**
-     * Create a wallet from mnemonic synchronously.
-     *
-     * @param {string} mnemonic - The mnemonic to create the wallet from.
-     * @param {FromMnemonicOptions | undefined} options - The optional options to use.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
-     */
-    public static fromMnemonicSync(mnemonic: string, options?: FromMnemonicOptions): Wallet;
-    /**
-     * Create a wallet from mnemonic synchronously.
-     *
-     * It is a polymorphic function that accepts mnemonic as first argument,
-     * if path is provided as second argument, it will use the path to derive the wallet.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     */
-    public static fromMnemonicSync(mnemonic: string, optionOrPath?: FromMnemonicOptions | string, options?: FromMnemonicOptions): Wallet {
+    public static fromMnemonicSync(mnemonic: string, path?: string, options?: MnemonicImportOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, options?: MnemonicImportOptions): Wallet;
+    public static fromMnemonicSync(mnemonic: string, optionOrPath?: MnemonicImportOptions | string, options?: MnemonicImportOptions): Wallet {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
             mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, option?.words), option?.words);
@@ -410,7 +356,7 @@ export class Wallet extends Signer {
      */
     public static fromKeystore(keystore: string, password: string, option?: WalletOption): Wallet {
         try {
-            const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
+            const privateKey = decryptKeystore(JSON.parse(keystore), password);
             return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         } catch (err) {
             ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
