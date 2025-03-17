@@ -1,12 +1,12 @@
 Manifest Call Encoder
 =====================
 
-The Manifest Call Encoder module enables the encoding and decoding of data 
+The Manifest Call Encoder package enables the encoding and decoding of data 
 according to the MOI Manifest specification. This specification defines the 
 structure of routines, classes, methods, and state within logic object, allowing 
 for seamless interaction with their properties.
 
-Through this module, developers can encode data in compliance with the 
+Through this package, developers can encode data in compliance with the 
 expected format specified by the logic Manifest. This is particularly valuable 
 when preparing data for invoking routines on logic object. By correctly encoding 
 routine parameters according to the logic Manifest, developers can generate 

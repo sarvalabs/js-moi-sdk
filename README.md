@@ -71,7 +71,7 @@ The **js-moi-sdk** package consists of several sub-packages, each offering indep
 
 - [js-moi-utils](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-utils) This package offers a comprehensive set of tools and functions to enhance development with MOI. It provides utility functions that simplify common tasks, making your development experience smoother and more efficient.
 
-- [js-moi-identifier](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-identifier) This package provides utils for working with various identifiers used in the MOI ecosystem. It offers functions for getting and setting identifiers, as well as validating and formatting them according to the MOI standard.
+- [js-moi-identifier](https://github.com/sarvalabs/js-moi-sdk/tree/main/packages/js-moi-identifier) This package provides utilities for working with various identifiers in the MOI ecosystem. It includes functionality to access flags, metadata, variant IDs, and fingerprint from an identifier. Additionally, it offers validation for multiple versions of each identifier type.
 
 ## Contributing
 

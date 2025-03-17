@@ -1,7 +1,7 @@
 Utilities
 =========
 
-The utilities module offers a comprehensive set of tools and functions to 
+The utilities package offers a comprehensive set of tools and functions to 
 simplify development process. This package encompasses various utility 
 functions designed to enhance the overall development experience when working 
 with MOI.
