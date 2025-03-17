@@ -131,16 +131,21 @@ InteractionResponse
 Transport
 ---------
 
-Transport are the underlying communication channels used by the
-Provider to connect to MOI nodes. The Transport class defines
-the common interface for establishing connections and sending
-requests to MOI nodes. By abstracting the communication layer,
-the Transport class enables the Provider to interact with
-different types of MOI nodes, provides a consistent way to
-communicate with the network.
+Transport serves as the underlying communication layer for the
+``Provider``, facilitating connections to MOI nodes. The ``Transport``
+class defines a standardized interface for establishing connections
+and transmitting requests, ensuring seamless interaction with the
+MOI network.
 
-Developers can create their own custom transports by extending
-the ``Transport`` interface and implementing the required methods.
+By abstracting the communication layer, ``Transport`` enables the ``Provider``
+to connect with MOI nodes with different communication methods while maintaining
+a consistent request-handling mechanism. This abstraction ensures
+flexibility and interoperability.
+
+Developers can extend the ``Transport`` interface to create custom
+transport implementations by defining the required methods,
+allowing for tailored communication strategies based on specific
+use cases.
 
 **For example**
 
