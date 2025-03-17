@@ -139,7 +139,7 @@ class Wallet extends js_moi_signer_1.Signer {
     async generateKeystore(password) {
         try {
             const data = (0, js_moi_utils_1.hexToBytes)(await this.getPrivateKey());
-            return (0, keystore_1.encryptKeystoreData)(data, password);
+            return (0, keystore_1.encryptKeystore)(data, password);
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to generate keystore", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
@@ -185,7 +185,7 @@ class Wallet extends js_moi_signer_1.Signer {
     async getIdentifier() {
         const publickey = await this.getPublicKey();
         const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(0, 24);
-        return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: 0, version: js_moi_identifiers_1.IdentifierVersion.V0 });
+        return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: 0, tag: js_moi_identifiers_1.ParticipantTagV0 });
     }
     /**
      * Retrieves the key identifier.
@@ -299,16 +299,6 @@ class Wallet extends js_moi_signer_1.Signer {
             js_moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
-    /**
-     * Create a wallet from mnemonic
-     *
-     * It is a polymorphic function that accepts mnemonic as first argument,
-     * if path is provided as second argument, it will use the path to derive the wallet.
-     *
-     * @returns {Promise<Wallet>} A promise that resolves to a `Wallet` instance.
-     *
-     * @throws {Error} if there is an error during initialization.
-     */
     static async fromMnemonic(mnemonic, optionOrPath, options) {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
@@ -329,14 +319,6 @@ class Wallet extends js_moi_signer_1.Signer {
             });
         }
     }
-    /**
-     * Create a wallet from mnemonic synchronously.
-     *
-     * It is a polymorphic function that accepts mnemonic as first argument,
-     * if path is provided as second argument, it will use the path to derive the wallet.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     */
     static fromMnemonicSync(mnemonic, optionOrPath, options) {
         try {
             const option = typeof optionOrPath === "object" ? optionOrPath : options;
@@ -370,7 +352,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static fromKeystore(keystore, password, option) {
         try {
-            const privateKey = (0, keystore_1.decryptKeystoreData)(JSON.parse(keystore), password);
+            const privateKey = (0, keystore_1.decryptKeystore)(JSON.parse(keystore), password);
             return new Wallet(Uint8Array.from(privateKey), CURVE.SECP256K1, option);
         }
         catch (err) {

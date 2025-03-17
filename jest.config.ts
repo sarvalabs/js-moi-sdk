@@ -39,7 +39,7 @@ const getPackages = (): Package[] => [
     },
     {
         name: "js-moi-logic",
-        run_tests: !true,
+        run_tests: true,
     },
     {
         name: "js-moi-signer",

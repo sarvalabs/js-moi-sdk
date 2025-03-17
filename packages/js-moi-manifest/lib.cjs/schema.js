@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = exports.isClass = exports.isMap = exports.isArray = exports.isPrimitiveType = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
 /**
@@ -60,286 +61,85 @@ class Schema {
         this.elements = elements;
         this.classDefs = classDefs;
     }
-    /**
-     * Represents the schema for the PISA engine.
-     */
-    static PISA_ENGINE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            kind: {
-                kind: "string",
-            },
-            flags: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA dependencies.
-     */
-    static PISA_DEPS_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "integer",
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA type field.
-     */
-    static PISA_TYPE_FIELD_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "struct",
-                fields: {
-                    slot: {
-                        kind: "integer",
-                    },
-                    label: {
-                        kind: "string",
-                    },
-                    type: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for the PISA method field.
-     */
-    static PISA_METHOD_FIELD_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "struct",
-                fields: {
-                    ptr: {
-                        kind: "integer",
-                    },
-                    code: {
-                        kind: "integer",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA instructions.
-     */
-    static PISA_INSTRUCTIONS_SCHEMA = {
-        kind: "struct",
-        fields: {
-            bin: {
-                kind: "bytes",
-            },
-            hex: {
-                kind: "string",
-            },
-            asm: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA state.
-     */
-    static PISA_STATE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            mode: {
-                kind: "string",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA constant.
-     */
-    static PISA_CONSTANT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            type: {
-                kind: "string",
-            },
-            value: {
-                kind: "string",
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA typedef.
-     */
-    static PISA_TYPEDEF_SCHEMA = {
-        kind: "string",
-        fields: {},
-    };
-    /**
-     * Schema definition for PISA class.
-     */
-    static PISA_CLASS_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            methods: {
-                ...Schema.PISA_METHOD_FIELD_SCHEMA,
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA routine.
-     */
-    static PISA_ROUTINE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            mode: {
-                kind: "string",
-            },
-            kind: {
-                kind: "string",
-            },
-            accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
-            },
-            catches: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA method.
-     */
-    static PISA_METHOD_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            class: {
-                kind: "string",
-            },
-            mutable: {
-                kind: "bool",
-            },
-            accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
-            },
-            catches: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA event.
-     */
-    static PISA_EVENT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            topics: {
-                kind: "integer",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA exception.
-     */
-    static PISA_EXCEPTION_SCHEMA = {
-        kind: "struct",
-        fields: {
-            class: {
-                kind: "string",
-            },
-            error: {
-                kind: "string",
-            },
-            revert: {
-                kind: "bool",
-            },
-            trace: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA result.
-     */
-    static PISA_RESULT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            outputs: {
-                kind: "bytes",
-            },
-            error: {
-                kind: "bytes",
-            },
-        },
-    };
-    /**
-     * Schema definition for PISA log.
-     */
-    static PISA_BUILT_IN_LOG_SCHEMA = {
-        kind: "struct",
-        fields: {
-            value: {
-                kind: "string",
-            },
-        },
-    };
+    static PISA_ENGINE_SCHEMA = js_polo_1.schema.struct({
+        kind: js_polo_1.schema.string,
+        flags: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+            values: js_polo_1.schema.string,
+        })),
+    });
+    static PISA_DEPS_SCHEMA = js_polo_1.schema.arrayOf(js_polo_1.schema.integer);
+    static PISA_TYPE_FIELD_SCHEMA = js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+        slot: js_polo_1.schema.integer,
+        label: js_polo_1.schema.string,
+        type: js_polo_1.schema.string,
+    }));
+    static PISA_METHOD_FIELD_SCHEMA = js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+        ptr: js_polo_1.schema.integer,
+        code: js_polo_1.schema.integer,
+    }));
+    static PISA_INSTRUCTIONS_SCHEMA = js_polo_1.schema.struct({
+        bin: js_polo_1.schema.bytes,
+        hex: js_polo_1.schema.string,
+        asm: js_polo_1.schema.arrayOf(js_polo_1.schema.string),
+    });
+    static PISA_STATE_SCHEMA = js_polo_1.schema.struct({
+        mode: js_polo_1.schema.string,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+    });
+    static PISA_CONSTANT_SCHEMA = js_polo_1.schema.struct({
+        type: js_polo_1.schema.string,
+        value: js_polo_1.schema.string,
+    });
+    static PISA_TYPEDEF_SCHEMA = js_polo_1.schema.string;
+    static PISA_CLASS_SCHEMA = js_polo_1.schema.struct({
+        name: js_polo_1.schema.string,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        methods: { ...Schema.PISA_METHOD_FIELD_SCHEMA },
+    });
+    static PISA_ROUTINE_SCHEMA = js_polo_1.schema.struct({
+        name: js_polo_1.schema.string,
+        mode: js_polo_1.schema.string,
+        kind: js_polo_1.schema.string,
+        accepts: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        returns: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        executes: { ...Schema.PISA_INSTRUCTIONS_SCHEMA },
+        catches: js_polo_1.schema.arrayOf(js_polo_1.schema.string),
+    });
+    static PISA_METHOD_SCHEMA = js_polo_1.schema.struct({
+        name: js_polo_1.schema.string,
+        class: js_polo_1.schema.string,
+        mutable: js_polo_1.schema.boolean,
+        accepts: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        returns: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        executes: { ...Schema.PISA_INSTRUCTIONS_SCHEMA },
+        catches: js_polo_1.schema.arrayOf(js_polo_1.schema.string),
+    });
+    static PISA_EVENT_SCHEMA = js_polo_1.schema.struct({
+        name: js_polo_1.schema.string,
+        topics: js_polo_1.schema.integer,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+    });
+    static PISA_EXCEPTION_SCHEMA = js_polo_1.schema.struct({
+        class: js_polo_1.schema.string,
+        error: js_polo_1.schema.string,
+        revert: js_polo_1.schema.boolean,
+        trace: js_polo_1.schema.arrayOf(js_polo_1.schema.string),
+    });
+    static PISA_RESULT_SCHEMA = js_polo_1.schema.struct({
+        outputs: js_polo_1.schema.bytes,
+        error: js_polo_1.schema.bytes,
+    });
+    // public static PISA_BUILT_IN_LOG_SCHEMA = {
+    //     kind: "struct",
+    //     fields: {
+    //         value: {
+    //             kind: "string",
+    //         },
+    //     },
+    // };
+    static PISA_BUILT_IN_LOG_SCHEMA = js_polo_1.schema.struct({
+        value: js_polo_1.schema.string,
+    });
     /**
      * Extracts the array data type from the provided data type string.
      *
@@ -400,20 +200,20 @@ class Schema {
     static convertPrimitiveDataType(type) {
         switch (type) {
             case "null":
-                return "null";
+                return js_polo_1.schema.null;
             case "bool":
-                return "bool";
+                return js_polo_1.schema.boolean;
             case "bytes":
             case "address":
-                return "bytes";
+                return js_polo_1.schema.bytes;
             case "string":
-                return "string";
+                return js_polo_1.schema.string;
             case "u64":
             case "u256":
             case "i64":
             case "i256":
             case "bigint":
-                return "integer";
+                return js_polo_1.schema.integer;
             default:
                 js_moi_utils_1.ErrorUtils.throwError("Unsupported data type!", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
         }
@@ -454,26 +254,16 @@ class Schema {
     static parseDataType(type, classDef, elements) {
         switch (true) {
             case (0, exports.isPrimitiveType)(type):
-                return {
-                    kind: Schema.convertPrimitiveDataType(type),
-                };
+                return Schema.convertPrimitiveDataType(type);
             case (0, exports.isArray)(type):
                 const values = Schema.extractArrayDataType(type);
-                return {
-                    kind: "array",
-                    fields: {
-                        values: Schema.parseDataType(values, classDef, elements),
-                    },
-                };
+                return js_polo_1.schema.arrayOf(Schema.parseDataType(values, classDef, elements));
             case (0, exports.isMap)(type):
                 const [key, value] = Schema.extractMapDataType(type);
-                return {
-                    kind: "map",
-                    fields: {
-                        keys: Schema.parseDataType(key, classDef, elements),
-                        values: Schema.parseDataType(value, classDef, elements),
-                    },
-                };
+                return js_polo_1.schema.map({
+                    keys: Schema.parseDataType(key, classDef, elements),
+                    values: Schema.parseDataType(value, classDef, elements),
+                });
             case (0, exports.isClass)(type, classDef):
                 return this.parseClassFields(type, classDef, elements);
             default:

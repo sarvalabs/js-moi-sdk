@@ -1,11 +1,11 @@
-import { IdentifierKind, IdentifierVersion } from "./enums";
+import { IdentifierKind } from "./enums";
 import { flagMasks, setFlag, type Flag } from "./flags";
 import { Identifier, type InvalidReason } from "./identifier";
 import { IdentifierTag } from "./identifier-tag";
 import { hexToBytes, type Hex } from "./utils";
 
 export interface GenerateParticipantOption {
-    version: IdentifierVersion;
+    tag: IdentifierTag;
     fingerprint: Uint8Array;
     variant: number;
     flags?: Flag[];
@@ -36,12 +36,11 @@ export class ParticipantId extends Identifier {
      * @returns An object containing the reason for invalidity if the identifier is invalid, or null if the identifier is valid.
      */
     public static validate(value: Uint8Array | Hex): InvalidReason | null {
-        const participant = value instanceof Uint8Array ? value : hexToBytes(value);
-
-        if (participant.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
 
+        const participant = value instanceof Uint8Array ? value : hexToBytes(value);
         const tag = this.getTag(participant);
         const kind = tag.getKind();
 
@@ -65,7 +64,11 @@ export class ParticipantId extends Identifier {
      * @returns `true` if the value is valid, otherwise `false`.
      */
     public static isValid(value: Uint8Array | Hex): boolean {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        } catch (error) {
+            return false;
+        }
     }
 }
 
@@ -92,20 +95,15 @@ export class ParticipantId extends Identifier {
  * >> "0x00000000168f031d5aaffe36b54dc4df07a5921ade2c1ac51b6df83800000000"
  */
 export const createParticipantId = (option: GenerateParticipantOption): ParticipantId => {
-    if (option.version !== IdentifierVersion.V0) {
-        throw new TypeError("Invalid identifier version. Expected V0.");
-    }
-
     if (option.fingerprint.length !== 24) {
         throw new TypeError("Invalid fingerprint length. Expected 24 bytes.");
     }
 
     const metadata = new Uint8Array(4);
-    const participantTag = IdentifierTag.getTag(IdentifierKind.Participant, option.version);
-    metadata[0] = participantTag.value;
+    metadata[0] = option.tag.value;
 
     for (const flag of option.flags ?? []) {
-        if (!flag.supports(participantTag)) {
+        if (!flag.supports(option.tag)) {
             throw new Error(`Invalid flag. Unsupported flag for participant identifier.`);
         }
 

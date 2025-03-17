@@ -42,6 +42,7 @@ class ManifestCoder {
         const reconstructSchema = (schema) => {
             for (const key in schema.fields ?? {}) {
                 if (schema.fields?.[key].kind === "struct") {
+                    // @ts-expect-error - The 'kind' is being updated to document is struct
                     schema.fields[key].kind = "document";
                 }
             }
@@ -71,7 +72,9 @@ class ManifestCoder {
             });
             const doc = (0, js_polo_1.documentEncode)(arg, reconstructSchema((0, js_moi_utils_1.deepCopy)(schema)));
             if (updateType) {
+                // @ts-expect-error - The 'kind' is being updated to document but supposed to be struct
                 schema.kind = "document";
+                // @ts-expect-error - fields can be optional property
                 delete schema.fields;
             }
             return doc.getData();
@@ -85,7 +88,8 @@ class ManifestCoder {
                 }
                 break;
             case "array":
-                if (parsableKinds.includes(schema.fields?.values.kind)) {
+                // Check if the array is parsable and values are of kind array
+                if (parsableKinds.includes(schema.fields?.values.kind) && schema.fields?.values.kind === "array") {
                     return parseArray(schema.fields?.values, arg);
                 }
                 break;

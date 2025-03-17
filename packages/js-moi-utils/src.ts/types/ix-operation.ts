@@ -1,7 +1,7 @@
 import type { AssetStandard, OpType } from "../enums";
 import type { Address, Hex } from "../hex";
 
-export interface PoloLogicPayload {
+export interface RawLogicPayload {
     manifest: Uint8Array;
     logic_id: Hex;
     callsite: string;
@@ -82,7 +82,7 @@ export interface KeyAddPayload {
     signature_algorithm: 0;
 }
 
-export interface PoloParticipantCreatePayload {
+export interface RawParticipantCreatePayload {
     id: Uint8Array;
     amount: number;
     keys_payload: (Omit<KeyAddPayload, "public_key"> & { public_key: Uint8Array })[];
@@ -108,7 +108,7 @@ export interface ParticipantCreatePayload {
     keys_payload: KeyAddPayload[];
 }
 
-export interface PoloAssetActionPayload {
+export interface RawAssetActionPayload {
     asset_id: Hex;
     beneficiary: Uint8Array;
     benefactor: Uint8Array;
@@ -143,19 +143,19 @@ export interface AssetActionPayload {
 }
 
 export type AssetTransferPayload = Omit<AssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<AssetActionPayload, "benefactor">>;
-export type PoloAssetTransferPayload = Omit<PoloAssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<PoloAssetActionPayload, "benefactor">>;
+export type RawAssetTransferPayload = Omit<RawAssetActionPayload, "timestamp" | "benefactor"> & Partial<Pick<RawAssetActionPayload, "benefactor">>;
 
 export type AssetApprovePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
-export type PoloAssetApprovePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
+export type RawAssetApprovePayload = Pick<RawAssetActionPayload, "beneficiary" | "asset_id" | "amount" | "timestamp">;
 
 export type AssetRevokePayload = Pick<AssetActionPayload, "beneficiary" | "asset_id">;
-export type PoloAssetRevokePayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id">;
+export type RawAssetRevokePayload = Pick<RawAssetActionPayload, "beneficiary" | "asset_id">;
 
 export type AssetLockupPayload = Pick<AssetActionPayload, "beneficiary" | "asset_id" | "amount">;
-export type PoloAssetLockupPayload = Pick<PoloAssetActionPayload, "beneficiary" | "asset_id" | "amount">;
+export type RawAssetLockupPayload = Pick<RawAssetActionPayload, "beneficiary" | "asset_id" | "amount">;
 
 export type AssetReleasePayload = Omit<AssetActionPayload, "timestamp">;
-export type PoloAssetReleasePayload = Omit<PoloAssetActionPayload, "timestamp">;
+export type RawAssetReleasePayload = Omit<RawAssetActionPayload, "timestamp">;
 
 export interface AssetSupplyPayload {
     /**
@@ -168,14 +168,14 @@ export interface AssetSupplyPayload {
     amount: number;
 }
 
-export interface PoloLogicDeployPayload extends Omit<PoloLogicPayload, "logic_id"> {}
+export interface RawLogicDeployPayload extends Omit<RawLogicPayload, "logic_id"> {}
 
 /**
  * `LogicDeployPayload` holds the data for deploying a new logic.
  */
 export interface LogicDeployPayload extends Omit<LogicPayload, "logic_id"> {}
 
-export interface PoloLogicActionPayload extends Omit<PoloLogicPayload, "manifest"> {}
+export interface RawLogicActionPayload extends Omit<RawLogicPayload, "manifest"> {}
 
 /**
  * `LogicActionPayload` holds the data for invoking or enlisting a logic.
@@ -191,12 +191,12 @@ export interface AccountConfigurePayload {
     revoke?: KeyRevokePayload[];
 }
 
-export interface PoloAccountConfigurePayload {
+export interface RawAccountConfigurePayload {
     add?: Partial<Omit<KeyAddPayload, "public_key"> & { public_key: Uint8Array }>[];
     revoke?: KeyRevokePayload[];
 }
 
-export interface PoloAssetSupplyPayload {
+export interface RawAssetSupplyPayload {
     asset_id: Uint8Array;
     amount: number;
 }
@@ -233,34 +233,34 @@ export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantC
     ? AccountConfigurePayload
     : never;
 
-export type PoloIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
-    ? PoloParticipantCreatePayload
+export type RawIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
+    ? RawParticipantCreatePayload
     : T extends OpType.AssetCreate
     ? AssetCreatePayload
     : T extends OpType.AssetBurn | OpType.AssetMint
-    ? PoloAssetSupplyPayload
+    ? RawAssetSupplyPayload
     : T extends OpType.AssetTransfer
-    ? PoloAssetTransferPayload
+    ? RawAssetTransferPayload
     : T extends OpType.AssetApprove
-    ? PoloAssetApprovePayload
+    ? RawAssetApprovePayload
     : T extends OpType.AssetRelease
-    ? PoloAssetReleasePayload
+    ? RawAssetReleasePayload
     : T extends OpType.AssetRevoke
-    ? PoloAssetRevokePayload
+    ? RawAssetRevokePayload
     : T extends OpType.AssetLockup
-    ? PoloAssetLockupPayload
+    ? RawAssetLockupPayload
     : T extends OpType.LogicDeploy
-    ? PoloLogicDeployPayload
+    ? RawLogicDeployPayload
     : T extends OpType.LogicInvoke | OpType.LogicEnlist
-    ? PoloLogicActionPayload
+    ? RawLogicActionPayload
     : T extends OpType.AccountConfigure
-    ? PoloAccountConfigurePayload
+    ? RawAccountConfigurePayload
     : never;
 
 /**
  * `IxRawOperation` is a type that holds the raw operation data.
  */
-export interface IxRawOperation {
+export interface RawIxOperation {
     /**
      * The type of the operation.
      */

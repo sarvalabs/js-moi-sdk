@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { Identifier } from "js-moi-identifiers";
 import { StorageKey, type Account, type AccountAsset, type AccountKey, type Asset, type Hex, type Interaction, type JsonRpcResponse, type Logic, type LogicMessage, type NetworkInfo, type Simulate, type Tesseract, type TesseractReference, type Transport } from "js-moi-utils";
 import type { MethodParams, MethodResponse, NetworkMethod } from "../types/moi-execution-api";
-import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateInteractionRequest, SimulateOption, TesseractRequestOption } from "../types/provider";
+import type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, SimulateInteractionRequest, SimulateOption, TesseractRequestOption } from "../types/provider";
 import { InteractionResponse } from "../utils/interaction-response";
 /**
  * A provider that communicates with the MOI protocol network using JSON-RPC.
@@ -215,22 +215,6 @@ export declare class JsonRpcProvider extends EventEmitter implements Provider {
      * @returns A promise that resolves to the account key information.
      */
     getAccountKey(participant: Identifier | Hex, index: number, option?: AccountKeyRequestOption): Promise<AccountKey>;
-    /**
-     * Executes an interaction on the MOI network.
-     *
-     * @param ix - The interaction to execute.
-     * @param signatures - The signatures to include in the request.
-     *
-     * @returns A promise that resolves to the result of the InteractionResponse.
-     */
-    execute(ix: Uint8Array | Hex, signatures: Signature[]): Promise<InteractionResponse>;
-    /**
-     * Executes an interaction on the MOI network.
-     *
-     * @param ix - The execution request object.
-     *
-     * @returns A promise that resolves to the InteractionResponse.
-     */
     execute(ix: ExecuteIx): Promise<InteractionResponse>;
     /**
      * Retrieves an interaction from the MOI network.

@@ -26,7 +26,14 @@ export const getKDFKeyForKeystore = (keystore, password) => {
     }
     ErrorUtils.throwError(`Unsupported KDF: ${keystore.kdf}`, ErrorCode.INVALID_ARGUMENT);
 };
-export const encryptKeystoreData = (data, password) => {
+/**
+ * Encrypts the given data using the provided password and returns a keystore object.
+ *
+ * @param data - The data to be encrypted as a Uint8Array.
+ * @param password - The password used for encryption.
+ * @returns A Keystore object containing the encrypted data and encryption parameters.
+ */
+export const encryptKeystore = (data, password) => {
     const salt = randomBytes(32);
     const derivedKey = scrypt(password, salt, {
         N: 4096,
@@ -55,7 +62,17 @@ export const encryptKeystoreData = (data, password) => {
         mac: trimHexPrefix(bytesToHex(mac)),
     };
 };
-export const decryptKeystoreData = (keystore, password) => {
+/**
+ * Decrypts a keystore using the provided password.
+ *
+ * @param keystore - The keystore object containing the encrypted data.
+ * @param password - The password used to decrypt the keystore.
+ * @returns The decrypted data as a Uint8Array.
+ *
+ * @throws If the cipher specified in the keystore is not supported.
+ * @throws If the password is incorrect and the keystore cannot be decrypted.
+ */
+export const decryptKeystore = (keystore, password) => {
     if (keystore.cipher !== "aes-128-ctr") {
         ErrorUtils.throwError(`Cipher not supported: ${keystore.cipher}`, ErrorCode.UNSUPPORTED_OPERATION);
     }

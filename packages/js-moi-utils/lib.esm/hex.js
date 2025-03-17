@@ -116,8 +116,8 @@ export const bytesToHex = (data) => {
  * Checks if a given value is a hexadecimal string.
  * Optionally, the length of the hexadecimal string can be specified.
  *
- * @param {unknown} value - The value to check.
- * @param {number} byteLength - The length of the in terms of bytes l.
+ * @param {string} value - The string needs to be checked.
+ * @param {number} byteLength - The number of bytes the hexadecimal string should have.
  * @returns {boolean} True if the value is a hexadecimal string, false otherwise.
  */
 export const isHex = (value, byteLength) => {
@@ -142,12 +142,6 @@ export const isHex = (value, byteLength) => {
 export const trimHexPrefix = (data) => {
     return isHex(data) ? data.slice(2) : data;
 };
-/**
- * Checks if a given value is an address.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} True if the value is an address, false otherwise.
-
 /**
  * Converts a hexadecimal string to a hash using the BLAKE2b cryptographic hash function.
  *

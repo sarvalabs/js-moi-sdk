@@ -1,4 +1,4 @@
-import { IdentifierKind } from "./enums";
+import { IdentifierKind, IdentifierVersion } from "./enums";
 /**
  * Represents an identifier tag with a specific kind and version.
  * The `IdentifierTag` class encapsulates an identifier value, which includes a kind and a version.
@@ -9,7 +9,7 @@ export class IdentifierTag {
      * This value is read-only and cannot be modified after initialization.
      */
     value;
-    static MAX_IDENTIFIER_KIND = IdentifierKind.Logic;
+    static maxIdentifierKind = IdentifierKind.Logic;
     static kindMaxSupportedVersion = {
         [IdentifierKind.Participant]: 0,
         [IdentifierKind.Asset]: 0,
@@ -82,7 +82,7 @@ export class IdentifierTag {
      * @returns An object containing the reason for invalidity if the identifier is invalid, or `null` if the identifier is valid.
      */
     static validate(value) {
-        if (IdentifierTag.getKind(value) > this.MAX_IDENTIFIER_KIND) {
+        if (IdentifierTag.getKind(value) > this.maxIdentifierKind) {
             return { why: "Unsupported identifier kind." };
         }
         if (IdentifierTag.getVersion(value) > IdentifierTag.getMaxSupportedVersion(IdentifierTag.getKind(value))) {
@@ -91,4 +91,7 @@ export class IdentifierTag {
         return null;
     }
 }
+export const ParticipantTagV0 = IdentifierTag.getTag(IdentifierKind.Participant, IdentifierVersion.V0);
+export const AssetTagV0 = IdentifierTag.getTag(IdentifierKind.Asset, IdentifierVersion.V0);
+export const LogicTagV0 = IdentifierTag.getTag(IdentifierKind.Logic, IdentifierVersion.V0);
 //# sourceMappingURL=identifier-tag.js.map

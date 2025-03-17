@@ -60,25 +60,11 @@ export class Signer {
      * By default, the signer supports the `ecdsa_secp256k1` algorithm.
      */
     signingAlgorithms;
-    fuelPrice = DEFAULT_FUEL_PRICE;
     constructor(provider, signingAlgorithms) {
         this.provider = provider;
         this.signingAlgorithms = signingAlgorithms ?? {
             ecdsa_secp256k1: new ECDSA_S256(),
         };
-    }
-    /**
-     * Sets the fuel price for the signer.
-     *
-     * @param {number} fuelPrice - The fuel price to set.
-     * @returns {void}
-     * @throws {Error} if the fuel price is less than 1.
-     */
-    setFuelPrice(fuelPrice) {
-        if (fuelPrice < 1) {
-            ErrorUtils.throwError("Fuel price must be greater than or equal to 1", ErrorCode.INVALID_ARGUMENT, { fuelPrice });
-        }
-        this.fuelPrice = fuelPrice;
     }
     /**
      * Connects the signer to a provider.
@@ -122,7 +108,7 @@ export class Signer {
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: this.fuelPrice,
+                fuel_price: DEFAULT_FUEL_PRICE,
                 operations: arg,
             };
         }
@@ -130,7 +116,7 @@ export class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: this.fuelPrice,
+                fuel_price: DEFAULT_FUEL_PRICE,
                 operations: [arg],
             };
         }
@@ -138,7 +124,7 @@ export class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? this.fuelPrice,
+            fuel_price: arg.fuel_price ?? DEFAULT_FUEL_PRICE,
         };
     }
     /**
@@ -243,8 +229,9 @@ export class Signer {
             return await this.getProvider().execute(arg);
         }
         const request = await this.createIxRequest("moi.Execute", arg);
-        if (request.sender.sequence < (await this.getLatestSequence())) {
-            ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
+        const latestSequence = await this.getLatestSequence();
+        if (request.sender.sequence < latestSequence) {
+            ErrorUtils.throwError(`The provided sequence number (${request.sender.sequence}) is outdated. The latest sequence is ${latestSequence}.`, ErrorCode.SEQUENCE_EXPIRED);
         }
         const error = validateIxRequest("moi.Execute", request);
         if (error != null) {

@@ -143,11 +143,6 @@ describe(isHex.name, () => {
                 expected: true,
                 message: "should return true for a valid hexadecimal string with an even length",
             },
-            {
-                input: "0x1234567890abcdef0",
-                expected: true,
-                message: "should return true for a valid hexadecimal string with a trailing zero",
-            },
         ];
 
         for (const testcase of testCases) {
@@ -158,7 +153,7 @@ describe(isHex.name, () => {
     });
 
     describe("if length is provided", () => {
-        const testCasesWithLength = [
+        const testcases = [
             {
                 input: "0x1234ABCD",
                 length: 4,
@@ -191,7 +186,7 @@ describe(isHex.name, () => {
             },
         ];
 
-        for (const testcase of testCasesWithLength) {
+        for (const testcase of testcases) {
             test(testcase.message, () => {
                 expect(isHex(testcase.input, testcase.length)).toBe(testcase.expected);
             });

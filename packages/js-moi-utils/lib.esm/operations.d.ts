@@ -1,13 +1,13 @@
-import { type PoloSchema } from "polo-schema";
+import { type Schema } from "js-polo";
 import { OpType } from "./enums";
-import type { IxOperation, IxRawOperation, PoloIxOperationPayload } from "./types/ix-operation";
+import type { IxOperation, RawIxOperation, RawIxOperationPayload } from "./types/ix-operation";
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
      * Returns the POLO schema for the operation payload.
      *
      * @returns Returns the POLO schema for the operation payload.
      */
-    schema: PoloSchema;
+    schema: Schema;
     /**
      * Validates the operation payload.
      *
@@ -21,7 +21,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the transformed operation payload.
      */
-    transform?: (payload: IxOperation<TOpType>) => PoloIxOperationPayload<TOpType>;
+    encode?: (payload: IxOperation<TOpType>) => RawIxOperationPayload<TOpType>;
 }
 declare const createInvalidResult: <T extends Record<any, any>>(value: T, field: keyof T, message: string) => {
     field: keyof T;
@@ -60,7 +60,7 @@ export declare const getIxOperationDescriptor: <TOpType extends OpType>(type: TO
  * @param payload Operation payload
  * @returns Returns the transformed operation payload.
  */
-export declare const transformOperationPayload: <TOpType extends OpType>(operation: IxOperation<TOpType>) => PoloIxOperationPayload<TOpType>;
+export declare const encodeOperationPayload: <TOpType extends OpType>(operation: IxOperation<TOpType>) => RawIxOperationPayload<TOpType>;
 /**
  * Encodes an operation payload to a POLO byte array.
  *
@@ -69,7 +69,7 @@ export declare const transformOperationPayload: <TOpType extends OpType>(operati
  *
  * @throws Throws an error if the operation type is not registered.
  */
-export declare const encodeOperation: <TOpType extends OpType>(operation: IxOperation<TOpType>) => IxRawOperation;
+export declare const encodeOperation: <TOpType extends OpType>(operation: IxOperation<TOpType>) => RawIxOperation;
 /**
  * Checks if the given operation is valid.
  *

@@ -219,7 +219,10 @@ exports.mnemonicToEntropy = mnemonicToEntropy;
  */
 const entropyToMnemonic = (entropy, wordlist) => {
     if (typeof entropy === "string") {
-        entropy = (0, js_moi_utils_1.isHex)((0, js_moi_utils_1.ensureHexPrefix)(entropy)) ? (0, js_moi_utils_1.hexToBytes)(entropy) : new Uint8Array([]);
+        if (!(0, js_moi_utils_1.isHex)((0, js_moi_utils_1.ensureHexPrefix)(entropy))) {
+            throw new TypeError(INVALID_ENTROPY);
+        }
+        entropy = (0, js_moi_utils_1.hexToBytes)(entropy);
     }
     wordlist = wordlist || DEFAULT_WORDLIST;
     if (!wordlist) {

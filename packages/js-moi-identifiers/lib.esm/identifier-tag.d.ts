@@ -1,4 +1,4 @@
-import { IdentifierKind, type IdentifierVersion } from "./enums";
+import { IdentifierKind, IdentifierVersion } from "./enums";
 import type { InvalidReason } from "./identifier";
 /**
  * Represents an identifier tag with a specific kind and version.
@@ -10,7 +10,7 @@ export declare class IdentifierTag {
      * This value is read-only and cannot be modified after initialization.
      */
     readonly value: number;
-    private static MAX_IDENTIFIER_KIND;
+    private static maxIdentifierKind;
     private static kindMaxSupportedVersion;
     constructor(value: number);
     /**
@@ -62,4 +62,7 @@ export declare class IdentifierTag {
      */
     static validate(value: number): InvalidReason | null;
 }
+export declare const ParticipantTagV0: IdentifierTag;
+export declare const AssetTagV0: IdentifierTag;
+export declare const LogicTagV0: IdentifierTag;
 //# sourceMappingURL=identifier-tag.d.ts.map

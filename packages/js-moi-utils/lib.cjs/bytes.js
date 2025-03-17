@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.concatBytes = exports.decodeText = exports.encodeText = exports.randomBytes = exports.isHexString = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
+exports.concatBytes = exports.decodeText = exports.encodeText = exports.randomBytes = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
+const hex_1 = require("./hex");
 /**
  * Checks if the given value is an integer.
  *
@@ -48,30 +49,16 @@ exports.isBytes = isBytes;
  */
 const hexDataLength = (data) => {
     // Check if the input is a valid hexadecimal string and has an even length
-    if (!(0, exports.isHexString)(data) || data.length % 2) {
+    if (data === "0x") {
+        return 0;
+    }
+    if (!(0, hex_1.isHex)(data) || data.length % 2 !== 0) {
         return null;
     }
     // Calculate the length of the data excluding the "0x" prefix
     return (data.length - 2) / 2;
 };
 exports.hexDataLength = hexDataLength;
-/**
- * Checks if the given value is a valid hexadecimal string.
- *
- * @param {any} value - The value to check.
- * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
- */
-const isHexString = (value, length) => {
-    if (typeof value !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
-        return false;
-    }
-    if (length && value.length !== 2 + 2 * length) {
-        return false;
-    }
-    return true;
-};
-exports.isHexString = isHexString;
 /**
  * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
  *

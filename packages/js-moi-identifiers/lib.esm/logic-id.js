@@ -20,10 +20,10 @@ export class LogicId extends Identifier {
      * @returns An object containing the reason for invalidity if the identifier is invalid, or null if the identifier is valid.
      */
     static validate(value) {
-        const logic = value instanceof Uint8Array ? value : hexToBytes(value);
-        if (logic.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
+        const logic = value instanceof Uint8Array ? value : hexToBytes(value);
         const tag = this.getTag(logic);
         const kind = tag.getKind();
         if (kind !== IdentifierKind.Logic) {
@@ -42,7 +42,12 @@ export class LogicId extends Identifier {
      * @returns A boolean indicating whether the value is valid (true) or not (false).
      */
     static isValid(value) {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        }
+        catch (error) {
+            return false;
+        }
     }
 }
 //# sourceMappingURL=logic-id.js.map

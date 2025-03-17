@@ -1,13 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.transformInteraction = exports.getInteractionRequestSchema = void 0;
-exports.encodeInteraction = encodeInteraction;
+exports.encodeInteraction = exports.toRawInteractionRequest = exports.getInteractionRequestSchema = void 0;
 exports.interaction = interaction;
 exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
-const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
 const hex_1 = require("./hex");
 const operations_1 = require("./operations");
@@ -17,36 +15,36 @@ const operations_1 = require("./operations");
  * @returns The POLO schema for an interaction request.
  */
 const getInteractionRequestSchema = () => {
-    return polo_schema_1.polo.struct({
-        sender: polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            sequence: polo_schema_1.polo.integer,
-            key_id: polo_schema_1.polo.integer,
+    return js_polo_1.schema.struct({
+        sender: js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            sequence: js_polo_1.schema.integer,
+            key_id: js_polo_1.schema.integer,
         }),
-        sponsor: polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            sequence: polo_schema_1.polo.integer,
-            key_id: polo_schema_1.polo.integer,
+        sponsor: js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            sequence: js_polo_1.schema.integer,
+            key_id: js_polo_1.schema.integer,
         }),
-        fuel_price: polo_schema_1.polo.integer,
-        fuel_limit: polo_schema_1.polo.integer,
-        ix_operations: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            type: polo_schema_1.polo.integer,
-            payload: polo_schema_1.polo.bytes,
+        fuel_price: js_polo_1.schema.integer,
+        fuel_limit: js_polo_1.schema.integer,
+        ix_operations: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+            type: js_polo_1.schema.integer,
+            payload: js_polo_1.schema.bytes,
         })),
-        participants: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            lock_type: polo_schema_1.polo.integer,
-            notary: polo_schema_1.polo.boolean,
+        participants: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            lock_type: js_polo_1.schema.integer,
+            notary: js_polo_1.schema.boolean,
         })),
-        preferences: polo_schema_1.polo.struct({
-            compute: polo_schema_1.polo.bytes,
-            consensus: polo_schema_1.polo.struct({
-                mtq: polo_schema_1.polo.integer,
-                trust_nodes: polo_schema_1.polo.arrayOf(polo_schema_1.polo.string),
+        preferences: js_polo_1.schema.struct({
+            compute: js_polo_1.schema.bytes,
+            consensus: js_polo_1.schema.struct({
+                mtq: js_polo_1.schema.integer,
+                trust_nodes: js_polo_1.schema.arrayOf(js_polo_1.schema.string),
             }),
         }),
-        perception: polo_schema_1.polo.bytes,
+        perception: js_polo_1.schema.bytes,
     });
 };
 exports.getInteractionRequestSchema = getInteractionRequestSchema;
@@ -56,7 +54,7 @@ exports.getInteractionRequestSchema = getInteractionRequestSchema;
  * @param ix Interaction request
  * @returns a raw interaction request
  */
-const transformInteraction = (ix) => {
+const toRawInteractionRequest = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
@@ -67,7 +65,7 @@ const transformInteraction = (ix) => {
         preferences: ix.preferences ? { ...ix.preferences, compute: (0, hex_1.hexToBytes)(ix.preferences.compute) } : undefined,
     };
 };
-exports.transformInteraction = transformInteraction;
+exports.toRawInteractionRequest = toRawInteractionRequest;
 /**
  * Encodes an interaction request into a POLO bytes.
  *
@@ -80,12 +78,13 @@ exports.transformInteraction = transformInteraction;
  * @param ix - The interaction request to encode. It can be of type `InteractionRequest` or `RawInteractionRequest`.
  * @returns A POLO bytes representing the encoded interaction request.
  */
-function encodeInteraction(ix) {
-    const data = "operations" in ix ? (0, exports.transformInteraction)(ix) : ix;
+const encodeInteraction = (ix) => {
+    const data = "operations" in ix ? (0, exports.toRawInteractionRequest)(ix) : ix;
     const polorizer = new js_polo_1.Polorizer();
     polorizer.polorize(data, (0, exports.getInteractionRequestSchema)());
     return polorizer.bytes();
-}
+};
+exports.encodeInteraction = encodeInteraction;
 const gatherIxParticipants = (interaction) => {
     const participants = new Map([
         [
@@ -177,12 +176,12 @@ function interaction(ix, format = "polo") {
         participants: gatherIxParticipants(ix),
     };
     switch (format) {
-        case "minimal":
+        case "default":
             return interaction;
         case "raw":
-            return (0, exports.transformInteraction)(interaction);
+            return (0, exports.toRawInteractionRequest)(interaction);
         case "polo":
-            return encodeInteraction(interaction);
+            return (0, exports.encodeInteraction)(interaction);
         default:
             throw new Error(`Invalid format: ${format}`);
     }
@@ -224,21 +223,17 @@ function validateIxRequest(type, ix) {
         return createInvalidResult(ix, "fuel_limit", "Fuel limit must be greater than or equal to 0");
     }
     if (ix.sponsor != null && !(0, hex_1.isHex)(ix.sender.id, 32)) {
-        return createInvalidResult(ix, "sponsor", "Invalid sponser address");
+        return createInvalidResult(ix, "sponsor", "Invalid sponsor address");
     }
     if (ix.participants != null) {
         if (!Array.isArray(ix.participants)) {
             return createInvalidResult(ix, "participants", "Participants must be an array");
         }
-        let error = null;
-        for (const participant of ix.participants) {
-            if (error != null) {
-                return error;
+        for (const [index, participant] of ix.participants.entries()) {
+            if ((0, hex_1.isHex)(participant.id, 32)) {
+                continue;
             }
-            if (!(0, hex_1.isHex)(participant.id, 32)) {
-                error = createInvalidResult(participant, "id", "Invalid participant address");
-                break;
-            }
+            return createInvalidResult(participant, "id", `Invalid participant address at index ${index}`);
         }
     }
     if (ix.operations == null) {
@@ -250,32 +245,22 @@ function validateIxRequest(type, ix) {
     if (ix.operations.length === 0) {
         return createInvalidResult(ix, "operations", "Operations must have at least one operation");
     }
-    let error = null;
-    for (let i = 0; i < ix.operations.length; i++) {
-        if (error != null) {
-            break;
-        }
-        const operation = ix.operations[i];
+    for (const [index, operation] of ix.operations.entries()) {
         if (operation.type == null) {
-            error = createInvalidResult(operation, "type", "Operation type is required");
-            break;
+            return createInvalidResult(operation, "type", `Operation type is required at index ${index}`);
         }
         if (operation.payload == null) {
-            error = createInvalidResult(operation, "payload", "Operation payload is required");
-            break;
+            return createInvalidResult(operation, "payload", `Operation payload is required at index ${index}`);
         }
         const result = (0, operations_1.validateOperation)(operation);
         if (result == null) {
             continue;
         }
-        error = {
-            field: `operations[${i}].${result.field}`,
-            message: `Invalid operation payload at index ${i}: ${result.message}`,
+        return {
+            field: `operations[${index}].${result.field}`,
+            message: `Invalid operation payload at index ${index}: ${result.message}`,
             value: operation,
         };
-    }
-    if (error != null) {
-        return error;
     }
     return null;
 }

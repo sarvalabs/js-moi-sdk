@@ -1,5 +1,4 @@
-import { IdentifierKind, IdentifierVersion } from "./enums";
-import { IdentifierTag } from "./identifier-tag";
+import { AssetTagV0, LogicTagV0, ParticipantTagV0 } from "./identifier-tag";
 /**
  * Represents a flag specifier for an identifier.
  */
@@ -37,12 +36,9 @@ export class Flag {
  */
 export const setFlag = (value, index, flag) => {
     if (flag) {
-        value |= 1 << index;
+        return value | (1 << index);
     }
-    else {
-        value = value & ~(1 << index);
-    }
-    return value;
+    return value & ~(1 << index);
 };
 /**
  * Determines if a specific flag is set in a given value.
@@ -55,8 +51,8 @@ export const getFlag = (value, index) => {
     return (value & (1 << index)) !== 0;
 };
 export const flagMasks = new Map([
-    [IdentifierTag.getTag(IdentifierKind.Participant, IdentifierVersion.V0).value, 0b01111111],
-    [IdentifierTag.getTag(IdentifierKind.Logic, IdentifierVersion.V0).value, 0b01111000],
-    [IdentifierTag.getTag(IdentifierKind.Asset, IdentifierVersion.V0).value, 0b01111111],
+    [ParticipantTagV0.value, 0b01111111],
+    [LogicTagV0.value, 0b01111000],
+    [AssetTagV0.value, 0b01111111],
 ]);
 //# sourceMappingURL=flags.js.map
