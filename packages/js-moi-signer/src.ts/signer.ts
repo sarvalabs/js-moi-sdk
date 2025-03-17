@@ -72,8 +72,6 @@ export abstract class Signer {
      */
     public signingAlgorithms: SigningAlgorithms;
 
-    private fuelPrice = DEFAULT_FUEL_PRICE;
-
     constructor(provider?: Provider, signingAlgorithms?: SigningAlgorithms) {
         this.provider = provider;
 
@@ -82,26 +80,6 @@ export abstract class Signer {
         };
     }
 
-    /**
-     * Sets the fuel price for the signer.
-     *
-     * @param {number} fuelPrice - The fuel price to set.
-     * @returns {void}
-     * @throws {Error} if the fuel price is less than 1.
-     */
-    public setFuelPrice(fuelPrice: number): void {
-        if (fuelPrice < 1) {
-            ErrorUtils.throwError("Fuel price must be greater than or equal to 1", ErrorCode.INVALID_ARGUMENT, { fuelPrice });
-        }
-
-        this.fuelPrice = fuelPrice;
-    }
-
-    /**
-     * Returns the key ID of the signer.
-     *
-     * @returns {Promise<number>} A promise that resolves to the key ID of the signer.
-     */
     public abstract getKeyId(): Promise<number>;
 
     /**
@@ -180,7 +158,7 @@ export abstract class Signer {
         if (Array.isArray(arg)) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: this.fuelPrice,
+                fuel_price: DEFAULT_FUEL_PRICE,
                 operations: arg,
             };
         }
@@ -189,7 +167,7 @@ export abstract class Signer {
         if (typeof arg === "object" && "type" in arg && "payload" in arg) {
             return {
                 sender: await this.createIxRequestSender(),
-                fuel_price: this.fuelPrice,
+                fuel_price: DEFAULT_FUEL_PRICE,
                 operations: [arg],
             };
         }
@@ -198,7 +176,7 @@ export abstract class Signer {
         return {
             ...arg,
             sender: await this.createIxRequestSender(arg.sender),
-            fuel_price: arg.fuel_price ?? this.fuelPrice,
+            fuel_price: arg.fuel_price ?? DEFAULT_FUEL_PRICE,
         };
     }
 
@@ -233,7 +211,7 @@ export abstract class Signer {
         args: SignerIx<InteractionRequest | SimulateInteractionRequest> | AnyIxOperation[] | AnyIxOperation
     ): Promise<SimulateInteractionRequest | InteractionRequest> {
         const simulateIxRequest = await this.createSimulateIxRequest(args);
-        
+
         if (type === "moi.Simulate") {
             return simulateIxRequest;
         }
@@ -245,7 +223,7 @@ export abstract class Signer {
         const simulation = await this.simulate(simulateIxRequest);
         const executeIxRequest = {
             ...simulateIxRequest,
-            fuel_limit: simulation.effort,
+            fuel_limit: simulation.fuel_spent,
         };
 
         const err = validateIxRequest("moi.Execute", executeIxRequest);
@@ -397,9 +375,9 @@ export abstract class Signer {
         }
 
         const request = await this.createIxRequest("moi.Execute", arg);
-
-        if (request.sender.sequence < (await this.getLatestSequence())) {
-            ErrorUtils.throwError("Sequence number is outdated", ErrorCode.SEQUENCE_EXPIRED);
+        const latestSequence = await this.getLatestSequence();
+        if (request.sender.sequence < latestSequence) {
+            ErrorUtils.throwError(`The provided sequence number (${request.sender.sequence}) is outdated. The latest sequence is ${latestSequence}.`, ErrorCode.SEQUENCE_EXPIRED);
         }
 
         const error = validateIxRequest("moi.Execute", request);

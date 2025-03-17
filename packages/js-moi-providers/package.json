@@ -44,7 +44,6 @@
     "events": "npm:events@^3.3.0",
     "js-moi-identifiers": "^0.6.0",
     "js-moi-utils": "^0.6.0",
-    "polo-schema": "^1.0.1",
     "ws": "^8.18.0"
   },
   "devDependencies": {

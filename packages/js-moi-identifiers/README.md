@@ -18,9 +18,9 @@
 
 This is a sub-package of [js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk).
 
-The **js-moi-identifiers** is a library that contains implementations for all account identifiers used in the MOI Protocol such as the `AssetID`, `LogicID` and `ParticipantID` identifiers
-The package contains the functionality to access flags, metadata, variant ID and account ID from the identifier.
-It also contains validation for multiple versions of each identifier kind and generator functions for each kind.
+The **js-moi-identifiers** is a library that implements all account identifiers used in the MOI Protocol, including `AssetID`, `LogicID`, and `ParticipantID`.
+It provides functionality to retrieve flags, metadata, variant IDs, and account IDs from identifiers. Additionally, it includes
+validation for multiple identifier versions and generator functions for each type.
 
 ## Installation
 

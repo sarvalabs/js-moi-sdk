@@ -89,7 +89,7 @@ describe(ManifestCoder, () => {
     });
 
     test("Decode polo encoded event log", () => {
-        const testTable = [
+        const testcases = [
             {
                 event: "builtin.Log",
                 log: "0x0d2f065576616c756506736565646564206239306633396663663334366261333236303531383636393439356635643336386138643162623830323335383466363765386135363731636633633536636520776974682031303030303030302044554d4d",
@@ -108,7 +108,7 @@ describe(ManifestCoder, () => {
             },
         ];
 
-        for (const test of testTable) {
+        for (const test of testcases) {
             const decoded = manifestCoder.decodeEventOutput(test.event, test.log);
             expect(decoded).not.toBeNull();
             expect(decoded).toEqual(test.expected);
@@ -116,7 +116,7 @@ describe(ManifestCoder, () => {
     });
 
     test("Decode polo-encoded manifest", async () => {
-        const testCases = [
+        const testcases = [
             {
                 manifest: "../../manifests/tokenledger.polo",
                 expected: "../../manifests/tokenledger.json",
@@ -136,7 +136,7 @@ describe(ManifestCoder, () => {
         ];
 
         await Promise.all(
-            testCases.map(async (testCase) => {
+            testcases.map(async (testCase) => {
                 const [polo, expected] = await Promise.all([loadFile(testCase.manifest), loadManifestFromFile(testCase.expected)]);
 
                 const manifest = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.JSON);
@@ -146,7 +146,7 @@ describe(ManifestCoder, () => {
     });
 
     test("Encoding JSON into YAML", async () => {
-        const testCases = [
+        const testcases = [
             {
                 manifest: "../../manifests/tokenledger.polo",
                 expected: "../../manifests/tokenledger.json",
@@ -166,7 +166,7 @@ describe(ManifestCoder, () => {
         ];
 
         await Promise.all(
-            testCases.map(async (testCase) => {
+            testcases.map(async (testCase) => {
                 const polo = await loadFile(testCase.manifest);
                 const yaml = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.YAML);
 

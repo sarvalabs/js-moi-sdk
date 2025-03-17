@@ -38,12 +38,11 @@ export class AssetId extends Identifier {
      * @returns An `InvalidReason` object containing the reason why the identifier is invalid, or `null` if the identifier is valid.
      */
     public static validate(value: Uint8Array | Hex): InvalidReason | null {
-        const asset = value instanceof Uint8Array ? value : hexToBytes(value);
-
-        if (asset.length !== 32) {
-            return { why: "Invalid length. Expected a 32-byte identifier." };
+        if (!(value instanceof Uint8Array || typeof value === "string")) {
+            return { why: "Invalid type of value, expected bytes or hex string." };
         }
 
+        const asset = value instanceof Uint8Array ? value : hexToBytes(value);
         const tag = this.getTag(asset);
         const kind = tag.getKind();
 
@@ -67,6 +66,10 @@ export class AssetId extends Identifier {
      * @returns `true` if the value is valid, otherwise `false`.
      */
     public static isValid(value: Uint8Array | Hex): boolean {
-        return this.validate(value) === null;
+        try {
+            return this.validate(value) === null;
+        } catch (error) {
+            return false;
+        }
     }
 }

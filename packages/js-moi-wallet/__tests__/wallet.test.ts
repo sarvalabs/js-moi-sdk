@@ -45,9 +45,9 @@ describe(Wallet, () => {
     });
 
     it.concurrent.each([
-        { name: "synchronously when path and option are passed", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH, {}) },
-        { name: "asynchronously when path and option are provided", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {}) },
-    ])("should create a wallet from a mnemonic $name", async ({ createWallet }) => {
+        { type: "synchronously", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH, {}) },
+        { type: "asynchronously", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {}) },
+    ])("should create a wallet from a mnemonic when path and option are passed ($type)", async ({ createWallet }) => {
         const wallet = await createWallet();
 
         expect(wallet).toBeInstanceOf(Wallet);
@@ -73,16 +73,16 @@ describe(Wallet, () => {
     const keystore =
         '{"cipher":"aes-128-ctr","ciphertext":"d2574897079cf82af2b48848cdc44ec40bd0d383562978eb50dd032e38b1c90e","cipherparams":{"IV":"5d98f0c4d8562244ee48d063a3d6ce07"},"kdf":"scrypt","kdfparams":{"n":4096,"r":8,"p":1,"dklen":32,"salt":"a99102406c29fdbc79793be3e4e4cae2bbc5c38a05a6e2917228fd6eea2244d9"},"mac":"33d1569f411526447edf1970cb5d61ed097543521024ebafbdd497c1017126f8"}';
 
-    // it.concurrent("should create a wallet using keystore and password", async () => {
-    //     const password = "password";
-    //     const wallet = Wallet.fromKeystore(keystore, password);
+    it.concurrent("should create a wallet using keystore and password", async () => {
+        const password = "password";
+        const wallet = Wallet.fromKeystore(keystore, password);
 
-    //     expect(wallet).toBeInstanceOf(Wallet);
-    //     expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
-    //     expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
-    //     expect(await wallet.getMnemonic()).not.toBeDefined();
-    //     expect(await wallet.getCurve()).toEqual(CURVE.SECP256K1);
-    // });
+        expect(wallet).toBeInstanceOf(Wallet);
+        expect((await wallet.getIdentifier()).toString()).toEqual(ID_STR);
+        expect(await wallet.getPrivateKey()).toEqual(PRIVATE_KEY);
+        expect(await wallet.getMnemonic()).not.toBeDefined();
+        expect(await wallet.getCurve()).toEqual(CURVE.SECP256K1);
+    });
 
     it.concurrent("should throw an error if password is incorrect", async () => {
         const password = "wrong";
@@ -183,7 +183,7 @@ describe(Wallet, () => {
     });
 
     describe(wallet.verify, () => {
-        it.concurrent("should be verify a signature using ECDSA secp256k1", async () => {
+        it.concurrent("should be verify a signature of when public key is in hex format", async () => {
             const message = "Hello, MOI";
             const signature =
                 "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
@@ -192,7 +192,7 @@ describe(Wallet, () => {
             expect(ok).toBeTruthy();
         });
 
-        it.concurrent("should be able to verify when public key in byte array", async () => {
+        it.concurrent("should verify a signature when public key is in byte array", async () => {
             const message = new TextEncoder().encode("Hello, MOI");
             const signature =
                 "0x0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402";
@@ -216,7 +216,7 @@ describe(Wallet, () => {
             sender: {
                 id: ID_STR,
                 key_id: 0,
-                sequence_id: 0,
+                sequence: 0,
             },
             fuel_price: 1,
             fuel_limit: 100,
@@ -255,7 +255,7 @@ describe(Wallet, () => {
         it.concurrent("should sign an interaction using ECDSA secp256k1", async () => {
             const { interaction: encoded, signatures } = await wallet.signInteraction(interaction, algorithm);
             const expectedSignature =
-                "0x01463044022011685f268b531472b68b2f0d5074437a5571a4326877281503a63877d458dc0402206899acfcdc388535e2a8f2f857ea9d6e99ca145fdfabb679b473496f2af1af5e02";
+                "0x01473045022100c7beee0e9ae79cf81242aa23b5ee27c66ce16e4c238985747d0e79252640f0810220151c7c41c7a5b3b7ee2a08bf881659bf8212ad97f7c3fc09b837e41c3a6a3b3402";
             const verify = wallet.verify(hexToBytes(encoded), signatures[0].signature, await wallet.getPublicKey());
 
             expect(isHex(encoded)).toBeTruthy();
@@ -294,13 +294,9 @@ describe("Provider integration test", () => {
         let ix: InteractionResponse;
 
         beforeAll(async () => {
-            const sequenceId = process.env["WALLET_SEQUENCE_CURRENT"] ?? undefined;
-            process.env["WALLET_SEQUENCE_CURRENT"] = process.env["WALLET_SEQUENCE_CURRENT"] ? (parseInt(process.env["WALLET_SEQUENCE_CURRENT"]) + 1).toString() : "1";
-
+            // just a delay to sync with logic tests
+            await new Promise((resolve) => setTimeout(resolve, 5000));
             ix = await wallet.execute({
-                sender: {
-                    sequence_id: sequenceId ? parseInt(sequenceId) : undefined,
-                },
                 fuel_price: 1,
                 fuel_limit: 100,
                 operations,

@@ -1,12 +1,13 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { HttpProvider, InteractionResponse } from "js-moi-providers";
 import { bytesToHex, ElementType, LogicState, OperationStatus, OpType, randomBytes, StorageKey, type IxResult } from "js-moi-utils";
-import { getLogicDriver, LogicDriver, type CallsiteOption } from "../src.ts";
+import { getLogicDriver, LogicDriver } from "../src.ts";
 import { loadManifestFromFile } from "./manifests";
 
 import { LogicId } from "js-moi-identifiers";
 import { Wallet } from "../../js-moi-wallet/src.ts";
 import { createWallet } from "./helpers";
+import { mockConfirmedInteraction } from "./utils";
 
 const TEST_LOGIC_ID = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 
@@ -135,26 +136,19 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
         });
 
         it("should get logic id", async () => {
-            const interaction: any = {
-                hash: bytesToHex(randomBytes(32)),
-                confirmation: {
-                    operations: [
-                        {
-                            type: OpType.LogicDeploy,
-                            status: OperationStatus.Ok,
-                            data: {
-                                error: "0x",
-                                logic_id: TEST_LOGIC_ID,
-                            },
-                        } satisfies IxResult<OpType.LogicDeploy>,
-                    ],
-                },
+            const result: IxResult<OpType.LogicDeploy> = {
+                type: OpType.LogicDeploy,
+                status: OperationStatus.Ok,
+                data: { error: "0x", logic_id: TEST_LOGIC_ID },
             };
-
-            const interactionResponseMock = jest.replaceProperty(driver, "deployIxResponse" as any, new InteractionResponse(interaction, wallet.getProvider()));
+            const interactionResponseMock = jest.replaceProperty(
+                driver,
+                "deployIxResponse" as any,
+                new InteractionResponse(mockConfirmedInteraction(result), wallet.getProvider())
+            );
             const logicId = await driver.getLogicId();
 
-            expect(logicId.toString()).toEqual(interaction.confirmation.operations[0].data.logic_id);
+            expect(logicId.toString()).toEqual(TEST_LOGIC_ID);
 
             // cleanup
             interactionResponseMock.restore();
@@ -186,15 +180,8 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
 
         beforeAll(async () => {
             driver = await getLogicDriver(manifest, wallet);
-
-            const sequenceId = process.env["WALLET_SEQUENCE_CURRENT"] ?? undefined;
-            process.env["WALLET_SEQUENCE_CURRENT"] = process.env["WALLET_SEQUENCE_CURRENT"] ? (parseInt(process.env["WALLET_SEQUENCE_CURRENT"]) + 1).toString() : "1";
-
             const callback = driver.endpoint[logic.deploy.name];
-            const option: CallsiteOption = {
-                sender: { sequence_id: sequenceId ? parseInt(sequenceId) : undefined },
-            };
-            await callback<InteractionResponse>(...(logic.deploy.args as any[]), option);
+            await callback<InteractionResponse>(...(logic.deploy.args as any[]));
             logicId = await driver.getLogicId();
         }, TEST_TIMEOUT);
 
@@ -282,7 +269,7 @@ describe.each(logics)(`${LogicDriver.name} of logic $name`, (logic) => {
 
             if (logic.ephemeral) {
                 it("should be able to retrieve from ephemeral storage", async () => {
-                    const value = await driver.ephemeral(logic.ephemeral.accessor);
+                    const value = await driver.ephemeral(await wallet.getIdentifier(), logic.ephemeral.accessor);
 
                     expect(value).toEqual(logic.ephemeral.expected);
                 });

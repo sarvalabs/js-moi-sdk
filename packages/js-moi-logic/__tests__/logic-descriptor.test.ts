@@ -56,6 +56,14 @@ describe.each(manifests)(`${LogicDescriptor.name} of manifest "$name"`, (manifes
         expect(coder).toBeInstanceOf(ManifestCoder);
     });
 
+    describe("if logic id is not defined", () => {
+        describe(descriptor.getLogicId, () => {
+            it.concurrent("should throw error", async () => {
+                expect(descriptor.getLogicId()).rejects.toThrow("Logic id not found. This can happen if the logic is not deployed.");
+            });
+        });
+    });
+
     describe("if logic id is defined", () => {
         const value = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 

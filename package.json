@@ -63,7 +63,7 @@
     "typescript-eslint": "^8.24.0"
   },
   "dependencies": {
-    "js-polo": "^0.1.4"
+    "js-polo": "../js-polo"
   },
   "sideEffects": false
 }
