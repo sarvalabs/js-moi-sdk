@@ -2,7 +2,7 @@ Providers
 =========
 
 A Provider is a convenient interface for connecting to MOI nodes
-and retrieving data from the blockchain. With the providers module,
+and retrieving data from the blockchain. With the providers package,
 developers can choose from various MOI providers such as Voyage to
 establish a connection with the MOI network.
 
@@ -10,7 +10,7 @@ The Provider class abstracts away the complexities of interacting
 directly with the MOI network and provides a consistent and
 straightforward API for retrieving blockchain data. Whether it's
 querying account balances, interaction history, or logic
-information, the providers module simplifies the process
+information, the providers package simplifies the process
 of connecting to MOI nodes and fetching data, making it easier
 for developers to build applications that interact with the MOI
 network.
@@ -131,16 +131,21 @@ InteractionResponse
 Transport
 ---------
 
-Transport are the underlying communication channels used by the
-Provider to connect to MOI nodes. The Transport class defines
-the common interface for establishing connections and sending
-requests to MOI nodes. By abstracting the communication layer,
-the Transport class enables the Provider to interact with
-different types of MOI nodes, provides a consistent way to
-communicate with the network.
+Transport serves as the underlying communication layer for the
+``Provider``, facilitating connections to MOI nodes. The ``Transport``
+class defines a standardized interface for establishing connections
+and transmitting requests, ensuring seamless interaction with the
+MOI network.
 
-Developers can create their own custom transports by extending
-the ``Transport`` interface and implementing the required methods.
+By abstracting the communication layer, ``Transport`` enables the ``Provider``
+to connect with MOI nodes with different communication methods while maintaining
+a consistent request-handling mechanism. This abstraction ensures
+flexibility and interoperability.
+
+Developers can extend the ``Transport`` interface to create custom
+transport implementations by defining the required methods,
+allowing for tailored communication strategies based on specific
+use cases.
 
 **For example**
 
