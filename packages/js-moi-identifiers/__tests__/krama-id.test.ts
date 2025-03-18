@@ -62,7 +62,7 @@ describe(KramaId, () => {
             value: invalidPeerId,
             error: /Unable to decode multibase string/,
         },
-    ])("should thrown an error when $name", ({ value, error }) => {
+    ])("should thrown an error $name", ({ value, error }) => {
         expect(() => new KramaId(value)).toThrow(error);
     });
 });
