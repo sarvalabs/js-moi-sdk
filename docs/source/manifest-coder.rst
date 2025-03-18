@@ -1,22 +1,21 @@
 Manifest Call Encoder
 =====================
 
-The Manifest Call Encoder package enables the encoding and decoding of data 
-according to the MOI Manifest specification. This specification defines the 
-structure of routines, classes, methods, and state within logic object, allowing 
-for seamless interaction with their properties.
+The Manifest Call Encoder package provides functionality for encoding and decoding data
+in accordance with the MOI Manifest Specification. This specification defines the structure
+of routines, classes, methods, and state within a logic object, ensuring standardized
+interaction with its properties.
 
-Through this package, developers can encode data in compliance with the 
-expected format specified by the logic Manifest. This is particularly valuable 
-when preparing data for invoking routines on logic object. By correctly encoding 
-routine parameters according to the logic Manifest, developers can generate 
-accurate input data that aligns with the logic objects's expectations.
+This package enables developers to encode data that conforms to the format prescribed by
+the logic Manifest. Proper encoding is essential for invoking routines on a logic object,
+as it ensures that routine parameters are correctly structured to meet the expectations
+defined within the Manifest.
 
-In addition, this facilitates the decoding of data received from the blockchain 
-or logic objects. Developers can decode routine call results, and other Manifest-encoded 
-data structures, enabling them to extract meaningful information. This 
-capability greatly aids in the efficient processing and interpretation of data 
-obtained from the MOI network.
+In addition to encoding, the package facilitates the decoding of data received from the
+blockchain or logic objects. Developers can interpret routine call results and other
+Manifest-encoded data structures, extracting meaningful information for further processing.
+This functionality enhances the efficiency and accuracy of data interpretation within the
+MOI network.
 
 Classes
 -------
