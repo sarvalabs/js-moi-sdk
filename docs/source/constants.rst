@@ -1,7 +1,7 @@
 Constants
 =========
 
-The constants module contains the following constant variables.
+The constants package contains the following constant variables.
 
 Version
 -------
