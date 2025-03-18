@@ -1,7 +1,7 @@
 Utilities
 =========
 
-The utilities module offers a comprehensive set of tools and functions to 
+The utilities package offers a comprehensive set of tools and functions to 
 simplify development process. This package encompasses various utility 
 functions designed to enhance the overall development experience when working 
 with MOI.
@@ -29,8 +29,6 @@ Bytes
 .. autofunction:: hexDataLength
 
 .. autofunction:: isBytes
-
-.. autofunction:: isHexString
 
 .. autofunction:: isInteger
 
@@ -179,7 +177,7 @@ Interaction
 
 .. autofunction:: interaction
 
-.. autofunction:: transformInteraction
+.. autofunction:: encodeInteraction
 
 .. autofunction:: validateIxRequest
 
@@ -192,7 +190,7 @@ Operation
 
 .. autofunction:: isValidOperation
 
-.. autofunction:: transformOperationPayload
+.. autofunction:: encodeOperationPayload
 
 .. autofunction:: validateOperation
 
