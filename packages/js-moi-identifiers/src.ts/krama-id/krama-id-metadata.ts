@@ -1,3 +1,4 @@
+import type { InvalidReason } from "../identifier";
 import { NetworkZone } from "./krama-id-enums";
 
 /**
@@ -9,8 +10,10 @@ export class KramaIdMetadata {
     constructor(value: number) {
         this.value = value;
 
-        if (this.getZone() > NetworkZone.Zone3) {
-            throw new Error("Invalid network zone");
+        const result = KramaIdMetadata.validate(this);
+
+        if (result !== null) {
+            throw new Error(`Invalid Krama ID: ${result.why}`);
         }
     }
 
@@ -21,5 +24,13 @@ export class KramaIdMetadata {
      */
     public getZone(): NetworkZone {
         return this.value >> 4;
+    }
+
+    public static validate(metadata: KramaIdMetadata): InvalidReason | null {
+        if (metadata.getZone() > NetworkZone.Zone3) {
+            return { why: "Invalid network zone" };
+        }
+
+        return null;
     }
 }
