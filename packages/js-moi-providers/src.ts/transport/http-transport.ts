@@ -55,9 +55,9 @@ export class HttpTransport extends EventEmitter implements Transport {
                         data: null,
                     },
                 };
+            } else {
+                result = await response.json();
             }
-
-            result = await response.json();
         } catch (error: any) {
             // Check if the error is a network error in various environments like Node.js, browser, Bun etc.
             const isNetworkError = error?.cause?.code === "ECONNREFUSED" || error?.message === "Failed to fetch" || error?.code === "ConnectionRefused";
