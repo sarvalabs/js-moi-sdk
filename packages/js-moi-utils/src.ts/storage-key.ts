@@ -86,7 +86,7 @@ export class PropertyAccessor extends AbstractAccessor {
      * @param key The key to polorize.
      * @returns The polorized key as a bytes.
      */
-    private polorize(key: string | number | boolean | Uint8Array): Uint8Array {
+    private polorize(key: string | number | bigint | boolean | Uint8Array): Uint8Array {
         const polorizer = new Polorizer();
 
         switch (true) {
@@ -101,6 +101,9 @@ export class PropertyAccessor extends AbstractAccessor {
                 if (!Number.isInteger(key)) {
                     polorizer.polorizeFloat(key);
                 }
+                break;
+            case typeof key === "bigint":
+                polorizer.polorizeInteger(new BN(key.toString()));
                 break;
             case typeof key === "boolean":
                 polorizer.polorizeBool(key);
