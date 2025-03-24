@@ -9,7 +9,7 @@ const TEST_TIMEOUT = 2 * 60_000;
 describe(Wallet, () => {
     const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
     const ID_STR = "0x00000000870ad6c5150ea8c0355316974873313004c6b9425a855a0600000000";
-    const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
+    const DERIVATION_PATH = "m/44'/6174'/0'/0/1";
     const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
 
     it.concurrent("should create a wallet from a constructor", async () => {
@@ -45,8 +45,8 @@ describe(Wallet, () => {
     });
 
     it.concurrent.each([
-        { type: "synchronously", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH, {}) },
-        { type: "asynchronously", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH, {}) },
+        { type: "synchronously", createWallet: () => Wallet.fromMnemonicSync(MNEMONIC, DERIVATION_PATH, {}) },
+        { type: "asynchronously", createWallet: async () => await Wallet.fromMnemonic(MNEMONIC, DERIVATION_PATH, {}) },
     ])("should create a wallet from a mnemonic when path and option are passed ($type)", async ({ createWallet }) => {
         const wallet = await createWallet();
 
@@ -98,7 +98,7 @@ describe(Wallet, () => {
         expect(createWallet).toThrow();
     });
 
-    let wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+    let wallet = Wallet.fromMnemonicSync(MNEMONIC, DERIVATION_PATH);
     let algorithm: SigType = wallet.signingAlgorithms.ecdsa_secp256k1;
 
     describe(wallet.getKeyId, () => {

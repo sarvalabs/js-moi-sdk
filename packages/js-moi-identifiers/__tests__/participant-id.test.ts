@@ -77,12 +77,13 @@ describe(createParticipantId, () => {
         expect(participant).toBeInstanceOf(ParticipantId);
     });
 
-    it.concurrent("should throw error for when created with object using invalid flags", () => {
+    it.concurrent("should throw an error when creating a participant id with invalid flags", () => {
         expect(() =>
             createParticipantId({
                 fingerprint: globalThis.crypto.getRandomValues(new Uint8Array(24)),
                 variant: 0,
                 tag: ParticipantTagV0,
+                // invalid flags
                 flags: [new Flag(IdentifierKind.Participant, 2, 3)],
             })
         ).toThrow();
