@@ -45,7 +45,9 @@ export class HttpTransport extends EventEmitter {
                     },
                 };
             }
-            result = await response.json();
+            else {
+                result = await response.json();
+            }
         }
         catch (error) {
             // Check if the error is a network error in various environments like Node.js, browser, Bun etc.

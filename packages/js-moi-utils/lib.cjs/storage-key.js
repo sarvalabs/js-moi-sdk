@@ -80,6 +80,9 @@ class PropertyAccessor extends AbstractAccessor {
                     polorizer.polorizeFloat(key);
                 }
                 break;
+            case typeof key === "bigint":
+                polorizer.polorizeInteger(new bn_js_1.default(key.toString()));
+                break;
             case typeof key === "boolean":
                 polorizer.polorizeBool(key);
                 break;

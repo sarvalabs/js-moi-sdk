@@ -40,7 +40,6 @@ class HttpTransport extends events_1.default {
                 body: content,
                 headers: headers,
             });
-
             if (!response.ok) {
                 result = {
                     jsonrpc: "2.0",
@@ -51,7 +50,8 @@ class HttpTransport extends events_1.default {
                         data: null,
                     },
                 };
-            } else {
+            }
+            else {
                 result = await response.json();
             }
         }

@@ -37,7 +37,7 @@ class SlotAccessorBuilder {
     }
     length() {
         if ((0, js_moi_manifest_1.isPrimitiveType)(this.slotType)) {
-            js_moi_utils_1.ErrorUtils.throwError(`Attempting to access the length of primitive on type "${this.slotType}"`, js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
+            js_moi_utils_1.ErrorUtils.throwError(`Cannot determine the length of a primitive type "${this.slotType}".`, js_moi_utils_1.ErrorCode.UNEXPECTED_ARGUMENT);
         }
         this.slotType = "u64";
         this.accessors.push(new js_moi_utils_1.LengthAccessor());
