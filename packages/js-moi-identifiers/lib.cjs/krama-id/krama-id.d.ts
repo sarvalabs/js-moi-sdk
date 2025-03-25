@@ -1,4 +1,5 @@
 import PeerId from "peer-id";
+import type { InvalidReason } from "../identifier";
 import { type Hex } from "../utils";
 import { KramaIdKind, KramaIdVersion, NetworkZone } from "./krama-id-enums";
 import { KramaIdMetadata } from "./krama-id-metadata";
@@ -9,7 +10,7 @@ import { KramaIdTag } from "./krama-id-tag";
 export declare class KramaId {
     private readonly value;
     constructor(value: string);
-    private getPeerIdLength;
+    private static getPeerIdLength;
     /**
      * Retrieves the tag associated with the Krama ID.
      *
@@ -55,5 +56,6 @@ export declare class KramaId {
      * @returns A new KramaId instance.
      */
     static fromPeerId(kind: KramaIdKind, version: KramaIdVersion, zone: NetworkZone, peerId: string | PeerId): KramaId;
+    static validate(value: KramaId | string): InvalidReason | null;
 }
 //# sourceMappingURL=krama-id.d.ts.map
