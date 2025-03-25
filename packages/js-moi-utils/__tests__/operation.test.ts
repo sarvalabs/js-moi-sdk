@@ -177,6 +177,17 @@ const cases: { operation: AnyIxOperation; expected: string }[] = [
         },
         expected: "0x0e2f0e701f0e3f00031301",
     },
+    {
+        operation: {
+            type: OpType.AccountInherit,
+            payload: {
+                target_account: "0x0000000029749b43593a479a48fb77558fd5e8d34206a56e3077fbd0b39b8ba7",
+                amount: 10000,
+                sub_account_index: 10,
+            },
+        },
+        expected: "0x0e5f068304a3040000000029749b43593a479a48fb77558fd5e8d34206a56e3077fbd0b39b8ba727100a",
+    },
 ];
 
 describe(encodeOperation, () => {
@@ -298,6 +309,22 @@ describe(validateOperation, () => {
                 logic_id: null!,
             },
         },
+        {
+            type: OpType.AccountInherit,
+            payload: {
+                target_account: null!,
+                amount: 1000,
+                sub_account_index: 0,
+            },
+        },
+        {
+            type: OpType.AccountInherit,
+            payload: {
+                target_account: "0x0000000029749b43593a479a48fb77558fd5e8d34206a56e3077fbd0b3", // invalid length
+                amount: 1000,
+                sub_account_index: 0,
+            },
+        },
     ];
 
     it.concurrent.each(cases.map((v) => ({ ...v, name: OpType[v.type] })))(
@@ -311,7 +338,7 @@ describe(validateOperation, () => {
 describe(listIxOperationDescriptors, () => {
     it("should list all operation descriptors", () => {
         const descriptors = listIxOperationDescriptors();
-        expect(descriptors.length).toBe(13);
+        expect(descriptors.length).toBe(Object.keys(OpType).length / 2); // half of the OpType enum is used for operations
     });
 });
 
