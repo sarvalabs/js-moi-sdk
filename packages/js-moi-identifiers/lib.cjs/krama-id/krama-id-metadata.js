@@ -9,8 +9,9 @@ class KramaIdMetadata {
     value;
     constructor(value) {
         this.value = value;
-        if (this.getZone() > krama_id_enums_1.NetworkZone.Zone3) {
-            throw new Error("Invalid network zone");
+        const result = KramaIdMetadata.validate(this);
+        if (result !== null) {
+            throw new Error(`Invalid Krama ID: ${result.why}`);
         }
     }
     /**
@@ -20,6 +21,12 @@ class KramaIdMetadata {
      */
     getZone() {
         return this.value >> 4;
+    }
+    static validate(metadata) {
+        if (metadata.getZone() > krama_id_enums_1.NetworkZone.Zone3) {
+            return { why: "Invalid network zone" };
+        }
+        return null;
     }
 }
 exports.KramaIdMetadata = KramaIdMetadata;

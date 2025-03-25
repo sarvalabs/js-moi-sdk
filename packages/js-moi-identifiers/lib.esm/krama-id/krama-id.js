@@ -1,5 +1,5 @@
 import elliptic from "elliptic";
-import { createFromB58String, createFromPubKey } from "peer-id";
+import { createFromB58String, createFromPubKey, parse } from "peer-id";
 import { decodeBase58, encodeBase58, hexToBytes } from "../utils";
 import { KramaIdKind } from "./krama-id-enums";
 import { KramaIdMetadata } from "./krama-id-metadata";
@@ -11,9 +11,13 @@ export class KramaId {
     value;
     constructor(value) {
         this.value = value;
+        const result = KramaId.validate(this);
+        if (result !== null) {
+            throw new Error(`Invalid Krama ID: ${result.why}`);
+        }
     }
-    getPeerIdLength(tag) {
-        switch (tag.getKind()) {
+    static getPeerIdLength(tag) {
+        switch (tag.value) {
             case KramaIdKind.Guardian:
                 return 53;
             default:
@@ -44,7 +48,7 @@ export class KramaId {
      * @returns The peer ID extracted from the value.
      */
     getPeerId() {
-        const length = this.getPeerIdLength(this.getTag());
+        const length = KramaId.getPeerIdLength(this.getTag());
         return this.value.slice(-length);
     }
     /**
@@ -98,6 +102,21 @@ export class KramaId {
         const encoded = encodeBase58(new Uint8Array([tag.value, metadata]));
         const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
         return new KramaId(encoded + peerIdString);
+    }
+    static validate(value) {
+        try {
+            const id = value instanceof KramaId ? value : new KramaId(value);
+            if (id.value === "") {
+                return { why: "KramaId must be a non-empty string" };
+            }
+            const tag = id.getTag();
+            const metadata = id.getMetadata();
+            parse(id.getPeerId());
+            return KramaIdTag.validate(tag) ?? KramaIdMetadata.validate(metadata) ?? null;
+        }
+        catch (error) {
+            return { why: error instanceof Error ? error.message : "Unknown" };
+        }
     }
 }
 //# sourceMappingURL=krama-id.js.map

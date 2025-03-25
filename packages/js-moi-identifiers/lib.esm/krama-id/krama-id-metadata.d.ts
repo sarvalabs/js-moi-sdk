@@ -1,3 +1,4 @@
+import type { InvalidReason } from "../identifier";
 import { NetworkZone } from "./krama-id-enums";
 /**
  * KramaIdMetadata provides a way to extract the network zone of a Krama ID.
@@ -11,5 +12,6 @@ export declare class KramaIdMetadata {
      * @returns {NetworkZone} The network zone of the Krama ID, derived by shifting the value 4 bits to the right.
      */
     getZone(): NetworkZone;
+    static validate(metadata: KramaIdMetadata): InvalidReason | null;
 }
 //# sourceMappingURL=krama-id-metadata.d.ts.map
