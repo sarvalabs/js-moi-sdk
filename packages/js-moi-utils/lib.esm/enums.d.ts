@@ -12,17 +12,18 @@ export declare enum AssetStandard {
 export declare enum OpType {
     ParticipantCreate = 1,
     AccountConfigure = 2,
-    AssetTransfer = 3,
-    AssetCreate = 5,
-    AssetApprove = 6,
-    AssetRevoke = 7,
-    AssetMint = 8,
-    AssetBurn = 9,
-    AssetLockup = 10,
-    AssetRelease = 11,
-    LogicDeploy = 12,
-    LogicInvoke = 13,
-    LogicEnlist = 14
+    AccountInherit = 3,
+    AssetTransfer = 4,
+    AssetCreate = 6,
+    AssetApprove = 7,
+    AssetRevoke = 8,
+    AssetMint = 9,
+    AssetBurn = 10,
+    AssetLockup = 11,
+    AssetRelease = 12,
+    LogicDeploy = 13,
+    LogicInvoke = 14,
+    LogicEnlist = 15
 }
 /**
  * Enumerates the types of participant locks in the system.

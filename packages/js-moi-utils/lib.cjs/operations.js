@@ -54,6 +54,32 @@ const createParticipantCreateDescriptor = () => {
         },
     });
 };
+const createAccountInheritDescriptor = () => {
+    return Object.freeze({
+        schema: js_polo_1.schema.struct({
+            target_account: js_polo_1.schema.bytes,
+            amount: js_polo_1.schema.integer,
+            sub_account_index: js_polo_1.schema.integer,
+        }),
+        encode: ({ payload }) => ({
+            ...payload,
+            target_account: (0, hex_1.hexToBytes)(payload.target_account),
+        }),
+        validator: (operation) => {
+            const { payload } = operation;
+            if (!(0, hex_1.isHex)(payload.target_account, 32)) {
+                return createInvalidResult(payload, "target_account", "Invalid identifier");
+            }
+            if (payload.amount < 0) {
+                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            }
+            if (typeof payload.sub_account_index !== "number") {
+                return createInvalidResult(payload, "sub_account_index", "Sub account index must be a number");
+            }
+            return null;
+        },
+    });
+};
 const createAssetCreateDescriptor = () => {
     return Object.freeze({
         schema: js_polo_1.schema.struct({
@@ -102,7 +128,6 @@ const createAccountConfigureDescriptor = () => {
             })),
         }),
         validator: ({ payload }) => {
-            console.log(payload);
             if (payload.add == null && payload.revoke == null) {
                 return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
@@ -326,6 +351,7 @@ const createLogicActionDescriptor = () => {
 };
 const ixOpDescriptor = {
     [enums_1.OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
+    [enums_1.OpType.AccountInherit]: createAccountInheritDescriptor(),
     [enums_1.OpType.AccountConfigure]: createAccountConfigureDescriptor(),
     [enums_1.OpType.AssetCreate]: createAssetCreateDescriptor(),
     [enums_1.OpType.AssetMint]: createAssetSupplyDescriptorFor(),
