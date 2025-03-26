@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InteractionResponse = exports.VoyageProvider = exports.NetworkType = exports.WebsocketTransport = exports.HttpTransport = exports.WebsocketProvider = exports.WebsocketEvent = exports.JsonRpcProvider = exports.HttpProvider = void 0;
+exports.InteractionResponse = exports.BrowserProvider = exports.VoyageProvider = exports.NetworkType = exports.WebsocketTransport = exports.HttpTransport = exports.WebsocketProvider = exports.WebsocketEvent = exports.JsonRpcProvider = exports.HttpProvider = void 0;
 var http_provider_1 = require("./provider/http-provider");
 Object.defineProperty(exports, "HttpProvider", { enumerable: true, get: function () { return http_provider_1.HttpProvider; } });
 var json_rpc_provider_1 = require("./provider/json-rpc-provider");
@@ -15,6 +15,8 @@ Object.defineProperty(exports, "WebsocketTransport", { enumerable: true, get: fu
 var voyage_provider_1 = require("./provider/voyage-provider");
 Object.defineProperty(exports, "NetworkType", { enumerable: true, get: function () { return voyage_provider_1.NetworkType; } });
 Object.defineProperty(exports, "VoyageProvider", { enumerable: true, get: function () { return voyage_provider_1.VoyageProvider; } });
+var browser_provider_1 = require("./provider/browser-provider");
+Object.defineProperty(exports, "BrowserProvider", { enumerable: true, get: function () { return browser_provider_1.BrowserProvider; } });
 var interaction_response_1 = require("./utils/interaction-response");
 Object.defineProperty(exports, "InteractionResponse", { enumerable: true, get: function () { return interaction_response_1.InteractionResponse; } });
 //# sourceMappingURL=index.js.map

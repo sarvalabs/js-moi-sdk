@@ -4,5 +4,6 @@ export { WebsocketEvent, WebsocketProvider } from "./provider/websocket-provider
 export { HttpTransport } from "./transport/http-transport";
 export { WebsocketTransport } from "./transport/ws-transport";
 export { NetworkType, VoyageProvider } from "./provider/voyage-provider";
+export { BrowserProvider } from "./provider/browser-provider";
 export { InteractionResponse } from "./utils/interaction-response";
 //# sourceMappingURL=index.js.map
