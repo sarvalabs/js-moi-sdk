@@ -66,3 +66,6 @@ Classes
 
 .. autoclass:: Wallet(privateKey, curve, [provider])
     :members:
+
+.. autoclass:: BrowserWallet
+    :members:

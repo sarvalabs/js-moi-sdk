@@ -30,7 +30,7 @@ Classes
 
 .. autoclass:: KramaId
     :members:
-
+    
 Functions
 ---------
 
