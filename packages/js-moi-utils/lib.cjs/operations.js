@@ -104,7 +104,6 @@ const createAccountConfigureDescriptor = () => {
     return Object.freeze({
         schema: schema,
         validator: ({ payload }) => {
-            console.log(payload);
             if (payload.add == null && payload.revoke == null) {
                 return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
             }
