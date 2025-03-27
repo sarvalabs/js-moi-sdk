@@ -1,23 +1,47 @@
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
-import { Schema as PoloSchema } from "js-polo";
-import { LogicManifest } from "../types/manifest";
+import { ElementType, ErrorCode, ErrorUtils, type LogicElement, type TypeField } from "js-moi-utils";
+import { Schema as PoloSchema, schema, type StructSchema } from "js-polo";
 
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 
 const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
 
+/**
+ * Checks if the given type is a primitive type.
+ *
+ * @param type - The type to check.
+ * @returns `true` if the type is a primitive type, otherwise `false`.
+ */
 export const isPrimitiveType = (type: string): boolean => {
     return primitiveTypes.includes(type);
 };
 
+/**
+ * Checks if the given type string matches the array pattern.
+ *
+ * @param type - The type string to be checked.
+ * @returns `true` if the type string matches the array pattern, otherwise `false`.
+ */
 export const isArray = (type: string): boolean => {
     return ARRAY_MATCHER_REGEX.test(type);
 };
 
+/**
+ * Checks if the given type string starts with "map".
+ *
+ * @param type - The type string to check.
+ * @returns `true` if the type string starts with "map", otherwise `false`.
+ */
 export const isMap = (type: string): boolean => {
     return type.startsWith("map");
 };
 
+/**
+ * Checks if a given type is present in the class definitions map.
+ *
+ * @param type - The type to check for in the class definitions.
+ * @param classDefs - A map containing class definitions where the key is the class type and the value is a number.
+ * @returns `true` if the type is present in the class definitions map, otherwise `false`.
+ */
 export const isClass = (type: string, classDefs: Map<string, number>): boolean => {
     return classDefs.has(type);
 };
@@ -31,254 +55,114 @@ export const isClass = (type: string, classDefs: Map<string, number>): boolean =
  * @class
  */
 export class Schema {
-    private elements: Map<number, LogicManifest.Element>;
+    private elements: Map<number, LogicElement>;
     private classDefs: Map<string, number>;
 
-    constructor(elements: Map<number, LogicManifest.Element>, classDefs: Map<string, number>) {
+    constructor(elements: Map<number, LogicElement>, classDefs: Map<string, number>) {
         this.elements = elements;
         this.classDefs = classDefs;
     }
 
-    public static PISA_ENGINE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            kind: {
-                kind: "string",
-            },
-            flags: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            }
-        },
-    };
+    public static PISA_ENGINE_SCHEMA = schema.struct({
+        kind: schema.string,
+        flags: schema.arrayOf(
+            schema.struct({
+                values: schema.string,
+            })
+        ),
+    });
 
-    public static PISA_DEPS_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "integer",
-            },
-        },
-    };
+    public static PISA_DEPS_SCHEMA = schema.arrayOf(schema.integer);
 
-    public static PISA_TYPE_FIELD_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "struct",
-                fields: {
-                    slot: {
-                        kind: "integer",
-                    },
-                    label: {
-                        kind: "string",
-                    },
-                    type: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
+    public static PISA_TYPE_FIELD_SCHEMA = schema.arrayOf(
+        schema.struct({
+            slot: schema.integer,
+            label: schema.string,
+            type: schema.string,
+        })
+    );
 
-    public static PISA_METHOD_FIELD_SCHEMA = {
-        kind: "array",
-        fields: {
-            values: {
-                kind: "struct",
-                fields: {
-                    ptr: {
-                        kind: "integer",
-                    },
-                    code: {
-                        kind: "integer",
-                    },
-                },
-            },
-        },
-    };
+    public static PISA_METHOD_FIELD_SCHEMA = schema.arrayOf(
+        schema.struct({
+            ptr: schema.integer,
+            code: schema.integer,
+        })
+    );
 
-    public static PISA_INSTRUCTIONS_SCHEMA = {
-        kind: "struct",
-        fields: {
-            bin: {
-                kind: "bytes",
-            },
-            hex: {
-                kind: "string",
-            },
-            asm: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
+    public static PISA_INSTRUCTIONS_SCHEMA = schema.struct({
+        bin: schema.bytes,
+        hex: schema.string,
+        asm: schema.arrayOf(schema.string),
+    });
 
-    public static PISA_STATE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            mode: {
-                kind: "string",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-        },
-    };
+    public static PISA_STATE_SCHEMA = schema.struct({
+        mode: schema.string,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+    });
 
-    public static PISA_CONSTANT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            type: {
-                kind: "string",
-            },
-            value: {
-                kind: "string",
-            },
-        },
-    };
+    public static PISA_CONSTANT_SCHEMA = schema.struct({
+        type: schema.string,
+        value: schema.string,
+    });
 
-    public static PISA_TYPEDEF_SCHEMA = {
-        kind: "string",
-        fields: {},
-    };
+    public static PISA_TYPEDEF_SCHEMA = schema.string;
 
-    public static PISA_CLASS_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            methods: {
-                ...Schema.PISA_METHOD_FIELD_SCHEMA,
-            },
-        },
-    };
+    public static PISA_CLASS_SCHEMA = schema.struct({
+        name: schema.string,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        methods: { ...Schema.PISA_METHOD_FIELD_SCHEMA },
+    });
 
-    public static PISA_ROUTINE_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            mode: {
-                kind: "string",
-            },
-            kind: {
-                kind: "string",
-            },
-            accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
-            },
-            catches: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
+    public static PISA_ROUTINE_SCHEMA = schema.struct({
+        name: schema.string,
+        mode: schema.string,
+        kind: schema.string,
+        accepts: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        returns: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        executes: { ...Schema.PISA_INSTRUCTIONS_SCHEMA },
+        catches: schema.arrayOf(schema.string),
+    });
 
-    public static PISA_METHOD_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            class: {
-                kind: "string",
-            },
-            mutable: {
-                kind: "bool",
-            },
-            accepts: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            returns: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA,
-            },
-            executes: {
-                ...Schema.PISA_INSTRUCTIONS_SCHEMA,
-            },
-            catches: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
+    public static PISA_METHOD_SCHEMA = schema.struct({
+        name: schema.string,
+        class: schema.string,
+        mutable: schema.boolean,
+        accepts: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        returns: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+        executes: { ...Schema.PISA_INSTRUCTIONS_SCHEMA },
+        catches: schema.arrayOf(schema.string),
+    });
 
-    public static PISA_EVENT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            name: {
-                kind: "string",
-            },
-            topics: {
-                kind: "integer",
-            },
-            fields: {
-                ...Schema.PISA_TYPE_FIELD_SCHEMA, 
-            }
-        }
-    }
+    public static PISA_EVENT_SCHEMA = schema.struct({
+        name: schema.string,
+        topics: schema.integer,
+        fields: { ...Schema.PISA_TYPE_FIELD_SCHEMA },
+    });
 
-    public static PISA_EXCEPTION_SCHEMA = {
-        kind: "struct",
-        fields: {
-            class: {
-                kind: "string",
-            },
-            error: {
-                kind: "string",
-            },
-            revert: {
-                kind: "bool",
-            },
-            trace: {
-                kind: "array",
-                fields: {
-                    values: {
-                        kind: "string",
-                    },
-                },
-            },
-        },
-    };
+    public static PISA_EXCEPTION_SCHEMA = schema.struct({
+        class: schema.string,
+        error: schema.string,
+        revert: schema.boolean,
+        trace: schema.arrayOf(schema.string),
+    });
 
-    public static PISA_RESULT_SCHEMA = {
-        kind: "struct",
-        fields: {
-            outputs: {
-                kind: "bytes",
-            },
-            error: {
-                kind: "bytes",
-            },
-        },
-    };
+    public static PISA_RESULT_SCHEMA = schema.struct({
+        outputs: schema.bytes,
+        error: schema.bytes,
+    });
+
+    // public static PISA_BUILT_IN_LOG_SCHEMA = {
+    //     kind: "struct",
+    //     fields: {
+    //         value: {
+    //             kind: "string",
+    //         },
+    //     },
+    // };
+
+    public static PISA_BUILT_IN_LOG_SCHEMA = schema.struct({
+        value: schema.string,
+    });
 
     /**
      * Extracts the array data type from the provided data type string.
@@ -335,10 +219,7 @@ export class Schema {
         const value = dataType.replace("map[" + key + "]", "");
 
         if (!key || !value) {
-            ErrorUtils.throwError(
-                "Failed to extract map type: The key or value type of the map could not be determined.",
-                ErrorCode.INVALID_ARGUMENT
-            );
+            ErrorUtils.throwError("Failed to extract map type: The key or value type of the map could not be determined.", ErrorCode.INVALID_ARGUMENT);
         }
 
         return [key, value];
@@ -351,23 +232,23 @@ export class Schema {
      * @returns {string} The converted data type.
      * @throws {Error} If the data type is unsupported.
      */
-    public static convertPrimitiveDataType(type: string): string {
+    public static convertPrimitiveDataType(type: string): PoloSchema {
         switch (type) {
             case "null":
-                return "null";
+                return schema.null;
             case "bool":
-                return "bool";
+                return schema.boolean;
             case "bytes":
             case "address":
-                return "bytes";
+                return schema.bytes;
             case "string":
-                return "string";
+                return schema.string;
             case "u64":
             case "u256":
             case "i64":
             case "i256":
             case "bigint":
-                return "integer";
+                return schema.integer;
             default:
                 ErrorUtils.throwError("Unsupported data type!", ErrorCode.UNSUPPORTED_OPERATION);
         }
@@ -379,7 +260,7 @@ export class Schema {
      * @param {string} className - The name of the class.
      * @returns {object} The schema for the class.
      */
-    public static parseClassFields(className: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema {
+    public static parseClassFields(className: string, classDef: Map<string, number>, elements: Map<number, LogicElement>): StructSchema {
         const ptr = classDef.get(className);
         if (ptr === undefined) {
             ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
@@ -387,12 +268,15 @@ export class Schema {
 
         const element = elements.get(ptr);
 
-        const schema = {
+        const schema: StructSchema = {
             kind: "struct",
-            fields: {},
+            fields: {} as Record<string, PoloSchema>,
         };
 
-        element.data = element.data as LogicManifest.Class;
+        if (element?.kind !== ElementType.Class) {
+            ErrorUtils.throwError(`Invalid class element: ${className}`, ErrorCode.INVALID_ARGUMENT);
+        }
+
         Object.values(element.data.fields).forEach((field) => {
             schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements);
         });
@@ -409,29 +293,19 @@ export class Schema {
      * @returns {object} The schema generated based on the data type.
      * @throws {Error} If the data type is unsupported.
      */
-    public static parseDataType(type: string, classDef: Map<string, number>, elements: Map<number, LogicManifest.Element>): PoloSchema {
+    public static parseDataType(type: string, classDef: Map<string, number>, elements: Map<number, LogicElement>): PoloSchema {
         switch (true) {
             case isPrimitiveType(type):
-                return {
-                    kind: Schema.convertPrimitiveDataType(type),
-                };
+                return Schema.convertPrimitiveDataType(type);
             case isArray(type):
                 const values = Schema.extractArrayDataType(type);
-                return {
-                    kind: "array",
-                    fields: {
-                        values: Schema.parseDataType(values, classDef, elements),
-                    },
-                };
+                return schema.arrayOf(Schema.parseDataType(values, classDef, elements));
             case isMap(type):
                 const [key, value] = Schema.extractMapDataType(type);
-                return {
-                    kind: "map",
-                    fields: {
-                        keys: Schema.parseDataType(key, classDef, elements),
-                        values: Schema.parseDataType(value, classDef, elements),
-                    },
-                };
+                return schema.map({
+                    keys: Schema.parseDataType(key, classDef, elements),
+                    values: Schema.parseDataType(value, classDef, elements),
+                });
             case isClass(type, classDef):
                 return this.parseClassFields(type, classDef, elements);
             default:
@@ -446,10 +320,10 @@ export class Schema {
      * @returns {PoloSchema} The generated schema based on the fields.
      * @throws {Error} If the fields are invalid or contain unsupported data types.
      */
-    public parseFields(fields: LogicManifest.TypeField[]): PoloSchema {
-        const schema = {
+    public parseFields(fields: TypeField[]): StructSchema {
+        const schema: StructSchema = {
             kind: "struct",
-            fields: {},
+            fields: {} as Record<string, PoloSchema>,
         };
 
         if (!Array.isArray(fields)) {
