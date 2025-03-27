@@ -2,9 +2,30 @@ import { Identifier } from "js-moi-identifiers";
 import { BrowserProvider } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { bytesToHex, ErrorUtils } from "js-moi-utils";
+/**
+ * The `BrowserWallet` class extends the `Signer` class and provides functionality
+ * for interacting with a browser-based wallet. It is designed to handle signing
+ * operations, interaction requests, and execution of interactions with a blockchain
+ * or decentralized application.
+ *
+ * This class is specifically tailored for use in browser environments and requires
+ * a `BrowserProvider` to function correctly.
+ *
+ * @example
+ * const identifier = "0x123...";
+ * const wallet = new BrowserWallet(identifier, { provider });
+ *
+ * @extends Signer
+ */
 export class BrowserWallet extends Signer {
     keyId;
     identifier;
+    /**
+     * Constructs a new instance of the browser wallet.
+     *
+     * @param {Hex} identifier - A hexadecimal string representing the unique identifier for the wallet.
+     * @param {WalletOption} option - An optional object containing additional options for the wallet.
+     */
     constructor(identifier, option) {
         super(option?.provider);
         this.identifier = new Identifier(identifier);
