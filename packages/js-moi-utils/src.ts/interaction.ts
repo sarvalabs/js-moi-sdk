@@ -118,6 +118,15 @@ const gatherIxParticipants = (interaction: InteractionRequest) => {
                 break;
             }
 
+            case OpType.AccountInherit: {
+                participants.set(payload.target_account, {
+                    id: payload.target_account,
+                    lock_type: LockType.MutateLock,
+                    notary: false,
+                });
+                break;
+            }
+
             case OpType.AssetMint:
             case OpType.AssetBurn: {
                 const identifier = new AssetId(payload.asset_id);

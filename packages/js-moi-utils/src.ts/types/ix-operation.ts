@@ -196,6 +196,18 @@ export interface RawAccountConfigurePayload {
     revoke?: KeyRevokePayload[];
 }
 
+export interface AccountInheritPayload {
+    target_account: Hex;
+    amount: number;
+    sub_account_index: number;
+}
+
+export interface RawAccountInheritPayload {
+    target_account: Uint8Array;
+    amount: number;
+    sub_account_index: number;
+}
+
 export interface RawAssetSupplyPayload {
     asset_id: Uint8Array;
     amount: number;
@@ -231,6 +243,8 @@ export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantC
     ? LogicActionPayload
     : T extends OpType.AccountConfigure
     ? AccountConfigurePayload
+    : T extends OpType.AccountInherit
+    ? AccountInheritPayload
     : never;
 
 export type RawIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate
@@ -255,6 +269,8 @@ export type RawIxOperationPayload<T extends OpType> = T extends OpType.Participa
     ? RawLogicActionPayload
     : T extends OpType.AccountConfigure
     ? RawAccountConfigurePayload
+    : T extends OpType.AccountInherit
+    ? RawAccountInheritPayload
     : never;
 
 /**
@@ -298,4 +314,5 @@ export type AnyIxOperation =
     | IxOperation<OpType.LogicEnlist>
     | IxOperation<OpType.LogicInvoke>
     | IxOperation<OpType.ParticipantCreate>
-    | IxOperation<OpType.AccountConfigure>;
+    | IxOperation<OpType.AccountConfigure>
+    | IxOperation<OpType.AccountInherit>;
