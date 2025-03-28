@@ -225,7 +225,7 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
     private newRoutine(routine: string) {
         const isDeployerRoutine = this.getRoutineType(routine) === RoutineType.Deploy;
 
-        const callback: RoutineCallback = async (...args: unknown[]) => {
+        const callback = async (...args) => {
             const isDeployed = await this.isDeployed();
 
             if (isDeployerRoutine && isDeployed) {
@@ -266,7 +266,7 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
             return response;
         };
 
-        return callback;
+        return callback as RoutineCallback;
     }
 
     private setupEndpoint() {
