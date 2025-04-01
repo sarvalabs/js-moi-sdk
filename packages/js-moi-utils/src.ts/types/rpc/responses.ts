@@ -253,10 +253,17 @@ export interface InteractionConfirmation {
     fuel_spent: number;
 }
 
+export interface InteractionSignature {
+    id: Hex;
+    signature: Hex;
+    key_id: number;
+}
+
 export interface Interaction {
     hash: Hex;
     status: InteractionStatus;
     interaction: InteractionInfo;
+    signatures: InteractionSignature[];
     confirmation?: InteractionConfirmation;
 }
 
