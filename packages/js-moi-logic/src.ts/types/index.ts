@@ -18,21 +18,7 @@ type RoutineExecuteResult = InteractionResponse | Record<any, any>;
 // This is pretty the below code as it more readable
 // prettier-ignore
 export interface RoutineCallback {
-    <TRes extends RoutineExecuteResult = any>(option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, arg13: any, option?: RoutineOption): Promise<TRes>;
-    <TRes extends RoutineExecuteResult = any>(arg1: any, arg2: any, arg3: any, arg4: any, arg5: any, arg6: any, arg7: any, arg8: any, arg9: any, arg10: any, arg11: any, arg12: any, arg13: any, arg14: any, option?: RoutineOption): Promise<TRes>;
+    <TRes extends RoutineExecuteResult = any>(...args: [...args: any[]] | [...args: any[], option: RoutineOption]): Promise<TRes>;
 }
 
 export type LogicRoutines = Record<string, RoutineCallback>;
