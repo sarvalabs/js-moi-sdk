@@ -73,8 +73,8 @@ export interface AccountLockup {
 export type KramaID = string;
 
 export interface Guardians {
-    behavior: KramaID[];
-    stochastic: KramaID[];
+    consensus: KramaID[];
+    stochastic: KramaID[] | null;
 }
 
 export interface Enlisted {}
