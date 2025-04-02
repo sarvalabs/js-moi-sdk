@@ -186,7 +186,7 @@ export interface InteractionInfo {
     operations: OperationItem[];
     accounts: IxParticipant[];
     metadata: Hex;
-    preference: Preference;
+    preferences: Preference;
     perception: Hex;
 }
 export interface TesseractInfo {
