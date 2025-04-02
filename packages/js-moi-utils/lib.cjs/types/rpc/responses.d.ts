@@ -244,14 +244,10 @@ export interface AssetMetadata {
 }
 export interface AssetController {
 }
-export interface AssetCreator {
-    address: Address;
-    balance: Quantity;
-}
 export interface Asset {
     metadata: AssetMetadata;
     controller?: AssetController;
-    creator?: AssetCreator;
+    creator?: Hex;
     editions?: Hex[];
 }
 export interface LogicEvent {

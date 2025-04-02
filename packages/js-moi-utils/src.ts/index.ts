@@ -127,7 +127,6 @@ export type {
     AssetActionOperation,
     AssetController,
     AssetCreateOperation,
-    AssetCreator,
     AssetMetadata,
     AssetSupplyOperation,
     Commits,
