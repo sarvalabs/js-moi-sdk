@@ -33,6 +33,7 @@ export interface AccountMetaData {
     id: Hex;
     height: number;
     tesseract: Hex;
+    inherited_account: Hex;
 }
 
 export interface AccountState {
