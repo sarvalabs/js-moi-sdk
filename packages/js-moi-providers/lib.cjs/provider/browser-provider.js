@@ -19,10 +19,7 @@ const json_rpc_provider_1 = require("./json-rpc-provider");
  * @extends JsonRpcProvider
  */
 class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
-    events = new Set([
-        "accountChange",
-        "networkChange",
-    ]);
+    events = new Set(["accountChange", "networkChange"]);
     constructor(transport) {
         super(transport);
     }
@@ -63,9 +60,7 @@ class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
         return this.processJsonRpcResponse(response);
     }
     async sendInteraction(interaction) {
-        const response = await this.request("wallet.SendInteraction", [
-            interaction,
-        ]);
+        const response = await this.request("wallet.SendInteraction", [interaction]);
         const hash = this.processJsonRpcResponse(response);
         return new interaction_response_1.InteractionResponse(hash, this);
     }
