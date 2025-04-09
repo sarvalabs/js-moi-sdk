@@ -20,8 +20,6 @@ import type { WalletOption } from "../types/wallet";
  * @extends Signer
  */
 export class BrowserWallet extends Signer {
-    private readonly keyId: number;
-
     private readonly identifier: Identifier;
 
     /**
@@ -30,15 +28,20 @@ export class BrowserWallet extends Signer {
      * @param {Hex} identifier - A hexadecimal string representing the unique identifier for the wallet.
      * @param {WalletOption} option - An optional object containing additional options for the wallet.
      */
-    constructor(identifier: Hex, option?: WalletOption) {
+    constructor(identifier: Hex, option?: Omit<WalletOption, "keyId">) {
         super(option?.provider);
 
         this.identifier = new Identifier(identifier);
-        this.keyId = option?.keyId ?? 0;
     }
 
     public async getKeyId(): Promise<number> {
-        return this.keyId;
+        const account = await this.getProvider().getWalletAccount(this.identifier);
+
+        if (account == null) {
+            ErrorUtils.throwError("Account not found in wallet extension.");
+        }
+
+        return account.keyId;
     }
 
     public async getIdentifier(): Promise<Identifier> {

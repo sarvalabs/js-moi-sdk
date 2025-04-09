@@ -18,7 +18,6 @@ import { bytesToHex, ErrorUtils } from "js-moi-utils";
  * @extends Signer
  */
 export class BrowserWallet extends Signer {
-    keyId;
     identifier;
     /**
      * Constructs a new instance of the browser wallet.
@@ -29,10 +28,13 @@ export class BrowserWallet extends Signer {
     constructor(identifier, option) {
         super(option?.provider);
         this.identifier = new Identifier(identifier);
-        this.keyId = option?.keyId ?? 0;
     }
     async getKeyId() {
-        return this.keyId;
+        const account = await this.getProvider().getWalletAccount(this.identifier);
+        if (account == null) {
+            ErrorUtils.throwError("Account not found in wallet extension.");
+        }
+        return account.keyId;
     }
     async getIdentifier() {
         return this.identifier;

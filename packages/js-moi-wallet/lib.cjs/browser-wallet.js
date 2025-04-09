@@ -21,7 +21,6 @@ const js_moi_utils_1 = require("js-moi-utils");
  * @extends Signer
  */
 class BrowserWallet extends js_moi_signer_1.Signer {
-    keyId;
     identifier;
     /**
      * Constructs a new instance of the browser wallet.
@@ -32,10 +31,13 @@ class BrowserWallet extends js_moi_signer_1.Signer {
     constructor(identifier, option) {
         super(option?.provider);
         this.identifier = new js_moi_identifiers_1.Identifier(identifier);
-        this.keyId = option?.keyId ?? 0;
     }
     async getKeyId() {
-        return this.keyId;
+        const account = await this.getProvider().getWalletAccount(this.identifier);
+        if (account == null) {
+            js_moi_utils_1.ErrorUtils.throwError("Account not found in wallet extension.");
+        }
+        return account.keyId;
     }
     async getIdentifier() {
         return this.identifier;
