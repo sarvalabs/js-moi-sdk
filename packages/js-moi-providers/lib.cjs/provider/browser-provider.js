@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrowserProvider = void 0;
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const interaction_response_1 = require("../utils/interaction-response");
 const json_rpc_provider_1 = require("./json-rpc-provider");
 /**
@@ -18,7 +19,10 @@ const json_rpc_provider_1 = require("./json-rpc-provider");
  * @extends JsonRpcProvider
  */
 class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
-    events = new Set(["accountChange", "networkChange"]);
+    events = new Set([
+        "accountChange",
+        "networkChange",
+    ]);
     constructor(transport) {
         super(transport);
     }
@@ -59,7 +63,9 @@ class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
         return this.processJsonRpcResponse(response);
     }
     async sendInteraction(interaction) {
-        const response = await this.request("wallet.SendInteraction", [interaction]);
+        const response = await this.request("wallet.SendInteraction", [
+            interaction,
+        ]);
         const hash = this.processJsonRpcResponse(response);
         return new interaction_response_1.InteractionResponse(hash, this);
     }
@@ -76,6 +82,17 @@ class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
     async getWalletPublicKey(id) {
         const params = id ? [id] : [];
         const response = await this.request("wallet.EncryptionPublicKey", params);
+        return this.processJsonRpcResponse(response);
+    }
+    /**
+     * Gets the details of a wallet account.
+     *
+     * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
+     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     */
+    async getWalletAccount(id) {
+        const value = id instanceof js_moi_identifiers_1.Identifier ? id.toHex() : id;
+        const response = await this.request("wallet.Account", [value]);
         return this.processJsonRpcResponse(response);
     }
     /**

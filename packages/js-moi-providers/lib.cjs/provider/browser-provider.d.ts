@@ -1,3 +1,4 @@
+import { Identifier } from "js-moi-identifiers";
 import type { Hex, InteractionRequest, JsonRpcResponse, Transport } from "js-moi-utils";
 import { InteractionResponse } from "../utils/interaction-response";
 import { JsonRpcProvider } from "./json-rpc-provider";
@@ -20,6 +21,12 @@ export interface NetworkConfiguration {
     name: string;
     jsonRpcHost: string;
     blockExplorer?: string;
+}
+export interface AccountConfiguration {
+    address: Hex;
+    name: Hex;
+    path: string;
+    keyId: number;
 }
 export interface WalletEventListenerMap {
     accountChange: (identifier: Hex) => void;
@@ -80,6 +87,13 @@ export declare class BrowserProvider extends JsonRpcProvider {
      * @throws Will throw an error if the JSON-RPC request fails or the response is invalid.
      */
     getWalletPublicKey(id?: Hex): Promise<string>;
+    /**
+     * Gets the details of a wallet account.
+     *
+     * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
+     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     */
+    getWalletAccount(id?: Hex | Identifier | null): Promise<AccountConfiguration | null>;
     /**
      * Retrieves the network configuration from the wallet.
      *

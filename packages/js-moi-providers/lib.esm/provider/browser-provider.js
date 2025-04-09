@@ -1,3 +1,4 @@
+import { Identifier } from "js-moi-identifiers";
 import { InteractionResponse } from "../utils/interaction-response";
 import { JsonRpcProvider } from "./json-rpc-provider";
 /**
@@ -15,7 +16,10 @@ import { JsonRpcProvider } from "./json-rpc-provider";
  * @extends JsonRpcProvider
  */
 export class BrowserProvider extends JsonRpcProvider {
-    events = new Set(["accountChange", "networkChange"]);
+    events = new Set([
+        "accountChange",
+        "networkChange",
+    ]);
     constructor(transport) {
         super(transport);
     }
@@ -56,7 +60,9 @@ export class BrowserProvider extends JsonRpcProvider {
         return this.processJsonRpcResponse(response);
     }
     async sendInteraction(interaction) {
-        const response = await this.request("wallet.SendInteraction", [interaction]);
+        const response = await this.request("wallet.SendInteraction", [
+            interaction,
+        ]);
         const hash = this.processJsonRpcResponse(response);
         return new InteractionResponse(hash, this);
     }
@@ -73,6 +79,17 @@ export class BrowserProvider extends JsonRpcProvider {
     async getWalletPublicKey(id) {
         const params = id ? [id] : [];
         const response = await this.request("wallet.EncryptionPublicKey", params);
+        return this.processJsonRpcResponse(response);
+    }
+    /**
+     * Gets the details of a wallet account.
+     *
+     * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
+     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     */
+    async getWalletAccount(id) {
+        const value = id instanceof Identifier ? id.toHex() : id;
+        const response = await this.request("wallet.Account", [value]);
         return this.processJsonRpcResponse(response);
     }
     /**
