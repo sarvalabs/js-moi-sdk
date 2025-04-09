@@ -1,5 +1,4 @@
 import type { Hex, InteractionRequest, JsonRpcResponse, Transport } from "js-moi-utils";
-import type { ExecuteIx } from "../types/provider";
 import { InteractionResponse } from "../utils/interaction-response";
 import { JsonRpcProvider } from "./json-rpc-provider";
 export interface RequestPermissions {
@@ -69,43 +68,6 @@ export declare class BrowserProvider extends JsonRpcProvider {
      * @returns {Promise<object>} A promise that resolves to an array containing the result of the requested permission.
      */
     requestPermissions<TKey extends keyof RequestPermissions>(key: TKey, permission: RequestPermissions[TKey]): Promise<[RequestPermissionsResult[TKey]]>;
-    /**
-     * Signs a given message using the specified account.
-     *
-     * @param {Hex} message - The message to be signed, represented as a hexadecimal string.
-     * @param {Hex} account - The account address to use for signing, represented as a hexadecimal string.
-     * @returns {Promise<Hex>} A promise that resolves to the signed message as a hexadecimal string.
-     *
-     * @throws Will throw an error if the signing process fails or the JSON-RPC response is invalid.
-     *
-     * @example
-     *
-     * const message = "Hello, World!";
-     * const encodedMessage = bytesToHex(new TextEncoder().encode(message));
-     * const account = "0x123456...";
-     *
-     * const signedMessage = await provider.sign(encodedMessage, account);
-     * console.log("Signed Message:", signedMessage);
-     *
-     * >> "Signed Message: 0xabcdef..."
-     */
-    sign(message: Hex, account: Hex): Promise<Hex>;
-    /**
-     * Signs a given interaction using the sender account mentioned in the interaction.
-     *
-     * @param {InteractionRequest} interaction - The interaction to be signed, represented as a hexadecimal string.
-     * @returns {Promise<ExecuteIx>} A promise that resolves to the object containing the signed payload.
-     *
-     * @throws Will throw an error if the signing process fails or the JSON-RPC response is invalid.
-     *
-     * @example
-     *
-     * const ix = { sender: { id: "0xabc..." }, ... };
-     * const signedIx = await provider.signInteraction(ix);
-     * console.log("Signed Interaction:", signedIx);
-     * >> "Signed Interaction: { ... }"
-     */
-    signInteraction(interaction: InteractionRequest): Promise<ExecuteIx>;
     sendInteraction(interaction: InteractionRequest): Promise<InteractionResponse>;
     /**
      * Retrieves the public encryption key of a wallet.
@@ -114,7 +76,7 @@ export declare class BrowserProvider extends JsonRpcProvider {
      * - If the `id` parameter is not provided, it retrieves the public encryption key for the master account.
      *
      * @param {string} id - (Optional) The hexadecimal identifier of the wallet
-     * @returns {Promise<strin>} A promise that resolves to the wallet's public encryption key as a string.
+     * @returns {Promise<string>} A promise that resolves to the wallet's public encryption key as a string.
      * @throws Will throw an error if the JSON-RPC request fails or the response is invalid.
      */
     getWalletPublicKey(id?: Hex): Promise<string>;

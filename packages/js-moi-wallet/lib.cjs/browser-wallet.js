@@ -50,18 +50,23 @@ class BrowserWallet extends js_moi_signer_1.Signer {
     async sign(message, _sig) {
         const provider = this.getProvider();
         const hexEncodedMessage = message instanceof Uint8Array ? (0, js_moi_utils_1.bytesToHex)(message) : message;
-        return await provider.sign(hexEncodedMessage, this.identifier.toHex());
+        const response = await provider.request("wallet.SignMessage", [hexEncodedMessage, this.identifier.toHex()]);
+        return provider.processJsonRpcResponse(response);
     }
     async signInteraction(ix, _sig) {
         const provider = this.getProvider();
-        return await provider.signInteraction(ix);
+        const response = await provider.request("wallet.SignInteraction", [ix]);
+        return provider.processJsonRpcResponse(response);
     }
     async execute(arg) {
         if ("interaction" in arg) {
             return await this.getProvider().execute(arg);
         }
+        const provider = this.getProvider();
         const request = await this.createIxRequest("moi.Execute", arg);
-        return await this.getProvider().sendInteraction(request);
+        const response = await provider.request("wallet.SendInteraction", [request]);
+        const hash = provider.processJsonRpcResponse(response);
+        return new js_moi_providers_1.InteractionResponse(hash, provider);
     }
 }
 exports.BrowserWallet = BrowserWallet;

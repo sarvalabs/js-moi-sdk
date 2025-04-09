@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import { BrowserProvider, type ExecuteIx, type InteractionResponse } from "js-moi-providers";
+import { BrowserProvider, InteractionResponse, type ExecuteIx } from "js-moi-providers";
 import { Signer, type SignerIx, type SigType } from "js-moi-signer";
 import { type AnyIxOperation, type Hex, type InteractionRequest } from "js-moi-utils";
 import type { WalletOption } from "../types/wallet";

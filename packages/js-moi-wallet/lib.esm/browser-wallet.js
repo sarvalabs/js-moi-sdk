@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import { BrowserProvider } from "js-moi-providers";
+import { BrowserProvider, InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { bytesToHex, ErrorUtils } from "js-moi-utils";
 /**
@@ -47,18 +47,23 @@ export class BrowserWallet extends Signer {
     async sign(message, _sig) {
         const provider = this.getProvider();
         const hexEncodedMessage = message instanceof Uint8Array ? bytesToHex(message) : message;
-        return await provider.sign(hexEncodedMessage, this.identifier.toHex());
+        const response = await provider.request("wallet.SignMessage", [hexEncodedMessage, this.identifier.toHex()]);
+        return provider.processJsonRpcResponse(response);
     }
     async signInteraction(ix, _sig) {
         const provider = this.getProvider();
-        return await provider.signInteraction(ix);
+        const response = await provider.request("wallet.SignInteraction", [ix]);
+        return provider.processJsonRpcResponse(response);
     }
     async execute(arg) {
         if ("interaction" in arg) {
             return await this.getProvider().execute(arg);
         }
+        const provider = this.getProvider();
         const request = await this.createIxRequest("moi.Execute", arg);
-        return await this.getProvider().sendInteraction(request);
+        const response = await provider.request("wallet.SendInteraction", [request]);
+        const hash = provider.processJsonRpcResponse(response);
+        return new InteractionResponse(hash, provider);
     }
 }
 //# sourceMappingURL=browser-wallet.js.map

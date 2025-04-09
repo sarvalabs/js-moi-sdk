@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import { BrowserProvider, type ExecuteIx, type InteractionResponse } from "js-moi-providers";
+import { BrowserProvider, InteractionResponse, type ExecuteIx } from "js-moi-providers";
 import { Signer, type SignerIx, type SigType } from "js-moi-signer";
 import { bytesToHex, ErrorUtils, type AnyIxOperation, type Hex, type InteractionRequest } from "js-moi-utils";
 import type { WalletOption } from "../types/wallet";
@@ -58,13 +58,15 @@ export class BrowserWallet extends Signer {
     async sign(message: Hex | Uint8Array, _sig: SigType): Promise<Hex> {
         const provider = this.getProvider();
         const hexEncodedMessage = message instanceof Uint8Array ? bytesToHex(message) : message;
+        const response = await provider.request<Hex>("wallet.SignMessage", [hexEncodedMessage, this.identifier.toHex()]);
 
-        return await provider.sign(hexEncodedMessage, this.identifier.toHex());
+        return provider.processJsonRpcResponse(response);
     }
 
     async signInteraction(ix: InteractionRequest, _sig: SigType): Promise<ExecuteIx> {
         const provider = this.getProvider();
-        return await provider.signInteraction(ix);
+        const response = await provider.request<ExecuteIx>("wallet.SignInteraction", [ix]);
+        return provider.processJsonRpcResponse(response);
     }
 
     async execute(arg: SignerIx<InteractionRequest> | AnyIxOperation | AnyIxOperation[] | ExecuteIx): Promise<InteractionResponse> {
@@ -72,7 +74,11 @@ export class BrowserWallet extends Signer {
             return await this.getProvider().execute(arg);
         }
 
+        const provider = this.getProvider();
         const request = await this.createIxRequest("moi.Execute", arg);
-        return await this.getProvider().sendInteraction(request);
+        const response = await provider.request<Hex>("wallet.SendInteraction", [request]);
+        const hash = provider.processJsonRpcResponse(response);
+
+        return new InteractionResponse(hash, provider);
     }
 }
