@@ -1,5 +1,5 @@
+import { Identifier } from "js-moi-identifiers";
 import type { Hex, InteractionRequest, JsonRpcResponse, Transport } from "js-moi-utils";
-import type { ExecuteIx } from "../types/provider";
 import { InteractionResponse } from "../utils/interaction-response";
 import { JsonRpcProvider } from "./json-rpc-provider";
 
@@ -21,6 +21,13 @@ export interface NetworkConfiguration {
     name: string;
     jsonRpcHost: string;
     blockExplorer?: string;
+}
+
+export interface AccountConfiguration {
+    address: Hex;
+    name: Hex;
+    path: string;
+    keyId: number;
 }
 
 export interface WalletEventListenerMap {
@@ -94,51 +101,6 @@ export class BrowserProvider extends JsonRpcProvider {
         return this.processJsonRpcResponse(response);
     }
 
-    /**
-     * Signs a given message using the specified account.
-     *
-     * @param {Hex} message - The message to be signed, represented as a hexadecimal string.
-     * @param {Hex} account - The account address to use for signing, represented as a hexadecimal string.
-     * @returns {Promise<Hex>} A promise that resolves to the signed message as a hexadecimal string.
-     *
-     * @throws Will throw an error if the signing process fails or the JSON-RPC response is invalid.
-     *
-     * @example
-     *
-     * const message = "Hello, World!";
-     * const encodedMessage = bytesToHex(new TextEncoder().encode(message));
-     * const account = "0x123456...";
-     *
-     * const signedMessage = await provider.sign(encodedMessage, account);
-     * console.log("Signed Message:", signedMessage);
-     *
-     * >> "Signed Message: 0xabcdef..."
-     */
-    public async sign(message: Hex, account: Hex): Promise<Hex> {
-        const response = await this.request<Hex>("wallet.SignMessage", [message, account]);
-        return this.processJsonRpcResponse(response);
-    }
-
-    /**
-     * Signs a given interaction using the sender account mentioned in the interaction.
-     *
-     * @param {InteractionRequest} interaction - The interaction to be signed, represented as a hexadecimal string.
-     * @returns {Promise<ExecuteIx>} A promise that resolves to the object containing the signed payload.
-     *
-     * @throws Will throw an error if the signing process fails or the JSON-RPC response is invalid.
-     *
-     * @example
-     *
-     * const ix = { sender: { id: "0xabc..." }, ... };
-     * const signedIx = await provider.signInteraction(ix);
-     * console.log("Signed Interaction:", signedIx);
-     * >> "Signed Interaction: { ... }"
-     */
-    public async signInteraction(interaction: InteractionRequest): Promise<ExecuteIx> {
-        const response = await this.request<ExecuteIx>("wallet.SignInteraction", [interaction]);
-        return this.processJsonRpcResponse(response);
-    }
-
     public async sendInteraction(interaction: InteractionRequest): Promise<InteractionResponse> {
         const response = await this.request<Hex>("wallet.SendInteraction", [interaction]);
         const hash = this.processJsonRpcResponse(response);
@@ -153,12 +115,24 @@ export class BrowserProvider extends JsonRpcProvider {
      * - If the `id` parameter is not provided, it retrieves the public encryption key for the master account.
      *
      * @param {string} id - (Optional) The hexadecimal identifier of the wallet
-     * @returns {Promise<strin>} A promise that resolves to the wallet's public encryption key as a string.
+     * @returns {Promise<string>} A promise that resolves to the wallet's public encryption key as a string.
      * @throws Will throw an error if the JSON-RPC request fails or the response is invalid.
      */
     public async getWalletPublicKey(id?: Hex): Promise<string> {
         const params = id ? [id] : [];
         const response = await this.request<string>("wallet.EncryptionPublicKey", params);
+        return this.processJsonRpcResponse(response);
+    }
+
+    /**
+     * Gets the details of a wallet account.
+     *
+     * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
+     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     */
+    public async getWalletAccount(id?: Hex | Identifier | null): Promise<AccountConfiguration | null> {
+        const value = id instanceof Identifier ? id.toHex() : id;
+        const response = await this.request<AccountConfiguration | null>("wallet.Account", [value]);
         return this.processJsonRpcResponse(response);
     }
 

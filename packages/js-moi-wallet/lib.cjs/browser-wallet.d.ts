@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import { BrowserProvider, type ExecuteIx, type InteractionResponse } from "js-moi-providers";
+import { BrowserProvider, InteractionResponse, type ExecuteIx } from "js-moi-providers";
 import { Signer, type SignerIx, type SigType } from "js-moi-signer";
 import { type AnyIxOperation, type Hex, type InteractionRequest } from "js-moi-utils";
 import type { WalletOption } from "../types/wallet";
@@ -19,7 +19,6 @@ import type { WalletOption } from "../types/wallet";
  * @extends Signer
  */
 export declare class BrowserWallet extends Signer {
-    private readonly keyId;
     private readonly identifier;
     /**
      * Constructs a new instance of the browser wallet.
@@ -27,7 +26,7 @@ export declare class BrowserWallet extends Signer {
      * @param {Hex} identifier - A hexadecimal string representing the unique identifier for the wallet.
      * @param {WalletOption} option - An optional object containing additional options for the wallet.
      */
-    constructor(identifier: Hex, option?: WalletOption);
+    constructor(identifier: Hex, option?: Omit<WalletOption, "keyId">);
     getKeyId(): Promise<number>;
     getIdentifier(): Promise<Identifier>;
     getProvider(): BrowserProvider;
