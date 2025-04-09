@@ -5,6 +5,8 @@ import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isHex } from "./hex";
 import type { IxOperation, RawIxOperation, RawIxOperationPayload } from "./types/ix-operation";
 
+type IxOperationOfOpType<T extends OpType> = T extends any ? IxOperation<T> : never;
+
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
      * Returns the POLO schema for the operation payload.
@@ -18,7 +20,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (operation: IxOperation<TOpType>) => ReturnType<typeof createInvalidResult> | null;
+    validator: <T extends IxOperationOfOpType<TOpType>>(operation: T) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *
@@ -263,9 +265,14 @@ const createAssetSupplyDescriptorFor = () => {
     });
 };
 
-type AssetActionOpType = OpType.AssetTransfer | OpType.AssetApprove | OpType.AssetRelease | OpType.AssetLockup | OpType.AssetRevoke;
+type AssetActionOperation =
+    | IxOperation<OpType.AssetTransfer>
+    | IxOperation<OpType.AssetApprove>
+    | IxOperation<OpType.AssetRelease>
+    | IxOperation<OpType.AssetLockup>
+    | IxOperation<OpType.AssetRevoke>;
 
-const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
+const createAssetActionDescriptor = <TOpType extends OpType>() => {
     const validateAmount = (payload: Partial<Record<"amount", number>>) => {
         if (payload.amount == null) {
             return createInvalidResult(payload, "amount", "Amount is required for operation");
@@ -310,7 +317,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
         return null;
     };
 
-    return Object.freeze<IxOperationDescriptor<TOpType>>({
+    return Object.freeze<IxOperationDescriptor<AssetActionOperation["type"]>>({
         schema: schema.struct({
             benefactor: schema.bytes,
             beneficiary: schema.bytes,
@@ -319,6 +326,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             timestamp: schema.integer,
         }),
 
+        // @ts-expect-error - This is a hack to fix the type of the payload
         encode: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw: RawIxOperationPayload<TOpType> = {
@@ -331,7 +339,7 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
             return raw;
         },
 
-        validator: (operation: IxOperation<AssetActionOpType>) => {
+        validator: (operation: AssetActionOperation) => {
             if (!operation.payload.asset_id) {
                 return createInvalidResult(operation.payload, "asset_id", "Asset ID is required");
             }
@@ -344,29 +352,25 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
 
-            switch (true) {
-                case isOperationType(OpType.AssetLockup, operation): {
+            switch (operation.type) {
+                case OpType.AssetLockup: {
                     return validateAmount(operation.payload);
                 }
 
-                case isOperationType(OpType.AssetTransfer, operation): {
+                case OpType.AssetTransfer: {
                     return validateAmount(operation.payload) ?? (operation.payload.benefactor != null ? validateBenefactor(operation.payload) : null);
                 }
 
-                case isOperationType(OpType.AssetApprove, operation): {
+                case OpType.AssetApprove: {
                     return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
                 }
 
-                case isOperationType(OpType.AssetRelease, operation): {
+                case OpType.AssetRelease: {
                     return validateAmount(operation.payload) ?? validateBenefactor(operation.payload);
                 }
 
-                case isOperationType(OpType.AssetRevoke, operation): {
+                case OpType.AssetRevoke: {
                     return null;
-                }
-
-                default: {
-                    ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, ErrorCode.INVALID_ARGUMENT);
                 }
             }
         },
@@ -445,18 +449,18 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
                 return createInvalidResult(operation.payload, "callsite", "Callsite is required");
             }
 
-            switch (true) {
-                case isOperationType(OpType.LogicDeploy, operation): {
+            switch (operation.type) {
+                case OpType.LogicDeploy: {
                     return validateManifest(operation.payload) ?? validateCalldata(operation.payload);
                 }
 
-                case isOperationType(OpType.LogicInvoke, operation):
-                case isOperationType(OpType.LogicEnlist, operation): {
+                case OpType.LogicInvoke:
+                case OpType.LogicEnlist: {
                     return validateLogicId(operation.payload) ?? validateCalldata(operation.payload);
                 }
 
                 default: {
-                    ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, ErrorCode.INVALID_ARGUMENT);
+                    ErrorUtils.throwError(`Operation type "${operation}" is not supported`, ErrorCode.INVALID_ARGUMENT);
                 }
             }
         },
@@ -577,5 +581,5 @@ export const validateOperation = <TOpType extends OpType>(operation: IxOperation
         throw new Error(`Descriptor for operation type "${operation.type}" is not registered`);
     }
 
-    return descriptor.validator(operation);
+    return descriptor.validator(operation as IxOperationOfOpType<TOpType>);
 };

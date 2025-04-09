@@ -234,6 +234,7 @@ const createAssetActionDescriptor = () => {
             amount: js_polo_1.schema.integer,
             timestamp: js_polo_1.schema.integer,
         }),
+        // @ts-expect-error - This is a hack to fix the type of the payload
         encode: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
             const raw = {
@@ -254,24 +255,21 @@ const createAssetActionDescriptor = () => {
             if (!(0, hex_1.isHex)(operation.payload.beneficiary, 32)) {
                 return createInvalidResult(operation.payload, "beneficiary", "Invalid beneficiary address");
             }
-            switch (true) {
-                case (0, exports.isOperationType)(enums_1.OpType.AssetLockup, operation): {
+            switch (operation.type) {
+                case enums_1.OpType.AssetLockup: {
                     return validateAmount(operation.payload);
                 }
-                case (0, exports.isOperationType)(enums_1.OpType.AssetTransfer, operation): {
+                case enums_1.OpType.AssetTransfer: {
                     return validateAmount(operation.payload) ?? (operation.payload.benefactor != null ? validateBenefactor(operation.payload) : null);
                 }
-                case (0, exports.isOperationType)(enums_1.OpType.AssetApprove, operation): {
+                case enums_1.OpType.AssetApprove: {
                     return validateAmount(operation.payload) ?? validateTimestamp(operation.payload);
                 }
-                case (0, exports.isOperationType)(enums_1.OpType.AssetRelease, operation): {
+                case enums_1.OpType.AssetRelease: {
                     return validateAmount(operation.payload) ?? validateBenefactor(operation.payload);
                 }
-                case (0, exports.isOperationType)(enums_1.OpType.AssetRevoke, operation): {
+                case enums_1.OpType.AssetRevoke: {
                     return null;
-                }
-                default: {
-                    errors_1.ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, errors_1.ErrorCode.INVALID_ARGUMENT);
                 }
             }
         },
@@ -334,16 +332,16 @@ const createLogicActionDescriptor = () => {
             if (!operation.payload.callsite) {
                 return createInvalidResult(operation.payload, "callsite", "Callsite is required");
             }
-            switch (true) {
-                case (0, exports.isOperationType)(enums_1.OpType.LogicDeploy, operation): {
+            switch (operation.type) {
+                case enums_1.OpType.LogicDeploy: {
                     return validateManifest(operation.payload) ?? validateCalldata(operation.payload);
                 }
-                case (0, exports.isOperationType)(enums_1.OpType.LogicInvoke, operation):
-                case (0, exports.isOperationType)(enums_1.OpType.LogicEnlist, operation): {
+                case enums_1.OpType.LogicInvoke:
+                case enums_1.OpType.LogicEnlist: {
                     return validateLogicId(operation.payload) ?? validateCalldata(operation.payload);
                 }
                 default: {
-                    errors_1.ErrorUtils.throwError(`Operation type "${operation.type}" is not supported`, errors_1.ErrorCode.INVALID_ARGUMENT);
+                    errors_1.ErrorUtils.throwError(`Operation type "${operation}" is not supported`, errors_1.ErrorCode.INVALID_ARGUMENT);
                 }
             }
         },
