@@ -58,7 +58,7 @@ class InteractionResponse {
                 }
             }
             catch (error) {
-                if (error instanceof js_moi_utils_1.CustomError && error.message === "failed to get receipt: tesseract hash not found: key not found") {
+                if (error instanceof js_moi_utils_1.CustomError && error.message === "error fetching interaction") {
                     if (this.notFoundRetries <= 0) {
                         js_moi_utils_1.ErrorUtils.throwError(`Interaction not found. Hash ${this.hash}`, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
                             hash: this.hash,
@@ -68,9 +68,13 @@ class InteractionResponse {
                     await new Promise((resolve) => setTimeout(resolve, DEFAULT_IX_INFO_RETRIEVAL_TIME));
                     continue;
                 }
+                if (error instanceof js_moi_utils_1.CustomError && error.message.includes("tesseract hash not found: key not found")) {
+                    timer.retries--;
+                    await new Promise((resolve) => setTimeout(resolve, delayInMs));
+                    continue;
+                }
+                throw error;
             }
-            timer.retries--;
-            await new Promise((resolve) => setTimeout(resolve, delayInMs));
         }
         js_moi_utils_1.ErrorUtils.throwError("Timeout", js_moi_utils_1.ErrorCode.TIMEOUT);
     }
