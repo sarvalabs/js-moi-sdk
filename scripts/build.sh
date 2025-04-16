@@ -16,10 +16,10 @@ for dir in packages/*; do
         echo " => Building $dir"
 
         mkdir -p $dir/lib.esm
-        echo '{"type": "module"}' >$dir/lib.esm/package.json
+        echo '{"type": "module", "sideEffects": false}' >$dir/lib.esm/package.json
 
         mkdir -p $dir/lib.cjs
-        echo '{"type": "commonjs"}' >$dir/lib.cjs/package.json
+        echo '{"type": "commonjs", "sideEffects": false}' >$dir/lib.cjs/package.json
 
     fi
 done

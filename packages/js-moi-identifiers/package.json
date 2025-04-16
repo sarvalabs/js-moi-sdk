@@ -29,6 +29,7 @@
     "logic_id",
     "participant_id"
   ],
+  "sideEffects": false,
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
