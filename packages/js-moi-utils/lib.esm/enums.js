@@ -96,4 +96,10 @@ export var InteractionStatus;
     InteractionStatus[InteractionStatus["Pending"] = 0] = "Pending";
     InteractionStatus[InteractionStatus["Finalized"] = 1] = "Finalized";
 })(InteractionStatus || (InteractionStatus = {}));
+export var Chain;
+(function (Chain) {
+    Chain[Chain["Testnet"] = 111] = "Testnet";
+    Chain[Chain["Devnet"] = 112] = "Devnet";
+    Chain[Chain["Mainnet"] = 113] = "Mainnet";
+})(Chain || (Chain = {}));
 //# sourceMappingURL=enums.js.map

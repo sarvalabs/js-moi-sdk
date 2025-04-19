@@ -97,3 +97,9 @@ export enum InteractionStatus {
     Pending = 0,
     Finalized = 1,
 }
+
+export enum Chain {
+    Testnet = 111,
+    Devnet = 112,
+    Mainnet = 113,
+}

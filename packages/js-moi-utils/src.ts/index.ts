@@ -3,6 +3,7 @@ export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isInteger,
 export {
     AccountType,
     AssetStandard,
+    Chain,
     ElementType,
     EngineKind,
     InteractionStatus,
