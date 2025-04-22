@@ -2,6 +2,7 @@
  * Enum representing error codes.
  */
 export declare enum ErrorCode {
+    KEY_REVOKED = "ERROR_KEY_REVOKED",
     UNKNOWN_ERROR = "ERROR_UNKNOWN",
     NOT_IMPLEMENTED = "ERROR_NOT_IMPLEMENTED",
     UNSUPPORTED_OPERATION = "ERROR_UNSUPPORTED_OPERATION",

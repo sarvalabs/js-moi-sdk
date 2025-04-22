@@ -6,6 +6,7 @@ exports.ErrorUtils = exports.CustomError = exports.ErrorCode = void 0;
  */
 var ErrorCode;
 (function (ErrorCode) {
+    ErrorCode["KEY_REVOKED"] = "ERROR_KEY_REVOKED";
     ErrorCode["UNKNOWN_ERROR"] = "ERROR_UNKNOWN";
     ErrorCode["NOT_IMPLEMENTED"] = "ERROR_NOT_IMPLEMENTED";
     ErrorCode["UNSUPPORTED_OPERATION"] = "ERROR_UNSUPPORTED_OPERATION";

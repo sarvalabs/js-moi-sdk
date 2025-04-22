@@ -42,7 +42,7 @@ export class BrowserWallet extends Signer {
      *
      * @returns {number} The key index of the wallet.
      */
-    getKeyId(): Promise<number> {
+    public getKeyId(): Promise<number> {
         return Promise.resolve(this.keyIndex);
     }
 
