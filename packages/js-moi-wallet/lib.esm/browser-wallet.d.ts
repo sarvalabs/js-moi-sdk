@@ -20,13 +20,19 @@ import type { WalletOption } from "../types/wallet";
  */
 export declare class BrowserWallet extends Signer {
     private readonly identifier;
+    private readonly keyIndex;
     /**
      * Constructs a new instance of the browser wallet.
      *
      * @param {Hex} identifier - A hexadecimal string representing the unique identifier for the wallet.
      * @param {WalletOption} option - An optional object containing additional options for the wallet.
      */
-    constructor(identifier: Hex, option?: Omit<WalletOption, "keyId">);
+    constructor(identifier: Hex, option?: WalletOption);
+    /**
+     * Returns the key index of the wallet.
+     *
+     * @returns {number} The key index of the wallet.
+     */
     getKeyId(): Promise<number>;
     getIdentifier(): Promise<Identifier>;
     getProvider(): BrowserProvider;

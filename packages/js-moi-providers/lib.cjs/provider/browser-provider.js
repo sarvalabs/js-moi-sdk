@@ -83,7 +83,7 @@ class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
      * Gets the details of a wallet account.
      *
      * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
-     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     * @returns {Promise<WalletParticipant | null>} A promise that resolves to the account configuration object or null if not found.
      */
     async getWalletAccount(id) {
         const value = id instanceof js_moi_identifiers_1.Identifier ? id.toHex() : id;

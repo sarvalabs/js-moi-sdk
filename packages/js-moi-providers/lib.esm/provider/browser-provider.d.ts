@@ -22,11 +22,16 @@ export interface NetworkConfiguration {
     jsonRpcHost: string;
     blockExplorer?: string;
 }
-export interface AccountConfiguration {
-    address: Hex;
-    name: Hex;
+export interface WalletAccount {
+    id: Hex;
+    name?: string;
     path: string;
-    keyId: number;
+    pubkey: string;
+}
+export interface WalletParticipant {
+    readonly id: string;
+    name: Hex;
+    accounts: WalletAccount[];
 }
 export interface WalletEventListenerMap {
     accountChange: (identifier: Hex) => void;
@@ -91,9 +96,9 @@ export declare class BrowserProvider extends JsonRpcProvider {
      * Gets the details of a wallet account.
      *
      * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
-     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     * @returns {Promise<WalletParticipant | null>} A promise that resolves to the account configuration object or null if not found.
      */
-    getWalletAccount(id?: Hex | Identifier | null): Promise<AccountConfiguration | null>;
+    getWalletAccount(id?: Hex | Identifier | null): Promise<WalletParticipant | null>;
     /**
      * Retrieves the network configuration from the wallet.
      *
