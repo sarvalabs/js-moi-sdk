@@ -58,6 +58,7 @@ export type {
 } from "./types/interaction";
 export type {
     AccountConfigurePayload,
+    AccountInheritPayload,
     AnyIxOperation,
     AssetActionPayload,
     AssetApprovePayload,
@@ -76,6 +77,7 @@ export type {
     LogicPayload,
     ParticipantCreatePayload,
     RawAccountConfigurePayload,
+    RawAccountInheritPayload,
     RawAssetActionPayload,
     RawAssetApprovePayload,
     RawAssetLockupPayload,
@@ -140,6 +142,7 @@ export type {
     Interaction,
     InteractionConfirmation,
     InteractionInfo,
+    InteractionSignature,
     IxAccount,
     KramaID,
     Lockup,
@@ -160,6 +163,7 @@ export type {
     Simulate,
     SimulationEffects,
     Stochastic,
+    SubAccount,
     Tesseract,
     TesseractAccountContextData,
     TesseractAccounts,

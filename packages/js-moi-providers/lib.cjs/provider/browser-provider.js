@@ -59,6 +59,26 @@ class BrowserProvider extends json_rpc_provider_1.JsonRpcProvider {
         const response = await this.request("wallet.RequestPermissions", [{ [key]: permission }]);
         return this.processJsonRpcResponse(response);
     }
+    /**
+     * Get the permissions granted to the wallet.
+     *
+     * @returns {Promise<RequestPermissionsResult[]>} A promise that resolves to an array of revoked permissions.
+     */
+    async getPermissions() {
+        const response = await this.request("wallet.GetPermissions");
+        return this.processJsonRpcResponse(response);
+    }
+    /**
+     * Revokes specific permissions from the wallet.
+     * @param key - The specific permission key to revoke.
+     * @param permission - The details or configuration of the permission being revoked.
+     *
+     * @returns {Promise<null>} A promise that resolves to null if the revocation is successful.
+     */
+    async revokePermissions(key, permission) {
+        const response = await this.request("wallet.RevokePermissions", [{ [key]: permission }]);
+        return this.processJsonRpcResponse(response);
+    }
     async sendInteraction(interaction) {
         const response = await this.request("wallet.SendInteraction", [interaction]);
         const hash = this.processJsonRpcResponse(response);
