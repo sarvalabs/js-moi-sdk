@@ -28,12 +28,18 @@ export interface Simulate {
     effects: SimulationEffects[] | null;
 }
 
+export interface SubAccount {
+    inherited_account: Hex;
+    accounts: Hex[];
+}
+
 export interface AccountMetaData {
     type: AccountType;
     id: Hex;
     height: number;
     tesseract: Hex;
     inherited_account: Hex;
+    sub_accounts: SubAccount[];
 }
 
 export interface AccountState {
