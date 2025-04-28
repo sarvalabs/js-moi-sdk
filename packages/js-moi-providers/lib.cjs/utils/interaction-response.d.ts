@@ -1,8 +1,9 @@
 import { type AnyIxOperationResult, type Hex, type Interaction, type InteractionConfirmation } from "js-moi-utils";
 import type { Provider } from "../types/provider";
-export interface TimerOption {
-    retries: number;
-    delayInSec: number;
+export interface WaitOption {
+    retries?: number;
+    delayInSec?: number;
+    signal?: AbortSignal;
 }
 /**
  * The `InteractionResponse` class represents the response of an interaction with the provider.
@@ -27,13 +28,13 @@ export declare class InteractionResponse {
      *
      * @throws Will throw a timeout error if the interaction is not finalized within the specified retries.
      */
-    wait(timer?: TimerOption): Promise<InteractionConfirmation>;
+    wait(timer?: WaitOption): Promise<InteractionConfirmation>;
     /**
      * Retrieves the result of an operation after waiting for a specified duration.
      *
-     * @param {TimerOption} [timer=this.getDefaultTimer()] - The timer option to wait for before retrieving the result. Defaults to the value returned by `getDefaultTimer()`.
+     * @param {WaitOption} [timer=this.getDefaultTimer()] - The timer option to wait for before retrieving the result. Defaults to the value returned by `getDefaultTimer()`.
      * @returns {Promise<OperationItem[]>} A promise that resolves to an array of `OperationItem` objects representing the operations.
      */
-    result(timer?: TimerOption): Promise<AnyIxOperationResult[]>;
+    result(timer?: WaitOption): Promise<AnyIxOperationResult[]>;
 }
 //# sourceMappingURL=interaction-response.d.ts.map
