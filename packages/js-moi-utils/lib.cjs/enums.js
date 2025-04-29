@@ -17,17 +17,18 @@ var OpType;
 (function (OpType) {
     OpType[OpType["ParticipantCreate"] = 1] = "ParticipantCreate";
     OpType[OpType["AccountConfigure"] = 2] = "AccountConfigure";
-    OpType[OpType["AssetTransfer"] = 3] = "AssetTransfer";
-    OpType[OpType["AssetCreate"] = 5] = "AssetCreate";
-    OpType[OpType["AssetApprove"] = 6] = "AssetApprove";
-    OpType[OpType["AssetRevoke"] = 7] = "AssetRevoke";
-    OpType[OpType["AssetMint"] = 8] = "AssetMint";
-    OpType[OpType["AssetBurn"] = 9] = "AssetBurn";
-    OpType[OpType["AssetLockup"] = 10] = "AssetLockup";
-    OpType[OpType["AssetRelease"] = 11] = "AssetRelease";
-    OpType[OpType["LogicDeploy"] = 12] = "LogicDeploy";
-    OpType[OpType["LogicInvoke"] = 13] = "LogicInvoke";
-    OpType[OpType["LogicEnlist"] = 14] = "LogicEnlist";
+    OpType[OpType["AccountInherit"] = 3] = "AccountInherit";
+    OpType[OpType["AssetTransfer"] = 4] = "AssetTransfer";
+    OpType[OpType["AssetCreate"] = 6] = "AssetCreate";
+    OpType[OpType["AssetApprove"] = 7] = "AssetApprove";
+    OpType[OpType["AssetRevoke"] = 8] = "AssetRevoke";
+    OpType[OpType["AssetMint"] = 9] = "AssetMint";
+    OpType[OpType["AssetBurn"] = 10] = "AssetBurn";
+    OpType[OpType["AssetLockup"] = 11] = "AssetLockup";
+    OpType[OpType["AssetRelease"] = 12] = "AssetRelease";
+    OpType[OpType["LogicDeploy"] = 13] = "LogicDeploy";
+    OpType[OpType["LogicInvoke"] = 14] = "LogicInvoke";
+    OpType[OpType["LogicEnlist"] = 15] = "LogicEnlist";
 })(OpType || (exports.OpType = OpType = {}));
 /**
  * Enumerates the types of participant locks in the system.

@@ -182,6 +182,16 @@ export interface RawAccountConfigurePayload {
     }>[];
     revoke?: KeyRevokePayload[];
 }
+export interface AccountInheritPayload {
+    target_account: Hex;
+    amount: number;
+    sub_account_index: number;
+}
+export interface RawAccountInheritPayload {
+    target_account: Uint8Array;
+    amount: number;
+    sub_account_index: number;
+}
 export interface RawAssetSupplyPayload {
     asset_id: Uint8Array;
     amount: number;
@@ -194,8 +204,8 @@ export interface RawAssetSupplyPayload {
  *  const operation: Operation<OpType.AssetCreate> = { ... }
  * ```
  */
-export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetTransferPayload : T extends OpType.AssetApprove ? AssetApprovePayload : T extends OpType.AssetRelease ? AssetReleasePayload : T extends OpType.AssetRevoke ? AssetRevokePayload : T extends OpType.AssetLockup ? AssetLockupPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : T extends OpType.AccountConfigure ? AccountConfigurePayload : never;
-export type RawIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? RawParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? RawAssetSupplyPayload : T extends OpType.AssetTransfer ? RawAssetTransferPayload : T extends OpType.AssetApprove ? RawAssetApprovePayload : T extends OpType.AssetRelease ? RawAssetReleasePayload : T extends OpType.AssetRevoke ? RawAssetRevokePayload : T extends OpType.AssetLockup ? RawAssetLockupPayload : T extends OpType.LogicDeploy ? RawLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? RawLogicActionPayload : T extends OpType.AccountConfigure ? RawAccountConfigurePayload : never;
+export type IxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? ParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? AssetSupplyPayload : T extends OpType.AssetTransfer ? AssetTransferPayload : T extends OpType.AssetApprove ? AssetApprovePayload : T extends OpType.AssetRelease ? AssetReleasePayload : T extends OpType.AssetRevoke ? AssetRevokePayload : T extends OpType.AssetLockup ? AssetLockupPayload : T extends OpType.LogicDeploy ? LogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? LogicActionPayload : T extends OpType.AccountConfigure ? AccountConfigurePayload : T extends OpType.AccountInherit ? AccountInheritPayload : never;
+export type RawIxOperationPayload<T extends OpType> = T extends OpType.ParticipantCreate ? RawParticipantCreatePayload : T extends OpType.AssetCreate ? AssetCreatePayload : T extends OpType.AssetBurn | OpType.AssetMint ? RawAssetSupplyPayload : T extends OpType.AssetTransfer ? RawAssetTransferPayload : T extends OpType.AssetApprove ? RawAssetApprovePayload : T extends OpType.AssetRelease ? RawAssetReleasePayload : T extends OpType.AssetRevoke ? RawAssetRevokePayload : T extends OpType.AssetLockup ? RawAssetLockupPayload : T extends OpType.LogicDeploy ? RawLogicDeployPayload : T extends OpType.LogicInvoke | OpType.LogicEnlist ? RawLogicActionPayload : T extends OpType.AccountConfigure ? RawAccountConfigurePayload : T extends OpType.AccountInherit ? RawAccountInheritPayload : never;
 /**
  * `IxRawOperation` is a type that holds the raw operation data.
  */
@@ -222,5 +232,5 @@ export interface IxOperation<TOpType extends OpType> {
 /**
  * `AnyIxOperation` is a union type that holds all the operations.
  */
-export type AnyIxOperation = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.AssetRevoke> | IxOperation<OpType.AssetLockup> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate> | IxOperation<OpType.AccountConfigure>;
+export type AnyIxOperation = IxOperation<OpType.AssetBurn> | IxOperation<OpType.AssetCreate> | IxOperation<OpType.AssetMint> | IxOperation<OpType.AssetTransfer> | IxOperation<OpType.AssetApprove> | IxOperation<OpType.AssetRelease> | IxOperation<OpType.AssetRevoke> | IxOperation<OpType.AssetLockup> | IxOperation<OpType.LogicDeploy> | IxOperation<OpType.LogicEnlist> | IxOperation<OpType.LogicInvoke> | IxOperation<OpType.ParticipantCreate> | IxOperation<OpType.AccountConfigure> | IxOperation<OpType.AccountInherit>;
 //# sourceMappingURL=ix-operation.d.ts.map

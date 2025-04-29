@@ -255,7 +255,7 @@ describe(Wallet, () => {
         it.concurrent("should sign an interaction using ECDSA secp256k1", async () => {
             const { interaction: encoded, signatures } = await wallet.signInteraction(interaction, algorithm);
             const expectedSignature =
-                "0x01473045022100c7beee0e9ae79cf81242aa23b5ee27c66ce16e4c238985747d0e79252640f0810220151c7c41c7a5b3b7ee2a08bf881659bf8212ad97f7c3fc09b837e41c3a6a3b3402";
+                "0x01473045022100c01bdca85a895ec4f23502faa7c0440f98f316cfdf7c13d480f97505cc7f176602204fc8e0494c7805ef305d654988755c4d44999a63935ae5da1c38d94bd627a70e02";
             const verify = wallet.verify(hexToBytes(encoded), signatures[0].signature, await wallet.getPublicKey());
 
             expect(isHex(encoded)).toBeTruthy();

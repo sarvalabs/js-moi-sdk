@@ -113,6 +113,14 @@ const gatherIxParticipants = (interaction) => {
                 });
                 break;
             }
+            case enums_1.OpType.AccountInherit: {
+                participants.set(payload.target_account, {
+                    id: payload.target_account,
+                    lock_type: enums_1.LockType.MutateLock,
+                    notary: false,
+                });
+                break;
+            }
             case enums_1.OpType.AssetMint:
             case enums_1.OpType.AssetBurn: {
                 const identifier = new js_moi_identifiers_1.AssetId(payload.asset_id);

@@ -93,6 +93,39 @@ const createParticipantCreateDescriptor = () => {
     });
 };
 
+const createAccountInheritDescriptor = () => {
+    return Object.freeze<IxOperationDescriptor<OpType.AccountInherit>>({
+        schema: schema.struct({
+            target_account: schema.bytes,
+            amount: schema.integer,
+            sub_account_index: schema.integer,
+        }),
+
+        encode: ({ payload }) => ({
+            ...payload,
+            target_account: hexToBytes(payload.target_account),
+        }),
+
+        validator: (operation) => {
+            const { payload } = operation;
+
+            if (!isHex(payload.target_account, 32)) {
+                return createInvalidResult(payload, "target_account", "Invalid identifier");
+            }
+
+            if (payload.amount < 0) {
+                return createInvalidResult(payload, "amount", "Amount cannot be negative");
+            }
+
+            if (typeof payload.sub_account_index !== "number") {
+                return createInvalidResult(payload, "sub_account_index", "Sub account index must be a number");
+            }
+
+            return null;
+        },
+    });
+};
+
 const createAssetCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.AssetCreate>>({
         schema: schema.struct({
@@ -436,7 +469,7 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
 
 const ixOpDescriptor: IxOperationDescriptorLookup = {
     [OpType.ParticipantCreate]: createParticipantCreateDescriptor(),
-
+    [OpType.AccountInherit]: createAccountInheritDescriptor(),
     [OpType.AccountConfigure]: createAccountConfigureDescriptor(),
 
     [OpType.AssetCreate]: createAssetCreateDescriptor(),
