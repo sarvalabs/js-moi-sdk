@@ -7,6 +7,8 @@ export { WebsocketTransport, type WebsocketTransportOptions } from "./transport/
 
 export { NetworkType, VoyageProvider } from "./provider/voyage-provider";
 
+export { BrowserProvider, type NetworkConfiguration, type RequestPermissions, type RequestPermissionsResult, type WalletEventListenerMap } from "./provider/browser-provider";
+
 export type { ApiMethod, MethodParams, MethodResponse, NetworkActionApi, NetworkMethod } from "./types/moi-execution-api";
 export type {
     AccountAssetRequestOption,

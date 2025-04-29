@@ -26,6 +26,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx_js', 'sphinx_copybutton']
 root_for_relative_js_paths = '../../'
 js_source_path = [
     '../../packages/js-moi-identifiers/lib.cjs',
+    '../../packages/js-moi-identifiers/lib.cjs/krama-id',
     '../../packages/js-moi-hdnode/lib.cjs',
     '../../packages/js-moi-bip39/lib.cjs',
     '../../packages/js-moi-wallet/lib.cjs',

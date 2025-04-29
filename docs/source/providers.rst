@@ -33,6 +33,9 @@ Classes
 .. js:autoclass:: VoyageProvider
     :members:
 
+.. js:autoclass:: BrowserProvider
+    :members:
+
 Events
 ******
 
