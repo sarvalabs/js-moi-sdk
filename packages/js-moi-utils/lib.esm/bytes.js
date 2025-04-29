@@ -1,11 +1,12 @@
+import { isHex } from "./hex";
 /**
  * Checks if the given value is an integer.
  *
- * @param {number} value - The value to check.
- * @returns {boolean} - Returns true if the value is an integer, otherwise false.
+ * @param value - The value to check.
+ * @returns Returns true if the value is an integer, otherwise false.
  */
 export const isInteger = (value) => {
-    return (typeof (value) === "number" && value === value && (value % 1) === 0);
+    return typeof value === "number" && value === value && value % 1 === 0;
 };
 /**
  * Checks if the given value is a valid byte array.
@@ -20,7 +21,7 @@ export const isBytes = (value) => {
     if (value.constructor === Uint8Array) {
         return true;
     }
-    if (typeof (value) === "string") {
+    if (typeof value === "string") {
         return false;
     }
     if (!isInteger(value.length) || value.length < 0) {
@@ -43,35 +44,56 @@ export const isBytes = (value) => {
  */
 export const hexDataLength = (data) => {
     // Check if the input is a valid hexadecimal string and has an even length
-    if (!isHexString(data) || (data.length % 2)) {
+    if (data === "0x") {
+        return 0;
+    }
+    if (!isHex(data) || data.length % 2 !== 0) {
         return null;
     }
     // Calculate the length of the data excluding the "0x" prefix
     return (data.length - 2) / 2;
 };
 /**
- * Checks if the given value is a valid hexadecimal string.
+ * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
  *
- * @param {any} value - The value to check.
- * @param {number} length - Optional. The expected length of the hexadecimal string.
- * @returns {boolean} Returns true if the value is a valid hexadecimal string, otherwise false.
+ * @param size - The number of random bytes to generate.
+ * @returns A Uint8Array containing the generated random bytes.
  */
-export const isHexString = (value, length) => {
-    if (typeof (value) !== "string" || !value.match(/^0x[0-9A-Fa-f]*$/)) {
-        return false;
-    }
-    if (length && value.length !== 2 + 2 * length) {
-        return false;
-    }
-    return true;
+export const randomBytes = (size) => {
+    return globalThis.crypto.getRandomValues(new Uint8Array(size));
 };
 /**
- * Converts a Buffer to a Uint8Array.
+ * Encodes a given text string into a Uint8Array using the TextEncoder API.
  *
- * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} The Uint8Array representation of the Buffer.
+ * @param text - The text string to be encoded.
+ * @returns A Uint8Array containing the encoded text.
  */
-export const bufferToUint8 = (target) => {
-    return new Uint8Array(target);
+export const encodeText = (text) => {
+    return new TextEncoder().encode(text);
+};
+/**
+ * Decodes a Uint8Array into a string using the TextDecoder API.
+ *
+ * @param data - The Uint8Array to decode.
+ * @returns The decoded string.
+ */
+export const decodeText = (data) => {
+    return new TextDecoder().decode(data);
+};
+/**
+ * Concatenates multiple Uint8Array instances into a single Uint8Array.
+ *
+ * @param {...Uint8Array[]} arrays - The arrays to concatenate.
+ * @returns {Uint8Array} A new Uint8Array containing the concatenated values.
+ */
+export const concatBytes = (...arrays) => {
+    const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (let i = 0; i < arrays.length; i++) {
+        result.set(arrays[i], offset);
+        offset += arrays[i].length;
+    }
+    return result;
 };
 //# sourceMappingURL=bytes.js.map

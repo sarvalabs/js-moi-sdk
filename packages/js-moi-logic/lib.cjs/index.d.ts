@@ -1,6 +1,4 @@
-export type * from "../types/logic";
-export * from "./logic-driver";
-export * from "./logic-factory";
-export * from "./logic-id";
-export * from "./routine-options";
+export { LogicDescriptor } from "./logic-descriptor";
+export { getLogicDriver, LogicDriver } from "./logic-driver";
+export type { LogicDriverOption, LogicRoutines, RoutineCallback, RoutineOption } from "./types";
 //# sourceMappingURL=index.d.ts.map
