@@ -1,6 +1,7 @@
 import { type Schema } from "js-polo";
 import { OpType } from "./enums";
 import type { IxOperation, RawIxOperation, RawIxOperationPayload } from "./types/ix-operation";
+type IxOperationOfOpType<T extends OpType> = T extends any ? IxOperation<T> : never;
 export interface IxOperationDescriptor<TOpType extends OpType> {
     /**
      * Returns the POLO schema for the operation payload.
@@ -14,7 +15,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      * @param payload Operation payload
      * @returns Returns the validation result.
      */
-    validator: (operation: IxOperation<TOpType>) => ReturnType<typeof createInvalidResult> | null;
+    validator: <T extends IxOperationOfOpType<TOpType>>(operation: T) => ReturnType<typeof createInvalidResult> | null;
     /**
      * Transforms the operation payload to a format that can be serialized to POLO.
      *
