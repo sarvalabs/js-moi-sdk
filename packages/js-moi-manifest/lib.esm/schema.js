@@ -122,14 +122,6 @@ export class Schema {
         outputs: schema.bytes,
         error: schema.bytes,
     });
-    // public static PISA_BUILT_IN_LOG_SCHEMA = {
-    //     kind: "struct",
-    //     fields: {
-    //         value: {
-    //             kind: "string",
-    //         },
-    //     },
-    // };
     static PISA_BUILT_IN_LOG_SCHEMA = schema.struct({
         value: schema.string,
     });
@@ -264,7 +256,7 @@ export class Schema {
         }
     }
     /**
-     * Parses an array of fields and generates the schema based on the fields.
+     * Parses an array of fields and generates the schema based on the fields
      *
      * @param {LogicManifest.TypeField[]} fields - The array of fields.
      * @returns {PoloSchema} The generated schema based on the fields.
