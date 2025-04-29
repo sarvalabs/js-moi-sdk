@@ -75,6 +75,20 @@ export declare class BrowserProvider extends JsonRpcProvider {
      * @returns {Promise<object>} A promise that resolves to an array containing the result of the requested permission.
      */
     requestPermissions<TKey extends keyof RequestPermissions>(key: TKey, permission: RequestPermissions[TKey]): Promise<[RequestPermissionsResult[TKey]]>;
+    /**
+     * Get the permissions granted to the wallet.
+     *
+     * @returns {Promise<RequestPermissionsResult[]>} A promise that resolves to an array of revoked permissions.
+     */
+    getPermissions(): Promise<RequestPermissionsResult[]>;
+    /**
+     * Revokes specific permissions from the wallet.
+     * @param key - The specific permission key to revoke.
+     * @param permission - The details or configuration of the permission being revoked.
+     *
+     * @returns {Promise<null>} A promise that resolves to null if the revocation is successful.
+     */
+    revokePermissions<TKey extends keyof RequestPermissions>(key: TKey, permission: RequestPermissions[TKey]): Promise<null>;
     sendInteraction(interaction: InteractionRequest): Promise<InteractionResponse>;
     /**
      * Retrieves the public encryption key of a wallet.

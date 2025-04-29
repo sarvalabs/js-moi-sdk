@@ -98,7 +98,7 @@ export declare class Schema {
      */
     static parseDataType(type: string, classDef: Map<string, number>, elements: Map<number, LogicElement>): PoloSchema;
     /**
-     * Parses an array of fields and generates the schema based on the fields.
+     * Parses an array of fields and generates the schema based on the fields
      *
      * @param {LogicManifest.TypeField[]} fields - The array of fields.
      * @returns {PoloSchema} The generated schema based on the fields.
