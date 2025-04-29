@@ -58,7 +58,7 @@ class InteractionResponse {
                 }
             }
             catch (error) {
-                if (error instanceof js_moi_utils_1.CustomError && error.message === "error fetching interaction") {
+                if (error instanceof js_moi_utils_1.CustomError && error.message === "failed to get receipt: tesseract hash not found: key not found") {
                     if (this.notFoundRetries <= 0) {
                         js_moi_utils_1.ErrorUtils.throwError(`Interaction not found. Hash ${this.hash}`, js_moi_utils_1.ErrorCode.ACTION_REJECTED, {
                             hash: this.hash,

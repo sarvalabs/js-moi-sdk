@@ -30,5 +30,12 @@
     "participant_id"
   ],
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
-  "license": "Apache-2.0 OR MIT"
+  "license": "Apache-2.0 OR MIT",
+  "dependencies": {
+    "elliptic": "^6.6.1",
+    "peer-id": "^0.16.0"
+  },
+  "devDependencies": {
+    "@types/elliptic": "^6.4.18"
+  }
 }
