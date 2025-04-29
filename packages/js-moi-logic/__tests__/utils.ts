@@ -2,6 +2,7 @@ import { bytesToHex, InteractionStatus, randomBytes, ReceiptStatus, type AnyIxOp
 
 export const mockConfirmedInteraction = (...operations: AnyIxOperationResult[]): Interaction => {
     return {
+        signatures: [],
         hash: bytesToHex(randomBytes(32)),
         status: InteractionStatus.Finalized,
         confirmation: {
