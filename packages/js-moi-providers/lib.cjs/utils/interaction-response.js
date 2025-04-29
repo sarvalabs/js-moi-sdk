@@ -101,10 +101,4 @@ class InteractionResponse {
     }
 }
 exports.InteractionResponse = InteractionResponse;
-const a = {
-    method: function () {
-        console.log(this);
-    },
-};
-a.method.bind(null);
 //# sourceMappingURL=interaction-response.js.map

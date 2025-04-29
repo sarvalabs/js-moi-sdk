@@ -129,14 +129,6 @@ class Schema {
         outputs: js_polo_1.schema.bytes,
         error: js_polo_1.schema.bytes,
     });
-    // public static PISA_BUILT_IN_LOG_SCHEMA = {
-    //     kind: "struct",
-    //     fields: {
-    //         value: {
-    //             kind: "string",
-    //         },
-    //     },
-    // };
     static PISA_BUILT_IN_LOG_SCHEMA = js_polo_1.schema.struct({
         value: js_polo_1.schema.string,
     });
@@ -271,7 +263,7 @@ class Schema {
         }
     }
     /**
-     * Parses an array of fields and generates the schema based on the fields.
+     * Parses an array of fields and generates the schema based on the fields
      *
      * @param {LogicManifest.TypeField[]} fields - The array of fields.
      * @returns {PoloSchema} The generated schema based on the fields.

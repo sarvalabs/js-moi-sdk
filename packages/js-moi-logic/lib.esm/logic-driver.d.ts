@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
+import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, WaitOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
 import { LogicState, OpType, RoutineType, StorageKey, type Hex, type InteractionRequest, type IxOperation, type LogicManifest, type LogicMessage } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -86,8 +86,8 @@ export declare class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines
      * @throws If the logic id not deployed.
      * @throws If error occurs during the deployment process.
      */
-    getLogicId(timer?: TimerOption): Promise<Identifier>;
-    protected obtainLogicIdFromResponse(response: InteractionResponse, timer?: TimerOption): Promise<void>;
+    getLogicId(timer?: WaitOption): Promise<Identifier>;
+    protected obtainLogicIdFromResponse(response: InteractionResponse, timer?: WaitOption): Promise<void>;
     private newRoutine;
     private setupEndpoint;
     /**
