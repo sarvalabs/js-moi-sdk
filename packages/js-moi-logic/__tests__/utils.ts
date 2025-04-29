@@ -26,7 +26,7 @@ export const mockConfirmedInteraction = (...operations: AnyIxOperationResult[]):
             metadata: "0x",
             operations: [],
             perception: "0x",
-            preference: {
+            preferences: {
                 compute: "0x",
                 consensus: {
                     mtq: 0,
