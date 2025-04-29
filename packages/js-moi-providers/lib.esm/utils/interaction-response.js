@@ -82,10 +82,4 @@ export class InteractionResponse {
         return confirmation.operations;
     }
 }
-const a = {
-    method: function () {
-        console.log(this);
-    },
-};
-a.method.bind(null);
 //# sourceMappingURL=interaction-response.js.map
