@@ -305,7 +305,7 @@ export class Schema {
     }
 
     /**
-     * Parses an array of fields and generates the schema based on the fields.
+     * Parses an array of fields and generates the schema based on the fields
      *
      * @param {LogicManifest.TypeField[]} fields - The array of fields.
      * @returns {PoloSchema} The generated schema based on the fields.
