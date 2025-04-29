@@ -1,6 +1,11 @@
 import EventEmitter from "events";
 import { ErrorUtils, type JsonRpcRequest, type JsonRpcResponse, type Transport } from "js-moi-utils";
 
+/**
+ * HttpTransport is a transport that sends JSON-RPC messages over HTTP.
+ *
+ * @param host The URL of the HTTP server to send requests to.
+ */
 export class HttpTransport extends EventEmitter implements Transport {
     private readonly host: string;
 
@@ -19,6 +24,12 @@ export class HttpTransport extends EventEmitter implements Transport {
         this.host = host;
     }
 
+    /**
+     * Sends a JSON-RPC request using `fetch`.
+     *
+     * @param request The JSON-RPC request to send.
+     * @returns The JSON-RPC response
+     */
     public async request<TResult = unknown>(method: string, params: unknown[]): Promise<JsonRpcResponse<TResult>> {
         const request: JsonRpcRequest = {
             jsonrpc: "2.0",

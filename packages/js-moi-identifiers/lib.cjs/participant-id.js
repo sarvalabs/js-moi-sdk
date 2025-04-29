@@ -5,6 +5,13 @@ const enums_1 = require("./enums");
 const flags_1 = require("./flags");
 const identifier_1 = require("./identifier");
 const utils_1 = require("./utils");
+/**
+ * Represents a participant identifier which extends the base `Identifier` class.
+ * This class ensures that the provided identifier is valid according to specific rules
+ * for participant identifiers.
+ *
+ * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+ */
 class ParticipantId extends identifier_1.Identifier {
     constructor(value) {
         super(value);
@@ -13,6 +20,12 @@ class ParticipantId extends identifier_1.Identifier {
             throw new Error(`Invalid participant identifier. ${error.why}`);
         }
     }
+    /**
+     * Validates a participant identifier.
+     *
+     * @param value - The identifier to validate, which can be a Uint8Array or a hexadecimal string.
+     * @returns An object containing the reason for invalidity if the identifier is invalid, or null if the identifier is valid.
+     */
     static validate(value) {
         if (!(value instanceof Uint8Array || typeof value === "string")) {
             return { why: "Invalid type of value, expected bytes or hex string." };
@@ -29,6 +42,12 @@ class ParticipantId extends identifier_1.Identifier {
         }
         return null;
     }
+    /**
+     * Checks if the given value is a valid participant identifier.
+     *
+     * @param value - The value to be validated, which can be a Uint8Array or a Hex string.
+     * @returns `true` if the value is valid, otherwise `false`.
+     */
     static isValid(value) {
         try {
             return this.validate(value) === null;
@@ -47,6 +66,19 @@ exports.ParticipantId = ParticipantId;
  * @throws {Error} If the identifier version is not `IdentifierVersion.V0`.
  * @throws {Error} If the fingerprint length is not 24 bytes.
  * @throws {Error} If any flag is unsupported for the participant identifier.
+ *
+ * @example
+ * import { createParticipantId, IdentifierVersion, randomBytes } from "js-moi-sdk";
+ *
+ * const participant = createParticipantId({
+ * fingerprint: randomBytes(24),
+ *     variant: 0,
+ *     version: IdentifierVersion.V0,
+ * });
+ *
+ * console.log(participant.toString());
+ *
+ * >> "0x00000000168f031d5aaffe36b54dc4df07a5921ade2c1ac51b6df83800000000"
  */
 const createParticipantId = (option) => {
     if (option.fingerprint.length !== 24) {

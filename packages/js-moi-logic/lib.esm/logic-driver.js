@@ -8,7 +8,10 @@ import { StateAccessorBuilder } from "./state/state-accessor-builder";
 /**
  * It is class that is used to interact with the logic.
  *
- * @class LogicDriver
+ * It provides methods to interact with the logic, such
+ * as invoking callsites, deploying the logic, and retrieving logic storage.
+ *
+ * Inherit from `LogicDescriptor` class.
  */
 export class LogicDriver extends LogicDescriptor {
     signer;
@@ -101,6 +104,14 @@ export class LogicDriver extends LogicDescriptor {
             }
         }
     }
+    /**
+     * Creates an interaction request for the specified callsite.
+     *
+     * @param method - name of the method to create the interaction request.
+     * @param callsite - name of the callsite.
+     * @param callsiteArguments - arguments to pass to the callsite.
+     * @param params - interaction request parameters.
+     */
     async createIxRequest(method, routine, routineArguments, params) {
         const operation = await this.createIxOperation(routine, routineArguments);
         if (method === "moi.Simulate") {
@@ -297,6 +308,34 @@ export class LogicDriver extends LogicDescriptor {
  * @returns A promise that resolves to a LogicDriver instance.
  *
  * @throws Will throw an error if the provider fails to retrieve the logic.
+ *
+ * @example
+ * // Creating a LogicDriver instance using a logic manifest
+ *
+ * import { getLogicDriver, Wallet } from "js-moi-sdk";
+ * import { provider } from "./provider";
+ * import manifest from "./token-ledger.json";
+ *
+ * const wallet = await Wallet.fromMnemonic("...", { provider });
+ * const driver = await getLogicDriver(manifest, wallet);
+ *
+ * console.log(driver);
+ *
+ * >> LogicDriver {  }
+ *
+ * @example
+ * // Creating a LogicDriver instance using a logic id
+ *
+ * import { getLogicDriver, Wallet } from "js-moi-sdk";
+ * import { provider } from "./provider";
+ *
+ * const logicId = "0x1234567890abcdef...";
+ * const wallet = await Wallet.fromMnemonic("...", { provider });
+ * const driver = await getLogicDriver(logicId, wallet);
+ *
+ * console.log(driver);
+ *
+ * >> LogicDriver {  }
  */
 export const getLogicDriver = async (source, signer) => {
     if (isIdentifier(source)) {

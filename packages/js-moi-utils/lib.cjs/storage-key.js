@@ -10,14 +10,29 @@ const bn_js_1 = __importDefault(require("bn.js"));
 const js_polo_1 = require("js-polo");
 const bytes_1 = require("./bytes");
 const hex_1 = require("./hex");
+/**
+ * Represents a storage key with a value that can be converted to different formats.
+ */
 class StorageKey {
     value;
+    /**
+     * Creates an instance of StorageKey.
+     * @param value - The value of the storage key, which can be a number, string, Uint8Array, or BN.
+     */
     constructor(value) {
         this.value = new bn_js_1.default(value);
     }
+    /**
+     * Converts the storage key value to a hexadecimal string.
+     * @returns The hexadecimal representation of the storage key value.
+     */
     hex() {
         return (0, hex_1.bytesToHex)(this.toBytes());
     }
+    /**
+     * Converts the storage key value to a byte array.
+     * @returns The byte array representation of the storage key value.
+     */
     toBytes() {
         return Uint8Array.from(this.value.toArray("be", 32));
     }
@@ -43,6 +58,12 @@ exports.AbstractAccessor = AbstractAccessor;
  * It generates slot hash for accessing the length of an Array/VArray or a Map.
  */
 class LengthAccessor extends AbstractAccessor {
+    /**
+     * Accesses the provided storage key.
+     *
+     * @param hash - The storage key to be accessed.
+     * @returns The same storage key that was provided.
+     */
     access(hash) {
         return hash;
     }
@@ -140,6 +161,12 @@ class ClassFieldAccessor extends AbstractAccessor {
         super();
         this.index = index;
     }
+    /**
+     * Computes a new `StorageKey` by hashing the provided `StorageKey` and adding an index.
+     *
+     * @param {StorageKey} hash - The `StorageKey` to be hashed and used for computation.
+     * @returns {StorageKey} - The newly computed `StorageKey`.
+     */
     access(hash) {
         let blob = this.sum256(hash.toBytes());
         const bn = new bn_js_1.default(blob).add(new bn_js_1.default(this.index));
@@ -147,6 +174,13 @@ class ClassFieldAccessor extends AbstractAccessor {
     }
 }
 exports.ClassFieldAccessor = ClassFieldAccessor;
+/**
+ * Generates a slot hash based on the provided base value and accessors.
+ *
+ * @param {number | StorageKey} base - The base value for generating the slot hash.
+ * @param {...Accessor} args - The accessors used in generating the slot hash.
+ * @returns {StorageKey} - The generated slot hash as a StorageKey.
+ */
 function generateStorageKey(base, ...args) {
     let slot = typeof base === "number" ? new StorageKey(base) : base;
     const accessors = Array.isArray(args[0]) ? args[0] : args;

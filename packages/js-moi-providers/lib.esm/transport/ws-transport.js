@@ -1,5 +1,8 @@
 import EventEmitter from "events";
 import { Websocket } from "../provider/ws/ws";
+/**
+ * WebsocketTransport is a transport that sends JSON-RPC messages over Websocket.
+ */
 export class WebsocketTransport extends EventEmitter {
     options;
     address;
@@ -80,6 +83,14 @@ export class WebsocketTransport extends EventEmitter {
         });
         return await this.waitForConnectionPromise;
     }
+    /**
+     * Sends a JSON-RPC request over a WebSocket connection and returns the response.
+     *
+     * @param {string} method - The JSON-RPC method to be invoked.
+     * @param {unknown[]} [param=[]] - The parameters to be sent with the JSON-RPC request.
+     * @returns {Promise<JsonRpcResponse<TResult>>} - A promise that resolves with the JSON-RPC response.
+     * @throws Will throw an error if the response cannot be parsed or if the request fails.
+     */
     async request(method, param = []) {
         await this.waitForConnection();
         return new Promise((resolve, reject) => {
@@ -109,6 +120,11 @@ export class WebsocketTransport extends EventEmitter {
             this.send(request);
         });
     }
+    /**
+     * Closes the WebSocket connection.
+     *
+     * @throws {Error} If the WebSocket is not initialized.
+     */
     close() {
         if (this.ws == null) {
             throw new Error("Websocket is not initialized");

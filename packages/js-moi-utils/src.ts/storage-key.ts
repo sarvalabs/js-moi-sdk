@@ -4,17 +4,32 @@ import { Polorizer } from "js-polo";
 import { concatBytes, encodeText } from "./bytes";
 import { bytesToHex, type Hex } from "./hex";
 
+/**
+ * Represents a storage key with a value that can be converted to different formats.
+ */
 export class StorageKey {
     private value: BN;
 
+    /**
+     * Creates an instance of StorageKey.
+     * @param value - The value of the storage key, which can be a number, string, Uint8Array, or BN.
+     */
     constructor(value: number | string | Uint8Array | BN) {
         this.value = new BN(value);
     }
 
+    /**
+     * Converts the storage key value to a hexadecimal string.
+     * @returns The hexadecimal representation of the storage key value.
+     */
     hex(): Hex {
         return bytesToHex(this.toBytes());
     }
 
+    /**
+     * Converts the storage key value to a byte array.
+     * @returns The byte array representation of the storage key value.
+     */
     toBytes(): Uint8Array {
         return Uint8Array.from(this.value.toArray("be", 32));
     }
@@ -61,6 +76,12 @@ export abstract class AbstractAccessor implements Accessor {
  * It generates slot hash for accessing the length of an Array/VArray or a Map.
  */
 export class LengthAccessor extends AbstractAccessor {
+    /**
+     * Accesses the provided storage key.
+     *
+     * @param hash - The storage key to be accessed.
+     * @returns The same storage key that was provided.
+     */
     public access(hash: StorageKey): StorageKey {
         return hash;
     }
@@ -163,6 +184,12 @@ export class ClassFieldAccessor extends AbstractAccessor {
         super();
     }
 
+    /**
+     * Computes a new `StorageKey` by hashing the provided `StorageKey` and adding an index.
+     *
+     * @param {StorageKey} hash - The `StorageKey` to be hashed and used for computation.
+     * @returns {StorageKey} - The newly computed `StorageKey`.
+     */
     public access(hash: StorageKey): StorageKey {
         let blob = this.sum256(hash.toBytes());
         const bn = new BN(blob).add(new BN(this.index));
@@ -187,6 +214,13 @@ export function generateStorageKey(base: number | StorageKey, ...accessors: Acce
  * @returns The generated slot hash as a Uint8Array.
  */
 export function generateStorageKey(base: number | StorageKey, accessorsArray: Accessor[]): StorageKey;
+/**
+ * Generates a slot hash based on the provided base value and accessors.
+ *
+ * @param {number | StorageKey} base - The base value for generating the slot hash.
+ * @param {...Accessor} args - The accessors used in generating the slot hash.
+ * @returns {StorageKey} - The generated slot hash as a StorageKey.
+ */
 export function generateStorageKey(base: number | StorageKey, ...args: any[]): StorageKey {
     let slot = typeof base === "number" ? new StorageKey(base) : base;
 

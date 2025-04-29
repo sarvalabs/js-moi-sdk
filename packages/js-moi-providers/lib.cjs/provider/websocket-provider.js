@@ -17,6 +17,11 @@ var WebsocketEvent;
     WebsocketEvent["NewTesseractsByAccount"] = "newTesseractsByAccount";
     WebsocketEvent["NewLogs"] = "newLogs";
 })(WebsocketEvent || (exports.WebsocketEvent = WebsocketEvent = {}));
+/**
+ * WebsocketProvider is a provider that connects to a network via a websocket connection.
+ *
+ * It extends the JsonRpcProvider and adds the ability to subscribe to network events.
+ */
 class WebsocketProvider extends json_rpc_provider_1.JsonRpcProvider {
     static events = {
         client: new Set(["error", "open", "close", "reconnect", "debug"]),
@@ -31,9 +36,20 @@ class WebsocketProvider extends json_rpc_provider_1.JsonRpcProvider {
             this.transport.on(event, (...args) => this.emit(event, ...args));
         }
     }
+    /**
+     * Retrieves the current list of subscriptions.
+     *
+     * @returns An array of subscription objects, each containing an `id` and an `event`.
+     */
     getSubscriptions() {
         return Array.from(Iterator.from(this.subscriptions).map(([id, event]) => ({ id, event })));
     }
+    /**
+     * Closes the WebSocket connection if the transport is an instance of WebsocketTransport.
+     * This method ensures that the WebSocket connection is properly terminated.
+     *
+     * @returns {void}
+     */
     close() {
         if (this.transport instanceof ws_transport_1.WebsocketTransport) {
             this.transport.close();
@@ -58,9 +74,23 @@ class WebsocketProvider extends json_rpc_provider_1.JsonRpcProvider {
             super.emit(eventName, data.params.result);
         });
     }
+    /**
+     * Registers an event listener for a specified provider event.
+     *
+     * @param event - The event to listen for.
+     * @param listener - The callback function to be invoked when the event occurs.
+     * @returns The current instance to allow method chaining.
+     */
     on(event, listener) {
         return this.subscribeToEvent("on", event, listener);
     }
+    /**
+     * Registers an event listener for a specified provider event that will only be called once.
+     *
+     * @param event - The event to listen for.
+     * @param listener - The callback function to be invoked when the event occurs.
+     * @returns The current instance to allow method chaining.
+     */
     once(eventName, listener) {
         return this.subscribeToEvent("once", eventName, listener);
     }

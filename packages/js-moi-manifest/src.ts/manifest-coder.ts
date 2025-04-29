@@ -1,5 +1,5 @@
 import { bytesToHex, deepCopy, ErrorCode, ErrorUtils, hexToBytes, trimHexPrefix, type Hex, type LogicManifest } from "js-moi-utils";
-import { Depolorizer, documentEncode, Schema as PoloSchema } from "js-polo";
+import { Depolorizer, documentEncode, Schema as PoloSchema, type ArraySchema, type MapSchema, type StructSchema } from "js-polo";
 import { ElementDescriptor } from "./element-descriptor";
 import { JsonManifestCoder } from "./manifest-coder/json-manifest-coder";
 import { ManifestCoderFormat } from "./manifest-coder/serialization-format";
@@ -49,9 +49,10 @@ export class ManifestCoder {
     private parseCalldata(schema: PoloSchema, arg: any, updateType: boolean = true): any {
         const parsableKinds = ["bytes", "array", "map", "struct"];
 
-        const reconstructSchema = (schema: PoloSchema): PoloSchema => {
+        const reconstructSchema = (schema: StructSchema): PoloSchema => {
             for (const key in schema.fields ?? {}) {
                 if (schema.fields?.[key].kind === "struct") {
+                    // @ts-expect-error - The 'kind' is being updated to document is struct
                     schema.fields[key].kind = "document";
                 }
             }
@@ -59,11 +60,11 @@ export class ManifestCoder {
             return schema;
         };
 
-        const parseArray = (schema: PoloSchema, arg: any[]) => {
+        const parseArray = (schema: ArraySchema, arg: any[]) => {
             return arg.map((value: any, index: number) => this.parseCalldata(schema, value, arg.length - 1 === index));
         };
 
-        const parseMap = (schema: PoloSchema, arg: Map<any, any>) => {
+        const parseMap = (schema: MapSchema, arg: Map<any, any>) => {
             const map = new Map();
             const entries = Array.from(arg.entries());
 
@@ -82,7 +83,7 @@ export class ManifestCoder {
             return map;
         };
 
-        const parseStruct = (schema: PoloSchema, arg: any, updateType: boolean) => {
+        const parseStruct = (schema: StructSchema, arg: any, updateType: boolean) => {
             Object.keys(arg).forEach((key) => {
                 if (schema.fields?.[key] == null) {
                     return;
@@ -93,7 +94,9 @@ export class ManifestCoder {
             const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)));
 
             if (updateType) {
+                // @ts-expect-error - The 'kind' is being updated to document but supposed to be struct
                 schema.kind = "document";
+                // @ts-expect-error - fields can be optional property
                 delete schema.fields;
             }
 
@@ -111,7 +114,8 @@ export class ManifestCoder {
                 break;
 
             case "array":
-                if (parsableKinds.includes(schema.fields?.values.kind)) {
+                // Check if the array is parsable and values are of kind array
+                if (parsableKinds.includes(schema.fields?.values.kind) && schema.fields?.values.kind === "array") {
                     return parseArray(schema.fields?.values, arg);
                 }
                 break;

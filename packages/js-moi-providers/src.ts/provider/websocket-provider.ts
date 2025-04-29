@@ -67,6 +67,11 @@ type WebsocketEmittedResponse = {
     };
 };
 
+/**
+ * WebsocketProvider is a provider that connects to a network via a websocket connection.
+ *
+ * It extends the JsonRpcProvider and adds the ability to subscribe to network events.
+ */
 export class WebsocketProvider extends JsonRpcProvider {
     private static events: Record<string, Set<string | symbol>> = {
         client: new Set(["error", "open", "close", "reconnect", "debug"]),
@@ -85,10 +90,21 @@ export class WebsocketProvider extends JsonRpcProvider {
         }
     }
 
+    /**
+     * Retrieves the current list of subscriptions.
+     *
+     * @returns An array of subscription objects, each containing an `id` and an `event`.
+     */
     getSubscriptions() {
         return Array.from(Iterator.from(this.subscriptions).map(([id, event]) => ({ id, event })));
     }
 
+    /**
+     * Closes the WebSocket connection if the transport is an instance of WebsocketTransport.
+     * This method ensures that the WebSocket connection is properly terminated.
+     *
+     * @returns {void}
+     */
     close(): void {
         if (this.transport instanceof WebsocketTransport) {
             this.transport.close();
@@ -121,10 +137,24 @@ export class WebsocketProvider extends JsonRpcProvider {
         });
     }
 
+    /**
+     * Registers an event listener for a specified provider event.
+     *
+     * @param event - The event to listen for.
+     * @param listener - The callback function to be invoked when the event occurs.
+     * @returns The current instance to allow method chaining.
+     */
     on<K, T extends ProviderEvent>(event: T, listener: ProviderEventListener<T>): this {
         return this.subscribeToEvent<K>("on", event, listener);
     }
 
+    /**
+     * Registers an event listener for a specified provider event that will only be called once.
+     *
+     * @param event - The event to listen for.
+     * @param listener - The callback function to be invoked when the event occurs.
+     * @returns The current instance to allow method chaining.
+     */
     once<K, T extends ProviderEvent>(eventName: T, listener: ProviderEventListener<T>): this {
         return this.subscribeToEvent<K>("once", eventName, listener);
     }

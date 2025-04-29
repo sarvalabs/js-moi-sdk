@@ -6,7 +6,6 @@ exports.validateIxRequest = validateIxRequest;
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
-const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
 const hex_1 = require("./hex");
 const operations_1 = require("./operations");
@@ -16,36 +15,36 @@ const operations_1 = require("./operations");
  * @returns The POLO schema for an interaction request.
  */
 const getInteractionRequestSchema = () => {
-    return polo_schema_1.polo.struct({
-        sender: polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            sequence: polo_schema_1.polo.integer,
-            key_id: polo_schema_1.polo.integer,
+    return js_polo_1.schema.struct({
+        sender: js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            sequence: js_polo_1.schema.integer,
+            key_id: js_polo_1.schema.integer,
         }),
-        sponsor: polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            sequence: polo_schema_1.polo.integer,
-            key_id: polo_schema_1.polo.integer,
+        sponsor: js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            sequence: js_polo_1.schema.integer,
+            key_id: js_polo_1.schema.integer,
         }),
-        fuel_price: polo_schema_1.polo.integer,
-        fuel_limit: polo_schema_1.polo.integer,
-        ix_operations: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            type: polo_schema_1.polo.integer,
-            payload: polo_schema_1.polo.bytes,
+        fuel_price: js_polo_1.schema.integer,
+        fuel_limit: js_polo_1.schema.integer,
+        ix_operations: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+            type: js_polo_1.schema.integer,
+            payload: js_polo_1.schema.bytes,
         })),
-        participants: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            lock_type: polo_schema_1.polo.integer,
-            notary: polo_schema_1.polo.boolean,
+        participants: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            lock_type: js_polo_1.schema.integer,
+            notary: js_polo_1.schema.boolean,
         })),
-        preferences: polo_schema_1.polo.struct({
-            compute: polo_schema_1.polo.bytes,
-            consensus: polo_schema_1.polo.struct({
-                mtq: polo_schema_1.polo.integer,
-                trust_nodes: polo_schema_1.polo.arrayOf(polo_schema_1.polo.string),
+        preferences: js_polo_1.schema.struct({
+            compute: js_polo_1.schema.bytes,
+            consensus: js_polo_1.schema.struct({
+                mtq: js_polo_1.schema.integer,
+                trust_nodes: js_polo_1.schema.arrayOf(js_polo_1.schema.string),
             }),
         }),
-        perception: polo_schema_1.polo.bytes,
+        perception: js_polo_1.schema.bytes,
     });
 };
 exports.getInteractionRequestSchema = getInteractionRequestSchema;

@@ -1,6 +1,5 @@
 import { LogicId } from "js-moi-identifiers";
-import { Polorizer } from "js-polo";
-import { polo, type PoloSchema } from "polo-schema";
+import { Polorizer, type Schema, schema } from "js-polo";
 import { AssetStandard, OpType } from "./enums";
 import { ErrorCode, ErrorUtils } from "./errors";
 import { hexToBytes, isHex } from "./hex";
@@ -12,7 +11,7 @@ export interface IxOperationDescriptor<TOpType extends OpType> {
      *
      * @returns Returns the POLO schema for the operation payload.
      */
-    schema: PoloSchema;
+    schema: Schema;
     /**
      * Validates the operation payload.
      *
@@ -52,16 +51,16 @@ export const isOperationType = <TOpType extends OpType>(type: TOpType, operation
 
 const createParticipantCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.ParticipantCreate>>({
-        schema: polo.struct({
-            id: polo.bytes,
-            keys_payload: polo.arrayOf(
-                polo.struct({
-                    public_key: polo.bytes,
-                    weight: polo.integer,
-                    signature_algorithm: polo.integer,
+        schema: schema.struct({
+            id: schema.bytes,
+            keys_payload: schema.arrayOf(
+                schema.struct({
+                    public_key: schema.bytes,
+                    weight: schema.integer,
+                    signature_algorithm: schema.integer,
                 })
             ),
-            amount: polo.integer,
+            amount: schema.integer,
         }),
 
         encode: ({ payload }) => {
@@ -94,19 +93,19 @@ const createParticipantCreateDescriptor = () => {
 
 const createAssetCreateDescriptor = () => {
     return Object.freeze<IxOperationDescriptor<OpType.AssetCreate>>({
-        schema: polo.struct({
-            symbol: polo.string,
-            supply: polo.integer,
-            standard: polo.integer,
-            dimension: polo.integer,
-            is_stateful: polo.boolean,
-            is_logical: polo.boolean,
-            logic_payload: polo.struct({
-                manifest: polo.bytes,
-                logic_id: polo.string,
-                callsite: polo.string,
-                calldata: polo.bytes,
-                interface: polo.map({ keys: polo.string, values: polo.string }),
+        schema: schema.struct({
+            symbol: schema.string,
+            supply: schema.integer,
+            standard: schema.integer,
+            dimension: schema.integer,
+            is_stateful: schema.boolean,
+            is_logical: schema.boolean,
+            logic_payload: schema.struct({
+                manifest: schema.bytes,
+                logic_id: schema.string,
+                callsite: schema.string,
+                calldata: schema.bytes,
+                interface: schema.map({ keys: schema.string, values: schema.string }),
             }),
         }),
 
@@ -135,23 +134,21 @@ const createAssetCreateDescriptor = () => {
 };
 
 const createAccountConfigureDescriptor = () => {
-    const schema = polo.struct({
-        add: polo.arrayOf(
-            polo.struct({
-                public_key: polo.bytes,
-                weight: polo.integer,
-                signature_algorithm: polo.integer,
-            })
-        ),
-        revoke: polo.arrayOf(
-            polo.struct({
-                key_id: polo.integer,
-            })
-        ),
-    });
-
     return Object.freeze<IxOperationDescriptor<OpType.AccountConfigure>>({
-        schema: schema,
+        schema: schema.struct({
+            add: schema.arrayOf(
+                schema.struct({
+                    public_key: schema.bytes,
+                    weight: schema.integer,
+                    signature_algorithm: schema.integer,
+                })
+            ),
+            revoke: schema.arrayOf(
+                schema.struct({
+                    key_id: schema.integer,
+                })
+            ),
+        }),
 
         validator: ({ payload }) => {
             if (payload.add == null && payload.revoke == null) {
@@ -207,9 +204,9 @@ const createAccountConfigureDescriptor = () => {
 
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze<IxOperationDescriptor<AssetSupplyOpType>>({
-        schema: polo.struct({
-            asset_id: polo.string,
-            amount: polo.integer,
+        schema: schema.struct({
+            asset_id: schema.string,
+            amount: schema.integer,
         }),
 
         encode: ({ payload }) => ({
@@ -281,12 +278,12 @@ const createAssetActionDescriptor = <TOpType extends AssetActionOpType>() => {
     };
 
     return Object.freeze<IxOperationDescriptor<TOpType>>({
-        schema: polo.struct({
-            benefactor: polo.bytes,
-            beneficiary: polo.bytes,
-            asset_id: polo.string,
-            amount: polo.integer,
-            timestamp: polo.integer,
+        schema: schema.struct({
+            benefactor: schema.bytes,
+            beneficiary: schema.bytes,
+            asset_id: schema.string,
+            amount: schema.integer,
+            timestamp: schema.integer,
         }),
 
         encode: ({ payload }) => {
@@ -375,14 +372,14 @@ const createLogicActionDescriptor = <T extends LogicActionOpType>() => {
     };
 
     return Object.freeze<IxOperationDescriptor<T>>({
-        schema: polo.struct({
-            manifest: polo.bytes,
-            logic_id: polo.bytes,
-            callsite: polo.string,
-            calldata: polo.bytes,
-            interfaces: polo.map({
-                keys: polo.string,
-                values: polo.string,
+        schema: schema.struct({
+            manifest: schema.bytes,
+            logic_id: schema.bytes,
+            callsite: schema.string,
+            calldata: schema.bytes,
+            interfaces: schema.map({
+                keys: schema.string,
+                values: schema.string,
             }),
         }),
 

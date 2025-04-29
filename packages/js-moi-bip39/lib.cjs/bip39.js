@@ -91,6 +91,16 @@ const salt = (password) => {
  * @param {string} mnemonic - The mnemonic phrase.
  * @param {string} [password] - The optional password.
  * @returns {Uint8Array} The generated seed.
+ *
+ * @example
+ * import { mnemonicToSeedSync } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const seed = mnemonicToSeedSync(mnemonic);
+ *
+ * console.log(seed);
+ *
+ * >> Uint8Array(64) [ 0, 1, 2, ... ]
  */
 const mnemonicToSeedSync = (mnemonic, password) => {
     const res = (0, pbkdf2_1.pbkdf2)(sha512_1.sha512, (0, js_moi_utils_1.encodeText)(normalize(mnemonic)), salt(normalize(password)), {
@@ -107,6 +117,16 @@ exports.mnemonicToSeedSync = mnemonicToSeedSync;
  * @param {string} [password] - The optional password.
  * @returns {Promise<Uint8Array>} The generated seed.
  * @throws {Error} If an error occurs during the conversion.
+ *
+ * @example
+ * import { mnemonicToSeed } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const seed = await mnemonicToSeed(mnemonic);
+ *
+ * console.log(seed);
+ *
+ * >> Uint8Array(64) [ 0, 1, 2, ... ]
  */
 const mnemonicToSeed = async (mnemonic, password) => {
     try {
@@ -128,6 +148,16 @@ exports.mnemonicToSeed = mnemonicToSeed;
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The corresponding entropy.
  * @throws {Error} If the mnemonic is invalid or a wordlist is required but not found.
+ *
+ * @example
+ * import { mnemonicToEntropy } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const entropy = mnemonicToEntropy(mnemonic);
+ *
+ * console.log(entropy);
+ *
+ * >> "6ce1535a6fdd...ae6f27fa0835b7"
  */
 const mnemonicToEntropy = (mnemonic, wordlist) => {
     wordlist = wordlist || DEFAULT_WORDLIST;
@@ -176,6 +206,16 @@ exports.mnemonicToEntropy = mnemonicToEntropy;
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The corresponding mnemonic phrase.
  * @throws {Error} If the entropy is invalid or a wordlist is required but not found.
+ *
+ * @example
+ * import { entropyToMnemonic } from "js-moi-sdk";
+ *
+ * const entropy = "6ce1535a6fdd...ae6f27fa0835b7";
+ * const mnemonic = entropyToMnemonic(entropy);
+ *
+ * console.log(mnemonic);
+ *
+ * >> "abandon hair ..."
  */
 const entropyToMnemonic = (entropy, wordlist) => {
     if (typeof entropy === "string") {
@@ -212,6 +252,15 @@ exports.entropyToMnemonic = entropyToMnemonic;
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {string} The generated mnemonic phrase.
  * @throws {TypeError} If the strength is not divisible by 32.
+ *
+ * @example
+ * import { generateMnemonic } from "js-moi-sdk";
+ *
+ * const mnemonic = generateMnemonic();
+ *
+ * console.log(mnemonic);
+ *
+ * >> "abandon hair ..."
  */
 const generateMnemonic = (strength, rng, wordlist) => {
     strength = strength || 128;
@@ -228,6 +277,16 @@ exports.generateMnemonic = generateMnemonic;
  * @param {string} mnemonic - The mnemonic phrase to validate.
  * @param {string[]} [wordlist] - The optional wordlist.
  * @returns {boolean} True if the mnemonic is valid, false otherwise.
+ *
+ * @example
+ * import { validateMnemonic } from "js-moi-sdk";
+ *
+ * const mnemonic = "abandon hair ...";
+ * const isValid = validateMnemonic(mnemonic);
+ *
+ * console.log(isValid);
+ *
+ * >> true
  */
 const validateMnemonic = (mnemonic, wordlist) => {
     try {
@@ -244,6 +303,15 @@ exports.validateMnemonic = validateMnemonic;
  *
  * @returns {string} The language code of the default wordlist.
  * @throws {Error} If the default wordlist is not set.
+ *
+ * @example
+ * import { getDefaultWordlist } from "js-moi-sdk";
+ *
+ * const wordlist = getDefaultWordlist();
+ *
+ * console.log(wordlist);
+ *
+ * >> "english"
  */
 const getDefaultWordlist = () => {
     if (!DEFAULT_WORDLIST) {

@@ -1,44 +1,69 @@
-===============
 Getting Started
 ===============
-
---------------------------------------------------------------------------------
 
 Kickstart your journey with js-moi-sdk by installing and importing it. Unleash its 
 potential through comprehensive documentation and resources to supercharge 
 your application development.
 
+It consists of several packages that provide a wide range of functionalities
+to interact with the MOI Protocol and its ecosystem. The available packages includes:
+
+- `js-moi-bip39 <https://www.npmjs.com/package/js-moi-bip39>`_: Provides features for generating and handling mnemonic phrases in accordance with the BIP39 standard.
+- `js-moi-constants <https://www.npmjs.com/package/js-moi-constants>`_: Defines common constants used across the ``js-moi-sdk`` ecosystem, offering predefined values for various components of the MOI Protocol.
+- `js-moi-hdnode <https://www.npmjs.com/package/js-moi-hdnode>`_: Implements a Hierarchical Deterministic (HD) Node for cryptographic key generation and derivation, facilitating secure and structured key management.
+- `js-moi-signer <https://www.npmjs.com/package/js-moi-signer>`_: Represents an MOI account with the ability to sign interactions and messages for cryptographic proof. It provides the necessary tools to sign interactions securely and authenticate interactions on the MOI network.
+- `js-moi-provider <https://www.npmjs.com/package/js-moi-provider>`_: Facilitates connectivity to MOI nodes and retrieve blockchain data, such as account balances and interaction history.
+- `js-moi-wallet <https://www.npmjs.com/package/js-moi-wallet>`_: Implements a Hierarchical Deterministic Wallet capable of signing interactions and managing accounts. It provides a convenient interface for managing multiple accounts, generating keys, and securely signing interactions.
+- `js-moi-logic <https://www.npmjs.com/package/js-moi-logic>`_: Simplifies interaction with MOI logic objects by offering deployment, interaction, and querying capabilities. It provides a higher-level interface for working with MOI logic, allowing you to deploy logic objects, send interactions, and retrieve results.
+- `js-moi-manifest <https://www.npmjs.com/package/js-moi-manifest>`_: Enables encoding and decoding of data according to the MOI Manifest specification, facilitating interaction with logic objects.
+- `js-moi-identifiers <https://www.npmjs.com/package/js-moi-identifiers>`_: Provides utilities for handling various identifiers in the MOI ecosystem, including access to flags, metadata, variant IDs, and fingerprints. It also offers validation for multiple identifier versions.
+- `js-moi-utils <https://www.npmjs.com/package/js-moi-utils>`_: Offers a set of utility functions to streamline development within the MOI ecosystem.
+
+All of these packages are included with ``js-moi-sdk`` by default. However, they can also be installed individually as needed.
+
 Installing
 ------------
-Install the latest `release <https://github.com/sarvalabs/js-moi-sdk/releases>`_ 
+Install the latest `release <https://www.npmjs.com/package/js-moi-sdk>`_ 
 using the following command:
+
+**Using NPM**
 
 .. code-block:: shell
 
     npm install js-moi-sdk
 
+**Using Yarn**
+
+.. code-block:: shell
+
+    yarn add js-moi-sdk
+
+**Using PNPM**
+
+.. code-block:: shell
+
+    pnpm add js-moi-sdk
+
 Importing
 -----------
-If you are using CommonJS or ES5, the require statement is used for 
-importing `js-moi-sdk`.
+If you are using CommonJS module, you can use ``require`` to import from `js-moi-sdk`.
 
 .. code-block:: javascript
 
-   const moi = require("js-moi-sdk")
+   const { Wallet, HttpProvider } = require("js-moi-sdk")
 
-If you are using ES6 or above, you can use the import statement to 
-import `js-moi-sdk`.
+If you are using EcmaScript module or TypeScript, you can use the import statement.
 
 .. code-block:: javascript
 
-   import * as moi from "js-moi-sdk"
+   import { Wallet, HttpProvider } from "js-moi-sdk"
 
 Key Concepts
 ------------
-To begin, it's crucial to grasp the fundamental concepts that underpin the 
-js-moi-sdk framework. Acquainting yourself with these concepts will empower you to 
-utilize the js-moi-sdk package efficiently during your application development 
-process.
+
+Before you begin, understanding the core concepts of ``js-moi-sdk`` is essential.
+Familiarizing yourself with these fundamentals will help you use the package
+efficiently in your application development.
 
 **Tesseract**
 
@@ -117,3 +142,15 @@ which is widely used for identity verification and authentication purposes in
 decentralized applications. Developers can utilize the signer's capabilities to 
 sign and verify arbitrary messages, providing cryptographic proof of the 
 message's origin and integrity.
+
+**Provider**
+
+A provider facilitates JSON-RPC communication with the MOI network, enabling
+blockchain queries. It allows developers to retrieve account, tesseract, and
+interaction details, query logic event logs and state, and interact with the MOI network.
+
+**Identifier**
+
+An Identifier is a unique hex value that represents a participant, asset,
+or logic object in the MOI ecosystem. Identifiers are used to reference participant,
+asset, or logic in interactions and queries.

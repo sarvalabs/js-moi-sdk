@@ -9,7 +9,14 @@ export interface TimerOption {
     delayInSec: number;
 }
 
+/**
+ * The `InteractionResponse` class represents the response of an interaction with the provider.
+ * It provides methods to wait for the interaction to be finalized and to retrieve the result of the interaction.
+ */
 export class InteractionResponse {
+    /**
+     * The hash of the interaction.
+     */
     public readonly hash: Hex;
     private interaction?: Interaction;
     private readonly provider: Provider;

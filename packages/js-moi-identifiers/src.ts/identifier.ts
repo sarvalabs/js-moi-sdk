@@ -7,9 +7,22 @@ export interface InvalidReason {
     why: string;
 }
 
+/**
+ * Represents an identifier with a fixed length of 32 bytes.
+ *
+ * The `Identifier` class provides methods to manipulate and retrieve information
+ * from the identifier, such as its fingerprint, tag, kind, version, flags, metadata,
+ * and variant. It also allows creating new variants of the identifier with specified
+ * flags.
+ */
 export class Identifier {
     private readonly value: Uint8Array;
 
+    /**
+     * Creates a new instance of the `Identifier` class.
+     *
+     * @param value - The identifier value as a `Uint8Array`, `Hex`, or `Identifier`.
+     */
     constructor(value: Uint8Array | Hex | Identifier) {
         value = value instanceof Uint8Array ? value : value instanceof Identifier ? value.toBytes() : hexToBytes(value);
 
@@ -180,7 +193,7 @@ export class Identifier {
  * Checks if the given value is an identifier.
  *
  * @param value - The value to check.
- * @returns True if the value is an instance of `BaseIdentifier`, otherwise false.
+ * @returns True if the value is an instance of `Identifier`, otherwise false.
  */
 export const isIdentifier = (value: unknown): value is Identifier => {
     return value instanceof Identifier;

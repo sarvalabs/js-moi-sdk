@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateOperation = exports.isValidOperation = exports.encodeOperation = exports.encodeOperationPayload = exports.getIxOperationDescriptor = exports.listIxOperationDescriptors = exports.isOperationType = void 0;
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_polo_1 = require("js-polo");
-const polo_schema_1 = require("polo-schema");
 const enums_1 = require("./enums");
 const errors_1 = require("./errors");
 const hex_1 = require("./hex");
@@ -23,14 +22,14 @@ const isOperationType = (type, operation) => {
 exports.isOperationType = isOperationType;
 const createParticipantCreateDescriptor = () => {
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            id: polo_schema_1.polo.bytes,
-            keys_payload: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-                public_key: polo_schema_1.polo.bytes,
-                weight: polo_schema_1.polo.integer,
-                signature_algorithm: polo_schema_1.polo.integer,
+        schema: js_polo_1.schema.struct({
+            id: js_polo_1.schema.bytes,
+            keys_payload: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+                public_key: js_polo_1.schema.bytes,
+                weight: js_polo_1.schema.integer,
+                signature_algorithm: js_polo_1.schema.integer,
             })),
-            amount: polo_schema_1.polo.integer,
+            amount: js_polo_1.schema.integer,
         }),
         encode: ({ payload }) => {
             const poloKeysPayload = payload.keys_payload.map((payload) => ({
@@ -57,19 +56,19 @@ const createParticipantCreateDescriptor = () => {
 };
 const createAssetCreateDescriptor = () => {
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            symbol: polo_schema_1.polo.string,
-            supply: polo_schema_1.polo.integer,
-            standard: polo_schema_1.polo.integer,
-            dimension: polo_schema_1.polo.integer,
-            is_stateful: polo_schema_1.polo.boolean,
-            is_logical: polo_schema_1.polo.boolean,
-            logic_payload: polo_schema_1.polo.struct({
-                manifest: polo_schema_1.polo.bytes,
-                logic_id: polo_schema_1.polo.string,
-                callsite: polo_schema_1.polo.string,
-                calldata: polo_schema_1.polo.bytes,
-                interface: polo_schema_1.polo.map({ keys: polo_schema_1.polo.string, values: polo_schema_1.polo.string }),
+        schema: js_polo_1.schema.struct({
+            symbol: js_polo_1.schema.string,
+            supply: js_polo_1.schema.integer,
+            standard: js_polo_1.schema.integer,
+            dimension: js_polo_1.schema.integer,
+            is_stateful: js_polo_1.schema.boolean,
+            is_logical: js_polo_1.schema.boolean,
+            logic_payload: js_polo_1.schema.struct({
+                manifest: js_polo_1.schema.bytes,
+                logic_id: js_polo_1.schema.string,
+                callsite: js_polo_1.schema.string,
+                calldata: js_polo_1.schema.bytes,
+                interface: js_polo_1.schema.map({ keys: js_polo_1.schema.string, values: js_polo_1.schema.string }),
             }),
         }),
         validator: (operation) => {
@@ -91,18 +90,17 @@ const createAssetCreateDescriptor = () => {
     });
 };
 const createAccountConfigureDescriptor = () => {
-    const schema = polo_schema_1.polo.struct({
-        add: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            public_key: polo_schema_1.polo.bytes,
-            weight: polo_schema_1.polo.integer,
-            signature_algorithm: polo_schema_1.polo.integer,
-        })),
-        revoke: polo_schema_1.polo.arrayOf(polo_schema_1.polo.struct({
-            key_id: polo_schema_1.polo.integer,
-        })),
-    });
     return Object.freeze({
-        schema: schema,
+        schema: js_polo_1.schema.struct({
+            add: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+                public_key: js_polo_1.schema.bytes,
+                weight: js_polo_1.schema.integer,
+                signature_algorithm: js_polo_1.schema.integer,
+            })),
+            revoke: js_polo_1.schema.arrayOf(js_polo_1.schema.struct({
+                key_id: js_polo_1.schema.integer,
+            })),
+        }),
         validator: ({ payload }) => {
             if (payload.add == null && payload.revoke == null) {
                 return createInvalidResult(payload, "add", "Either 'add' or 'revoke' field is required");
@@ -148,9 +146,9 @@ const createAccountConfigureDescriptor = () => {
 };
 const createAssetSupplyDescriptorFor = () => {
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            asset_id: polo_schema_1.polo.string,
-            amount: polo_schema_1.polo.integer,
+        schema: js_polo_1.schema.struct({
+            asset_id: js_polo_1.schema.string,
+            amount: js_polo_1.schema.integer,
         }),
         encode: ({ payload }) => ({
             ...payload,
@@ -203,12 +201,12 @@ const createAssetActionDescriptor = () => {
         return null;
     };
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            benefactor: polo_schema_1.polo.bytes,
-            beneficiary: polo_schema_1.polo.bytes,
-            asset_id: polo_schema_1.polo.string,
-            amount: polo_schema_1.polo.integer,
-            timestamp: polo_schema_1.polo.integer,
+        schema: js_polo_1.schema.struct({
+            benefactor: js_polo_1.schema.bytes,
+            beneficiary: js_polo_1.schema.bytes,
+            asset_id: js_polo_1.schema.string,
+            amount: js_polo_1.schema.integer,
+            timestamp: js_polo_1.schema.integer,
         }),
         encode: ({ payload }) => {
             // @ts-expect-error - This is a hack to fix the type of the payload
@@ -276,14 +274,14 @@ const createLogicActionDescriptor = () => {
         return null;
     };
     return Object.freeze({
-        schema: polo_schema_1.polo.struct({
-            manifest: polo_schema_1.polo.bytes,
-            logic_id: polo_schema_1.polo.bytes,
-            callsite: polo_schema_1.polo.string,
-            calldata: polo_schema_1.polo.bytes,
-            interfaces: polo_schema_1.polo.map({
-                keys: polo_schema_1.polo.string,
-                values: polo_schema_1.polo.string,
+        schema: js_polo_1.schema.struct({
+            manifest: js_polo_1.schema.bytes,
+            logic_id: js_polo_1.schema.bytes,
+            callsite: js_polo_1.schema.string,
+            calldata: js_polo_1.schema.bytes,
+            interfaces: js_polo_1.schema.map({
+                keys: js_polo_1.schema.string,
+                values: js_polo_1.schema.string,
             }),
         }),
         encode: ({ payload }) => {
