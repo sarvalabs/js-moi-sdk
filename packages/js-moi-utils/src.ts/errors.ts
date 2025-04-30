@@ -56,7 +56,7 @@ export class CustomError extends Error {
      *
      * @returns {string} - The string representation of the error.
      */
-    public toString(): string {
+    public override toString(): string {
         const messageDetails = Object.entries(this.params)
             .map(([key, value]) => `${key}=${serializeValue(value)}`)
             .join(", ");

@@ -261,7 +261,7 @@ export class Schema {
 
         const schema: StructSchema = {
             kind: "struct",
-            fields: {},
+            fields: {} as Record<string, PoloSchema>,
         };
 
         if (element?.kind !== ElementType.Class) {
@@ -314,7 +314,7 @@ export class Schema {
     public parseFields(fields: TypeField[]): StructSchema {
         const schema: StructSchema = {
             kind: "struct",
-            fields: {},
+            fields: {} as Record<string, PoloSchema>,
         };
 
         if (!Array.isArray(fields)) {

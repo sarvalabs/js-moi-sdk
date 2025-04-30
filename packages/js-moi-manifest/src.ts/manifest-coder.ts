@@ -94,9 +94,9 @@ export class ManifestCoder {
             const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)));
 
             if (updateType) {
-                // @ts-expect-error - The 'kind' is being updated to document but supposed to be struct
+                // @ts-ignore - The 'kind' is being updated to document is struct
                 schema.kind = "document";
-                // @ts-expect-error - fields can be optional property
+                // @ts-ignore - The 'fields' is being updated to document is struct
                 delete schema.fields;
             }
 

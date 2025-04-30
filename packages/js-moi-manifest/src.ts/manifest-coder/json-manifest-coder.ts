@@ -73,7 +73,7 @@ export class JsonManifestCoder extends BaseManifestCoder {
         return polorizer;
     }
 
-    private deserializeElement(element) {
+    private deserializeElement(element: any) {
         if (element.deps.length == 0) {
             delete element.deps;
         }
@@ -120,7 +120,7 @@ export class JsonManifestCoder extends BaseManifestCoder {
         return polorizer;
     }
 
-    private deserializeElements(elements: any[]) {
+    private deserializeElements(elements: LogicElement[]) {
         for (const element of elements) {
             this.deserializeElement(element);
         }

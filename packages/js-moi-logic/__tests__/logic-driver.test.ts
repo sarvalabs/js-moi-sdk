@@ -6,6 +6,7 @@ import { loadManifestFromFile } from "./manifests";
 
 import { LogicId } from "js-moi-identifiers";
 import { Wallet } from "../../js-moi-wallet/src.ts";
+import type { StateAccessorBuilder } from "../src.ts/state/state-accessor-builder.js";
 import { createWallet } from "./helpers";
 import { mockConfirmedInteraction } from "./utils";
 
@@ -62,7 +63,7 @@ const logics = [
             args: [10_000, bytesToHex(randomBytes(32))],
         },
         persistent: {
-            accessor: (b) => b.name("Symbol"),
+            accessor: (b: StateAccessorBuilder) => b.name("Symbol"),
             expected: "MOI",
         },
     },
@@ -80,7 +81,7 @@ const logics = [
             args: [],
         },
         ephemeral: {
-            accessor: (b) => b.name("Spendable"),
+            accessor: (b: StateAccessorBuilder) => b.name("Spendable"),
             expected: 10_000,
         },
     },
