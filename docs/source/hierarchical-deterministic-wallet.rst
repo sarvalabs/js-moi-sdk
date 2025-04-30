@@ -61,6 +61,41 @@ Creating a Wallet from a Keystore
 
     >> Wallet
 
+Executing A Interaction Request Using Wallet
+********************************************
+
+.. code-block:: typescript
+
+    import { AssetStandard, NetworkType, OpType, VoyageProvider, Wallet, type IxOperation } from "js-moi-sdk";
+
+    const mnemonic = "hollow appear ... hurdle";
+    const wallet = await Wallet.fromMnemonic(mnemonic, {
+        provider: new VoyageProvider(NetworkType.Babylon),
+    });
+
+    const operation: IxOperation<OpType.AssetCreate> = {
+        type: OpType.AssetCreate,
+        payload: {
+            symbol: "DEMO",
+            supply: 1000000,
+            standard: AssetStandard.MAS0,
+        },
+    };
+
+    const ix = await wallet.execute(operation);
+
+    console.log("Ix hash:", ix.hash);
+
+    const result = await ix.result();
+
+    console.log("Ix result:", result);
+    
+    // Console output:
+
+    >> Ix hash: 0x5a2bea...;
+    >> Ix result: [{ type: 6, status: 0, data: { asset_id: "0x00000001c2..." } }] 
+
+
 Classes
 -------
 
