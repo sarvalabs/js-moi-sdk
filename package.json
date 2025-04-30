@@ -14,6 +14,8 @@
     "watch": "turbo run watch --continue --cache=local:r,remote:r --concurrency 11",
     "check-types": "turbo run check-types --continue",
     "clean:node_modules": "turbo run clean:node_modules",
+    "docs": "make -C docs html",
+    "dev:docs": "make -C docs watch",
     "pretest": "npm run build"
   },
   "repository": {

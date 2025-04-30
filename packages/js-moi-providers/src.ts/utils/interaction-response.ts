@@ -4,9 +4,10 @@ import type { Provider } from "../types/provider";
 const MAX_RETRIES_ON_NOT_FOUND = 10;
 const DEFAULT_IX_INFO_RETRIEVAL_TIME = 1500;
 
-export interface TimerOption {
-    retries: number;
-    delayInSec: number;
+export interface WaitOption {
+    retries?: number;
+    delayInSec?: number;
+    signal?: AbortSignal;
 }
 
 /**
@@ -36,7 +37,7 @@ export class InteractionResponse {
         this.hash = this.interaction.hash;
     }
 
-    private getDefaultTimer(): TimerOption {
+    private getDefaultTimer(): Required<Omit<WaitOption, "signal">> {
         return { delayInSec: 1.5, retries: 80 };
     }
 
@@ -48,7 +49,15 @@ export class InteractionResponse {
      *
      * @throws Will throw a timeout error if the interaction is not finalized within the specified retries.
      */
-    async wait(timer: TimerOption = this.getDefaultTimer()): Promise<InteractionConfirmation> {
+    async wait(timer: WaitOption = this.getDefaultTimer()): Promise<InteractionConfirmation> {
+        if (timer.retries == null) {
+            timer.retries = this.getDefaultTimer().retries;
+        }
+
+        if (timer.delayInSec == null) {
+            timer.delayInSec = this.getDefaultTimer().delayInSec;
+        }
+
         if (timer.retries <= 0) {
             ErrorUtils.throwArgumentError("Must have at least 1 retry", "timer.retries", timer.retries);
         }
@@ -64,6 +73,12 @@ export class InteractionResponse {
         const delayInMs = timer.delayInSec * 1000;
         for (let retries = 0; retries < timer.retries; retries++) {
             try {
+                if (timer.signal?.aborted) {
+                    ErrorUtils.throwError("Aborted", ErrorCode.ACTION_ABORTED, {
+                        hash: this.hash,
+                    });
+                }
+
                 const ix = await this.provider.getInteraction(this.hash, {
                     modifier: { include: ["confirmation"] },
                 });
@@ -73,7 +88,7 @@ export class InteractionResponse {
                     return ix.confirmation;
                 }
             } catch (error) {
-                if (error instanceof CustomError && error.message === "failed to get receipt: tesseract hash not found: key not found") {
+                if (error instanceof CustomError && error.message === "error fetching interaction") {
                     if (this.notFoundRetries <= 0) {
                         ErrorUtils.throwError(`Interaction not found. Hash ${this.hash}`, ErrorCode.ACTION_REJECTED, {
                             hash: this.hash,
@@ -84,10 +99,15 @@ export class InteractionResponse {
                     await new Promise((resolve) => setTimeout(resolve, DEFAULT_IX_INFO_RETRIEVAL_TIME));
                     continue;
                 }
-            }
 
-            timer.retries--;
-            await new Promise((resolve) => setTimeout(resolve, delayInMs));
+                if (error instanceof CustomError && error.message.includes("tesseract hash not found: key not found")) {
+                    timer.retries--;
+                    await new Promise((resolve) => setTimeout(resolve, delayInMs));
+                    continue;
+                }
+
+                throw error;
+            }
         }
 
         ErrorUtils.throwError("Timeout", ErrorCode.TIMEOUT);
@@ -96,19 +116,11 @@ export class InteractionResponse {
     /**
      * Retrieves the result of an operation after waiting for a specified duration.
      *
-     * @param {TimerOption} [timer=this.getDefaultTimer()] - The timer option to wait for before retrieving the result. Defaults to the value returned by `getDefaultTimer()`.
+     * @param {WaitOption} [timer=this.getDefaultTimer()] - The timer option to wait for before retrieving the result. Defaults to the value returned by `getDefaultTimer()`.
      * @returns {Promise<OperationItem[]>} A promise that resolves to an array of `OperationItem` objects representing the operations.
      */
-    async result(timer: TimerOption = this.getDefaultTimer()): Promise<AnyIxOperationResult[]> {
+    async result(timer: WaitOption = this.getDefaultTimer()): Promise<AnyIxOperationResult[]> {
         const confirmation = await this.wait(timer);
         return confirmation.operations;
     }
 }
-
-const a = {
-    method: function () {
-        console.log(this);
-    },
-};
-
-a.method.bind(null);

@@ -19,7 +19,8 @@
     "build": "npm run build:cjs && npm run build:esm",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf ./lib.cjs ./lib.esm",
-    "clean:node_modules": "rm -rf node_modules"
+    "clean:node_modules": "rm -rf node_modules",
+    "compile": "tsc -b tsconfig.json"
   },
   "homepage": "https://docs.moi.technology/docs/build/packages/js-moi-sdk",
   "repository": {
@@ -37,6 +38,7 @@
     "logic_id",
     "participant_id"
   ],
+  "sideEffects": false,
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {

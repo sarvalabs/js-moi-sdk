@@ -6,6 +6,7 @@ import { loadManifestFromFile } from "./manifests";
 
 import { LogicId } from "js-moi-identifiers";
 import { Wallet } from "../../js-moi-wallet/src.ts";
+import type { StateAccessorBuilder } from "../src.ts/state/state-accessor-builder.js";
 import { createWallet } from "./helpers";
 import { mockConfirmedInteraction } from "./utils";
 

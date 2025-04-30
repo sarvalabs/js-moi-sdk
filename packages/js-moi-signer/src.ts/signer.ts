@@ -135,7 +135,14 @@ export abstract class Signer {
 
     private async getLatestSequence() {
         const [participant, index] = await Promise.all([this.getIdentifier(), this.getKeyId()]);
-        const { sequence } = await this.getProvider().getAccountKey(participant, index);
+        const { sequence, revoked } = await this.getProvider().getAccountKey(participant, index);
+
+        if (revoked) {
+            ErrorUtils.throwError("The key has been revoked. Please use a different key.", ErrorCode.KEY_REVOKED, {
+                revoked_key_id: index,
+            });
+        }
+
         return sequence;
     }
 

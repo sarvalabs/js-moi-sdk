@@ -1,6 +1,6 @@
 import { Identifier, isIdentifier, LogicId } from "js-moi-identifiers";
 import { isPrimitiveType, ManifestCoder, ManifestCoderFormat, Schema } from "js-moi-manifest";
-import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, TimerOption } from "js-moi-providers";
+import type { InteractionResponse, LogicMessageRequestOption, SimulateInteractionRequest, WaitOption } from "js-moi-providers";
 import type { Signer, SignerIx } from "js-moi-signer";
 import {
     ElementType,
@@ -214,7 +214,7 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
      * @throws If the logic id not deployed.
      * @throws If error occurs during the deployment process.
      */
-    public async getLogicId(timer?: TimerOption): Promise<Identifier> {
+    public async getLogicId(timer?: WaitOption): Promise<Identifier> {
         if (this.deployIxResponse != null) {
             // This is to handle the case where the logic id is not set but the deployIxResponse is available.
             // handleLogicDeployResponse uses `InteractionResponse` which caches the result on confirmation preventing multiple calls.
@@ -224,7 +224,7 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
         return super.getLogicId();
     }
 
-    protected async obtainLogicIdFromResponse(response: InteractionResponse, timer?: TimerOption) {
+    protected async obtainLogicIdFromResponse(response: InteractionResponse, timer?: WaitOption) {
         const results = await response.result(timer);
         const result = results.at(0);
 
@@ -244,7 +244,7 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
     private newRoutine(routine: string) {
         const isDeployerRoutine = this.getRoutineType(routine) === RoutineType.Deploy;
 
-        const callback: RoutineCallback = async (...args: unknown[]) => {
+        const callback = async (...args) => {
             const isDeployed = await this.isDeployed();
 
             if (isDeployerRoutine && isDeployed) {
@@ -285,11 +285,11 @@ export class LogicDriver<TRoutines extends LogicRoutines = LogicRoutines> extend
             return response;
         };
 
-        return callback;
+        return callback as RoutineCallback;
     }
 
     private setupEndpoint() {
-        const endpoint: Record<string, RoutineCallback> = {};
+        const endpoint = {};
 
         for (const { ptr } of this.getCallsites().values()) {
             const element = this.getElement(ptr);

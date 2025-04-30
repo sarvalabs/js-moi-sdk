@@ -94,8 +94,9 @@ export class ManifestCoder {
             const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)));
 
             if (updateType) {
-                // @ts-expect-error - The 'kind' is being updated to document but supposed to be struct
+                // @ts-ignore - The 'kind' is being updated to document is struct
                 schema.kind = "document";
+                // @ts-ignore - The 'fields' is being updated to document is struct
                 delete schema.fields;
             }
 
@@ -145,7 +146,7 @@ export class ManifestCoder {
     public encodeArguments(routine: string, ...args: any[]): Hex {
         const element = this.elementDescriptor.getRoutineElement(routine).data;
         const schema = this.schema.parseFields(element.accepts ?? []);
-        const calldata = Object.values(element.accepts).reduce((acc: Record<string, any>, field) => {
+        const calldata = Object.values(element.accepts).reduce((acc, field) => {
             if (schema.fields) {
                 acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
             }

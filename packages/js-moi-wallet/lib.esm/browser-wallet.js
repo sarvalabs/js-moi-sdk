@@ -1,5 +1,5 @@
 import { Identifier } from "js-moi-identifiers";
-import { BrowserProvider } from "js-moi-providers";
+import { BrowserProvider, InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { bytesToHex, ErrorUtils } from "js-moi-utils";
 /**
@@ -18,8 +18,8 @@ import { bytesToHex, ErrorUtils } from "js-moi-utils";
  * @extends Signer
  */
 export class BrowserWallet extends Signer {
-    keyId;
     identifier;
+    keyIndex = 0;
     /**
      * Constructs a new instance of the browser wallet.
      *
@@ -29,10 +29,15 @@ export class BrowserWallet extends Signer {
     constructor(identifier, option) {
         super(option?.provider);
         this.identifier = new Identifier(identifier);
-        this.keyId = option?.keyId ?? 0;
+        this.keyIndex = option?.keyId ?? 0;
     }
-    async getKeyId() {
-        return this.keyId;
+    /**
+     * Returns the key index of the wallet.
+     *
+     * @returns {number} The key index of the wallet.
+     */
+    getKeyId() {
+        return Promise.resolve(this.keyIndex);
     }
     async getIdentifier() {
         return this.identifier;
@@ -47,18 +52,23 @@ export class BrowserWallet extends Signer {
     async sign(message, _sig) {
         const provider = this.getProvider();
         const hexEncodedMessage = message instanceof Uint8Array ? bytesToHex(message) : message;
-        return await provider.sign(hexEncodedMessage, this.identifier.toHex());
+        const response = await provider.request("wallet.SignMessage", [hexEncodedMessage, this.identifier.toHex()]);
+        return provider.processJsonRpcResponse(response);
     }
     async signInteraction(ix, _sig) {
         const provider = this.getProvider();
-        return await provider.signInteraction(ix);
+        const response = await provider.request("wallet.SignInteraction", [ix]);
+        return provider.processJsonRpcResponse(response);
     }
     async execute(arg) {
         if ("interaction" in arg) {
             return await this.getProvider().execute(arg);
         }
+        const provider = this.getProvider();
         const request = await this.createIxRequest("moi.Execute", arg);
-        return await this.getProvider().sendInteraction(request);
+        const response = await provider.request("wallet.SendInteraction", [request]);
+        const hash = provider.processJsonRpcResponse(response);
+        return new InteractionResponse(hash, provider);
     }
 }
 //# sourceMappingURL=browser-wallet.js.map

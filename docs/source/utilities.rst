@@ -135,6 +135,14 @@ Enums
 
     - ``Pending``
     - ``Finalized``
+
+.. js:data:: Chain
+    
+    Types of interaction status
+
+    - ``Mainnet``
+    - ``Devnet``
+    - ``Localnet``
   
 Hex
 ---

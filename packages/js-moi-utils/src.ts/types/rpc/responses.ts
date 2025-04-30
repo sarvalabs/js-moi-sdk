@@ -1,4 +1,4 @@
-import type { AccountType, AssetStandard, InteractionStatus, LockType, OpType, ReceiptStatus } from "../../enums";
+import type { AccountType, AssetStandard, Chain, InteractionStatus, LockType, OpType, ReceiptStatus } from "../../enums";
 import type { Address, Hex, Quantity } from "../../hex";
 import type { IxParticipant, Sender } from "../interaction";
 import type { LogicActionPayload, LogicDeployPayload, LogicPayload } from "../ix-operation";
@@ -8,7 +8,7 @@ export interface NetworkInfo {
     /**
      * The chain ID of the network.
      */
-    chain_id: number;
+    chain_id: Chain;
     /**
      * The version of the network.
      */
@@ -28,11 +28,18 @@ export interface Simulate {
     effects: SimulationEffects[] | null;
 }
 
+export interface SubAccount {
+    inherited_account: Hex;
+    accounts: Hex[];
+}
+
 export interface AccountMetaData {
     type: AccountType;
     id: Hex;
     height: number;
     tesseract: Hex;
+    inherited_account: Hex;
+    sub_accounts: SubAccount[];
 }
 
 export interface AccountState {
@@ -72,8 +79,8 @@ export interface AccountLockup {
 export type KramaID = string;
 
 export interface Guardians {
-    behavior: KramaID[];
-    stochastic: KramaID[];
+    consensus: KramaID[];
+    stochastic: KramaID[] | null;
 }
 
 export interface Enlisted {}
@@ -237,7 +244,7 @@ export interface InteractionInfo {
     operations: OperationItem[];
     accounts: IxParticipant[];
     metadata: Hex;
-    preference: Preference;
+    preferences: Preference;
     perception: Hex;
 }
 
@@ -253,10 +260,17 @@ export interface InteractionConfirmation {
     fuel_spent: number;
 }
 
+export interface InteractionSignature {
+    id: Hex;
+    signature: Hex;
+    key_id: number;
+}
+
 export interface Interaction {
     hash: Hex;
     status: InteractionStatus;
     interaction: InteractionInfo;
+    signatures: InteractionSignature[];
     confirmation?: InteractionConfirmation;
 }
 
@@ -296,15 +310,10 @@ export interface AssetMetadata {
 
 export interface AssetController {}
 
-export interface AssetCreator {
-    address: Address;
-    balance: Quantity;
-}
-
 export interface Asset {
     metadata: AssetMetadata;
     controller?: AssetController;
-    creator?: AssetCreator;
+    creator?: Hex;
     editions?: Hex[];
 }
 

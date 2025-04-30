@@ -1,3 +1,4 @@
+import { Identifier } from "js-moi-identifiers";
 import { InteractionResponse } from "../utils/interaction-response";
 import { JsonRpcProvider } from "./json-rpc-provider";
 /**
@@ -56,46 +57,23 @@ export class BrowserProvider extends JsonRpcProvider {
         return this.processJsonRpcResponse(response);
     }
     /**
-     * Signs a given message using the specified account.
+     * Get the permissions granted to the wallet.
      *
-     * @param {Hex} message - The message to be signed, represented as a hexadecimal string.
-     * @param {Hex} account - The account address to use for signing, represented as a hexadecimal string.
-     * @returns {Promise<Hex>} A promise that resolves to the signed message as a hexadecimal string.
-     *
-     * @throws Will throw an error if the signing process fails or the JSON-RPC response is invalid.
-     *
-     * @example
-     *
-     * const message = "Hello, World!";
-     * const encodedMessage = bytesToHex(new TextEncoder().encode(message));
-     * const account = "0x123456...";
-     *
-     * const signedMessage = await provider.sign(encodedMessage, account);
-     * console.log("Signed Message:", signedMessage);
-     *
-     * >> "Signed Message: 0xabcdef..."
+     * @returns {Promise<RequestPermissionsResult[]>} A promise that resolves to an array of revoked permissions.
      */
-    async sign(message, account) {
-        const response = await this.request("wallet.SignMessage", [message, account]);
+    async getPermissions() {
+        const response = await this.request("wallet.GetPermissions");
         return this.processJsonRpcResponse(response);
     }
     /**
-     * Signs a given interaction using the sender account mentioned in the interaction.
+     * Revokes specific permissions from the wallet.
+     * @param key - The specific permission key to revoke.
+     * @param permission - The details or configuration of the permission being revoked.
      *
-     * @param {InteractionRequest} interaction - The interaction to be signed, represented as a hexadecimal string.
-     * @returns {Promise<ExecuteIx>} A promise that resolves to the object containing the signed payload.
-     *
-     * @throws Will throw an error if the signing process fails or the JSON-RPC response is invalid.
-     *
-     * @example
-     *
-     * const ix = { sender: { id: "0xabc..." }, ... };
-     * const signedIx = await provider.signInteraction(ix);
-     * console.log("Signed Interaction:", signedIx);
-     * >> "Signed Interaction: { ... }"
+     * @returns {Promise<null>} A promise that resolves to null if the revocation is successful.
      */
-    async signInteraction(interaction) {
-        const response = await this.request("wallet.SignInteraction", [interaction]);
+    async revokePermissions(key, permission) {
+        const response = await this.request("wallet.RevokePermissions", [{ [key]: permission }]);
         return this.processJsonRpcResponse(response);
     }
     async sendInteraction(interaction) {
@@ -104,18 +82,14 @@ export class BrowserProvider extends JsonRpcProvider {
         return new InteractionResponse(hash, this);
     }
     /**
-     * Retrieves the public encryption key of a wallet.
+     * Gets the details of a wallet account.
      *
-     * - If the `id` parameter is provided, it retrieves the public encryption key for that specific wallet.
-     * - If the `id` parameter is not provided, it retrieves the public encryption key for the master account.
-     *
-     * @param {string} id - (Optional) The hexadecimal identifier of the wallet
-     * @returns {Promise<strin>} A promise that resolves to the wallet's public encryption key as a string.
-     * @throws Will throw an error if the JSON-RPC request fails or the response is invalid.
+     * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
+     * @returns {Promise<WalletParticipant | null>} A promise that resolves to the account configuration object or null if not found.
      */
-    async getWalletPublicKey(id) {
-        const params = id ? [id] : [];
-        const response = await this.request("wallet.EncryptionPublicKey", params);
+    async getWalletAccount(id) {
+        const value = id instanceof Identifier ? id.toHex() : id;
+        const response = await this.request("wallet.Account", [value]);
         return this.processJsonRpcResponse(response);
     }
     /**

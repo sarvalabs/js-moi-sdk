@@ -21,8 +21,8 @@ const js_moi_utils_1 = require("js-moi-utils");
  * @extends Signer
  */
 class BrowserWallet extends js_moi_signer_1.Signer {
-    keyId;
     identifier;
+    keyIndex = 0;
     /**
      * Constructs a new instance of the browser wallet.
      *
@@ -32,10 +32,15 @@ class BrowserWallet extends js_moi_signer_1.Signer {
     constructor(identifier, option) {
         super(option?.provider);
         this.identifier = new js_moi_identifiers_1.Identifier(identifier);
-        this.keyId = option?.keyId ?? 0;
+        this.keyIndex = option?.keyId ?? 0;
     }
-    async getKeyId() {
-        return this.keyId;
+    /**
+     * Returns the key index of the wallet.
+     *
+     * @returns {number} The key index of the wallet.
+     */
+    getKeyId() {
+        return Promise.resolve(this.keyIndex);
     }
     async getIdentifier() {
         return this.identifier;
@@ -50,18 +55,23 @@ class BrowserWallet extends js_moi_signer_1.Signer {
     async sign(message, _sig) {
         const provider = this.getProvider();
         const hexEncodedMessage = message instanceof Uint8Array ? (0, js_moi_utils_1.bytesToHex)(message) : message;
-        return await provider.sign(hexEncodedMessage, this.identifier.toHex());
+        const response = await provider.request("wallet.SignMessage", [hexEncodedMessage, this.identifier.toHex()]);
+        return provider.processJsonRpcResponse(response);
     }
     async signInteraction(ix, _sig) {
         const provider = this.getProvider();
-        return await provider.signInteraction(ix);
+        const response = await provider.request("wallet.SignInteraction", [ix]);
+        return provider.processJsonRpcResponse(response);
     }
     async execute(arg) {
         if ("interaction" in arg) {
             return await this.getProvider().execute(arg);
         }
+        const provider = this.getProvider();
         const request = await this.createIxRequest("moi.Execute", arg);
-        return await this.getProvider().sendInteraction(request);
+        const response = await provider.request("wallet.SendInteraction", [request]);
+        const hash = provider.processJsonRpcResponse(response);
+        return new js_moi_providers_1.InteractionResponse(hash, provider);
     }
 }
 exports.BrowserWallet = BrowserWallet;
