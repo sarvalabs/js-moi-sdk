@@ -1,6 +1,6 @@
 export { decodeBase64, encodeBase64 } from "./base64";
 export { concatBytes, decodeText, encodeText, hexDataLength, isBytes, isInteger, randomBytes } from "./bytes";
-export { AccountType, AssetStandard, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineKind, RoutineType, } from "./enums";
+export { AccountType, AssetStandard, Chain, ElementType, EngineKind, InteractionStatus, LockType, LogicState, OperationStatus, OpType, ReceiptStatus, RoutineKind, RoutineType, } from "./enums";
 export { CustomError, ErrorCode, ErrorUtils } from "./errors";
 export { bytesToHex, ensureHexPrefix, hexToBN, hexToBytes, hexToHash, isHex, isNullBytes, numToHex, trimHexPrefix, } from "./hex";
 export { encodeInteraction, getInteractionRequestSchema, interaction, toRawInteractionRequest, validateIxRequest } from "./interaction";

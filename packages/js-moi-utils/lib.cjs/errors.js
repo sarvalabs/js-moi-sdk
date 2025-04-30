@@ -6,6 +6,7 @@ exports.ErrorUtils = exports.CustomError = exports.ErrorCode = void 0;
  */
 var ErrorCode;
 (function (ErrorCode) {
+    ErrorCode["KEY_REVOKED"] = "ERROR_KEY_REVOKED";
     ErrorCode["UNKNOWN_ERROR"] = "ERROR_UNKNOWN";
     ErrorCode["NOT_IMPLEMENTED"] = "ERROR_NOT_IMPLEMENTED";
     ErrorCode["UNSUPPORTED_OPERATION"] = "ERROR_UNSUPPORTED_OPERATION";
@@ -26,6 +27,7 @@ var ErrorCode;
     ErrorCode["INTERACTION_UNDERPRICED"] = "ERROR_INTERACTION_UNDERPRICED";
     ErrorCode["UNPREDICTABLE_FUEL_LIMIT"] = "ERROR_UNPREDICTABLE_FUEL_LIMIT";
     ErrorCode["ACTION_REJECTED"] = "ERROR_ACTION_REJECTED";
+    ErrorCode["ACTION_ABORTED"] = "ERROR_ACTION_ABORTED";
     ErrorCode["INVALID_SIGNATURE"] = "ERROR_INVALID_SIGNATURE";
     ErrorCode["NOT_FOUND"] = "ERROR_NOT_FOUND";
 })(ErrorCode || (exports.ErrorCode = ErrorCode = {}));

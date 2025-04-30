@@ -244,10 +244,6 @@ export class Wallet extends Signer {
             if (error) {
                 ErrorUtils.throwArgumentError(`Invalid interaction request: ${error.message}`, ErrorCode.INVALID_ARGUMENT, error);
             }
-            const identifier = await this.getIdentifier();
-            if (ix.sender.id !== identifier.toHex()) {
-                ErrorUtils.throwError("Sender identifier does not match signer identifier", ErrorCode.INVALID_ARGUMENT);
-            }
             const encoded = interaction(ix);
             const signatures = {
                 id: ix.sender.id,

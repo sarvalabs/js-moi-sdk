@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InteractionStatus = exports.ElementType = exports.RoutineType = exports.RoutineKind = exports.LogicState = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
+exports.Chain = exports.InteractionStatus = exports.ElementType = exports.RoutineType = exports.RoutineKind = exports.LogicState = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.OpType = exports.AssetStandard = void 0;
 /**
  * Enumerates the standard of assets in the system.
  * MAS is moi asset standard.
@@ -99,4 +99,10 @@ var InteractionStatus;
     InteractionStatus[InteractionStatus["Pending"] = 0] = "Pending";
     InteractionStatus[InteractionStatus["Finalized"] = 1] = "Finalized";
 })(InteractionStatus || (exports.InteractionStatus = InteractionStatus = {}));
+var Chain;
+(function (Chain) {
+    Chain[Chain["Testnet"] = 111] = "Testnet";
+    Chain[Chain["Devnet"] = 112] = "Devnet";
+    Chain[Chain["Mainnet"] = 113] = "Mainnet";
+})(Chain || (exports.Chain = Chain = {}));
 //# sourceMappingURL=enums.js.map

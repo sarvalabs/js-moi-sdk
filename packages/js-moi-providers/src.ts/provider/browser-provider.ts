@@ -23,11 +23,17 @@ export interface NetworkConfiguration {
     blockExplorer?: string;
 }
 
-export interface AccountConfiguration {
-    address: Hex;
-    name: Hex;
+export interface WalletAccount {
+    id: Hex;
+    name?: string;
     path: string;
-    keyId: number;
+    pubkey: string;
+}
+
+export interface WalletParticipant {
+    readonly id: string;
+    name: Hex;
+    accounts: WalletAccount[];
 }
 
 export interface WalletEventListenerMap {
@@ -131,30 +137,14 @@ export class BrowserProvider extends JsonRpcProvider {
     }
 
     /**
-     * Retrieves the public encryption key of a wallet.
-     *
-     * - If the `id` parameter is provided, it retrieves the public encryption key for that specific wallet.
-     * - If the `id` parameter is not provided, it retrieves the public encryption key for the master account.
-     *
-     * @param {string} id - (Optional) The hexadecimal identifier of the wallet
-     * @returns {Promise<string>} A promise that resolves to the wallet's public encryption key as a string.
-     * @throws Will throw an error if the JSON-RPC request fails or the response is invalid.
-     */
-    public async getWalletPublicKey(id?: Hex): Promise<string> {
-        const params = id ? [id] : [];
-        const response = await this.request<string>("wallet.EncryptionPublicKey", params);
-        return this.processJsonRpcResponse(response);
-    }
-
-    /**
      * Gets the details of a wallet account.
      *
      * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
-     * @returns {Promise<AccountConfiguration | null>} A promise that resolves to the account configuration object or null if not found.
+     * @returns {Promise<WalletParticipant | null>} A promise that resolves to the account configuration object or null if not found.
      */
-    public async getWalletAccount(id?: Hex | Identifier | null): Promise<AccountConfiguration | null> {
+    public async getWalletAccount(id?: Hex | Identifier | null): Promise<WalletParticipant | null> {
         const value = id instanceof Identifier ? id.toHex() : id;
-        const response = await this.request<AccountConfiguration | null>("wallet.Account", [value]);
+        const response = await this.request<WalletParticipant | null>("wallet.Account", [value]);
         return this.processJsonRpcResponse(response);
     }
 

@@ -84,4 +84,9 @@ export declare enum InteractionStatus {
     Pending = 0,
     Finalized = 1
 }
+export declare enum Chain {
+    Testnet = 111,
+    Devnet = 112,
+    Mainnet = 113
+}
 //# sourceMappingURL=enums.d.ts.map

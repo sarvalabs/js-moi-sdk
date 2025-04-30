@@ -7,5 +7,5 @@ export { NetworkType, VoyageProvider } from "./provider/voyage-provider";
 export { BrowserProvider, type NetworkConfiguration, type RequestPermissions, type RequestPermissionsResult, type WalletEventListenerMap } from "./provider/browser-provider";
 export type { ApiMethod, MethodParams, MethodResponse, NetworkActionApi, NetworkMethod } from "./types/moi-execution-api";
 export type { AccountAssetRequestOption, AccountKeyRequestOption, AccountRequestOption, AssetRequestOption, ExecuteIx, GetNetworkInfoOption, InteractionRequestOption, LogicMessageRequestOption, LogicRequestOption, LogicStorageRequestOption, Provider, SelectFromResponseModifier, Signature, SimulateInteractionRequest, SimulateOption, TesseractRequestOption, } from "./types/provider";
-export { InteractionResponse, type TimerOption } from "./utils/interaction-response";
+export { InteractionResponse, type WaitOption } from "./utils/interaction-response";
 //# sourceMappingURL=index.d.ts.map

@@ -1,4 +1,4 @@
-import type { AccountType, AssetStandard, InteractionStatus, LockType, OpType, ReceiptStatus } from "../../enums";
+import type { AccountType, AssetStandard, Chain, InteractionStatus, LockType, OpType, ReceiptStatus } from "../../enums";
 import type { Address, Hex, Quantity } from "../../hex";
 import type { IxParticipant, Sender } from "../interaction";
 import type { LogicActionPayload, LogicDeployPayload, LogicPayload } from "../ix-operation";
@@ -8,7 +8,7 @@ export interface NetworkInfo {
     /**
      * The chain ID of the network.
      */
-    chain_id: number;
+    chain_id: Chain;
     /**
      * The version of the network.
      */
@@ -310,15 +310,10 @@ export interface AssetMetadata {
 
 export interface AssetController {}
 
-export interface AssetCreator {
-    address: Address;
-    balance: Quantity;
-}
-
 export interface Asset {
     metadata: AssetMetadata;
     controller?: AssetController;
-    creator?: AssetCreator;
+    creator?: Hex;
     editions?: Hex[];
 }
 

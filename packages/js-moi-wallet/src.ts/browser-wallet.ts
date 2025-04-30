@@ -22,26 +22,28 @@ import type { WalletOption } from "../types/wallet";
 export class BrowserWallet extends Signer {
     private readonly identifier: Identifier;
 
+    private readonly keyIndex: number = 0;
+
     /**
      * Constructs a new instance of the browser wallet.
      *
      * @param {Hex} identifier - A hexadecimal string representing the unique identifier for the wallet.
      * @param {WalletOption} option - An optional object containing additional options for the wallet.
      */
-    constructor(identifier: Hex, option?: Omit<WalletOption, "keyId">) {
+    constructor(identifier: Hex, option?: WalletOption) {
         super(option?.provider);
 
         this.identifier = new Identifier(identifier);
+        this.keyIndex = option?.keyId ?? 0;
     }
 
-    public async getKeyId(): Promise<number> {
-        const account = await this.getProvider().getWalletAccount(this.identifier);
-
-        if (account == null) {
-            ErrorUtils.throwError("Account not found in wallet extension.");
-        }
-
-        return account.keyId;
+    /**
+     * Returns the key index of the wallet.
+     *
+     * @returns {number} The key index of the wallet.
+     */
+    public getKeyId(): Promise<number> {
+        return Promise.resolve(this.keyIndex);
     }
 
     public async getIdentifier(): Promise<Identifier> {

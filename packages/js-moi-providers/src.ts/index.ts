@@ -29,4 +29,4 @@ export type {
     TesseractRequestOption,
 } from "./types/provider";
 
-export { InteractionResponse, type TimerOption } from "./utils/interaction-response";
+export { InteractionResponse, type WaitOption } from "./utils/interaction-response";
