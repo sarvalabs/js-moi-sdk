@@ -111,7 +111,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         try {
             const result = await response.result(timeout);
             return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
+                output: this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs),
                 error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
             };
         }
