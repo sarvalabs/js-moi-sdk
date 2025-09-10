@@ -38,9 +38,9 @@ export class JsonManifestCoder extends BaseManifestCoder {
     };
 
     private static readonly SCHEMA_CONFIG: SchemaConfig = {
-        constant: {
+        literal: {
             wireType: WireType.WIRE_PACK,
-            schema: Schema.PISA_CONSTANT_SCHEMA,
+            schema: Schema.PISA_LITERAL_SCHEMA,
         },
         typedef: {
             wireType: WireType.WIRE_WORD,
@@ -50,7 +50,7 @@ export class JsonManifestCoder extends BaseManifestCoder {
             wireType: WireType.WIRE_PACK,
             schema: Schema.PISA_STATE_SCHEMA,
         },
-        routine: {
+        callable: {
             wireType: WireType.WIRE_PACK,
             schema: Schema.PISA_ROUTINE_SCHEMA,
         },
@@ -61,6 +61,10 @@ export class JsonManifestCoder extends BaseManifestCoder {
         class: {
             wireType: WireType.WIRE_PACK,
             schema: Schema.PISA_CLASS_SCHEMA,
+        },
+        interface: {
+            wireType: WireType.WIRE_PACK,
+            schema: Schema.PISA_EXTERN_SCHEMA,
         },
         event: {
             wireType: WireType.WIRE_PACK,
@@ -173,6 +177,7 @@ export class JsonManifestCoder extends BaseManifestCoder {
 
         polorizer.polorizeInteger(manifest.syntax);
         polorizer.polorize(manifest.engine, Schema.PISA_ENGINE_SCHEMA);
+        polorizer.polorizeString(manifest.kind)
 
         const elements = this.serializeElementArray(manifest);
 

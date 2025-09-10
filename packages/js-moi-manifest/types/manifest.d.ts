@@ -4,6 +4,11 @@ export declare module LogicManifest {
     flags: string[];
   }
 
+  export enum ManifestKind {
+    LOGIC = "logic",
+    ASSET = "asset",
+  }
+
   export interface TypeField {
     slot: number;
     label: string;
@@ -21,12 +26,17 @@ export declare module LogicManifest {
     methods?: MethodField[] | null;
   }
 
+  export enum PersistenceMode {
+    STATIC = "static",
+    DYNAMIC = "dynamic",
+  }
+
   export interface State {
-    mode: string;
+    mode: PersistenceMode;
     fields: TypeField[];
   }
 
-  export interface Constant {
+  export interface Literal {
     type: string;
     value: string;
   }
@@ -40,7 +50,7 @@ export declare module LogicManifest {
   export interface Routine {
     name: string;
     kind: string;
-    mode: string;
+    mode: PersistenceMode;
     accepts?: TypeField[] | null;
     returns?: TypeField[] | null;
     executes: Instructions;
@@ -57,6 +67,19 @@ export declare module LogicManifest {
     catches?: string[] | null;
   }
 
+  export interface ExternalRoutine {
+    name: string;
+    accepts?: TypeField[] | null;
+    returns?: TypeField[] | null;
+  }
+
+  export interface Extern {
+    name: string;
+    logic: State;
+    actor: State;
+    endpoint: ExternalRoutine[];
+  }
+
   export interface Event {
     name: string;
     topics: number;
@@ -67,7 +90,7 @@ export declare module LogicManifest {
 
   export type ElementKind =
     | State
-    | Constant
+    | Literal
     | TypeDef
     | Routine
     | Class
@@ -84,6 +107,7 @@ export declare module LogicManifest {
   export interface Manifest {
     syntax: number;
     engine: EngineConfig;
+    kind: ManifestKind;
     elements: Element[];
   }
 

@@ -134,7 +134,7 @@ export class Schema {
         },
     };
 
-    public static PISA_CONSTANT_SCHEMA = {
+    public static PISA_LITERAL_SCHEMA = {
         kind: "struct",
         fields: {
             type: {
@@ -229,6 +229,44 @@ export class Schema {
             },
         },
     };
+
+    public static PISA_EXTERNAL_ROUTINE_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string",
+            },
+            accepts: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
+            },
+            returns: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
+            },
+        }
+    }
+
+    public static PISA_EXTERN_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string",
+            },
+            logic: {
+                ...Schema.PISA_STATE_SCHEMA,
+            },
+            actor: {
+                ...Schema.PISA_STATE_SCHEMA,
+            },
+            endpoint: {
+                kind: "array",
+                fields: {
+                    values: {
+                        ...Schema.PISA_EXTERNAL_ROUTINE_SCHEMA
+                    }
+                }
+            }
+        }
+    }
 
     public static PISA_EVENT_SCHEMA = {
         kind: "struct",
