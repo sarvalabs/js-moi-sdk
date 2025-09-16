@@ -267,12 +267,14 @@ interface Stream {
 
 export interface AssetCreatePayload {
     symbol: string;
-    supply: number | bigint;
-    standard: AssetStandard;
     dimension?: number;
-    is_stateful?: boolean;
-    is_logical?: boolean;
-    logic_payload?: LogicPayload;
+    decimals?: number;
+    standard: AssetStandard;
+    enable_events: boolean;
+    manager: string;
+    max_supply: number;
+    metadata: Record<string, Uint8Array>;
+    logicPayload?: LogicPayload;
 }
 
 export interface AssetCreateOperation {
@@ -280,9 +282,31 @@ export interface AssetCreateOperation {
     payload: AssetCreatePayload;
 }
 
+export interface KeyAddPayload {
+    public_key: string;
+    weight: number;
+    signature_algorithm: number;
+}
+
+export interface KeyRevokePayload {
+    key_id: number;
+}
+
 export interface ParticipantCreatePayload {
-    address: string;
-    amount: number;
+    id: string;
+    keys_payload: KeyAddPayload;
+    value: AssetActionPayload;
+}
+
+export interface AccountInheritPayload {
+    target_account: string;
+    value: AssetActionPayload;
+    sub_account_index: number;
+}
+
+export interface AccountConfigurePayload {
+    add: KeyAddPayload;
+    revoke: KeyRevokePayload;
 }
 
 export interface ParticipantCreateOperation {
@@ -290,25 +314,25 @@ export interface ParticipantCreateOperation {
     payload: ParticipantCreatePayload;
 }
 
-export interface AssetSupplyPayload {
-    asset_id: string;
-    amount: number | bigint;
+export interface AccountConfigureOperation {
+    type: OpType.ACCOUNT_CONFIGURE;
+    payload: AccountConfigurePayload;
 }
 
-export interface AssetSupplyOperation {
-    type: OpType.ASSET_MINT | OpType.ASSET_BURN;
-    payload: AssetSupplyPayload;
+export interface AccountInheritOperation {
+    type: OpType.ACCOUNT_INHERIT;
+    payload: AccountInheritPayload;
 }
 
 export interface AssetActionPayload {
-    benefactor?: string;
-    beneficiary: string;
     asset_id: string;
-    amount: number | bigint;
+    callsite: string;
+    calldata: string;
+    funds: Record<string, number | bigint>;
 }
 
 export interface AssetActionOperation {
-    type: OpType.ASSET_TRANSFER;
+    type: OpType.ASSET_INVOKE;
     payload: AssetActionPayload;
 }
 
@@ -341,9 +365,31 @@ export interface LogicPayload {
     manifest?: string;
 }
 
+interface ProcessedKeysAddPayload {
+    public_key: Uint8Array;
+    weight: number;
+    signature_algorithm: number;
+}
+
+interface ProcessedKeysRevokePayload {
+    public_key: Uint8Array;
+}
+
+interface ProcessedAccountConfigurePayload {
+    add: ProcessedKeysAddPayload;
+    revoke: ProcessedKeysRevokePayload;
+}
+
+interface ProcessedAccountInheritPayload {
+    target_account: Uint8Array;
+    value: ProcessedAssetActionPayload;
+    sub_account_index: number;
+}
+
 interface ProcessedParticipantCreatePayload {
-    address: Uint8Array;
-    amount: number | bigint;
+    id: Uint8Array;
+    keys_payload: ProcessedKeysAddPayload;
+    value: ProcessedAssetActionPayload;
 }
 
 interface ProcessedAssetActionPayload {
@@ -360,9 +406,9 @@ interface ProcessedLogicPayload {
     manifest?: Uint8Array;
 }
 
-type ProcessedOperationPayload = | ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
+type ProcessedOperationPayload = | ProcessedParticipantCreatePayload | ProcessedAccountConfigurePayload | AssetCreatePayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
 
-export type OperationPayload = | ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicDeployPayload | LogicActionPayload;
+export type OperationPayload = | ParticipantCreatePayload | AccountInheritPayload | AccountConfigurePayload | AssetCreatePayload | AssetActionPayload | LogicDeployPayload | LogicActionPayload;
 
 export interface IxAssetFund {
     asset_id: string;
@@ -374,7 +420,7 @@ interface ProcessedIxAssetFund {
     amount: string;
 }
 
-export type IxOperation = | ParticipantCreateOperation | AssetCreateOperation | AssetActionOperation | AssetSupplyOperation | LogicDeployOperation | LogicActionOperation;
+export type IxOperation = | ParticipantCreateOperation | AccountInheritOperation | AccountConfigureOperation | AssetCreateOperation | AssetActionOperation | LogicDeployOperation | LogicActionOperation;
 
 interface ProcessedIxOperation {
     type: OpType;
