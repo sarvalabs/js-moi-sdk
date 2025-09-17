@@ -121,7 +121,7 @@ export declare class Schema {
             };
         };
     };
-    static PISA_CONSTANT_SCHEMA: {
+    static PISA_LITERAL_SCHEMA: {
         kind: string;
         fields: {
             type: {
@@ -332,6 +332,165 @@ export declare class Schema {
                 fields: {
                     values: {
                         kind: string;
+                    };
+                };
+            };
+        };
+    };
+    static PISA_EXTERNAL_ROUTINE_SCHEMA: {
+        kind: string;
+        fields: {
+            name: {
+                kind: string;
+            };
+            accepts: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            slot: {
+                                kind: string;
+                            };
+                            label: {
+                                kind: string;
+                            };
+                            type: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
+            returns: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            slot: {
+                                kind: string;
+                            };
+                            label: {
+                                kind: string;
+                            };
+                            type: {
+                                kind: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    static PISA_EXTERN_SCHEMA: {
+        kind: string;
+        fields: {
+            name: {
+                kind: string;
+            };
+            logic: {
+                kind: string;
+                fields: {
+                    mode: {
+                        kind: string;
+                    };
+                    fields: {
+                        kind: string;
+                        fields: {
+                            values: {
+                                kind: string;
+                                fields: {
+                                    slot: {
+                                        kind: string;
+                                    };
+                                    label: {
+                                        kind: string;
+                                    };
+                                    type: {
+                                        kind: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+            actor: {
+                kind: string;
+                fields: {
+                    mode: {
+                        kind: string;
+                    };
+                    fields: {
+                        kind: string;
+                        fields: {
+                            values: {
+                                kind: string;
+                                fields: {
+                                    slot: {
+                                        kind: string;
+                                    };
+                                    label: {
+                                        kind: string;
+                                    };
+                                    type: {
+                                        kind: string;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+            endpoint: {
+                kind: string;
+                fields: {
+                    values: {
+                        kind: string;
+                        fields: {
+                            name: {
+                                kind: string;
+                            };
+                            accepts: {
+                                kind: string;
+                                fields: {
+                                    values: {
+                                        kind: string;
+                                        fields: {
+                                            slot: {
+                                                kind: string;
+                                            };
+                                            label: {
+                                                kind: string;
+                                            };
+                                            type: {
+                                                kind: string;
+                                            };
+                                        };
+                                    };
+                                };
+                            };
+                            returns: {
+                                kind: string;
+                                fields: {
+                                    values: {
+                                        kind: string;
+                                        fields: {
+                                            slot: {
+                                                kind: string;
+                                            };
+                                            label: {
+                                                kind: string;
+                                            };
+                                            type: {
+                                                kind: string;
+                                            };
+                                        };
+                                    };
+                                };
+                            };
+                        };
                     };
                 };
             };

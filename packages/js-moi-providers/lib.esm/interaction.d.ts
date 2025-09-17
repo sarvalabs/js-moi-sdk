@@ -1,5 +1,5 @@
 import { OpType } from "js-moi-utils";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, ParticipantCreatePayload, OperationPayload, ProcessedCallorEstimateIxObject, LogicActionPayload, LogicDeployPayload } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, CallorEstimateIxObject, ParticipantCreatePayload, OperationPayload, ProcessedCallorEstimateIxObject, LogicActionPayload, LogicDeployPayload } from "../types/jsonrpc";
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
  *
@@ -16,14 +16,6 @@ export declare const validateParticipantCreatePayload: (payload: OperationPayloa
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export declare const validateAssetCreatePayload: (payload: OperationPayload) => AssetCreatePayload;
-/**
- * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetSupplyPayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export declare const validateAssetSupplyPayload: (payload: OperationPayload) => AssetSupplyPayload;
 /**
  * Validates the payload for ASSET_TRANSFER operation type.
  *

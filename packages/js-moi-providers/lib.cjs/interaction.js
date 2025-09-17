@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processIxObject = exports.serializePayload = exports.validateLogicActionPayload = exports.validateLogicDeployPayload = exports.validateAssetTransferPayload = exports.validateAssetSupplyPayload = exports.validateAssetCreatePayload = exports.validateParticipantCreatePayload = void 0;
+exports.processIxObject = exports.serializePayload = exports.validateLogicActionPayload = exports.validateLogicDeployPayload = exports.validateAssetTransferPayload = exports.validateAssetCreatePayload = exports.validateParticipantCreatePayload = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
-const js_moi_constants_1 = require("js-moi-constants");
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
  *
@@ -12,7 +11,7 @@ const js_moi_constants_1 = require("js-moi-constants");
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 const validateParticipantCreatePayload = (payload) => {
-    if ('address' in payload && 'amount' in payload) {
+    if ('id' in payload && 'keys_payload' in payload && 'value' in payload) {
         return payload;
     }
     throw new Error("Invalid participant create payload");
@@ -32,20 +31,6 @@ const validateAssetCreatePayload = (payload) => {
     throw new Error("Invalid asset create payload");
 };
 exports.validateAssetCreatePayload = validateAssetCreatePayload;
-/**
- * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetSupplyPayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-const validateAssetSupplyPayload = (payload) => {
-    if ('asset_id' in payload && 'amount' in payload) {
-        return payload;
-    }
-    throw new Error("Invalid asset mint or burn payload");
-};
-exports.validateAssetSupplyPayload = validateAssetSupplyPayload;
 /**
  * Validates the payload for ASSET_TRANSFER operation type.
  *
@@ -100,31 +85,27 @@ const processPayload = (opType, payload) => {
     switch (opType) {
         case js_moi_utils_1.OpType.PARTICIPANT_CREATE: {
             const participantPayload = (0, exports.validateParticipantCreatePayload)(payload);
+            const keysPayload = participantPayload.keys_payload.map(keyPayload => {
+                return {
+                    ...keyPayload,
+                    public_key: (0, js_moi_utils_1.hexToBytes)(keyPayload.public_key)
+                };
+            });
             return {
-                ...participantPayload,
-                address: (0, js_moi_utils_1.hexToBytes)(participantPayload.address),
+                id: (0, js_moi_utils_1.hexToBytes)(participantPayload.id),
+                keys_payload: keysPayload,
+                value: {
+                    ...participantPayload.value,
+                    asset_id: (0, js_moi_utils_1.hexToBytes)(participantPayload.value.asset_id),
+                    calldata: participantPayload.value.calldata ?
+                        (0, js_moi_utils_1.hexToBytes)(participantPayload.value.calldata) :
+                        new Uint8Array()
+                }
             };
         }
         case js_moi_utils_1.OpType.ASSET_CREATE: {
             const createPayload = (0, exports.validateAssetCreatePayload)(payload);
             return { ...createPayload };
-        }
-        case js_moi_utils_1.OpType.ASSET_MINT:
-        case js_moi_utils_1.OpType.ASSET_BURN: {
-            const supplyPayload = (0, exports.validateAssetSupplyPayload)(payload);
-            return {
-                ...supplyPayload,
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(supplyPayload.asset_id),
-            };
-        }
-        case js_moi_utils_1.OpType.ASSET_TRANSFER: {
-            const actionPayload = (0, exports.validateAssetTransferPayload)(payload);
-            return {
-                ...actionPayload,
-                benefactor: (0, js_moi_utils_1.hexToBytes)(actionPayload.benefactor ?? js_moi_constants_1.ZERO_ADDRESS),
-                beneficiary: (0, js_moi_utils_1.hexToBytes)(actionPayload.beneficiary),
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(actionPayload.asset_id),
-            };
         }
         case js_moi_utils_1.OpType.LOGIC_DEPLOY: {
             const logicPayload = (0, exports.validateLogicDeployPayload)(payload);
@@ -164,15 +145,8 @@ const serializePayload = (opType, payload) => {
         case js_moi_utils_1.OpType.PARTICIPANT_CREATE:
             polorizer.polorize(processedPayload, js_moi_utils_1.participantCreateSchema);
             return polorizer.bytes();
-        case js_moi_utils_1.OpType.ASSET_TRANSFER:
-            polorizer.polorize(processedPayload, js_moi_utils_1.assetActionSchema);
-            return polorizer.bytes();
         case js_moi_utils_1.OpType.ASSET_CREATE:
             polorizer.polorize(processedPayload, js_moi_utils_1.assetCreateSchema);
-            return polorizer.bytes();
-        case js_moi_utils_1.OpType.ASSET_MINT:
-        case js_moi_utils_1.OpType.ASSET_BURN:
-            polorizer.polorize(processedPayload, js_moi_utils_1.assetSupplySchema);
             return polorizer.bytes();
         case js_moi_utils_1.OpType.LOGIC_DEPLOY:
         case js_moi_utils_1.OpType.LOGIC_INVOKE:
@@ -193,20 +167,6 @@ exports.serializePayload = serializePayload;
  */
 const processFunds = (ixObject) => {
     const assetFunds = new Map();
-    ixObject.ix_operations.forEach(operation => {
-        switch (operation.type) {
-            case js_moi_utils_1.OpType.ASSET_TRANSFER:
-            case js_moi_utils_1.OpType.ASSET_BURN: {
-                const payload = operation.payload;
-                const amount = assetFunds.get(payload.asset_id) ?? 0;
-                if (typeof payload.amount === "bigint" || typeof amount === "bigint") {
-                    assetFunds.set(payload.asset_id, (0, js_moi_utils_1.toQuantity)(BigInt(payload.amount) + BigInt(amount)));
-                    return;
-                }
-                assetFunds.set(payload.asset_id, (0, js_moi_utils_1.toQuantity)(Number(payload.amount) + Number(amount)));
-            }
-        }
-    });
     if (ixObject.funds != null) {
         // Add additional asset funds to the list if not present
         ixObject.funds.forEach(assetFund => {
@@ -244,32 +204,14 @@ const processParticipants = (ixObject) => {
         switch (operation.type) {
             case js_moi_utils_1.OpType.PARTICIPANT_CREATE: {
                 const participantCreatePayload = operation.payload;
-                participants.set(participantCreatePayload.address, {
-                    address: participantCreatePayload.address,
+                participants.set(participantCreatePayload.id, {
+                    address: participantCreatePayload.id,
                     lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
                 });
                 break;
             }
             case js_moi_utils_1.OpType.ASSET_CREATE:
                 break;
-            case js_moi_utils_1.OpType.ASSET_MINT:
-            case js_moi_utils_1.OpType.ASSET_BURN: {
-                const assetSupplyPayload = operation.payload;
-                const address = "0x" + (0, js_moi_utils_1.trimHexPrefix)(assetSupplyPayload.asset_id).slice(8);
-                participants.set(address, {
-                    address: address,
-                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            case js_moi_utils_1.OpType.ASSET_TRANSFER: {
-                const assetActionPayload = operation.payload;
-                participants.set(assetActionPayload.beneficiary, {
-                    address: assetActionPayload.beneficiary,
-                    lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
-                });
-                break;
-            }
             case js_moi_utils_1.OpType.LOGIC_DEPLOY:
                 break;
             case js_moi_utils_1.OpType.LOGIC_ENLIST:

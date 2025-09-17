@@ -26,37 +26,37 @@ export declare const logicSchema: {
         };
     };
 };
-export declare const participantCreateSchema: {
-    kind: string;
-    fields: {
-        address: {
-            kind: string;
-        };
-        amount: {
-            kind: string;
-        };
-    };
-};
 export declare const assetCreateSchema: {
     kind: string;
     fields: {
         symbol: {
             kind: string;
         };
-        supply: {
+        dimension: {
+            kind: string;
+        };
+        decimals: {
             kind: string;
         };
         standard: {
             kind: string;
         };
-        dimension: {
+        enable_events: {
             kind: string;
         };
-        is_stateful: {
+        manager: {
             kind: string;
         };
-        is_logical: {
+        max_supply: {
             kind: string;
+        };
+        metadata: {
+            key: {
+                kind: string;
+            };
+            values: {
+                kind: string;
+            };
         };
         logic_payload: {
             kind: string;
@@ -91,27 +91,158 @@ export declare const assetCreateSchema: {
 export declare const assetActionSchema: {
     kind: string;
     fields: {
-        benefactor: {
-            kind: string;
-        };
-        beneficiary: {
-            kind: string;
-        };
         asset_id: {
             kind: string;
         };
-        amount: {
+        callsite: {
+            kind: string;
+        };
+        calldata: {
+            kind: string;
+        };
+        funds: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
+        };
+    };
+};
+export declare const keyAddSchema: {
+    kind: string;
+    fields: {
+        public_key: {
+            kind: string;
+        };
+        weight: {
+            kind: string;
+        };
+        signature_algorithm: {
             kind: string;
         };
     };
 };
-export declare const assetSupplySchema: {
+export declare const keyRevokeSchema: {
     kind: string;
     fields: {
-        asset_id: {
+        key_id: {
             kind: string;
         };
-        amount: {
+    };
+};
+export declare const participantCreateSchema: {
+    kind: string;
+    fields: {
+        id: {
+            kind: string;
+        };
+        keys_payload: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        public_key: {
+                            kind: string;
+                        };
+                        weight: {
+                            kind: string;
+                        };
+                        signature_algorithm: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        value: {
+            kind: string;
+            fields: {
+                asset_id: {
+                    kind: string;
+                };
+                callsite: {
+                    kind: string;
+                };
+                calldata: {
+                    kind: string;
+                };
+                funds: {
+                    kind: string;
+                    fields: {
+                        keys: {
+                            kind: string;
+                        };
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+export declare const accountConfigureSchema: {
+    add: {
+        kind: string;
+        fields: {
+            public_key: {
+                kind: string;
+            };
+            weight: {
+                kind: string;
+            };
+            signature_algorithm: {
+                kind: string;
+            };
+        };
+    };
+    revoke: {
+        kind: string;
+        fields: {
+            key_id: {
+                kind: string;
+            };
+        };
+    };
+};
+export declare const accountInheritSchema: {
+    kind: string;
+    fields: {
+        target_account: {
+            kind: string;
+        };
+        value: {
+            kind: string;
+            fields: {
+                asset_id: {
+                    kind: string;
+                };
+                callsite: {
+                    kind: string;
+                };
+                calldata: {
+                    kind: string;
+                };
+                funds: {
+                    kind: string;
+                    fields: {
+                        keys: {
+                            kind: string;
+                        };
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        sub_account_index: {
             kind: string;
         };
     };

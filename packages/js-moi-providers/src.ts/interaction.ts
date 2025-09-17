@@ -1,7 +1,6 @@
-import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetActionSchema, assetCreateSchema, assetSupplySchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix, LockType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetCreateSchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix, LockType } from "js-moi-utils";
 import { Polorizer } from "js-polo";
-import { ZERO_ADDRESS } from "js-moi-constants";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload, InteractionObject, IxOperation, ProcessedIxOperation, IxParticipant, ProcessedCallorEstimateIxObject, ProcessedIxAssetFund, LogicActionPayload, LogicDeployPayload } from "../types/jsonrpc";
+import { AssetActionPayload, AssetCreatePayload, CallorEstimateIxObject, LogicPayload, ParticipantCreatePayload, ProcessedOperationPayload, OperationPayload, InteractionObject, IxOperation, ProcessedIxOperation, IxParticipant, ProcessedCallorEstimateIxObject, ProcessedIxAssetFund, LogicActionPayload, LogicDeployPayload } from "../types/jsonrpc";
 
 /**
  * Validates the payload for PARTICIPANT_CREATE operation type.
@@ -11,7 +10,7 @@ import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstim
  * @throws {Error} - Throws an error if the payload is invalid.
  */
 export const validateParticipantCreatePayload = (payload: OperationPayload): ParticipantCreatePayload => {
-    if ('address' in payload && 'amount' in payload) {
+    if ('id' in payload && 'keys_payload' in payload && 'value' in payload) {
         return payload as ParticipantCreatePayload;
     }
 
@@ -31,21 +30,6 @@ export const validateAssetCreatePayload = (payload: OperationPayload): AssetCrea
     }
 
     throw new Error("Invalid asset create payload");
-};
-
-/**
- * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetSupplyPayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export const validateAssetSupplyPayload = (payload: OperationPayload): AssetSupplyPayload => {
-    if ('asset_id' in payload && 'amount' in payload) {
-        return payload as AssetSupplyPayload;
-    }
-
-    throw new Error("Invalid asset mint or burn payload");
 };
 
 /**
@@ -106,34 +90,29 @@ const processPayload = (opType: OpType, payload: OperationPayload): ProcessedOpe
         case OpType.PARTICIPANT_CREATE: {
             const participantPayload = validateParticipantCreatePayload(payload);
 
+            const keysPayload =  participantPayload.keys_payload.map(keyPayload => {
+                return {
+                    ...keyPayload,
+                    public_key: hexToBytes(keyPayload.public_key)
+                }
+            })
+
             return {
-                ...participantPayload,
-                address: hexToBytes(participantPayload.address),
+                id: hexToBytes(participantPayload.id),
+                keys_payload: keysPayload,
+                value: {
+                    ...participantPayload.value,
+                    asset_id: hexToBytes(participantPayload.value.asset_id),
+                    calldata: participantPayload.value.calldata ? 
+                    hexToBytes(participantPayload.value.calldata) : 
+                    new Uint8Array()
+                }
             };
         }
 
         case OpType.ASSET_CREATE: {
             const createPayload = validateAssetCreatePayload(payload);
             return { ...createPayload };
-        }
-
-        case OpType.ASSET_MINT:
-        case OpType.ASSET_BURN: {
-            const supplyPayload = validateAssetSupplyPayload(payload);
-            return {
-                ...supplyPayload,
-                asset_id: trimHexPrefix(supplyPayload.asset_id),
-            };
-        }
-
-        case OpType.ASSET_TRANSFER: {
-            const actionPayload = validateAssetTransferPayload(payload);
-            return {
-                ...actionPayload,
-                benefactor: hexToBytes(actionPayload.benefactor ?? ZERO_ADDRESS),
-                beneficiary: hexToBytes(actionPayload.beneficiary),
-                asset_id: trimHexPrefix(actionPayload.asset_id),
-            };
         }
 
         case OpType.LOGIC_DEPLOY: {
@@ -181,15 +160,8 @@ export const serializePayload = (opType: OpType, payload: OperationPayload): Uin
         case OpType.PARTICIPANT_CREATE:
             polorizer.polorize(processedPayload, participantCreateSchema);
             return polorizer.bytes()
-        case OpType.ASSET_TRANSFER:
-            polorizer.polorize(processedPayload, assetActionSchema);
-            return polorizer.bytes()
         case OpType.ASSET_CREATE:
             polorizer.polorize(processedPayload, assetCreateSchema);
-            return polorizer.bytes()
-        case OpType.ASSET_MINT:
-        case OpType.ASSET_BURN:
-            polorizer.polorize(processedPayload, assetSupplySchema);
             return polorizer.bytes()
         case OpType.LOGIC_DEPLOY:
         case OpType.LOGIC_INVOKE:
@@ -213,29 +185,6 @@ export const serializePayload = (opType: OpType, payload: OperationPayload): Uin
  */
 const processFunds = (ixObject: InteractionObject): ProcessedIxAssetFund[] => {
     const assetFunds = new Map<string, string>();
-
-    ixObject.ix_operations.forEach(operation => {
-        switch(operation.type) {
-            case OpType.ASSET_TRANSFER:
-            case OpType.ASSET_BURN: {
-                const payload = operation.payload as AssetSupplyPayload | AssetActionPayload;
-                const amount = assetFunds.get(payload.asset_id) ?? 0;
-
-                if(typeof payload.amount === "bigint" || typeof amount === "bigint") {
-                    assetFunds.set(
-                        payload.asset_id, 
-                        toQuantity(BigInt(payload.amount) + BigInt(amount))
-                    );
-                    return;
-                }
-                
-                assetFunds.set(
-                    payload.asset_id, 
-                    toQuantity(Number(payload.amount) + Number(amount)),
-                );
-            }
-        }
-    });
 
     if(ixObject.funds != null) {
         // Add additional asset funds to the list if not present
@@ -282,34 +231,14 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
             case OpType.PARTICIPANT_CREATE: {
                 const participantCreatePayload = operation.payload as ParticipantCreatePayload;
 
-                participants.set(participantCreatePayload.address, {
-                    address: participantCreatePayload.address,
+                participants.set(participantCreatePayload.id, {
+                    address: participantCreatePayload.id,
                     lock_type: LockType.MUTATE_LOCK
                 });
                 break;
             }
             case OpType.ASSET_CREATE:
                 break;
-            case OpType.ASSET_MINT:
-            case OpType.ASSET_BURN: {
-                const assetSupplyPayload = operation.payload as AssetSupplyPayload;
-                const address = "0x" + trimHexPrefix(assetSupplyPayload.asset_id).slice(8);
-
-                participants.set(address, {
-                    address: address,
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            case OpType.ASSET_TRANSFER: {
-                const assetActionPayload = operation.payload as AssetActionPayload;
-
-                participants.set(assetActionPayload.beneficiary, {
-                    address: assetActionPayload.beneficiary,
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
             case OpType.LOGIC_DEPLOY:
                 break;
             case OpType.LOGIC_ENLIST:

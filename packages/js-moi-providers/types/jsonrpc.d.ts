@@ -294,7 +294,7 @@ export interface KeyRevokePayload {
 
 export interface ParticipantCreatePayload {
     id: string;
-    keys_payload: KeyAddPayload;
+    keys_payload: KeyAddPayload[];
     value: AssetActionPayload;
 }
 
@@ -388,15 +388,15 @@ interface ProcessedAccountInheritPayload {
 
 interface ProcessedParticipantCreatePayload {
     id: Uint8Array;
-    keys_payload: ProcessedKeysAddPayload;
+    keys_payload: ProcessedKeysAddPayload[];
     value: ProcessedAssetActionPayload;
 }
 
 interface ProcessedAssetActionPayload {
-    benefactor: Uint8Array;
-    beneficiary: Uint8Array;
-    asset_id: string;
-    amount: number | bigint;
+    asset_id: Uint8Array;
+    callsite: string;
+    calldata: Uint8Array;
+    funds: Record<string, number | bigint>;
 }
 
 interface ProcessedLogicPayload {

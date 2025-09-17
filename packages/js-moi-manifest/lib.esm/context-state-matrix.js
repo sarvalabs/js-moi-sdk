@@ -17,10 +17,10 @@ export class ContextStateMatrix {
             const stateElement = stateElements[i];
             stateElement.data = stateElement.data;
             switch (stateElement.data.mode) {
-                case "persistent":
+                case "static":
                     this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
                     break;
-                case "ephemeral":
+                case "dynamic":
                     this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
                     break;
                 default:

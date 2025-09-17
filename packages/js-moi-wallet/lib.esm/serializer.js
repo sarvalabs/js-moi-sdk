@@ -11,20 +11,6 @@ import { Polorizer } from "js-polo";
  */
 const processFunds = (ixObject) => {
     const assetFunds = new Map();
-    ixObject.ix_operations.forEach(operation => {
-        switch (operation.type) {
-            case OpType.ASSET_TRANSFER:
-            case OpType.ASSET_BURN: {
-                const payload = operation.payload;
-                const amount = assetFunds.get(payload.asset_id) ?? 0;
-                if (typeof payload.amount === "bigint" || typeof amount === "bigint") {
-                    assetFunds.set(trimHexPrefix(payload.asset_id), BigInt(payload.amount) + BigInt(amount));
-                    return;
-                }
-                assetFunds.set(trimHexPrefix(payload.asset_id), Number(payload.amount) + Number(amount));
-            }
-        }
-    });
     if (ixObject.funds != null) {
         // Add additional asset funds to the list if not present
         ixObject.funds.forEach(assetFund => {
@@ -62,32 +48,14 @@ const processParticipants = (ixObject) => {
         switch (operation.type) {
             case OpType.PARTICIPANT_CREATE: {
                 const participantCreatePayload = operation.payload;
-                participants.set(participantCreatePayload.address, {
-                    address: hexToBytes(participantCreatePayload.address),
+                participants.set(participantCreatePayload.id, {
+                    address: hexToBytes(participantCreatePayload.id),
                     lock_type: LockType.MUTATE_LOCK
                 });
                 break;
             }
             case OpType.ASSET_CREATE:
                 break;
-            case OpType.ASSET_MINT:
-            case OpType.ASSET_BURN: {
-                const assetSupplyPayload = operation.payload;
-                const address = trimHexPrefix(assetSupplyPayload.asset_id).slice(8);
-                participants.set(address, {
-                    address: hexToBytes(address),
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            case OpType.ASSET_TRANSFER: {
-                const assetActionPayload = operation.payload;
-                participants.set(assetActionPayload.beneficiary, {
-                    address: hexToBytes(assetActionPayload.beneficiary),
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
             case OpType.LOGIC_DEPLOY:
                 break;
             case OpType.LOGIC_ENLIST:

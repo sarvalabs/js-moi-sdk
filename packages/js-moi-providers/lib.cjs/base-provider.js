@@ -996,19 +996,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return receipt.ix_operations.map(operation => {
             switch ((0, js_moi_utils_1.hexToBN)(operation.tx_type)) {
                 case js_moi_utils_1.OpType.PARTICIPANT_CREATE:
-                case js_moi_utils_1.OpType.ASSET_TRANSFER:
-                    return null;
                 case js_moi_utils_1.OpType.ASSET_CREATE:
                     if (operation.data) {
                         return operation.data;
                     }
                     throw new Error("Failed to retrieve asset creation response");
-                case js_moi_utils_1.OpType.ASSET_MINT:
-                case js_moi_utils_1.OpType.ASSET_BURN:
-                    if (operation.data) {
-                        return operation.data;
-                    }
-                    throw new Error("Failed to retrieve asset mint/burn response");
                 case js_moi_utils_1.OpType.LOGIC_DEPLOY:
                     if (operation.data) {
                         return operation.data;
