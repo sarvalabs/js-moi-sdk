@@ -318,6 +318,15 @@ export class Schema {
         },
     };
 
+    public static PISA_ASSET_SCHEMA = {
+        kind: "struct",
+        fields: {
+            engine: {
+                kind: "string"
+            }
+        }
+    }
+
     /**
      * Extracts the array data type from the provided data type string.
      *

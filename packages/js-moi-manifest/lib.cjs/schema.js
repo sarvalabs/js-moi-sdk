@@ -298,6 +298,14 @@ class Schema {
             },
         },
     };
+    static PISA_ASSET_SCHEMA = {
+        kind: "struct",
+        fields: {
+            version: {
+                kind: "string"
+            }
+        }
+    };
     /**
      * Extracts the array data type from the provided data type string.
      *

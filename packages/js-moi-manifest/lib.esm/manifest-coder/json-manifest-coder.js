@@ -65,6 +65,10 @@ export class JsonManifestCoder extends BaseManifestCoder {
             wireType: WireType.WIRE_PACK,
             schema: Schema.PISA_EVENT_SCHEMA,
         },
+        asset: {
+            wireType: WireType.WIRE_PACK,
+            schema: Schema.PISA_ASSET_SCHEMA,
+        }
     };
     /**
      * Serializes a given LogicManifest.Element into a Polorizer instance.
