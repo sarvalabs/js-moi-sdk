@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -38,10 +48,12 @@ const js_moi_utils_1 = require("js-moi-utils");
 const SigningKeyErrors = __importStar(require("./errors"));
 const keystore_1 = require("./keystore");
 const serializer_1 = require("./serializer");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
 })(CURVE || (exports.CURVE = CURVE = {}));
+const DEFAULT_KEY_ID = 0;
 /**
  * Retrieves the value associated with the receiver from a private map.
  * Throws an error if the receiver is not found in the map.
@@ -110,9 +122,10 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 class Wallet extends js_moi_signer_1.Signer {
-    constructor(key, curve) {
+    key_index;
+    constructor(key, curve, options) {
         try {
-            super();
+            super(options?.provider);
             __vault.set(this, {
                 value: void 0,
             });
@@ -124,7 +137,7 @@ class Wallet extends js_moi_signer_1.Signer {
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
             }
             const ecPrivKey = new elliptic_1.default.ec(curve);
-            const keyBuffer = key instanceof buffer_1.Buffer ? key : buffer_1.Buffer.from(key, "hex");
+            const keyBuffer = buffer_1.Buffer.isBuffer(key) ? key : buffer_1.Buffer.from(key, "hex");
             const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
@@ -134,6 +147,7 @@ class Wallet extends js_moi_signer_1.Signer {
                 _public: pubKey,
                 _curve: curve,
             });
+            this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
         }
         catch (error) {
             js_moi_utils_1.ErrorUtils.throwError("Failed to load wallet", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: error });
@@ -218,21 +232,39 @@ class Wallet extends js_moi_signer_1.Signer {
         js_moi_utils_1.ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * Retrieves the address associated with the wallet.
+     * Retrieves the public key associated with the wallet.
      *
-     * @returns {string} The address as a string.
+     * @returns {Promise<string>} A promise that resolves to the public key
      */
-    getAddress() {
-        return "0x" + this.publicKey.slice(2);
+    getPublicKey() {
+        return Promise.resolve(privateMapGet(this, __vault)._public);
+    }
+    /**
+     * Retrieves the identifier for the wallet.
+     *
+     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     */
+    async getIdentifier() {
+        const publickey = await this.getPublicKey();
+        const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(0, 24);
+        return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: 0, tag: js_moi_identifiers_1.ParticipantTagV0 });
+    }
+    /**
+     * Retrieves the key identifier.
+     *
+     * @returns {Promise<number>} A promise that resolves to the key index.
+     */
+    getKeyId() {
+        return Promise.resolve(this.key_index);
     }
     /**
      * Address associated with the wallet.
      *
      * @readonly
      */
-    get address() {
-        return this.getAddress();
-    }
+    // public get address(): string {
+    //     return this.getAddress();
+    // }
     /**
      * Connects the wallet to the given provider.
      *

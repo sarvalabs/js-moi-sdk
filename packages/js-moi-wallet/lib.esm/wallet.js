@@ -5,14 +5,16 @@ import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 import { serializeIxObject } from "./serializer";
+import { createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
 export var CURVE;
 (function (CURVE) {
     CURVE["SECP256K1"] = "secp256k1";
 })(CURVE || (CURVE = {}));
+const DEFAULT_KEY_ID = 0;
 /**
  * Retrieves the value associated with the receiver from a private map.
  * Throws an error if the receiver is not found in the map.
@@ -81,9 +83,10 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export class Wallet extends Signer {
-    constructor(key, curve) {
+    key_index;
+    constructor(key, curve, options) {
         try {
-            super();
+            super(options?.provider);
             __vault.set(this, {
                 value: void 0,
             });
@@ -95,7 +98,7 @@ export class Wallet extends Signer {
                 ErrorUtils.throwError(`Unsupported curve: ${curve}`, ErrorCode.UNSUPPORTED_OPERATION);
             }
             const ecPrivKey = new elliptic.ec(curve);
-            const keyBuffer = key instanceof Buffer ? key : Buffer.from(key, "hex");
+            const keyBuffer = Buffer.isBuffer(key) ? key : Buffer.from(key, "hex");
             const keyInBytes = bufferToUint8(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
@@ -105,6 +108,7 @@ export class Wallet extends Signer {
                 _public: pubKey,
                 _curve: curve,
             });
+            this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
         }
         catch (error) {
             ErrorUtils.throwError("Failed to load wallet", ErrorCode.UNKNOWN_ERROR, { originalError: error });
@@ -189,21 +193,39 @@ export class Wallet extends Signer {
         ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * Retrieves the address associated with the wallet.
+     * Retrieves the public key associated with the wallet.
      *
-     * @returns {string} The address as a string.
+     * @returns {Promise<string>} A promise that resolves to the public key
      */
-    getAddress() {
-        return "0x" + this.publicKey.slice(2);
+    getPublicKey() {
+        return Promise.resolve(privateMapGet(this, __vault)._public);
+    }
+    /**
+     * Retrieves the identifier for the wallet.
+     *
+     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     */
+    async getIdentifier() {
+        const publickey = await this.getPublicKey();
+        const fingerprint = hexToBytes(publickey).slice(0, 24);
+        return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
+    }
+    /**
+     * Retrieves the key identifier.
+     *
+     * @returns {Promise<number>} A promise that resolves to the key index.
+     */
+    getKeyId() {
+        return Promise.resolve(this.key_index);
     }
     /**
      * Address associated with the wallet.
      *
      * @readonly
      */
-    get address() {
-        return this.getAddress();
-    }
+    // public get address(): string {
+    //     return this.getAddress();
+    // }
     /**
      * Connects the wallet to the given provider.
      *

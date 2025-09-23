@@ -35,7 +35,7 @@ export declare class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
+    getBalance(id: string, assetId: string, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the context information for the specified address.
      *
@@ -46,16 +46,16 @@ export declare class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
+    getContextInfo(id: string, options?: Options): Promise<ContextInfo>;
     /**
-     * Retrieves the TDU (Total Digital Utility) for the specified address.
+     * Retrieves the TDU (Total Digital Utility) for the specified id.
      *
-     * @param {string} address - The address for which to retrieve the TDU.
+     * @param {string} id - The id for which to retrieve the TDU.
      * @param {Options} options - The tesseract options. (optional)
      * @returns {Promise<TDU[]>} A Promise that resolves to the TDU object.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getTDU(address: string, options?: Options): Promise<TDU[]>;
+    getTDU(id: string, options?: Options): Promise<TDU[]>;
     /**
      * Retrieves the interaction information for the specified interaction hash.
      *
@@ -92,7 +92,7 @@ export declare class BaseProvider extends AbstractProvider {
      * of interactions as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getInteractionCount(address: string, options?: Options): Promise<number | bigint>;
+    getInteractionCount(id: string, keyId: number, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the total number of interactions for the specified address,
      * including the pending interactions in IxPool.
@@ -104,7 +104,7 @@ export declare class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws Error if there is an error executing the RPC call.
      */
-    getPendingInteractionCount(address: string): Promise<number | bigint>;
+    getPendingInteractionCount(id: string, keyId: number): Promise<number | bigint>;
     /**
      * Retrieves the account state for the specified address.
      *
@@ -134,7 +134,7 @@ export declare class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getContentFrom(address: string): Promise<ContentFrom>;
+    getContentFrom(id: string): Promise<ContentFrom>;
     /**
      * Retrieves the wait time for a specific account in ixpool.
      *
@@ -143,7 +143,7 @@ export declare class BaseProvider extends AbstractProvider {
      * time (in seconds) as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getWaitTime(address: string): Promise<number | bigint>;
+    getWaitTime(id: string): Promise<number | bigint>;
     /**
      * Initializes a filter for retrieving newly detected terreracts.
      * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
@@ -230,7 +230,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<string[]>} A Promise that resolves to an array of logic id's.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getLogicIds(address: string, options?: Options): Promise<string[]>;
+    getLogicIds(id: string, options?: Options): Promise<string[]>;
     /**
      * Retrieves the registry for a specific address.
      *
@@ -239,7 +239,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<Registry>} A Promise that resolves to the registry.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getRegistry(address: string, options?: Options): Promise<Registry>;
+    getRegistry(id: string, options?: Options): Promise<Registry>;
     /**
      * Retrieves the synchronization status for a specific account.
      *

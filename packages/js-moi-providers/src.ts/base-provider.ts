@@ -82,10 +82,10 @@ export class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint> {
+    public async getBalance(id: string, assetId: string, options?: Options): Promise<number | bigint> {
         try {
             const params: BalanceParams = {
-                address: address,
+                id: id,
                 asset_id: assetId,
                 options: options ? options : defaultOptions
             }
@@ -110,10 +110,10 @@ export class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getContextInfo(address: string, options?: Options): Promise<ContextInfo> {
+    public async getContextInfo(id: string, options?: Options): Promise<ContextInfo> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -126,17 +126,17 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Retrieves the TDU (Total Digital Utility) for the specified address.
+     * Retrieves the TDU (Total Digital Utility) for the specified id.
      *
-     * @param {string} address - The address for which to retrieve the TDU.
+     * @param {string} id - The id for which to retrieve the TDU.
      * @param {Options} options - The tesseract options. (optional)
      * @returns {Promise<TDU[]>} A Promise that resolves to the TDU object.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getTDU(address: string, options?: Options): Promise<TDU[]> {
+    public async getTDU(id: string, options?: Options): Promise<TDU[]> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -243,10 +243,11 @@ export class BaseProvider extends AbstractProvider {
      * of interactions as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getInteractionCount(address: string, options?: Options): Promise<number | bigint> {
+    public async getInteractionCount(id: string, keyId: number, options?: Options): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
+                key_id: keyId,
                 options: options ? options : defaultOptions
             }
     
@@ -271,10 +272,11 @@ export class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws Error if there is an error executing the RPC call.
      */
-    public async getPendingInteractionCount(address: string): Promise<number | bigint> {
+    public async getPendingInteractionCount(id: string, keyId: number): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                address: address
+                id: id,
+                key_id: keyId
             }
     
             const response = await this.execute("moi.PendingInteractionCount", params);
@@ -343,10 +345,10 @@ export class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getContentFrom(address: string): Promise<ContentFrom> {
+    public async getContentFrom(id: string): Promise<ContentFrom> {
         try {
             const params: AccountParamsBase = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("ixpool.ContentFrom", params)
@@ -386,10 +388,10 @@ export class BaseProvider extends AbstractProvider {
      * time (in seconds) as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getWaitTime(address: string): Promise<number | bigint> {
+    public async getWaitTime(id: string): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("ixpool.WaitTime", params)
@@ -617,10 +619,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<string[]>} A Promise that resolves to an array of logic id's.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getLogicIds(address: string, options?: Options): Promise<string[]> {
+    public async getLogicIds(id: string, options?: Options): Promise<string[]> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -640,10 +642,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Registry>} A Promise that resolves to the registry.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getRegistry(address: string, options?: Options): Promise<Registry> {
+    public async getRegistry(id: string, options?: Options): Promise<Registry> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     

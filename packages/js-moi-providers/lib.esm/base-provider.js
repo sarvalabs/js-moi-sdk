@@ -43,10 +43,10 @@ export class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getBalance(address, assetId, options) {
+    async getBalance(id, assetId, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 asset_id: assetId,
                 options: options ? options : defaultOptions
             };
@@ -68,10 +68,10 @@ export class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getContextInfo(address, options) {
+    async getContextInfo(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.ContextInfo", params);
@@ -82,17 +82,17 @@ export class BaseProvider extends AbstractProvider {
         }
     }
     /**
-     * Retrieves the TDU (Total Digital Utility) for the specified address.
+     * Retrieves the TDU (Total Digital Utility) for the specified id.
      *
-     * @param {string} address - The address for which to retrieve the TDU.
+     * @param {string} id - The id for which to retrieve the TDU.
      * @param {Options} options - The tesseract options. (optional)
      * @returns {Promise<TDU[]>} A Promise that resolves to the TDU object.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getTDU(address, options) {
+    async getTDU(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.TDU", params);
@@ -172,10 +172,11 @@ export class BaseProvider extends AbstractProvider {
      * of interactions as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getInteractionCount(address, options) {
+    async getInteractionCount(id, keyId, options) {
         try {
             const params = {
-                address: address,
+                id: id,
+                key_id: keyId,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.InteractionCount", params);
@@ -197,10 +198,11 @@ export class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws Error if there is an error executing the RPC call.
      */
-    async getPendingInteractionCount(address) {
+    async getPendingInteractionCount(id, keyId) {
         try {
             const params = {
-                address: address
+                id: id,
+                key_id: keyId
             };
             const response = await this.execute("moi.PendingInteractionCount", params);
             const ixCount = this.processResponse(response);
@@ -262,10 +264,10 @@ export class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getContentFrom(address) {
+    async getContentFrom(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("ixpool.ContentFrom", params);
             const contentResponse = this.processResponse(response);
@@ -289,10 +291,10 @@ export class BaseProvider extends AbstractProvider {
      * time (in seconds) as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getWaitTime(address) {
+    async getWaitTime(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("ixpool.WaitTime", params);
             return this.processResponse(response);
@@ -477,10 +479,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<string[]>} A Promise that resolves to an array of logic id's.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getLogicIds(address, options) {
+    async getLogicIds(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.LogicIDs", params);
@@ -498,10 +500,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Registry>} A Promise that resolves to the registry.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getRegistry(address, options) {
+    async getRegistry(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.Registry", params);

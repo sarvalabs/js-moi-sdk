@@ -135,7 +135,8 @@ interface SyncStatus {
 }
 
 export interface AccountParamsBase {
-    address: string,
+    id: string,
+    key_id?: number,
     options?: Options 
 }
 

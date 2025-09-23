@@ -74,7 +74,7 @@ export class LogicBase extends ElementDescriptor {
         if (this.getTxType(ixObject.routine.kind) !== OpType.LOGIC_DEPLOY && !this.getLogicId()) {
             ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign an logic id.", ErrorCode.NOT_INITIALIZED);
         }
-        const { type, params } = this.processArguments(ixObject, method, option);
+        const { type, params } = await this.processArguments(ixObject, method, option);
         switch (type) {
             case "call": {
                 const response = await this.provider.call(params);
@@ -118,9 +118,9 @@ export class LogicBase extends ElementDescriptor {
      * @returns {any} The processed arguments object.
      * @throws {Error} Throws an error if there are missing arguments or missing fuel information.
      */
-    processArguments(ixObject, type, option) {
+    async processArguments(ixObject, type, option) {
         const params = {
-            sender: option.sender ?? this.signer?.getAddress(),
+            sender: option.sender ?? ((await this.signer?.getIdentifier()).toString()),
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
             nonce: option.nonce,

@@ -2,6 +2,8 @@ import { Buffer } from "buffer";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { Keystore } from "../types/keystore";
+import { type WalletOption } from "../types/wallet";
+import { Identifier } from "js-moi-identifiers";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"
 }
@@ -30,7 +32,8 @@ export declare enum CURVE {
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export declare class Wallet extends Signer {
-    constructor(key: Buffer | string, curve: string);
+    private readonly key_index;
+    constructor(key: Buffer | string, curve: string, options?: WalletOption);
     /**
      * Checks if the wallet is initialized.
      *
@@ -74,17 +77,28 @@ export declare class Wallet extends Signer {
      */
     get curve(): string;
     /**
-     * Retrieves the address associated with the wallet.
+     * Retrieves the public key associated with the wallet.
      *
-     * @returns {string} The address as a string.
+     * @returns {Promise<string>} A promise that resolves to the public key
      */
-    getAddress(): string;
+    getPublicKey(): Promise<string>;
+    /**
+     * Retrieves the identifier for the wallet.
+     *
+     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     */
+    getIdentifier(): Promise<Identifier>;
+    /**
+     * Retrieves the key identifier.
+     *
+     * @returns {Promise<number>} A promise that resolves to the key index.
+     */
+    getKeyId(): Promise<number>;
     /**
      * Address associated with the wallet.
      *
      * @readonly
      */
-    get address(): string;
     /**
      * Connects the wallet to the given provider.
      *
