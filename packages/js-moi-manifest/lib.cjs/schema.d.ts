@@ -562,7 +562,7 @@ export declare class Schema {
     static PISA_ASSET_SCHEMA: {
         kind: string;
         fields: {
-            version: {
+            engine: {
                 kind: string;
             };
         };

@@ -294,7 +294,7 @@ export class Schema {
     static PISA_ASSET_SCHEMA = {
         kind: "struct",
         fields: {
-            version: {
+            engine: {
                 kind: "string"
             }
         }

@@ -456,8 +456,7 @@ interface InteractionObject {
 }
 
 export interface CallorEstimateIxObject extends InteractionObject {
-    nonce: number | bigint;
-    sender: string
+    ix_args: InteractionObject,
 }
 
 interface ProcessedCallorEstimateIxObject {
