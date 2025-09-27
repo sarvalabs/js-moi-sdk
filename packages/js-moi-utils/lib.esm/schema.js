@@ -5,7 +5,7 @@ export const logicSchema = {
             kind: "bytes"
         },
         logic_id: {
-            kind: "string"
+            kind: "bytes"
         },
         callsite: {
             kind: "string"
@@ -65,7 +65,7 @@ export const assetActionSchema = {
     kind: "struct",
     fields: {
         asset_id: {
-            kind: "string"
+            kind: "bytes"
         },
         callsite: {
             kind: "string"
@@ -124,8 +124,21 @@ export const participantCreateSchema = {
     }
 };
 export const accountConfigureSchema = {
-    add: keyAddSchema,
-    revoke: keyRevokeSchema,
+    kind: "struct",
+    fields: {
+        add: {
+            kind: "array",
+            fields: {
+                values: keyAddSchema
+            }
+        },
+        revoke: {
+            kind: "array",
+            fields: {
+                values: keyRevokeSchema
+            }
+        },
+    }
 };
 export const accountInheritSchema = {
     kind: "struct",
@@ -143,13 +156,21 @@ export const ixObjectSchema = {
     kind: "struct",
     fields: {
         sender: {
-            kind: "bytes"
+            kind: "struct",
+            fields: {
+                id: {
+                    kind: "bytes"
+                },
+                sequence: {
+                    kind: "integer"
+                },
+                key_id: {
+                    kind: "integer"
+                }
+            }
         },
         payer: {
             kind: "bytes"
-        },
-        nonce: {
-            kind: "integer"
         },
         fuel_price: {
             kind: "integer"
@@ -164,7 +185,7 @@ export const ixObjectSchema = {
                     kind: "struct",
                     fields: {
                         asset_id: {
-                            kind: "string"
+                            kind: "bytes"
                         },
                         amount: {
                             kind: "integer"
@@ -195,18 +216,18 @@ export const ixObjectSchema = {
                 values: {
                     kind: "struct",
                     fields: {
-                        address: {
+                        id: {
                             kind: "bytes"
                         },
                         lock_type: {
                             kind: "integer"
+                        },
+                        notary: {
+                            kind: "bool"
                         }
                     }
                 }
             }
-        },
-        perception: {
-            kind: "bytes"
         },
         preferences: {
             kind: "struct",
@@ -215,10 +236,46 @@ export const ixObjectSchema = {
                     kind: "bytes"
                 },
                 consensus: {
-                    kind: "bytes"
+                    kind: "struct",
+                    fields: {
+                        mtq: {
+                            kind: "integer"
+                        },
+                        trusted_nodes: {
+                            kind: "array",
+                            fields: {
+                                values: {
+                                    kind: "string"
+                                }
+                            }
+                        }
+                    }
                 }
             }
+        },
+        perception: {
+            kind: "bytes"
+        },
+    }
+};
+export const ixSignatureSchema = {
+    kind: "struct",
+    fields: {
+        id: {
+            kind: "bytes"
+        },
+        key_id: {
+            kind: "integer"
+        },
+        signature: {
+            kind: "bytes"
         }
+    }
+};
+export const ixSignaturesSchema = {
+    kind: "array",
+    fields: {
+        values: ixSignatureSchema
     }
 };
 export const builtInLogEventSchema = {

@@ -123,10 +123,13 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
      */
     async processArguments(ixObject, type, option) {
         const params = {
-            sender: option.sender ?? ((await this.signer?.getIdentifier()).toString()),
+            sender: option.sender ?? {
+                id: ((await this.signer?.getIdentifier()).toString()),
+                key_id: (await this.signer?.getKeyId()),
+                sequence: option.nonce,
+            },
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
-            nonce: option.nonce,
             ix_operations: []
         };
         const opType = this.getTxType(ixObject.routine.kind);

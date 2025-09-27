@@ -549,7 +549,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async call(ixObject, options) {
         try {
             const params = {
-                ix_args: (0, interaction_1.processIxObject)(ixObject),
+                ix_args: (0, interaction_1.toRawInteractionObject)(ixObject),
                 options: options
             };
             const response = await this.execute("moi.Call", params);
@@ -578,7 +578,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async estimateFuel(ixObject, options) {
         try {
             const params = {
-                ix_args: (0, interaction_1.processIxObject)(ixObject),
+                ix_args: (0, interaction_1.toRawInteractionObject)(ixObject),
                 options: options
             };
             const response = await this.execute("moi.FuelEstimate", params);

@@ -1,8 +1,9 @@
 import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
 import { type ProviderEvents } from "../types/websocket";
+import { InteractionObject } from "../types/interaction";
 /**
  * Abstract class representing a provider for interacting with the MOI protocol.
  * Provides methods for account operations, execution, and querying.
@@ -25,8 +26,8 @@ export declare abstract class AbstractProvider extends EventEmitter {
     abstract getSyncStatus(address?: string): Promise<SyncStatus>;
     abstract getContentFrom(id: string): Promise<ContentFrom>;
     abstract getWaitTime(id: string): Promise<number | bigint>;
-    abstract call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
-    abstract estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>;
+    abstract call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
+    abstract estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint>;
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>;
     abstract getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>;
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;

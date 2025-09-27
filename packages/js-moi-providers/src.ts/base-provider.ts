@@ -10,7 +10,7 @@ import {
 } from "js-moi-utils";
 import type {
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
-    AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
+    AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding,
     ExecutionResult,
     Filter, FilterDeletionResult, Inspect,
@@ -25,7 +25,8 @@ import type {
 import { type NestedArray } from "../types/util";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
-import { processIxObject } from "./interaction";
+import { toRawInteractionObject } from "./interaction";
+import { InteractionObject } from "../types/interaction";
 
 // Default timeout value in seconds
 const defaultTimeout: number = 120;
@@ -690,10 +691,10 @@ export class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or 
      * processing the response.
      */
-    public async call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse> {
+    public async call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse> {
         try {
             const params = {
-                ix_args: processIxObject(ixObject),
+                ix_args: toRawInteractionObject(ixObject),
                 options : options
             }
 
@@ -722,10 +723,10 @@ export class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or 
      * processing the response.
      */
-    public async estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint> {
+    public async estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint> {
         try {
             const params = {
-                ix_args: processIxObject(ixObject),
+                ix_args: toRawInteractionObject(ixObject),
                 options : options
             }
 

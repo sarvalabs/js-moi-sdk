@@ -5,10 +5,10 @@ import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex, hexToBytes, trimHexPrefix } from "js-moi-utils";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
-import { serializeIxObject } from "./serializer";
+import { serializeIxObject, serializeIxSignatures } from "./serializer";
 import { createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
 export var CURVE;
 (function (CURVE) {
@@ -102,7 +102,7 @@ export class Wallet extends Signer {
             const keyInBytes = bufferToUint8(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
-            pubKey = keyPair.getPublic(true, "hex");
+            pubKey = trimHexPrefix(bytesToHex(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1))));
             privateMapSet(this, __vault, {
                 _key: privKey,
                 _public: pubKey,
@@ -274,10 +274,17 @@ export class Wallet extends Signer {
     signInteraction(ixObject, sigAlgo) {
         try {
             const ixData = serializeIxObject(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
+            const signatures = [
+                {
+                    id: ixObject.sender.id,
+                    key_id: ixObject.sender.key_id,
+                    signature: this.sign(ixData, sigAlgo),
+                }
+            ];
+            const rawSign = serializeIxSignatures(signatures);
             return {
                 ix_args: bytesToHex(ixData),
-                signature: signature,
+                signatures: bytesToHex(rawSign),
             };
         }
         catch (err) {

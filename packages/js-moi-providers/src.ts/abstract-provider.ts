@@ -5,7 +5,6 @@ import {
     AccountMetaInfo,
     AccountState,
     AssetInfo,
-    CallorEstimateIxObject,
     CallorEstimateOptions,
     Content,
     ContentFrom,
@@ -26,6 +25,7 @@ import {
     type LogFilter
 } from "../types/jsonrpc";
 import { type ProviderEvents } from "../types/websocket";
+import { InteractionObject } from "../types/interaction";
 
 
 
@@ -58,8 +58,8 @@ export abstract class AbstractProvider extends EventEmitter {
     abstract getWaitTime(id: string): Promise<number|bigint>
 
     // Execution Methods
-    abstract call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>
-    abstract estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>
+    abstract call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>
+    abstract estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint>
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>
 
     // Query Methods

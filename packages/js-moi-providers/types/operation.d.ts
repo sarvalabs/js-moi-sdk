@@ -30,15 +30,15 @@ export interface LogicPayload {
      *
      * It may be required for `LogicInvoke`, `LogicEnlist` and `LogicDeploy` operations.
      */
-    interfaces?: Map<string, Hex>;
+    interfaces?: Record<string, Hex>;
 }
 
 export interface RawLogicPayload {
     manifest: Uint8Array;
-    logic_id: Hex;
+    logic_id: Uint8Array;
     callsite: string;
     calldata?: Uint8Array;
-    interfaces?: Map<string, Uint8Array>;
+    interfaces?: Record<string, Uint8Array>;
 }
 
 /**
@@ -76,7 +76,7 @@ export interface AssetCreatePayload {
     /**
      * The stateful flag of the asset.
      */
-    metadata: Map<string, Hex[]>;
+    metadata?: Record<string, Hex>;
     /**
      * The logic of the asset.
      */
@@ -115,7 +115,7 @@ export interface RawAssetCreatePayload {
     /**
      * The stateful flag of the asset.
      */
-    metadata: Map<string, Uint8Array[]>;
+    metadata: Record<string, Uint8Array[]>;
     /**
      * The logic of the asset.
      */
@@ -123,12 +123,22 @@ export interface RawAssetCreatePayload {
 }
 
 export interface KeyAddPayload {
-    public_key: string;
+    public_key: Hex;
     weight: number;
-    signature_algorithm: 0;
+    signature_algorithm: number;
+}
+
+export interface RawKeyAddPayload {
+    public_key: Uint8Array;
+    weight: number;
+    signature_algorithm: number;
 }
 
 export interface KeyRevokePayload {
+    key_id: number;
+}
+
+export interface RawKeyRevokePayload {
     key_id: number;
 }
 
@@ -175,7 +185,7 @@ export interface AssetActionPayload {
     /**
      * Funds is used to specify the asset id and amount involved.
      */
-    funds: Map<Hex, number | bigint>;
+    funds: Record<Hex, number | bigint>;
 }
 
 export interface RawAssetActionPayload {
@@ -200,12 +210,12 @@ export interface RawLogicDeployPayload extends Omit<RawLogicPayload, "logic_id">
 export interface RawLogicActionPayload extends Omit<RawLogicPayload, "manifest"> {}
 
 export interface AccountConfigurePayload {
-    add?: Partial<KeyAddPayload>[];
+    add?: KeyAddPayload[];
     revoke?: KeyRevokePayload[];
 }
 
 export interface RawAccountConfigurePayload {
-    add?: Partial<Omit<KeyAddPayload, "public_key"> & { public_key: Uint8Array }>[];
+    add?: Omit<KeyAddPayload, "public_key"> & { public_key: Uint8Array }[];
     revoke?: KeyRevokePayload[];
 }
 

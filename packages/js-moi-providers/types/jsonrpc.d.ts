@@ -9,6 +9,7 @@ import {
     Participants
 } from "js-moi-utils";
 import type { NestedArray } from "./util";
+import { InteractionObject, RawInteractionObject } from "./interaction";
 
 export interface Options {
     tesseract_number?: number;
@@ -56,7 +57,7 @@ export interface AccountMetaInfo {
 
 export interface InteractionRequest {
     ix_args: string;
-    signature: string;
+    signatures: string;
 }
 
 export interface InteractionResponse {
@@ -266,216 +267,12 @@ interface Stream {
     direction: number;
 }
 
-export interface AssetCreatePayload {
-    symbol: string;
-    dimension?: number;
-    decimals?: number;
-    standard: AssetStandard;
-    enable_events: boolean;
-    manager: string;
-    max_supply: number;
-    metadata: Record<string, Uint8Array>;
-    logicPayload?: LogicPayload;
-}
-
-export interface AssetCreateOperation {
-    type: OpType.ASSET_CREATE;
-    payload: AssetCreatePayload;
-}
-
-export interface KeyAddPayload {
-    public_key: string;
-    weight: number;
-    signature_algorithm: number;
-}
-
-export interface KeyRevokePayload {
-    key_id: number;
-}
-
-export interface ParticipantCreatePayload {
-    id: string;
-    keys_payload: KeyAddPayload[];
-    value: AssetActionPayload;
-}
-
-export interface AccountInheritPayload {
-    target_account: string;
-    value: AssetActionPayload;
-    sub_account_index: number;
-}
-
-export interface AccountConfigurePayload {
-    add: KeyAddPayload;
-    revoke: KeyRevokePayload;
-}
-
-export interface ParticipantCreateOperation {
-    type: OpType.PARTICIPANT_CREATE;
-    payload: ParticipantCreatePayload;
-}
-
-export interface AccountConfigureOperation {
-    type: OpType.ACCOUNT_CONFIGURE;
-    payload: AccountConfigurePayload;
-}
-
-export interface AccountInheritOperation {
-    type: OpType.ACCOUNT_INHERIT;
-    payload: AccountInheritPayload;
-}
-
-export interface AssetActionPayload {
-    asset_id: string;
-    callsite: string;
-    calldata: string;
-    funds: Record<string, number | bigint>;
-}
-
-export interface AssetActionOperation {
-    type: OpType.ASSET_INVOKE;
-    payload: AssetActionPayload;
-}
-
-export interface LogicDeployPayload {
-    manifest: string;
-    callsite: string;
-    calldata?: string;
-}
-
-export interface LogicDeployOperation {
-    type: OpType.LOGIC_DEPLOY;
-    payload: LogicDeployPayload;
-}
-
-export interface LogicActionPayload {
-    logic_id: string;
-    callsite: string;
-    calldata?: string;
-}
-
-export interface LogicActionOperation {
-    type: OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST;
-    payload: LogicActionPayload;
-}
-
-export interface LogicPayload {
-    logic_id?: string;
-    callsite: string;
-    calldata?: string;
-    manifest?: string;
-}
-
-interface ProcessedKeysAddPayload {
-    public_key: Uint8Array;
-    weight: number;
-    signature_algorithm: number;
-}
-
-interface ProcessedKeysRevokePayload {
-    public_key: Uint8Array;
-}
-
-interface ProcessedAccountConfigurePayload {
-    add: ProcessedKeysAddPayload;
-    revoke: ProcessedKeysRevokePayload;
-}
-
-interface ProcessedAccountInheritPayload {
-    target_account: Uint8Array;
-    value: ProcessedAssetActionPayload;
-    sub_account_index: number;
-}
-
-interface ProcessedParticipantCreatePayload {
-    id: Uint8Array;
-    keys_payload: ProcessedKeysAddPayload[];
-    value: ProcessedAssetActionPayload;
-}
-
-interface ProcessedAssetActionPayload {
-    asset_id: Uint8Array;
-    callsite: string;
-    calldata: Uint8Array;
-    funds: Record<string, number | bigint>;
-}
-
-interface ProcessedLogicPayload {
-    logic_id?: string;
-    callsite: string;
-    calldata?: Uint8Array;
-    manifest?: Uint8Array;
-}
-
-type ProcessedOperationPayload = | ProcessedParticipantCreatePayload | ProcessedAccountConfigurePayload | AssetCreatePayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
-
-export type OperationPayload = | ParticipantCreatePayload | AccountInheritPayload | AccountConfigurePayload | AssetCreatePayload | AssetActionPayload | LogicDeployPayload | LogicActionPayload;
-
-export interface IxAssetFund {
-    asset_id: string;
-    amount: number | bigint;
-}
-
-interface ProcessedIxAssetFund {
-    asset_id: string;
-    amount: string;
-}
-
-export type IxOperation = | ParticipantCreateOperation | AccountInheritOperation | AccountConfigureOperation | AssetCreateOperation | AssetActionOperation | LogicDeployOperation | LogicActionOperation;
-
-interface ProcessedIxOperation {
-    type: OpType;
-    payload: string;
-}
-
-export interface IxParticipant {
-    address: string;
-    lock_type: number;
-}
-
-export interface IxPreferences {
-    compute: Uint8Array;
-    consensus: Uint8Array;
-}
-
-interface InteractionObject {
-    nonce?: number | bigint;
-
-    sender?: string;
-    payer?: string;
-
-    fuel_price?: number | bigint;
-    fuel_limit?: number | bigint;
-    
-    funds?: IxAssetFund[]
-    ix_operations: IxOperation[]
-    participants?: IxParticipant[]
-
-    perception?: Uint8Array
-
-    preferences?: IxPreferences
-}
-
-export interface CallorEstimateIxObject extends InteractionObject {
+export interface CallorEstimateIxObject {
     ix_args: InteractionObject,
 }
 
 interface ProcessedCallorEstimateIxObject {
-    nonce: string;
-
-    sender: string;
-    payer?: string;
-
-    funds: ProcessedIxAssetFund[]
-    ix_operations: ProcessedIxOperation[]
-    participants: IxParticipant[]
-
-    fuel_price: string;
-    fuel_limit: string;
-
-    perception?: Uint8Array
-
-    preferences?: IxPreferences
+    ix_args: RawInteractionObject
 }
 
 export type CallorEstimateOptions = Record<string, Options>

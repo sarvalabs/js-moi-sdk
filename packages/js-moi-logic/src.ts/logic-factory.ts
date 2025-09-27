@@ -1,7 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { InteractionResponse, LogicDeployPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, Hex } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 import { RoutineOption } from "./routine-options";
@@ -35,7 +35,7 @@ export class LogicFactory extends LogicBase {
             payload.calldata = this.manifestCoder.encodeArguments(
                 payload.callsite, 
                 ...ixObject.arguments,
-            );
+            ) as Hex;
         }
 
         return payload;

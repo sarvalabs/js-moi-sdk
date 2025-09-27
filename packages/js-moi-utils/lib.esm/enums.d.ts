@@ -16,11 +16,16 @@ export declare enum OpType {
     ACCOUNT_INHERIT = 3,
     ASSET_CREATE = 4,
     ASSET_INVOKE = 5,
-    LOGIC_DEPLOY = 6,
-    LOGIC_INVOKE = 7,
-    LOGIC_ENLIST = 8,
-    LOGIC_INTERACT = 9,
-    LOGIC_UPGRADE = 10
+    GUARDIAN_REGISTER = 6,
+    GUARDIAN_STAKE = 7,
+    GUARDIAN_UNSTAKE = 8,
+    GUARDIAN_WITHDRAW = 9,
+    GUARDIAN_CLAIM = 10,
+    LOGIC_DEPLOY = 11,
+    LOGIC_INVOKE = 12,
+    LOGIC_ENLIST = 13,
+    LOGIC_INTERACT = 14,
+    LOGIC_UPGRADE = 15
 }
 /**
  * Enumerates the types of particpant locks in the system.

@@ -1,132 +1,6 @@
-import { ErrorCode, ErrorUtils, OpType, hexToBytes, trimHexPrefix, ixObjectSchema, LockType } from "js-moi-utils";
-import { serializePayload } from "js-moi-providers";
-import { ZERO_ADDRESS } from "js-moi-constants";
+import { ErrorCode, ErrorUtils, ixObjectSchema, ixSignaturesSchema } from "js-moi-utils";
+import { toRawInteractionObject, toRawSignatures } from "js-moi-providers";
 import { Polorizer } from "js-polo";
-/**
- * Processes the interaction object to extract and consolidate asset funds from
- * ix_operations and asset funds.
- *
- * @param {InteractionObject} ixObject - The interaction object containing ix_operations and asset funds.
- * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
- */
-const processFunds = (ixObject) => {
-    const assetFunds = new Map();
-    if (ixObject.funds != null) {
-        // Add additional asset funds to the list if not present
-        ixObject.funds.forEach(assetFund => {
-            if (!assetFunds.has(trimHexPrefix(assetFund.asset_id))) {
-                assetFunds.set(trimHexPrefix(assetFund.asset_id), assetFund.amount);
-            }
-        });
-    }
-    return Array.from(assetFunds, ([asset_id, amount]) => ({ asset_id, amount }));
-};
-/**
- * Processes a series of ix_operations and returns an array of processed participants.
- * Each participant is derived based on the type of operation and its associated payload.
- *
- * @param {IxOperation[]} steps - The array of operation steps to process.
- * @returns {ProcessedIxParticipant[]} - The array of processed participants.
- * @throws {Error} - Throws an error if an unsupported operation type is encountered.
- */
-const processParticipants = (ixObject) => {
-    const participants = new Map();
-    // Add sender to participants
-    participants.set(trimHexPrefix(ixObject.sender), {
-        address: hexToBytes(ixObject.sender),
-        lock_type: LockType.MUTATE_LOCK
-    });
-    // Add payer if it exists
-    if (ixObject.payer != null) {
-        participants.set(trimHexPrefix(ixObject.payer), {
-            address: hexToBytes(ixObject.payer),
-            lock_type: LockType.MUTATE_LOCK
-        });
-    }
-    // Process ix_operations and add participants
-    ixObject.ix_operations.forEach((operation) => {
-        switch (operation.type) {
-            case OpType.PARTICIPANT_CREATE: {
-                const participantCreatePayload = operation.payload;
-                participants.set(participantCreatePayload.id, {
-                    address: hexToBytes(participantCreatePayload.id),
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            case OpType.ASSET_CREATE:
-                break;
-            case OpType.LOGIC_DEPLOY:
-                break;
-            case OpType.LOGIC_ENLIST:
-            case OpType.LOGIC_INVOKE: {
-                const logicPayload = operation.payload;
-                const address = trimHexPrefix(logicPayload.logic_id).slice(6);
-                participants.set(address, {
-                    address: hexToBytes(address),
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            default:
-                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
-        }
-    });
-    // Add additional participants if they exist
-    if (ixObject.participants != null) {
-        ixObject.participants.forEach((participant) => {
-            const address = trimHexPrefix(participant.address);
-            if (!participants.has(address)) {
-                participants.set(address, {
-                    address: hexToBytes(participant.address),
-                    lock_type: participant.lock_type
-                });
-            }
-        });
-    }
-    return Array.from(participants.values());
-};
-/**
- * Processes an array of ix_operations by serializing their payloads into byte form
- * and returns the processed ix_operations.
- *
- * @param {IxOperation[]} ix_operations - Operations to process.
- * @returns {ProcessedIxOperation[]} - Processed ix_operations with serialized payloads.
- * @throws {Error} - If the payload is missing or operation type is unsupported.
- */
-const processOperations = (ix_operations) => {
-    return ix_operations.map(operation => {
-        if (!operation.payload) {
-            ErrorUtils.throwError("Payload is missing!", ErrorCode.MISSING_ARGUMENT);
-        }
-        const payload = serializePayload(operation.type, operation.payload);
-        return { ...operation, payload };
-    });
-};
-/**
- * Processes the interaction object based on its type and returns the processed object.
- *
- * @param {InteractionObject} ixObject - The interaction object to be processed.
- * @returns {ProcessedIxObject} - The processed interaction object.
- * @throws {Error} - Throws an error if the interaction type is unsupported or if there is a missing payload.
- */
-const processIxObject = (ixObject) => {
-    try {
-        return {
-            sender: hexToBytes(ixObject.sender),
-            payer: hexToBytes(ZERO_ADDRESS),
-            nonce: ixObject.nonce,
-            fuel_price: ixObject.fuel_price,
-            fuel_limit: ixObject.fuel_limit,
-            funds: processFunds(ixObject),
-            ix_operations: processOperations(ixObject.ix_operations),
-            participants: processParticipants(ixObject),
-        };
-    }
-    catch (err) {
-        ErrorUtils.throwError("Failed to process interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });
-    }
-};
 /**
  * POLO encodes an interaction object into a Uint8Array representation.
  *
@@ -136,13 +10,24 @@ const processIxObject = (ixObject) => {
  */
 export const serializeIxObject = (ixObject) => {
     try {
-        const processedIxObject = processIxObject(ixObject);
+        const processedIxObject = toRawInteractionObject(ixObject);
         const polorizer = new Polorizer();
         polorizer.polorize(processedIxObject, ixObjectSchema);
         return polorizer.bytes();
     }
     catch (err) {
         ErrorUtils.throwError("Failed to serialize interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });
+    }
+};
+export const serializeIxSignatures = (signatures) => {
+    try {
+        const processedIxSigns = toRawSignatures(signatures);
+        const polorizer = new Polorizer();
+        polorizer.polorize(processedIxSigns, ixSignaturesSchema);
+        return polorizer.bytes();
+    }
+    catch (err) {
+        ErrorUtils.throwError("Failed to serialize signatures", ErrorCode.UNKNOWN_ERROR, { originalError: err });
     }
 };
 //# sourceMappingURL=serializer.js.map

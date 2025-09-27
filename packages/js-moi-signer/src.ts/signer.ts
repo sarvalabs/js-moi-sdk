@@ -1,4 +1,4 @@
-import { AbstractProvider, CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
+import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, isValidAddress } from "js-moi-utils";
 import { SigType, SigningAlgorithms } from "../types";
 import ECDSA_S256 from "./ecdsa";
@@ -85,11 +85,11 @@ export abstract class Signer {
             ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
         }
 
-        if(!isValidAddress(ixObject.sender)) {
+        if(!isValidAddress(ixObject.sender.id)) {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
 
-        if(this.isInitialized() && ixObject.sender !== await this.getIdentifier().toString()) {
+        if(this.isInitialized() && ixObject.sender.id !== (await this.getIdentifier()).toString()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
 
@@ -122,9 +122,9 @@ export abstract class Signer {
                 ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);
             }
 
-            if(ixObject.nonce != null) {
+            if(ixObject.sender?.sequence != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
-                if(ixObject.nonce < nonce) {
+                if(ixObject.sender.sequence < nonce) {
                     ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
                 }
             }
@@ -143,13 +143,17 @@ export abstract class Signer {
      */
     private async prepareInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
         if (!ixObject.sender) {
-            ixObject.sender = (await this.getIdentifier()).toString();
+            ixObject.sender = {
+                id: (await this.getIdentifier()).toHex(),
+                key_id: (await this.getKeyId()),
+                sequence: 0,
+            };
         }
         
         await this.checkInteraction(method, ixObject);
         
-        if (method === "send" && ixObject.nonce == null) {
-            ixObject.nonce = await this.getNonce();
+        if (method === "send" && ixObject.sender.sequence == null) {
+            ixObject.sender.sequence = await this.getNonce() as number;
         }
     }
 
@@ -169,7 +173,7 @@ export abstract class Signer {
 
         await this.prepareInteraction('call', ixObject);
 
-        return await provider.call(ixObject as CallorEstimateIxObject)
+        return await provider.call(ixObject)
     }
 
     /**
@@ -190,7 +194,7 @@ export abstract class Signer {
 
         await this.prepareInteraction('estimateFuel', ixObject);
 
-        return await provider.estimateFuel(ixObject as CallorEstimateIxObject)
+        return await provider.estimateFuel(ixObject)
     }
 
     /**

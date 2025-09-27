@@ -61,10 +61,10 @@ export class Signer {
         if (ixObject.sender == null) {
             ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
         }
-        if (!isValidAddress(ixObject.sender)) {
+        if (!isValidAddress(ixObject.sender.id)) {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
-        if (this.isInitialized() && ixObject.sender !== await this.getIdentifier().toString()) {
+        if (this.isInitialized() && ixObject.sender.id !== (await this.getIdentifier()).toString()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.ix_operations == null || ixObject.ix_operations.length == 0) {
@@ -89,9 +89,9 @@ export class Signer {
             if (ixObject.fuel_limit <= 0) {
                 ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);
             }
-            if (ixObject.nonce != null) {
+            if (ixObject.sender?.sequence != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
-                if (ixObject.nonce < nonce) {
+                if (ixObject.sender.sequence < nonce) {
                     ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
                 }
             }
@@ -109,11 +109,15 @@ export class Signer {
      */
     async prepareInteraction(method, ixObject) {
         if (!ixObject.sender) {
-            ixObject.sender = (await this.getIdentifier()).toString();
+            ixObject.sender = {
+                id: (await this.getIdentifier()).toHex(),
+                key_id: (await this.getKeyId()),
+                sequence: 0,
+            };
         }
         await this.checkInteraction(method, ixObject);
-        if (method === "send" && ixObject.nonce == null) {
-            ixObject.nonce = await this.getNonce();
+        if (method === "send" && ixObject.sender.sequence == null) {
+            ixObject.sender.sequence = await this.getNonce();
         }
     }
     /**

@@ -1,8 +1,9 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import type { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import type { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
+import { InteractionObject } from "../types/interaction";
 export interface EventTag {
     event: string;
     params?: unknown;
@@ -258,7 +259,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or
      * processing the response.
      */
-    call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
+    call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
     /**
      * Estimates the amount of fuel required for processing the interaction.
      *
@@ -269,7 +270,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or
      * processing the response.
      */
-    estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>;
+    estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint>;
     /**
      * Sends an interaction request.
      *

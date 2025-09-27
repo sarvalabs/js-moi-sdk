@@ -1,276 +1,456 @@
-import { ErrorCode, ErrorUtils, OpType, participantCreateSchema, assetCreateSchema, bytesToHex, hexToBytes, logicSchema, toQuantity, trimHexPrefix, LockType } from "js-moi-utils";
+import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { ParticipantId, AssetId, Identifier } from "js-moi-identifiers";
+import { ZERO_ADDRESS, KMOI_ASSET_ID } from "js-moi-constants";
 import { Polorizer } from "js-polo";
-/**
- * Validates the payload for PARTICIPANT_CREATE operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetActionPayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export const validateParticipantCreatePayload = (payload) => {
-    if ('id' in payload && 'keys_payload' in payload && 'value' in payload) {
-        return payload;
+import { bytesToHex } from "@noble/secp256k1";
+export const validateKeyAdd = (key, index) => {
+    if (typeof key.public_key !== "string" || key.public_key.length === 0) {
+        throw new Error("public key must be a non-empty hex string");
     }
-    throw new Error("Invalid participant create payload");
-};
-/**
- * Validates the payload for ASSET_CREATE operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetCreatePayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export const validateAssetCreatePayload = (payload) => {
-    if ('symbol' in payload && 'supply' in payload && 'standard' in payload) {
-        return payload;
+    if (typeof key.weight !== "number" || key.weight <= 0) {
+        throw new Error("weight must be a positive number");
     }
-    throw new Error("Invalid asset create payload");
-};
-/**
- * Validates the payload for ASSET_TRANSFER operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetActionPayload} - The validated logic action payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export const validateAssetTransferPayload = (payload) => {
-    if ('beneficiary' in payload && 'asset_id' in payload && 'amount' in payload) {
-        return payload;
+    if (key.signature_algorithm !== 0) {
+        throw new Error("signature algorithm must be 0");
     }
-    throw new Error("Invalid asset transfer payload");
 };
-/**
- * Validates the payload for LOGIC_DEPLOY operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicDeployPayload} - The validated logic deploy payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export const validateLogicDeployPayload = (payload) => {
-    if ('manifest' in payload && 'callsite' in payload) {
-        return payload;
+export const validateKeyRevoke = (key, index) => {
+    if (typeof key.key_id !== "number" || key.key_id < 0) {
+        throw new Error("key id must be a non-negative number");
     }
-    throw new Error("Invalid logic deploy payload");
+    return key;
 };
-/**
- * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicActionPayload} - The validated logic action payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export const validateLogicActionPayload = (payload) => {
-    if ('logic_id' in payload && 'callsite' in payload) {
-        return payload;
+export const validateAssetAction = (value) => {
+    if (value == null)
+        throw new Error("payload is required");
+    const { asset_id, callsite, calldata, funds } = value;
+    if (typeof asset_id !== "string" || asset_id.length === 0) {
+        throw new Error("asset_id must be a non-empty hex string");
     }
-    throw new Error("Invalid logic invoke or enlist payload");
+    if (typeof callsite !== "string" || callsite.length === 0) {
+        throw new Error("callsite must be a non-empty string");
+    }
+    if (calldata !== undefined) {
+        if (typeof calldata !== "string" || calldata.length === 0) {
+            throw new Error("calldata must be a non-empty hex string if provided");
+        }
+    }
+    if (funds != null) {
+        if (!(funds instanceof Object)) {
+            throw new Error("funds must be a Object<Hex, number|bigint>");
+        }
+        for (const [k, v] of Object.entries(funds)) {
+            if (typeof k !== "string" || k.length === 0) {
+                throw new Error("funds keys must be non-empty hex strings");
+            }
+            if (typeof v !== "number" && typeof v !== "bigint") {
+                throw new Error("funds values must be number or bigint");
+            }
+            if (typeof v === "number" && v < 0) {
+                throw new Error("funds number values must be non-negative");
+            }
+        }
+    }
 };
+export const validateParticipantCreate = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.id !== "string" || payload.id.length === 0) {
+        throw new Error("id must be a non-empty string (Hex address)");
+    }
+    if (!Array.isArray(payload.keys_payload)) {
+        throw new Error(`keys payload must be an array`);
+    }
+    if (payload.keys_payload == null || payload.keys_payload.length === 0) {
+        throw new Error(`keys payload must not be empty`);
+    }
+    validateAssetAction(payload.value);
+    payload.keys_payload.forEach((k, idx) => validateKeyAdd(k, idx));
+};
+export const validateAccountConfigure = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    const hasAdd = Array.isArray(payload.add) && payload.add.length > 0;
+    const hasRevoke = Array.isArray(payload.revoke) && payload.revoke.length > 0;
+    if (!hasAdd && !hasRevoke) {
+        throw new Error("payload must have either non-empty add or revoke");
+    }
+    if (hasAdd) {
+        payload.add.forEach((k, idx) => validateKeyAdd(k, idx));
+    }
+    if (hasRevoke) {
+        payload.revoke.forEach((k, idx) => validateKeyRevoke(k, idx));
+    }
+};
+export const validateAccountInherit = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+        throw new Error("target account must be a non-empty hex string");
+    }
+    validateAssetAction(payload.value);
+    // sub_account_index must be a non-negative number
+    if (typeof payload.sub_account_index !== "number" || payload.sub_account_index < 0) {
+        throw new Error("sub account index must be a non-negative number");
+    }
+};
+export const validateLogicPayload = (payload) => {
+    if (typeof payload.callsite !== "string" || payload.callsite.length === 0) {
+        throw new Error("callsite must be a non-empty string");
+    }
+    if (payload.calldata !== undefined) {
+        if (typeof payload.calldata !== "string" || payload.calldata.length === 0) {
+            throw new Error("calldata must be a non-empty hex string if provided");
+        }
+    }
+    if (payload.interfaces !== undefined) {
+        if (typeof payload.interfaces !== "object" || Array.isArray(payload.interfaces)) {
+            throw new Error("interfaces must be an object");
+        }
+        for (const [k, v] of Object.entries(payload.interfaces)) {
+            if (typeof k !== "string" || k.length === 0) {
+                throw new Error("interface key must be a non-empty string");
+            }
+            if (typeof v !== "string" || v.length === 0) {
+                throw new Error(`interface['${k}'] must be a non-empty hex string`);
+            }
+        }
+    }
+};
+export const validateLogicDeploy = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.manifest == null) {
+        throw new Error("payload must include manifest");
+    }
+    validateLogicPayload(payload);
+};
+export const validateLogicAction = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    // manifest is omitted, so we don’t validate it
+    if (typeof payload.logic_id !== "string" || payload.logic_id.length === 0) {
+        throw new Error("logic_id must be a non-empty hex string");
+    }
+    validateLogicPayload(payload);
+};
+export const validateAssetCreate = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    // symbol: required, non-empty string
+    if (typeof payload.symbol !== "string" || payload.symbol.length === 0) {
+        throw new Error("symbol must be a non-empty string");
+    }
+    // dimension: optional, must be non-negative number if provided
+    if (payload.dimension !== undefined) {
+        if (typeof payload.dimension !== "number" || payload.dimension < 0) {
+            throw new Error("dimension must be a non-negative number if provided");
+        }
+    }
+    // decimals: optional, must be non-negative number if provided
+    if (payload.decimals !== undefined) {
+        if (typeof payload.decimals !== "number" || payload.decimals < 0) {
+            throw new Error("decimals must be a non-negative number if provided");
+        }
+    }
+    // standard: required
+    if (payload.standard == null) {
+        throw new Error("standard is required");
+    }
+    // enable_events: required boolean
+    if (typeof payload.enable_events !== "boolean") {
+        throw new Error("enable events must be a boolean value");
+    }
+    // manager: required non-empty hex string
+    if (typeof payload.manager !== "string" || payload.manager.length === 0) {
+        throw new Error("manager must be a non-empty hex string");
+    }
+    // max_supply: required non-negative number
+    if (typeof payload.max_supply !== "number" || payload.max_supply < 0) {
+        throw new Error("max_supply must be a non-negative number");
+    }
+    // metadata: required object with arrays of non-empty hex strings
+    if (payload.metadata) {
+        if (typeof payload.metadata !== "object" || Array.isArray(payload.metadata)) {
+            throw new Error("metadata must be a non-empty object");
+        }
+        for (const [k, v] of Object.entries(payload.metadata)) {
+            if (typeof v !== "string" || v.length === 0) {
+                throw new Error(`metadata['${k}'] must be a non-empty hex string`);
+            }
+        }
+    }
+    // logic_payload: optional, validated if provided
+    if (payload.logic_payload !== undefined) {
+        validateLogicAction(payload.logic_payload);
+    }
+    return payload;
+};
+const polorize = (payload, schema) => {
+    const polorizer = new Polorizer();
+    polorizer.polorize(payload, schema);
+    return polorizer.bytes();
+};
+const withCalldata = (payload) => ({
+    ...payload,
+    calldata: payload.calldata ? hexToBytes(payload.calldata) : new Uint8Array(),
+});
+const withAssetId = (payload) => ({
+    ...payload,
+    asset_id: new AssetId(payload.asset_id).toBytes(),
+});
+const mapPublicKeys = (keys) => keys?.map(k => ({ ...k, public_key: hexToBytes(k.public_key) }));
+const mapHexValues = (obj = {}) => {
+    const out = {};
+    Object.keys(obj).forEach(k => { out[k] = hexToBytes(out[k]); });
+    return out;
+};
+function processParticipantCreate(payload) {
+    const processed = {
+        id: new ParticipantId(payload.id).toBytes(),
+        keys_payload: mapPublicKeys(payload.keys_payload),
+        value: withCalldata(withAssetId(payload.value)),
+    };
+    return polorize(processed, participantCreateSchema);
+}
+function processAccountConfigure(payload) {
+    return polorize({ ...payload, add: mapPublicKeys(payload.add) }, accountConfigureSchema);
+}
+function processAccountInherit(payload) {
+    const processed = {
+        ...payload,
+        target_account: new ParticipantId(payload.target_account).toBytes(),
+        value: withCalldata(withAssetId(payload.value)),
+    };
+    return polorize(processed, accountInheritSchema);
+}
+function processAssetCreate(payload) {
+    const createPayload = {
+        ...payload,
+        manager: new ParticipantId(payload.manager).toBytes(),
+        metadata: mapHexValues(payload.metadata),
+    };
+    if (payload.logic_payload) {
+        createPayload.logic_payload = {
+            ...withCalldata(payload.logic_payload),
+            logic_id: new AssetId(payload.logic_payload.logic_id).toBytes(),
+            interfaces: mapHexValues(payload.logic_payload.interfaces),
+        };
+    }
+    return polorize(createPayload, assetCreateSchema);
+}
+function processAssetInvoke(op) {
+    const payload = withCalldata(withAssetId(validateAssetAction(op)));
+    return polorize(payload, assetActionSchema);
+}
+function processLogicDeploy(payload) {
+    const processed = {
+        ...withCalldata(payload),
+        manifest: hexToBytes(payload.manifest),
+        interfaces: mapHexValues(payload.interfaces),
+    };
+    return polorize(processed, logicSchema);
+}
+function processLogicAction(payload) {
+    const processed = {
+        ...withCalldata(payload),
+        logic_id: new AssetId(payload.logic_id).toBytes(),
+        interfaces: mapHexValues(payload.interfaces),
+    };
+    return polorize(processed, logicSchema);
+}
 /**
- * Processes the payload based on the operation type.
+ * Processes ix_operations and returns an array of processed participants.
  *
- * @param {OpType} opType - The operation type.
- * @param {OperationPayload} payload - The operation payload.
- * @returns {OperationPayload} - The processed operation payload.
- * @throws {Error} - Throws an error if the operation type is unsupported.
+ * @param {InteractionObject} ixObject - The interaction object containing sender, payer, operations, etc.
+ * @returns {IxParticipant[]} - The processed participants.
+ * @throws {Error} - If an unsupported operation type is encountered.
  */
-const processPayload = (opType, payload) => {
-    switch (opType) {
+const processParticipants = (ixObject) => {
+    const participants = new Map();
+    const addParticipant = (id, lock_type) => {
+        participants.set(trimHexPrefix(id), { id, lock_type });
+    };
+    // Add sender
+    addParticipant(ixObject.sender.id, LockType.MUTATE_LOCK);
+    // Add payer if present
+    if (ixObject.payer && ixObject.payer != ZERO_ADDRESS) {
+        addParticipant(ixObject.payer, LockType.MUTATE_LOCK);
+    }
+    // Process operations
+    for (const operation of ixObject.ix_operations) {
+        switch (operation.type) {
+            case OpType.PARTICIPANT_CREATE: {
+                const { value } = operation.payload;
+                addParticipant(value.asset_id, LockType.NO_LOCK);
+                break;
+            }
+            case OpType.ACCOUNT_CONFIGURE:
+                break;
+            case OpType.ACCOUNT_INHERIT:
+                addParticipant(KMOI_ASSET_ID, LockType.NO_LOCK);
+                break;
+            case OpType.ASSET_CREATE:
+                break;
+            case OpType.ASSET_INVOKE: {
+                const { asset_id } = operation.payload;
+                addParticipant(asset_id, LockType.NO_LOCK);
+                break;
+            }
+            case OpType.LOGIC_DEPLOY:
+            case OpType.LOGIC_ENLIST:
+            case OpType.LOGIC_INVOKE:
+                break;
+            default:
+                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
+        }
+    }
+    // Merge additional participants (if not already present)
+    if (ixObject.participants) {
+        for (const { id, lock_type } of ixObject.participants) {
+            if (!participants.has(trimHexPrefix(id))) {
+                addParticipant(id, lock_type);
+            }
+        }
+    }
+    return [...participants.values()];
+};
+export const processInteractionObject = (ix) => {
+    return {
+        ...ix,
+        participants: processParticipants(ix),
+    };
+};
+const toRawFund = (fund) => {
+    return {
+        ...fund,
+        asset_id: new AssetId(fund.asset_id).toBytes(),
+    };
+};
+const toRawParticipant = (participant) => {
+    return {
+        ...participant,
+        id: new Identifier(participant.id).toBytes(),
+    };
+};
+const toRawOperation = (operation) => {
+    switch (operation.type) {
         case OpType.PARTICIPANT_CREATE: {
-            const participantPayload = validateParticipantCreatePayload(payload);
-            const keysPayload = participantPayload.keys_payload.map(keyPayload => {
-                return {
-                    ...keyPayload,
-                    public_key: hexToBytes(keyPayload.public_key)
-                };
-            });
+            validateParticipantCreate(operation.payload);
             return {
-                id: hexToBytes(participantPayload.id),
-                keys_payload: keysPayload,
-                value: {
-                    ...participantPayload.value,
-                    asset_id: hexToBytes(participantPayload.value.asset_id),
-                    calldata: participantPayload.value.calldata ?
-                        hexToBytes(participantPayload.value.calldata) :
-                        new Uint8Array()
-                }
+                ...operation,
+                payload: processParticipantCreate(operation.payload)
+            };
+        }
+        case OpType.ACCOUNT_CONFIGURE: {
+            validateAccountConfigure(operation.payload);
+            return {
+                ...operation,
+                payload: processAccountConfigure(operation.payload)
+            };
+        }
+        case OpType.ACCOUNT_INHERIT: {
+            validateAccountInherit(operation.payload);
+            return {
+                ...operation,
+                payload: processAccountInherit(operation.payload)
             };
         }
         case OpType.ASSET_CREATE: {
-            const createPayload = validateAssetCreatePayload(payload);
-            return { ...createPayload };
+            validateAssetCreate(operation.payload);
+            return {
+                ...operation,
+                payload: processAssetCreate(operation.payload)
+            };
+        }
+        case OpType.ASSET_INVOKE: {
+            validateAssetAction(operation.payload);
+            return {
+                ...operation,
+                payload: processAssetInvoke(operation.payload)
+            };
         }
         case OpType.LOGIC_DEPLOY: {
-            const logicPayload = validateLogicDeployPayload(payload);
+            validateLogicDeploy(operation.payload);
             return {
-                manifest: hexToBytes(logicPayload.manifest),
-                callsite: logicPayload.callsite,
-                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : null,
+                ...operation,
+                payload: processLogicDeploy(operation.payload)
             };
         }
         case OpType.LOGIC_INVOKE:
         case OpType.LOGIC_ENLIST: {
-            const logicPayload = validateLogicActionPayload(payload);
+            validateLogicAction(operation.payload);
             return {
-                logic_id: trimHexPrefix(logicPayload.logic_id),
-                callsite: logicPayload.callsite,
-                calldata: logicPayload.calldata ? hexToBytes(logicPayload.calldata) : null,
+                ...operation,
+                payload: processLogicAction(operation.payload)
             };
         }
         default:
-            ErrorUtils.throwError(`Unsupported operation type: ${opType}`, ErrorCode.UNSUPPORTED_OPERATION);
+            throw new Error(`Unsupported interaction type: ${operation.type}`);
     }
 };
 /**
- * Serializes the payload of a operation based on its type.
- * This function polorizes (serializes) the payload using the appropriate schema
- * based on the operation type and returns it as a byte array.
+ * Transforms an interaction object to a format that can be serialized to POLO.
  *
- * @param {OpType} opType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
- * @param {OperationPayload} payload - The payload of the operation to be serialized.
- * @returns {Uint8Array} - A serialized byte array representing the processed payload.
- * @throws {Error} - Throws an error if the operation type is unsupported.
+ * @param ix Interaction object
+ * @returns a raw interaction object
  */
-export const serializePayload = (opType, payload) => {
-    const polorizer = new Polorizer();
-    const processedPayload = processPayload(opType, payload);
-    switch (opType) {
-        case OpType.PARTICIPANT_CREATE:
-            polorizer.polorize(processedPayload, participantCreateSchema);
-            return polorizer.bytes();
-        case OpType.ASSET_CREATE:
-            polorizer.polorize(processedPayload, assetCreateSchema);
-            return polorizer.bytes();
-        case OpType.LOGIC_DEPLOY:
-        case OpType.LOGIC_INVOKE:
-        case OpType.LOGIC_ENLIST:
-            polorizer.polorize(processedPayload, logicSchema);
-            return polorizer.bytes();
-        default:
-            ErrorUtils.throwError(`Unsupported operation type: ${opType}`, ErrorCode.UNSUPPORTED_OPERATION);
-    }
+export const toRawInteractionObject = (ix) => {
+    return {
+        ...ix,
+        sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
+        payer: ix.payer ? new ParticipantId(ix.payer).toBytes() : undefined,
+        funds: ix.funds?.map((fund) => toRawFund(fund)),
+        participants: ix.participants?.map((participant) => toRawParticipant(participant)),
+        ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
+        preferences: ix.preferences ? {
+            ...ix.preferences,
+            compute: ix.preferences.compute ? hexToBytes(ix.preferences.compute) : undefined,
+        } : undefined,
+        perception: ix.perception ? hexToBytes(ix.perception) : undefined,
+    };
 };
-/**
- * Processes the interaction object to extract and consolidate asset funds from
- * ix_operations and asset funds.
- *
- * @param {InteractionObject} ixObject - The interaction object containing ix_operations and asset funds.
- * @returns {ProcessedIxAssetFund[]} - The consolidated list of processed asset funds.
- */
-const processFunds = (ixObject) => {
-    const assetFunds = new Map();
-    if (ixObject.funds != null) {
-        // Add additional asset funds to the list if not present
-        ixObject.funds.forEach(assetFund => {
-            if (!assetFunds.has(assetFund.asset_id)) {
-                assetFunds.set(assetFund.asset_id, toQuantity(assetFund.amount));
-            }
-        });
-    }
-    return Array.from(assetFunds, ([asset_id, amount]) => ({ asset_id, amount }));
+export const toRawSignatures = (signs) => {
+    return signs.map(sign => ({
+        ...sign,
+        id: hexToBytes(sign.id),
+        signature: hexToBytes(sign.signature)
+    }));
 };
-/**
- * Processes a series of ix_operations and returns an array of processed participants.
- * Each participant is derived based on the type of operation and its associated payload.
- *
- * @param {IxOperation[]} steps - The array of operation steps to process.
- * @returns {IxParticipant[]} - The array of processed participants.
- * @throws {Error} - Throws an error if an unsupported operation type is encountered.
- */
-const processParticipants = (ixObject) => {
-    const participants = new Map();
-    // Add sender to participants
-    participants.set(trimHexPrefix(ixObject.sender), {
-        address: ixObject.sender,
-        lock_type: LockType.MUTATE_LOCK
-    });
-    // Add payer if it exists
-    if (ixObject.payer != null) {
-        participants.set(trimHexPrefix(ixObject.payer), {
-            address: ixObject.payer,
-            lock_type: LockType.MUTATE_LOCK
-        });
-    }
-    // Process ix_operations and add participants
-    ixObject.ix_operations.forEach((operation) => {
-        switch (operation.type) {
-            case OpType.PARTICIPANT_CREATE: {
-                const participantCreatePayload = operation.payload;
-                participants.set(participantCreatePayload.id, {
-                    address: participantCreatePayload.id,
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            case OpType.ASSET_CREATE:
-                break;
-            case OpType.LOGIC_DEPLOY:
-                break;
-            case OpType.LOGIC_ENLIST:
-            case OpType.LOGIC_INVOKE: {
-                const logicPayload = operation.payload;
-                const address = "0x" + trimHexPrefix(logicPayload.logic_id).slice(6);
-                participants.set(address, {
-                    address: address,
-                    lock_type: LockType.MUTATE_LOCK
-                });
-                break;
-            }
-            default:
-                ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
-        }
-    });
-    // Add additional participants if they exist
-    if (ixObject.participants != null) {
-        ixObject.participants.forEach((participant) => {
-            const address = trimHexPrefix(participant.address);
-            if (!participants.has(address)) {
-                participants.set(address, {
-                    address: participant.address,
-                    lock_type: participant.lock_type
-                });
-            }
-        });
-    }
-    return Array.from(participants.values());
+const toFundArgs = (fund) => {
+    return {
+        ...fund,
+        amount: toQuantity(fund.amount)
+    };
 };
-/**
- * Processes an array of ix_operations by serializing their payloads into byte form
- * and returns the processed ix_operations.
- *
- * @param {IxOperation[]} ix_operations - Operations to process.
- * @returns {ProcessedIxOperation[]} - Processed ix_operations with serialized payloads.
- * @throws {Error} - If the payload is missing or operation type is unsupported.
- */
-const processOperations = (ix_operations) => {
-    return ix_operations.map(operation => {
-        if (!operation.payload) {
-            ErrorUtils.throwError("Payload is missing!", ErrorCode.MISSING_ARGUMENT);
-        }
-        const payload = serializePayload(operation.type, operation.payload);
-        return { ...operation, payload: "0x" + bytesToHex(payload) };
-    });
+const toOperationArgs = (operation) => {
+    const rawOpPayload = toRawOperation(operation);
+    return {
+        ...operation,
+        payload: bytesToHex(rawOpPayload.payload)
+    };
 };
-/**
- * Processes the interaction object based on its type and returns the processed object.
- *
- * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
- * @returns {ProcessedCallorEstimateIxObject} - The processed interaction object.
- * @throws {Error} - Throws an error if the interaction type is unsupported or if there is a missing payload.
- */
-export const processIxObject = (ixObject) => {
-    try {
-        return {
-            nonce: toQuantity(ixObject.nonce),
-            sender: ixObject.sender,
-            fuel_price: toQuantity(ixObject.fuel_price),
-            fuel_limit: toQuantity(ixObject.fuel_limit),
-            funds: processFunds(ixObject),
-            ix_operations: processOperations(ixObject.ix_operations),
-            participants: processParticipants(ixObject)
-        };
-    }
-    catch (err) {
-        ErrorUtils.throwError("Failed to process interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });
-    }
+export const toInteractionArgs = (ix) => {
+    return {
+        sender: ix.sender,
+        payer: ix.payer,
+        fuel_price: toQuantity(ix.fuel_price),
+        fuel_limit: toQuantity(ix.fuel_limit),
+        funds: ix.funds?.map((fund) => toFundArgs(fund)),
+        ix_operations: ix.ix_operations?.map((operation) => toOperationArgs(operation)),
+        preferences: ix.preferences ? {
+            ...ix.preferences,
+            consensus: ix.preferences.consensus ? {
+                ...ix.preferences.consensus,
+                mtq: toQuantity(ix.preferences.consensus.mtq ?? 0)
+            } : undefined,
+        } : undefined,
+    };
 };
 //# sourceMappingURL=interaction.js.map

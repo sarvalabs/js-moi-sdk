@@ -6,12 +6,12 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes, trimHexPrefix } from "js-moi-utils";
 
 import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
-import { serializeIxObject } from "./serializer";
+import { serializeIxObject, serializeIxSignatures } from "./serializer";
 import { type WalletOption } from "../types/wallet";
 import { Identifier, createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
 
@@ -116,7 +116,13 @@ export class Wallet extends Signer {
             const keyInBytes = bufferToUint8(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
-            pubKey = keyPair.getPublic(true, "hex");
+            pubKey = trimHexPrefix(
+                bytesToHex(
+                    Uint8Array.from(
+                        keyPair.getPublic().encodeCompressed("array").slice(1)
+                    )
+                )
+            );
 
             privateMapSet(this, __vault, {
                 _key: privKey,
@@ -325,10 +331,19 @@ export class Wallet extends Signer {
     public signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest {
         try {
             const ixData = serializeIxObject(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
+            const signatures = [
+                {
+                    id: ixObject.sender.id,
+                    key_id: ixObject.sender.key_id,
+                    signature: this.sign(ixData, sigAlgo) as Hex,
+                }
+            ];
+
+            const rawSign = serializeIxSignatures(signatures)
+
             return {
                 ix_args: bytesToHex(ixData),
-                signature: signature,
+                signatures: bytesToHex(rawSign),
             };
         } catch (err) {
             ErrorUtils.throwError("Failed to sign interaction", ErrorCode.UNKNOWN_ERROR, { originalError: err });

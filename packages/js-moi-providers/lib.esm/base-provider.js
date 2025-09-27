@@ -1,6 +1,6 @@
 import { ErrorCode, ErrorUtils, OpType, bytesToHex, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
-import { processIxObject } from "./interaction";
+import { toRawInteractionObject } from "./interaction";
 // Default timeout value in seconds
 const defaultTimeout = 120;
 const defaultOptions = {
@@ -546,7 +546,7 @@ export class BaseProvider extends AbstractProvider {
     async call(ixObject, options) {
         try {
             const params = {
-                ix_args: processIxObject(ixObject),
+                ix_args: toRawInteractionObject(ixObject),
                 options: options
             };
             const response = await this.execute("moi.Call", params);
@@ -575,7 +575,7 @@ export class BaseProvider extends AbstractProvider {
     async estimateFuel(ixObject, options) {
         try {
             const params = {
-                ix_args: processIxObject(ixObject),
+                ix_args: toRawInteractionObject(ixObject),
                 options: options
             };
             const response = await this.execute("moi.FuelEstimate", params);

@@ -188,25 +188,38 @@ export declare const participantCreateSchema: {
     };
 };
 export declare const accountConfigureSchema: {
-    add: {
-        kind: string;
-        fields: {
-            public_key: {
-                kind: string;
-            };
-            weight: {
-                kind: string;
-            };
-            signature_algorithm: {
-                kind: string;
+    kind: string;
+    fields: {
+        add: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        public_key: {
+                            kind: string;
+                        };
+                        weight: {
+                            kind: string;
+                        };
+                        signature_algorithm: {
+                            kind: string;
+                        };
+                    };
+                };
             };
         };
-    };
-    revoke: {
-        kind: string;
-        fields: {
-            key_id: {
-                kind: string;
+        revoke: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        key_id: {
+                            kind: string;
+                        };
+                    };
+                };
             };
         };
     };
@@ -252,11 +265,19 @@ export declare const ixObjectSchema: {
     fields: {
         sender: {
             kind: string;
+            fields: {
+                id: {
+                    kind: string;
+                };
+                sequence: {
+                    kind: string;
+                };
+                key_id: {
+                    kind: string;
+                };
+            };
         };
         payer: {
-            kind: string;
-        };
-        nonce: {
             kind: string;
         };
         fuel_price: {
@@ -303,18 +324,18 @@ export declare const ixObjectSchema: {
                 values: {
                     kind: string;
                     fields: {
-                        address: {
+                        id: {
                             kind: string;
                         };
                         lock_type: {
                             kind: string;
                         };
+                        notary: {
+                            kind: string;
+                        };
                     };
                 };
             };
-        };
-        perception: {
-            kind: string;
         };
         preferences: {
             kind: string;
@@ -323,6 +344,55 @@ export declare const ixObjectSchema: {
                     kind: string;
                 };
                 consensus: {
+                    kind: string;
+                    fields: {
+                        mtq: {
+                            kind: string;
+                        };
+                        trusted_nodes: {
+                            kind: string;
+                            fields: {
+                                values: {
+                                    kind: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        perception: {
+            kind: string;
+        };
+    };
+};
+export declare const ixSignatureSchema: {
+    kind: string;
+    fields: {
+        id: {
+            kind: string;
+        };
+        key_id: {
+            kind: string;
+        };
+        signature: {
+            kind: string;
+        };
+    };
+};
+export declare const ixSignaturesSchema: {
+    kind: string;
+    fields: {
+        values: {
+            kind: string;
+            fields: {
+                id: {
+                    kind: string;
+                };
+                key_id: {
+                    kind: string;
+                };
+                signature: {
                     kind: string;
                 };
             };

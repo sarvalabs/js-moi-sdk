@@ -1,7 +1,7 @@
 import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { LogicActionPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, Hex, defineReadOnly } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
@@ -123,7 +123,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             payload.calldata = this.manifestCoder.encodeArguments(
                 ixObject.routine.name, 
                 ...ixObject.arguments
-            );
+            ) as Hex;
         }
 
         return payload;

@@ -1,12 +1,13 @@
+import { Sender } from "js-moi-providers";
 interface IRoutineOption {
     nonce?: number;
-    sender?: string;
+    sender?: Sender;
     fuelLimit?: number;
     fuelPrice?: number;
 }
 export declare class RoutineOption implements IRoutineOption {
     nonce?: number;
-    sender?: string;
+    sender?: Sender;
     fuelLimit?: number;
     fuelPrice?: number;
     constructor(options?: IRoutineOption);

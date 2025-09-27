@@ -1,6 +1,6 @@
 import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
-import type { AbstractProvider, LogicActionPayload, LogicDeployPayload } from "js-moi-providers";
-import { CallorEstimateIxObject, InteractionCallResponse, InteractionObject, InteractionResponse } from "js-moi-providers";
+import type { AbstractProvider, LogicActionPayload, LogicDeployPayload, LogicPayload, Sender } from "js-moi-providers";
+import { InteractionCallResponse, InteractionObject, InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
@@ -103,7 +103,7 @@ export abstract class LogicBase extends ElementDescriptor {
 
         switch (type) {
             case "call": {
-                const response = await this.provider.call(params as CallorEstimateIxObject);
+                const response = await this.provider.call(params);
 
                 return {
                     ...response,
@@ -120,7 +120,7 @@ export abstract class LogicBase extends ElementDescriptor {
                         ErrorCode.NOT_INITIALIZED
                     );
                 }
-                return this.provider.estimateFuel(params as CallorEstimateIxObject);
+                return this.provider.estimateFuel(params);
             }
             case "send": {
                 if (!this.signer?.isInitialized()) {
@@ -157,10 +157,13 @@ export abstract class LogicBase extends ElementDescriptor {
      */
     protected async processArguments(ixObject: LogicIxObject, type: string, option: RoutineOption): Promise<LogicIxArguments> {
         const params: InteractionObject = {
-            sender: option.sender ?? ((await this.signer?.getIdentifier()).toString()),
+            sender: option.sender ?? {
+                id: ((await this.signer?.getIdentifier()).toString()),
+                key_id: (await this.signer?.getKeyId()),
+                sequence: option.nonce,
+            } as Sender,
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
-            nonce: option.nonce,
             ix_operations: []
         }
 
@@ -246,8 +249,8 @@ export abstract class LogicBase extends ElementDescriptor {
             return this.executeRoutine(ixObject, "estimate", option) as Promise<number | bigint>
         }
 
-        ixObject.createPayload = (): LogicDeployPayload | LogicActionPayload => {
-            return this.createPayload(ixObject)
+        ixObject.createPayload = (): LogicPayload => {
+            return this.createPayload(ixObject) as LogicPayload
         }
 
         return this.createIxRequest(ixObject);

@@ -21,11 +21,16 @@ var OpType;
     OpType[OpType["ACCOUNT_INHERIT"] = 3] = "ACCOUNT_INHERIT";
     OpType[OpType["ASSET_CREATE"] = 4] = "ASSET_CREATE";
     OpType[OpType["ASSET_INVOKE"] = 5] = "ASSET_INVOKE";
-    OpType[OpType["LOGIC_DEPLOY"] = 6] = "LOGIC_DEPLOY";
-    OpType[OpType["LOGIC_INVOKE"] = 7] = "LOGIC_INVOKE";
-    OpType[OpType["LOGIC_ENLIST"] = 8] = "LOGIC_ENLIST";
-    OpType[OpType["LOGIC_INTERACT"] = 9] = "LOGIC_INTERACT";
-    OpType[OpType["LOGIC_UPGRADE"] = 10] = "LOGIC_UPGRADE";
+    OpType[OpType["GUARDIAN_REGISTER"] = 6] = "GUARDIAN_REGISTER";
+    OpType[OpType["GUARDIAN_STAKE"] = 7] = "GUARDIAN_STAKE";
+    OpType[OpType["GUARDIAN_UNSTAKE"] = 8] = "GUARDIAN_UNSTAKE";
+    OpType[OpType["GUARDIAN_WITHDRAW"] = 9] = "GUARDIAN_WITHDRAW";
+    OpType[OpType["GUARDIAN_CLAIM"] = 10] = "GUARDIAN_CLAIM";
+    OpType[OpType["LOGIC_DEPLOY"] = 11] = "LOGIC_DEPLOY";
+    OpType[OpType["LOGIC_INVOKE"] = 12] = "LOGIC_INVOKE";
+    OpType[OpType["LOGIC_ENLIST"] = 13] = "LOGIC_ENLIST";
+    OpType[OpType["LOGIC_INTERACT"] = 14] = "LOGIC_INTERACT";
+    OpType[OpType["LOGIC_UPGRADE"] = 15] = "LOGIC_UPGRADE";
 })(OpType || (exports.OpType = OpType = {}));
 /**
  * Enumerates the types of particpant locks in the system.

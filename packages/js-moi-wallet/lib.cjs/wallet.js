@@ -141,7 +141,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
-            pubKey = keyPair.getPublic(true, "hex");
+            pubKey = (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1))));
             privateMapSet(this, __vault, {
                 _key: privKey,
                 _public: pubKey,
@@ -313,10 +313,17 @@ class Wallet extends js_moi_signer_1.Signer {
     signInteraction(ixObject, sigAlgo) {
         try {
             const ixData = (0, serializer_1.serializeIxObject)(ixObject);
-            const signature = this.sign(ixData, sigAlgo);
+            const signatures = [
+                {
+                    id: ixObject.sender.id,
+                    key_id: ixObject.sender.key_id,
+                    signature: this.sign(ixData, sigAlgo),
+                }
+            ];
+            const rawSign = (0, serializer_1.serializeIxSignatures)(signatures);
             return {
                 ix_args: (0, js_moi_utils_1.bytesToHex)(ixData),
-                signature: signature,
+                signatures: (0, js_moi_utils_1.bytesToHex)(rawSign),
             };
         }
         catch (err) {
