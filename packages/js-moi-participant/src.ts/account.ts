@@ -1,9 +1,16 @@
-import { KeyAddPayload, KeyRevokePayload, AccountConfigurePayload, AccountInheritPayload, AssetActionPayload } from "js-moi-providers";
-import { Hex } from "js-moi-utils";
+import { KeyAddPayload, KeyRevokePayload, AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, InteractionResponse } from "js-moi-providers";
+import { Signer } from "js-moi-signer";
+import { Hex, LockType, OpType } from "js-moi-utils";
+import { KMOI_ASSET_ID } from "js-moi-constants";
 
 export class AccountConfigure {
   private _add: KeyAddPayload[] = [];
   private _revoke: KeyRevokePayload[] = [];
+  private signer: Signer;
+
+  constructor(signer: Signer) {
+    this.signer = signer;
+  }
 
   addKey(publicKey: Hex, weight: number, signatureAlgorithm = 0): this {
     this._add.push({ 
@@ -32,35 +39,56 @@ export class AccountConfigure {
       revoke: this._revoke
     };
   }
+
+    public async send(): Promise<InteractionResponse> {
+      const payload = this.build()
+
+      return this.signer.sendInteraction({
+          sender: {
+              id: (await this.signer.getIdentifier()).toHex(),
+              sequence: (await this.signer.getNonce()) as number,
+              key_id: (await this.signer.getKeyId()),
+          },
+          fuel_price: 1,
+          fuel_limit: 10000,
+          ix_operations: [
+              {
+                  type: OpType.ACCOUNT_CONFIGURE,
+                  payload: payload,
+              }
+          ]
+      })
+  }
 }
 
 export class AccountInherit {
   private _target?: Hex;
   private _value?: AssetActionPayload;
   private _index?: number;
+  private signer: Signer;
 
-  /** Set the target account to inherit from */
-  target(account: Hex): this {
+  constructor(signer: Signer) {
+    this.signer = signer;
+  }
+
+  public target(account: Hex): this {
     this._target = account;
     return this;
   }
 
-  /** Set the value payload */
-  value(assetId: Hex, callsite: string, funds: Record<Hex, number | bigint>, calldata?: Hex): this {
+  public value(assetId: Hex, callsite: string, funds: Record<Hex, number | bigint>, calldata?: Hex): this {
     this._value = { asset_id: assetId, callsite, funds, calldata };
 
     return this;
   }
 
-  /** Set the sub-account index */
-  index(idx: number): this {
+  public index(idx: number): this {
     this._index = idx;
 
     return this;
   }
 
-  /** Build the final AccountInherit payload */
-  build(): AccountInheritPayload {
+  public build(): AccountInheritPayload {
     if (this._target == null) throw new Error("target account is required");
     if (this._value == null) throw new Error("asset payload is required");
     if (this._index === undefined) throw new Error("sub account index is required");
@@ -70,5 +98,31 @@ export class AccountInherit {
       value: this._value,
       sub_account_index: this._index
     };
+  }
+
+  public async send(): Promise<InteractionResponse> {
+    const payload = this.build()
+
+    return this.signer.sendInteraction({
+        sender: {
+            id: (await this.signer.getIdentifier()).toHex(),
+            sequence: (await this.signer.getNonce()) as number,
+            key_id: (await this.signer.getKeyId()),
+        },
+        fuel_price: 1,
+        fuel_limit: 10000,
+        ix_operations: [
+            {
+                type: OpType.ACCOUNT_INHERIT,
+                payload: payload,
+            }
+        ],
+        participants: [
+            {
+              id: KMOI_ASSET_ID,
+              lock_type: LockType.NO_LOCK,
+            }
+        ]
+    })
   }
 }

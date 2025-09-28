@@ -72,7 +72,7 @@ export interface AssetCreatePayload {
     /**
      * The total supply of the asset.
      */
-    max_supply: number;
+    max_supply: number | bigint;
     /**
      * The stateful flag of the asset.
      */
@@ -111,7 +111,7 @@ export interface RawAssetCreatePayload {
     /**
      * The total supply of the asset.
      */
-    max_supply: number;
+    max_supply: number | bigint;
     /**
      * The stateful flag of the asset.
      */
@@ -185,14 +185,14 @@ export interface AssetActionPayload {
     /**
      * Funds is used to specify the asset id and amount involved.
      */
-    funds: Record<Hex, number | bigint>;
+    funds?: Record<Hex, number | bigint>;
 }
 
 export interface RawAssetActionPayload {
     asset_id: Uint8Array;
     callsite: string;
     calldata: Uint8Array;
-    funds: Map<Uint8Array, number | bigint>
+    funds?: Map<Uint8Array, number | bigint>
 }
 
 /**
