@@ -1,5 +1,6 @@
-import { LockType, OpType } from "js-moi-utils";
+import { bytesToHex, LockType, OpType } from "js-moi-utils";
 import { KMOI_ASSET_ID } from "js-moi-constants";
+import { Polorizer } from "js-polo";
 export class AccountConfigure {
     _add = [];
     _revoke = [];
@@ -60,8 +61,30 @@ export class AccountInherit {
         this._target = account;
         return this;
     }
-    value(assetId, callsite, funds, calldata) {
-        this._value = { asset_id: assetId, callsite, funds, calldata };
+    value(assetId, beneficiary, amount) {
+        const transferPayload = {
+            beneficiary: beneficiary,
+            amount: amount
+        };
+        const transferSchema = {
+            kind: "struct",
+            fields: {
+                beneficiary: {
+                    kind: "bytes"
+                },
+                amount: {
+                    kind: "integer"
+                }
+            }
+        };
+        const polorizer = new Polorizer();
+        polorizer.polorize(transferPayload, transferSchema);
+        this._value = {
+            asset_id: assetId,
+            callsite: "Transfer",
+            calldata: "0x" + bytesToHex(polorizer.bytes()),
+            // Todo: add funds when required
+        };
         return this;
     }
     index(idx) {

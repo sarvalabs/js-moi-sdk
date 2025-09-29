@@ -216,11 +216,11 @@ const withCalldata = (payload) => ({
 });
 const withAssetId = (payload) => ({
     ...payload,
-    asset_id: new js_moi_identifiers_1.AssetId(payload.asset_id).toBytes(),
+    asset_id: new js_moi_identifiers_1.Identifier(payload.asset_id).toBytes(),
 });
 const mapPublicKeys = (keys) => keys?.map(k => ({ ...k, public_key: (0, js_moi_utils_1.hexToBytes)(k.public_key) }));
 const mapHexValues = (obj = {}) => {
-    const out = {};
+    const out = new Map();
     Object.keys(obj).forEach(k => { out[k] = (0, js_moi_utils_1.hexToBytes)(out[k]); });
     return out;
 };
@@ -238,7 +238,7 @@ function processAccountConfigure(payload) {
 function processAccountInherit(payload) {
     const processed = {
         ...payload,
-        target_account: new js_moi_identifiers_1.ParticipantId(payload.target_account).toBytes(),
+        target_account: new js_moi_identifiers_1.Identifier(payload.target_account).toBytes(),
         value: withCalldata(withAssetId(payload.value)),
     };
     return polorize(processed, js_moi_utils_1.accountInheritSchema);
@@ -259,7 +259,8 @@ function processAssetCreate(payload) {
     return polorize(createPayload, js_moi_utils_1.assetCreateSchema);
 }
 function processAssetInvoke(op) {
-    const payload = withCalldata(withAssetId((0, exports.validateAssetAction)(op)));
+    (0, exports.validateAssetAction)(op);
+    const payload = withCalldata(withAssetId(op));
     return polorize(payload, js_moi_utils_1.assetActionSchema);
 }
 function processLogicDeploy(payload) {
@@ -416,10 +417,11 @@ const toRawOperation = (operation) => {
  * @returns a raw interaction object
  */
 const toRawInteractionObject = (ix) => {
+    ix.participants = processParticipants(ix);
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
-        payer: ix.payer ? new js_moi_identifiers_1.ParticipantId(ix.payer).toBytes() : undefined,
+        payer: ix.payer ? new js_moi_identifiers_1.ParticipantId(ix.payer).toBytes() : (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
@@ -453,9 +455,10 @@ const toOperationArgs = (operation) => {
     };
 };
 const toInteractionArgs = (ix) => {
+    ix.participants = processParticipants(ix);
     return {
         sender: ix.sender,
-        payer: ix.payer,
+        payer: ix.payer ?? js_moi_constants_1.ZERO_ADDRESS,
         fuel_price: (0, js_moi_utils_1.toQuantity)(ix.fuel_price),
         fuel_limit: (0, js_moi_utils_1.toQuantity)(ix.fuel_limit),
         funds: ix.funds?.map((fund) => toFundArgs(fund)),

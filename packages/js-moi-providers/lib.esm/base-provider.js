@@ -1,6 +1,6 @@
 import { ErrorCode, ErrorUtils, OpType, bytesToHex, hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal } from "js-moi-utils";
 import { AbstractProvider } from "./abstract-provider";
-import { toRawInteractionObject } from "./interaction";
+import { toInteractionArgs } from "./interaction";
 // Default timeout value in seconds
 const defaultTimeout = 120;
 const defaultOptions = {
@@ -546,7 +546,7 @@ export class BaseProvider extends AbstractProvider {
     async call(ixObject, options) {
         try {
             const params = {
-                ix_args: toRawInteractionObject(ixObject),
+                ix_args: toInteractionArgs(ixObject),
                 options: options
             };
             const response = await this.execute("moi.Call", params);
@@ -575,7 +575,7 @@ export class BaseProvider extends AbstractProvider {
     async estimateFuel(ixObject, options) {
         try {
             const params = {
-                ix_args: toRawInteractionObject(ixObject),
+                ix_args: toInteractionArgs(ixObject),
                 options: options
             };
             const response = await this.execute("moi.FuelEstimate", params);
@@ -923,7 +923,7 @@ export class BaseProvider extends AbstractProvider {
         if (typeof event === "object") {
             params = this.validateAndFormatEvent(event);
         }
-        const response = await this.execute("moi.subscribe", params);
+        const response = await this.execute("moi.Subscribe", params);
         return this.processResponse(response);
     }
     validateAndFormatEvent(event) {
@@ -997,6 +997,12 @@ export class BaseProvider extends AbstractProvider {
                 case OpType.PARTICIPANT_CREATE:
                 case OpType.ASSET_CREATE:
                     if (operation.data) {
+                        return operation.data;
+                    }
+                    throw new Error("Failed to retrieve asset creation response");
+                case OpType.ASSET_INVOKE:
+                    if (operation.data) {
+                        // Todo: update response type
                         return operation.data;
                     }
                     throw new Error("Failed to retrieve asset creation response");

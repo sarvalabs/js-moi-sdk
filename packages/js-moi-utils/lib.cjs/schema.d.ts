@@ -51,11 +51,14 @@ export declare const assetCreateSchema: {
             kind: string;
         };
         metadata: {
-            key: {
-                kind: string;
-            };
-            values: {
-                kind: string;
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
             };
         };
         logic_payload: {

@@ -7,4 +7,5 @@ export * from "js-moi-providers";
 export * from "js-moi-signer";
 export * from "js-moi-utils";
 export * from "js-moi-wallet";
-
+export * from "js-moi-participant";
+export * from "js-moi-asset";

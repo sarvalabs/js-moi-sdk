@@ -203,11 +203,11 @@ const withCalldata = (payload) => ({
 });
 const withAssetId = (payload) => ({
     ...payload,
-    asset_id: new AssetId(payload.asset_id).toBytes(),
+    asset_id: new Identifier(payload.asset_id).toBytes(),
 });
 const mapPublicKeys = (keys) => keys?.map(k => ({ ...k, public_key: hexToBytes(k.public_key) }));
 const mapHexValues = (obj = {}) => {
-    const out = {};
+    const out = new Map();
     Object.keys(obj).forEach(k => { out[k] = hexToBytes(out[k]); });
     return out;
 };
@@ -225,7 +225,7 @@ function processAccountConfigure(payload) {
 function processAccountInherit(payload) {
     const processed = {
         ...payload,
-        target_account: new ParticipantId(payload.target_account).toBytes(),
+        target_account: new Identifier(payload.target_account).toBytes(),
         value: withCalldata(withAssetId(payload.value)),
     };
     return polorize(processed, accountInheritSchema);
@@ -246,7 +246,8 @@ function processAssetCreate(payload) {
     return polorize(createPayload, assetCreateSchema);
 }
 function processAssetInvoke(op) {
-    const payload = withCalldata(withAssetId(validateAssetAction(op)));
+    validateAssetAction(op);
+    const payload = withCalldata(withAssetId(op));
     return polorize(payload, assetActionSchema);
 }
 function processLogicDeploy(payload) {
@@ -402,10 +403,11 @@ const toRawOperation = (operation) => {
  * @returns a raw interaction object
  */
 export const toRawInteractionObject = (ix) => {
+    ix.participants = processParticipants(ix);
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
-        payer: ix.payer ? new ParticipantId(ix.payer).toBytes() : undefined,
+        payer: ix.payer ? new ParticipantId(ix.payer).toBytes() : hexToBytes(ZERO_ADDRESS),
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
@@ -437,9 +439,10 @@ const toOperationArgs = (operation) => {
     };
 };
 export const toInteractionArgs = (ix) => {
+    ix.participants = processParticipants(ix);
     return {
         sender: ix.sender,
-        payer: ix.payer,
+        payer: ix.payer ?? ZERO_ADDRESS,
         fuel_price: toQuantity(ix.fuel_price),
         fuel_limit: toQuantity(ix.fuel_limit),
         funds: ix.funds?.map((fund) => toFundArgs(fund)),

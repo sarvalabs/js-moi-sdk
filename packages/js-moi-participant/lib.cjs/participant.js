@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipantCreate = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
 class ParticipantCreate {
     _id;
     _keys = [];
@@ -21,8 +22,30 @@ class ParticipantCreate {
         });
         return this;
     }
-    value(assetId, callsite, funds, calldata) {
-        this._value = { asset_id: assetId, callsite, funds, calldata };
+    value(assetId, beneficiary, amount) {
+        const transferPayload = {
+            beneficiary: beneficiary,
+            amount: amount
+        };
+        const transferSchema = {
+            kind: "struct",
+            fields: {
+                beneficiary: {
+                    kind: "bytes"
+                },
+                amount: {
+                    kind: "integer"
+                }
+            }
+        };
+        const polorizer = new js_polo_1.Polorizer();
+        polorizer.polorize(transferPayload, transferSchema);
+        this._value = {
+            asset_id: assetId,
+            callsite: "Transfer",
+            calldata: "0x" + (0, js_moi_utils_1.bytesToHex)(polorizer.bytes()),
+            // Todo: add funds when required
+        };
         return this;
     }
     build() {

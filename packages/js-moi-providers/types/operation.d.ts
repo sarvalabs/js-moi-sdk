@@ -115,7 +115,7 @@ export interface RawAssetCreatePayload {
     /**
      * The stateful flag of the asset.
      */
-    metadata: Record<string, Uint8Array[]>;
+    metadata: Map<string, Uint8Array[]>;
     /**
      * The logic of the asset.
      */

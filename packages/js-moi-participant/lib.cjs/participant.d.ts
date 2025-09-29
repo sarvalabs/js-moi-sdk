@@ -7,9 +7,9 @@ export declare class ParticipantCreate {
     private _value?;
     private signer;
     constructor(signer: Signer);
-    id(id: Hex): this;
-    addKey(publicKey: Hex, weight: number, signatureAlgorithm?: number): this;
-    value(assetId: Hex, callsite: string, funds: Record<Hex, number | bigint>, calldata?: Hex): this;
+    id(id: Hex): ParticipantCreate;
+    addKey(publicKey: Hex, weight: number, signatureAlgorithm?: number): ParticipantCreate;
+    value(assetId: Hex, beneficiary: Hex, amount: number | bigint): ParticipantCreate;
     build(): ParticipantCreatePayload;
     send(): Promise<InteractionResponse>;
 }

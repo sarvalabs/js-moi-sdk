@@ -1,10 +1,11 @@
 import { AssetCreationResult, AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType } from "js-moi-utils";
-import { MAS0 } from "../types/mas0";
-import { Polorizer, Schema } from "js-polo";
+import { MAS0 } from "./mas0";
+import { documentEncode, Schema } from "js-polo";
 import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
 import { Signer } from "js-moi-signer";
-import { AssetActionPayload, AssetCreatePayload, InteractionResponse, IxParticipant } from "js-moi-providers";
+import { AssetCreatePayload, IxParticipant } from "js-moi-providers";
 import { SARGA_ADDRESS } from "js-moi-constants";
+import { InteractionContext } from "./interaction";
 
 export class MAS0AssetLogic {
     assetId: string
@@ -15,46 +16,29 @@ export class MAS0AssetLogic {
         this.signer = signer;
     }
 
-    private async send(
-        callsite: MAS0.Endpoint, calldata: Uint8Array, 
-        participants: IxParticipant[],
-    ): Promise<InteractionResponse> {
-        const payload: AssetActionPayload = {
-            asset_id: this.assetId as Hex,
-            callsite: callsite,
-            calldata: bytesToHex(calldata) as Hex,
-        }
-
-        return this.signer.sendInteraction({
-            sender: {
-                id: (await this.signer.getIdentifier()).toHex(),
-                sequence: (await this.signer.getNonce()) as number,
-                key_id: (await this.signer.getKeyId()),
-            },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: OpType.ASSET_INVOKE,
-                    payload: payload,
-                }
-            ],
-            participants
-        })
-    }
-
     private polorize<T extends MAS0.OperationPayload>(payload: T, schema: Schema): Uint8Array {
-        const polorizer = new Polorizer()
-        polorizer.polorize(payload, schema)
+        const document = documentEncode(payload, schema)
 
-        return polorizer.bytes()
+        return document.bytes()
     }
 
-    static async create(
+    static async newAsset(
+        signer: Signer,
+        symbol: string, supply: number | bigint, manager: string, 
+        enableEvents: boolean, 
+    ): Promise<MAS0AssetLogic> {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents).send()
+
+        const result:AssetCreationResult = await response.result()
+
+        return new MAS0AssetLogic(result[0].asset_id, signer)
+    }
+
+    static create(
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string, 
         enableEvents: boolean,
-    ): Promise<MAS0AssetLogic> {
+    ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
             symbol: symbol,
             max_supply: supply,
@@ -64,28 +48,15 @@ export class MAS0AssetLogic {
             manager: manager as Hex,
         }
 
-        const response = await signer.sendInteraction({
-            sender: {
-                id: (await signer.getIdentifier()).toHex(),
-                sequence: (await signer.getNonce()) as number,
-                key_id: (await signer.getKeyId()),
-            },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: OpType.ASSET_CREATE,
-                    payload: payload,
-                }
-            ],
+        return new InteractionContext<OpType.ASSET_CREATE>({
+              opType: OpType.ASSET_CREATE,
+              payload: payload,
+              participants: [],
+              signer: signer,
         })
-
-        const result:AssetCreationResult = await response.result()
-
-        return new MAS0AssetLogic(result.asset_id, signer)
     }
 
-    public async mint(beneficiary: string, amount: number | bigint) {
+    public mint(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Mint = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
@@ -104,10 +75,19 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Mint>(payload, MINT_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.MINT, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+              opType: OpType.ASSET_INVOKE,
+              payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.MINT,
+                calldata: bytesToHex(rawPayload) as Hex,
+              },
+              participants: participants,
+              signer: this.signer,
+        })
     }
 
-    public async burn(amount: number | bigint) {
+    public burn(amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Burn = {
             amount: amount,
         }
@@ -121,10 +101,19 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Burn>(payload, BURN_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.BURN, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.BURN,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
     }
 
-    public async transfer(beneficiary: string, amount: number | bigint) {
+    public transfer(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Transfer = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
@@ -143,10 +132,19 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Transfer>(payload, TRANSFER_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.TRANSFER, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.TRANSFER,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
     }
 
-    public async approve(beneficiary: string, amount: number | bigint, expiresAt: number) {
+    public approve(beneficiary: string, amount: number | bigint, expiresAt: number): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Approve = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
@@ -170,10 +168,19 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Approve>(payload, APPROVE_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.APPROVE, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.APPROVE,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
     }
 
-    public async revoke(beneficiary: string) {
+    public revoke(beneficiary: string): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Revoke = {
             beneficiary: hexToBytes(beneficiary),
         }
@@ -191,10 +198,19 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Revoke>(payload, REVOKE_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.REVOKE, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.REVOKE,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
     }
 
-    public async lockup(beneficiary: string, amount: number | bigint) {
+    public lockup(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Lockup = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount
@@ -217,10 +233,19 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Lockup>(payload, LOCKUP_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.LOCKUP, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.LOCKUP,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
     }
 
-    public async release(benefactor: string, beneficiary: string, amount: number | bigint) {
+    public release(benefactor: string, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS0.Release = {
             benefactor: hexToBytes(benefactor),
             beneficiary: hexToBytes(beneficiary),
@@ -244,6 +269,15 @@ export class MAS0AssetLogic {
 
         const rawPayload = this.polorize<MAS0.Release>(payload, RELEASE_SCHEMA)
 
-        return await this.send(MAS0.Endpoint.RELEASE, rawPayload, participants)
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.RELEASE,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
     }
 }

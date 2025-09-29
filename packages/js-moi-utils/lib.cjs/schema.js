@@ -54,11 +54,14 @@ exports.assetCreateSchema = {
             kind: "integer"
         },
         metadata: {
-            key: {
-                kind: "string"
-            },
-            values: {
-                kind: "bytes"
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "bytes"
+                }
             }
         },
         logic_payload: exports.logicSchema,

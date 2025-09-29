@@ -1,8 +1,9 @@
 import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
-import { MAS0 } from "../types/mas0";
-import { Polorizer } from "js-polo";
+import { MAS0 } from "./mas0";
+import { documentEncode } from "js-polo";
 import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
 import { SARGA_ADDRESS } from "js-moi-constants";
+import { InteractionContext } from "./interaction";
 export class MAS0AssetLogic {
     assetId;
     signer;
@@ -10,35 +11,16 @@ export class MAS0AssetLogic {
         this.assetId = assetId;
         this.signer = signer;
     }
-    async send(callsite, calldata, participants) {
-        const payload = {
-            asset_id: this.assetId,
-            callsite: callsite,
-            calldata: bytesToHex(calldata),
-        };
-        return this.signer.sendInteraction({
-            sender: {
-                id: (await this.signer.getIdentifier()).toHex(),
-                sequence: (await this.signer.getNonce()),
-                key_id: (await this.signer.getKeyId()),
-            },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: OpType.ASSET_INVOKE,
-                    payload: payload,
-                }
-            ],
-            participants
-        });
-    }
     polorize(payload, schema) {
-        const polorizer = new Polorizer();
-        polorizer.polorize(payload, schema);
-        return polorizer.bytes();
+        const document = documentEncode(payload, schema);
+        return document.bytes();
     }
-    static async create(signer, symbol, supply, manager, enableEvents) {
+    static async newAsset(signer, symbol, supply, manager, enableEvents) {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents).send();
+        const result = await response.result();
+        return new MAS0AssetLogic(result[0].asset_id, signer);
+    }
+    static create(signer, symbol, supply, manager, enableEvents) {
         const payload = {
             symbol: symbol,
             max_supply: supply,
@@ -47,25 +29,14 @@ export class MAS0AssetLogic {
             enable_events: enableEvents,
             manager: manager,
         };
-        const response = await signer.sendInteraction({
-            sender: {
-                id: (await signer.getIdentifier()).toHex(),
-                sequence: (await signer.getNonce()),
-                key_id: (await signer.getKeyId()),
-            },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: OpType.ASSET_CREATE,
-                    payload: payload,
-                }
-            ],
+        return new InteractionContext({
+            opType: OpType.ASSET_CREATE,
+            payload: payload,
+            participants: [],
+            signer: signer,
         });
-        const result = await response.result();
-        return new MAS0AssetLogic(result.asset_id, signer);
     }
-    async mint(beneficiary, amount) {
+    mint(beneficiary, amount) {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
@@ -81,9 +52,18 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, MINT_SCHEMA);
-        return await this.send(MAS0.Endpoint.MINT, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.MINT,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
-    async burn(amount) {
+    burn(amount) {
         const payload = {
             amount: amount,
         };
@@ -94,9 +74,18 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, BURN_SCHEMA);
-        return await this.send(MAS0.Endpoint.BURN, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.BURN,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
-    async transfer(beneficiary, amount) {
+    transfer(beneficiary, amount) {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
@@ -112,9 +101,18 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, TRANSFER_SCHEMA);
-        return await this.send(MAS0.Endpoint.TRANSFER, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.TRANSFER,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
-    async approve(beneficiary, amount, expiresAt) {
+    approve(beneficiary, amount, expiresAt) {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
@@ -135,9 +133,18 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, APPROVE_SCHEMA);
-        return await this.send(MAS0.Endpoint.APPROVE, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.APPROVE,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
-    async revoke(beneficiary) {
+    revoke(beneficiary) {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
         };
@@ -152,9 +159,18 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, REVOKE_SCHEMA);
-        return await this.send(MAS0.Endpoint.REVOKE, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.REVOKE,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
-    async lockup(beneficiary, amount) {
+    lockup(beneficiary, amount) {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount
@@ -174,9 +190,18 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, LOCKUP_SCHEMA);
-        return await this.send(MAS0.Endpoint.LOCKUP, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.LOCKUP,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
-    async release(benefactor, beneficiary, amount) {
+    release(benefactor, beneficiary, amount) {
         const payload = {
             benefactor: hexToBytes(benefactor),
             beneficiary: hexToBytes(beneficiary),
@@ -197,7 +222,16 @@ export class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, RELEASE_SCHEMA);
-        return await this.send(MAS0.Endpoint.RELEASE, rawPayload, participants);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.RELEASE,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
     }
 }
 //# sourceMappingURL=mas0-asset.js.map

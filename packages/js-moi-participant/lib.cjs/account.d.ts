@@ -6,8 +6,8 @@ export declare class AccountConfigure {
     private _revoke;
     private signer;
     constructor(signer: Signer);
-    addKey(publicKey: Hex, weight: number, signatureAlgorithm?: number): this;
-    revokeKey(keyId: number): this;
+    addKey(publicKey: Hex, weight: number, signatureAlgorithm?: number): AccountConfigure;
+    revokeKey(keyId: number): AccountConfigure;
     build(): AccountConfigurePayload;
     send(): Promise<InteractionResponse>;
 }
@@ -17,9 +17,9 @@ export declare class AccountInherit {
     private _index?;
     private signer;
     constructor(signer: Signer);
-    target(account: Hex): this;
-    value(assetId: Hex, callsite: string, funds: Record<Hex, number | bigint>, calldata?: Hex): this;
-    index(idx: number): this;
+    target(account: Hex): AccountInherit;
+    value(assetId: Hex, beneficiary: Hex, amount: number | bigint): AccountInherit;
+    index(idx: number): AccountInherit;
     build(): AccountInheritPayload;
     send(): Promise<InteractionResponse>;
 }

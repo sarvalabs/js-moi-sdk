@@ -25,7 +25,7 @@ import type {
 import { type NestedArray } from "../types/util";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
-import { toRawInteractionObject } from "./interaction";
+import { toInteractionArgs } from "./interaction";
 import { InteractionObject } from "../types/interaction";
 
 // Default timeout value in seconds
@@ -694,7 +694,7 @@ export class BaseProvider extends AbstractProvider {
     public async call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse> {
         try {
             const params = {
-                ix_args: toRawInteractionObject(ixObject),
+                ix_args: toInteractionArgs(ixObject),
                 options : options
             }
 
@@ -726,7 +726,7 @@ export class BaseProvider extends AbstractProvider {
     public async estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint> {
         try {
             const params = {
-                ix_args: toRawInteractionObject(ixObject),
+                ix_args: toInteractionArgs(ixObject),
                 options : options
             }
 
@@ -1148,7 +1148,7 @@ export class BaseProvider extends AbstractProvider {
 
         }
         
-        const response = await this.execute("moi.subscribe", params);
+        const response = await this.execute("moi.Subscribe", params);
         return this.processResponse(response);
     }
 
@@ -1240,6 +1240,12 @@ export class BaseProvider extends AbstractProvider {
                 case OpType.ASSET_CREATE:
                     if (operation.data) {
                         return operation.data as AssetCreationResult;
+                    }
+                    throw new Error("Failed to retrieve asset creation response");
+                case OpType.ASSET_INVOKE:
+                    if (operation.data) {
+                        // Todo: update response type
+                        return operation.data as any;
                     }
                     throw new Error("Failed to retrieve asset creation response");
                 case OpType.LOGIC_DEPLOY:

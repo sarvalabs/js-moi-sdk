@@ -1,6 +1,7 @@
 import { AssetActionPayload, ParticipantCreatePayload, KeyAddPayload, InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { LockType, OpType, type Hex } from "js-moi-utils";
+import { bytesToHex, LockType, OpType, type Hex } from "js-moi-utils";
+import { Polorizer } from "js-polo";
 
 export class ParticipantCreate {
   private _id?: Hex;
@@ -12,13 +13,13 @@ export class ParticipantCreate {
     this.signer = signer;
   }
 
-  public id(id: Hex): this {
+  public id(id: Hex): ParticipantCreate {
     this._id = id;
 
     return this;
   }
 
-  public addKey(publicKey: Hex, weight: number, signatureAlgorithm = 0): this {
+  public addKey(publicKey: Hex, weight: number, signatureAlgorithm = 0): ParticipantCreate {
     this._keys.push({ 
         public_key: publicKey, weight, 
         signature_algorithm: signatureAlgorithm 
@@ -27,8 +28,33 @@ export class ParticipantCreate {
     return this;
   }
 
-  public value(assetId: Hex, callsite: string, funds: Record<Hex, number | bigint>, calldata?: Hex): this {
-    this._value = { asset_id: assetId, callsite, funds, calldata };
+  public value(assetId: Hex, beneficiary: Hex, amount: number | bigint): ParticipantCreate {
+    const transferPayload = {
+        beneficiary: beneficiary,
+        amount: amount
+    }
+
+    const transferSchema = {
+        kind: "struct",
+        fields: {
+            beneficiary: {
+                kind: "bytes"
+            },
+            amount: {
+                kind: "integer"
+            }
+        }
+    }
+
+    const polorizer = new Polorizer()
+    polorizer.polorize(transferPayload, transferSchema)
+
+    this._value = { 
+      asset_id: assetId, 
+      callsite: "Transfer", 
+      calldata: "0x" + bytesToHex(polorizer.bytes()) as Hex, 
+      // Todo: add funds when required
+    };
 
     return this;
   }

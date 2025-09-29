@@ -260,14 +260,14 @@ const withCalldata = (payload: any) => ({
 
 const withAssetId = (payload: any) => ({
     ...payload,
-    asset_id: new AssetId(payload.asset_id).toBytes(),
+    asset_id: new Identifier(payload.asset_id).toBytes(),
 })
 
 const mapPublicKeys = (keys: any[]) =>
     keys?.map(k => ({ ...k, public_key: hexToBytes(k.public_key) }))
 
 const mapHexValues = (obj: Record<string, string> = {}) => {
-    const out = {}
+    const out = new Map()
     Object.keys(obj).forEach(k => { out[k] = hexToBytes(out[k]) })
 
     return out
@@ -290,7 +290,7 @@ function processAccountConfigure(payload: AccountConfigurePayload) {
 function processAccountInherit(payload: AccountInheritPayload) {
     const processed = {
         ...payload,
-        target_account: new ParticipantId(payload.target_account).toBytes(),
+        target_account: new Identifier(payload.target_account).toBytes(),
         value: withCalldata(withAssetId(payload.value)),
     }
 
@@ -316,7 +316,9 @@ function processAssetCreate(payload: AssetCreatePayload) {
 }
 
 function processAssetInvoke(op: any) {
-    const payload = withCalldata(withAssetId(validateAssetAction(op)))
+    validateAssetAction(op)
+
+    const payload = withCalldata(withAssetId(op))
 
     return polorize(payload, assetActionSchema)
 }
@@ -387,7 +389,7 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
         addParticipant(asset_id, LockType.NO_LOCK);
         break;
       }
-      
+
       case OpType.LOGIC_DEPLOY:
       case OpType.LOGIC_ENLIST:
       case OpType.LOGIC_INVOKE: 
@@ -495,10 +497,12 @@ const toRawOperation = (operation): RawIxOperation => {
  * @returns a raw interaction object
  */
 export const toRawInteractionObject = (ix: InteractionObject): RawInteractionObject => {
+    ix.participants = processParticipants(ix)
+
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
-        payer: ix.payer ? new ParticipantId(ix.payer).toBytes() : undefined,
+        payer: ix.payer ? new ParticipantId(ix.payer).toBytes() : hexToBytes(ZERO_ADDRESS),
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
@@ -534,9 +538,11 @@ const toOperationArgs = (operation): IxOperationArgs => {
 }
 
 export const toInteractionArgs = (ix: InteractionObject): InteractionArgs => {
+    ix.participants = processParticipants(ix)
+
     return {
       sender: ix.sender,
-      payer: ix.payer,
+      payer: ix.payer ?? ZERO_ADDRESS,
       fuel_price: toQuantity(ix.fuel_price) as Hex,
       fuel_limit: toQuantity(ix.fuel_limit) as Hex,
       funds: ix.funds?.map((fund) => toFundArgs(fund)),
