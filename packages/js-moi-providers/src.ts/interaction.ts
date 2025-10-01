@@ -533,7 +533,7 @@ const toOperationArgs = (operation): IxOperationArgs => {
   const rawOpPayload = toRawOperation(operation)
   return {
     ...operation,
-    payload: bytesToHex(rawOpPayload.payload)
+    payload: "0x" + bytesToHex(rawOpPayload.payload)
   }
 }
 
@@ -554,5 +554,6 @@ export const toInteractionArgs = (ix: InteractionObject): InteractionArgs => {
               mtq: toQuantity(ix.preferences.consensus.mtq ?? 0) as Hex
             } : undefined,
       } : undefined,
+      participants: ix.participants
     }
 }

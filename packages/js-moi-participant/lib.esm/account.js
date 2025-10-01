@@ -1,6 +1,7 @@
-import { bytesToHex, LockType, OpType } from "js-moi-utils";
+import { bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
 import { KMOI_ASSET_ID } from "js-moi-constants";
-import { Polorizer } from "js-polo";
+import { documentEncode } from "js-polo";
+import { InteractionContext } from "js-moi-wallet";
 export class AccountConfigure {
     _add = [];
     _revoke = [];
@@ -25,28 +26,19 @@ export class AccountConfigure {
             (this._add.length === 0 && this._revoke.length === 0)) {
             throw new Error("either add or revoke payload is required");
         }
-        return {
-            add: this._add,
-            revoke: this._revoke
-        };
+        return new InteractionContext({
+            opType: OpType.ACCOUNT_CONFIGURE,
+            payload: {
+                add: this._add,
+                revoke: this._revoke
+            },
+            participants: [],
+            signer: this.signer,
+        });
     }
     async send() {
-        const payload = this.build();
-        return this.signer.sendInteraction({
-            sender: {
-                id: (await this.signer.getIdentifier()).toHex(),
-                sequence: (await this.signer.getNonce()),
-                key_id: (await this.signer.getKeyId()),
-            },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: OpType.ACCOUNT_CONFIGURE,
-                    payload: payload,
-                }
-            ]
-        });
+        const ixnContext = this.build();
+        return await ixnContext.send();
     }
 }
 export class AccountInherit {
@@ -63,7 +55,7 @@ export class AccountInherit {
     }
     value(assetId, beneficiary, amount) {
         const transferPayload = {
-            beneficiary: beneficiary,
+            beneficiary: hexToBytes(beneficiary),
             amount: amount
         };
         const transferSchema = {
@@ -77,12 +69,11 @@ export class AccountInherit {
                 }
             }
         };
-        const polorizer = new Polorizer();
-        polorizer.polorize(transferPayload, transferSchema);
+        const calldata = documentEncode(transferPayload, transferSchema);
         this._value = {
             asset_id: assetId,
             callsite: "Transfer",
-            calldata: "0x" + bytesToHex(polorizer.bytes()),
+            calldata: "0x" + bytesToHex(calldata.bytes()),
             // Todo: add funds when required
         };
         return this;
@@ -98,35 +89,25 @@ export class AccountInherit {
             throw new Error("asset payload is required");
         if (this._index === undefined)
             throw new Error("sub account index is required");
-        return {
-            target_account: this._target,
-            value: this._value,
-            sub_account_index: this._index
-        };
-    }
-    async send() {
-        const payload = this.build();
-        return this.signer.sendInteraction({
-            sender: {
-                id: (await this.signer.getIdentifier()).toHex(),
-                sequence: (await this.signer.getNonce()),
-                key_id: (await this.signer.getKeyId()),
+        return new InteractionContext({
+            opType: OpType.ACCOUNT_INHERIT,
+            payload: {
+                target_account: this._target,
+                value: this._value,
+                sub_account_index: this._index
             },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: OpType.ACCOUNT_INHERIT,
-                    payload: payload,
-                }
-            ],
             participants: [
                 {
                     id: KMOI_ASSET_ID,
                     lock_type: LockType.NO_LOCK,
                 }
-            ]
+            ],
+            signer: this.signer,
         });
+    }
+    async send() {
+        const ixnContext = this.build();
+        return await ixnContext.send();
     }
 }
 //# sourceMappingURL=account.js.map

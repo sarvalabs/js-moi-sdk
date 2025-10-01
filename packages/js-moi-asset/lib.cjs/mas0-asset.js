@@ -6,7 +6,7 @@ const mas0_1 = require("./mas0");
 const js_polo_1 = require("js-polo");
 const mas0_schemas_1 = require("./mas0-schemas");
 const js_moi_constants_1 = require("js-moi-constants");
-const interaction_1 = require("./interaction");
+const js_moi_wallet_1 = require("js-moi-wallet");
 class MAS0AssetLogic {
     assetId;
     signer;
@@ -32,7 +32,7 @@ class MAS0AssetLogic {
             enable_events: enableEvents,
             manager: manager,
         };
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_CREATE,
             payload: payload,
             participants: [],
@@ -55,7 +55,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.MINT_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -77,7 +77,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.BURN_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -104,7 +104,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.TRANSFER_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -136,7 +136,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.APPROVE_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -162,7 +162,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.REVOKE_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -193,7 +193,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.LOCKUP_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -225,7 +225,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.RELEASE_SCHEMA);
-        return new interaction_1.InteractionContext({
+        return new js_moi_wallet_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,

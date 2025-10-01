@@ -1,6 +1,7 @@
-import { ParticipantCreatePayload, InteractionResponse } from "js-moi-providers";
+import { InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { type Hex } from "js-moi-utils";
+import { OpType, type Hex } from "js-moi-utils";
+import { InteractionContext } from "js-moi-wallet";
 export declare class ParticipantCreate {
     private _id?;
     private _keys;
@@ -10,7 +11,7 @@ export declare class ParticipantCreate {
     id(id: Hex): ParticipantCreate;
     addKey(publicKey: Hex, weight: number, signatureAlgorithm?: number): ParticipantCreate;
     value(assetId: Hex, beneficiary: Hex, amount: number | bigint): ParticipantCreate;
-    build(): ParticipantCreatePayload;
+    build(): InteractionContext<OpType.PARTICIPANT_CREATE>;
     send(): Promise<InteractionResponse>;
 }
 //# sourceMappingURL=participant.d.ts.map

@@ -3,7 +3,7 @@ import { MAS0 } from "./mas0";
 import { documentEncode } from "js-polo";
 import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
 import { SARGA_ADDRESS } from "js-moi-constants";
-import { InteractionContext } from "./interaction";
+import { InteractionContext } from "js-moi-wallet";
 export class MAS0AssetLogic {
     assetId;
     signer;

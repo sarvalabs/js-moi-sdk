@@ -435,7 +435,7 @@ const toOperationArgs = (operation) => {
     const rawOpPayload = toRawOperation(operation);
     return {
         ...operation,
-        payload: bytesToHex(rawOpPayload.payload)
+        payload: "0x" + bytesToHex(rawOpPayload.payload)
     };
 };
 export const toInteractionArgs = (ix) => {
@@ -454,6 +454,7 @@ export const toInteractionArgs = (ix) => {
                 mtq: toQuantity(ix.preferences.consensus.mtq ?? 0)
             } : undefined,
         } : undefined,
+        participants: ix.participants
     };
 };
 //# sourceMappingURL=interaction.js.map

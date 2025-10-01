@@ -25,4 +25,5 @@ __exportStar(require("js-moi-utils"), exports);
 __exportStar(require("js-moi-wallet"), exports);
 __exportStar(require("js-moi-participant"), exports);
 __exportStar(require("js-moi-asset"), exports);
+__exportStar(require("js-moi-identifiers"), exports);
 //# sourceMappingURL=index.js.map

@@ -1,10 +1,22 @@
-import { OpType } from "js-moi-utils";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InteractionContext = void 0;
+const js_moi_utils_1 = require("js-moi-utils");
 const DEFAULT_FUEL_PRICE = 1;
 const DEFAULT_FUEL_LIMIT = 10000;
-export class InteractionContext {
+class InteractionContext {
     ctx;
     constructor(ctx) {
         this.ctx = ctx;
+    }
+    type() {
+        return this.ctx.opType;
+    }
+    payload() {
+        return this.ctx.payload;
+    }
+    participants() {
+        return this.ctx.participants;
     }
     async send(option) {
         const { opType, payload, participants, signer } = this.ctx;
@@ -33,7 +45,7 @@ export class InteractionContext {
             type: opType,
             payload: payload,
         };
-        return signer.estimateFuel({
+        return signer.call({
             sender: {
                 id: (await signer.getIdentifier()).toHex(),
                 sequence: (await signer.getNonce()),
@@ -66,4 +78,5 @@ export class InteractionContext {
         });
     }
 }
-//# sourceMappingURL=interaction.js.map
+exports.InteractionContext = InteractionContext;
+//# sourceMappingURL=ixn-context.js.map

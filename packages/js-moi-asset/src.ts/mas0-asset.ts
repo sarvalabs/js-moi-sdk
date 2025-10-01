@@ -5,7 +5,7 @@ import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA
 import { Signer } from "js-moi-signer";
 import { AssetCreatePayload, IxParticipant } from "js-moi-providers";
 import { SARGA_ADDRESS } from "js-moi-constants";
-import { InteractionContext } from "./interaction";
+import { InteractionContext } from "js-moi-wallet";
 
 export class MAS0AssetLogic {
     assetId: string

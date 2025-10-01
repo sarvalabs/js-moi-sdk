@@ -451,7 +451,7 @@ const toOperationArgs = (operation) => {
     const rawOpPayload = toRawOperation(operation);
     return {
         ...operation,
-        payload: (0, secp256k1_1.bytesToHex)(rawOpPayload.payload)
+        payload: "0x" + (0, secp256k1_1.bytesToHex)(rawOpPayload.payload)
     };
 };
 const toInteractionArgs = (ix) => {
@@ -470,6 +470,7 @@ const toInteractionArgs = (ix) => {
                 mtq: (0, js_moi_utils_1.toQuantity)(ix.preferences.consensus.mtq ?? 0)
             } : undefined,
         } : undefined,
+        participants: ix.participants
     };
 };
 exports.toInteractionArgs = toInteractionArgs;

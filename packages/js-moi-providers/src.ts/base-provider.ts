@@ -300,10 +300,10 @@ export class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getAccountState(address: string, options?: Options): Promise<AccountState> {
+    public async getAccountState(id: string, options?: Options): Promise<AccountState> {
         try {
             const params: AccountStateParams = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -324,10 +324,10 @@ export class BaseProvider extends AbstractProvider {
      * account meta information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getAccountMetaInfo(address: string): Promise<AccountMetaInfo> {
+    public async getAccountMetaInfo(id: string): Promise<AccountMetaInfo> {
         try {
             const params: AccountMetaInfoParams = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("moi.AccountMetaInfo", params)
@@ -475,10 +475,10 @@ export class BaseProvider extends AbstractProvider {
             filter.topics = [];
         }
 
-        const { address, height, topics } = filter;
+        const { id, height, topics } = filter;
         
-        if(!isValidAddress(address)) {
-            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        if(!isValidAddress(id)) {
+            ErrorUtils.throwArgumentError("Invalid identifier provided", "identifier", id);
         }
 
         if (!Array.isArray(topics)) {
@@ -487,7 +487,7 @@ export class BaseProvider extends AbstractProvider {
 
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
@@ -593,7 +593,7 @@ export class BaseProvider extends AbstractProvider {
             const params = {};
 
             if (typeof arg1 === 'string') {
-                params['address'] = arg1;
+                params['id'] = arg1;
                 params['with_interactions'] = arg2;
                 params['with_commit_info'] = arg3;
                 params['options'] = arg4 ?? defaultOptions;
@@ -665,10 +665,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getSyncStatus(address?: string): Promise<SyncStatus> {
+    public async getSyncStatus(id?: string): Promise<SyncStatus> {
         try {
             const params: SyncStatusParams = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("moi.Syncing", params)
@@ -867,11 +867,11 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getStorageAt(logicId: string, storageKey: string, arg3?: string | Options, arg4?: Options): Promise<string> {
         try {
-            const address = typeof arg3 === 'string' ? arg3 : undefined
+            const id = typeof arg3 === 'string' ? arg3 : undefined
             const options = typeof arg3 === 'object' ? arg3 : arg4
 
             const params: StorageParams = {
-                address: address,
+                id: id,
                 logic_id: logicId,
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
@@ -954,10 +954,10 @@ export class BaseProvider extends AbstractProvider {
             logFilter.topics = [];
         }
 
-        const { address, height, topics } = logFilter;
+        const { id, height, topics } = logFilter;
         
-        if(!isValidAddress(address)) {
-            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        if(!isValidAddress(id)) {
+            ErrorUtils.throwArgumentError("Invalid identifier provided", "id", id);
         }
 
         if (!Array.isArray(topics)) {
@@ -966,7 +966,7 @@ export class BaseProvider extends AbstractProvider {
 
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end

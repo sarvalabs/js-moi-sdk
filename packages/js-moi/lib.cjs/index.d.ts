@@ -9,4 +9,5 @@ export * from "js-moi-utils";
 export * from "js-moi-wallet";
 export * from "js-moi-participant";
 export * from "js-moi-asset";
+export * from "js-moi-identifiers";
 //# sourceMappingURL=index.d.ts.map

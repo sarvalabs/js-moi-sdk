@@ -6,7 +6,7 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes, trimHexPrefix } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
 
 import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";
@@ -116,13 +116,7 @@ export class Wallet extends Signer {
             const keyInBytes = bufferToUint8(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
-            pubKey = trimHexPrefix(
-                bytesToHex(
-                    Uint8Array.from(
-                        keyPair.getPublic().encodeCompressed("array").slice(1)
-                    )
-                )
-            );
+            pubKey = keyPair.getPublic(true, "hex");
 
             privateMapSet(this, __vault, {
                 _key: privKey,
@@ -256,7 +250,7 @@ export class Wallet extends Signer {
      */
     public async getIdentifier(): Promise<Identifier> {
         const publickey = await this.getPublicKey();
-        const fingerprint = hexToBytes(publickey).slice(0, 24);
+        const fingerprint = hexToBytes(publickey).slice(1, 25);
 
         return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
     }

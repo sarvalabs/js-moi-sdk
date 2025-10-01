@@ -141,7 +141,7 @@ class Wallet extends js_moi_signer_1.Signer {
             const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
             const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
             privKey = keyPair.getPrivate("hex");
-            pubKey = (0, js_moi_utils_1.trimHexPrefix)((0, js_moi_utils_1.bytesToHex)(Uint8Array.from(keyPair.getPublic().encodeCompressed("array").slice(1))));
+            pubKey = keyPair.getPublic(true, "hex");
             privateMapSet(this, __vault, {
                 _key: privKey,
                 _public: pubKey,
@@ -246,7 +246,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     async getIdentifier() {
         const publickey = await this.getPublicKey();
-        const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(0, 24);
+        const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(1, 25);
         return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: 0, tag: js_moi_identifiers_1.ParticipantTagV0 });
     }
     /**

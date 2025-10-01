@@ -1,6 +1,6 @@
 import { OpType } from "js-moi-utils";
 import { Signer } from "js-moi-signer";
-import { InteractionContext } from "./interaction";
+import { InteractionContext } from "js-moi-wallet";
 export declare class MAS0AssetLogic {
     assetId: string;
     signer: Signer;

@@ -222,10 +222,10 @@ export class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getAccountState(address, options) {
+    async getAccountState(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.AccountState", params);
@@ -244,10 +244,10 @@ export class BaseProvider extends AbstractProvider {
      * account meta information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getAccountMetaInfo(address) {
+    async getAccountMetaInfo(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("moi.AccountMetaInfo", params);
             return this.processResponse(response);
@@ -369,16 +369,16 @@ export class BaseProvider extends AbstractProvider {
         if (filter.topics == null) {
             filter.topics = [];
         }
-        const { address, height, topics } = filter;
-        if (!isValidAddress(address)) {
-            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        const { id, height, topics } = filter;
+        if (!isValidAddress(id)) {
+            ErrorUtils.throwArgumentError("Invalid identifier provided", "identifier", id);
         }
         if (!Array.isArray(topics)) {
             ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
         }
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
@@ -454,7 +454,7 @@ export class BaseProvider extends AbstractProvider {
         try {
             const params = {};
             if (typeof arg1 === 'string') {
-                params['address'] = arg1;
+                params['id'] = arg1;
                 params['with_interactions'] = arg2;
                 params['with_commit_info'] = arg3;
                 params['options'] = arg4 ?? defaultOptions;
@@ -520,10 +520,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getSyncStatus(address) {
+    async getSyncStatus(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("moi.Syncing", params);
             return this.processResponse(response);
@@ -680,10 +680,10 @@ export class BaseProvider extends AbstractProvider {
      */
     async getStorageAt(logicId, storageKey, arg3, arg4) {
         try {
-            const address = typeof arg3 === 'string' ? arg3 : undefined;
+            const id = typeof arg3 === 'string' ? arg3 : undefined;
             const options = typeof arg3 === 'object' ? arg3 : arg4;
             const params = {
-                address: address,
+                id: id,
                 logic_id: logicId,
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
@@ -756,16 +756,16 @@ export class BaseProvider extends AbstractProvider {
         if (logFilter.topics == null) {
             logFilter.topics = [];
         }
-        const { address, height, topics } = logFilter;
-        if (!isValidAddress(address)) {
-            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        const { id, height, topics } = logFilter;
+        if (!isValidAddress(id)) {
+            ErrorUtils.throwArgumentError("Invalid identifier provided", "id", id);
         }
         if (!Array.isArray(topics)) {
             ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
         }
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end

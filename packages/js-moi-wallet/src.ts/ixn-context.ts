@@ -1,12 +1,16 @@
-import { AssetCreatePayload, AssetActionPayload, IxParticipant, InteractionResponse, AnyIxOperation } from "js-moi-providers"
+import { AssetCreatePayload, AssetActionPayload, IxParticipant, InteractionResponse, AnyIxOperation, ParticipantCreatePayload, AccountConfigurePayload, AccountInheritPayload, InteractionCallResponse } from "js-moi-providers"
 import { Signer } from "js-moi-signer"
 import { OpType } from "js-moi-utils"
 
-type AllowedOps = OpType.ASSET_CREATE | OpType.ASSET_INVOKE
+export type AllowedOps = OpType.ASSET_CREATE | OpType.ASSET_INVOKE | OpType.PARTICIPANT_CREATE | 
+OpType.ACCOUNT_CONFIGURE | OpType.ACCOUNT_INHERIT
 
 type OperationMap = {
   [OpType.ASSET_CREATE]: AssetCreatePayload
   [OpType.ASSET_INVOKE]: AssetActionPayload
+  [OpType.PARTICIPANT_CREATE]: ParticipantCreatePayload
+  [OpType.ACCOUNT_CONFIGURE]: AccountConfigurePayload
+  [OpType.ACCOUNT_INHERIT]: AccountInheritPayload
 }
 
 type Context<T extends AllowedOps> = {
@@ -30,6 +34,18 @@ export class InteractionContext<T extends AllowedOps> {
 
   constructor(ctx: Context<T>) {
     this.ctx = ctx
+  }
+
+  public type(): OpType {
+    return this.ctx.opType
+  }
+
+  public payload(): OperationMap[T] {
+    return this.ctx.payload
+  }
+
+  public participants(): IxParticipant[] {
+    return this.ctx.participants
   }
 
   async send(option?: IxOption): Promise<InteractionResponse> {
@@ -56,7 +72,7 @@ export class InteractionContext<T extends AllowedOps> {
     })
   }
 
-  async call(option?: IxOption): Promise<number|bigint> {
+  async call(option?: IxOption): Promise<InteractionCallResponse> {
     const { opType, payload, participants, signer } = this.ctx
 
     const ixOp: Extract<AnyIxOperation, { type: T }> = {
@@ -64,7 +80,7 @@ export class InteractionContext<T extends AllowedOps> {
       payload: payload,
     } as Extract<AnyIxOperation, { type: T }>
 
-    return signer.estimateFuel({
+    return signer.call({
       sender: {
         id: (await signer.getIdentifier()).toHex(),
         sequence: (await signer.getNonce()) as number,

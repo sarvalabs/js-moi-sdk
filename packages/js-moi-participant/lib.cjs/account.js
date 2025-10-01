@@ -4,6 +4,7 @@ exports.AccountInherit = exports.AccountConfigure = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
+const js_moi_wallet_1 = require("js-moi-wallet");
 class AccountConfigure {
     _add = [];
     _revoke = [];
@@ -28,28 +29,19 @@ class AccountConfigure {
             (this._add.length === 0 && this._revoke.length === 0)) {
             throw new Error("either add or revoke payload is required");
         }
-        return {
-            add: this._add,
-            revoke: this._revoke
-        };
+        return new js_moi_wallet_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ACCOUNT_CONFIGURE,
+            payload: {
+                add: this._add,
+                revoke: this._revoke
+            },
+            participants: [],
+            signer: this.signer,
+        });
     }
     async send() {
-        const payload = this.build();
-        return this.signer.sendInteraction({
-            sender: {
-                id: (await this.signer.getIdentifier()).toHex(),
-                sequence: (await this.signer.getNonce()),
-                key_id: (await this.signer.getKeyId()),
-            },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: js_moi_utils_1.OpType.ACCOUNT_CONFIGURE,
-                    payload: payload,
-                }
-            ]
-        });
+        const ixnContext = this.build();
+        return await ixnContext.send();
     }
 }
 exports.AccountConfigure = AccountConfigure;
@@ -67,7 +59,7 @@ class AccountInherit {
     }
     value(assetId, beneficiary, amount) {
         const transferPayload = {
-            beneficiary: beneficiary,
+            beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
             amount: amount
         };
         const transferSchema = {
@@ -81,12 +73,11 @@ class AccountInherit {
                 }
             }
         };
-        const polorizer = new js_polo_1.Polorizer();
-        polorizer.polorize(transferPayload, transferSchema);
+        const calldata = (0, js_polo_1.documentEncode)(transferPayload, transferSchema);
         this._value = {
             asset_id: assetId,
             callsite: "Transfer",
-            calldata: "0x" + (0, js_moi_utils_1.bytesToHex)(polorizer.bytes()),
+            calldata: "0x" + (0, js_moi_utils_1.bytesToHex)(calldata.bytes()),
             // Todo: add funds when required
         };
         return this;
@@ -102,35 +93,25 @@ class AccountInherit {
             throw new Error("asset payload is required");
         if (this._index === undefined)
             throw new Error("sub account index is required");
-        return {
-            target_account: this._target,
-            value: this._value,
-            sub_account_index: this._index
-        };
-    }
-    async send() {
-        const payload = this.build();
-        return this.signer.sendInteraction({
-            sender: {
-                id: (await this.signer.getIdentifier()).toHex(),
-                sequence: (await this.signer.getNonce()),
-                key_id: (await this.signer.getKeyId()),
+        return new js_moi_wallet_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ACCOUNT_INHERIT,
+            payload: {
+                target_account: this._target,
+                value: this._value,
+                sub_account_index: this._index
             },
-            fuel_price: 1,
-            fuel_limit: 10000,
-            ix_operations: [
-                {
-                    type: js_moi_utils_1.OpType.ACCOUNT_INHERIT,
-                    payload: payload,
-                }
-            ],
             participants: [
                 {
                     id: js_moi_constants_1.KMOI_ASSET_ID,
                     lock_type: js_moi_utils_1.LockType.NO_LOCK,
                 }
-            ]
+            ],
+            signer: this.signer,
         });
+    }
+    async send() {
+        const ixnContext = this.build();
+        return await ixnContext.send();
     }
 }
 exports.AccountInherit = AccountInherit;

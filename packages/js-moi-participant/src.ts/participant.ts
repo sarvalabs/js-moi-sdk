@@ -1,7 +1,8 @@
-import { AssetActionPayload, ParticipantCreatePayload, KeyAddPayload, InteractionResponse } from "js-moi-providers";
+import { AssetActionPayload, InteractionResponse, KeyAddPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { bytesToHex, LockType, OpType, type Hex } from "js-moi-utils";
-import { Polorizer } from "js-polo";
+import { bytesToHex, hexToBytes, LockType, OpType, type Hex } from "js-moi-utils";
+import { documentEncode } from "js-polo";
+import { InteractionContext } from "js-moi-wallet";
 
 export class ParticipantCreate {
   private _id?: Hex;
@@ -30,7 +31,7 @@ export class ParticipantCreate {
 
   public value(assetId: Hex, beneficiary: Hex, amount: number | bigint): ParticipantCreate {
     const transferPayload = {
-        beneficiary: beneficiary,
+        beneficiary: hexToBytes(beneficiary),
         amount: amount
     }
 
@@ -46,54 +47,43 @@ export class ParticipantCreate {
         }
     }
 
-    const polorizer = new Polorizer()
-    polorizer.polorize(transferPayload, transferSchema)
+    const calldata = documentEncode(transferPayload, transferSchema)
 
     this._value = { 
       asset_id: assetId, 
       callsite: "Transfer", 
-      calldata: "0x" + bytesToHex(polorizer.bytes()) as Hex, 
+      calldata: "0x" + bytesToHex(calldata.bytes()) as Hex, 
       // Todo: add funds when required
     };
 
     return this;
   }
 
-  public build(): ParticipantCreatePayload {
+  public build(): InteractionContext<OpType.PARTICIPANT_CREATE> {
     if (this._id == null) throw new Error("participant id is required");
     if (this._value == null) throw new Error("asset payload is required");
     if (this._keys == null || this._keys.length === 0) throw new Error("atleast one key is required");
 
-    return {
-      id: this._id,
-      keys_payload: this._keys,
-      value: this._value
-    };
-  }
-  
-  public async send(): Promise<InteractionResponse> {
-      const payload = this.build()
-
-      return this.signer.sendInteraction({
-          sender: {
-              id: (await this.signer.getIdentifier()).toHex(),
-              sequence: (await this.signer.getNonce()) as number,
-              key_id: (await this.signer.getKeyId()),
-          },
-          fuel_price: 1,
-          fuel_limit: 10000,
-          ix_operations: [
+    return new InteractionContext<OpType.PARTICIPANT_CREATE>({
+        opType: OpType.PARTICIPANT_CREATE,
+        payload: {
+          id: this._id,
+          keys_payload: this._keys,
+          value: this._value
+        },
+        participants: [
               {
-                  type: OpType.PARTICIPANT_CREATE,
-                  payload: payload,
-              }
-          ],
-          participants: [
-              {
-                id: payload.value?.asset_id,
+                id: this._value?.asset_id,
                 lock_type: LockType.NO_LOCK,
               }
-          ]
-      })
+        ],
+        signer: this.signer,
+    })
+  }
+
+  public async send(): Promise<InteractionResponse> {
+    const ixnContext = this.build()
+
+    return await ixnContext.send()
   }
 }

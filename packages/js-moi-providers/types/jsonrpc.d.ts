@@ -48,7 +48,7 @@ export interface AccountState {
 
 export interface AccountMetaInfo {
     type: number;
-    address: string;
+    id: string;
     height: string;
     tesseract_hash: string;
     lattice_exists: boolean;
@@ -72,12 +72,12 @@ export interface InteractionCallResponse {
 }
 
 export interface StateHash {
-    address: string;
+    id: string;
     hash: string;
 }
 
 export interface ContextHash {
-    address: string;
+    id: string;
     hash: string;
 }
 
@@ -142,12 +142,12 @@ export interface AccountParamsBase {
 }
 
 export interface AccountStateParams {
-    address: string,
+    id: string,
     options?: Options 
 }
 
 export interface AccountMetaInfoParams {
-    address: string
+    id: string
 }
 
 export interface BalanceParams extends AccountParamsBase {
@@ -172,11 +172,11 @@ export interface InteractionByTesseractParams extends AccountParamsBase {
 }
 
 export interface SyncStatusParams {
-    address?: string
+    id?: string
 }
 
 export interface StorageParams {
-    address?: string;
+    id?: string;
     logic_id: string;
     storage_key: string;
     options: Options;
@@ -296,7 +296,7 @@ export interface RpcResponse<T> {
 }
 
 export interface Log {
-    address: string;
+    id: string;
     topics: string[];
     data: string;
     ix_hash: string;
@@ -305,14 +305,14 @@ export interface Log {
 }
 
 export interface LogFilter {
-    address: string;
+    id: string;
     height: [start: number, end: number];
     topics?: NestedArray<string>;
 }
 
 
 export interface Log {
-    address: string;
+    id: string;
     topics: string[];
     data: string;
     ix_hash: string;
@@ -321,7 +321,7 @@ export interface Log {
 }
 
 export interface LogFilter {
-    address: string;
+    id: string;
     height: [start: number, end: number];
     topics?: NestedArray<string>;
 }

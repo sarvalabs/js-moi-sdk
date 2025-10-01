@@ -116,7 +116,7 @@ export declare class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getAccountState(address: string, options?: Options): Promise<AccountState>;
+    getAccountState(id: string, options?: Options): Promise<AccountState>;
     /**
      * Retrieves the account meta information for the specified address.
      *
@@ -126,7 +126,7 @@ export declare class BaseProvider extends AbstractProvider {
      * account meta information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getAccountMetaInfo(address: string): Promise<AccountMetaInfo>;
+    getAccountMetaInfo(id: string): Promise<AccountMetaInfo>;
     /**
      * Retrieves the content from a specific address.
      *
@@ -248,7 +248,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getSyncStatus(address?: string): Promise<SyncStatus>;
+    getSyncStatus(id?: string): Promise<SyncStatus>;
     /**
      * Handles the interaction without modifying the account's current state.
      *
