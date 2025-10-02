@@ -102,13 +102,16 @@ export interface InteractionReceipt {
 }
 
 export interface AssetInfo {
+    asset_id: string;
     symbol: string;
-    operator: string;
-    supply: string;
     dimension: string;
-    standard: string;
-    is_logical: boolean;
-    is_stateful: boolean;
+    decimals: string;
+    creator: string;
+    manager: string;
+    max_supply: string;
+    circulating_supply: string;
+    enable_events: string;
+    metadata: Record<string, Uint8Array>
     logic_id?: string;
 }
 

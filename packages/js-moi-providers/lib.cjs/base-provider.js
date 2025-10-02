@@ -509,7 +509,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                 id: id,
                 options: options ? options : defaultOptions
             };
-            const response = await this.execute("moi.Registry", params);
+            const response = await this.execute("moi.Deeds", params);
             return this.processResponse(response);
         }
         catch (error) {
