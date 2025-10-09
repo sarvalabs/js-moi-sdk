@@ -9,7 +9,7 @@ export class ParticipantCreate {
   private _keys: KeyAddPayload[] = [];
   private _value?: AssetActionPayload;
   private signer: Signer;
-
+ 
   constructor(signer: Signer) {
     this.signer = signer;
   }

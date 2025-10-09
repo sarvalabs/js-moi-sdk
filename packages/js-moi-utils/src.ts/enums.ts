@@ -5,6 +5,7 @@
 export enum AssetStandard {
     MAS0 = 0,
     MAS1 = 1,
+    MASX = 65535,
 }
 
 /**
