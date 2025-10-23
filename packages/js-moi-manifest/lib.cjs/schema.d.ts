@@ -30,6 +30,9 @@ export declare class Schema {
                     };
                 };
             };
+            version: {
+                kind: string;
+            };
         };
     };
     static PISA_DEPS_SCHEMA: {

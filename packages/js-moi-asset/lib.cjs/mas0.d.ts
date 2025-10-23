@@ -1,14 +1,22 @@
 export declare namespace MAS0 {
     enum Endpoint {
         TRANSFER = "Transfer",
+        TRANSFERFROM = "TransferFrom",
         MINT = "Mint",
         LOCKUP = "Lockup",
         BURN = "Burn",
         APPROVE = "Approve",
         RELEASE = "Release",
-        REVOKE = "Revoke"
+        REVOKE = "Revoke",
+        SYMBOL = "Symbol",
+        BALANCEOF = "BalanceOf"
     }
     interface Transfer {
+        beneficiary: Uint8Array;
+        amount: number | bigint;
+    }
+    interface TransferFrom {
+        benefactor: Uint8Array;
         beneficiary: Uint8Array;
         amount: number | bigint;
     }
@@ -36,7 +44,10 @@ export declare namespace MAS0 {
     interface Revoke {
         beneficiary: Uint8Array;
     }
-    type OperationPayload = Transfer | Mint | Burn | Approve | Lockup | Release | Revoke;
+    interface BalanceOf {
+        address: Uint8Array;
+    }
+    type OperationPayload = Transfer | Mint | Burn | Approve | Lockup | Release | Revoke | BalanceOf;
     /** Union of all operation payloads */
     type Operation = {
         callsite: Endpoint.TRANSFER;
@@ -59,6 +70,9 @@ export declare namespace MAS0 {
     } | {
         callsite: Endpoint.REVOKE;
         payload: Revoke;
+    } | {
+        callsite: Endpoint.BALANCEOF;
+        payload: BalanceOf;
     };
 }
 //# sourceMappingURL=mas0.d.ts.map

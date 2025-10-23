@@ -219,6 +219,24 @@ export class Wallet extends Signer {
     }
 
     /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    public get identifier(): Identifier {
+        return this.getIdentifier()
+    }
+
+    /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    public get keyId(): number {
+        return this.getKeyId()
+    }
+
+    /**
      * Curve associated with the wallet.
      * 
      * @readonly
@@ -237,19 +255,19 @@ export class Wallet extends Signer {
     /**
      * Retrieves the public key associated with the wallet.
      *
-     * @returns {Promise<string>} A promise that resolves to the public key
+     * @returns {string} A promise that resolves to the public key
      */
-    public getPublicKey(): Promise<string> {
-        return Promise.resolve(privateMapGet(this, __vault)._public);
+    public getPublicKey(): Hex {
+        return privateMapGet(this, __vault)._public;
     }
 
     /**
      * Retrieves the identifier for the wallet.
      *
-     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
-    public async getIdentifier(): Promise<Identifier> {
-        const publickey = await this.getPublicKey();
+    public getIdentifier(): Identifier {
+        const publickey = this.getPublicKey();
         const fingerprint = hexToBytes(publickey).slice(1, 25);
 
         return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
@@ -258,10 +276,10 @@ export class Wallet extends Signer {
     /**
      * Retrieves the key identifier.
      *
-     * @returns {Promise<number>} A promise that resolves to the key index.
+     * @returns {number} A promise that resolves to the key index.
      */
-    public getKeyId(): Promise<number> {
-        return Promise.resolve(this.key_index);
+    public getKeyId(): number {
+        return this.key_index;
     }
 
     /**

@@ -1,11 +1,11 @@
 import { AssetCreationResult, AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType } from "js-moi-utils";
 import { MAS0 } from "./mas0";
 import { documentEncode, Schema } from "js-polo";
-import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
 import { Signer } from "js-moi-signer";
 import { AssetCreatePayload, IxParticipant } from "js-moi-providers";
 import { SARGA_ADDRESS } from "js-moi-constants";
-import { InteractionContext } from "js-moi-wallet";
+import { InteractionContext } from "js-moi-interactions";
 
 export class MAS0AssetLogic {
     assetId: string
@@ -137,6 +137,42 @@ export class MAS0AssetLogic {
             payload: {
                 asset_id: this.assetId as Hex,
                 callsite: MAS0.Endpoint.TRANSFER,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: participants,
+            signer: this.signer,
+        })
+    }
+
+    public transferFrom(benefactor: string, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE> {
+        const payload: MAS0.TransferFrom = {
+            benefactor: hexToBytes(benefactor),
+            beneficiary: hexToBytes(beneficiary),
+            amount: amount,
+        }
+
+        const participants: IxParticipant[] = [
+            {
+                id: beneficiary as Hex,
+                lock_type: LockType.MUTATE_LOCK,
+            },
+            {
+                id: benefactor as Hex,
+                lock_type: LockType.MUTATE_LOCK,
+            },
+            {
+                id: this.assetId as Hex,
+                lock_type: LockType.NO_LOCK, 
+            }
+        ]
+
+        const rawPayload = this.polorize<MAS0.Transfer>(payload, TRANSFER_FROM_SCHEMA)
+
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.TRANSFERFROM,
                 calldata: bytesToHex(rawPayload) as Hex,
             },
             participants: participants,
@@ -278,6 +314,40 @@ export class MAS0AssetLogic {
             },
             participants: participants,
             signer: this.signer,
-        })
+        });
+    }
+
+    // Readonly routines
+
+    public symbol() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.SYMBOL,
+                // calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: [],
+            signer: this.signer,
+        }) 
+    }
+
+    public balanceOf(id: string) {
+        const payload: MAS0.BalanceOf = {
+            address: hexToBytes(id)
+        }
+
+        const rawPayload = this.polorize<MAS0.BalanceOf>(payload, BALANCEOF_SCHEMA)
+
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.BALANCEOF,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: [],
+            signer: this.signer,
+        }) 
     }
 }

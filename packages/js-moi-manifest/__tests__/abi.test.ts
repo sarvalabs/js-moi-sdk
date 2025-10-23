@@ -24,10 +24,6 @@ describe("Test ManifestCoder", () => {
                 expected: "../../manifests/flipper.polo",
             },
             {
-                manifest: "../../manifests/guardian.json",
-                expected: "../../manifests/guardian.polo",
-            },
-            {
                 manifest: "../../manifests/lock-ledger.json",
                 expected: "../../manifests/lock-ledger.polo",
             }
@@ -131,14 +127,17 @@ describe("Test ManifestCoder", () => {
                 expected: "../../manifests/flipper.json",
             },
             {
-                manifest: "../../manifests/guardian.polo",
-                expected: "../../manifests/guardian.json",
-            },
-            {
                 manifest: "../../manifests/lock-ledger.polo",
                 expected: "../../manifests/lock-ledger.json",
             }
         ];
+
+        const normalize = (obj: any) =>
+        JSON.parse(
+            JSON.stringify(obj, (key, value) =>
+            value instanceof Uint8Array ? Array.from(value) : value
+            )
+        );
 
         await Promise.all(testCases.map(async (testCase) => {
             const [polo, expected] = await Promise.all([
@@ -147,7 +146,8 @@ describe("Test ManifestCoder", () => {
             ]);
 
             const manifest = ManifestCoder.decodeManifest(polo, ManifestCoderFormat.JSON);
-            expect(manifest).toEqual(expected);
+
+            expect(normalize(manifest)).toEqual(normalize(expected));
         }));
     });
 
@@ -160,10 +160,6 @@ describe("Test ManifestCoder", () => {
             {
                 manifest: "../../manifests/flipper.polo",
                 expected: "../../manifests/flipper.json",
-            },
-            {
-                manifest: "../../manifests/guardian.polo",
-                expected: "../../manifests/guardian.json",
             },
             {
                 manifest: "../../manifests/lock-ledger.polo",

@@ -221,6 +221,22 @@ class Wallet extends js_moi_signer_1.Signer {
         js_moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    get identifier() {
+        return this.getIdentifier();
+    }
+    /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    get keyId() {
+        return this.getKeyId();
+    }
+    /**
      * Curve associated with the wallet.
      *
      * @readonly
@@ -234,28 +250,28 @@ class Wallet extends js_moi_signer_1.Signer {
     /**
      * Retrieves the public key associated with the wallet.
      *
-     * @returns {Promise<string>} A promise that resolves to the public key
+     * @returns {string} A promise that resolves to the public key
      */
     getPublicKey() {
-        return Promise.resolve(privateMapGet(this, __vault)._public);
+        return privateMapGet(this, __vault)._public;
     }
     /**
      * Retrieves the identifier for the wallet.
      *
-     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
-    async getIdentifier() {
-        const publickey = await this.getPublicKey();
+    getIdentifier() {
+        const publickey = this.getPublicKey();
         const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(1, 25);
         return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: 0, tag: js_moi_identifiers_1.ParticipantTagV0 });
     }
     /**
      * Retrieves the key identifier.
      *
-     * @returns {Promise<number>} A promise that resolves to the key index.
+     * @returns {number} A promise that resolves to the key index.
      */
     getKeyId() {
-        return Promise.resolve(this.key_index);
+        return this.key_index;
     }
     /**
      * Address associated with the wallet.

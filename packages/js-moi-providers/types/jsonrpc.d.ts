@@ -46,6 +46,15 @@ export interface AccountState {
     asset_registry: string;
 }
 
+export interface AccountKey {
+  id: number; 
+  publicKey: string;
+  weight: number;
+  signature_algorithm: number;
+  revoked: boolean;
+  sequence_id: number;
+}
+
 export interface AccountMetaInfo {
     type: number;
     id: string;
@@ -145,6 +154,11 @@ export interface AccountParamsBase {
 }
 
 export interface AccountStateParams {
+    id: string,
+    options?: Options 
+}
+
+export interface AccountKeyParams {
     id: string,
     options?: Options 
 }

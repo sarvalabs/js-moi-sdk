@@ -6,7 +6,7 @@ const mas0_1 = require("./mas0");
 const js_polo_1 = require("js-polo");
 const mas0_schemas_1 = require("./mas0-schemas");
 const js_moi_constants_1 = require("js-moi-constants");
-const js_moi_wallet_1 = require("js-moi-wallet");
+const js_moi_interactions_1 = require("js-moi-interactions");
 class MAS0AssetLogic {
     assetId;
     signer;
@@ -32,7 +32,7 @@ class MAS0AssetLogic {
             enable_events: enableEvents,
             manager: manager,
         };
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_CREATE,
             payload: payload,
             participants: [],
@@ -55,7 +55,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.MINT_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -77,7 +77,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.BURN_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -104,11 +104,43 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.TRANSFER_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
                 callsite: mas0_1.MAS0.Endpoint.TRANSFER,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
+    }
+    transferFrom(benefactor, beneficiary, amount) {
+        const payload = {
+            benefactor: (0, js_moi_utils_1.hexToBytes)(benefactor),
+            beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
+            amount: amount,
+        };
+        const participants = [
+            {
+                id: beneficiary,
+                lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
+            },
+            {
+                id: benefactor,
+                lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
+            },
+            {
+                id: this.assetId,
+                lock_type: js_moi_utils_1.LockType.NO_LOCK,
+            }
+        ];
+        const rawPayload = this.polorize(payload, mas0_schemas_1.TRANSFER_FROM_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.TRANSFERFROM,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: participants,
@@ -136,7 +168,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.APPROVE_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -162,7 +194,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.REVOKE_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -193,7 +225,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.LOCKUP_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -225,7 +257,7 @@ class MAS0AssetLogic {
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.RELEASE_SCHEMA);
-        return new js_moi_wallet_1.InteractionContext({
+        return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: this.assetId,
@@ -233,6 +265,35 @@ class MAS0AssetLogic {
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: participants,
+            signer: this.signer,
+        });
+    }
+    // Readonly routines
+    symbol() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.SYMBOL,
+                // calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    balanceOf(id) {
+        const payload = {
+            address: (0, js_moi_utils_1.hexToBytes)(id)
+        };
+        const rawPayload = this.polorize(payload, mas0_schemas_1.BALANCEOF_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.BALANCEOF,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
             signer: this.signer,
         });
     }

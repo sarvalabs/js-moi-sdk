@@ -14,6 +14,9 @@ export class JsonManifestCoder extends BaseManifestCoder {
                 kind: "integer",
             },
             engine: Schema.PISA_ENGINE_SCHEMA,
+            kind: {
+                kind: "string",
+            },
             elements: {
                 kind: "array",
                 fields: {

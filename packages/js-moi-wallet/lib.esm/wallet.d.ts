@@ -1,6 +1,7 @@
 import { Buffer } from "buffer";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
+import { Hex } from "js-moi-utils";
 import { Keystore } from "../types/keystore";
 import { type WalletOption } from "../types/wallet";
 import { Identifier } from "js-moi-identifiers";
@@ -71,6 +72,18 @@ export declare class Wallet extends Signer {
      */
     get publicKey(): string;
     /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    get identifier(): Identifier;
+    /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    get keyId(): number;
+    /**
      * Curve associated with the wallet.
      *
      * @readonly
@@ -79,21 +92,21 @@ export declare class Wallet extends Signer {
     /**
      * Retrieves the public key associated with the wallet.
      *
-     * @returns {Promise<string>} A promise that resolves to the public key
+     * @returns {string} A promise that resolves to the public key
      */
-    getPublicKey(): Promise<string>;
+    getPublicKey(): Hex;
     /**
      * Retrieves the identifier for the wallet.
      *
-     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
-    getIdentifier(): Promise<Identifier>;
+    getIdentifier(): Identifier;
     /**
      * Retrieves the key identifier.
      *
-     * @returns {Promise<number>} A promise that resolves to the key index.
+     * @returns {number} A promise that resolves to the key index.
      */
-    getKeyId(): Promise<number>;
+    getKeyId(): number;
     /**
      * Address associated with the wallet.
      *

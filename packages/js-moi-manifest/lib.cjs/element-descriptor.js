@@ -31,7 +31,7 @@ class ElementDescriptor {
                     };
                     this.methodDefs.set(methodData.name, methodDef);
                     break;
-                case "routine":
+                case "callable":
                     const routineData = element.data;
                     const callsite = {
                         ptr: element.ptr,

@@ -8,12 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  # test:
-  #   name: "Test"
-  #   uses: ./.github/workflows/test.yml
+  test:
+    name: "Test"
+    uses: ./.github/workflows/test.yml
 
   publish:
     name: "Publish Packages"
+    needs: test
     runs-on: ubuntu-latest
 
     steps:

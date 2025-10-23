@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = exports.isClass = exports.isMap = exports.isArray = exports.isPrimitiveType = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
-const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
+const primitiveTypes = ["null", "bool", "bytes", "identifier", "string", "u64", "u256", "i64", "i256", "bigint"];
 const isPrimitiveType = (type) => {
     return primitiveTypes.includes(type);
 };
@@ -48,6 +48,9 @@ class Schema {
                         kind: "string",
                     },
                 },
+            },
+            version: {
+                kind: "string"
             }
         },
     };
@@ -370,7 +373,7 @@ class Schema {
             case "bool":
                 return "bool";
             case "bytes":
-            case "address":
+            case "identifier":
                 return "bytes";
             case "string":
                 return "string";

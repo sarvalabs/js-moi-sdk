@@ -1,9 +1,9 @@
 import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
 import { MAS0 } from "./mas0";
 import { documentEncode } from "js-polo";
-import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
 import { SARGA_ADDRESS } from "js-moi-constants";
-import { InteractionContext } from "js-moi-wallet";
+import { InteractionContext } from "js-moi-interactions";
 export class MAS0AssetLogic {
     assetId;
     signer;
@@ -106,6 +106,38 @@ export class MAS0AssetLogic {
             payload: {
                 asset_id: this.assetId,
                 callsite: MAS0.Endpoint.TRANSFER,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
+    }
+    transferFrom(benefactor, beneficiary, amount) {
+        const payload = {
+            benefactor: hexToBytes(benefactor),
+            beneficiary: hexToBytes(beneficiary),
+            amount: amount,
+        };
+        const participants = [
+            {
+                id: beneficiary,
+                lock_type: LockType.MUTATE_LOCK,
+            },
+            {
+                id: benefactor,
+                lock_type: LockType.MUTATE_LOCK,
+            },
+            {
+                id: this.assetId,
+                lock_type: LockType.NO_LOCK,
+            }
+        ];
+        const rawPayload = this.polorize(payload, TRANSFER_FROM_SCHEMA);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.TRANSFERFROM,
                 calldata: bytesToHex(rawPayload),
             },
             participants: participants,
@@ -230,6 +262,35 @@ export class MAS0AssetLogic {
                 calldata: bytesToHex(rawPayload),
             },
             participants: participants,
+            signer: this.signer,
+        });
+    }
+    // Readonly routines
+    symbol() {
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.SYMBOL,
+                // calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    balanceOf(id) {
+        const payload = {
+            address: hexToBytes(id)
+        };
+        const rawPayload = this.polorize(payload, BALANCEOF_SCHEMA);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: MAS0.Endpoint.BALANCEOF,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: [],
             signer: this.signer,
         });
     }

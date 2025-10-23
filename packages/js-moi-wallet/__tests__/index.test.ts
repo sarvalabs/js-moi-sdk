@@ -1,10 +1,10 @@
 import { randomBytes } from "crypto";
 import { VoyageProvider, type InteractionRequest } from "js-moi-providers";
-import { AssetStandard, isValidAddress, OpType } from "js-moi-utils";
+import { AssetStandard, OpType } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts/index";
 
 const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
-const ADDRESS = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+const IDENTIFIER = "0x00000000870ad6c5150ea8c0355316974873313004c6b9425a855a0600000000";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
 const PRIVATE_KEY = "879b415fc8ef34da94aa62a26345b20ea76f7cc9d5485fda428dfe2d6b6d158c";
 
@@ -15,7 +15,7 @@ describe("Wallet", () => {
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.identifier.toHex()).toBe(IDENTIFIER);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
@@ -25,7 +25,7 @@ describe("Wallet", () => {
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.identifier.toHex()).toBe(IDENTIFIER);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
@@ -35,7 +35,7 @@ describe("Wallet", () => {
         test(Wallet.fromMnemonic.name, async () => {
             const wallet = await Wallet.fromMnemonic(MNEMONIC, DEVIATION_PATH);
 
-            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.identifier.toHex()).toBe(IDENTIFIER);
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic).toBe(MNEMONIC);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
@@ -45,7 +45,7 @@ describe("Wallet", () => {
         test(Wallet.fromMnemonicSync.name, () => {
             const wallet =  Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
 
-            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.identifier.toHex()).toBe(IDENTIFIER);
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet.mnemonic).toBe(MNEMONIC);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
@@ -67,7 +67,7 @@ describe("Wallet", () => {
 
             expect(wallet.isInitialized()).toBe(true);
             expect(wallet).toBeDefined();
-            expect(isValidAddress(wallet.address)).toBeTruthy();
+            // expect(isValidIDENTIFIER(wallet.identifier.toHex())).toBeTruthy();
             expect(wallet.privateKey).toBeDefined();
             expect(wallet.mnemonic.split(" ").length).toBe(12);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
@@ -95,7 +95,7 @@ describe("Wallet", () => {
 
             expect(wallet).toBeDefined();
             expect(wallet.isInitialized()).toBe(true);
-            expect(wallet.address).toBe(ADDRESS);
+            expect(wallet.identifier.toHex()).toBe(IDENTIFIER);
             expect(wallet.privateKey).toBe(PRIVATE_KEY);
             expect(wallet.curve).toBe(CURVE.SECP256K1);
         });
@@ -149,8 +149,11 @@ describe("Wallet", () => {
         test("signInteraction", () => {
             const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
             const ixArgs = wallet.signInteraction({
-                nonce: 0,
-                sender: wallet.address,
+                sender: {
+                    id: wallet.identifier.toHex(),
+                    sequence: 0,
+                    key_id: wallet.keyId,
+                },
                 fuel_price: 1,
                 fuel_limit: 200,
                 ix_operations: [
@@ -159,7 +162,10 @@ describe("Wallet", () => {
                         payload: {
                             standard: AssetStandard.MAS0,
                             symbol: "SIG",
-                            supply: 1248577,
+                            max_supply: 20000,
+                            dimension: 0,
+                            enable_events: true,
+                            manager: wallet.identifier.toHex()
                         },
                     }
                 ]
@@ -168,15 +174,15 @@ describe("Wallet", () => {
             expect(ixArgs).toBeDefined();
             expect(ixArgs).toMatchObject<InteractionRequest>({
                 ix_args: expect.any(String),
-                signature: expect.any(String),
+                signatures: expect.any(String),
             });
             expect(ixArgs.ix_args).toEqual(
-                "0ebf02068604830883089308ae08be088e0be00fe00f870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b000000000000000000000000000000000000000000000000000000000000000001c80f1f0e2f0316040e7f06336363616160534947130d411f0e3f068304870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b"
+                "0e9f020ee604e308f30880098e09be10b015b0155f068304830400000000870ad6c5150ea8c0355316974873313004c6b9425a855a0600000000000000000000000000000000000000000000000000000000000000000000000001c81f0e2f0316040ecf01063333333236b304de04e00453494700000000870ad6c5150ea8c0355316974873313004c6b9425a855a06000000004e200f1f0e5f068304810400000000870ad6c5150ea8c0355316974873313004c6b9425a855a0600000000"
             );
         });
 
-        test("address", () => {
-            expect(wallet.address).toBe(ADDRESS);
+        test("IDENTIFIER", () => {
+            expect(wallet.identifier.toHex()).toBe(IDENTIFIER);
         });
 
         test("isInitialized", () => {

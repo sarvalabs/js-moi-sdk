@@ -23,8 +23,8 @@ export abstract class Signer {
     }
 
     abstract connect(provider: AbstractProvider): void;
-    abstract getKeyId(): Promise<number>;
-    abstract getIdentifier(): Promise<Identifier>;
+    abstract getKeyId(): number;
+    abstract getIdentifier(): Identifier;
     abstract sign(message: Uint8Array, sigAlgo: SigType): string;
     abstract isInitialized(): boolean;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;

@@ -9,6 +9,7 @@ import {
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import type {
+    AccountKeyParams,
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding,
@@ -308,6 +309,31 @@ export class BaseProvider extends AbstractProvider {
             }
     
             const response = await this.execute("moi.AccountState", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves the account state for the specified address.
+     * 
+     * @param {string} address - The address for which to retrieve the account 
+     * state.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<AccountState>} A Promise that resolves to the account 
+     * state.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getAccountKeys(id: string, options?: Options): Promise<AccountState> {
+        try {
+            const params: AccountKeyParams = {
+                id: id,
+                options: options ? options : defaultOptions
+            }
+    
+            const response = await this.execute("moi.AccountKeys", params)
 
             return this.processResponse(response)
         } catch (error) {

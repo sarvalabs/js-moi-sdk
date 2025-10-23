@@ -86,10 +86,10 @@
             "path": "./packages/js-moi-logic/tsconfig.esm.json"
         },
         {
-            "path": "./packages/js-moi-participant/tsconfig.esm.json"
+            "path": "./packages/js-moi-interactions/tsconfig.esm.json"
         },
         {
-            "path": "./packages/js-moi-participant/tsconfig.cjs.json"
+            "path": "./packages/js-moi-interactions/tsconfig.cjs.json"
         },
         {
             "path": "./packages/js-moi-asset/tsconfig.esm.json"

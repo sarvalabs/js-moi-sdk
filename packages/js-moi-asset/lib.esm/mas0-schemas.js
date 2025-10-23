@@ -5,6 +5,14 @@ export const TRANSFER_SCHEMA = {
         amount: { kind: "integer" }
     }
 };
+export const TRANSFER_FROM_SCHEMA = {
+    kind: "struct",
+    fields: {
+        benefactor: { kind: "bytes" },
+        beneficiary: { kind: "bytes" },
+        amount: { kind: "integer" }
+    }
+};
 export const BURN_SCHEMA = {
     kind: "struct",
     fields: {
@@ -45,6 +53,12 @@ export const REVOKE_SCHEMA = {
     kind: "struct",
     fields: {
         beneficiary: { kind: "bytes" }
+    }
+};
+export const BALANCEOF_SCHEMA = {
+    kind: "struct",
+    fields: {
+        address: { kind: "bytes" }
     }
 };
 //# sourceMappingURL=mas0-schemas.js.map

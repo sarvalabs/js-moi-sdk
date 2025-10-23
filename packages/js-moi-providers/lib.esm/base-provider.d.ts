@@ -118,6 +118,17 @@ export declare class BaseProvider extends AbstractProvider {
      */
     getAccountState(id: string, options?: Options): Promise<AccountState>;
     /**
+     * Retrieves the account state for the specified address.
+     *
+     * @param {string} address - The address for which to retrieve the account
+     * state.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<AccountState>} A Promise that resolves to the account
+     * state.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getAccountKeys(id: string, options?: Options): Promise<AccountState>;
+    /**
      * Retrieves the account meta information for the specified address.
      *
      * @param {string} address - The address for which to retrieve the account

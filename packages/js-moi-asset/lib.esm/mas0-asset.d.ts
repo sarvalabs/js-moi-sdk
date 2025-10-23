@@ -1,6 +1,6 @@
 import { OpType } from "js-moi-utils";
 import { Signer } from "js-moi-signer";
-import { InteractionContext } from "js-moi-wallet";
+import { InteractionContext } from "js-moi-interactions";
 export declare class MAS0AssetLogic {
     assetId: string;
     signer: Signer;
@@ -11,9 +11,12 @@ export declare class MAS0AssetLogic {
     mint(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     burn(amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     transfer(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
+    transferFrom(benefactor: string, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     approve(beneficiary: string, amount: number | bigint, expiresAt: number): InteractionContext<OpType.ASSET_INVOKE>;
     revoke(beneficiary: string): InteractionContext<OpType.ASSET_INVOKE>;
     lockup(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     release(benefactor: string, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
+    symbol(): InteractionContext<OpType.ASSET_INVOKE>;
+    balanceOf(id: string): InteractionContext<OpType.ASSET_INVOKE>;
 }
 //# sourceMappingURL=mas0-asset.d.ts.map

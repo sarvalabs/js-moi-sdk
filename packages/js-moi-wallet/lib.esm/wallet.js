@@ -182,6 +182,22 @@ export class Wallet extends Signer {
         ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
     /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    get identifier() {
+        return this.getIdentifier();
+    }
+    /**
+     * Identifier associated with the wallet.
+     * .
+     * @readonly
+     */
+    get keyId() {
+        return this.getKeyId();
+    }
+    /**
      * Curve associated with the wallet.
      *
      * @readonly
@@ -195,28 +211,28 @@ export class Wallet extends Signer {
     /**
      * Retrieves the public key associated with the wallet.
      *
-     * @returns {Promise<string>} A promise that resolves to the public key
+     * @returns {string} A promise that resolves to the public key
      */
     getPublicKey() {
-        return Promise.resolve(privateMapGet(this, __vault)._public);
+        return privateMapGet(this, __vault)._public;
     }
     /**
      * Retrieves the identifier for the wallet.
      *
-     * @returns {Promise<Identifier>} A promise that resolves to the wallet's identifier.
+     * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
-    async getIdentifier() {
-        const publickey = await this.getPublicKey();
+    getIdentifier() {
+        const publickey = this.getPublicKey();
         const fingerprint = hexToBytes(publickey).slice(1, 25);
         return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
     }
     /**
      * Retrieves the key identifier.
      *
-     * @returns {Promise<number>} A promise that resolves to the key index.
+     * @returns {number} A promise that resolves to the key index.
      */
     getKeyId() {
-        return Promise.resolve(this.key_index);
+        return this.key_index;
     }
     /**
      * Address associated with the wallet.

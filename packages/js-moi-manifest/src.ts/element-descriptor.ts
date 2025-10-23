@@ -35,7 +35,7 @@ export class ElementDescriptor {
                     };
                     this.methodDefs.set(methodData.name, methodDef);
                     break;
-                case "routine":
+                case "callable":
                     const routineData = element.data as LogicManifest.Routine;
                     const callsite: LogicManifest.CallSite = {
                         ptr: element.ptr,

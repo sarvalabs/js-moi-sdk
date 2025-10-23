@@ -28,7 +28,8 @@ export class LogicFactory extends LogicBase {
     protected createPayload(ixObject: LogicIxObject): LogicDeployPayload {
         const payload = {
             manifest: this.encodedManifest,
-            callsite: ixObject.routine.name
+            callsite: ixObject.routine.name,
+            logic_id: "0x",
         } as LogicDeployPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
