@@ -1,5 +1,6 @@
-Asset Module
-=============
+=====
+Asset
+=====
 
 This module provides classes and utilities for creating, managing, and interacting with on-chain assets
 within the MOI framework. It defines three main components:
@@ -309,13 +310,3 @@ Readonly Routines
    .. code-block:: javascript
 
       const balance = await mas0.balanceOf(walletAddress).call();
-
-
-Summary
--------
-
-- **AssetFactory** → Builds creation interactions for any asset type.
-- **AssetDriver** → Provides a generic interface for logic interaction.
-- **MAS0AssetLogic** → Implements MAS0-standard logic, offering full asset lifecycle control.
-
-Together, these classes provide a complete system for defining, deploying, and interacting with MOI assets in JavaScript.

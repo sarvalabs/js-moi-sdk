@@ -1,5 +1,6 @@
-js-moi-interactions
-===================
+============
+Interactions
+============
 
 Overview
 --------
@@ -131,12 +132,3 @@ controlled, logic-based transfer process.
 
     const receipt = await response.wait();
     console.log("Receipt:", receipt);
-
-In Summary
-----------
-
-The **js-moi-interactions** package streamlines the creation and execution of
-participant and account-level interactions in the MOI protocol.  
-By using these builders, developers can securely manage user identity,
-account permissions, and hierarchical ownership structures on-chain with
-concise, declarative JavaScript code.

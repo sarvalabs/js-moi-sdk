@@ -24,7 +24,9 @@ need to unlock the full potential of the MOI Protocol.
    manifest-call-encoder
    providers
    signer
+   asset
    logic
+   interactions
    bip39
    hierarchical-deterministic-node
    hierarchical-deterministic-wallet
