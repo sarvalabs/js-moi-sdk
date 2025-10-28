@@ -35,7 +35,7 @@ and optionally include an asset payload for initial value assignment.
 
 - Initialize a new participant ID
 - Add one or more cryptographic keys with configurable weights
-- Define asset payloads (e.g., token allocations)
+- Define asset payloads (e.g: token allocations)
 - Construct and send the participant creation request
 
 **Example:**
