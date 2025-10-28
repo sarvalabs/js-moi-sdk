@@ -195,10 +195,6 @@ export class MAS0AssetLogic {
             {
                 id: this.assetId as Hex,
                 lock_type: LockType.NO_LOCK, 
-            },
-            {
-                id: this.assetId as Hex,
-                lock_type: LockType.NO_LOCK, 
             }
         ]
 

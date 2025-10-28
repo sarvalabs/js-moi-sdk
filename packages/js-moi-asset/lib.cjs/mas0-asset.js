@@ -161,10 +161,6 @@ class MAS0AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.NO_LOCK,
-            },
-            {
-                id: this.assetId,
-                lock_type: js_moi_utils_1.LockType.NO_LOCK,
             }
         ];
         const rawPayload = this.polorize(payload, mas0_schemas_1.APPROVE_SCHEMA);

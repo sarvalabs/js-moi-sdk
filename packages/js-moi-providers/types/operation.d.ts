@@ -12,7 +12,7 @@ export interface LogicPayload {
      *
      * It is required for `LogicDeploy` and `LogicEnlist` operations.
      */
-    logic_id: Hex;
+    logic_id?: Hex;
     /**
      * The callsite name of the logic contract.
      *

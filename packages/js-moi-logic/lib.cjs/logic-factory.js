@@ -25,7 +25,8 @@ class LogicFactory extends logic_base_1.LogicBase {
     createPayload(ixObject) {
         const payload = {
             manifest: this.encodedManifest,
-            callsite: ixObject.routine.name
+            callsite: ixObject.routine.name,
+            logic_id: "0x",
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);

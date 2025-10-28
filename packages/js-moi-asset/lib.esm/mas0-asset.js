@@ -158,10 +158,6 @@ export class MAS0AssetLogic {
             {
                 id: this.assetId,
                 lock_type: LockType.NO_LOCK,
-            },
-            {
-                id: this.assetId,
-                lock_type: LockType.NO_LOCK,
             }
         ];
         const rawPayload = this.polorize(payload, APPROVE_SCHEMA);

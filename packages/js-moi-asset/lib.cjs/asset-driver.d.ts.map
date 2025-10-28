@@ -1,0 +1,1 @@
+{"version":3,"file":"asset-driver.d.ts","sourceRoot":"","sources":["../src.ts/asset-driver.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,cAAc,CAAC;AAC3C,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAC;AAChD,OAAO,EAAE,MAAM,EAAE,MAAM,eAAe,CAAC;AAEvC,qBAAa,WAAY,SAAQ,WAAW;gBAC5B,OAAO,EAAE,MAAM,EAAE,QAAQ,EAAE,aAAa,CAAC,QAAQ,EAAE,GAAG,EAAE,MAAM;CAG7E"}
