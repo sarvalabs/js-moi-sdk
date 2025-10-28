@@ -46,11 +46,12 @@ AssetFactory
          - ``dimension`` (default 0)
          - ``enable_events``
          - ``manager`` (converted to Hex)
+         - ``logic_payload``
 
       2. If a ``manifest`` is provided:
          - Searches for a *deploy* routine matching the given ``callsite``.
          - Validates argument counts.
-         - Encodes the manifest and the routine call data (if applicable).
+         - Encodes the manifest and the routine calldata (if applicable).
 
       3. Returns an :class:`InteractionContext` initialized for ``ASSET_CREATE``.
 
@@ -63,7 +64,11 @@ AssetFactory
              "GOLD",
              1000000n,
              managerAddress,
-             true
+             true,
+             manifest,
+             callsite,
+             1000, // calldata arg 1
+             "JOHN" // calldata arg 2
         );
 
         const response = await ctx.send();

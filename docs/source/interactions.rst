@@ -5,7 +5,7 @@ Interactions
 Overview
 --------
 
-The **js-moi-interactions** package provides high-level abstractions to construct and
+The Interactions package provides high-level abstractions to construct and
 send **participant** and **account-related interactions** in the MOI protocol.
 
 These interactions are essential for managing identity, access control, and
