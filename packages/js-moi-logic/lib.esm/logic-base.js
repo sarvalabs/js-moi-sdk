@@ -1,6 +1,6 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, LockType, OpType } from "js-moi-utils";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**
@@ -123,7 +123,7 @@ export class LogicBase extends ElementDescriptor {
             sender: option.sender ?? {
                 id: ((await this.signer?.getIdentifier()).toString()),
                 key_id: (await this.signer?.getKeyId()),
-                sequence: option.nonce,
+                sequence: option.sequence != null ? option.sequence : (await this.signer?.getNonce()),
             },
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
@@ -147,6 +147,12 @@ export class LogicBase extends ElementDescriptor {
                         type: opType,
                         payload: payload,
                     },
+                ];
+                params.participants = [
+                    {
+                        id: payload.logic_id,
+                        lock_type: LockType.MUTATE_LOCK,
+                    }
                 ];
                 break;
             default:

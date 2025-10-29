@@ -98,7 +98,7 @@ var ElementType;
     ElementType["TYPEDEF"] = "typedef";
     ElementType["CLASS"] = "class";
     ElementType["STATE"] = "state";
-    ElementType["ROUTINE"] = "routine";
+    ElementType["ROUTINE"] = "callable";
     ElementType["METHOD"] = "method";
     ElementType["EVENT"] = "event";
 })(ElementType || (exports.ElementType = ElementType = {}));

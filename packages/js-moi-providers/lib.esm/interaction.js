@@ -1,5 +1,5 @@
 import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
-import { ParticipantId, AssetId, Identifier } from "js-moi-identifiers";
+import { ParticipantId, AssetId, Identifier, LogicId } from "js-moi-identifiers";
 import { ZERO_ADDRESS, KMOI_ASSET_ID } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 import { bytesToHex } from "@noble/secp256k1";
@@ -261,7 +261,7 @@ function processLogicDeploy(payload) {
 function processLogicAction(payload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: new AssetId(payload.logic_id).toBytes(),
+        logic_id: new LogicId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     };
     return polorize(processed, logicSchema);

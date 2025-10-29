@@ -29,7 +29,6 @@ export class LogicFactory extends LogicBase {
         const payload = {
             manifest: this.encodedManifest,
             callsite: ixObject.routine.name,
-            logic_id: "0x",
         } as LogicDeployPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
@@ -82,7 +81,7 @@ export class LogicFactory extends LogicBase {
     public deploy(builderName: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse> {
         const builder = Object.values(this.manifest.elements)
         .find(element => {
-            if(element.kind === "routine"){
+            if(element.kind === "callable"){
                 const routine = element.data as LogicManifest.Routine;
                 return routine.kind === "deploy" && 
                 builderName === routine.name;

@@ -77,7 +77,7 @@ export declare enum ElementType {
     TYPEDEF = "typedef",
     CLASS = "class",
     STATE = "state",
-    ROUTINE = "routine",
+    ROUTINE = "callable",
     METHOD = "method",
     EVENT = "event"
 }

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createRoutineOption = exports.RoutineOption = void 0;
 class RoutineOption {
-    nonce;
+    sequence;
     sender;
     fuelLimit;
     fuelPrice;

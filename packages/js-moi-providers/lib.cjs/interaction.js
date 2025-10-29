@@ -274,7 +274,7 @@ function processLogicDeploy(payload) {
 function processLogicAction(payload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: new js_moi_identifiers_1.AssetId(payload.logic_id).toBytes(),
+        logic_id: new js_moi_identifiers_1.LogicId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     };
     return polorize(processed, js_moi_utils_1.logicSchema);

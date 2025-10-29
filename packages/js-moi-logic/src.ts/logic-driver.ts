@@ -48,7 +48,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
         const routines = {};
 
         this.manifest.elements.forEach((element: LogicManifest.Element) => {
-            if (element.kind !== "routine") {
+            if (element.kind !== "callable") {
                 return;
             }
 

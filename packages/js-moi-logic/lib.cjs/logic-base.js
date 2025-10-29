@@ -126,7 +126,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             sender: option.sender ?? {
                 id: ((await this.signer?.getIdentifier()).toString()),
                 key_id: (await this.signer?.getKeyId()),
-                sequence: option.nonce,
+                sequence: option.sequence != null ? option.sequence : (await this.signer?.getNonce()),
             },
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
@@ -150,6 +150,12 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
                         type: opType,
                         payload: payload,
                     },
+                ];
+                params.participants = [
+                    {
+                        id: payload.logic_id,
+                        lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
+                    }
                 ];
                 break;
             default:

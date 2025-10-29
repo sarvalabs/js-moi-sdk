@@ -15,7 +15,7 @@ export class AssetFactory {
         if (manifest != null) {
             const builder = Object.values(manifest.elements)
                 .find(element => {
-                if (element.kind === "routine") {
+                if (element.kind === "callable") {
                     const routine = element.data;
                     return routine.kind === "deploy" &&
                         callsite === routine.name;

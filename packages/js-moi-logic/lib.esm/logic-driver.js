@@ -37,7 +37,7 @@ export class LogicDriver extends LogicDescriptor {
     createRoutines() {
         const routines = {};
         this.manifest.elements.forEach((element) => {
-            if (element.kind !== "routine") {
+            if (element.kind !== "callable") {
                 return;
             }
             const routine = element.data;

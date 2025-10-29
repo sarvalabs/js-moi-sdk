@@ -1,6 +1,6 @@
 import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, Hex, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
 import { InteractionObject, IxFund, IxParticipant, RawInteractionObject, RawIxFund, RawIxParticipant, Signature, RawSignature, InteractionArgs, IxFundArgs, IxOperationArgs } from "../types/interaction";
-import { ParticipantId, AssetId, Identifier } from "js-moi-identifiers";
+import { ParticipantId, AssetId, Identifier, LogicId } from "js-moi-identifiers";
 import { AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload, RawAssetCreatePayload, RawIxOperation } from "../types/operation";
 import {ZERO_ADDRESS, KMOI_ASSET_ID} from "js-moi-constants";
 import { Polorizer } from "js-polo";
@@ -336,7 +336,7 @@ function processLogicDeploy(payload: LogicDeployPayload) {
 function processLogicAction(payload: LogicActionPayload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: new AssetId(payload.logic_id).toBytes(),
+        logic_id: new LogicId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     }
 

@@ -23,7 +23,6 @@ export class LogicFactory extends LogicBase {
         const payload = {
             manifest: this.encodedManifest,
             callsite: ixObject.routine.name,
-            logic_id: "0x",
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
@@ -68,7 +67,7 @@ export class LogicFactory extends LogicBase {
     deploy(builderName, ...args) {
         const builder = Object.values(this.manifest.elements)
             .find(element => {
-            if (element.kind === "routine") {
+            if (element.kind === "callable") {
                 const routine = element.data;
                 return routine.kind === "deploy" &&
                     builderName === routine.name;

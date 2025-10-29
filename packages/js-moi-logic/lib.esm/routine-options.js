@@ -1,5 +1,5 @@
 export class RoutineOption {
-    nonce;
+    sequence;
     sender;
     fuelLimit;
     fuelPrice;

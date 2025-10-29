@@ -2,7 +2,7 @@ import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest
 import type { AbstractProvider, LogicActionPayload, LogicDeployPayload, LogicPayload, Sender } from "js-moi-providers";
 import { InteractionCallResponse, InteractionObject, InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, LockType, OpType } from "js-moi-utils";
 import { LogicIxArguments, LogicIxObject, LogicIxResponse } from "../types/interaction";
 import { LogicIxRequest } from "../types/logic";
 import { LogicId } from "./logic-id";
@@ -160,7 +160,7 @@ export abstract class LogicBase extends ElementDescriptor {
             sender: option.sender ?? {
                 id: ((await this.signer?.getIdentifier()).toString()),
                 key_id: (await this.signer?.getKeyId()),
-                sequence: option.nonce,
+                sequence: option.sequence != null ? option.sequence : (await this.signer?.getNonce()),
             } as Sender,
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
@@ -187,6 +187,12 @@ export abstract class LogicBase extends ElementDescriptor {
                         payload: payload as LogicActionPayload,
                     },
                 ];
+                params.participants = [
+                    {
+                        id: payload.logic_id,
+                        lock_type: LockType.MUTATE_LOCK,
+                    }
+                ]
                 break;
             default:
                 ErrorUtils.throwError(
