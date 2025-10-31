@@ -318,8 +318,11 @@ const processParticipants = (ixObject) => {
                 break;
             }
             case js_moi_utils_1.OpType.LOGIC_DEPLOY:
+                break;
             case js_moi_utils_1.OpType.LOGIC_ENLIST:
             case js_moi_utils_1.OpType.LOGIC_INVOKE:
+                const { logic_id } = operation.payload;
+                addParticipant(`0x${logic_id}`, js_moi_utils_1.LockType.MUTATE_LOCK);
                 break;
             default:
                 js_moi_utils_1.ErrorUtils.throwError("Unsupported Ix type", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);

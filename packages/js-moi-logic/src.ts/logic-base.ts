@@ -187,12 +187,6 @@ export abstract class LogicBase extends ElementDescriptor {
                         payload: payload as LogicActionPayload,
                     },
                 ];
-                params.participants = [
-                    {
-                        id: payload.logic_id,
-                        lock_type: LockType.MUTATE_LOCK,
-                    }
-                ]
                 break;
             default:
                 ErrorUtils.throwError(

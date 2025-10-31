@@ -103,7 +103,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: LogicManifest.Routine): boolean {
-        return ["persistent", "ephemeral"].includes(routine.mode);
+        return ["dynamic"].includes(routine.mode);
     }
 
     /**
@@ -143,7 +143,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             const result = await response.result(timeout);
 
             return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
+                output: this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs),
                 error: ManifestCoder.decodeException(result[0].error)
             };
         } catch(err) {

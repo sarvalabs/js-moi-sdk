@@ -79,7 +79,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return ["persistent", "ephemeral"].includes(routine.mode);
+        return ["dynamic"].includes(routine.mode);
     }
     /**
      * Creates the logic payload from the given interaction object.
@@ -111,7 +111,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         try {
             const result = await response.result(timeout);
             return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
+                output: this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs),
                 error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
             };
         }

@@ -1,6 +1,6 @@
 import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, LockType, OpType } from "js-moi-utils";
+import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { LogicId } from "./logic-id";
 import { RoutineOption } from "./routine-options";
 /**
@@ -147,12 +147,6 @@ export class LogicBase extends ElementDescriptor {
                         type: opType,
                         payload: payload,
                     },
-                ];
-                params.participants = [
-                    {
-                        id: payload.logic_id,
-                        lock_type: LockType.MUTATE_LOCK,
-                    }
                 ];
                 break;
             default:

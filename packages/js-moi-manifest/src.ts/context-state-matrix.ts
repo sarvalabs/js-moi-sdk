@@ -24,10 +24,10 @@ export class ContextStateMatrix {
             stateElement.data = stateElement.data as LogicManifest.State;
 
             switch (stateElement.data.mode) {
-                case "static":
+                case "logic":
                     this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
                     break;
-                case "dynamic":
+                case "actor":
                     this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
                     break;
                 default:

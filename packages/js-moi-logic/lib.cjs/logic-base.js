@@ -151,12 +151,6 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
                         payload: payload,
                     },
                 ];
-                params.participants = [
-                    {
-                        id: payload.logic_id,
-                        lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
-                    }
-                ];
                 break;
             default:
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported operation type: ${opType}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);

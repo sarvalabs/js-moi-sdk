@@ -26,13 +26,18 @@ export declare module LogicManifest {
     methods?: MethodField[] | null;
   }
 
-  export enum PersistenceMode {
+  export enum RoutineMode {
     STATIC = "static",
     DYNAMIC = "dynamic",
   }
 
+  export enum StateMode {
+    STATIC = "logic",
+    DYNAMIC = "actor",
+  }
+
   export interface State {
-    mode: PersistenceMode;
+    mode: StateMode;
     fields: TypeField[];
   }
 
@@ -50,7 +55,7 @@ export declare module LogicManifest {
   export interface Routine {
     name: string;
     kind: string;
-    mode: PersistenceMode;
+    mode: RoutineMode;
     accepts?: TypeField[] | null;
     returns?: TypeField[] | null;
     executes: Instructions;
