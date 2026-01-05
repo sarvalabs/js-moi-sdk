@@ -1,7 +1,7 @@
 import { AssetCreationResult, AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType } from "js-moi-utils";
 import { MAS0 } from "./mas0";
 import { documentEncode, Schema } from "js-polo";
-import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schemas";
 import { Signer } from "js-moi-signer";
 import { AssetCreatePayload, IxParticipant } from "js-moi-providers";
 import { SARGA_ADDRESS } from "js-moi-constants";
@@ -74,6 +74,38 @@ export class MAS0AssetLogic {
         ]
 
         const rawPayload = this.polorize<MAS0.Mint>(payload, MINT_SCHEMA)
+
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+              opType: OpType.ASSET_INVOKE,
+              payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.MINT,
+                calldata: bytesToHex(rawPayload) as Hex,
+              },
+              participants: participants,
+              signer: this.signer,
+        })
+    }
+
+    public mintWithMetadata(beneficiary: string, amount: number | bigint, staticMetadata: Record<string, Uint8Array>): InteractionContext<OpType.ASSET_INVOKE> {
+        const payload: MAS0.MintWithMetadata = {
+            beneficiary: hexToBytes(beneficiary),
+            amount: amount,
+            static_metadata: staticMetadata
+        }
+
+        const participants: IxParticipant[] = [
+            {
+                id: this.assetId as Hex,
+                lock_type: LockType.MUTATE_LOCK,
+            },
+            {
+                id: beneficiary as Hex,
+                lock_type: LockType.MUTATE_LOCK,
+            }
+        ]
+
+        const rawPayload = this.polorize<MAS0.MintWithMetadata>(payload, MINT_SCHEMA)
 
         return new InteractionContext<OpType.ASSET_INVOKE>({
               opType: OpType.ASSET_INVOKE,
@@ -313,6 +345,46 @@ export class MAS0AssetLogic {
         });
     }
 
+    public SetStaticMetadata(key: string, value: Uint8Array) {
+        const payload: MAS0.SetStaticMetadata = {
+            key: key,
+            value: value
+        }
+
+        const rawPayload = this.polorize<MAS0.SetStaticMetadata>(payload, SET_STATIC_METADATA_SCHEMA)
+
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.SETSTATICMETADATA,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public SetDynamicMetadata(key: string, value: Uint8Array) {
+        const payload: MAS0.SetDynamicMetadata = {
+            key: key,
+            value: value
+        }
+
+        const rawPayload = this.polorize<MAS0.SetDynamicMetadata>(payload, SET_DYNAMIC_METADATA_SCHEMA)
+
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.SETDYNAMICMETADATA,
+                calldata: bytesToHex(rawPayload) as Hex,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
     // Readonly routines
 
     public symbol() {
@@ -321,7 +393,6 @@ export class MAS0AssetLogic {
             payload: {
                 asset_id: this.assetId as Hex,
                 callsite: MAS0.Endpoint.SYMBOL,
-                // calldata: bytesToHex(rawPayload) as Hex,
             },
             participants: [],
             signer: this.signer,
@@ -345,5 +416,89 @@ export class MAS0AssetLogic {
             participants: [],
             signer: this.signer,
         }) 
+    }
+
+    public creator() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.CREATOR,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public manager() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.MANAGER,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public Decimals() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.DECIMALS,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public MaxSupply() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.MAXSUPPLY,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public CirculatingSupply() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.CIRCULATINGSUPPLY,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public GetStaticMetadata() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.GETSTATICMETADATA,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
+    }
+
+    public GetDynamicMetadata() {
+        return new InteractionContext<OpType.ASSET_INVOKE>({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId as Hex,
+                callsite: MAS0.Endpoint.GETDYNAMICMETADATA,
+            },
+            participants: [],
+            signer: this.signer,
+        })  
     }
 }

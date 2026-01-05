@@ -66,6 +66,34 @@ class MAS0AssetLogic {
             signer: this.signer,
         });
     }
+    mintWithMetadata(beneficiary, amount, staticMetadata) {
+        const payload = {
+            beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
+            amount: amount,
+            static_metadata: staticMetadata
+        };
+        const participants = [
+            {
+                id: this.assetId,
+                lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
+            },
+            {
+                id: beneficiary,
+                lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
+            }
+        ];
+        const rawPayload = this.polorize(payload, mas0_schemas_1.MINT_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.MINT,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: participants,
+            signer: this.signer,
+        });
+    }
     burn(amount) {
         const payload = {
             amount: amount,
@@ -264,6 +292,40 @@ class MAS0AssetLogic {
             signer: this.signer,
         });
     }
+    SetStaticMetadata(key, value) {
+        const payload = {
+            key: key,
+            value: value
+        };
+        const rawPayload = this.polorize(payload, mas0_schemas_1.SET_STATIC_METADATA_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.SETSTATICMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    SetDynamicMetadata(key, value) {
+        const payload = {
+            key: key,
+            value: value
+        };
+        const rawPayload = this.polorize(payload, mas0_schemas_1.SET_DYNAMIC_METADATA_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.SETDYNAMICMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
     // Readonly routines
     symbol() {
         return new js_moi_interactions_1.InteractionContext({
@@ -271,7 +333,6 @@ class MAS0AssetLogic {
             payload: {
                 asset_id: this.assetId,
                 callsite: mas0_1.MAS0.Endpoint.SYMBOL,
-                // calldata: bytesToHex(rawPayload) as Hex,
             },
             participants: [],
             signer: this.signer,
@@ -288,6 +349,83 @@ class MAS0AssetLogic {
                 asset_id: this.assetId,
                 callsite: mas0_1.MAS0.Endpoint.BALANCEOF,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    creator() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.CREATOR,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    manager() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.MANAGER,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    Decimals() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.DECIMALS,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    MaxSupply() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.MAXSUPPLY,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    CirculatingSupply() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.CIRCULATINGSUPPLY,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    GetStaticMetadata() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.GETSTATICMETADATA,
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    GetDynamicMetadata() {
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: this.assetId,
+                callsite: mas0_1.MAS0.Endpoint.GETDYNAMICMETADATA,
             },
             participants: [],
             signer: this.signer,

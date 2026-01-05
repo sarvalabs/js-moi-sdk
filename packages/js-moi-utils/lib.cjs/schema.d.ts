@@ -50,7 +50,18 @@ export declare const assetCreateSchema: {
         max_supply: {
             kind: string;
         };
-        metadata: {
+        static_metadata: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
+        };
+        dynamic_metadata: {
             kind: string;
             fields: {
                 keys: {

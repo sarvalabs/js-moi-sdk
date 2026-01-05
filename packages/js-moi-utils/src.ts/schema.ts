@@ -51,7 +51,18 @@ export const assetCreateSchema = {
         max_supply: {
             kind: "integer"
         },
-        metadata: {
+        static_metadata: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "bytes"
+                }
+            }
+        },
+        dynamic_metadata: {
             kind: "map",
             fields: {
                 keys: {

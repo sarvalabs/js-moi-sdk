@@ -6,6 +6,7 @@ export var AssetStandard;
 (function (AssetStandard) {
     AssetStandard[AssetStandard["MAS0"] = 0] = "MAS0";
     AssetStandard[AssetStandard["MAS1"] = 1] = "MAS1";
+    AssetStandard[AssetStandard["MAS2"] = 2] = "MAS2";
 })(AssetStandard || (AssetStandard = {}));
 /**
  * Enumerates the types of operations in the system.
