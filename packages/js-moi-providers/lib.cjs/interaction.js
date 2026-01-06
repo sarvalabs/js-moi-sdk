@@ -187,14 +187,25 @@ const validateAssetCreate = (payload) => {
     if (typeof payload.max_supply !== "number" || payload.max_supply < 0) {
         throw new Error("max_supply must be a non-negative number");
     }
-    // metadata: required object with arrays of non-empty hex strings
-    if (payload.metadata) {
-        if (typeof payload.metadata !== "object" || Array.isArray(payload.metadata)) {
-            throw new Error("metadata must be a non-empty object");
+    // static metadata: required object with arrays of non-empty hex strings
+    if (payload.static_metadata) {
+        if (typeof payload.static_metadata !== "object" || Array.isArray(payload.static_metadata)) {
+            throw new Error("static metadata must be a non-empty object");
         }
-        for (const [k, v] of Object.entries(payload.metadata)) {
+        for (const [k, v] of Object.entries(payload.static_metadata)) {
             if (typeof v !== "string" || v.length === 0) {
-                throw new Error(`metadata['${k}'] must be a non-empty hex string`);
+                throw new Error(`static metadata['${k}'] must be a non-empty hex string`);
+            }
+        }
+    }
+    // dynamic metadata: required object with arrays of non-empty hex strings
+    if (payload.dynamic_metadata) {
+        if (typeof payload.dynamic_metadata !== "object" || Array.isArray(payload.dynamic_metadata)) {
+            throw new Error("dynamic metadata must be a non-empty object");
+        }
+        for (const [k, v] of Object.entries(payload.dynamic_metadata)) {
+            if (typeof v !== "string" || v.length === 0) {
+                throw new Error(`dynamic metadata['${k}'] must be a non-empty hex string`);
             }
         }
     }
@@ -247,7 +258,8 @@ function processAssetCreate(payload) {
     const createPayload = {
         ...payload,
         manager: new js_moi_identifiers_1.ParticipantId(payload.manager).toBytes(),
-        metadata: mapHexValues(payload.metadata),
+        static_metadata: mapHexValues(payload.static_metadata),
+        dynamic_metadata: mapHexValues(payload.dynamic_metadata),
     };
     if (payload.logic_payload) {
         createPayload.logic_payload = {

@@ -74,9 +74,13 @@ export interface AssetCreatePayload {
      */
     max_supply: number | bigint;
     /**
-     * The stateful flag of the asset.
+     * The static metadata of the asset.
      */
-    metadata?: Record<string, Hex>;
+    static_metadata?: Record<string, Hex>;
+    /**
+     * The dynamic metadata of the asset.
+     */
+    dynamic_metadata?: Record<string, Hex>;
     /**
      * The logic of the asset.
      */
@@ -113,9 +117,13 @@ export interface RawAssetCreatePayload {
      */
     max_supply: number | bigint;
     /**
-     * The stateful flag of the asset.
+     * The static metadata of the asset.
      */
-    metadata: Map<string, Uint8Array[]>;
+    static_metadata: Map<string, Uint8Array[]>;
+    /**
+     * The dynamic metadata of the asset.
+     */
+    dynamic_metadata: Map<string, Uint8Array[]>;
     /**
      * The logic of the asset.
      */
