@@ -198,7 +198,7 @@ describe("Wallet", () => {
         });
 
         test("connect", () => {
-            const provider = new VoyageProvider("babylon");
+            const provider = new VoyageProvider("devnet");
 
             wallet.connect(provider);
 
