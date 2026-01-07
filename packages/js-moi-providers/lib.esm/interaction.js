@@ -199,7 +199,7 @@ export const validateAssetCreate = (payload) => {
     }
     // logic_payload: optional, validated if provided
     if (payload.logic_payload !== undefined) {
-        validateLogicAction(payload.logic_payload);
+        validateLogicDeploy(payload.logic_payload);
     }
     return payload;
 };
@@ -251,7 +251,7 @@ function processAssetCreate(payload) {
     if (payload.logic_payload) {
         createPayload.logic_payload = {
             ...withCalldata(payload.logic_payload),
-            logic_id: new AssetId(payload.logic_payload.logic_id).toBytes(),
+            manifest: hexToBytes(payload.logic_payload.manifest),
             interfaces: mapHexValues(payload.logic_payload.interfaces),
         };
     }
@@ -273,7 +273,8 @@ function processLogicDeploy(payload) {
 function processLogicAction(payload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: new LogicId(payload.logic_id).toBytes(),
+        logic_id: LogicId.isValid(payload.logic_id) ? new LogicId(payload.logic_id).toBytes() :
+            new AssetId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     };
     return polorize(processed, logicSchema);

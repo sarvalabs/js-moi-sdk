@@ -10,7 +10,7 @@ class AssetFactory {
         const payload = {
             symbol: symbol,
             max_supply: supply,
-            standard: js_moi_utils_1.AssetStandard.MAS0,
+            standard: js_moi_utils_1.AssetStandard.MASX,
             dimension: 0,
             enable_events: enableEvents,
             manager: manager,

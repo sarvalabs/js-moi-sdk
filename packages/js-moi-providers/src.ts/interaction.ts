@@ -254,7 +254,7 @@ export const validateAssetCreate = (payload: AssetCreatePayload) => {
 
   // logic_payload: optional, validated if provided
   if (payload.logic_payload !== undefined) {
-    validateLogicAction(payload.logic_payload);
+    validateLogicDeploy(payload.logic_payload);
   }
 
   return payload;
@@ -321,7 +321,7 @@ function processAssetCreate(payload: AssetCreatePayload) {
     if (payload.logic_payload) {
         createPayload.logic_payload = {
             ...withCalldata(payload.logic_payload),
-            logic_id: new AssetId(payload.logic_payload.logic_id).toBytes(),
+            manifest: hexToBytes(payload.logic_payload.manifest),
             interfaces: mapHexValues(payload.logic_payload.interfaces),
         }
     }
@@ -350,7 +350,8 @@ function processLogicDeploy(payload: LogicDeployPayload) {
 function processLogicAction(payload: LogicActionPayload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: new LogicId(payload.logic_id).toBytes(),
+        logic_id: LogicId.isValid(payload.logic_id) ? new LogicId(payload.logic_id).toBytes() :
+        new AssetId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     }
 
@@ -515,7 +516,6 @@ const toRawOperation = (operation): RawIxOperation => {
  */
 export const toRawInteractionObject = (ix: InteractionObject): RawInteractionObject => {
     ix.participants = processParticipants(ix)
-
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },

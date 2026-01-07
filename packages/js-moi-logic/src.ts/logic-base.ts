@@ -164,7 +164,8 @@ export abstract class LogicBase extends ElementDescriptor {
             } as Sender,
             fuel_price: option.fuelPrice,
             fuel_limit: option.fuelLimit,
-            ix_operations: []
+            ix_operations: [],
+            participants: option.participants ?? [],
         }
 
         const opType = this.getTxType(ixObject.routine.kind);
@@ -235,17 +236,20 @@ export abstract class LogicBase extends ElementDescriptor {
         } as LogicIxObject
 
         ixObject.call = async (): Promise<InteractionCallResponse> => {
+            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "call", option) as Promise<InteractionCallResponse>
         }
 
         ixObject.send = async (): Promise<InteractionResponse> => {
             option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;  
+            option.particpants = option.participants ?? [];
 
             return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }
         
         ixObject.estimateFuel = (): Promise<number|bigint> => {
+            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "estimate", option) as Promise<number | bigint>
         }
 

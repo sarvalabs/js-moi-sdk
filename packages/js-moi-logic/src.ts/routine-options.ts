@@ -1,10 +1,11 @@
-import { Sender } from "js-moi-providers";
+import { IxParticipant, Sender } from "js-moi-providers";
 
 interface IRoutineOption {
     sequence?: number;
     sender?: Sender;
     fuelLimit?: number;
     fuelPrice?: number;
+    participants?: IxParticipant[];
 }
 
 export class RoutineOption implements IRoutineOption {
@@ -12,6 +13,7 @@ export class RoutineOption implements IRoutineOption {
     public sender?: Sender;
     public fuelLimit?: number;
     public fuelPrice?: number;
+    public participants?: IxParticipant[];
 
     constructor(options: IRoutineOption = {}) {
         const keys = Object.keys(options) as Array<keyof IRoutineOption>

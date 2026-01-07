@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssetId = void 0;
 const enums_1 = require("./enums");
-const flags_1 = require("./flags");
 const identifier_1 = require("./identifier");
 const utils_1 = require("./utils");
 /**
@@ -45,10 +44,10 @@ class AssetId extends identifier_1.Identifier {
         if (kind !== enums_1.IdentifierKind.Asset) {
             return { why: "Invalid identifier kind. Expected a asset identifier." };
         }
-        const hasUnsupportedFlags = (asset[1] & (flags_1.flagMasks.get(tag.value) ?? 0)) !== 0;
-        if (hasUnsupportedFlags) {
-            return { why: "Invalid Flags. Unsupported flags for identifier" };
-        }
+        // const hasUnsupportedFlags = (asset[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;
+        // if (hasUnsupportedFlags) {
+        //     return { why: "Invalid Flags. Unsupported flags for identifier" };
+        // }
         return null;
     }
     /**

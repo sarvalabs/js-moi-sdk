@@ -7,7 +7,7 @@ export class AssetFactory {
         const payload = {
             symbol: symbol,
             max_supply: supply,
-            standard: AssetStandard.MAS0,
+            standard: AssetStandard.MASX,
             dimension: 0,
             enable_events: enableEvents,
             manager: manager,

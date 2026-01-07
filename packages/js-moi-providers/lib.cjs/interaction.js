@@ -211,7 +211,7 @@ const validateAssetCreate = (payload) => {
     }
     // logic_payload: optional, validated if provided
     if (payload.logic_payload !== undefined) {
-        (0, exports.validateLogicAction)(payload.logic_payload);
+        (0, exports.validateLogicDeploy)(payload.logic_payload);
     }
     return payload;
 };
@@ -264,7 +264,7 @@ function processAssetCreate(payload) {
     if (payload.logic_payload) {
         createPayload.logic_payload = {
             ...withCalldata(payload.logic_payload),
-            logic_id: new js_moi_identifiers_1.AssetId(payload.logic_payload.logic_id).toBytes(),
+            manifest: (0, js_moi_utils_1.hexToBytes)(payload.logic_payload.manifest),
             interfaces: mapHexValues(payload.logic_payload.interfaces),
         };
     }
@@ -286,7 +286,8 @@ function processLogicDeploy(payload) {
 function processLogicAction(payload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: new js_moi_identifiers_1.LogicId(payload.logic_id).toBytes(),
+        logic_id: js_moi_identifiers_1.LogicId.isValid(payload.logic_id) ? new js_moi_identifiers_1.LogicId(payload.logic_id).toBytes() :
+            new js_moi_identifiers_1.AssetId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     };
     return polorize(processed, js_moi_utils_1.logicSchema);
