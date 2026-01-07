@@ -1,15 +1,17 @@
-import { Sender } from "js-moi-providers";
+import { IxParticipant, Sender } from "js-moi-providers";
 interface IRoutineOption {
     sequence?: number;
     sender?: Sender;
     fuelLimit?: number;
     fuelPrice?: number;
+    participants?: IxParticipant[];
 }
 export declare class RoutineOption implements IRoutineOption {
     sequence?: number;
     sender?: Sender;
     fuelLimit?: number;
     fuelPrice?: number;
+    participants?: IxParticipant[];
     constructor(options?: IRoutineOption);
 }
 /**
