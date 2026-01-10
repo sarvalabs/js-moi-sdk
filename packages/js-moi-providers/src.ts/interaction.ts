@@ -401,7 +401,7 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
 
       case OpType.ASSET_INVOKE: {
         const { asset_id } = operation.payload as AssetActionPayload;
-        addParticipant(asset_id, LockType.NO_LOCK);
+        addParticipant(`0x${asset_id}`, LockType.MUTATE_LOCK);
         break;
       }
 

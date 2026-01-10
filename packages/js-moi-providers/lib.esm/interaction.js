@@ -314,7 +314,7 @@ const processParticipants = (ixObject) => {
                 break;
             case OpType.ASSET_INVOKE: {
                 const { asset_id } = operation.payload;
-                addParticipant(asset_id, LockType.NO_LOCK);
+                addParticipant(`0x${asset_id}`, LockType.MUTATE_LOCK);
                 break;
             }
             case OpType.LOGIC_DEPLOY:
