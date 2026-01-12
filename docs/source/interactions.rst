@@ -450,8 +450,8 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
       const mas0 = new MAS0AssetLogic(assetId, wallet);
       const response = await mas0.setDynamicMetadata(key, value).send();
 
-Readonly Routines
-^^^^^^^^^^^^^^^^^
+**Readonly Routines**
+
 
 .. method:: symbol()
 
@@ -825,8 +825,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
       const mas1 = new MAS1AssetLogic(assetId, wallet);
       const response = await mas1.setDynamicMetadata(tokenId, key, value).send();
 
-Readonly Routines
-^^^^^^^^^^^^^^^^^
+**Readonly Routines**
 
 .. method:: symbol()
 
@@ -1189,8 +1188,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
       const mas2 = new MAS2AssetLogic(assetId, wallet);
       const response = await mas2.setDynamicMetadata(tokenId, key, value).send();
 
-Readonly Routines
-^^^^^^^^^^^^^^^^^
+**Readonly Routines**
 
 .. method:: symbol()
 
