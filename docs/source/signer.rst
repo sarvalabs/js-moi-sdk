@@ -434,7 +434,7 @@ Wallet
             const wallet = await Wallet.createRandom();
 
     Properties
-    ======================
+    ==========
 
     - ``address`` - ``readonly`` ``string`` : The address of the wallet.
 
@@ -473,7 +473,7 @@ Wallet
 
 
     Methods
-    ======================
+    ========
 
     .. autofunction:: Wallet#sign
 
@@ -532,3 +532,72 @@ Wallet
     .. autofunction:: Wallet.createRandom
 
     .. autofunction:: Wallet.createRandomSync
+
+Identifier
+----------
+
+Identifiers are unique values used to reference and interact with different
+types of accounts on the MOI network. Every account—whether it represents a
+participant, asset, or logic—is uniquely identified and addressable using its
+corresponding identifier.
+
+Participant ID
+^^^^^^^^^^^^^^
+
+A Participant ID uniquely identifies a participant account on the MOI network.
+It represents an externally owned account (EOA) that can hold assets, initiate
+interactions, pay fuel costs, and sign messages or interactions using a signer.
+
+Participant IDs are typically derived from public keys and are controlled by
+private keys managed through wallets and signers.
+
+**Example**
+
+.. code-block:: text
+
+   0x000000001ec28dabfc3e4ac4dfc2084b45785b5e9cf1287b63a4f46900000000
+
+Asset ID
+^^^^^^^^
+
+An Asset ID uniquely identifies an asset account in the MOI network. Each asset
+exists as its own account with independent state and logic defined by the MOI
+protocol.
+
+Asset IDs are used to reference assets during operations such as creation,
+transfer, minting, and burning, and to query balances held by participant
+accounts.
+
+**Example**
+
+.. code-block:: text
+
+   0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000
+
+Logic ID
+^^^^^^^^
+
+A Logic ID uniquely identifies a logic account deployed on the MOI network.
+Logic accounts store executable programs along with their state and exposed
+routines.
+
+Logic IDs are used when invoking logic methods, querying logic state, or
+interacting with decentralized applications built on MOI.
+
+**Example**
+
+.. code-block:: text
+
+   0x1003ffffb9b7c1b6a7c13ba64db5c93c5135f2ba3cfc70ec7575a52f00000000
+
+Account Keys
+^^^^^^^^^^^^
+
+Account keys are cryptographic keys associated with MOI accounts and are used to
+establish ownership, authorization, and identity. These keys enable secure
+signing of interactions and messages and ensure that only authorized entities
+can mutate account state.
+
+In the js-moi-sdk, account keys are typically derived and managed using wallets
+and exposed through signers, abstracting low-level cryptographic operations from
+application developers.
