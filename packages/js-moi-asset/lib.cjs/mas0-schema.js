@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BALANCEOF_SCHEMA = exports.REVOKE_SCHEMA = exports.RELEASE_SCHEMA = exports.LOCKUP_SCHEMA = exports.APPROVE_SCHEMA = exports.MINT_SCHEMA = exports.BURN_SCHEMA = exports.TRANSFER_FROM_SCHEMA = exports.TRANSFER_SCHEMA = void 0;
+exports.SET_DYNAMIC_METADATA_SCHEMA = exports.SET_STATIC_METADATA_SCHEMA = exports.BALANCEOF_SCHEMA = exports.REVOKE_SCHEMA = exports.RELEASE_SCHEMA = exports.LOCKUP_SCHEMA = exports.APPROVE_SCHEMA = exports.MINT_WITH_METADATA_SCHEMA = exports.MINT_SCHEMA = exports.BURN_SCHEMA = exports.TRANSFER_FROM_SCHEMA = exports.TRANSFER_SCHEMA = void 0;
 exports.TRANSFER_SCHEMA = {
     kind: "struct",
     fields: {
@@ -27,6 +27,24 @@ exports.MINT_SCHEMA = {
     fields: {
         beneficiary: { kind: "bytes" },
         amount: { kind: "integer" }
+    }
+};
+exports.MINT_WITH_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        beneficiary: { kind: "bytes" },
+        amount: { kind: "integer" },
+        static_metadata: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "bytes"
+                }
+            }
+        }
     }
 };
 exports.APPROVE_SCHEMA = {
@@ -64,4 +82,18 @@ exports.BALANCEOF_SCHEMA = {
         address: { kind: "bytes" }
     }
 };
-//# sourceMappingURL=mas0-schemas.js.map
+exports.SET_STATIC_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        key: { kind: "string" },
+        value: { kind: "string" },
+    }
+};
+exports.SET_DYNAMIC_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        key: { kind: "string" },
+        value: { kind: "string" },
+    }
+};
+//# sourceMappingURL=mas0-schema.js.map

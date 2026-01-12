@@ -42,6 +42,28 @@ export declare const MINT_SCHEMA: {
         };
     };
 };
+export declare const MINT_WITH_METADATA_SCHEMA: {
+    kind: string;
+    fields: {
+        beneficiary: {
+            kind: string;
+        };
+        amount: {
+            kind: string;
+        };
+        static_metadata: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
+        };
+    };
+};
 export declare const APPROVE_SCHEMA: {
     kind: string;
     fields: {
@@ -97,4 +119,26 @@ export declare const BALANCEOF_SCHEMA: {
         };
     };
 };
-//# sourceMappingURL=mas0-schemas.d.ts.map
+export declare const SET_STATIC_METADATA_SCHEMA: {
+    kind: string;
+    fields: {
+        key: {
+            kind: string;
+        };
+        value: {
+            kind: string;
+        };
+    };
+};
+export declare const SET_DYNAMIC_METADATA_SCHEMA: {
+    kind: string;
+    fields: {
+        key: {
+            kind: string;
+        };
+        value: {
+            kind: string;
+        };
+    };
+};
+//# sourceMappingURL=mas0-schema.d.ts.map

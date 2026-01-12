@@ -26,6 +26,24 @@ export const MINT_SCHEMA = {
         amount: { kind: "integer" }
     }
 };
+export const MINT_WITH_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        beneficiary: { kind: "bytes" },
+        amount: { kind: "integer" },
+        static_metadata: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "bytes"
+                }
+            }
+        }
+    }
+};
 export const APPROVE_SCHEMA = {
     kind: "struct",
     fields: {
@@ -61,4 +79,18 @@ export const BALANCEOF_SCHEMA = {
         address: { kind: "bytes" }
     }
 };
-//# sourceMappingURL=mas0-schemas.js.map
+export const SET_STATIC_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        key: { kind: "string" },
+        value: { kind: "string" },
+    }
+};
+export const SET_DYNAMIC_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        key: { kind: "string" },
+        value: { kind: "string" },
+    }
+};
+//# sourceMappingURL=mas0-schema.js.map

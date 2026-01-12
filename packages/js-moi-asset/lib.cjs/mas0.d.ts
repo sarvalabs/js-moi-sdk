@@ -3,13 +3,23 @@ export declare namespace MAS0 {
         TRANSFER = "Transfer",
         TRANSFERFROM = "TransferFrom",
         MINT = "Mint",
+        MINTWITHMETADATA = "MintWithMetadata",
         LOCKUP = "Lockup",
         BURN = "Burn",
         APPROVE = "Approve",
         RELEASE = "Release",
         REVOKE = "Revoke",
+        SETSTATICMETADATA = "SetStaticMetadata",
+        SETDYNAMICMETADATA = "SetDynamicMetadata",
         SYMBOL = "Symbol",
-        BALANCEOF = "BalanceOf"
+        BALANCEOF = "BalanceOf",
+        CREATOR = "Creator",
+        MANAGER = "Manager",
+        DECIMALS = "Decimals",
+        MAXSUPPLY = "MaxSupply",
+        CIRCULATINGSUPPLY = "CirculatingSupply",
+        GETSTATICMETADATA = "GetStaticMetadata",
+        GETDYNAMICMETADATA = "GetDynamicMetadata"
     }
     interface Transfer {
         beneficiary: Uint8Array;
@@ -27,6 +37,11 @@ export declare namespace MAS0 {
         beneficiary: Uint8Array;
         amount: number | bigint;
     }
+    interface MintWithMetadata {
+        beneficiary: Uint8Array;
+        amount: number | bigint;
+        static_metadata: Record<string, Uint8Array>;
+    }
     interface Approve {
         beneficiary: Uint8Array;
         amount: number | bigint;
@@ -41,13 +56,21 @@ export declare namespace MAS0 {
         beneficiary: Uint8Array;
         amount: number | bigint;
     }
+    interface SetStaticMetadata {
+        key: string;
+        value: Uint8Array;
+    }
+    interface SetDynamicMetadata {
+        key: string;
+        value: Uint8Array;
+    }
     interface Revoke {
         beneficiary: Uint8Array;
     }
     interface BalanceOf {
         address: Uint8Array;
     }
-    type OperationPayload = Transfer | Mint | Burn | Approve | Lockup | Release | Revoke | BalanceOf;
+    type OperationPayload = Transfer | Mint | MintWithMetadata | Burn | Approve | Lockup | Release | Revoke | SetStaticMetadata | SetDynamicMetadata | BalanceOf;
     /** Union of all operation payloads */
     type Operation = {
         callsite: Endpoint.TRANSFER;
@@ -55,6 +78,9 @@ export declare namespace MAS0 {
     } | {
         callsite: Endpoint.MINT;
         payload: Mint;
+    } | {
+        callsite: Endpoint.MINTWITHMETADATA;
+        payload: MintWithMetadata;
     } | {
         callsite: Endpoint.BURN;
         payload: Burn;

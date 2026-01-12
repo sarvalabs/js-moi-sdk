@@ -117,3 +117,10 @@ which is widely used for identity verification and authentication purposes in
 decentralized applications. Developers can utilize the signer's capabilities to 
 sign and verify arbitrary messages, providing cryptographic proof of the 
 message's origin and integrity.
+
+**Account**
+
+An Account is a fundamental state-holding entity in the MOI network, identified 
+by a unique address. Participant accounts, asset accounts, and logic accounts 
+are all forms of accounts, each maintaining state and participating in 
+interactions according to their type.

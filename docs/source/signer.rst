@@ -2,8 +2,6 @@
 Signer
 ======
 
---------------------------------------------------------------------------------
-
 The Signer class serves as a base class for various signer implementations and 
 defines the common interface for signing interactions and messages.
 
@@ -153,3 +151,384 @@ Regular Methods
     console.log(isVerified)
 
     >> true
+
+Key Management & Wallets
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+BIP39
+-----
+
+The `BIP39 <https://en.bitcoin.it/wiki/BIP_0039>`_ module provides utility 
+functions for working with mnemonic phrases, entropy, and seed generation. It 
+includes methods for converting mnemonic phrases to seeds synchronously and 
+asynchronously, converting mnemonic phrases to their corresponding entropy 
+values and vice versa, generating mnemonic phrases with specified strengths, 
+and validating the correctness of mnemonic phrases.
+
+    Functions
+    =========
+
+    .. autofunction:: bip39.mnemonicToSeed
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+        const password = 'password';
+        const seed = await mnemonicToSeed(mnemonic, password);
+        console.log(seed)
+
+        >> Buffer
+
+    .. autofunction:: bip39.mnemonicToSeedSync
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+        const password = 'password';
+        const seed = mnemonicToSeedSync(mnemonic, password);
+        console.log(seed)
+
+        >> Buffer
+
+    .. autofunction:: bip39.mnemonicToEntropy
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+        const entropy = mnemonicToEntropy(mnemonic);
+        console.log(entropy)
+
+        >> 6ce1535a6fdd4b10efae6f27fa0835b7
+
+    .. autofunction:: bip39.entropyToMnemonic
+
+    .. code-block:: javascript
+
+        // Example
+        const entropy = 'c1f651a1fb62bebf8db1ecacf66a6a3d';
+        const mnemonic = entropyToMnemonic(entropy);
+        console.log(mnemonic)
+
+        >> sea raw half walnut cloud garlic cycle diesel provide rebuild once key
+
+    .. autofunction:: bip39.generateMnemonic
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = generateMnemonic();
+        console.log(mnemonic)
+
+        >> gaze hole neither spring effort fringe kit neck girl lamp smart afraid
+
+    .. autofunction:: bip39.validateMnemonic
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = 'invalid mnemonic';
+        const isValid = validateMnemonic(mnemonic);
+        console.log(isValid)
+
+        >> false
+
+    .. autofunction:: bip39.getDefaultWordlist
+
+    .. code-block:: javascript
+
+        // Example
+        const language = getDefaultWordlist();
+        console.log(language)
+
+        >> english
+
+Hierarchical Deterministic Node
+-------------------------------
+
+The HDNode class in js-moi-sdk represents a Hierarchical Deterministic (HD) Node 
+used for cryptographic key generation and derivation. It follows the `BIP-32 
+<https://en.bitcoin.it/wiki/BIP_0032>`_ standard and allows the creation of 
+hierarchical deterministic wallets. With HDNode, developers can generate and 
+derive child keys, create private and public keys, derive MOI account addresses, 
+and serialize/deserialize HDNode instances. It simplifies the management of 
+multiple addresses and keys within a single wallet, enhancing security and 
+organization.
+
+    HDNode
+    ~~~~~~
+    A class representing a Hierarchical Deterministic (HD) Node used in cryptographic key generation and derivation.
+
+    Methods
+    ~~~~~~~
+
+    .. autofunction:: HDNode.fromSeed
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = "behind wish visual father ...";
+        const seed = await mnemonicToSeed(mnemonic);
+        const hdNode = HDNode.fromSeed(seed);
+        console.log(hdNode)
+
+        >> HDNode
+
+    .. autofunction:: HDNode.fromExtendedKey
+
+    .. code-block:: javascript
+
+        // Example
+        const hdNode = HDNode.fromExtendedKey(...);
+        console.log(hdNode)
+
+        >> HDNode
+
+    .. autofunction:: HDNode#derivePath
+
+    .. code-block:: javascript
+
+        // Example
+        const hdNode = HDNode.fromSeed(...);
+        const childHDNode = hdNode.derivePath("m/44'/7567'/0'/0/1");
+        console.log(childHDNode)
+
+        >> HDNode
+
+    .. autofunction:: HDNode#deriveChild
+
+    .. code-block:: javascript
+
+        // Example
+        const hdNode = HDNode.fromSeed(...);
+        const childHDNode = hdNode.deriveChild(1);
+        console.log(childHDNode)
+
+        >> HDNode
+
+    .. autofunction:: HDNode#publicKey
+
+    .. code-block:: javascript
+
+        // Example
+        const hdNode = HDNode.fromSeed(...);
+        const publicKey = hdNode.publicKey();
+        console.log(publicKey)
+
+        >> Buffer
+
+    .. autofunction:: HDNode#privateKey
+
+    .. code-block:: javascript
+
+        // Example
+        const hdNode = HDNode.fromSeed(...);
+        const privateKey = hdNode.privateKey();
+        console.log(privateKey)
+
+        >> Buffer
+
+Hierarchical Deterministic Wallet
+---------------------------------
+
+The Wallet module extends the functionality of the Signer class, enhancing the 
+management and interaction with MOI accounts. By extending the signer class, the 
+wallet module inherits and adds additional features that simplify the process 
+of handling cryptographic signing operations. Moreover, the wallet module 
+supports Hierarchical Deterministic (HD) wallets, allowing users to generate 
+master seeds, derive child keys, and organize multiple accounts within a single 
+wallet. With the extended functionality of the signer class in the wallet 
+module, users can seamlessly manage tasks such as checking nonce, sending 
+interactions, and interacting with logic objects, providing a streamlined 
+experience for MOI applications.
+
+Types
+^^^^^
+**Keystore**
+
+The ``Keystore`` interface represents a keystore object. It has the following properties:
+
+* ``cipher`` - ``string``: The cipher used for encryption.
+* ``ciphertext`` - ``string``: The encrypted ciphertext.
+* ``cipherparams`` - ``object``: Parameters for the cipher, containing the following property:
+ 
+  - ``IV`` - ``string``: The initialization vector used for encryption.
+
+* ``kdf`` - ``string``: The key derivation function used.
+* ``kdfparams`` - ``object``: Parameters for the key derivation function, containing the following properties:
+  
+  - ``dklen`` - ``number``: The length of the derived key.
+
+  - ``n`` - ``number``: The iteration count.
+
+  - ``p`` - ``number``: The parallelization factor.
+
+  - ``r`` - ``number``: The block size.
+
+  - ``salt`` - ``string``: The salt value.
+
+* ``mac`` - ``string``: The message authentication code.
+
+Wallet
+^^^^^^
+
+    A class representing a Hierarchical Deterministic Wallet that can sign interactions and manage accounts.
+
+    .. code-block:: javascript
+
+        // Example
+        const mnemonic = "hollow appear story text start mask salt social child ...";
+
+        const wallet = await Wallet.fromMnemonic(mnemonic);
+
+
+    Creating Instances
+    ======================
+
+    - Create a wallet instance from private key
+
+        .. code-block:: javascript
+
+            const privateKey = "0x...";
+
+            const wallet = new Wallet(privateKey, CURVE.SECP256K1);
+    
+    -  Create a wallet instance from a mnemonic
+
+        .. code-block:: javascript
+
+            const mnemonic = "hollow appear story text start mask salt social child ...";
+
+            const wallet = await Wallet.fromMnemonic(mnemonic);
+
+    - Create a wallet instance from JSON keystore
+
+        .. code-block:: javascript
+
+            const keystore = `{
+                "cipher": "aes-128-ctr",
+                "ciphertext": "...",
+                "cipherparams": {
+                    "IV": "..."
+                },
+                "kdf": "scrypt",
+                "kdfparams": {
+                    "n": 4096,
+                    "r": 8,
+                    "p": 1,
+                    "dklen": 32,
+                    "salt": "..."
+                },
+                "mac": "..."
+            }`;
+            const password = "YOUR_PASSWORD_HERE";
+
+            const wallet = await Wallet.fromKeystore(keystore, password);
+
+    - Create a wallet instance from a random mnemonic
+
+        .. code-block:: javascript
+
+            const wallet = await Wallet.createRandom();
+
+    Properties
+    ======================
+
+    - ``address`` - ``readonly`` ``string`` : The address of the wallet.
+
+    .. code-block:: javascript
+
+        console.log(wallet.address);
+        >> "0x87925..."
+
+    - ``publicKey`` - ``readonly`` ``string``: The public key of the wallet.
+
+    .. code-block:: javascript
+
+        console.log(wallet.publicKey);
+        >> "038792..."
+
+    - ``privateKey`` - ``readonly`` ``string``: The private key of the wallet. 
+
+    .. code-block:: javascript
+
+        console.log(wallet.privateKey);
+        >> "0x87925..."
+
+    - ``mnemonic`` - ``readonly`` ``string``: The mnemonic of the wallet.
+
+    .. code-block:: javascript
+
+        console.log(wallet.mnemonic);
+        >> "hollow appear story text start mask salt social child ..."
+
+    - ``curve`` - ``readonly`` ``string``: The curve of the wallet.
+
+    .. code-block:: javascript
+
+        console.log(wallet.curve);
+        >> "secp256k1"
+
+
+    Methods
+    ======================
+
+    .. autofunction:: Wallet#sign
+
+
+    **Example**
+
+    .. code-block:: javascript
+
+        const message = "Hello, MOI";
+        const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+
+        const signature = wallet.sign(Buffer.from(message), algo);
+        >>"0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee..."
+
+    .. autofunction:: Wallet#signInteraction
+
+    .. code-block:: javascript
+
+        const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+        const interaction = {
+            nonce: 0,
+            sender: address,
+            fuel_price: 1,
+            fuel_limit: 200,
+            ix_operations: [
+                {
+                    type: OpType.ASSET_CREATE,
+                    payload: {
+                        standard: AssetStandard.MAS0,
+                        symbol: "SIG",
+                        supply: 1248577
+                    }
+                }
+            ]
+        }
+        const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+        const signedIxn = wallet.signInteraction(interaction, sigAlgo);
+        console.log(signedIxn)
+        
+        // Output
+        /*
+            {
+                ix_args:'0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f063363636161604d4f49130d41',
+                signature: '01463044022059e8e9839a02d2a0b2585e2267400826f91e575eb27cb89485d2deab697c5a34022020d71b2d3caa8c0b003849a2cb4effdbfd32028357db335549a75c82dd329f8902'
+            }
+        */
+
+    .. autofunction:: Wallet#generateKeystore
+
+    .. autofunction:: Wallet.fromMnemonic
+
+    .. autofunction:: Wallet.fromMnemonicSync
+
+    .. autofunction:: Wallet.fromKeystore
+
+    .. autofunction:: Wallet.createRandom
+
+    .. autofunction:: Wallet.createRandomSync

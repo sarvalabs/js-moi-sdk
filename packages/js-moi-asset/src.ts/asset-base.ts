@@ -257,5 +257,3 @@ export abstract class AssetBase extends ElementDescriptor {
         return this.createIxRequest(ixObject);
     }
 }
-
-
