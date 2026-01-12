@@ -18,15 +18,15 @@ class MAS1AssetLogic {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, supply, manager, enableEvents) {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents).send();
+    static async newAsset(signer, symbol, manager, enableEvents) {
+        const response = await this.create(signer, symbol, manager, enableEvents).send();
         const result = await response.result();
         return new MAS1AssetLogic(result[0].asset_id, signer);
     }
-    static create(signer, symbol, supply, manager, enableEvents) {
+    static create(signer, symbol, manager, enableEvents) {
         const payload = {
             symbol: symbol,
-            max_supply: supply,
+            max_supply: 1,
             standard: js_moi_utils_1.AssetStandard.MAS1,
             dimension: 0,
             enable_events: enableEvents,

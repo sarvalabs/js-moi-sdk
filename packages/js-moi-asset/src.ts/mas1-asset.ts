@@ -24,10 +24,10 @@ export class MAS1AssetLogic {
 
     static async newAsset(
         signer: Signer,
-        symbol: string, supply: number | bigint, manager: string, 
+        symbol: string, manager: string, 
         enableEvents: boolean, 
     ): Promise<MAS1AssetLogic> {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents).send()
+        const response = await this.create(signer, symbol, manager, enableEvents).send()
 
         const result:AssetCreationResult = await response.result()
 
@@ -36,12 +36,12 @@ export class MAS1AssetLogic {
 
     static create(
         signer: Signer,
-        symbol: string, supply: number | bigint, manager: string, 
+        symbol: string, manager: string, 
         enableEvents: boolean,
     ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
             symbol: symbol,
-            max_supply: supply,
+            max_supply: 1,
             standard: AssetStandard.MAS1,
             dimension: 0,
             enable_events: enableEvents,
