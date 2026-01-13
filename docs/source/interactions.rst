@@ -239,9 +239,15 @@ AssetDriver
         const driver = new AssetDriver(assetId, manifest, signer);
         const response = driver.routines.mint(beneficiary, 5000).send();
 
+MAS Asset Standards
+^^^^^^^^^^^^^^^^^^^
+
+The MOI Asset Standards (MAS) define a series of progressively capable asset logic specifications on the MOI network.
+Each standard builds on the previous one, enabling developers to choose the appropriate level of functionality and complexity for their asset use case.
 
 MAS0AssetLogic
 ^^^^^^^^^^^^^^
+MAS0 defines the standard contract for fungible assets, where all units belong to a single token ID and are fully interchangeable. It supports minting, burning, transfers, approvals, lockups, and asset-level metadata, making it suitable for currencies and utility tokens.
 
 .. class:: MAS0AssetLogic
 
@@ -571,6 +577,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
 
 MAS1AssetLogic
 ^^^^^^^^^^^^^^
+MAS1 defines the standard contract for non-fungible assets, where each token has a unique token ID and a supply of one. It supports per-token ownership, transfers, approvals, lockups, and both asset-level and token-level metadata, making it suitable for collectibles and identity-like assets.
 
 .. class:: MAS1AssetLogic
 
@@ -934,6 +941,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
 
 MAS2AssetLogic
 ^^^^^^^^^^^^^^
+MAS2 defines the standard contract for multi-token (semi-fungible) assets, where each token ID represents a distinct class with its own variable supply. It supports partial transfers, approvals, lockups, burns, and token-level metadata, making it suitable for batch-based, editioned, or class-based assets.
 
 .. class:: MAS2AssetLogic
 
