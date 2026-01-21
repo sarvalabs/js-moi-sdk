@@ -735,7 +735,7 @@ complexities of node management, synchronization, and data retrieval.
 .. code-block:: javascript
 
     // Example
-    const provider = new VoyageProvider("babylon");
+    const provider = new VoyageProvider("devnet");
 
 Usage
 ~~~~~
