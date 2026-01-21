@@ -618,7 +618,7 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
    .. method:: static create(signer, symbol, supply, manager, enableEvents)
 
-      Builds an :class:`InteractionContext` for creating a MAS0-standard asset.
+      Builds an :class:`InteractionContext` for creating a MAS1-standard asset.
 
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
