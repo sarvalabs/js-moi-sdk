@@ -8,9 +8,7 @@ import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-
 import { SigType, Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
 
-import { Keystore } from "../types/keystore";
 import * as SigningKeyErrors from "./errors";
-import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 import { serializeIxObject, serializeIxSignatures } from "./serializer";
 import { type WalletOption } from "../types/wallet";
 import { Identifier, createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
@@ -20,6 +18,7 @@ export enum CURVE {
 }
 
 const DEFAULT_KEY_ID = 0;
+const DEFAULT_SUB_ACCOUNT_ID = 0
 
 /**
  * Retrieves the value associated with the receiver from a private map.
@@ -91,9 +90,10 @@ const __vault = new WeakMap();
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export class Wallet extends Signer {
-    private readonly key_index: number;
+    private key_index: number;
+    private sub_account_index: number;
 
-    constructor(key: Buffer | string, curve: string, options?: WalletOption) {
+    constructor(hdNode: HDNode, curve: string, options?: WalletOption) {
         try {
             super(options?.provider);
 
@@ -101,7 +101,7 @@ export class Wallet extends Signer {
                 value: void 0,
             });
 
-            let privKey: string, pubKey: string;
+            const key = hdNode.privateKey()
 
             if (!key) {
                 ErrorUtils.throwError("Key is required, cannot be undefined", ErrorCode.INVALID_ARGUMENT);
@@ -111,23 +111,39 @@ export class Wallet extends Signer {
                 ErrorUtils.throwError(`Unsupported curve: ${curve}`, ErrorCode.UNSUPPORTED_OPERATION);
             }
 
-            const ecPrivKey = new elliptic.ec(curve);
-            const keyBuffer = Buffer.isBuffer(key) ? key : Buffer.from(key, "hex");
-            const keyInBytes = bufferToUint8(keyBuffer);
-            const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
-            privKey = keyPair.getPrivate("hex");
-            pubKey = keyPair.getPublic(true, "hex");
+           const { privKey, pubKey } = Wallet.deriveKeys(key, curve)
+
 
             privateMapSet(this, __vault, {
                 _key: privKey,
+                _node: hdNode,
                 _public: pubKey,
                 _curve: curve,
             });
 
             this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
+            this.sub_account_index = options?.subAccountId ?? DEFAULT_SUB_ACCOUNT_ID;
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet", ErrorCode.UNKNOWN_ERROR, { originalError: error });
         }
+    }
+
+    public static deriveKeys(key: Buffer, curve = CURVE.SECP256K1): { privKey: string; pubKey: string } {
+        const ecPrivKey = new elliptic.ec(curve);
+        const keyBuffer = Buffer.isBuffer(key) ? key : Buffer.from(key, "hex");
+        const keyInBytes = bufferToUint8(keyBuffer);
+        const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
+
+        return { privKey: keyPair.getPrivate("hex"), pubKey: keyPair.getPublic(true, "hex") }
+    }
+
+    public static async deriveAccountKey(mnemonic: string, path?: string, wordlist?: string[]): Promise<{ privKey: string; pubKey: string; }> {
+        mnemonic = bip39.entropyToMnemonic(bip39.mnemonicToEntropy(mnemonic, wordlist), wordlist);
+        const seed = await bip39.mnemonicToSeed(mnemonic, undefined);
+        const masterNode = HDNode.fromSeed(seed);
+        const childNode = masterNode.derivePath(path ? path : MOI_DERIVATION_PATH);
+
+        return Wallet.deriveKeys(childNode.privateKey())
     }
 
     /**
@@ -141,30 +157,6 @@ export class Wallet extends Signer {
         }
 
         return false;
-    }
-
-    /**
-     * Generates a keystore file from the wallet's private key, encrypted with a password.
-     *
-     * @param {string} password Used for encrypting the keystore data.
-     * @returns {Keystore} The generated keystore object.
-     * @throws {Error} if the wallet is not initialized or loaded, or if there
-     * is an error generating the keystore.
-     */
-    public generateKeystore(password: string): Keystore {
-        if (!this.isInitialized()) {
-            ErrorUtils.throwError(
-                "Keystore not found. The wallet has not been loaded or initialized.",
-                ErrorCode.NOT_INITIALIZED
-            );
-        }
-
-        try {
-            const data = Buffer.from(this.privateKey, "hex");
-            return encryptKeystoreData(data, password);
-        } catch (err) {
-            ErrorUtils.throwError("Failed to generate keystore", ErrorCode.UNKNOWN_ERROR, { originalError: err });
-        }
     }
 
     /**
@@ -219,6 +211,23 @@ export class Wallet extends Signer {
     }
 
     /**
+     * HDNode associated with the wallet.
+     * 
+     * @throws {Error} if the wallet is not loaded or initialized.
+     * @readonly
+     */
+    private get hdNode(): HDNode {
+        if (this.isInitialized()) {
+            return privateMapGet(this, __vault)._node;
+        }
+
+        ErrorUtils.throwError(
+            "HD Node not found. The wallet has not been loaded or initialized.",
+            ErrorCode.NOT_INITIALIZED
+        );
+    }
+
+    /**
      * Identifier associated with the wallet.
      * .
      * @readonly
@@ -228,12 +237,21 @@ export class Wallet extends Signer {
     }
 
     /**
-     * Identifier associated with the wallet.
+     * Key id associated with the wallet.
      * .
      * @readonly
      */
     public get keyId(): number {
         return this.getKeyId()
+    }
+
+    /**
+     * sub account id associated with the wallet.
+     * .
+     * @readonly
+     */
+    public get subAccountId(): number {
+        return this.getSubAccountId()
     }
 
     /**
@@ -270,16 +288,47 @@ export class Wallet extends Signer {
         const publickey = this.getPublicKey();
         const fingerprint = hexToBytes(publickey).slice(1, 25);
 
-        return createParticipantId({ fingerprint, variant: 0, tag: ParticipantTagV0 });
+        return createParticipantId({ fingerprint, variant: this.sub_account_index, tag: ParticipantTagV0 });
     }
 
     /**
-     * Retrieves the key identifier.
+     * Retrieves the key id.
      *
      * @returns {number} A promise that resolves to the key index.
      */
     public getKeyId(): number {
         return this.key_index;
+    }
+
+    /**
+     * Updates the key id.
+     */
+    public setKeyId(keyId: number, privateKey: string) {
+        if(privateKey == null) {
+            const childNode = this.hdNode.deriveChild(keyId);
+            const { privKey } = Wallet.deriveKeys(childNode.privateKey())
+            privateKey = privKey;   
+        }
+
+        const valut = privateMapGet(this, __vault)
+        valut._key = privateKey;
+        this.key_index = keyId;
+    }
+
+    /**
+     * Retrieves the sub account id.
+     *
+     * @returns {number} A promise that resolves to the sub account index.
+     */
+    public getSubAccountId(): number {
+        return this.sub_account_index;
+    }
+
+    /**
+     * Updates the sub account id.
+     */
+    public setSubAccountId(id: number) {
+        this.sub_account_index = id
     }
 
     /**
@@ -390,7 +439,7 @@ export class Wallet extends Signer {
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(path ? path : MOI_DERIVATION_PATH);
 
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1);
+            const wallet = new Wallet(childNode, CURVE.SECP256K1);
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -433,7 +482,7 @@ export class Wallet extends Signer {
             const masterNode = HDNode.fromSeed(seed);
             const childNode = masterNode.derivePath(path ? path : MOI_DERIVATION_PATH);
 
-            const wallet = new Wallet(childNode.privateKey(), CURVE.SECP256K1);
+            const wallet = new Wallet(childNode, CURVE.SECP256K1);
 
             privateMapSet(wallet, __vault, {
                 ...privateMapGet(wallet, __vault),
@@ -444,26 +493,6 @@ export class Wallet extends Signer {
         } catch (error) {
             ErrorUtils.throwError("Failed to load wallet from mnemonic", ErrorCode.UNKNOWN_ERROR, {
                 originalError: error,
-            });
-        }
-    }
-
-    /**
-     * Initializes the wallet from a provided keystore.
-     *
-     * @param {string} keystore - The keystore to initialize the wallet with.
-     * @param {string} password - The password used to decrypt the keystore.
-     * 
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
-     */
-    public static fromKeystore(keystore: string, password: string): Wallet {
-        try {
-            const privateKey = decryptKeystoreData(JSON.parse(keystore), password);
-            return new Wallet(privateKey, CURVE.SECP256K1);
-        } catch (err) {
-            ErrorUtils.throwError("Failed to load wallet from keystore", ErrorCode.UNKNOWN_ERROR, {
-                originalError: err,
             });
         }
     }

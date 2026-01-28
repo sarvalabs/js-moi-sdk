@@ -3,6 +3,7 @@ export type * from "../types/jsonrpc";
 export type * from "../types/provider";
 export type * from "../types/interaction";
 export type * from "../types/operation";
+export type * from "../types/transport";
 export * from "./abstract-provider";
 export * from "./base-provider";
 export * from "./jsonrpc-provider";

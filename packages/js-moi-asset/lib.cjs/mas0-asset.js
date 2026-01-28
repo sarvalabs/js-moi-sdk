@@ -82,7 +82,7 @@ class MAS0AssetLogic {
                 lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
             }
         ];
-        const rawPayload = this.polorize(payload, mas0_schema_1.MINT_SCHEMA);
+        const rawPayload = this.polorize(payload, mas0_schema_1.MINT_WITH_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {

@@ -1,8 +1,8 @@
 import { Buffer } from "buffer";
+import { HDNode } from "js-moi-hdnode";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { Hex } from "js-moi-utils";
-import { Keystore } from "../types/keystore";
 import { type WalletOption } from "../types/wallet";
 import { Identifier } from "js-moi-identifiers";
 export declare enum CURVE {
@@ -33,23 +33,23 @@ export declare enum CURVE {
  * @docs https://js-moi-sdk.docs.moi.technology/hierarchical-deterministic-wallet
  */
 export declare class Wallet extends Signer {
-    private readonly key_index;
-    constructor(key: Buffer | string, curve: string, options?: WalletOption);
+    private key_index;
+    private sub_account_index;
+    constructor(hdNode: HDNode, curve: string, options?: WalletOption);
+    static deriveKeys(key: Buffer, curve?: CURVE): {
+        privKey: string;
+        pubKey: string;
+    };
+    static deriveAccountKey(mnemonic: string, path?: string, wordlist?: string[]): Promise<{
+        privKey: string;
+        pubKey: string;
+    }>;
     /**
      * Checks if the wallet is initialized.
      *
      * @returns {boolean} true if the wallet is initialized, false otherwise.
      */
     isInitialized(): boolean;
-    /**
-     * Generates a keystore file from the wallet's private key, encrypted with a password.
-     *
-     * @param {string} password Used for encrypting the keystore data.
-     * @returns {Keystore} The generated keystore object.
-     * @throws {Error} if the wallet is not initialized or loaded, or if there
-     * is an error generating the keystore.
-     */
-    generateKeystore(password: string): Keystore;
     /**
      * Private key associated with the wallet.
      *
@@ -72,17 +72,30 @@ export declare class Wallet extends Signer {
      */
     get publicKey(): string;
     /**
+     * HDNode associated with the wallet.
+     *
+     * @throws {Error} if the wallet is not loaded or initialized.
+     * @readonly
+     */
+    private get hdNode();
+    /**
      * Identifier associated with the wallet.
      * .
      * @readonly
      */
     get identifier(): Identifier;
     /**
-     * Identifier associated with the wallet.
+     * Key id associated with the wallet.
      * .
      * @readonly
      */
     get keyId(): number;
+    /**
+     * sub account id associated with the wallet.
+     * .
+     * @readonly
+     */
+    get subAccountId(): number;
     /**
      * Curve associated with the wallet.
      *
@@ -102,11 +115,25 @@ export declare class Wallet extends Signer {
      */
     getIdentifier(): Identifier;
     /**
-     * Retrieves the key identifier.
+     * Retrieves the key id.
      *
      * @returns {number} A promise that resolves to the key index.
      */
     getKeyId(): number;
+    /**
+     * Updates the key id.
+     */
+    setKeyId(keyId: number, privateKey: string): void;
+    /**
+     * Retrieves the sub account id.
+     *
+     * @returns {number} A promise that resolves to the sub account index.
+     */
+    getSubAccountId(): number;
+    /**
+     * Updates the sub account id.
+     */
+    setSubAccountId(id: number): void;
     /**
      * Address associated with the wallet.
      *
@@ -185,16 +212,6 @@ export declare class Wallet extends Signer {
      * const wallet = Wallet.fromMnemonicSync(mnemonic, path);
      */
     static fromMnemonicSync(mnemonic: string, path?: string, wordlist?: string[]): Wallet;
-    /**
-     * Initializes the wallet from a provided keystore.
-     *
-     * @param {string} keystore - The keystore to initialize the wallet with.
-     * @param {string} password - The password used to decrypt the keystore.
-     *
-     * @returns {Wallet} a instance of `Wallet`.
-     * @throws {Error} if there is an error during initialization.
-     */
-    static fromKeystore(keystore: string, password: string): Wallet;
     /**
      * Generates a random mnemonic and initializes the wallet from it.
      *

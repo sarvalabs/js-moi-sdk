@@ -13,6 +13,22 @@ export type Address = Hex;
 export type NumberLike = string | number | bigint | BN | Buffer | Uint8Array | number[];
 
 /**
+ * Ensures that a given string has the '0x' prefix.
+ * If the string already has the prefix, it is returned as is.
+ * Otherwise, the prefix is added to the string.
+ *
+ * @param {string} hex - The input string.
+ * @returns {Hex} The string with the '0x' prefix.
+ */
+export const withHexPrefix = (hex: string): Hex => {
+    if (typeof hex !== "string") {
+        throw new TypeError("Input must be a string");
+    }
+
+    return (hex.startsWith("0x") ? hex : `0x${hex}`) as Hex;
+};
+
+/**
  * Converts a number, bigint, or BN instance to a hexadecimal string representation.
  * If the input value is not already a BN instance, it is converted to one.
  * Throws an error if the input value is a negative number.

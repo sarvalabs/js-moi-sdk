@@ -294,22 +294,30 @@ interface ProcessedCallorEstimateIxObject {
 
 export type CallorEstimateOptions = Record<string, Options>
 
+interface RpcCommon {
+    id: number | string;
+    jsonrpc: "2.0";
+}
+
 export interface RpcErrorResponse {
     code: number;
     message: string;
 }
 
-export interface RpcError {
-    code: number,
+interface RpcError {
+    code: number | string,
     message: string,
-    data: any
+    data?: unknown
 }
 
-export interface RpcResponse<T> {
-    jsonrpc: string;
+export interface RpcRequest extends RpcCommon {
+    method: string;
+    params: unknown[];
+}
+
+export interface RpcResponse<T=unknown> extends RpcCommon {
     result?: T;
     error?: RpcError;
-    id: 1;
 }
 
 export interface Log {

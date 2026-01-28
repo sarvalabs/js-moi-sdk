@@ -1,7 +1,7 @@
 import { AssetCreationResult, AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
 import { MAS2 } from "./mas2";
 import { documentEncode, Schema } from "js-polo";
-import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
 import { Signer } from "js-moi-signer";
 import { AssetCreatePayload, IxParticipant } from "js-moi-providers";
 import { SARGA_ADDRESS } from "js-moi-constants";
@@ -178,7 +178,7 @@ export class MAS2AssetLogic {
             }
         ]
 
-        const rawPayload = this.polorize<MAS2.MintWithMetadata>(payload, MINT_SCHEMA)
+        const rawPayload = this.polorize<MAS2.MintWithMetadata>(payload, MINT_WITH_METADATA_SCHEMA)
 
         return new InteractionContext<OpType.ASSET_INVOKE>({
               opType: OpType.ASSET_INVOKE,

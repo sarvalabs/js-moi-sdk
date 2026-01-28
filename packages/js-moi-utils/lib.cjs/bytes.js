@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bufferToUint8 = exports.isHexString = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
+exports.bufferToUint8 = exports.isHexString = exports.randomBytes = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
 /**
  * Checks if the given value is an integer.
  *
@@ -55,6 +55,16 @@ const hexDataLength = (data) => {
     return (data.length - 2) / 2;
 };
 exports.hexDataLength = hexDataLength;
+/**
+ * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
+ *
+ * @param size - The number of random bytes to generate.
+ * @returns A Uint8Array containing the generated random bytes.
+ */
+const randomBytes = (size) => {
+    return globalThis.crypto.getRandomValues(new Uint8Array(size));
+};
+exports.randomBytes = randomBytes;
 /**
  * Checks if the given value is a valid hexadecimal string.
  *
