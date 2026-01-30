@@ -647,7 +647,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
    Mints new asset units to the specified beneficiary.
 
    :param str beneficiary: Recipient participant id.
-   :param record static_metadata: Static metadata to mint.
+   :param record staticMetadata: Static metadata to mint.
    :returns: InteractionContext<OpType.ASSET_INVOKE>
 
    **Example**
