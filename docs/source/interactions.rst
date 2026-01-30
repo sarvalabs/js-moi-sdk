@@ -642,7 +642,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
       const mas1 = new MAS1AssetLogic(assetId, wallet);
       const response = await mas1.mint(beneficiary).send();
 
-.. method:: mintWithMetadata(beneficiary)
+.. method:: mintWithMetadata(beneficiary, staticMetadata)
 
    Mints new asset units to the specified beneficiary.
 
@@ -655,7 +655,7 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
    .. code-block:: javascript
 
       const mas1 = new MAS1AssetLogic(assetId, wallet);
-      const response = await mas1.mintWithMetadata(beneficiary).send();
+      const response = await mas1.mintWithMetadata(beneficiary, staticMetadata).send();
 
 .. method:: burn(tokenId)
 
