@@ -22,4 +22,5 @@ __exportStar(require("./mas2"), exports);
 __exportStar(require("./mas2-asset"), exports);
 __exportStar(require("./asset-factory"), exports);
 __exportStar(require("./asset-driver"), exports);
+__exportStar(require("./mas0-schema"), exports);
 //# sourceMappingURL=index.js.map

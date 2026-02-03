@@ -102,6 +102,7 @@ export class Wallet extends Signer {
             privateMapSet(this, __vault, {
                 _key: privKey,
                 _node: hdNode,
+                _pkey: pubKey,
                 _public: pubKey,
                 _curve: curve,
             });
@@ -174,18 +175,6 @@ export class Wallet extends Signer {
         ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * HDNode associated with the wallet.
-     *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
-     */
-    get hdNode() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._node;
-        }
-        ErrorUtils.throwError("HD Node not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
-    }
-    /**
      * Identifier associated with the wallet.
      * .
      * @readonly
@@ -233,8 +222,8 @@ export class Wallet extends Signer {
      *
      * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
-    getIdentifier() {
-        const publickey = this.getPublicKey();
+    async getIdentifier() {
+        const publickey = privateMapGet(this, __vault)._pkey;
         const fingerprint = hexToBytes(publickey).slice(1, 25);
         return createParticipantId({ fingerprint, variant: this.sub_account_index, tag: ParticipantTagV0 });
     }
@@ -243,19 +232,15 @@ export class Wallet extends Signer {
      *
      * @returns {number} A promise that resolves to the key index.
      */
-    getKeyId() {
+    async getKeyId() {
         return this.key_index;
     }
     /**
      * Updates the key id.
      */
-    setKeyId(keyId, privateKey) {
-        if (privateKey == null) {
-            const childNode = this.hdNode.deriveChild(keyId);
-            const { privKey } = Wallet.deriveKeys(childNode.privateKey());
-            privateKey = privKey;
-        }
+    setKeyId(keyId, publicKey, privateKey) {
         const valut = privateMapGet(this, __vault);
+        valut._public = publicKey;
         valut._key = privateKey;
         this.key_index = keyId;
     }
@@ -299,7 +284,7 @@ export class Wallet extends Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message, sigAlgo) {
+    async sign(message, sigAlgo) {
         if (sigAlgo == null) {
             ErrorUtils.throwError("Signature type cannot be undefined", ErrorCode.INVALID_ARGUMENT);
         }
@@ -326,14 +311,14 @@ export class Wallet extends Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject, sigAlgo) {
+    async signInteraction(ixObject, sigAlgo) {
         try {
             const ixData = serializeIxObject(ixObject);
             const signatures = [
                 {
                     id: ixObject.sender.id,
                     key_id: ixObject.sender.key_id,
-                    signature: this.sign(ixData, sigAlgo),
+                    signature: await this.sign(ixData, sigAlgo),
                 }
             ];
             const rawSign = serializeIxSignatures(signatures);

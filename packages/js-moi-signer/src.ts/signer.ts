@@ -23,11 +23,11 @@ export abstract class Signer {
     }
 
     abstract connect(provider: AbstractProvider): void;
-    abstract getKeyId(): number;
-    abstract getIdentifier(): Identifier;
-    abstract sign(message: Uint8Array, sigAlgo: SigType): string;
+    abstract getKeyId(): Promise<number>;
+    abstract getIdentifier(): Promise<Identifier>;
+    abstract sign(message: Uint8Array, sigAlgo: SigType): Promise<string>;
     abstract isInitialized(): boolean;
-    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
+    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
 
 
     /**
@@ -141,7 +141,7 @@ export abstract class Signer {
      * @throws {Error} if the interaction object is not valid or if there is 
      * an error during preparation.
      */
-    private async prepareInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
+    public async prepareInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void> {
         if (!ixObject.sender) {
             ixObject.sender = {
                 id: (await this.getIdentifier()).toHex(),
@@ -218,7 +218,7 @@ export abstract class Signer {
             await this.prepareInteraction('send', ixObject);
 
             // Sign the interaction object
-            const ixRequest = this.signInteraction(ixObject, sigAlgo)
+            const ixRequest = await this.signInteraction(ixObject, sigAlgo)
 
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);

@@ -1,6 +1,6 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import type { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import type { AccountKey, AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
 import { InteractionObject } from "../types/interaction";
@@ -127,7 +127,7 @@ export declare class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getAccountKeys(id: string, options?: Options): Promise<AccountState>;
+    getAccountKeys(id: string, options?: Options): Promise<AccountKey[]>;
     /**
      * Retrieves the account meta information for the specified address.
      *

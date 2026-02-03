@@ -6,3 +6,4 @@ export * from "./mas2";
 export * from "./mas2-asset";
 export * from "./asset-factory";
 export * from "./asset-driver";
+export * from "./mas0-schema";

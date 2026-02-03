@@ -141,6 +141,7 @@ class Wallet extends js_moi_signer_1.Signer {
             privateMapSet(this, __vault, {
                 _key: privKey,
                 _node: hdNode,
+                _pkey: pubKey,
                 _public: pubKey,
                 _curve: curve,
             });
@@ -213,18 +214,6 @@ class Wallet extends js_moi_signer_1.Signer {
         js_moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * HDNode associated with the wallet.
-     *
-     * @throws {Error} if the wallet is not loaded or initialized.
-     * @readonly
-     */
-    get hdNode() {
-        if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._node;
-        }
-        js_moi_utils_1.ErrorUtils.throwError("HD Node not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
-    }
-    /**
      * Identifier associated with the wallet.
      * .
      * @readonly
@@ -272,8 +261,8 @@ class Wallet extends js_moi_signer_1.Signer {
      *
      * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
-    getIdentifier() {
-        const publickey = this.getPublicKey();
+    async getIdentifier() {
+        const publickey = privateMapGet(this, __vault)._pkey;
         const fingerprint = (0, js_moi_utils_1.hexToBytes)(publickey).slice(1, 25);
         return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: this.sub_account_index, tag: js_moi_identifiers_1.ParticipantTagV0 });
     }
@@ -282,19 +271,15 @@ class Wallet extends js_moi_signer_1.Signer {
      *
      * @returns {number} A promise that resolves to the key index.
      */
-    getKeyId() {
+    async getKeyId() {
         return this.key_index;
     }
     /**
      * Updates the key id.
      */
-    setKeyId(keyId, privateKey) {
-        if (privateKey == null) {
-            const childNode = this.hdNode.deriveChild(keyId);
-            const { privKey } = Wallet.deriveKeys(childNode.privateKey());
-            privateKey = privKey;
-        }
+    setKeyId(keyId, publicKey, privateKey) {
         const valut = privateMapGet(this, __vault);
+        valut._public = publicKey;
         valut._key = privateKey;
         this.key_index = keyId;
     }
@@ -338,7 +323,7 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message, sigAlgo) {
+    async sign(message, sigAlgo) {
         if (sigAlgo == null) {
             js_moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
@@ -365,14 +350,14 @@ class Wallet extends js_moi_signer_1.Signer {
      * the serialized interaction object and the signature.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject, sigAlgo) {
+    async signInteraction(ixObject, sigAlgo) {
         try {
             const ixData = (0, serializer_1.serializeIxObject)(ixObject);
             const signatures = [
                 {
                     id: ixObject.sender.id,
                     key_id: ixObject.sender.key_id,
-                    signature: this.sign(ixData, sigAlgo),
+                    signature: await this.sign(ixData, sigAlgo),
                 }
             ];
             const rawSign = (0, serializer_1.serializeIxSignatures)(signatures);

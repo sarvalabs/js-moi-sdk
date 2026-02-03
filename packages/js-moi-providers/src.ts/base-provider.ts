@@ -9,6 +9,7 @@ import {
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import type {
+    AccountKey,
     AccountKeyParams,
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateOptions,
@@ -326,7 +327,7 @@ export class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getAccountKeys(id: string, options?: Options): Promise<AccountState> {
+    public async getAccountKeys(id: string, options?: Options): Promise<AccountKey[]> {
         try {
             const params: AccountKeyParams = {
                 id: id,
