@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bufferToUint8 = exports.isHexString = exports.randomBytes = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
+exports.isHexString = exports.decodeText = exports.encodeText = exports.randomBytes = exports.hexDataLength = exports.isBytes = exports.isInteger = void 0;
 /**
  * Checks if the given value is an integer.
  *
@@ -66,6 +66,26 @@ const randomBytes = (size) => {
 };
 exports.randomBytes = randomBytes;
 /**
+ * Encodes a given text string into a Uint8Array using the TextEncoder API.
+ *
+ * @param text - The text string to be encoded.
+ * @returns A Uint8Array containing the encoded text.
+ */
+const encodeText = (text) => {
+    return new TextEncoder().encode(text);
+};
+exports.encodeText = encodeText;
+/**
+ * Decodes a Uint8Array into a string using the TextDecoder API.
+ *
+ * @param data - The Uint8Array to decode.
+ * @returns The decoded string.
+ */
+const decodeText = (data) => {
+    return new TextDecoder().decode(data);
+};
+exports.decodeText = decodeText;
+/**
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.
@@ -82,14 +102,4 @@ const isHexString = (value, length) => {
     return true;
 };
 exports.isHexString = isHexString;
-/**
- * Converts a Buffer to a Uint8Array.
- *
- * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} The Uint8Array representation of the Buffer.
- */
-const bufferToUint8 = (target) => {
-    return new Uint8Array(target);
-};
-exports.bufferToUint8 = bufferToUint8;
 //# sourceMappingURL=bytes.js.map

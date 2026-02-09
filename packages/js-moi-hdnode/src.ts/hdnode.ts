@@ -1,5 +1,4 @@
 import { HDKey } from "@scure/bip32";
-import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 
 /**
@@ -14,12 +13,12 @@ export class HDNode {
   }
 
   /**
-   * Generates an HDNode from a seed buffer.
+   * Generates an HDNode from a seed value.
    *
-   * @param {Buffer} seed - The seed buffer.
+   * @param {Uint8Array} seed - The seed buffer.
    * @throws {Error} If an error occurs during the HDNode generation.
    */
-  public static fromSeed(seed: Buffer): HDNode {
+  public static fromSeed(seed: Uint8Array): HDNode {
     try {
       // Generate the master HDNode from the seed buffer
       const node = HDKey.fromMasterSeed(seed, undefined);
@@ -104,23 +103,23 @@ export class HDNode {
   /**
    * Retrieves the public key associated with the HDNode.
    *
-   * @returns {Buffer} The public key.
+   * @returns {Uint8Array} The public key.
    * @throws {Error} If the HDNode is not initialized.
    */
-  public publicKey(): Buffer {
+  public publicKey(): Uint8Array {
     if (!this.node) {
       ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
     }
-    return Buffer.from(this.node.publicKey);
+    return this.node.publicKey;
   }
 
   /**
    * Retrieves the private key associated with the HDNode.
    *
-   * @returns {Buffer} The private key.
+   * @returns {Uint8Array} The private key.
    * @throws {Error} If the HDNode is not initialized or private key is not available.
    */
-  public privateKey(): Buffer {
+  public privateKey(): Uint8Array {
     if (!this.node) {
       ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
     }
@@ -131,6 +130,6 @@ export class HDNode {
         ErrorCode.PROPERTY_NOT_DEFINED
       );
     }
-    return Buffer.from(this.node.privateKey);
+    return this.node.privateKey;
   }
 }

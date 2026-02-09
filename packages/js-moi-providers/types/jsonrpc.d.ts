@@ -47,7 +47,7 @@ export interface AccountState {
 }
 
 export interface AccountKey {
-  id: number; 
+  id: string; 
   publicKey: string;
   weight: number;
   signature_algorithm: number;

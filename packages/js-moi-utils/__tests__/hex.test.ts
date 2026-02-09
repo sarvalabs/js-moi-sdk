@@ -31,7 +31,7 @@ describe("toQuantity", () => {
 describe("encodeToString", () => {
   test("should encode a Uint8Array to a hexadecimal string", () => {
     const data = new Uint8Array([1, 2, 3, 4]);
-    expect(encodeToString(data)).toBe("0x01020304");
+    expect(encodeToString(data)).toBe("01020304");
   });
 });
 
@@ -64,7 +64,7 @@ describe("hexToBN", () => {
 describe("bytesToHex", () => {
   test("should convert a Uint8Array to a hexadecimal string", () => {
     const data = new Uint8Array([1, 2, 3, 4]);
-    expect(bytesToHex(data)).toBe("01020304");
+    expect(bytesToHex(data)).toBe("0x01020304");
   });
 });
 

@@ -1,4 +1,3 @@
-import { Buffer } from "buffer";
 import { HDNode } from "js-moi-hdnode";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
@@ -36,7 +35,7 @@ export declare class Wallet extends Signer {
     private key_index;
     private sub_account_index;
     constructor(hdNode: HDNode, curve: string, options?: WalletOption);
-    static deriveKeys(key: Buffer, curve?: CURVE): {
+    static deriveKeys(key: Uint8Array, curve?: CURVE): {
         privKey: string;
         pubKey: string;
     };

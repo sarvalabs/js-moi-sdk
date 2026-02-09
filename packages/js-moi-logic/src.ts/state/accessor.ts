@@ -1,21 +1,22 @@
 import { blake2b } from "@noble/hashes/blake2b";
+import { concatBytes } from "@noble/hashes/utils";
 import BN from "bn.js";
-import { encodeToString } from "js-moi-utils";
+import { encodeText, encodeToString } from "js-moi-utils";
 import { Polorizer } from "js-polo";
 
 export class StorageKey {
     private value: BN;
 
-    constructor(value: number | string | Buffer | Uint8Array | BN) {
+    constructor(value: number | string | Uint8Array | BN) {
         this.value = new BN(value);
     }
 
     hex(): string {
-        return encodeToString(this.toBuffer());
+        return encodeToString(this.toBytes());
     }
 
-    toBuffer(): Buffer {
-        return this.value.toBuffer("be", 32);
+    toBytes(): Uint8Array {
+        return Uint8Array.from(this.value.toArray("be", 32));
     }
 }
 
@@ -109,7 +110,7 @@ export class PropertyAccessor extends AbstractAccessor {
      * @param key The key to polorize.
      * @returns The polorized key as a bytes.
      */
-    private polorize(key: string | number | boolean | Uint8Array | Buffer): Uint8Array {
+    private polorize(key: string | number | bigint | boolean | Uint8Array): Uint8Array {
         const polorizer = new Polorizer();
 
         switch (true) {
@@ -125,11 +126,13 @@ export class PropertyAccessor extends AbstractAccessor {
                     polorizer.polorizeFloat(key);
                 }
                 break;
+            case typeof key === "bigint":
+                polorizer.polorizeInteger(new BN(key.toString()));
+                break;
             case typeof key === "boolean":
                 polorizer.polorizeBool(key);
                 break;
             case key instanceof Uint8Array:
-            case key instanceof Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
@@ -145,10 +148,10 @@ export class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     public access(hash: StorageKey): StorageKey {
-        const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
+        const separator = encodeText(".");
+        const bytes = concatBytes(hash.toBytes(), separator, this.key);
 
-        return new StorageKey(this.sum256(buffer));
+        return new StorageKey(this.sum256(bytes));
     }
 }
 
@@ -170,7 +173,7 @@ export class ArrayIndexAccessor extends AbstractAccessor {
      * @returns The updated hash after accessing the element.
      */
     public access(hash: StorageKey): StorageKey {
-        const bytes = this.sum256(hash.toBuffer());
+        const bytes = this.sum256(hash.toBytes());
         const slot = new BN(bytes).add(new BN(this.index));
         return new StorageKey(slot);
     }
@@ -185,7 +188,7 @@ export class ClassFieldAccessor extends AbstractAccessor {
     }
 
     public access(hash: StorageKey): StorageKey {
-        let blob: Uint8Array = hash.toBuffer();
+        let blob: Uint8Array = hash.toBytes();
         blob = this.sum256(blob);
         const bn = new BN(blob).add(new BN(this.index));
 

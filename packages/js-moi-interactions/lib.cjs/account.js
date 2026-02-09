@@ -67,7 +67,7 @@ class AccountInherit {
         this._value = {
             asset_id: assetId,
             callsite: "Transfer",
-            calldata: "0x" + (0, js_moi_utils_1.bytesToHex)(calldata.bytes()),
+            calldata: (0, js_moi_utils_1.bytesToHex)(calldata.bytes()),
             // Todo: add funds when required
         };
         return this;

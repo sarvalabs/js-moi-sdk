@@ -37,8 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = exports.CURVE = void 0;
-const utils_1 = require("@noble/hashes/utils");
-const buffer_1 = require("buffer");
 const elliptic_1 = __importDefault(require("elliptic"));
 const bip39 = __importStar(require("js-moi-bip39"));
 const js_moi_constants_1 = require("js-moi-constants");
@@ -154,9 +152,7 @@ class Wallet extends js_moi_signer_1.Signer {
     }
     static deriveKeys(key, curve = CURVE.SECP256K1) {
         const ecPrivKey = new elliptic_1.default.ec(curve);
-        const keyBuffer = buffer_1.Buffer.isBuffer(key) ? key : buffer_1.Buffer.from(key, "hex");
-        const keyInBytes = (0, js_moi_utils_1.bufferToUint8)(keyBuffer);
-        const keyPair = ecPrivKey.keyFromPrivate(keyInBytes);
+        const keyPair = ecPrivKey.keyFromPrivate(key);
         return { privKey: keyPair.getPrivate("hex"), pubKey: keyPair.getPublic(true, "hex") };
     }
     static async deriveAccountKey(mnemonic, path, wordlist) {
@@ -330,7 +326,7 @@ class Wallet extends js_moi_signer_1.Signer {
         switch (sigAlgo.sigName) {
             case "ECDSA_S256": {
                 const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-                const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), this.privateKey);
+                const sig = _sigAlgo.sign(message, this.privateKey);
                 const sigBytes = sig.serialize();
                 return (0, js_moi_utils_1.bytesToHex)(sigBytes);
             }
@@ -362,8 +358,8 @@ class Wallet extends js_moi_signer_1.Signer {
             ];
             const rawSign = (0, serializer_1.serializeIxSignatures)(signatures);
             return {
-                ix_args: (0, js_moi_utils_1.bytesToHex)(ixData),
-                signatures: (0, js_moi_utils_1.bytesToHex)(rawSign),
+                ix_args: (0, js_moi_utils_1.encodeToString)(ixData),
+                signatures: (0, js_moi_utils_1.encodeToString)(rawSign),
             };
         }
         catch (err) {
@@ -459,8 +455,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static async createRandom() {
         try {
-            const _random16Bytes = buffer_1.Buffer.from((0, utils_1.randomBytes)(16));
-            var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
+            const mnemonic = bip39.entropyToMnemonic((0, js_moi_utils_1.randomBytes)(16));
             return await Wallet.fromMnemonic(mnemonic);
         }
         catch (err) {
@@ -476,8 +471,7 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     static createRandomSync() {
         try {
-            const _random16Bytes = buffer_1.Buffer.from((0, utils_1.randomBytes)(16));
-            var mnemonic = bip39.entropyToMnemonic(_random16Bytes, undefined);
+            const mnemonic = bip39.entropyToMnemonic((0, js_moi_utils_1.randomBytes)(16));
             return Wallet.fromMnemonicSync(mnemonic);
         }
         catch (err) {

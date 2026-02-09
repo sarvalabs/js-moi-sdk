@@ -1,4 +1,3 @@
-import { Buffer } from "buffer";
 import { bytesToHex, hexToBytes } from "js-moi-utils";
 /**
  * Represents a LogicID, which is an identifier for a logic.
@@ -14,7 +13,7 @@ export class LogicId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     hex() {
-        return "0x" + Buffer.from(this.logic).toString('hex');
+        return bytesToHex(this.logic);
     }
     /**
      * Returns the LogicID as a hex encoded string without 0x prefix.
@@ -22,7 +21,7 @@ export class LogicId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     string() {
-        return Buffer.from(this.logic).toString('hex');
+        return bytesToHex(this.logic);
     }
     /**
      * Checks if the LogicID is valid.

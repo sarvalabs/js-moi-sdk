@@ -26,7 +26,6 @@
     "js-moi-providers": "^0.7.0-rc7",
     "js-moi-identifiers": "^0.7.0-rc7",
     "js-moi-utils": "^0.7.0-rc7",
-    "buffer": "^6.0.3",
     "@noble/hashes": "^1.1.5",
     "@noble/secp256k1": "^1.7.1"
   }

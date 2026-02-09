@@ -2,7 +2,6 @@ import { blake2b } from "@noble/hashes/blake2b";
 import { hmac } from '@noble/hashes/hmac';
 import { sha256 } from '@noble/hashes/sha256';
 import * as nobleECC from '@noble/secp256k1';
-import { Buffer } from "buffer";
 import { hexToBytes } from "js-moi-utils";
 
 import { SigType } from "../types";
@@ -31,36 +30,33 @@ export default class ECDSA_S256 implements SigType {
     }
 
     /**
-     * sign
+     * Signs a message using the provided signing key.
      *
-     * Signs a message using the ECDSA_S256 signature algorithm.
-     *
-     * @param message - The message to be signed, as a Buffer.
-     * @param signingKey - The private key used for signing, either as 
-     * a hexadecimal string or a Buffer.
-     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
+     * @param message - The message to be signed as a Uint8Array.
+     * @param signingKey - The signing key, which can be either a Uint8Array or a hexadecimal string.
+     * @returns A Signature object containing the signed message.
      */
-     public sign(message: Buffer, signingKey: Buffer | string): Signature {
-        let _signingKey: Uint8Array
-        if(typeof signingKey === "string") {
-            _signingKey = hexToBytes(signingKey)
-        }else {
-            _signingKey = signingKey
+    public sign(message: Uint8Array, signingKey: Uint8Array | string): Signature {
+        let _signingKey: Uint8Array;
+        if (typeof signingKey === "string") {
+            _signingKey = hexToBytes(signingKey);
+        } else {
+            _signingKey = signingKey;
         }
-        
+
         const messageHash = blake2b(message, {
             dkLen: 1 << 5, // Hashing raw message with blake2b to get 32 bytes digest
         });
-        
-        const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false }); 
-        
+
+        const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false });
+
         const digest: SigDigest = {
             _r: toDER(sigParts.slice(0, 32)),
-            _s: toDER(sigParts.slice(32, 64))
-        }
+            _s: toDER(sigParts.slice(32, 64)),
+        };
 
         const signature = bip66Encode(digest);
-        
+
         const prefixArray = new Uint8Array(2);
         prefixArray[0] = this.prefix;
         prefixArray[1] = signature.length;

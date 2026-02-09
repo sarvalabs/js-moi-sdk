@@ -1,5 +1,3 @@
-import type { Buffer } from "buffer";
-
 /**
  * Array-like type representing bytes.
  */
@@ -63,6 +61,26 @@ export const randomBytes = (size: number): Uint8Array => {
 };
 
 /**
+ * Encodes a given text string into a Uint8Array using the TextEncoder API.
+ *
+ * @param text - The text string to be encoded.
+ * @returns A Uint8Array containing the encoded text.
+ */
+export const encodeText = (text: string) => {
+    return new TextEncoder().encode(text);
+};
+
+/**
+ * Decodes a Uint8Array into a string using the TextDecoder API.
+ *
+ * @param data - The Uint8Array to decode.
+ * @returns The decoded string.
+ */
+export const decodeText = (data: Uint8Array) => {
+    return new TextDecoder().decode(data);
+};
+
+/**
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.
@@ -75,14 +93,4 @@ export const isHexString = (value: any, length?: number): boolean => {
     }
     if (length && value.length !== 2 + 2 * length) { return false; }
     return true;
-}
-
-/**
- * Converts a Buffer to a Uint8Array.
- *
- * @param {Buffer} target - The Buffer to convert.
- * @returns {Uint8Array} The Uint8Array representation of the Buffer.
- */
-export const bufferToUint8 = (target: Buffer): Uint8Array => {
-    return new Uint8Array(target)
 }

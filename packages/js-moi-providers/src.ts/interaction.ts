@@ -550,7 +550,7 @@ const toOperationArgs = (operation): IxOperationArgs => {
   const rawOpPayload = toRawOperation(operation)
   return {
     ...operation,
-    payload: "0x" + bytesToHex(rawOpPayload.payload)
+    payload: bytesToHex(rawOpPayload.payload)
   }
 }
 

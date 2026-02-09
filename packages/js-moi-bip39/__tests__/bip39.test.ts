@@ -14,7 +14,7 @@ import {
         const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
         const password = 'password';
         const seed = mnemonicToSeedSync(mnemonic, password);
-        expect(Buffer.isBuffer(seed)).toBe(true);
+        expect(seed).toBeInstanceOf(Uint8Array);
         expect(seed.length).toBeGreaterThan(0);
       });
     });
@@ -24,7 +24,7 @@ import {
         const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
         const password = 'password';
         const seed = await mnemonicToSeed(mnemonic, password);
-        expect(Buffer.isBuffer(seed)).toBe(true);
+        expect(seed).toBeInstanceOf(Uint8Array);
         expect(seed.length).toBeGreaterThan(0);
       });
     });

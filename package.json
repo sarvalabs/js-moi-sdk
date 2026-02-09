@@ -50,7 +50,6 @@
     "aes-js": "4.0.0-beta.5",
     "assert": "^2.0.0",
     "bn.js": "^5.2.1",
-    "buffer": "^6.0.3",
     "cross-fetch": "^4.0.0",
     "elliptic": "^6.5.4",
     "js-polo": "0.1.4",

@@ -111,7 +111,7 @@ class ManifestCoder {
             acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
             return acc;
         }, {});
-        return "0x" + (0, js_moi_utils_1.bytesToHex)(((0, js_polo_1.documentEncode)(calldata, schema).bytes()));
+        return (0, js_moi_utils_1.bytesToHex)(((0, js_polo_1.documentEncode)(calldata, schema).bytes()));
     }
     /**
      * Decodes the provided calldata into the expected arguments for a given routine.
@@ -201,11 +201,11 @@ class ManifestCoder {
     static encodeManifest(manifest) {
         if (typeof manifest === "object" && manifest !== null) {
             const serializer = new json_manifest_coder_1.JsonManifestCoder();
-            return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
+            return (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
         }
         if (typeof manifest === "string") {
             const serializer = new yaml_manifest_coder_1.YamlManifestCoder();
-            return "0x" + (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
+            return (0, js_moi_utils_1.bytesToHex)(serializer.encode(manifest));
         }
         js_moi_utils_1.ErrorUtils.throwError("Unsupported manifest type", js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
     }

@@ -467,7 +467,7 @@ const toOperationArgs = (operation) => {
     const rawOpPayload = toRawOperation(operation);
     return {
         ...operation,
-        payload: "0x" + (0, secp256k1_1.bytesToHex)(rawOpPayload.payload)
+        payload: (0, secp256k1_1.bytesToHex)(rawOpPayload.payload)
     };
 };
 const toInteractionArgs = (ix) => {

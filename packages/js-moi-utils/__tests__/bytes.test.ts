@@ -1,4 +1,4 @@
-import { bufferToUint8, hexDataLength, isBytes, isHexString, isInteger } from '../src.ts/bytes';
+import { hexDataLength, isBytes, isHexString, isInteger } from '../src.ts/bytes';
 
 describe('isInteger', () => {
   it('should return true for integers', () => {
@@ -65,14 +65,5 @@ describe('isHexString', () => {
   it('should return false for hexadecimal strings with incorrect length', () => {
     expect(isHexString('0x1234', 3)).toBe(false);
     expect(isHexString('0xabcdef', 4)).toBe(false);
-  });
-});
-
-describe('bufferToUint8', () => {
-  it('should convert a Buffer to a Uint8Array', () => {
-    const buffer = Buffer.from([1, 2, 3]);
-    const uint8Array = bufferToUint8(buffer);
-    expect(uint8Array).toBeInstanceOf(Uint8Array);
-    expect(uint8Array).toEqual(new Uint8Array([1, 2, 3]));
   });
 });

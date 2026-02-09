@@ -62,14 +62,11 @@ class ECDSA_S256 {
         this.sigName = "ECDSA_S256";
     }
     /**
-     * sign
+     * Signs a message using the provided signing key.
      *
-     * Signs a message using the ECDSA_S256 signature algorithm.
-     *
-     * @param message - The message to be signed, as a Buffer.
-     * @param signingKey - The private key used for signing, either as
-     * a hexadecimal string or a Buffer.
-     * @returns A Signature instance with ECDSA_S256 prefix and parity byte as extra data
+     * @param message - The message to be signed as a Uint8Array.
+     * @param signingKey - The signing key, which can be either a Uint8Array or a hexadecimal string.
+     * @returns A Signature object containing the signed message.
      */
     sign(message, signingKey) {
         let _signingKey;
@@ -85,7 +82,7 @@ class ECDSA_S256 {
         const sigParts = nobleECC.signSync(messageHash, _signingKey, { der: false });
         const digest = {
             _r: (0, utils_1.toDER)(sigParts.slice(0, 32)),
-            _s: (0, utils_1.toDER)(sigParts.slice(32, 64))
+            _s: (0, utils_1.toDER)(sigParts.slice(32, 64)),
         };
         const signature = (0, utils_1.bip66Encode)(digest);
         const prefixArray = new Uint8Array(2);

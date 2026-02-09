@@ -1,5 +1,4 @@
 import { HDKey } from "@scure/bip32";
-import { Buffer } from "buffer";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 /**
  * This class represents a Hierarchical Deterministic (HD) Node used in
@@ -11,9 +10,9 @@ export class HDNode {
         this.node = node;
     }
     /**
-     * Generates an HDNode from a seed buffer.
+     * Generates an HDNode from a seed value.
      *
-     * @param {Buffer} seed - The seed buffer.
+     * @param {Uint8Array} seed - The seed buffer.
      * @throws {Error} If an error occurs during the HDNode generation.
      */
     static fromSeed(seed) {
@@ -87,19 +86,19 @@ export class HDNode {
     /**
      * Retrieves the public key associated with the HDNode.
      *
-     * @returns {Buffer} The public key.
+     * @returns {Uint8Array} The public key.
      * @throws {Error} If the HDNode is not initialized.
      */
     publicKey() {
         if (!this.node) {
             ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
         }
-        return Buffer.from(this.node.publicKey);
+        return this.node.publicKey;
     }
     /**
      * Retrieves the private key associated with the HDNode.
      *
-     * @returns {Buffer} The private key.
+     * @returns {Uint8Array} The private key.
      * @throws {Error} If the HDNode is not initialized or private key is not available.
      */
     privateKey() {
@@ -109,7 +108,7 @@ export class HDNode {
         if (!this.node.privateKey) {
             ErrorUtils.throwError("Private key not available in the HDNode", ErrorCode.PROPERTY_NOT_DEFINED);
         }
-        return Buffer.from(this.node.privateKey);
+        return this.node.privateKey;
     }
 }
 //# sourceMappingURL=hdnode.js.map

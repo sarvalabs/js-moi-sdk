@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.withHexPrefix = void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
-const buffer_1 = require("buffer");
 /**
  * Ensures that a given string has the '0x' prefix.
  * If the string already has the prefix, it is returned as is.
@@ -65,7 +64,11 @@ exports.toQuantity = toQuantity;
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const encodeToString = (data) => {
-    return "0x" + buffer_1.Buffer.from(data).toString('hex');
+    let value = "";
+    for (let i = 0; i < data.length; i++) {
+        value += data[i].toString(16).padStart(2, "0");
+    }
+    return value;
 };
 exports.encodeToString = encodeToString;
 /**
@@ -120,7 +123,7 @@ exports.hexToBN = hexToBN;
  * @returns {string} The hexadecimal string representation of the Uint8Array.
  */
 const bytesToHex = (data) => {
-    return buffer_1.Buffer.from(data).toString('hex');
+    return `0x${(0, exports.encodeToString)(data)}`;
 };
 exports.bytesToHex = bytesToHex;
 /**

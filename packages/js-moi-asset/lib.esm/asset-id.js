@@ -1,5 +1,4 @@
-import { Buffer } from "buffer";
-import { bytesToHex, hexToBytes } from "js-moi-utils";
+import { bytesToHex, encodeToString, hexToBytes } from "js-moi-utils";
 /**
  * Represents a AssetID, which is an identifier for a asset.
  */
@@ -14,7 +13,7 @@ export class AssetId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     hex() {
-        return "0x" + Buffer.from(this.asset).toString('hex');
+        return bytesToHex(this.asset);
     }
     /**
      * Returns the LogicID as a hex encoded string without 0x prefix.
@@ -22,7 +21,7 @@ export class AssetId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     string() {
-        return Buffer.from(this.asset).toString('hex');
+        return encodeToString(this.asset);
     }
     /**
      * Checks if the LogicID is valid.

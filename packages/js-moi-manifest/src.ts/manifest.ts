@@ -154,7 +154,7 @@ export class ManifestCoder {
             return acc;
         }, {});
 
-        return "0x" + bytesToHex((documentEncode(calldata, schema).bytes()))
+        return bytesToHex((documentEncode(calldata, schema).bytes()))
     }
 
 
@@ -275,12 +275,12 @@ export class ManifestCoder {
     public static encodeManifest(manifest: string | LogicManifest.Manifest): string {
         if (typeof manifest === "object" && manifest !== null) {
             const serializer = new JsonManifestCoder();
-            return "0x" + bytesToHex(serializer.encode(manifest));
+            return bytesToHex(serializer.encode(manifest));
         }
 
         if (typeof manifest === "string") {
             const serializer = new YamlManifestCoder();
-            return "0x" + bytesToHex(serializer.encode(manifest));
+            return bytesToHex(serializer.encode(manifest));
         }
 
         ErrorUtils.throwError("Unsupported manifest type", ErrorCode.UNSUPPORTED_OPERATION);

@@ -451,7 +451,7 @@ const toOperationArgs = (operation) => {
     const rawOpPayload = toRawOperation(operation);
     return {
         ...operation,
-        payload: "0x" + bytesToHex(rawOpPayload.payload)
+        payload: bytesToHex(rawOpPayload.payload)
     };
 };
 export const toInteractionArgs = (ix) => {

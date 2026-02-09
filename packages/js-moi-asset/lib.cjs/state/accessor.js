@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClassFieldAccessor = exports.ArrayIndexAccessor = exports.PropertyAccessor = exports.LengthAccessor = exports.AbstractAccessor = exports.StorageKey = void 0;
 exports.generateStorageKey = generateStorageKey;
 const blake2b_1 = require("@noble/hashes/blake2b");
+const utils_1 = require("@noble/hashes/utils");
 const bn_js_1 = __importDefault(require("bn.js"));
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
@@ -15,10 +16,10 @@ class StorageKey {
         this.value = new bn_js_1.default(value);
     }
     hex() {
-        return (0, js_moi_utils_1.encodeToString)(this.toBuffer());
+        return (0, js_moi_utils_1.encodeToString)(this.toBytes());
     }
-    toBuffer() {
-        return this.value.toBuffer("be", 32);
+    toBytes() {
+        return Uint8Array.from(this.value.toArray("be", 32));
     }
 }
 exports.StorageKey = StorageKey;
@@ -79,11 +80,13 @@ class PropertyAccessor extends AbstractAccessor {
                     polorizer.polorizeFloat(key);
                 }
                 break;
+            case typeof key === "bigint":
+                polorizer.polorizeInteger(new bn_js_1.default(key.toString()));
+                break;
             case typeof key === "boolean":
                 polorizer.polorizeBool(key);
                 break;
             case key instanceof Uint8Array:
-            case key instanceof Buffer:
                 polorizer.polorizeBytes(key);
                 break;
             default:
@@ -97,9 +100,9 @@ class PropertyAccessor extends AbstractAccessor {
      * @returns The resulting hash after accessing the property.
      */
     access(hash) {
-        const separator = Buffer.from(".");
-        const buffer = Buffer.concat([hash.toBuffer(), separator, this.key]);
-        return new StorageKey(this.sum256(buffer));
+        const separator = (0, js_moi_utils_1.encodeText)(".");
+        const bytes = (0, utils_1.concatBytes)(hash.toBytes(), separator, this.key);
+        return new StorageKey(this.sum256(bytes));
     }
 }
 exports.PropertyAccessor = PropertyAccessor;
@@ -122,7 +125,7 @@ class ArrayIndexAccessor extends AbstractAccessor {
      * @returns The updated hash after accessing the element.
      */
     access(hash) {
-        const bytes = this.sum256(hash.toBuffer());
+        const bytes = this.sum256(hash.toBytes());
         const slot = new bn_js_1.default(bytes).add(new bn_js_1.default(this.index));
         return new StorageKey(slot);
     }
@@ -138,7 +141,7 @@ class ClassFieldAccessor extends AbstractAccessor {
         this.index = index;
     }
     access(hash) {
-        let blob = hash.toBuffer();
+        let blob = hash.toBytes();
         blob = this.sum256(blob);
         const bn = new bn_js_1.default(blob).add(new bn_js_1.default(this.index));
         return new StorageKey(bn);

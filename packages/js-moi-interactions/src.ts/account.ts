@@ -84,7 +84,7 @@ export class AccountInherit {
     this._value = { 
       asset_id: assetId, 
       callsite: "Transfer", 
-      calldata: "0x" + bytesToHex(calldata.bytes()) as Hex, 
+      calldata: bytesToHex(calldata.bytes()) as Hex, 
       // Todo: add funds when required
     };
 

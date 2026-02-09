@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicId = void 0;
-const buffer_1 = require("buffer");
 const js_moi_utils_1 = require("js-moi-utils");
 /**
  * Represents a LogicID, which is an identifier for a logic.
@@ -17,7 +16,7 @@ class LogicId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     hex() {
-        return "0x" + buffer_1.Buffer.from(this.logic).toString('hex');
+        return (0, js_moi_utils_1.bytesToHex)(this.logic);
     }
     /**
      * Returns the LogicID as a hex encoded string without 0x prefix.
@@ -25,7 +24,7 @@ class LogicId {
      * @returns {string} The LogicID as a hex encoded string.
      */
     string() {
-        return buffer_1.Buffer.from(this.logic).toString('hex');
+        return (0, js_moi_utils_1.bytesToHex)(this.logic);
     }
     /**
      * Checks if the LogicID is valid.
