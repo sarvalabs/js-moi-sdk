@@ -1,6 +1,6 @@
 {
   "name": "js-moi-identifiers",
-  "version": "0.7.0-rc7",
+  "version": "0.7.0-rc8",
   "description": "It a library that contains implementations for all account identifiers used in the MOI Protocol such as the `AssetID`, `LogicID` and `ParticipantID` identifiers",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
