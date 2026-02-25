@@ -69,7 +69,7 @@ export class MAS1AssetLogic {
     mintWithMetadata(beneficiary, staticMetadata) {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
-            static_metadata: staticMetadata
+            static_metadata: new Map(Object.entries(staticMetadata))
         };
         const participants = [
             {
@@ -86,7 +86,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
-                callsite: MAS1.Endpoint.MINT,
+                callsite: MAS1.Endpoint.MINTWITHMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
             participants: participants,
@@ -302,7 +302,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
-                callsite: MAS1.Endpoint.SETSTATICTOKENMETADATA,
+                callsite: MAS1.Endpoint.SETSTATICMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
             participants: [],
@@ -319,7 +319,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
-                callsite: MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
+                callsite: MAS1.Endpoint.SETDYNAMICMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
             participants: [],
@@ -355,7 +355,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
-                callsite: MAS1.Endpoint.SETDYNAMICMETADATA,
+                callsite: MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
             participants: [],
@@ -445,11 +445,10 @@ export class MAS1AssetLogic {
             signer: this.signer,
         });
     }
-    GetStaticTokenMetadata(tokenId, key, value) {
+    GetStaticTokenMetadata(tokenId, key) {
         const payload = {
             token_id: tokenId,
             key: key,
-            value: value
         };
         const rawPayload = this.polorize(payload, GET_STATIC_TOKEN_METADATA_SCHEMA);
         return new InteractionContext({
@@ -463,11 +462,10 @@ export class MAS1AssetLogic {
             signer: this.signer,
         });
     }
-    GetDynamicTokenMetadata(tokenId, key, value) {
+    GetDynamicTokenMetadata(tokenId, key) {
         const payload = {
             token_id: tokenId,
-            key: key,
-            value: value
+            key: key
         };
         const rawPayload = this.polorize(payload, GET_DYNAMIC_TOKEN_METADATA_SCHEMA);
         return new InteractionContext({

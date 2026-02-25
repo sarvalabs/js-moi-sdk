@@ -93,7 +93,7 @@ export class MAS1AssetLogic {
     public mintWithMetadata(beneficiary: string, staticMetadata: Record<string, Uint8Array>): InteractionContext<OpType.ASSET_INVOKE> {
         const payload: MAS1.MintWithMetadata = {
             beneficiary: hexToBytes(beneficiary),
-            static_metadata: staticMetadata
+            static_metadata: new Map(Object.entries(staticMetadata))
         }
 
         const participants: IxParticipant[] = [
@@ -113,7 +113,7 @@ export class MAS1AssetLogic {
               opType: OpType.ASSET_INVOKE,
               payload: {
                 asset_id: trimHexPrefix(this.assetId) as Hex,
-                callsite: MAS1.Endpoint.MINT,
+                callsite: MAS1.Endpoint.MINTWITHMETADATA,
                 calldata: bytesToHex(rawPayload) as Hex,
               },
               participants: participants,
@@ -360,7 +360,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId) as Hex,
-                callsite: MAS1.Endpoint.SETSTATICTOKENMETADATA,
+                callsite: MAS1.Endpoint.SETSTATICMETADATA,
                 calldata: bytesToHex(rawPayload) as Hex,
             },
             participants: [],
@@ -380,7 +380,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId) as Hex,
-                callsite: MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
+                callsite: MAS1.Endpoint.SETDYNAMICMETADATA,
                 calldata: bytesToHex(rawPayload) as Hex,
             },
             participants: [],
@@ -422,7 +422,7 @@ export class MAS1AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId) as Hex,
-                callsite: MAS1.Endpoint.SETDYNAMICMETADATA,
+                callsite: MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
                 calldata: bytesToHex(rawPayload) as Hex,
             },
             participants: [],
@@ -525,11 +525,10 @@ export class MAS1AssetLogic {
         })  
     }
 
-    public GetStaticTokenMetadata(tokenId: number | bigint, key: string, value: Uint8Array) {
-        const payload: MAS1.SetStaticTokenMetadata = {
+    public GetStaticTokenMetadata(tokenId: number | bigint, key: string) {
+        const payload: MAS1.GetStaticTokenMetadata = {
             token_id: tokenId,
             key: key,
-            value: value
         }
 
         const rawPayload = this.polorize<MAS1.GetStaticTokenMetadata>(payload, GET_STATIC_TOKEN_METADATA_SCHEMA)
@@ -546,11 +545,10 @@ export class MAS1AssetLogic {
         })  
     }
 
-    public GetDynamicTokenMetadata(tokenId: number | bigint, key: string, value: Uint8Array) {
-        const payload: MAS1.SetDynamicTokenMetadata = {
+    public GetDynamicTokenMetadata(tokenId: number | bigint, key: string) {
+        const payload: MAS1.GetDynamicTokenMetadata = {
             token_id: tokenId,
-            key: key,
-            value: value
+            key: key
         }
 
         const rawPayload = this.polorize<MAS1.GetDynamicTokenMetadata>(payload, GET_DYNAMIC_TOKEN_METADATA_SCHEMA)

@@ -7,6 +7,7 @@ const js_polo_1 = require("js-polo");
 const mas2_schema_1 = require("./mas2-schema");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_interactions_1 = require("js-moi-interactions");
+const mas1_schema_1 = require("./mas1-schema");
 class MAS2AssetLogic {
     assetId;
     signer;
@@ -135,7 +136,7 @@ class MAS2AssetLogic {
         const payload = {
             beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
             amount: amount,
-            static_metadata: staticMetadata
+            static_metadata: new Map(Object.entries(staticMetadata))
         };
         const participants = [
             {
@@ -152,7 +153,7 @@ class MAS2AssetLogic {
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
-                callsite: mas2_1.MAS2.Endpoint.MINT,
+                callsite: mas2_1.MAS2.Endpoint.MINTWITHMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: participants,
@@ -337,6 +338,42 @@ class MAS2AssetLogic {
             signer: this.signer,
         });
     }
+    SetStaticTokenMetadata(tokenId, key, value) {
+        const payload = {
+            token_id: tokenId,
+            key: key,
+            value: value
+        };
+        const rawPayload = this.polorize(payload, mas2_schema_1.SET_STATIC_TOKEN_METADATA_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                callsite: mas2_1.MAS2.Endpoint.SETSTATICTOKENMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    SetDynamicTokenMetadata(tokenId, key, value) {
+        const payload = {
+            token_id: tokenId,
+            key: key,
+            value: value
+        };
+        const rawPayload = this.polorize(payload, mas1_schema_1.SET_DYNAMIC_TOKEN_METADATA_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                callsite: mas2_1.MAS2.Endpoint.SETDYNAMICTOKENMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
     // Readonly routines
     symbol() {
         return new js_moi_interactions_1.InteractionContext({
@@ -388,23 +425,67 @@ class MAS2AssetLogic {
             signer: this.signer,
         });
     }
-    GetStaticMetadata() {
+    GetStaticMetadata(key) {
+        const payload = {
+            key: key,
+        };
+        const rawPayload = this.polorize(payload, mas2_schema_1.GET_STATIC_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
                 callsite: mas2_1.MAS2.Endpoint.GETSTATICMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: [],
             signer: this.signer,
         });
     }
-    GetDynamicMetadata() {
+    GetDynamicMetadata(key) {
+        const payload = {
+            key: key,
+        };
+        const rawPayload = this.polorize(payload, mas2_schema_1.GET_DYNAMIC_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
                 callsite: mas2_1.MAS2.Endpoint.GETDYNAMICMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    GetStaticTokenMetadata(tokenId, key) {
+        const payload = {
+            token_id: tokenId,
+            key: key,
+        };
+        const rawPayload = this.polorize(payload, mas2_schema_1.GET_STATIC_TOKEN_METADATA_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                callsite: mas2_1.MAS2.Endpoint.GETSTATICTOKENMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    GetDynamicTokenMetadata(tokenId, key) {
+        const payload = {
+            token_id: tokenId,
+            key: key
+        };
+        const rawPayload = this.polorize(payload, mas2_schema_1.GET_DYNAMIC_TOKEN_METADATA_SCHEMA);
+        return new js_moi_interactions_1.InteractionContext({
+            opType: js_moi_utils_1.OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                callsite: mas2_1.MAS2.Endpoint.GETDYNAMICTOKENMETADATA,
+                calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: [],
             signer: this.signer,

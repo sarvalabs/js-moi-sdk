@@ -40,7 +40,7 @@ export declare namespace MAS0 {
     interface MintWithMetadata {
         beneficiary: Uint8Array;
         amount: number | bigint;
-        static_metadata: Record<string, Uint8Array>;
+        static_metadata: Map<string, Uint8Array>;
     }
     interface Approve {
         beneficiary: Uint8Array;
@@ -64,13 +64,19 @@ export declare namespace MAS0 {
         key: string;
         value: Uint8Array;
     }
+    interface GetStaticMetadata {
+        key: string;
+    }
+    interface GetDynamicMetadata {
+        key: string;
+    }
     interface Revoke {
         beneficiary: Uint8Array;
     }
     interface BalanceOf {
         address: Uint8Array;
     }
-    type OperationPayload = Transfer | Mint | MintWithMetadata | Burn | Approve | Lockup | Release | Revoke | SetStaticMetadata | SetDynamicMetadata | BalanceOf;
+    type OperationPayload = Transfer | Mint | MintWithMetadata | Burn | Approve | Lockup | Release | Revoke | SetStaticMetadata | SetDynamicMetadata | GetStaticMetadata | GetDynamicMetadata | BalanceOf;
     /** Union of all operation payloads */
     type Operation = {
         callsite: Endpoint.TRANSFER;
@@ -99,6 +105,18 @@ export declare namespace MAS0 {
     } | {
         callsite: Endpoint.BALANCEOF;
         payload: BalanceOf;
+    } | {
+        callsite: Endpoint.SETSTATICMETADATA;
+        payload: SetStaticMetadata;
+    } | {
+        callsite: Endpoint.GETSTATICMETADATA;
+        payload: GetStaticMetadata;
+    } | {
+        callsite: Endpoint.SETDYNAMICMETADATA;
+        payload: SetDynamicMetadata;
+    } | {
+        callsite: Endpoint.GETDYNAMICMETADATA;
+        payload: GetDynamicMetadata;
     };
 }
 //# sourceMappingURL=mas0.d.ts.map

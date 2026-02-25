@@ -149,6 +149,7 @@ export class BaseProvider extends AbstractProvider {
 
             return tdu.map((asset: TDUResponse) => ({
                 asset_id: asset.asset_id,
+                token_id: hexToBN(asset.token_id),
                 amount: hexToBN(asset.amount)
             }));
         } catch (error) {

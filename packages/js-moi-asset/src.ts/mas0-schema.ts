@@ -104,3 +104,17 @@ export const SET_DYNAMIC_METADATA_SCHEMA = {
     value: { kind: "string" },
   }
 }
+
+export const GET_STATIC_METADATA_SCHEMA = {
+  kind: "struct",
+  fields: {
+    key: { kind: "string" },
+  }
+}
+
+export const GET_DYNAMIC_METADATA_SCHEMA = {
+  kind: "struct",
+  fields: {
+    key: { kind: "string" },
+  }
+}

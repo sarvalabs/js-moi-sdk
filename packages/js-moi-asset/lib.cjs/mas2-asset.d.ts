@@ -19,11 +19,15 @@ export declare class MAS2AssetLogic {
     release(tokenId: number | bigint, benefactor: string, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     SetStaticMetadata(key: string, value: Uint8Array): InteractionContext<OpType.ASSET_INVOKE>;
     SetDynamicMetadata(key: string, value: Uint8Array): InteractionContext<OpType.ASSET_INVOKE>;
+    SetStaticTokenMetadata(tokenId: number | bigint, key: string, value: Uint8Array): InteractionContext<OpType.ASSET_INVOKE>;
+    SetDynamicTokenMetadata(tokenId: number | bigint, key: string, value: Uint8Array): InteractionContext<OpType.ASSET_INVOKE>;
     symbol(): InteractionContext<OpType.ASSET_INVOKE>;
     balanceOf(tokenId: number | bigint, address: string): InteractionContext<OpType.ASSET_INVOKE>;
     creator(): InteractionContext<OpType.ASSET_INVOKE>;
     manager(): InteractionContext<OpType.ASSET_INVOKE>;
-    GetStaticMetadata(): InteractionContext<OpType.ASSET_INVOKE>;
-    GetDynamicMetadata(): InteractionContext<OpType.ASSET_INVOKE>;
+    GetStaticMetadata(key: string): InteractionContext<OpType.ASSET_INVOKE>;
+    GetDynamicMetadata(key: string): InteractionContext<OpType.ASSET_INVOKE>;
+    GetStaticTokenMetadata(tokenId: number | bigint, key: string): InteractionContext<OpType.ASSET_INVOKE>;
+    GetDynamicTokenMetadata(tokenId: number | bigint, key: string): InteractionContext<OpType.ASSET_INVOKE>;
 }
 //# sourceMappingURL=mas2-asset.d.ts.map

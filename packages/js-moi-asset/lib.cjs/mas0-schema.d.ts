@@ -141,4 +141,20 @@ export declare const SET_DYNAMIC_METADATA_SCHEMA: {
         };
     };
 };
+export declare const GET_STATIC_METADATA_SCHEMA: {
+    kind: string;
+    fields: {
+        key: {
+            kind: string;
+        };
+    };
+};
+export declare const GET_DYNAMIC_METADATA_SCHEMA: {
+    kind: string;
+    fields: {
+        key: {
+            kind: string;
+        };
+    };
+};
 //# sourceMappingURL=mas0-schema.d.ts.map

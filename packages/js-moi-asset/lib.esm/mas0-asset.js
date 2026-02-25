@@ -1,7 +1,7 @@
 import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
 import { MAS0 } from "./mas0";
 import { documentEncode } from "js-polo";
-import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
 import { SARGA_ADDRESS } from "js-moi-constants";
 import { InteractionContext } from "js-moi-interactions";
 export class MAS0AssetLogic {
@@ -67,7 +67,7 @@ export class MAS0AssetLogic {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
-            static_metadata: staticMetadata
+            static_metadata: new Map(Object.entries(staticMetadata))
         };
         const participants = [
             {
@@ -84,7 +84,7 @@ export class MAS0AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
-                callsite: MAS0.Endpoint.MINT,
+                callsite: MAS0.Endpoint.MINTWITHMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
             participants: participants,
@@ -406,23 +406,33 @@ export class MAS0AssetLogic {
             signer: this.signer,
         });
     }
-    GetStaticMetadata() {
+    GetStaticMetadata(key) {
+        const payload = {
+            key: key
+        };
+        const rawPayload = this.polorize(payload, GET_STATIC_METADATA_SCHEMA);
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
                 callsite: MAS0.Endpoint.GETSTATICMETADATA,
+                calldata: bytesToHex(rawPayload)
             },
             participants: [],
             signer: this.signer,
         });
     }
-    GetDynamicMetadata() {
+    GetDynamicMetadata(key) {
+        const payload = {
+            key: key
+        };
+        const rawPayload = this.polorize(payload, GET_DYNAMIC_METADATA_SCHEMA);
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
                 callsite: MAS0.Endpoint.GETDYNAMICMETADATA,
+                calldata: bytesToHex(rawPayload)
             },
             participants: [],
             signer: this.signer,

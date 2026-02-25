@@ -146,9 +146,6 @@ export declare const BALANCEOF_SCHEMA: {
 export declare const SET_STATIC_METADATA_SCHEMA: {
     kind: string;
     fields: {
-        token_id: {
-            kind: string;
-        };
         key: {
             kind: string;
         };
@@ -160,9 +157,6 @@ export declare const SET_STATIC_METADATA_SCHEMA: {
 export declare const GET_STATIC_METADATA_SCHEMA: {
     kind: string;
     fields: {
-        token_id: {
-            kind: string;
-        };
         key: {
             kind: string;
         };
@@ -171,9 +165,6 @@ export declare const GET_STATIC_METADATA_SCHEMA: {
 export declare const SET_DYNAMIC_METADATA_SCHEMA: {
     kind: string;
     fields: {
-        token_id: {
-            kind: string;
-        };
         key: {
             kind: string;
         };
@@ -185,9 +176,6 @@ export declare const SET_DYNAMIC_METADATA_SCHEMA: {
 export declare const GET_DYNAMIC_METADATA_SCHEMA: {
     kind: string;
     fields: {
-        token_id: {
-            kind: string;
-        };
         key: {
             kind: string;
         };

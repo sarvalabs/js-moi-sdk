@@ -72,7 +72,7 @@ class MAS1AssetLogic {
     mintWithMetadata(beneficiary, staticMetadata) {
         const payload = {
             beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
-            static_metadata: staticMetadata
+            static_metadata: new Map(Object.entries(staticMetadata))
         };
         const participants = [
             {
@@ -89,7 +89,7 @@ class MAS1AssetLogic {
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
-                callsite: mas1_1.MAS1.Endpoint.MINT,
+                callsite: mas1_1.MAS1.Endpoint.MINTWITHMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: participants,
@@ -305,7 +305,7 @@ class MAS1AssetLogic {
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
-                callsite: mas1_1.MAS1.Endpoint.SETSTATICTOKENMETADATA,
+                callsite: mas1_1.MAS1.Endpoint.SETSTATICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: [],
@@ -322,7 +322,7 @@ class MAS1AssetLogic {
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
-                callsite: mas1_1.MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
+                callsite: mas1_1.MAS1.Endpoint.SETDYNAMICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: [],
@@ -358,7 +358,7 @@ class MAS1AssetLogic {
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
                 asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
-                callsite: mas1_1.MAS1.Endpoint.SETDYNAMICMETADATA,
+                callsite: mas1_1.MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
             participants: [],
@@ -448,11 +448,10 @@ class MAS1AssetLogic {
             signer: this.signer,
         });
     }
-    GetStaticTokenMetadata(tokenId, key, value) {
+    GetStaticTokenMetadata(tokenId, key) {
         const payload = {
             token_id: tokenId,
             key: key,
-            value: value
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.GET_STATIC_TOKEN_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -466,11 +465,10 @@ class MAS1AssetLogic {
             signer: this.signer,
         });
     }
-    GetDynamicTokenMetadata(tokenId, key, value) {
+    GetDynamicTokenMetadata(tokenId, key) {
         const payload = {
             token_id: tokenId,
-            key: key,
-            value: value
+            key: key
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.GET_DYNAMIC_TOKEN_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({

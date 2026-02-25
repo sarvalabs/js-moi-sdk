@@ -47,7 +47,7 @@ export namespace MAS0 {
     export interface MintWithMetadata {
         beneficiary: Uint8Array;
         amount: number | bigint;
-        static_metadata: Record<string, Uint8Array>;
+        static_metadata: Map<string, Uint8Array>;
     }
 
     export interface Approve {
@@ -77,6 +77,14 @@ export namespace MAS0 {
         value: Uint8Array;
     }
 
+    export interface GetStaticMetadata {
+        key: string;
+    }
+
+    export interface GetDynamicMetadata {
+        key: string;
+    }
+
     export interface Revoke {
         beneficiary: Uint8Array;
     }
@@ -96,6 +104,8 @@ export namespace MAS0 {
         | Revoke
         | SetStaticMetadata
         | SetDynamicMetadata
+        | GetStaticMetadata
+        | GetDynamicMetadata
         | BalanceOf;
 
     /** Union of all operation payloads */
@@ -108,5 +118,9 @@ export namespace MAS0 {
         | { callsite: Endpoint.LOCKUP; payload: Lockup }
         | { callsite: Endpoint.RELEASE; payload: Release }
         | { callsite: Endpoint.REVOKE; payload: Revoke }
-        | { callsite: Endpoint.BALANCEOF; payload: BalanceOf };
+        | { callsite: Endpoint.BALANCEOF; payload: BalanceOf }
+        | { callsite: Endpoint.SETSTATICMETADATA; payload: SetStaticMetadata }
+        | { callsite: Endpoint.GETSTATICMETADATA; payload: GetStaticMetadata }
+        | { callsite: Endpoint.SETDYNAMICMETADATA; payload: SetDynamicMetadata }
+        | { callsite: Endpoint.GETDYNAMICMETADATA; payload: GetDynamicMetadata };
 }

@@ -45,7 +45,7 @@ export namespace MAS2 {
     export interface MintWithMetadata {
         beneficiary: Uint8Array;
         amount: number | bigint;
-        static_metadata: Record<string, Uint8Array>;
+        static_metadata: Map<string, Uint8Array>;
     }
 
     export interface Burn {

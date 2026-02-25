@@ -27,7 +27,7 @@ export declare class MAS1AssetLogic {
     manager(): InteractionContext<OpType.ASSET_INVOKE>;
     GetStaticMetadata(key: string): InteractionContext<OpType.ASSET_INVOKE>;
     GetDynamicMetadata(key: string): InteractionContext<OpType.ASSET_INVOKE>;
-    GetStaticTokenMetadata(tokenId: number | bigint, key: string, value: Uint8Array): InteractionContext<OpType.ASSET_INVOKE>;
-    GetDynamicTokenMetadata(tokenId: number | bigint, key: string, value: Uint8Array): InteractionContext<OpType.ASSET_INVOKE>;
+    GetStaticTokenMetadata(tokenId: number | bigint, key: string): InteractionContext<OpType.ASSET_INVOKE>;
+    GetDynamicTokenMetadata(tokenId: number | bigint, key: string): InteractionContext<OpType.ASSET_INVOKE>;
 }
 //# sourceMappingURL=mas1-asset.d.ts.map

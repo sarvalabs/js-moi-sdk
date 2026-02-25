@@ -26,7 +26,7 @@ export declare class MAS0AssetLogic {
     Decimals(): InteractionContext<OpType.ASSET_INVOKE>;
     MaxSupply(): InteractionContext<OpType.ASSET_INVOKE>;
     CirculatingSupply(): InteractionContext<OpType.ASSET_INVOKE>;
-    GetStaticMetadata(): InteractionContext<OpType.ASSET_INVOKE>;
-    GetDynamicMetadata(): InteractionContext<OpType.ASSET_INVOKE>;
+    GetStaticMetadata(key: string): InteractionContext<OpType.ASSET_INVOKE>;
+    GetDynamicMetadata(key: string): InteractionContext<OpType.ASSET_INVOKE>;
 }
 //# sourceMappingURL=mas0-asset.d.ts.map

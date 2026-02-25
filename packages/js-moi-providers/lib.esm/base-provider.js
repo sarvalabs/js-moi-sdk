@@ -99,6 +99,7 @@ export class BaseProvider extends AbstractProvider {
             const tdu = this.processResponse(response);
             return tdu.map((asset) => ({
                 asset_id: asset.asset_id,
+                token_id: hexToBN(asset.token_id),
                 amount: hexToBN(asset.amount)
             }));
         }

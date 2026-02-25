@@ -102,6 +102,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             const tdu = this.processResponse(response);
             return tdu.map((asset) => ({
                 asset_id: asset.asset_id,
+                token_id: (0, js_moi_utils_1.hexToBN)(asset.token_id),
                 amount: (0, js_moi_utils_1.hexToBN)(asset.amount)
             }));
         }

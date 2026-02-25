@@ -41,7 +41,7 @@ export namespace MAS1 {
 
     export interface MintWithMetadata {
         beneficiary: Uint8Array;
-        static_metadata: Record<string, Uint8Array>;
+        static_metadata: Map<string, Uint8Array>;
     }
 
     export interface Burn {

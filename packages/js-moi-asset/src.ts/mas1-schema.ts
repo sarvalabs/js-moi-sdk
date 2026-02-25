@@ -92,7 +92,6 @@ export const IS_OWNER_SCHEMA = {
 export const SET_STATIC_METADATA_SCHEMA = {
   kind: "struct",
   fields: {
-    token_id: { kind: "integer" },
     key: { kind: "string" },
     value: { kind: "bytes" },
   }
@@ -101,7 +100,6 @@ export const SET_STATIC_METADATA_SCHEMA = {
 export const GET_STATIC_METADATA_SCHEMA = {
   kind: "struct",
   fields: {
-    token_id: { kind: "integer" },
     key: { kind: "string" },
   }
 }
@@ -109,7 +107,6 @@ export const GET_STATIC_METADATA_SCHEMA = {
 export const SET_DYNAMIC_METADATA_SCHEMA = {
   kind: "struct",
   fields: {
-    token_id: { kind: "integer" },
     key: { kind: "string" },
     value: { kind: "bytes" },
   }
@@ -118,7 +115,6 @@ export const SET_DYNAMIC_METADATA_SCHEMA = {
 export const GET_DYNAMIC_METADATA_SCHEMA = {
   kind: "struct",
   fields: {
-    token_id: { kind: "integer" },
     key: { kind: "string" },
   }
 }

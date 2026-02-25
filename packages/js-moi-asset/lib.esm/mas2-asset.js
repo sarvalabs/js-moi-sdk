@@ -1,9 +1,10 @@
 import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
 import { MAS2 } from "./mas2";
 import { documentEncode } from "js-polo";
-import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
 import { SARGA_ADDRESS } from "js-moi-constants";
 import { InteractionContext } from "js-moi-interactions";
+import { SET_DYNAMIC_TOKEN_METADATA_SCHEMA } from "./mas1-schema";
 export class MAS2AssetLogic {
     assetId;
     signer;
@@ -132,7 +133,7 @@ export class MAS2AssetLogic {
         const payload = {
             beneficiary: hexToBytes(beneficiary),
             amount: amount,
-            static_metadata: staticMetadata
+            static_metadata: new Map(Object.entries(staticMetadata))
         };
         const participants = [
             {
@@ -149,7 +150,7 @@ export class MAS2AssetLogic {
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
-                callsite: MAS2.Endpoint.MINT,
+                callsite: MAS2.Endpoint.MINTWITHMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
             participants: participants,
@@ -334,6 +335,42 @@ export class MAS2AssetLogic {
             signer: this.signer,
         });
     }
+    SetStaticTokenMetadata(tokenId, key, value) {
+        const payload = {
+            token_id: tokenId,
+            key: key,
+            value: value
+        };
+        const rawPayload = this.polorize(payload, SET_STATIC_TOKEN_METADATA_SCHEMA);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: trimHexPrefix(this.assetId),
+                callsite: MAS2.Endpoint.SETSTATICTOKENMETADATA,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    SetDynamicTokenMetadata(tokenId, key, value) {
+        const payload = {
+            token_id: tokenId,
+            key: key,
+            value: value
+        };
+        const rawPayload = this.polorize(payload, SET_DYNAMIC_TOKEN_METADATA_SCHEMA);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: trimHexPrefix(this.assetId),
+                callsite: MAS2.Endpoint.SETDYNAMICTOKENMETADATA,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
     // Readonly routines
     symbol() {
         return new InteractionContext({
@@ -385,23 +422,67 @@ export class MAS2AssetLogic {
             signer: this.signer,
         });
     }
-    GetStaticMetadata() {
+    GetStaticMetadata(key) {
+        const payload = {
+            key: key,
+        };
+        const rawPayload = this.polorize(payload, GET_STATIC_METADATA_SCHEMA);
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
                 callsite: MAS2.Endpoint.GETSTATICMETADATA,
+                calldata: bytesToHex(rawPayload),
             },
             participants: [],
             signer: this.signer,
         });
     }
-    GetDynamicMetadata() {
+    GetDynamicMetadata(key) {
+        const payload = {
+            key: key,
+        };
+        const rawPayload = this.polorize(payload, GET_DYNAMIC_METADATA_SCHEMA);
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
                 asset_id: trimHexPrefix(this.assetId),
                 callsite: MAS2.Endpoint.GETDYNAMICMETADATA,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    GetStaticTokenMetadata(tokenId, key) {
+        const payload = {
+            token_id: tokenId,
+            key: key,
+        };
+        const rawPayload = this.polorize(payload, GET_STATIC_TOKEN_METADATA_SCHEMA);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: trimHexPrefix(this.assetId),
+                callsite: MAS2.Endpoint.GETSTATICTOKENMETADATA,
+                calldata: bytesToHex(rawPayload),
+            },
+            participants: [],
+            signer: this.signer,
+        });
+    }
+    GetDynamicTokenMetadata(tokenId, key) {
+        const payload = {
+            token_id: tokenId,
+            key: key
+        };
+        const rawPayload = this.polorize(payload, GET_DYNAMIC_TOKEN_METADATA_SCHEMA);
+        return new InteractionContext({
+            opType: OpType.ASSET_INVOKE,
+            payload: {
+                asset_id: trimHexPrefix(this.assetId),
+                callsite: MAS2.Endpoint.GETDYNAMICTOKENMETADATA,
+                calldata: bytesToHex(rawPayload),
             },
             participants: [],
             signer: this.signer,

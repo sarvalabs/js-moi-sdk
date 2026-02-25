@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SET_DYNAMIC_METADATA_SCHEMA = exports.SET_STATIC_METADATA_SCHEMA = exports.BALANCEOF_SCHEMA = exports.REVOKE_SCHEMA = exports.RELEASE_SCHEMA = exports.LOCKUP_SCHEMA = exports.APPROVE_SCHEMA = exports.MINT_WITH_METADATA_SCHEMA = exports.MINT_SCHEMA = exports.BURN_SCHEMA = exports.TRANSFER_FROM_SCHEMA = exports.TRANSFER_SCHEMA = void 0;
+exports.GET_DYNAMIC_METADATA_SCHEMA = exports.GET_STATIC_METADATA_SCHEMA = exports.SET_DYNAMIC_METADATA_SCHEMA = exports.SET_STATIC_METADATA_SCHEMA = exports.BALANCEOF_SCHEMA = exports.REVOKE_SCHEMA = exports.RELEASE_SCHEMA = exports.LOCKUP_SCHEMA = exports.APPROVE_SCHEMA = exports.MINT_WITH_METADATA_SCHEMA = exports.MINT_SCHEMA = exports.BURN_SCHEMA = exports.TRANSFER_FROM_SCHEMA = exports.TRANSFER_SCHEMA = void 0;
 exports.TRANSFER_SCHEMA = {
     kind: "struct",
     fields: {
@@ -94,6 +94,18 @@ exports.SET_DYNAMIC_METADATA_SCHEMA = {
     fields: {
         key: { kind: "string" },
         value: { kind: "string" },
+    }
+};
+exports.GET_STATIC_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        key: { kind: "string" },
+    }
+};
+exports.GET_DYNAMIC_METADATA_SCHEMA = {
+    kind: "struct",
+    fields: {
+        key: { kind: "string" },
     }
 };
 //# sourceMappingURL=mas0-schema.js.map

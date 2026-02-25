@@ -27,10 +27,12 @@ interface TDUBase {
 }
 
 export interface TDU extends TDUBase {
+    token_id: number | bigint;
     amount: number | bigint; 
 }
 
 export interface TDUResponse extends TDUBase {
+    token_id: string;
     amount: string; 
 }
 
