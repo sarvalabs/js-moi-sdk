@@ -110,6 +110,20 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             throw error;
         }
     }
+    async getSubAccountCount(id, options) {
+        try {
+            const params = {
+                id: id,
+                options: options ? options : defaultOptions
+            };
+            const response = await this.execute("moi.SubAccountCount", params);
+            const count = this.processResponse(response);
+            return (0, js_moi_utils_1.hexToBN)(count);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     /**
      * Retrieves the interaction information for the specified interaction hash.
      *

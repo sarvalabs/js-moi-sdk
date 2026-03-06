@@ -158,6 +158,31 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
+     * Retrieves the sub account count for the specified id.
+     *
+     * @param {string} id - The id for which to retrieve the sub account count.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the sub account count object.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getSubAccountCount(id: string, options?: Options): Promise<number | bigint> {
+        try {
+            const params: AccountParamsBase = {
+                id: id,
+                options: options ? options : defaultOptions
+            }
+
+            const response = await this.execute("moi.SubAccountCount", params);
+
+            const count: string = this.processResponse(response);
+
+            return hexToBN(count)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Retrieves the interaction information for the specified interaction hash.
      *
      * @param {string} ixHash - The hash of the interaction to retrieve.

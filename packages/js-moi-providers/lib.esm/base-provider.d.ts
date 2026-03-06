@@ -57,6 +57,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call.
      */
     getTDU(id: string, options?: Options): Promise<TDU[]>;
+    getSubAccountCount(id: string, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the interaction information for the specified interaction hash.
      *
