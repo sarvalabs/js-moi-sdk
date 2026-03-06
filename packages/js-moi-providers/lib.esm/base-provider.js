@@ -107,6 +107,14 @@ export class BaseProvider extends AbstractProvider {
             throw error;
         }
     }
+    /**
+     * Retrieves the sub account count for the specified id.
+     *
+     * @param {string} id - The id for which to retrieve the sub account count.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the sub account count object.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
     async getSubAccountCount(id, options) {
         try {
             const params = {

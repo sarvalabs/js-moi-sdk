@@ -57,6 +57,14 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call.
      */
     getTDU(id: string, options?: Options): Promise<TDU[]>;
+    /**
+     * Retrieves the sub account count for the specified id.
+     *
+     * @param {string} id - The id for which to retrieve the sub account count.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the sub account count object.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
     getSubAccountCount(id: string, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the interaction information for the specified interaction hash.
