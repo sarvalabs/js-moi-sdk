@@ -40,6 +40,6 @@ export declare class LogicFactory extends LogicBase {
      * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    deploy(builderName: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse>;
+    deploy(builderName?: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse>;
 }
 //# sourceMappingURL=logic-factory.d.ts.map
