@@ -25,7 +25,7 @@ class LogicFactory extends logic_base_1.LogicBase {
     createPayload(ixObject) {
         const payload = {
             manifest: this.encodedManifest,
-            callsite: ixObject.routine.name,
+            callsite: ixObject.routine != null ? ixObject.routine.name : "",
         };
         if (ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(payload.callsite, ...ixObject.arguments);
@@ -68,6 +68,10 @@ class LogicFactory extends logic_base_1.LogicBase {
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
     deploy(builderName, ...args) {
+        if (builderName == null) {
+            const deployRoutine = { name: "", kind: "deploy" };
+            return this.createIxObject(deployRoutine, ...args).send();
+        }
         const builder = Object.values(this.manifest.elements)
             .find(element => {
             if (element.kind === "callable") {

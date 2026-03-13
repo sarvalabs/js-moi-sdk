@@ -98,9 +98,6 @@ export const validateAccountInherit = (payload) => {
     }
 };
 export const validateLogicPayload = (payload) => {
-    if (typeof payload.callsite !== "string" || payload.callsite.length === 0) {
-        throw new Error("callsite must be a non-empty string");
-    }
     if (payload.calldata !== undefined) {
         if (typeof payload.calldata !== "string" || payload.calldata.length === 0) {
             throw new Error("calldata must be a non-empty hex string if provided");

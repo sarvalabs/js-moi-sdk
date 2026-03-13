@@ -18,7 +18,7 @@ export interface LogicPayload {
      *
      * It is required for `LogicInvoke`, `LogicEnlist` and `LogicDeploy` operations.
      */
-    callsite: string;
+    callsite?: string;
     /**
      * The calldata of the logic contract.
      *
@@ -36,7 +36,7 @@ export interface LogicPayload {
 export interface RawLogicPayload {
     manifest: Uint8Array;
     logic_id: Uint8Array;
-    callsite: string;
+    callsite?: string;
     calldata?: Uint8Array;
     interfaces?: Record<string, Uint8Array>;
 }
@@ -206,16 +206,24 @@ export interface RawAssetActionPayload {
 /**
  * `LogicDeployPayload` holds the data for deploying a new logic.
  */
-export interface LogicDeployPayload extends Omit<LogicPayload, "logic_id"> {}
+export interface LogicDeployPayload extends Omit<LogicPayload, "logic_id"> {
+    callsite?: string;
+}
 
 /**
  * `LogicActionPayload` holds the data for invoking or enlisting a logic.
  */
-export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {}
+export interface LogicActionPayload extends Omit<LogicPayload, "manifest"> {
+    callsite: string;
+}
 
-export interface RawLogicDeployPayload extends Omit<RawLogicPayload, "logic_id"> {}
+export interface RawLogicDeployPayload extends Omit<RawLogicPayload, "logic_id"> {
+    callsite?: string;
+}
 
-export interface RawLogicActionPayload extends Omit<RawLogicPayload, "manifest"> {}
+export interface RawLogicActionPayload extends Omit<RawLogicPayload, "manifest"> {
+    callsite: string;
+}
 
 export interface AccountConfigurePayload {
     add?: KeyAddPayload[];

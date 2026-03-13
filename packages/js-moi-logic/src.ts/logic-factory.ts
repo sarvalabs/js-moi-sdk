@@ -28,7 +28,7 @@ export class LogicFactory extends LogicBase {
     protected createPayload(ixObject: LogicIxObject): LogicDeployPayload {
         const payload = {
             manifest: this.encodedManifest,
-            callsite: ixObject.routine.name,
+            callsite: ixObject.routine != null ? ixObject.routine.name : "",
         } as LogicDeployPayload;
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
@@ -78,7 +78,12 @@ export class LogicFactory extends LogicBase {
      * @returns {LogicIxRequest} The logic interaction request object.
      * @throws {Error} If the builder routine is not found or if there are missing arguments.
      */
-    public deploy(builderName: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse> {
+    public deploy(builderName?: string, ...args: [...any, option?: RoutineOption]): Promise<InteractionResponse> {
+        if (builderName == null) {
+            const deployRoutine = { name: "", kind: "deploy" } as LogicManifest.Routine;
+            return this.createIxObject(deployRoutine, ...args).send();
+        }
+
         const builder = Object.values(this.manifest.elements)
         .find(element => {
             if(element.kind === "callable"){
