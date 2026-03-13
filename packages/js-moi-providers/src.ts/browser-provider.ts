@@ -1,150 +1,103 @@
 import { Identifier } from "js-moi-identifiers";
 import type { Hex } from "js-moi-utils";
-import { JsonRpcProvider } from "./jsonrpc-provider";
-import { InteractionRequest, InteractionResponse, RpcResponse } from "../types/jsonrpc";
-
-export interface RequestPermissions {
-    "wallet.Accounts": {};
-}
-
-export interface RequestPermissionsResult {
-    "wallet.Accounts": {
-        capability: "wallet.Accounts";
-        id: string;
-        invoker: string;
-        caveats: { type: "returnAddress"; value: Hex[] }[];
-    };
-}
-
-export interface NetworkConfiguration {
-    id: string;
-    name: string;
-    jsonRpcHost: string;
-    blockExplorer?: string;
-}
-
-export interface WalletAccount {
-    id: Hex;
-    name?: string;
-    path: string;
-    pubkey: string;
-}
-
-export interface WalletParticipant {
-    readonly id: string;
-    name: Hex;
-    accounts: WalletAccount[];
-}
-
-export interface WalletEventListenerMap {
-    accountChange: (identifier: Hex) => void;
-    networkChange: (host: NetworkConfiguration) => void;
-
-    // !Important to note: (string & {}) is specifically used to prevent the type from being narrowed to a string literal type.
-    // This also helps provides a better developer experience by allowing the developer to use string literals or symbols as event names along
-    // with suggestions and autocompletion in modern IDEs.
-    [key: (string & {}) | symbol]: (...args: any[]) => void;
-}
+import { BaseProvider } from "./base-provider";
+import type { InteractionRequest, InteractionResponse, RpcResponse } from "../types/jsonrpc";
+import type { Transport } from "../types/transport";
+import type {
+    NetworkConfiguration,
+    RequestPermissions,
+    RequestPermissionsResult,
+    WalletEventListenerMap,
+    WalletParticipant,
+} from "../types/browser";
 
 /**
- * The `BrowserProvider` class extends the `JsonRpcProvider` to provide
- * additional functionality for interacting with a wallet in a browser environment.
- * It includes methods for managing wallet accounts, signing messages and interactions,
- * requesting permissions, and handling wallet-related events.
+ * `BrowserProvider` wraps a browser-injected `Transport` (e.g. `window.moi`)
+ * to provide wallet-aware RPC access in a browser environment.
  *
- * @param {Transport} transport - The transport layer for communication with the wallet.
+ * All standard MOI RPC calls (inherited from `BaseProvider`) and wallet-specific
+ * calls are routed through the transport, so no HTTP host URL is needed.
  *
  * @example
- *
  * const provider = new BrowserProvider(globalThis.moi);
- *
- * @extends JsonRpcProvider
  */
-export class BrowserProvider extends JsonRpcProvider {
-    // private readonly events = new Set<keyof WalletEventListenerMap>(["accountChange", "networkChange"]);
+export class BrowserProvider extends BaseProvider {
+    private readonly transport: Transport;
 
-    constructor(host: string) {
-        super(host);
-    }
-
-    public request<T>(method: string, params: unknown[] = []): Promise<RpcResponse<T>> {
-        return super.send<T>(method, JSON.parse(JSON.stringify(params)));
+    constructor(transport: Transport) {
+        super();
+        this.transport = transport;
     }
 
     /**
-     * Retrieves the version of the wallet client.
-     *
-     * @returns {Promise<string>} A promise that resolves to the wallet client version.
-     * @throws Will throw an error if the JSON-RPC request or response processing fails.
+     * Entry point for all `BaseProvider` RPC methods (getBalance, getTDU, etc.).
+     * Wraps the single params object in an array to match the JSON-RPC spec.
      */
+    protected override async execute<T>(method: string, params: any): Promise<RpcResponse<T>> {
+        return this.transport.request<T>(method, params != null ? [params] : []);
+    }
+
+    /**
+     * Low-level request method for wallet-specific calls that already supply
+     * their params as an array.
+     */
+    public async request<T>(method: string, params: unknown[] = []): Promise<RpcResponse<T>> {
+        return this.transport.request<T>(method, params);
+    }
+
+    // ── Wallet methods ──────────────────────────────────────────────────────
+
     public async getWalletVersion(): Promise<string> {
         const response = await this.request<string>("wallet.ClientVersion");
         return this.processResponse(response);
     }
 
     /**
-     * Retrieves the list of wallet accounts available.
-     *
-     * **Note**: The first address in the returned array is the current active address.
-     *
-     * @returns {Promise<Hex[]>} A promise that resolves to an array of wallet account addresses in hexadecimal format.
-     * @throws {Error} If the JSON-RPC request fails or the response is invalid.
+     * Returns all wallet account addresses. The first element is the currently
+     * active account.
      */
     public async getWalletAccounts(): Promise<Hex[]> {
         const response = await this.request<Hex[]>("wallet.Accounts");
         return this.processResponse(response);
     }
 
-    /**
-     * Requests specific permissions from the wallet.
-     *
-     * @param {string} key - The specific permission key to request.
-     * @param {object} permission - The details or configuration of the permission being requested.
-     * @returns {Promise<object>} A promise that resolves to an array containing the result of the requested permission.
-     */
-    public async requestPermissions<TKey extends keyof RequestPermissions>(key: TKey, permission: RequestPermissions[TKey]): Promise<[RequestPermissionsResult[TKey]]> {
-        const response = await this.request<[RequestPermissionsResult[TKey]]>("wallet.RequestPermissions", [{ [key]: permission }]);
+    public async requestPermissions<TKey extends keyof RequestPermissions>(
+        key: TKey,
+        permission: RequestPermissions[TKey],
+    ): Promise<[RequestPermissionsResult[TKey]]> {
+        const response = await this.request<[RequestPermissionsResult[TKey]]>(
+            "wallet.RequestPermissions",
+            [{ [key]: permission }],
+        );
         return this.processResponse(response);
     }
 
-    /**
-     * Get the permissions granted to the wallet.
-     *
-     * @returns {Promise<RequestPermissionsResult[]>} A promise that resolves to an array of revoked permissions.
-     */
     public async getPermissions(): Promise<RequestPermissionsResult[]> {
         const response = await this.request<RequestPermissionsResult[]>("wallet.GetPermissions");
         return this.processResponse(response);
     }
 
-    /**
-     * Revokes specific permissions from the wallet.
-     * @param key - The specific permission key to revoke.
-     * @param permission - The details or configuration of the permission being revoked.
-     *
-     * @returns {Promise<null>} A promise that resolves to null if the revocation is successful.
-     */
-    public async revokePermissions<TKey extends keyof RequestPermissions>(key: TKey, permission: RequestPermissions[TKey]): Promise<null> {
+    public async revokePermissions<TKey extends keyof RequestPermissions>(
+        key: TKey,
+        permission: RequestPermissions[TKey],
+    ): Promise<null> {
         const response = await this.request<null>("wallet.RevokePermissions", [{ [key]: permission }]);
-        return this.processResponse(response);
+        return response.result != null ? this.processResponse(response) : null;
     }
 
-    public async sendInteraction(interaction: InteractionRequest): Promise<InteractionResponse> {
+    public override async sendInteraction(interaction: InteractionRequest): Promise<InteractionResponse> {
         const response = await this.request<Hex>("wallet.SendInteraction", [interaction]);
         const hash = this.processResponse(response);
 
         return {
-            hash: hash,
+            hash,
             wait: this.waitForInteraction.bind(this, hash),
-            result: this.waitForResult.bind(this, hash)
+            result: this.waitForResult.bind(this, hash),
         };
     }
 
     /**
-     * Gets the details of a wallet account.
-     *
-     * @param id - The identifier of the wallet account. If not provided, the method will return master account details.
-     * @returns {Promise<WalletParticipant | null>} A promise that resolves to the account configuration object or null if not found.
+     * @param id - Participant identifier. Omit to get the master account.
      */
     public async getWalletAccount(id?: Hex | Identifier | null): Promise<WalletParticipant | null> {
         const value = id instanceof Identifier ? id.toHex() : id;
@@ -152,91 +105,54 @@ export class BrowserProvider extends JsonRpcProvider {
         return this.processResponse(response);
     }
 
-    /**
-     * Retrieves the network configuration from the wallet.
-     *
-     * @returns A promise that resolves to the `NetworkConfiguration` object if the request is successful, or `null` if the network details is not available.
-     * @throws This method may throw an error if the underlying request fails.
-     */
     public async getNetwork(): Promise<NetworkConfiguration | null> {
         const response = await this.request<NetworkConfiguration>("wallet.Network");
         return this.processResponse(response);
     }
 
-    // /**
-    //  * Registers an event listener for a specific wallet event.
-    //  *
-    //  * @param eventName - The name of the event to listen for.
-    //  * @param listener - The callback function to be executed when the event is triggered.
-    //  * @returns The current instance of the class for method chaining.
-    //  */
-    // public on<K extends keyof WalletEventListenerMap>(eventName: K, listener: WalletEventListenerMap[K]): this {
-    //     if (this.events.has(eventName)) {
-    //         this.transport.on(eventName, listener);
-    //     }
+    // ── Event delegation ────────────────────────────────────────────────────
+    // The Transport already extends EventEmitter and (in browser environments)
+    // wires DOM `window.postMessage` listeners for wallet events. Delegating
+    // here means callers work against a single object without caring about the
+    // underlying transport's event plumbing.
 
-    //     return super.on(eventName, listener);
-    // }
+    public override on<K extends keyof WalletEventListenerMap>(
+        eventName: K,
+        listener: WalletEventListenerMap[K],
+    ): this {
+        this.transport.on(eventName, listener);
+        return this;
+    }
 
-    // /**
-    //  * Registers a one-time event listener for the specified event.
-    //  * The listener will be invoked at most once after being registered,
-    //  * and then it will be automatically removed.
-    //  *
-    //  * @param eventName - The name of the event to listen for.
-    //  * @param listener - The callback function to execute when the event is triggered.
-    //  * @returns The current instance of the class, allowing for method chaining.
-    //  */
-    // public once<K extends keyof WalletEventListenerMap>(eventName: K, listener: WalletEventListenerMap[K]): this {
-    //     if (this.events.has(eventName)) {
-    //         this.transport.once(eventName, listener);
-    //     }
+    public override once<K extends keyof WalletEventListenerMap>(
+        eventName: K,
+        listener: WalletEventListenerMap[K],
+    ): this {
+        this.transport.once(eventName, listener);
+        return this;
+    }
 
-    //     return super.once(eventName, listener);
-    // }
+    public override addListener<K extends keyof WalletEventListenerMap>(
+        eventName: K,
+        listener: WalletEventListenerMap[K],
+    ): this {
+        this.transport.addListener(eventName, listener);
+        return this;
+    }
 
-    // /**
-    //  * Adds a listener for a specific wallet event.
-    //  *
-    //  * @param eventName - The name of the event to listen for.
-    //  * @param listener - The callback function to be executed when the event is triggered.
-    //  * @returns The current instance of the class, allowing for method chaining.
-    //  */
-    // public addListener<K extends keyof WalletEventListenerMap>(eventName: K, listener: WalletEventListenerMap[K]): this {
-    //     if (this.events.has(eventName)) {
-    //         this.transport.addListener(eventName, listener);
-    //     }
+    public override off<K extends keyof WalletEventListenerMap>(
+        eventName: K,
+        listener: WalletEventListenerMap[K],
+    ): this {
+        this.transport.off(eventName, listener);
+        return this;
+    }
 
-    //     return super.addListener(eventName, listener);
-    // }
-
-    // /**
-    //  * Removes a previously registered event listener for a specific wallet event.
-    //  *
-    //  * @param eventName - The name of the event for which the listener should be removed.
-    //  * @param listener - The listener function to be removed for the specified event.
-    //  * @returns The current instance of the class for method chaining.
-    //  */
-    // public removeListener<K extends keyof WalletEventListenerMap>(eventName: K, listener: WalletEventListenerMap[K]): this {
-    //     if (this.events.has(eventName)) {
-    //         this.transport.removeListener(eventName, listener);
-    //     }
-
-    //     return super.removeListener(eventName, listener);
-    // }
-
-    // /**
-    //  * Removes a previously registered event listener for a specific wallet event.
-    //  *
-    //  * @param eventName - The name of the event for which the listener should be removed.
-    //  * @param listener - The listener function to be removed for the specified event.
-    //  * @returns The current instance of the class for method chaining.
-    //  */
-    // public off<K extends keyof WalletEventListenerMap>(eventName: K, listener: WalletEventListenerMap[K]): this {
-    //     if (this.events.has(eventName)) {
-    //         this.transport.off(eventName, listener);
-    //     }
-
-    //     return super.off(eventName, listener);
-    // }
+    public override removeListener<K extends keyof WalletEventListenerMap>(
+        eventName: K,
+        listener: WalletEventListenerMap[K],
+    ): this {
+        this.transport.removeListener(eventName, listener);
+        return this;
+    }
 }
