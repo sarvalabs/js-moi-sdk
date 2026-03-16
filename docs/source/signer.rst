@@ -521,13 +521,9 @@ Wallet
             }
         */
 
-    .. autofunction:: Wallet#generateKeystore
-
     .. autofunction:: Wallet.fromMnemonic
 
     .. autofunction:: Wallet.fromMnemonicSync
-
-    .. autofunction:: Wallet.fromKeystore
 
     .. autofunction:: Wallet.createRandom
 
