@@ -723,9 +723,258 @@ Websocket enabled JSON-RPC communication
         ]
     */
 
+Browser Provider
+----------------
+The **BrowserProvider** is a subclass of ``BaseProvider`` that wraps a
+browser-injected ``Transport`` (e.g. ``window.moi``) to provide wallet-aware
+RPC access in a browser environment. It is the recommended provider for
+decentralized applications running in the browser.
+
+All standard MOI RPC calls inherited from ``BaseProvider`` and wallet-specific
+calls are routed through the injected transport, so no HTTP host URL is needed.
+The provider also delegates wallet events such as account and network changes
+directly from the transport, so callers interact with a single unified object.
+
+Types
+~~~~~
+
+**NetworkConfiguration**
+
+The ``NetworkConfiguration`` interface represents the network configuration
+returned by the wallet. It has the following properties:
+
+* ``id`` - ``string``: The unique identifier of the network.
+* ``name`` - ``string``: The human-readable name of the network.
+* ``jsonRpcHost`` - ``string``: The JSON-RPC endpoint URL for the network.
+* ``blockExplorer`` (optional) - ``string``: The block explorer URL for the network.
+
+**WalletAccount**
+
+The ``WalletAccount`` interface represents an individual account stored in the
+wallet. It has the following properties:
+
+* ``id`` - ``Hex``: The unique identifier (address) of the account.
+* ``name`` (optional) - ``string``: A human-readable label for the account.
+* ``path`` - ``string``: The derivation path of the account.
+* ``pubkey`` - ``string``: The public key associated with the account.
+
+**WalletParticipant**
+
+The ``WalletParticipant`` interface represents a wallet participant (identity)
+that groups one or more accounts. It has the following properties:
+
+* ``id`` - ``string``: The unique identifier of the participant.
+* ``name`` - ``Hex``: The name of the participant.
+* ``accounts`` - ``WalletAccount[]``: The list of accounts belonging to this participant.
+
+**RequestPermissions**
+
+The ``RequestPermissions`` interface maps permission keys to their request
+payload shapes. Currently supported:
+
+* ``"wallet.Accounts"`` - ``{}``: Requests access to the wallet's account list.
+
+**RequestPermissionsResult**
+
+The ``RequestPermissionsResult`` interface maps permission keys to their result
+shapes. For ``"wallet.Accounts"`` it has the following properties:
+
+* ``capability`` - ``string``: The capability granted (e.g. ``"wallet.Accounts"``).
+* ``id`` - ``string``: The unique identifier of the granted permission.
+* ``invoker`` - ``string``: The origin that was granted the permission.
+* ``caveats`` - ``{ type: "returnAddress"; value: Hex[] }[]``: Restrictions
+  placed on the granted permission.
+
+**WalletEventListenerMap**
+
+The ``WalletEventListenerMap`` interface defines the events emitted by the
+wallet transport. It has the following entries:
+
+* ``accountChange`` - ``(identifier: Hex) => void``: Emitted when the active wallet account changes.
+* ``networkChange`` - ``(host: NetworkConfiguration) => void``: Emitted when the connected network changes.
+
+.. code-block:: javascript
+
+    // Example
+    const provider = new BrowserProvider(globalThis.moi);
+
+Usage
+~~~~~
+
+Wallet Version
+^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const version = await provider.getWalletVersion();
+    console.log(version);
+
+    // Output
+    /*
+        "0.1.0"
+    */
+
+Wallet Accounts
+^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const accounts = await provider.getWalletAccounts();
+    console.log(accounts);
+
+    // Output
+    /*
+        [
+            "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+            "0x96c93a80bc13e4864b485937d5aca52a2e61135b03e4918c58cc2bcc1b9e7a6b"
+        ]
+    */
+
+Wallet Account
+^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example — get the master (currently active) participant
+    const participant = await provider.getWalletAccount();
+    console.log(participant);
+
+    // Output
+    /*
+        {
+            "id": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+            "name": "0x...",
+            "account_keys": [
+                {
+                    "id": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+                    "path": "m/44'/6174'/0'/0/0",
+                    "pubkey": "0x..."
+                }
+            ]
+        }
+    */
+
+    // Example — get a specific participant by address
+    const specific = await provider.getWalletAccount("0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08");
+    console.log(specific);
+
+Network
+^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const network = await provider.getNetwork();
+    console.log(network);
+
+    // Output
+    /*
+        {
+            "id": "devnet",
+            "name": "MOI Devnet",
+            "jsonRpcHost": "http://localhost:1600",
+            "blockExplorer": "https://explorer.moi.technology"
+        }
+    */
+
+Requesting Permissions
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const result = await provider.requestPermissions("wallet.Accounts", {});
+    console.log(result);
+
+    // Output
+    /*
+        [
+            {
+                "capability": "wallet.Accounts",
+                "id": "abc123",
+                "invoker": "https://my-dapp.example.com",
+                "caveats": [
+                    {
+                        "type": "returnAddress",
+                        "value": [
+                            "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08"
+                        ]
+                    }
+                ]
+            }
+        ]
+    */
+
+Getting Permissions
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const permissions = await provider.getPermissions();
+    console.log(permissions);
+
+    // Output
+    /*
+        [
+            {
+                "capability": "wallet.Accounts",
+                "id": "abc123",
+                "invoker": "https://my-dapp.example.com",
+                "caveats": [...]
+            }
+        ]
+    */
+
+Revoking Permissions
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    await provider.revokePermissions("wallet.Accounts", {});
+
+Sending an Interaction
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example
+    const response = await provider.sendInteraction(signedIxRequest);
+    console.log(response.hash);
+
+    // Wait for the interaction to be confirmed
+    const receipt = await response.wait();
+    console.log(receipt);
+
+Listening to Wallet Events
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: javascript
+
+    // Example — react to account changes
+    provider.on("accountChange", (identifier) => {
+        console.log("Active account changed to:", identifier);
+    });
+
+    // Example — react to network changes
+    provider.on("networkChange", (network) => {
+        console.log("Network changed:", network.name, network.jsonRpcHost);
+    });
+
+    // Example — remove a listener
+    const handleAccountChange = (identifier) => {
+        console.log("Account:", identifier);
+    };
+
+    provider.on("accountChange", handleAccountChange);
+    provider.off("accountChange", handleAccountChange);
+
 Voyage Provider
 ---------------
-The **VoyageProvider** is a subclass of ``BaseProvider`` it allows users to 
+The **VoyageProvider** is a subclass of ``BaseProvider`` it allows users to
 connect their applications to the MOI network using the voyage service.
 Voyage is a reliable and scalable infrastructure provider for MOI, offering a 
 convenient way to access the MOI blockchain without the need to run a full node. 
