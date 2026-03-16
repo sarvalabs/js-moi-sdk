@@ -314,7 +314,7 @@ const processParticipants = (ixObject) => {
                 break;
             case OpType.ASSET_INVOKE: {
                 const { asset_id } = operation.payload;
-                addParticipant(`0x${asset_id}`, LockType.MUTATE_LOCK);
+                addParticipant(asset_id, LockType.MUTATE_LOCK);
                 break;
             }
             case OpType.LOGIC_DEPLOY:
@@ -322,7 +322,7 @@ const processParticipants = (ixObject) => {
             case OpType.LOGIC_ENLIST:
             case OpType.LOGIC_INVOKE:
                 const { logic_id } = operation.payload;
-                addParticipant(`0x${logic_id}`, LockType.MUTATE_LOCK);
+                addParticipant(logic_id, LockType.MUTATE_LOCK);
                 break;
             default:
                 ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
