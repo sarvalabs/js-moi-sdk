@@ -18,7 +18,7 @@ js-moi-sdk package.
 
     console.log(moi.VERSION)
 
-    >> 0.7.0-rc9
+    >> 0.7.0-rc10
 
 MOI Derivation Path
 -------------------
