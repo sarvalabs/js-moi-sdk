@@ -4,7 +4,6 @@ exports.LogicFactory = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_base_1 = require("./logic-base");
-const routine_options_1 = require("./routine-options");
 /**
  * This class represents a factory for deploying logic.
  */
@@ -40,16 +39,11 @@ class LogicFactory extends logic_base_1.LogicBase {
      * @returns {Promise<LogicIxResult>} The processed logic interaction result.
      */
     async processResult(response, timeout) {
-        try {
-            const result = await response.result(timeout);
-            return {
-                logic_id: result[0].logic_id ? result[0].logic_id : "",
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
-            };
-        }
-        catch (err) {
-            throw err;
-        }
+        const result = await response.result(timeout);
+        return {
+            logic_id: result[0].logic_id ?? "",
+            error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error),
+        };
     }
     /**
      * Returns the POLO encoded manifest in hexadecimal format.
@@ -62,32 +56,29 @@ class LogicFactory extends logic_base_1.LogicBase {
     /**
      * Deploys a logic.
      *
-     * @param {string} builderName - The name of the builder routine.
-     * @param {any[]} args - Optional arguments for the deployment.
-     * @returns {LogicIxRequest} The logic interaction request object.
-     * @throws {Error} If the builder routine is not found or if there are missing arguments.
+     * @param {string} builderName - The name of the builder routine. (optional)
+     * @param {any[]} args - Arguments for the builder routine. (optional)
+     * @returns {LogicContext<LogicOps>} The logic interaction context.
+     * @throws {Error} If the builder routine is not found or required arguments are missing.
      */
     deploy(builderName, ...args) {
         if (builderName == null) {
             const deployRoutine = { name: "", kind: "deploy" };
-            return this.createIxObject(deployRoutine, ...args).send();
+            return this.createIxObject(deployRoutine, ...args);
         }
-        const builder = Object.values(this.manifest.elements)
-            .find(element => {
+        const builder = Object.values(this.manifest.elements).find(element => {
             if (element.kind === "callable") {
                 const routine = element.data;
-                return routine.kind === "deploy" &&
-                    builderName === routine.name;
+                return routine.kind === "deploy" && routine.name === builderName;
             }
             return false;
         });
         if (builder) {
             const builderRoutine = builder.data;
-            const argsLen = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.length - 1 : args.length;
-            if (builderRoutine.accepts && (argsLen < Object.keys(builderRoutine.accepts).length)) {
+            if (builderRoutine.accepts && args.length < Object.keys(builderRoutine.accepts).length) {
                 js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
-            return this.createIxObject(builderRoutine, ...args).send();
+            return this.createIxObject(builderRoutine, ...args);
         }
         js_moi_utils_1.ErrorUtils.throwError("Invalid builder name, builder not found!", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
     }

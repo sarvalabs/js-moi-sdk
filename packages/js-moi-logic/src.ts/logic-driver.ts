@@ -5,7 +5,6 @@ import { ErrorCode, ErrorUtils, Hex, defineReadOnly } from "js-moi-utils";
 import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
 
 /**
@@ -58,26 +57,15 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
                 return;
             }
 
-            routines[routine.name] = async (...params: [...args: any[], options: RoutineOption | undefined]) => {
-                const argsLen =
-                    params.at(-1) && params.at(-1) instanceof RoutineOption
-                        ? params.length - 1
-                        : params.length;
-
-                if (routine.accepts && argsLen < routine.accepts.length) {
+            routines[routine.name] = (...params: any[]) => {
+                if (routine.accepts && params.length < routine.accepts.length) {
                     ErrorUtils.throwError(
                         "One or more required arguments are missing.",
                         ErrorCode.INVALID_ARGUMENT
                     );
                 }
 
-                const ixObject = this.createIxObject(routine, ...params);
-
-                if (!this.isMutableRoutine(routine)) {
-                    return await ixObject.unwrap();
-                }
-
-                return await ixObject.send();
+                return this.createIxObject(routine, ...params);
             };
 
             routines[routine.name].isMutable = (): boolean => {
@@ -97,9 +85,9 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     }
 
     /**
-     * Checks if a routine is mutable based on its name.
-     * 
-     * @param {string} routineName - The name of the routine.
+     * Checks if a routine is mutable based on its mode.
+     *
+     * @param {LogicManifest.Routine} routine - The routine to check.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine(routine: LogicManifest.Routine): boolean {
@@ -107,8 +95,8 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     }
 
     /**
-     * Creates the logic payload from the given interaction object.
-     * 
+     * Creates the logic action payload from the given interaction object.
+     *
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicActionPayload} The logic action payload.
      */
@@ -130,25 +118,19 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     }
 
     /**
-     * Processes the logic interaction result and returns the decoded data or 
-     error, if available.
-     * 
+     * Processes the logic interaction result and returns the decoded output and error, if available.
+     *
      * @param {LogicIxResponse} response - The logic interaction response.
      * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult | null>} A promise that resolves to the 
-     logic interaction result or null.
+     * @returns {Promise<LogicIxResult>} A promise that resolves to the logic interaction result.
      */
     protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
-        try {
-            const result = await response.result(timeout);
+        const result = await response.result(timeout);
 
-            return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs),
-                error: ManifestCoder.decodeException(result[0].error)
-            };
-        } catch(err) {
-            throw err;
-        }
+        return {
+            output: this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs),
+            error: ManifestCoder.decodeException(result[0].error),
+        };
     }
 }
 

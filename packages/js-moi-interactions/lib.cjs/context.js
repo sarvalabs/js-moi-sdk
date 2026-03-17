@@ -25,77 +25,74 @@ class InteractionContext {
     participants() {
         return this.ctx.participants;
     }
-    /** @internal Builds the base sender object for all calls. */
-    async buildSender() {
+    /** Builds the base sender object, respecting any overrides in option. */
+    async buildSender(option) {
+        if (option?.sender) {
+            return option.sender;
+        }
         const { signer } = this.ctx;
-        const [identifier, nonce, keyId] = await Promise.all([
+        const [identifier, keyId] = await Promise.all([
             signer.getIdentifier(),
-            signer.getNonce(),
             signer.getKeyId(),
         ]);
         return {
             id: identifier.toHex(),
-            sequence: nonce,
+            sequence: option?.sequence ?? (await signer.getNonce()),
             key_id: keyId,
         };
     }
-    /** @internal Builds the interaction operation. */
+    /** Builds the interaction operation. */
     buildOperation() {
         return {
             type: this.ctx.opType,
             payload: this.ctx.payload,
         };
     }
-    /** @internal Combines base and additional participants. */
+    /** Merges base and option participants, with option entries overriding base entries by id. */
     mergeParticipants(option) {
-        const base = this.ctx.participants ?? [];
-        const extra = option?.participants ?? [];
-        return [...base, ...extra];
+        const merged = new Map();
+        for (const p of this.ctx.participants ?? []) {
+            merged.set((0, js_moi_utils_1.trimHexPrefix)(p.id), p);
+        }
+        for (const p of option?.participants ?? []) {
+            merged.set((0, js_moi_utils_1.trimHexPrefix)(p.id), p);
+        }
+        return Array.from(merged.values());
+    }
+    /**
+     * Builds and returns the full interaction data object.
+     * @param option Optional configuration such as fuel price or participants
+     */
+    async ixData(option) {
+        const sender = await this.buildSender(option);
+        return {
+            sender,
+            fuel_price: option?.fuel_price ?? js_moi_constants_1.DEFAULT_FUEL_PRICE,
+            fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
+            ix_operations: [this.buildOperation()],
+            participants: this.mergeParticipants(option),
+        };
     }
     /**
      * Sends a transaction to the network, committing changes.
      * @param option Optional configuration such as fuel price or participants
      */
     async send(option) {
-        const { signer } = this.ctx;
-        const sender = await this.buildSender();
-        return signer.sendInteraction({
-            sender,
-            fuel_price: option?.fuel_price ?? js_moi_constants_1.DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
-            ix_operations: [this.buildOperation()],
-            participants: this.mergeParticipants(option),
-        });
+        return this.ctx.signer.sendInteraction(await this.ixData(option));
     }
     /**
      * Executes a read-only call (no state changes).
      * @param option Optional configuration such as additional participants
      */
     async call(option) {
-        const { signer } = this.ctx;
-        const sender = await this.buildSender();
-        return signer.call({
-            sender,
-            fuel_price: option?.fuel_price ?? js_moi_constants_1.DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
-            ix_operations: [this.buildOperation()],
-            participants: this.mergeParticipants(option),
-        });
+        return this.ctx.signer.call(await this.ixData(option));
     }
     /**
      * Estimates the fuel cost for this interaction.
      * @param option Optional configuration such as additional participants
      */
     async estimateFuel(option) {
-        const { signer } = this.ctx;
-        const sender = await this.buildSender();
-        return signer.estimateFuel({
-            sender,
-            fuel_price: option?.fuel_price ?? js_moi_constants_1.DEFAULT_FUEL_PRICE,
-            fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
-            ix_operations: [this.buildOperation()],
-            participants: this.mergeParticipants(option),
-        });
+        return this.ctx.signer.estimateFuel(await this.ixData(option));
     }
 }
 exports.InteractionContext = InteractionContext;

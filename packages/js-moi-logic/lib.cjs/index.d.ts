@@ -1,4 +1,5 @@
 export type * from "../types/logic";
+export * from "./logic-context";
 export * from "./logic-driver";
 export * from "./logic-factory";
 export * from "./routine-options";

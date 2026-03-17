@@ -1,37 +1,6 @@
-import { AssetCreatePayload, AssetActionPayload, IxParticipant, InteractionResponse, ParticipantCreatePayload, AccountConfigurePayload, AccountInheritPayload, InteractionCallResponse } from "js-moi-providers";
-import { Signer } from "js-moi-signer";
+import { IxParticipant, InteractionResponse, AnyIxOperation, InteractionCallResponse, InteractionObject } from "js-moi-providers";
 import { OpType } from "js-moi-utils";
-/**
- * Represents all valid operation types supported by InteractionContext.
- */
-export type AllowedOps = OpType.ASSET_CREATE | OpType.ASSET_INVOKE | OpType.PARTICIPANT_CREATE | OpType.ACCOUNT_CONFIGURE | OpType.ACCOUNT_INHERIT;
-/**
- * Maps operation types to their expected payloads.
- */
-type OperationMap = {
-    [OpType.ASSET_CREATE]: AssetCreatePayload;
-    [OpType.ASSET_INVOKE]: AssetActionPayload;
-    [OpType.PARTICIPANT_CREATE]: ParticipantCreatePayload;
-    [OpType.ACCOUNT_CONFIGURE]: AccountConfigurePayload;
-    [OpType.ACCOUNT_INHERIT]: AccountInheritPayload;
-};
-/**
- * Context object describing the state of an interaction.
- */
-interface Context<T extends AllowedOps> {
-    opType: T;
-    payload: OperationMap[T];
-    participants: IxParticipant[];
-    signer: Signer;
-}
-/**
- * Optional configuration for executing an interaction.
- */
-export interface IxOption {
-    fuel_price?: number;
-    fuel_limit?: number;
-    participants?: IxParticipant[];
-}
+import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context";
 /**
  * A unified context class that encapsulates the full lifecycle of
  * a Moi interaction — from building the operation to executing
@@ -39,19 +8,26 @@ export interface IxOption {
  */
 export declare class InteractionContext<T extends AllowedOps> {
     private readonly ctx;
-    constructor(ctx: Context<T>);
+    constructor(ctx: IxContext<T>);
     /** Returns the operation type for this interaction. */
     type(): OpType;
     /** Returns the payload associated with this interaction. */
     payload(): OperationMap[T];
     /** Returns all participants involved in this interaction. */
     participants(): IxParticipant[];
-    /** @internal Builds the base sender object for all calls. */
-    private buildSender;
-    /** @internal Builds the interaction operation. */
-    private buildOperation;
-    /** @internal Combines base and additional participants. */
-    private mergeParticipants;
+    /** Builds the base sender object, respecting any overrides in option. */
+    protected buildSender(option?: IxOption): Promise<import("js-moi-providers").Sender>;
+    /** Builds the interaction operation. */
+    protected buildOperation(): Extract<AnyIxOperation, {
+        type: T;
+    }>;
+    /** Merges base and option participants, with option entries overriding base entries by id. */
+    protected mergeParticipants(option?: IxOption): IxParticipant[];
+    /**
+     * Builds and returns the full interaction data object.
+     * @param option Optional configuration such as fuel price or participants
+     */
+    ixData(option?: IxOption): Promise<InteractionObject>;
     /**
      * Sends a transaction to the network, committing changes.
      * @param option Optional configuration such as fuel price or participants
@@ -68,5 +44,4 @@ export declare class InteractionContext<T extends AllowedOps> {
      */
     estimateFuel(option?: IxOption): Promise<number | bigint>;
 }
-export {};
 //# sourceMappingURL=context.d.ts.map

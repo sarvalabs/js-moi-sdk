@@ -1,4 +1,4 @@
-import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix, withHexPrefix } from "js-moi-utils";
 import { ParticipantId, AssetId, Identifier, LogicId } from "js-moi-identifiers";
 import { ZERO_ADDRESS, KMOI_ASSET_ID } from "js-moi-constants";
 import { Polorizer } from "js-polo";
@@ -311,7 +311,7 @@ const processParticipants = (ixObject) => {
                 break;
             case OpType.ASSET_INVOKE: {
                 const { asset_id } = operation.payload;
-                addParticipant(asset_id, LockType.MUTATE_LOCK);
+                addParticipant(withHexPrefix(asset_id), LockType.MUTATE_LOCK);
                 break;
             }
             case OpType.LOGIC_DEPLOY:
@@ -319,7 +319,7 @@ const processParticipants = (ixObject) => {
             case OpType.LOGIC_ENLIST:
             case OpType.LOGIC_INVOKE:
                 const { logic_id } = operation.payload;
-                addParticipant(logic_id, LockType.MUTATE_LOCK);
+                addParticipant(withHexPrefix(logic_id), LockType.MUTATE_LOCK);
                 break;
             default:
                 ErrorUtils.throwError("Unsupported Ix type", ErrorCode.INVALID_ARGUMENT);
@@ -328,9 +328,7 @@ const processParticipants = (ixObject) => {
     // Merge additional participants (if not already present)
     if (ixObject.participants) {
         for (const { id, lock_type } of ixObject.participants) {
-            if (!participants.has(trimHexPrefix(id))) {
-                addParticipant(id, lock_type);
-            }
+            addParticipant(id, lock_type);
         }
     }
     return [...participants.values()];

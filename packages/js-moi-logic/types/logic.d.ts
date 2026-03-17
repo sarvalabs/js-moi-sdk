@@ -1,22 +1,14 @@
 import { LogicManifest } from "js-moi-manifest";
-import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
-import type { RoutineOption } from "../src.ts/routine-options";
-
-export interface LogicIxRequest {
-    call: () => Promise<InteractionCallResponse>;
-    send: () => Promise<InteractionResponse>;
-    estimateFuel: () => Promise<number | bigint>;
-    unwrap: () => Promise<any>;
-}
+import type { LogicContext, LogicOps } from "../src.ts/logic-context";
 
 export interface Routine<T extends (...args: any[]) => any> {
     /**
-     * Executes the logic interaction request with the specified routine and arguments.
-     * @param {...any[]} args - The arguments for the logic interaction request.
-     * @param {RoutineOption} option - The option for the logic interaction request.
-     * @returns {Promise<any>} a promise that resolves to the result of the logic interaction request.
+     * Prepares the logic interaction with the specified arguments.
+     * Returns a LogicContext that can be executed with .send(), .call(), or .estimateFuel().
+     * @param {...any[]} args - The arguments for the routine.
+     * @returns {LogicContext} The logic interaction context.
      */
-    (...args: [...Parameters<T>, option?: RoutineOption]): ReturnType<T> | Promise<InteractionResponse>;
+    (...args: Parameters<T>): LogicContext<LogicOps>;
     isMutable: () => boolean;
     accepts: () => LogicManifest.TypeField[] | null;
     returns: () => LogicManifest.TypeField[] | null;

@@ -1,4 +1,4 @@
-import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, Hex, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix } from "js-moi-utils";
+import { accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, ErrorCode, ErrorUtils, Hex, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, toQuantity, trimHexPrefix, withHexPrefix } from "js-moi-utils";
 import { InteractionObject, IxFund, IxParticipant, RawInteractionObject, RawIxFund, RawIxParticipant, Signature, RawSignature, InteractionArgs, IxFundArgs, IxOperationArgs } from "../types/interaction";
 import { ParticipantId, AssetId, Identifier, LogicId } from "js-moi-identifiers";
 import { AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload, RawAssetCreatePayload, RawIxOperation } from "../types/operation";
@@ -397,7 +397,7 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
 
       case OpType.ASSET_INVOKE: {
         const { asset_id } = operation.payload as AssetActionPayload;
-        addParticipant(asset_id, LockType.MUTATE_LOCK);
+        addParticipant(withHexPrefix(asset_id), LockType.MUTATE_LOCK);
         break;
       }
 
@@ -406,7 +406,7 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
       case OpType.LOGIC_ENLIST:
       case OpType.LOGIC_INVOKE: 
         const { logic_id } = operation.payload as LogicActionPayload;
-        addParticipant(logic_id, LockType.MUTATE_LOCK);
+        addParticipant(withHexPrefix(logic_id), LockType.MUTATE_LOCK);
         break;
 
       default:
@@ -417,9 +417,7 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
   // Merge additional participants (if not already present)
   if (ixObject.participants) {
     for (const { id, lock_type } of ixObject.participants) {
-      if (!participants.has(trimHexPrefix(id))) {
-        addParticipant(id, lock_type);
-      }
+      addParticipant(id, lock_type);
     }
   }
 
