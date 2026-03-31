@@ -1,6 +1,6 @@
 {
   "name": "js-moi-providers",
-  "version": "0.7.0-rc11",
+  "version": "0.7.0-rc13",
   "description": "Module to connect and interact with MOI network",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -25,8 +25,8 @@
   "dependencies": {
     "cross-fetch": "^4.0.0",
     "events": "npm:events@^3.3.0",
-    "js-moi-manifest": "^0.7.0-rc11",
-    "js-moi-utils": "^0.7.0-rc11",
+    "js-moi-manifest": "^0.7.0-rc13",
+    "js-moi-utils": "^0.7.0-rc13",
     "websocket": "^1.0.35",
     "crypto": "npm:crypto-browserify"
   },
