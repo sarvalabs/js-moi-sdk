@@ -13,7 +13,7 @@ export declare abstract class Signer {
     abstract connect(provider: AbstractProvider): void;
     abstract getKeyId(): Promise<number>;
     abstract getIdentifier(): Promise<Identifier>;
-    abstract sign(message: Uint8Array, sigAlgo: SigType): Promise<string>;
+    abstract sign(message: Uint8Array, keyId: number, sigAlgo: SigType): Promise<string>;
     abstract isInitialized(): boolean;
     abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
     /**

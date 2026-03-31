@@ -14,6 +14,10 @@ export declare enum CURVE {
  * The Wallet implements the Signer API and can be used anywhere a [Signer](https://js-moi-sdk.docs.moi.technology/signer)
  * is expected and has all the required properties.
  *
+ * A wallet is always initialized for a specific participant. Additional keys belonging
+ * to the same participant can be registered via `addKey`. All registered keys will
+ * contribute signatures when `signInteraction` is called, enabling multisig interactions.
+ *
  * @example
  * // creating a wallet from mnemonic
  * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
@@ -51,7 +55,7 @@ export declare class Wallet extends Signer {
      */
     isInitialized(): boolean;
     /**
-     * Private key associated with the wallet.
+     * Private key of the sender key (key at `key_index`).
      *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
@@ -65,7 +69,7 @@ export declare class Wallet extends Signer {
      */
     get mnemonic(): string;
     /**
-     * Public key associated with the wallet.
+     * Public key of the sender key (key at `key_index`).
      *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
@@ -96,27 +100,58 @@ export declare class Wallet extends Signer {
      */
     get curve(): string;
     /**
-     * Retrieves the public key associated with the wallet.
+     * Retrieves the public key of the sender key (key at `key_index`).
      *
-     * @returns {string} A promise that resolves to the public key
+     * @returns {string} The public key as a hex string.
      */
     getPublicKey(): Hex;
     /**
      * Retrieves the identifier for the wallet.
+     * The identifier is always derived from the primary key (set at initialization).
      *
      * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
     getIdentifier(): Promise<Identifier>;
     /**
-     * Retrieves the key id.
+     * Retrieves the sender key id.
      *
      * @returns {number} A promise that resolves to the key index.
      */
     getKeyId(): Promise<number>;
     /**
-     * Updates the key id.
+     * Adds a key to the wallet. All keys registered on this wallet belong to the
+     * same participant and will each contribute a signature when `signInteraction`
+     * is called, satisfying multisig threshold requirements.
+     *
+     * @param {number} keyId - The key's position in the participant's key list.
+     * @param {string} publicKey - The public key as a hex string.
+     * @param {string} privateKey - The private key as a hex string.
+     * @returns {Wallet} The current wallet instance for chaining.
      */
-    setKeyId(keyId: number, publicKey: string, privateKey: string): void;
+    addKey(keyId: number, publicKey: string, privateKey: string): Wallet;
+    /**
+     * Updates the sender key. The key must already be registered via `addKey`.
+     * The sender key is used as `sender.key_id` in interactions and must always
+     * be present in the signatures.
+     *
+     * @param {number} keyId - The key ID to set as the sender key.
+     * @throws {Error} if the key is not registered on this wallet.
+     */
+    setKeyId(keyId: number): void;
+    /**
+     * Returns the list of key IDs currently registered on this wallet.
+     *
+     * @returns {number[]} Array of registered key IDs.
+     */
+    getKeys(): number[];
+    /**
+     * Removes a key from the wallet.
+     *
+     * @param {number} keyId - The key ID to remove.
+     * @returns {Wallet} The current wallet instance for chaining.
+     * @throws {Error} if attempting to remove the sender key (`key_index`), as it is required for signing.
+     */
+    removeKey(keyId: number): Wallet;
     /**
      * Retrieves the sub account id.
      *
@@ -128,18 +163,13 @@ export declare class Wallet extends Signer {
      */
     setSubAccountId(id: number): void;
     /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    /**
      * Connects the wallet to the given provider.
      *
      * @param {AbstractProvider} provider - The provider to connect.
      */
     connect(provider: AbstractProvider): void;
     /**
-     * Signs a message using the wallet's private key and the specified
+     * Signs a message using the sender key's private key and the specified
      * signature algorithm.
      *
      * @param {Uint8Array} message - The message to sign as a Uint8Array.
@@ -148,19 +178,18 @@ export declare class Wallet extends Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    sign(message: Uint8Array, sigAlgo: SigType): Promise<string>;
+    sign(message: Uint8Array, keyId: number, sigAlgo: SigType): Promise<string>;
     /**
-     * Signs an interaction object using the wallet's private key and the
-     * specified signature algorithm. The interaction object is serialized
-     * into POLO bytes before signing.
+     * Signs an interaction object using all registered keys on this wallet.
+     * Each key produces its own signature entry, enabling multisig interactions.
+     * The interaction object is serialized into POLO bytes before signing.
      *
      * @param {InteractionObject} ixObject - The interaction object to sign.
-     * @param {SigType} sigAlgo - The signature algorithm to use.
      * @returns {InteractionRequest} The signed interaction request containing
-     * the serialized interaction object and the signature.
+     * the serialized interaction object and all signatures.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
+    signInteraction(ixObject: InteractionObject, _sigAlgo: SigType): Promise<InteractionRequest>;
     /**
      * Initializes the wallet from a provided mnemonic.
      *

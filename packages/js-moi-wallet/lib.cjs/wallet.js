@@ -103,6 +103,10 @@ const __vault = new WeakMap();
  * The Wallet implements the Signer API and can be used anywhere a [Signer](https://js-moi-sdk.docs.moi.technology/signer)
  * is expected and has all the required properties.
  *
+ * A wallet is always initialized for a specific participant. Additional keys belonging
+ * to the same participant can be registered via `addKey`. All registered keys will
+ * contribute signatures when `signInteraction` is called, enabling multisig interactions.
+ *
  * @example
  * // creating a wallet from mnemonic
  * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt social child ...");
@@ -138,14 +142,16 @@ class Wallet extends js_moi_signer_1.Signer {
                 js_moi_utils_1.ErrorUtils.throwError(`Unsupported curve: ${curve}`, js_moi_utils_1.ErrorCode.UNSUPPORTED_OPERATION);
             }
             const { privKey, pubKey } = Wallet.deriveKeys(key, curve);
+            const keyId = options?.keyId ?? DEFAULT_KEY_ID;
+            const keys = new Map();
+            keys.set(keyId, { privateKey: privKey, publicKey: pubKey });
             privateMapSet(this, __vault, {
-                _key: privKey,
-                _node: hdNode,
                 _pkey: pubKey,
-                _public: pubKey,
+                _node: hdNode,
                 _curve: curve,
+                _keys: keys,
             });
-            this.key_index = options?.keyId ?? DEFAULT_KEY_ID;
+            this.key_index = keyId;
             this.sub_account_index = options?.subAccountId ?? DEFAULT_SUB_ACCOUNT_ID;
         }
         catch (error) {
@@ -178,14 +184,15 @@ class Wallet extends js_moi_signer_1.Signer {
         return false;
     }
     /**
-     * Private key associated with the wallet.
+     * Private key of the sender key (key at `key_index`).
      *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
     get privateKey() {
         if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._key;
+            const keys = privateMapGet(this, __vault)._keys;
+            return keys.get(this.key_index)?.privateKey;
         }
         js_moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
@@ -202,14 +209,15 @@ class Wallet extends js_moi_signer_1.Signer {
         js_moi_utils_1.ErrorUtils.throwError("Mnemonic not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * Public key associated with the wallet.
+     * Public key of the sender key (key at `key_index`).
      *
      * @throws {Error} if the wallet is not loaded or initialized.
      * @readonly
      */
     get publicKey() {
         if (this.isInitialized()) {
-            return privateMapGet(this, __vault)._public;
+            const keys = privateMapGet(this, __vault)._keys;
+            return keys.get(this.key_index)?.publicKey;
         }
         js_moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
@@ -249,15 +257,17 @@ class Wallet extends js_moi_signer_1.Signer {
         js_moi_utils_1.ErrorUtils.throwError("Curve not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
     /**
-     * Retrieves the public key associated with the wallet.
+     * Retrieves the public key of the sender key (key at `key_index`).
      *
-     * @returns {string} A promise that resolves to the public key
+     * @returns {string} The public key as a hex string.
      */
     getPublicKey() {
-        return privateMapGet(this, __vault)._public;
+        const keys = privateMapGet(this, __vault)._keys;
+        return keys.get(this.key_index)?.publicKey;
     }
     /**
      * Retrieves the identifier for the wallet.
+     * The identifier is always derived from the primary key (set at initialization).
      *
      * @returns {Identifier} A promise that resolves to the wallet's identifier.
      */
@@ -267,7 +277,7 @@ class Wallet extends js_moi_signer_1.Signer {
         return (0, js_moi_identifiers_1.createParticipantId)({ fingerprint, variant: this.sub_account_index, tag: js_moi_identifiers_1.ParticipantTagV0 });
     }
     /**
-     * Retrieves the key id.
+     * Retrieves the sender key id.
      *
      * @returns {number} A promise that resolves to the key index.
      */
@@ -275,13 +285,58 @@ class Wallet extends js_moi_signer_1.Signer {
         return this.key_index;
     }
     /**
-     * Updates the key id.
+     * Adds a key to the wallet. All keys registered on this wallet belong to the
+     * same participant and will each contribute a signature when `signInteraction`
+     * is called, satisfying multisig threshold requirements.
+     *
+     * @param {number} keyId - The key's position in the participant's key list.
+     * @param {string} publicKey - The public key as a hex string.
+     * @param {string} privateKey - The private key as a hex string.
+     * @returns {Wallet} The current wallet instance for chaining.
      */
-    setKeyId(keyId, publicKey, privateKey) {
-        const valut = privateMapGet(this, __vault);
-        valut._public = publicKey;
-        valut._key = privateKey;
+    addKey(keyId, publicKey, privateKey) {
+        const keys = privateMapGet(this, __vault)._keys;
+        keys.set(keyId, { privateKey, publicKey });
+        return this;
+    }
+    /**
+     * Updates the sender key. The key must already be registered via `addKey`.
+     * The sender key is used as `sender.key_id` in interactions and must always
+     * be present in the signatures.
+     *
+     * @param {number} keyId - The key ID to set as the sender key.
+     * @throws {Error} if the key is not registered on this wallet.
+     */
+    setKeyId(keyId) {
+        const keys = privateMapGet(this, __vault)._keys;
+        if (!keys.has(keyId)) {
+            js_moi_utils_1.ErrorUtils.throwError(`Key ${keyId} is not registered`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
         this.key_index = keyId;
+    }
+    /**
+     * Returns the list of key IDs currently registered on this wallet.
+     *
+     * @returns {number[]} Array of registered key IDs.
+     */
+    getKeys() {
+        const keys = privateMapGet(this, __vault)._keys;
+        return Array.from(keys.keys());
+    }
+    /**
+     * Removes a key from the wallet.
+     *
+     * @param {number} keyId - The key ID to remove.
+     * @returns {Wallet} The current wallet instance for chaining.
+     * @throws {Error} if attempting to remove the sender key (`key_index`), as it is required for signing.
+     */
+    removeKey(keyId) {
+        if (keyId === this.key_index) {
+            js_moi_utils_1.ErrorUtils.throwError("Cannot remove the sender key", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
+        const keys = privateMapGet(this, __vault)._keys;
+        keys.delete(keyId);
+        return this;
     }
     /**
      * Retrieves the sub account id.
@@ -298,14 +353,6 @@ class Wallet extends js_moi_signer_1.Signer {
         this.sub_account_index = id;
     }
     /**
-     * Address associated with the wallet.
-     *
-     * @readonly
-     */
-    // public get address(): string {
-    //     return this.getAddress();
-    // }
-    /**
      * Connects the wallet to the given provider.
      *
      * @param {AbstractProvider} provider - The provider to connect.
@@ -314,7 +361,7 @@ class Wallet extends js_moi_signer_1.Signer {
         this.provider = provider;
     }
     /**
-     * Signs a message using the wallet's private key and the specified
+     * Signs a message using the sender key's private key and the specified
      * signature algorithm.
      *
      * @param {Uint8Array} message - The message to sign as a Uint8Array.
@@ -323,14 +370,15 @@ class Wallet extends js_moi_signer_1.Signer {
      * @throws {Error} if the signature type is unsupported or undefined, or if
      * there is an error during signing.
      */
-    async sign(message, sigAlgo) {
+    async sign(message, keyId, sigAlgo) {
         if (sigAlgo == null) {
             js_moi_utils_1.ErrorUtils.throwError("Signature type cannot be undefined", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         switch (sigAlgo.sigName) {
             case "ECDSA_S256": {
+                const keys = privateMapGet(this, __vault)._keys;
                 const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-                const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), this.privateKey);
+                const sig = _sigAlgo.sign(buffer_1.Buffer.from(message), keys.get(keyId).privateKey);
                 const sigBytes = sig.serialize();
                 return (0, js_moi_utils_1.bytesToHex)(sigBytes);
             }
@@ -340,26 +388,32 @@ class Wallet extends js_moi_signer_1.Signer {
         }
     }
     /**
-     * Signs an interaction object using the wallet's private key and the
-     * specified signature algorithm. The interaction object is serialized
-     * into POLO bytes before signing.
+     * Signs an interaction object using all registered keys on this wallet.
+     * Each key produces its own signature entry, enabling multisig interactions.
+     * The interaction object is serialized into POLO bytes before signing.
      *
      * @param {InteractionObject} ixObject - The interaction object to sign.
-     * @param {SigType} sigAlgo - The signature algorithm to use.
      * @returns {InteractionRequest} The signed interaction request containing
-     * the serialized interaction object and the signature.
+     * the serialized interaction object and all signatures.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    async signInteraction(ixObject, sigAlgo) {
+    async signInteraction(ixObject, _sigAlgo) {
         try {
             const ixData = (0, serializer_1.serializeIxObject)(ixObject);
-            const signatures = [
-                {
-                    id: ixObject.sender.id,
-                    key_id: ixObject.sender.key_id,
-                    signature: await this.sign(ixData, sigAlgo),
-                }
-            ];
+            const participantId = ixObject.sender.id;
+            const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+            const keys = privateMapGet(this, __vault)._keys;
+            if (!keys.has(ixObject.sender.key_id)) {
+                js_moi_utils_1.ErrorUtils.throwError(`Sender key ${ixObject.sender.key_id} is not registered`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+            const signatures = await Promise.all(Array.from(keys.keys()).map(async (keyId) => {
+                const signature = await this.sign(buffer_1.Buffer.from(ixData), keyId, sigAlgo);
+                return {
+                    id: participantId,
+                    key_id: keyId,
+                    signature: signature,
+                };
+            }));
             const rawSign = (0, serializer_1.serializeIxSignatures)(signatures);
             return {
                 ix_args: (0, js_moi_utils_1.bytesToHex)(ixData),
