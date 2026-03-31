@@ -44,15 +44,17 @@ provider.
 
 **sign**
 
-This method is responsible for signing arbitrary messages using the 
-MOI signing scheme. Concrete classes need to implement this method to 
+This method is responsible for signing arbitrary messages using the
+MOI signing scheme. It accepts a ``keyId`` parameter to specify which registered
+key should be used for signing. Concrete classes need to implement this method to
 enable the functionality of signing messages.
 
 **signInteraction**
 
-This method is used to sign MOI interactions. Concrete classes must 
-implement this method to provide the logic for signing the interactions using 
-the signer's private key.
+This method is used to sign MOI interactions. Concrete classes must
+implement this method to provide the logic for signing the interactions. When
+a wallet has multiple keys registered, all keys contribute signatures to satisfy
+multisig threshold requirements.
 
 Regular Methods
 ~~~~~~~~~~~~~~~
@@ -376,6 +378,10 @@ Wallet
 
     A class representing a Hierarchical Deterministic Wallet that can sign interactions and manage accounts.
 
+    A wallet is always initialized for a specific account. Additional keys belonging
+    to the same account can be registered via ``addKey``. All registered keys
+    contribute signatures when ``signInteraction`` is called, enabling multisig interactions.
+
     .. code-block:: javascript
 
         // Example
@@ -443,14 +449,14 @@ Wallet
         console.log(wallet.address);
         >> "0x87925..."
 
-    - ``publicKey`` - ``readonly`` ``string``: The public key of the wallet.
+    - ``publicKey`` - ``readonly`` ``string``: The public key of the sender key (key at ``key_index``).
 
     .. code-block:: javascript
 
         console.log(wallet.publicKey);
         >> "038792..."
 
-    - ``privateKey`` - ``readonly`` ``string``: The private key of the wallet. 
+    - ``privateKey`` - ``readonly`` ``string``: The private key of the sender key (key at ``key_index``).
 
     .. code-block:: javascript
 
@@ -477,6 +483,8 @@ Wallet
 
     .. autofunction:: Wallet#sign
 
+    Signs a message using the specified key. The ``keyId`` must be registered
+    on the wallet via ``addKey``.
 
     **Example**
 
@@ -484,18 +492,22 @@ Wallet
 
         const message = "Hello, MOI";
         const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+        const keyId = await wallet.getKeyId();
 
-        const signature = wallet.sign(Buffer.from(message), algo);
+        const signature = await wallet.sign(Buffer.from(message), keyId, algo);
         >>"0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee..."
 
     .. autofunction:: Wallet#signInteraction
+
+    Signs an interaction using all registered keys. Each key produces its own
+    signature entry in the response. The sender key (``key_index``) must be
+    registered or an error is thrown before signing.
 
     .. code-block:: javascript
 
         const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
         const interaction = {
-            nonce: 0,
-            sender: address,
+            sender: { id: address, key_id: 0, sequence: 0 },
             fuel_price: 1,
             fuel_limit: 200,
             ix_operations: [
@@ -510,16 +522,65 @@ Wallet
             ]
         }
         const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
-        const signedIxn = wallet.signInteraction(interaction, sigAlgo);
+        const signedIxn = await wallet.signInteraction(interaction, sigAlgo);
         console.log(signedIxn)
-        
+
         // Output
         /*
             {
-                ix_args:'0e9f0203131696049608900c900c930ca30cb60c03870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c80e7f063363636161604d4f49130d41',
-                signature: '01463044022059e8e9839a02d2a0b2585e2267400826f91e575eb27cb89485d2deab697c5a34022020d71b2d3caa8c0b003849a2cb4effdbfd32028357db335549a75c82dd329f8902'
+                ix_args: '0e9f02...',
+                signatures: '...'   // POLO-encoded array, one entry per registered key
             }
         */
+
+    Key Management
+    ==============
+
+    .. autofunction:: Wallet#addKey
+
+    Registers an additional key for this participant. All registered keys will
+    sign the interaction when ``signInteraction`` is called.
+
+    .. code-block:: javascript
+
+        // Single key (default)
+        const wallet = await Wallet.fromMnemonic(mnemonic);
+
+        // Add more keys for multisig
+        wallet.addKey(1, pubKey1, privKey1)
+              .addKey(2, pubKey2, privKey2);
+
+    .. autofunction:: Wallet#setKeyId
+
+    Updates which key is the sender key. The key must already be registered
+    via ``addKey``.
+
+    .. code-block:: javascript
+
+        wallet.addKey(1, pubKey1, privKey1);
+        wallet.setKeyId(1); // interactions will now use key 1 as sender
+
+    .. autofunction:: Wallet#getKeys
+
+    Returns the list of key IDs currently registered on the wallet.
+
+    .. code-block:: javascript
+
+        wallet.addKey(1, pubKey1, privKey1).addKey(2, pubKey2, privKey2);
+        console.log(wallet.getKeys());
+        >> [0, 1, 2]
+
+    .. autofunction:: Wallet#removeKey
+
+    Removes a key from the wallet. Throws if the key is the current sender key.
+
+    .. code-block:: javascript
+
+        wallet.removeKey(2); // removes key 2
+
+        // To remove the sender key, switch to another key first
+        wallet.setKeyId(1);
+        wallet.removeKey(0);
 
     .. autofunction:: Wallet.fromMnemonic
 
