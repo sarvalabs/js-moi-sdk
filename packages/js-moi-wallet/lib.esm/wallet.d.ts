@@ -139,11 +139,14 @@ export declare class Wallet extends Signer {
      */
     setKeyId(keyId: number): void;
     /**
-     * Returns the list of key IDs currently registered on this wallet.
+     * Returns the list of keys currently registered on this wallet.
      *
-     * @returns {number[]} Array of registered key IDs.
+     * @returns {{ key_id: number; public_key: string }[]} Array of registered keys with their IDs and public keys.
      */
-    getKeys(): number[];
+    getKeys(): {
+        key_id: number;
+        public_key: string;
+    }[];
     /**
      * Removes a key from the wallet.
      *

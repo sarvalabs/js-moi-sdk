@@ -276,13 +276,16 @@ export class Wallet extends Signer {
         this.key_index = keyId;
     }
     /**
-     * Returns the list of key IDs currently registered on this wallet.
+     * Returns the list of keys currently registered on this wallet.
      *
-     * @returns {number[]} Array of registered key IDs.
+     * @returns {{ key_id: number; public_key: string }[]} Array of registered keys with their IDs and public keys.
      */
     getKeys() {
         const keys = privateMapGet(this, __vault)._keys;
-        return Array.from(keys.keys());
+        return Array.from(keys.entries()).map(([key_id, entry]) => ({
+            key_id,
+            public_key: entry.publicKey,
+        }));
     }
     /**
      * Removes a key from the wallet.
