@@ -1,6 +1,6 @@
 {
   "name": "js-moi-sdk",
-  "version": "0.7.0-rc13",
+  "version": "0.7.0-rc14",
   "description": "A feature-rich library designed to seamlessly interact with the MOI Protocol.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -23,16 +23,16 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "js-moi-providers": "^0.7.0-rc13",
-    "js-moi-manifest": "^0.7.0-rc13",
-    "js-moi-logic": "^0.7.0-rc13",
-    "js-moi-hdnode": "^0.7.0-rc13",
-    "js-moi-wallet": "^0.7.0-rc13",
-    "js-moi-signer": "^0.7.0-rc13",
-    "js-moi-bip39": "^0.7.0-rc13",
-    "js-moi-constants": "^0.7.0-rc13",
-    "js-moi-interactions": "^0.7.0-rc13",
-    "js-moi-asset": "^0.7.0-rc13",
-    "js-moi-utils": "^0.7.0-rc13"
+    "js-moi-providers": "^0.7.0-rc14",
+    "js-moi-manifest": "^0.7.0-rc14",
+    "js-moi-logic": "^0.7.0-rc14",
+    "js-moi-hdnode": "^0.7.0-rc14",
+    "js-moi-wallet": "^0.7.0-rc14",
+    "js-moi-signer": "^0.7.0-rc14",
+    "js-moi-bip39": "^0.7.0-rc14",
+    "js-moi-constants": "^0.7.0-rc14",
+    "js-moi-interactions": "^0.7.0-rc14",
+    "js-moi-asset": "^0.7.0-rc14",
+    "js-moi-utils": "^0.7.0-rc14"
   }
 }
