@@ -20,13 +20,22 @@ export declare class ManifestCoder {
     constructor(manifest: LogicManifest.Manifest);
     private get schema();
     /**
+     * Recursively walks the schema after calldata parsing and replaces all
+     * `struct` nodes with `document`, so the final `documentEncode` call
+     * receives the correct wire types without mutating shared schema references
+     * during recursive parsing.
+     *
+     * @private
+     * @param {PoloSchema} schema - The schema to reconstruct in place.
+     */
+    private reconstructSchema;
+    /**
      * Parses the calldata arguments based on the provided POLO Schema.
      * The calldata arguments is recursively processed and transformed according to the schema.
      *
      * @private
      * @param {PoloSchema} schema - The schema definition for the calldata.
      * @param {*} arg - The calldata argument to parse.
-     * @param {boolean} [updateType=true] - Indicates whether to update the schema type during parsing.
      * @returns {*} The parsed calldata argument.
      */
     private parseCalldata;
