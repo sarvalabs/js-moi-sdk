@@ -4,7 +4,7 @@ exports.getAssetDriver = exports.AssetDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const asset_descriptor_1 = require("./asset-descriptor");
-const routine_options_1 = require("./routine-options");
+const js_moi_logic_1 = require("js-moi-logic");
 const state_1 = require("./state");
 /**
  * Represents a asset driver that serves as an interface for interacting with logics.
@@ -48,7 +48,7 @@ class AssetDriver extends asset_descriptor_1.AssetDescriptor {
                 return;
             }
             routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && params.at(-1) instanceof routine_options_1.RoutineOption
+                const argsLen = params.at(-1) && params.at(-1) instanceof js_moi_logic_1.RoutineOption
                     ? params.length - 1
                     : params.length;
                 if (routine.accepts && argsLen < routine.accepts.length) {

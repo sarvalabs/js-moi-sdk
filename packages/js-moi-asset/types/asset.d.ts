@@ -1,6 +1,6 @@
 import { LogicManifest } from "js-moi-manifest";
 import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
-import type { RoutineOption } from "../src.ts/routine-options";
+import type { RoutineOption } from "js-moi-logic";
 
 export interface AssetIxRequest {
     call: () => Promise<InteractionCallResponse>;

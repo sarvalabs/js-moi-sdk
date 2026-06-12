@@ -5,7 +5,7 @@ const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
 const asset_id_1 = require("./asset-id");
-const routine_options_1 = require("./routine-options");
+const js_moi_logic_1 = require("js-moi-logic");
 /**
  * The default fuel price used for logic interactions.
  */
@@ -181,23 +181,20 @@ class AssetBase extends js_moi_manifest_1.ElementDescriptor {
      * @returns {AssetIxRequest} The logic interaction request object.
      */
     createIxObject(routine, ...args) {
-        const option = args.at(-1) && args.at(-1) instanceof routine_options_1.RoutineOption ? args.pop() : {};
+        const option = args.at(-1) && args.at(-1) instanceof js_moi_logic_1.RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
             arguments: args
         };
         ixObject.call = async () => {
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
             option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "estimate", option);
         };
         ixObject.createPayload = () => {

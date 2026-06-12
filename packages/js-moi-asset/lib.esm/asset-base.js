@@ -2,7 +2,7 @@ import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { AssetId } from "./asset-id";
-import { RoutineOption } from "./routine-options";
+import { RoutineOption } from "js-moi-logic";
 /**
  * The default fuel price used for logic interactions.
  */
@@ -184,17 +184,14 @@ export class AssetBase extends ElementDescriptor {
             arguments: args
         };
         ixObject.call = async () => {
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
             option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
             option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "send", option);
         };
         ixObject.estimateFuel = () => {
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "estimate", option);
         };
         ixObject.createPayload = () => {

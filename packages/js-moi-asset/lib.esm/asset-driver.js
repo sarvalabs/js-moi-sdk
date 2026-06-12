@@ -1,7 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { AssetDescriptor } from "./asset-descriptor";
-import { RoutineOption } from "./routine-options";
+import { RoutineOption } from "js-moi-logic";
 import { EphemeralState, PersistentState } from "./state";
 /**
  * Represents a asset driver that serves as an interface for interacting with logics.

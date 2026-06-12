@@ -6,7 +6,7 @@ import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { AssetIxArguments, AssetIxObject, AssetIxResponse } from "../types/interaction";
 import { AssetIxRequest } from "../types/asset";
 import { AssetId } from "./asset-id";
-import { RoutineOption } from "./routine-options";
+import { RoutineOption } from "js-moi-logic";
 
 /**
  * The default fuel price used for logic interactions.
@@ -233,20 +233,17 @@ export abstract class AssetBase extends ElementDescriptor {
         } as AssetIxObject
 
         ixObject.call = async (): Promise<InteractionCallResponse> => {
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "call", option) as Promise<InteractionCallResponse>
         }
 
         ixObject.send = async (): Promise<InteractionResponse> => {
             option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
-            option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;  
-            option.particpants = option.participants ?? [];
+            option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
 
             return this.executeRoutine(ixObject, "send", option) as Promise<InteractionResponse>
         }
-        
+
         ixObject.estimateFuel = (): Promise<number|bigint> => {
-            option.particpants = option.participants ?? [];
             return this.executeRoutine(ixObject, "estimate", option) as Promise<number | bigint>
         }
 

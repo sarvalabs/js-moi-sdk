@@ -6,7 +6,7 @@ import { OpType } from "js-moi-utils";
 import { AssetIxArguments, AssetIxObject, AssetIxResponse } from "../types/interaction";
 import { AssetIxRequest } from "../types/asset";
 import { AssetId } from "./asset-id";
-import { RoutineOption } from "./routine-options";
+import { RoutineOption } from "js-moi-logic";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.

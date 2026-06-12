@@ -5,7 +5,7 @@ import { ErrorCode, ErrorUtils, Hex, defineReadOnly } from "js-moi-utils";
 import { AssetIxObject, AssetIxResponse, AssetIxResult } from "../types/interaction";
 import { Routines } from "../types/asset";
 import { AssetDescriptor } from "./asset-descriptor";
-import { RoutineOption } from "./routine-options";
+import { RoutineOption } from "js-moi-logic";
 import { EphemeralState, PersistentState } from "./state";
 
 /**
