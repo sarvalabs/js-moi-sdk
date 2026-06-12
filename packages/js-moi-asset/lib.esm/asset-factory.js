@@ -34,7 +34,7 @@ export class AssetFactory {
                 };
                 if (argsLen > 0) {
                     const manifestCoder = new ManifestCoder(manifest);
-                    payload.logic_payload.calldata = manifestCoder.encodeArguments(callsite, calldata);
+                    payload.logic_payload.calldata = manifestCoder.encodeArguments(callsite, ...calldata);
                 }
             }
         }
