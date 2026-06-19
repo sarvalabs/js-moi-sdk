@@ -2,7 +2,7 @@ import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest
 import type { AbstractProvider, LogicActionPayload, LogicDeployPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { OpType } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicContext, LogicOps } from "./logic-context";
 import { LogicId } from "./logic-id";
 /**
@@ -16,7 +16,7 @@ export declare abstract class LogicBase extends ElementDescriptor {
     protected manifestCoder: ManifestCoder;
     constructor(manifest: LogicManifest.Manifest, signer: Signer);
     protected abstract createPayload(ixObject: LogicIxObject): LogicDeployPayload | LogicActionPayload;
-    protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
+    protected abstract processResult(response: LogicIxResponse | LogicIxCallResponse, timeout?: number): Promise<LogicIxResult>;
     /**
      * Returns the logic ID associated with this instance.
      *

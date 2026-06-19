@@ -1,7 +1,7 @@
 import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
 import { InteractionContext, IxContext, IxOption } from "js-moi-interactions";
 import { OpType } from "js-moi-utils";
-import { LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxResponse, LogicIxResult } from "../types/interaction";
 /**
  * Union of all logic-specific operation types.
  */
@@ -25,7 +25,7 @@ export interface LogicCallResponse extends InteractionCallResponse {
 export declare class LogicContext<T extends LogicOps> extends InteractionContext<T> {
     private readonly routineName;
     private readonly processResultFn;
-    constructor(ctx: IxContext<T>, routineName: string, processResult: (response: LogicIxResponse, timeout?: number) => Promise<LogicIxResult>);
+    constructor(ctx: IxContext<T>, routineName: string, processResult: (response: LogicIxResponse | LogicIxCallResponse, timeout?: number) => Promise<LogicIxResult>);
     /**
      * Sends a transaction to the network, committing state changes.
      * Automatically estimates fuel if not provided in option.

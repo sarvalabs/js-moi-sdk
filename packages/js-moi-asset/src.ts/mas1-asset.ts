@@ -1,4 +1,4 @@
-import { AssetCreationResult, AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
+import { AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode, Schema } from "js-polo";
 import { Signer } from "js-moi-signer";
@@ -29,9 +29,9 @@ export class MAS1AssetLogic {
     ): Promise<MAS1AssetLogic> {
         const response = await this.create(signer, symbol, manager, enableEvents).send()
 
-        const result:AssetCreationResult = await response.result()
+        const results = await response.result()
 
-        return new MAS1AssetLogic(result[0].asset_id, signer)
+        return new MAS1AssetLogic(results[0].asset_id, signer)
     }
 
     static create(

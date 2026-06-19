@@ -10,8 +10,8 @@ import { EphemeralState, PersistentState } from "./state";
  */
 export declare class AssetDriver<T extends Record<string, (...args: any) => any> = any> extends AssetDescriptor {
     readonly routines: Routines<T>;
-    readonly persistentState: PersistentState;
-    readonly ephemeralState: EphemeralState;
+    readonly persistentState?: PersistentState;
+    readonly ephemeralState?: EphemeralState;
     constructor(assetId: string, manifest: LogicManifest.Manifest, arg: Signer);
     /**
      * Creates the persistent and ephemeral states for the asset driver,

@@ -153,7 +153,7 @@ export class Wallet extends Signer {
     get privateKey() {
         if (this.isInitialized()) {
             const keys = privateMapGet(this, __vault)._keys;
-            return keys.get(this.key_index)?.privateKey;
+            return keys.get(this.key_index).privateKey;
         }
         ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }
@@ -178,7 +178,7 @@ export class Wallet extends Signer {
     get publicKey() {
         if (this.isInitialized()) {
             const keys = privateMapGet(this, __vault)._keys;
-            return keys.get(this.key_index)?.publicKey;
+            return keys.get(this.key_index).publicKey;
         }
         ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", ErrorCode.NOT_INITIALIZED);
     }

@@ -104,7 +104,9 @@ export class ElementDescriptor {
         this.methodDefs.forEach((method, methodName) => {
             if (method.class === className) {
                 const element = this.elements.get(method.ptr);
-                classMethods.set(methodName, element.data);
+                if (element) {
+                    classMethods.set(methodName, element.data);
+                }
             }
         });
         return classMethods;

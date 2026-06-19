@@ -223,8 +223,8 @@ export interface InteractionInfo {
 }
 
 interface ContentResponse {
-    pending: Record<string, Map<number | bigint, InteractionInfo>>
-    queued: Record<string, Map<number | bigint, InteractionInfo>>
+    pending: Record<string, Record<string, InteractionInfo>>
+    queued: Record<string, Record<string, InteractionInfo>>
 }
 
 export interface Content {

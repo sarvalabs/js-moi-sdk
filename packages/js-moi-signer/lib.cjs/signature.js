@@ -7,10 +7,10 @@ class Signature {
     extraData;
     name;
     constructor(prefix, digest, extraData, signatureName) {
-        this.prefix = prefix;
-        this.digest = digest;
-        this.extraData = extraData;
-        this.name = signatureName;
+        this.prefix = prefix ?? new Uint8Array();
+        this.digest = digest ?? new Uint8Array();
+        this.extraData = extraData ?? new Uint8Array();
+        this.name = signatureName ?? "";
     }
     unmarshall(signature) {
         let sig;

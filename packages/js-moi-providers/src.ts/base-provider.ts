@@ -68,7 +68,7 @@ export class BaseProvider extends AbstractProvider {
         }
 
         ErrorUtils.throwError(
-            response.error.message, 
+            response.error!.message,
             ErrorCode.SERVER_ERROR,
         );
     }
@@ -243,7 +243,7 @@ export class BaseProvider extends AbstractProvider {
      */
     async getInteractionByTesseract(arg1?: unknown, arg2?: unknown, ix_index?: NumberLike): Promise<Interaction> {
         try {
-            const params = {};
+            const params: Record<string, any> = {};
 
             if(typeof arg1 === "string") {
                 params['address'] = arg1;
@@ -594,7 +594,7 @@ export class BaseProvider extends AbstractProvider {
             const response = await this.execute("moi.GetFilterChanges", params);
             
             if (response.result == null) {
-                return null;
+                return null as T;
             }
 
             return this.processResponse(response);
@@ -643,7 +643,7 @@ export class BaseProvider extends AbstractProvider {
      */
    async getTesseract(arg1: unknown, arg2: unknown, arg3: unknown, arg4?: unknown): Promise<Tesseract> {
         try {
-            const params = {};
+            const params: Record<string, any> = {};
 
             if (typeof arg1 === 'string') {
                 params['id'] = arg1;
@@ -815,7 +815,7 @@ export class BaseProvider extends AbstractProvider {
             }
     
             ErrorUtils.throwError(
-                response.error.message, 
+                response.error!.message,
                 ErrorCode.SERVER_ERROR,
             );
         } catch (error) {
@@ -1049,9 +1049,9 @@ export class BaseProvider extends AbstractProvider {
 
             Object.keys(contentResponse.pending).forEach(key => {
                 content.pending.set(key, new Map())
-                Object.keys(contentResponse.pending[key]).forEach(nonce => 
-                    content.pending.get(key).set(
-                        hexToBN(nonce), 
+                Object.keys(contentResponse.pending[key]).forEach(nonce =>
+                    content.pending.get(key)!.set(
+                        hexToBN(nonce),
                         contentResponse.pending[key][nonce]
                     )
                 )
@@ -1059,9 +1059,9 @@ export class BaseProvider extends AbstractProvider {
 
             Object.keys(contentResponse.queued).forEach(key => {
                 content.queued.set(key, new Map())
-                Object.keys(contentResponse.queued[key]).forEach(nonce => 
-                    content.queued.get(key).set(
-                        hexToBN(nonce), 
+                Object.keys(contentResponse.queued[key]).forEach(nonce =>
+                    content.queued.get(key)!.set(
+                        hexToBN(nonce),
                         contentResponse.queued[key][nonce]
                     )
                 )
@@ -1126,10 +1126,10 @@ export class BaseProvider extends AbstractProvider {
                 inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])))
             })
 
-            Object.keys(inspect.wait_time).forEach(key => {
+            Object.keys(inspectResponse.wait_time).forEach(key => {
                 inspect.wait_time.set(key, {
-                    ...inspect.wait_time[key],
-                    time: hexToBN(inspect.wait_time[key]["time"])
+                    ...inspectResponse.wait_time[key],
+                    time: hexToBN(inspectResponse.wait_time[key].time as unknown as string)
                 })
             })
 

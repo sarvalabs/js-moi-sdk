@@ -107,7 +107,7 @@ export class JsonManifestCoder extends BaseManifestCoder {
         return polorizer;
     }
 
-    private deserializeElement(element) {
+    private deserializeElement(element: any) {
         if (element.deps.length == 0) {
             delete element.deps;
         }

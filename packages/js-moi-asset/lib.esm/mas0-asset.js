@@ -17,8 +17,8 @@ export class MAS0AssetLogic {
     }
     static async newAsset(signer, symbol, supply, manager, enableEvents) {
         const response = await this.create(signer, symbol, supply, manager, enableEvents).send();
-        const result = await response.result();
-        return new MAS0AssetLogic(result[0].asset_id, signer);
+        const results = await response.result();
+        return new MAS0AssetLogic(results[0].asset_id, signer);
     }
     static create(signer, symbol, supply, manager, enableEvents) {
         const payload = {

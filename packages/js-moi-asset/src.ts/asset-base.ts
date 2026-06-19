@@ -20,7 +20,7 @@ const DEFAULT_FUEL_PRICE = 1;
  */
 export abstract class AssetBase extends ElementDescriptor {
     protected signer?: Signer;
-    protected provider: AbstractProvider;
+    protected provider!: AbstractProvider;
     protected manifestCoder: ManifestCoder;
     
 
@@ -156,12 +156,12 @@ export abstract class AssetBase extends ElementDescriptor {
     protected async processArguments(ixObject: AssetIxObject, type: string, option: RoutineOption): Promise<AssetIxArguments> {
         const params: InteractionObject = {
             sender: option.sender ?? {
-                id: ((await this.signer?.getIdentifier()).toString()),
+                id: ((await this.signer!.getIdentifier()).toString()),
                 key_id: (await this.signer?.getKeyId()),
                 sequence: option.sequence != null ? option.sequence : (await this.signer?.getNonce()),
             } as Sender,
-            fuel_price: option.fuelPrice,
-            fuel_limit: option.fuelLimit,
+            fuel_price: option.fuelPrice ?? 0,
+            fuel_limit: option.fuelLimit ?? 0,
             ix_operations: [],
             participants: option.participants ?? [],
         }

@@ -119,11 +119,11 @@ export interface RawAssetCreatePayload {
     /**
      * The static metadata of the asset.
      */
-    static_metadata: Map<string, Uint8Array[]>;
+    static_metadata: Map<string, Uint8Array>;
     /**
      * The dynamic metadata of the asset.
      */
-    dynamic_metadata: Map<string, Uint8Array[]>;
+    dynamic_metadata: Map<string, Uint8Array>;
     /**
      * The logic of the asset.
      */

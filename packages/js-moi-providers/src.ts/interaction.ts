@@ -272,12 +272,12 @@ const withAssetId = (payload: any) => ({
     asset_id: new Identifier(payload.asset_id).toBytes(),
 })
 
-const mapPublicKeys = (keys: any[]) =>
+const mapPublicKeys = (keys: any[] | undefined) =>
     keys?.map(k => ({ ...k, public_key: hexToBytes(k.public_key) }))
 
 const mapHexValues = (obj: Record<string, string> = {}) => {
-    const out = new Map()
-    Object.keys(obj).forEach(k => { out[k] = hexToBytes(out[k]) })
+    const out = new Map<string, Uint8Array>()
+    Object.keys(obj).forEach(k => out.set(k, hexToBytes(obj[k])))
 
     return out
 }
@@ -346,8 +346,8 @@ function processLogicDeploy(payload: LogicDeployPayload) {
 function processLogicAction(payload: LogicActionPayload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: LogicId.isValid(payload.logic_id) ? new LogicId(payload.logic_id).toBytes() :
-        new AssetId(payload.logic_id).toBytes(),
+        logic_id: LogicId.isValid(payload.logic_id!) ? new LogicId(payload.logic_id!).toBytes() :
+        new AssetId(payload.logic_id!).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     }
 
@@ -404,9 +404,9 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
       case OpType.LOGIC_DEPLOY:
         break;
       case OpType.LOGIC_ENLIST:
-      case OpType.LOGIC_INVOKE: 
+      case OpType.LOGIC_INVOKE:
         const { logic_id } = operation.payload as LogicActionPayload;
-        addParticipant(withHexPrefix(logic_id), LockType.MUTATE_LOCK);
+        addParticipant(withHexPrefix(logic_id!), LockType.MUTATE_LOCK);
         break;
 
       default:
@@ -445,7 +445,7 @@ const toRawParticipant = (participant: IxParticipant): RawIxParticipant => {
     }
 }
 
-const toRawOperation = (operation): RawIxOperation => {
+const toRawOperation = (operation: any): RawIxOperation => {
     switch (operation.type) {
         case OpType.PARTICIPANT_CREATE: {
             validateParticipantCreate(operation.payload)
@@ -517,9 +517,9 @@ export const toRawInteractionObject = (ix: InteractionObject): RawInteractionObj
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
-        preferences: ix.preferences ? { 
+        preferences: ix.preferences ? {
             ...ix.preferences,
-            compute: ix.preferences.compute ? hexToBytes(ix.preferences.compute) : undefined,
+            compute: hexToBytes(ix.preferences.compute),
         } : undefined,
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
     };
@@ -540,7 +540,7 @@ const toFundArgs = (fund: IxFund): IxFundArgs => {
   }
 }
 
-const toOperationArgs = (operation): IxOperationArgs => {
+const toOperationArgs = (operation: any): IxOperationArgs => {
   const rawOpPayload = toRawOperation(operation)
   return {
     ...operation,
@@ -558,12 +558,12 @@ export const toInteractionArgs = (ix: InteractionObject): InteractionArgs => {
       fuel_limit: toQuantity(ix.fuel_limit) as Hex,
       funds: ix.funds?.map((fund) => toFundArgs(fund)),
       ix_operations: ix.ix_operations?.map((operation) => toOperationArgs(operation)),
-      preferences: ix.preferences ? { 
+      preferences: ix.preferences ? {
             ...ix.preferences,
-            consensus: ix.preferences.consensus ? {
+            consensus: {
               ...ix.preferences.consensus,
               mtq: toQuantity(ix.preferences.consensus.mtq ?? 0) as Hex
-            } : undefined,
+            },
       } : undefined,
       participants: ix.participants
     }

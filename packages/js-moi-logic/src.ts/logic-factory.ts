@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { LogicDeployPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, Hex } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 import { LogicContext, LogicOps } from "./logic-context";
 
@@ -33,7 +33,7 @@ export class LogicFactory extends LogicBase {
 
         if(ixObject.routine.accepts && Object.keys(ixObject.routine.accepts).length > 0) {
             payload.calldata = this.manifestCoder.encodeArguments(
-                payload.callsite, 
+                payload.callsite!,
                 ...ixObject.arguments,
             ) as Hex;
         }
@@ -48,7 +48,7 @@ export class LogicFactory extends LogicBase {
      * @param {number} timeout - The custom timeout for processing the result. (optional)
      * @returns {Promise<LogicIxResult>} The processed logic interaction result.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
+    protected async processResult(response: LogicIxResponse | LogicIxCallResponse, timeout?: number): Promise<LogicIxResult> {
         const result = await response.result(timeout);
 
         return {

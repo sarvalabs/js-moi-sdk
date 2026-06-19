@@ -392,6 +392,9 @@ export class Schema {
             ErrorUtils.throwError(`Invalid class name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
         const element = elements.get(ptr);
+        if (!element) {
+            ErrorUtils.throwError(`Element not found for class: ${className}`, ErrorCode.INVALID_ARGUMENT);
+        }
         const schema = {
             kind: "struct",
             fields: {},

@@ -399,6 +399,9 @@ class Schema {
             js_moi_utils_1.ErrorUtils.throwError(`Invalid class name: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
         const element = elements.get(ptr);
+        if (!element) {
+            js_moi_utils_1.ErrorUtils.throwError(`Element not found for class: ${className}`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+        }
         const schema = {
             kind: "struct",
             fields: {},

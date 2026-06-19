@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { LogicDeployPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicBase } from "./logic-base";
 import { LogicContext, LogicOps } from "./logic-context";
 /**
@@ -25,7 +25,7 @@ export declare class LogicFactory extends LogicBase {
      * @param {number} timeout - The custom timeout for processing the result. (optional)
      * @returns {Promise<LogicIxResult>} The processed logic interaction result.
      */
-    protected processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
+    protected processResult(response: LogicIxResponse | LogicIxCallResponse, timeout?: number): Promise<LogicIxResult>;
     /**
      * Returns the POLO encoded manifest in hexadecimal format.
      *

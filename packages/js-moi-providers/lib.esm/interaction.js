@@ -216,7 +216,7 @@ const withAssetId = (payload) => ({
 const mapPublicKeys = (keys) => keys?.map(k => ({ ...k, public_key: hexToBytes(k.public_key) }));
 const mapHexValues = (obj = {}) => {
     const out = new Map();
-    Object.keys(obj).forEach(k => { out[k] = hexToBytes(out[k]); });
+    Object.keys(obj).forEach(k => out.set(k, hexToBytes(obj[k])));
     return out;
 };
 function processParticipantCreate(payload) {
@@ -424,7 +424,7 @@ export const toRawInteractionObject = (ix) => {
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
         preferences: ix.preferences ? {
             ...ix.preferences,
-            compute: ix.preferences.compute ? hexToBytes(ix.preferences.compute) : undefined,
+            compute: hexToBytes(ix.preferences.compute),
         } : undefined,
         perception: ix.perception ? hexToBytes(ix.perception) : undefined,
     };
@@ -460,10 +460,10 @@ export const toInteractionArgs = (ix) => {
         ix_operations: ix.ix_operations?.map((operation) => toOperationArgs(operation)),
         preferences: ix.preferences ? {
             ...ix.preferences,
-            consensus: ix.preferences.consensus ? {
+            consensus: {
                 ...ix.preferences.consensus,
                 mtq: toQuantity(ix.preferences.consensus.mtq ?? 0)
-            } : undefined,
+            },
         } : undefined,
         participants: ix.participants
     };

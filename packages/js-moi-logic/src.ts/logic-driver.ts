@@ -2,7 +2,7 @@ import { LogicManifest, ManifestCoder } from "js-moi-manifest";
 import { LogicActionPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, Hex, defineReadOnly } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
@@ -12,8 +12,8 @@ import { EphemeralState, PersistentState } from "./state";
  */
 export class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
     public readonly routines: Routines<T> = {} as Routines<T>;
-    public readonly persistentState: PersistentState;
-    public readonly ephemeralState: EphemeralState;
+    public readonly persistentState?: PersistentState;
+    public readonly ephemeralState?: EphemeralState;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer) {
         super(logicId, manifest, arg)
@@ -44,7 +44,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * Creates an interface for executing routines defined in the logic manifest.
      */
     private createRoutines() {
-        const routines = {};
+        const routines: Record<string, any> = {};
 
         this.manifest.elements.forEach((element: LogicManifest.Element) => {
             if (element.kind !== "callable") {
@@ -124,7 +124,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      * @param {number} timeout - The custom timeout for processing the result. (optional)
      * @returns {Promise<LogicIxResult>} A promise that resolves to the logic interaction result.
      */
-    protected async processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult> {
+    protected async processResult(response: LogicIxResponse | LogicIxCallResponse, timeout?: number): Promise<LogicIxResult> {
         const result = await response.result(timeout);
 
         return {

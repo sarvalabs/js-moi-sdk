@@ -437,13 +437,17 @@ export class Schema {
 
         const element = elements.get(ptr);
 
-        const schema = {
+        if (!element) {
+            ErrorUtils.throwError(`Element not found for class: ${className}`, ErrorCode.INVALID_ARGUMENT);
+        }
+
+        const schema: { kind: string; fields: Record<string, PoloSchema> } = {
             kind: "struct",
             fields: {},
         };
 
         element.data = element.data as LogicManifest.Class;
-        Object.values(element.data.fields).forEach((field) => {
+        Object.values(element.data.fields!).forEach((field) => {
             schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements);
         });
 
@@ -497,7 +501,7 @@ export class Schema {
      * @throws {Error} If the fields are invalid or contain unsupported data types.
      */
     public parseFields(fields: LogicManifest.TypeField[]): PoloSchema {
-        const schema = {
+        const schema: { kind: string; fields: Record<string, PoloSchema> } = {
             kind: "struct",
             fields: {},
         };

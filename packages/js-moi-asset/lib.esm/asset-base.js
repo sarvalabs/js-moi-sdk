@@ -119,12 +119,12 @@ export class AssetBase extends ElementDescriptor {
     async processArguments(ixObject, type, option) {
         const params = {
             sender: option.sender ?? {
-                id: ((await this.signer?.getIdentifier()).toString()),
+                id: ((await this.signer.getIdentifier()).toString()),
                 key_id: (await this.signer?.getKeyId()),
                 sequence: option.sequence != null ? option.sequence : (await this.signer?.getNonce()),
             },
-            fuel_price: option.fuelPrice,
-            fuel_limit: option.fuelLimit,
+            fuel_price: option.fuelPrice ?? 0,
+            fuel_limit: option.fuelLimit ?? 0,
             ix_operations: [],
             participants: option.participants ?? [],
         };

@@ -229,7 +229,7 @@ const withAssetId = (payload) => ({
 const mapPublicKeys = (keys) => keys?.map(k => ({ ...k, public_key: (0, js_moi_utils_1.hexToBytes)(k.public_key) }));
 const mapHexValues = (obj = {}) => {
     const out = new Map();
-    Object.keys(obj).forEach(k => { out[k] = (0, js_moi_utils_1.hexToBytes)(out[k]); });
+    Object.keys(obj).forEach(k => out.set(k, (0, js_moi_utils_1.hexToBytes)(obj[k])));
     return out;
 };
 function processParticipantCreate(payload) {
@@ -438,7 +438,7 @@ const toRawInteractionObject = (ix) => {
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
         preferences: ix.preferences ? {
             ...ix.preferences,
-            compute: ix.preferences.compute ? (0, js_moi_utils_1.hexToBytes)(ix.preferences.compute) : undefined,
+            compute: (0, js_moi_utils_1.hexToBytes)(ix.preferences.compute),
         } : undefined,
         perception: ix.perception ? (0, js_moi_utils_1.hexToBytes)(ix.perception) : undefined,
     };
@@ -476,10 +476,10 @@ const toInteractionArgs = (ix) => {
         ix_operations: ix.ix_operations?.map((operation) => toOperationArgs(operation)),
         preferences: ix.preferences ? {
             ...ix.preferences,
-            consensus: ix.preferences.consensus ? {
+            consensus: {
                 ...ix.preferences.consensus,
                 mtq: (0, js_moi_utils_1.toQuantity)(ix.preferences.consensus.mtq ?? 0)
-            } : undefined,
+            },
         } : undefined,
         participants: ix.participants
     };

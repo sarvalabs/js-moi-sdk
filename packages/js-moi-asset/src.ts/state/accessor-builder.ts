@@ -126,7 +126,7 @@ export class SlotAccessorBuilder implements AccessorBuilder, AccessorProvider, S
 
         const element = this.elementDescriptor.getClassElement(this.slotType);
         element.data = element.data as LogicManifest.Class;
-        const field = element.data.fields.find((field) => field.label === fieldName);
+        const field = element.data.fields!.find((field) => field.label === fieldName);
 
         if (field == null) {
             ErrorUtils.throwError(

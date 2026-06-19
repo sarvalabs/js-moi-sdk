@@ -1,4 +1,4 @@
-import { AssetCreationResult, AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
+import { AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
 import { MAS0 } from "./mas0";
 import { documentEncode, Schema } from "js-polo";
 import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
@@ -29,9 +29,9 @@ export class MAS0AssetLogic {
     ): Promise<MAS0AssetLogic> {
         const response = await this.create(signer, symbol, supply, manager, enableEvents).send()
 
-        const result:AssetCreationResult = await response.result()
+        const results = await response.result()
 
-        return new MAS0AssetLogic(result[0].asset_id, signer)
+        return new MAS0AssetLogic(results[0].asset_id, signer)
     }
 
     static create(

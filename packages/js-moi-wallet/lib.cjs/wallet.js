@@ -192,7 +192,7 @@ class Wallet extends js_moi_signer_1.Signer {
     get privateKey() {
         if (this.isInitialized()) {
             const keys = privateMapGet(this, __vault)._keys;
-            return keys.get(this.key_index)?.privateKey;
+            return keys.get(this.key_index).privateKey;
         }
         js_moi_utils_1.ErrorUtils.throwError("Private key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }
@@ -217,7 +217,7 @@ class Wallet extends js_moi_signer_1.Signer {
     get publicKey() {
         if (this.isInitialized()) {
             const keys = privateMapGet(this, __vault)._keys;
-            return keys.get(this.key_index)?.publicKey;
+            return keys.get(this.key_index).publicKey;
         }
         js_moi_utils_1.ErrorUtils.throwError("Public key not found. The wallet has not been loaded or initialized.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
     }

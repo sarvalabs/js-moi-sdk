@@ -2,7 +2,7 @@ import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
 import { InteractionContext, IxContext, IxOption } from "js-moi-interactions";
 import { OpType } from "js-moi-utils";
 import { DEFAULT_FUEL_PRICE } from "js-moi-constants";
-import { LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxResponse, LogicIxResult } from "../types/interaction";
 
 /**
  * Union of all logic-specific operation types.
@@ -29,12 +29,12 @@ export interface LogicCallResponse extends InteractionCallResponse {
  */
 export class LogicContext<T extends LogicOps> extends InteractionContext<T> {
     private readonly routineName: string;
-    private readonly processResultFn: (response: LogicIxResponse, timeout?: number) => Promise<LogicIxResult>;
+    private readonly processResultFn: (response: LogicIxResponse | LogicIxCallResponse, timeout?: number) => Promise<LogicIxResult>;
 
     constructor(
         ctx: IxContext<T>,
         routineName: string,
-        processResult: (response: LogicIxResponse, timeout?: number) => Promise<LogicIxResult>
+        processResult: (response: LogicIxResponse | LogicIxCallResponse, timeout?: number) => Promise<LogicIxResult>
     ) {
         super(ctx);
         this.routineName = routineName;

@@ -13,8 +13,8 @@ import { EphemeralState, PersistentState } from "./state";
  */
 export class AssetDriver<T extends Record<string, (...args: any) => any> = any> extends AssetDescriptor {
     public readonly routines: Routines<T> = {} as Routines<T>;
-    public readonly persistentState: PersistentState;
-    public readonly ephemeralState: EphemeralState;
+    public readonly persistentState?: PersistentState;
+    public readonly ephemeralState?: EphemeralState;
 
     constructor(assetId: string, manifest: LogicManifest.Manifest, arg: Signer) {
         super(assetId, manifest, arg)
@@ -45,7 +45,7 @@ export class AssetDriver<T extends Record<string, (...args: any) => any> = any> 
      * Creates an interface for executing routines defined in the logic manifest.
      */
     private createRoutines() {
-        const routines = {};
+        const routines: Record<string, any> = {};
 
         this.manifest.elements.forEach((element: LogicManifest.Element) => {
             if (element.kind !== "callable") {

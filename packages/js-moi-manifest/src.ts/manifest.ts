@@ -85,8 +85,8 @@ export class ManifestCoder {
                 const [key, value] = entry;
 
                 map.set(
-                    this.parseCalldata(schema.fields.keys, key),
-                    this.parseCalldata(schema.fields.values, value)
+                    this.parseCalldata(schema.fields!.keys, key),
+                    this.parseCalldata(schema.fields!.values, value)
                 );
             });
 
@@ -96,7 +96,7 @@ export class ManifestCoder {
         const parseStruct = (schema: PoloSchema, arg: any) => {
             const copy: Record<string, any> = {};
             Object.keys(arg).forEach(key => {
-                copy[key] = this.parseCalldata(schema.fields[key], arg[key]);
+                copy[key] = this.parseCalldata((schema.fields as Record<string, PoloSchema>)[key], arg[key]);
             });
 
             const schemaCopy = deepCopy(schema);
@@ -116,14 +116,14 @@ export class ManifestCoder {
                 break;
 
             case "array":
-                if (parsableKinds.includes(schema.fields.values.kind)) {
-                    return parseArray(schema.fields.values, arg);
+                if (parsableKinds.includes(schema.fields!.values.kind)) {
+                    return parseArray(schema.fields!.values, arg);
                 }
                 break;
 
             case "map":
-                if ((parsableKinds.includes(schema.fields.keys.kind) ||
-                    parsableKinds.includes(schema.fields.values.kind))) {
+                if ((parsableKinds.includes(schema.fields!.keys.kind) ||
+                    parsableKinds.includes(schema.fields!.values.kind))) {
                     return parseMap(schema, arg);
                 }
                 break;
@@ -148,8 +148,8 @@ export class ManifestCoder {
     public encodeArguments(routine: string, ...args: any[]): string {
         const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
         const schema = this.schema.parseFields(element.accepts ?? []);
-        const calldata = Object.values(element.accepts).reduce((acc, field: LogicManifest.TypeField) => {
-            acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+        const calldata = Object.values(element.accepts!).reduce<Record<string, any>>((acc, field: LogicManifest.TypeField) => {
+            acc[field.label] = this.parseCalldata((schema.fields as Record<string, PoloSchema>)[field.label], args[field.slot]);
             return acc;
         }, {});
 
@@ -170,13 +170,13 @@ export class ManifestCoder {
     public decodeArguments<T>(routine: string, calldata: string): T | null {
         const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
 
-        if (element && element.accepts.length === 0) {
+        if (element && element.accepts!.length === 0) {
             return null
         }
 
         const schema = this.schema.parseFields(element.accepts ?? []);
         const decodedCalldata = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
-        return element.accepts.map((field: LogicManifest.TypeField) => decodedCalldata[field.label]) as T;
+        return element.accepts!.map((field: LogicManifest.TypeField) => (decodedCalldata as Record<string, any>)[field.label]) as T;
     }
 
     /**

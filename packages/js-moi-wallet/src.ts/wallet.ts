@@ -180,7 +180,7 @@ export class Wallet extends Signer {
     public get privateKey(): string {
         if (this.isInitialized()) {
             const keys: Map<number, KeyEntry> = privateMapGet(this, __vault)._keys;
-            return keys.get(this.key_index)?.privateKey;
+            return keys.get(this.key_index)!.privateKey;
         }
 
         ErrorUtils.throwError(
@@ -215,7 +215,7 @@ export class Wallet extends Signer {
     public get publicKey(): string {
         if (this.isInitialized()) {
             const keys: Map<number, KeyEntry> = privateMapGet(this, __vault)._keys;
-            return keys.get(this.key_index)?.publicKey;
+            return keys.get(this.key_index)!.publicKey;
         }
 
         ErrorUtils.throwError(
@@ -410,7 +410,7 @@ export class Wallet extends Signer {
             case "ECDSA_S256": {
                 const keys: Map<number, KeyEntry> = privateMapGet(this, __vault)._keys;
                 const _sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
-                const sig = _sigAlgo.sign(Buffer.from(message), keys.get(keyId).privateKey);
+                const sig = _sigAlgo.sign(Buffer.from(message), keys.get(keyId)!.privateKey);
                 const sigBytes = sig.serialize();
                 return bytesToHex(sigBytes);
             }

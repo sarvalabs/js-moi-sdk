@@ -3,7 +3,7 @@ import type { AbstractProvider, LogicActionPayload, LogicDeployPayload, LogicPay
 import { IxContext } from "js-moi-interactions";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicContext, LogicOps } from "./logic-context";
 import { LogicId } from "./logic-id";
 
@@ -14,7 +14,7 @@ import { LogicId } from "./logic-id";
  */
 export abstract class LogicBase extends ElementDescriptor {
     protected signer?: Signer;
-    protected provider: AbstractProvider;
+    protected provider!: AbstractProvider;
     protected manifestCoder: ManifestCoder;
 
     constructor(manifest: LogicManifest.Manifest, signer: Signer) {
@@ -25,7 +25,7 @@ export abstract class LogicBase extends ElementDescriptor {
 
     protected abstract createPayload(ixObject: LogicIxObject): LogicDeployPayload | LogicActionPayload;
 
-    protected abstract processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
+    protected abstract processResult(response: LogicIxResponse | LogicIxCallResponse, timeout?: number): Promise<LogicIxResult>;
 
     /**
      * Returns the logic ID associated with this instance.
@@ -95,7 +95,7 @@ export abstract class LogicBase extends ElementDescriptor {
             opType,
             payload: payload as any,
             participants: [],
-            signer: this.signer,
+            signer: this.signer!,
         };
 
         return new LogicContext(ctx, routine.name, this.processResult.bind(this));

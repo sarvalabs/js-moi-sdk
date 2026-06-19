@@ -899,10 +899,10 @@ export class BaseProvider extends AbstractProvider {
             Object.keys(inspectResponse.queued).forEach(key => {
                 inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])));
             });
-            Object.keys(inspect.wait_time).forEach(key => {
+            Object.keys(inspectResponse.wait_time).forEach(key => {
                 inspect.wait_time.set(key, {
-                    ...inspect.wait_time[key],
-                    time: hexToBN(inspect.wait_time[key]["time"])
+                    ...inspectResponse.wait_time[key],
+                    time: hexToBN(inspectResponse.wait_time[key].time)
                 });
             });
             return inspect;
