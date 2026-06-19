@@ -111,7 +111,7 @@ export class HDNode {
     if (!this.node) {
       ErrorUtils.throwError("HDNode not initialized", ErrorCode.NOT_INITIALIZED);
     }
-    return Buffer.from(this.node.publicKey);
+    return Buffer.from(this.node.publicKey!);
   }
 
   /**

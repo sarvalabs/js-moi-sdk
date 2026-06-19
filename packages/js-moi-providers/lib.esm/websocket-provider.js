@@ -2,9 +2,8 @@ import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { w3cwebsocket as Websocket } from "websocket";
 import { BaseProvider } from "./base-provider";
 import { WebSocketEvent } from "./websocket-events";
+import { randomUUID } from "crypto";
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
-const crypto = globalThis.crypto ?? global.crypto;
-const randomUUID = crypto.randomUUID;
 export class WebsocketProvider extends BaseProvider {
     ws;
     reconnects = 0;
@@ -42,13 +41,14 @@ export class WebsocketProvider extends BaseProvider {
         this.reconnects++;
         this.ws = this.createNewWebsocket(this.host, this.options);
         this.emit('reconnect', this.reconnects);
-        if (this.options.reconnect) {
+        const reconnect = this.options?.reconnect;
+        if (reconnect) {
             const interval = setInterval(() => {
                 if (this.ws.readyState === this.ws.OPEN) {
                     clearInterval(interval);
                     return;
                 }
-                if (this.reconnects >= this.options.reconnect.maxAttempts) {
+                if (this.reconnects >= reconnect.maxAttempts) {
                     this.emit('error', new Error('Max reconnect attempts reached'));
                     clearInterval(interval);
                     return;
@@ -56,7 +56,7 @@ export class WebsocketProvider extends BaseProvider {
                 this.reconnects++;
                 this.ws = this.createNewWebsocket(this.host, this.options);
                 this.emit('reconnect', this.reconnects);
-            }, this.options.reconnect.delay);
+            }, reconnect.delay);
         }
     }
     async disconnect() {
@@ -143,7 +143,7 @@ export class WebsocketProvider extends BaseProvider {
     async getSubscription(eventName) {
         const sub = this.subscriptions.get(eventName);
         if (sub?.subID != null) {
-            return await this.subscriptions.get(eventName).subID;
+            return await sub.subID;
         }
         if (sub == null) {
             const promise = super.getSubscription(eventName);
@@ -167,7 +167,7 @@ export class WebsocketProvider extends BaseProvider {
         if (typeof eventName === "object") {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
-                if (_sub?.uuid == null) {
+                if (_sub.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
                 super.on(_sub.uuid, listener);
@@ -194,7 +194,7 @@ export class WebsocketProvider extends BaseProvider {
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
                     }
-                    if (typeof eventName === "object" && _sub.uuid != null) {
+                    if (typeof eventName === "object" && _sub?.uuid != null) {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
@@ -217,7 +217,7 @@ export class WebsocketProvider extends BaseProvider {
         if (typeof eventName === "object") {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
-                if (_sub?.uuid == null) {
+                if (_sub.uuid == null) {
                     _sub.uuid = `${eventName.event}:${randomUUID()}`;
                 }
                 super.once(_sub.uuid, listener);
@@ -244,7 +244,7 @@ export class WebsocketProvider extends BaseProvider {
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
                     }
-                    if (typeof eventName === "object" && _sub.uuid != null) {
+                    if (typeof eventName === "object" && _sub?.uuid != null) {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }

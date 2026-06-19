@@ -5,7 +5,6 @@ import {
     AccountMetaInfo,
     AccountState,
     AssetInfo,
-    CallorEstimateIxObject,
     CallorEstimateOptions,
     Content,
     ContentFrom,
@@ -26,6 +25,7 @@ import {
     type LogFilter
 } from "../types/jsonrpc";
 import { type ProviderEvents } from "../types/websocket";
+import { InteractionObject } from "../types/interaction";
 
 
 
@@ -35,39 +35,38 @@ import { type ProviderEvents } from "../types/websocket";
  */
 export abstract class AbstractProvider extends EventEmitter {
     // Account Methods
-    abstract getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>
-    abstract getContextInfo(address: string, options?: Options): Promise<ContextInfo>
+    abstract getBalance(id: string, assetId: string, options?: Options): Promise<number | bigint>
+    abstract getContextInfo(id: string, options?: Options): Promise<ContextInfo>
 
-
-    abstract getTesseract(address: string, with_interactions: boolean, with_commit_info: boolean, options?: Options): Promise<Tesseract>
+    abstract getTesseract(id: string, with_interactions: boolean, with_commit_info: boolean, options?: Options): Promise<Tesseract>
     abstract getTesseract(with_interactions: boolean, with_commit_info: boolean, options?: Options): Promise<Tesseract>
 
-    abstract getTDU(address: string, options?: Options): Promise<TDU[]>
+    abstract getTDU(id: string, options?: Options): Promise<TDU[]>
     abstract getInteractionByHash(ixHash: string): Promise<Interaction>
     
-    abstract getInteractionByTesseract(address: string, options?: Options, ix_index?: number): Promise<Interaction>
+    abstract getInteractionByTesseract(id: string, options?: Options, ix_index?: number): Promise<Interaction>
     abstract getInteractionByTesseract(options: Options, ix_index?: number): Promise<Interaction>
 
-    abstract getInteractionCount(address: string, options?: Options): Promise<number | bigint>
-    abstract getPendingInteractionCount(address: string): Promise<number | bigint>
-    abstract getAccountState(address: string, options?: Options): Promise<AccountState>
-    abstract getAccountMetaInfo(address: string, options?: Options): Promise<AccountMetaInfo>
-    abstract getLogicIds(address: string, options?: Options): Promise<string[]>
-    abstract getRegistry(address: string, options?: Options): Promise<Registry>
+    abstract getInteractionCount(id: string, key_id: number , options?: Options): Promise<number | bigint>
+    abstract getPendingInteractionCount(id: string, key_id: number): Promise<number | bigint>
+    abstract getAccountState(id: string, options?: Options): Promise<AccountState>
+    abstract getAccountMetaInfo(id: string, options?: Options): Promise<AccountMetaInfo>
+    abstract getLogicIds(id: string, options?: Options): Promise<string[]>
+    abstract getRegistry(id: string, options?: Options): Promise<Registry>
     abstract getSyncStatus(address?: string): Promise<SyncStatus>
-    abstract getContentFrom(address: string): Promise<ContentFrom>
-    abstract getWaitTime(address: string): Promise<number|bigint>
+    abstract getContentFrom(id: string): Promise<ContentFrom>
+    abstract getWaitTime(id: string): Promise<number|bigint>
 
     // Execution Methods
-    abstract call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>
-    abstract estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>
+    abstract call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>
+    abstract estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint>
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>
 
     // Query Methods
     abstract getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>
     abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>
-    abstract getStorageAt(logicId: string, storageKey: string, address: string, options?: Options): Promise<string>
+    abstract getStorageAt(logicId: string, storageKey: string, id: string, options?: Options): Promise<string>
     abstract getLogicManifest(logicId: string, encoding: Encoding, options?: Options): Promise<string | LogicManifest.Manifest>
     abstract getContent(): Promise<Content>
     abstract getStatus(): Promise<Status>
@@ -76,7 +75,7 @@ export abstract class AbstractProvider extends EventEmitter {
     abstract getVersion(): Promise<string>
     abstract getNodeInfo(): Promise<NodeInfo>
     abstract getNewTesseractFilter(): Promise<Filter>
-    abstract getNewTesseractsByAccountFilter(address: string): Promise<Filter>
+    abstract getNewTesseractsByAccountFilter(id: string): Promise<Filter>
     abstract getPendingInteractionFilter(): Promise<Filter>
     abstract getFilterChanges<T extends any>(filter: Filter): Promise<T>
     abstract removeFilter(filter: Filter): Promise<FilterDeletionResult>

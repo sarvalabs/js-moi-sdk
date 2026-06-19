@@ -4,7 +4,6 @@ exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
-const routine_options_1 = require("./routine-options");
 const state_1 = require("./state");
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -40,25 +39,18 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
     createRoutines() {
         const routines = {};
         this.manifest.elements.forEach((element) => {
-            if (element.kind !== "routine") {
+            if (element.kind !== "callable") {
                 return;
             }
             const routine = element.data;
             if (!["invoke", "enlist"].includes(routine.kind)) {
                 return;
             }
-            routines[routine.name] = async (...params) => {
-                const argsLen = params.at(-1) && params.at(-1) instanceof routine_options_1.RoutineOption
-                    ? params.length - 1
-                    : params.length;
-                if (routine.accepts && argsLen < routine.accepts.length) {
+            routines[routine.name] = (...params) => {
+                if (routine.accepts && params.length < routine.accepts.length) {
                     js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
-                const ixObject = this.createIxObject(routine, ...params);
-                if (!this.isMutableRoutine(routine)) {
-                    return await ixObject.unwrap();
-                }
-                return await ixObject.send();
+                return this.createIxObject(routine, ...params);
             };
             routines[routine.name].isMutable = () => {
                 return this.isMutableRoutine(routine);
@@ -73,16 +65,16 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         (0, js_moi_utils_1.defineReadOnly)(this, "routines", routines);
     }
     /**
-     * Checks if a routine is mutable based on its name.
+     * Checks if a routine is mutable based on its mode.
      *
-     * @param {string} routineName - The name of the routine.
+     * @param {LogicManifest.Routine} routine - The routine to check.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     isMutableRoutine(routine) {
-        return ["persistent", "ephemeral"].includes(routine.mode);
+        return ["dynamic"].includes(routine.mode);
     }
     /**
-     * Creates the logic payload from the given interaction object.
+     * Creates the logic action payload from the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicActionPayload} The logic action payload.
@@ -99,25 +91,18 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
         return payload;
     }
     /**
-     * Processes the logic interaction result and returns the decoded data or
-     error, if available.
+     * Processes the logic interaction result and returns the decoded output and error, if available.
      *
      * @param {LogicIxResponse} response - The logic interaction response.
      * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult | null>} A promise that resolves to the
-     logic interaction result or null.
+     * @returns {Promise<LogicIxResult>} A promise that resolves to the logic interaction result.
      */
     async processResult(response, timeout) {
-        try {
-            const result = await response.result(timeout);
-            return {
-                output: this.manifestCoder.decodeOutput(response.routine_name, result.outputs),
-                error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error)
-            };
-        }
-        catch (err) {
-            throw err;
-        }
+        const result = await response.result(timeout);
+        return {
+            output: this.manifestCoder.decodeOutput(response.routine_name, result[0].outputs),
+            error: js_moi_manifest_1.ManifestCoder.decodeException(result[0].error),
+        };
     }
 }
 exports.LogicDriver = LogicDriver;

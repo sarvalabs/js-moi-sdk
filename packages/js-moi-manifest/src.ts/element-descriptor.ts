@@ -35,7 +35,7 @@ export class ElementDescriptor {
                     };
                     this.methodDefs.set(methodData.name, methodDef);
                     break;
-                case "routine":
+                case "callable":
                     const routineData = element.data as LogicManifest.Routine;
                     const callsite: LogicManifest.CallSite = {
                         ptr: element.ptr,
@@ -120,7 +120,9 @@ export class ElementDescriptor {
         this.methodDefs.forEach((method, methodName) => {
             if (method.class === className) {
                 const element = this.elements.get(method.ptr);
-                classMethods.set(methodName, element.data as LogicManifest.Method);
+                if (element) {
+                    classMethods.set(methodName, element.data as LogicManifest.Method);
+                }
             }
         });
 
@@ -142,7 +144,7 @@ export class ElementDescriptor {
             return ErrorUtils.throwError(`Invalid routine name: ${routineName}`, ErrorCode.INVALID_ARGUMENT);
         }
 
-        return this.elements.get(callsite.ptr);
+        return this.elements.get(callsite.ptr)!;
     }
 
     /**
@@ -159,7 +161,7 @@ export class ElementDescriptor {
             return ErrorUtils.throwError(`Invalid routine name: ${className}`, ErrorCode.INVALID_ARGUMENT);
         }
 
-        return this.elements.get(ptr);
+        return this.elements.get(ptr)!;
     }
 
     /**
@@ -177,7 +179,7 @@ export class ElementDescriptor {
             return ErrorUtils.throwError(`Invalid routine name: ${methodName}`, ErrorCode.INVALID_ARGUMENT);
         }
 
-        return this.elements.get(methodDef.ptr);
+        return this.elements.get(methodDef.ptr)!;
     }
 
     /**

@@ -50,6 +50,15 @@ export const hexDataLength = (data) => {
     return (data.length - 2) / 2;
 };
 /**
+ * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
+ *
+ * @param size - The number of random bytes to generate.
+ * @returns A Uint8Array containing the generated random bytes.
+ */
+export const randomBytes = (size) => {
+    return globalThis.crypto.getRandomValues(new Uint8Array(size));
+};
+/**
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.

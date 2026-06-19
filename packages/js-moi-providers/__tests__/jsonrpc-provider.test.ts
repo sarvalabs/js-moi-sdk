@@ -428,7 +428,7 @@ describe("Test JsonRpcProvider Query Calls", () => {
     });
 
     describe("getLogs", () => {
-      const provider = new VoyageProvider("babylon");
+      const provider = new VoyageProvider("devnet");
       const address = "0xb90f39fcf346ba3260518669495f5d368a8d1bb8023584f67e8a5671cf3c56ce";
 
       it("should return an result", async () => {

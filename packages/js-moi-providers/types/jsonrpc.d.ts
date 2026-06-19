@@ -9,6 +9,7 @@ import {
     Participants
 } from "js-moi-utils";
 import type { NestedArray } from "./util";
+import { InteractionObject, RawInteractionObject } from "./interaction";
 
 export interface Options {
     tesseract_number?: number;
@@ -26,10 +27,12 @@ interface TDUBase {
 }
 
 export interface TDU extends TDUBase {
+    token_id: number | bigint;
     amount: number | bigint; 
 }
 
 export interface TDUResponse extends TDUBase {
+    token_id: string;
     amount: string; 
 }
 
@@ -45,9 +48,18 @@ export interface AccountState {
     asset_registry: string;
 }
 
+export interface AccountKey {
+  id: number; 
+  publicKey: string;
+  weight: number;
+  signature_algorithm: number;
+  revoked: boolean;
+  sequence_id: number;
+}
+
 export interface AccountMetaInfo {
     type: number;
-    address: string;
+    id: string;
     height: string;
     tesseract_hash: string;
     lattice_exists: boolean;
@@ -56,7 +68,7 @@ export interface AccountMetaInfo {
 
 export interface InteractionRequest {
     ix_args: string;
-    signature: string;
+    signatures: string;
 }
 
 export interface InteractionResponse {
@@ -71,12 +83,12 @@ export interface InteractionCallResponse {
 }
 
 export interface StateHash {
-    address: string;
+    id: string;
     hash: string;
 }
 
 export interface ContextHash {
-    address: string;
+    id: string;
     hash: string;
 }
 
@@ -101,13 +113,16 @@ export interface InteractionReceipt {
 }
 
 export interface AssetInfo {
+    asset_id: string;
     symbol: string;
-    operator: string;
-    supply: string;
     dimension: string;
-    standard: string;
-    is_logical: boolean;
-    is_stateful: boolean;
+    decimals: string;
+    creator: string;
+    manager: string;
+    max_supply: string;
+    circulating_supply: string;
+    enable_events: string;
+    metadata: Record<string, Uint8Array>
     logic_id?: string;
 }
 
@@ -135,17 +150,23 @@ interface SyncStatus {
 }
 
 export interface AccountParamsBase {
-    address: string,
+    id: string,
+    key_id?: number,
     options?: Options 
 }
 
 export interface AccountStateParams {
-    address: string,
+    id: string,
+    options?: Options 
+}
+
+export interface AccountKeyParams {
+    id: string,
     options?: Options 
 }
 
 export interface AccountMetaInfoParams {
-    address: string
+    id: string
 }
 
 export interface BalanceParams extends AccountParamsBase {
@@ -170,11 +191,11 @@ export interface InteractionByTesseractParams extends AccountParamsBase {
 }
 
 export interface SyncStatusParams {
-    address?: string
+    id?: string
 }
 
 export interface StorageParams {
-    address?: string;
+    id?: string;
     logic_id: string;
     storage_key: string;
     options: Options;
@@ -202,8 +223,8 @@ export interface InteractionInfo {
 }
 
 interface ContentResponse {
-    pending: Record<string, Map<number | bigint, InteractionInfo>>
-    queued: Record<string, Map<number | bigint, InteractionInfo>>
+    pending: Record<string, Record<string, InteractionInfo>>
+    queued: Record<string, Record<string, InteractionInfo>>
 }
 
 export interface Content {
@@ -265,195 +286,44 @@ interface Stream {
     direction: number;
 }
 
-export interface AssetCreatePayload {
-    symbol: string;
-    supply: number | bigint;
-    standard: AssetStandard;
-    dimension?: number;
-    is_stateful?: boolean;
-    is_logical?: boolean;
-    logic_payload?: LogicPayload;
-}
-
-export interface AssetCreateOperation {
-    type: OpType.ASSET_CREATE;
-    payload: AssetCreatePayload;
-}
-
-export interface ParticipantCreatePayload {
-    address: string;
-    amount: number;
-}
-
-export interface ParticipantCreateOperation {
-    type: OpType.PARTICIPANT_CREATE;
-    payload: ParticipantCreatePayload;
-}
-
-export interface AssetSupplyPayload {
-    asset_id: string;
-    amount: number | bigint;
-}
-
-export interface AssetSupplyOperation {
-    type: OpType.ASSET_MINT | OpType.ASSET_BURN;
-    payload: AssetSupplyPayload;
-}
-
-export interface AssetActionPayload {
-    benefactor?: string;
-    beneficiary: string;
-    asset_id: string;
-    amount: number | bigint;
-}
-
-export interface AssetActionOperation {
-    type: OpType.ASSET_TRANSFER;
-    payload: AssetActionPayload;
-}
-
-export interface LogicDeployPayload {
-    manifest: string;
-    callsite: string;
-    calldata?: string;
-}
-
-export interface LogicDeployOperation {
-    type: OpType.LOGIC_DEPLOY;
-    payload: LogicDeployPayload;
-}
-
-export interface LogicActionPayload {
-    logic_id: string;
-    callsite: string;
-    calldata?: string;
-}
-
-export interface LogicActionOperation {
-    type: OpType.LOGIC_INVOKE | OpType.LOGIC_ENLIST;
-    payload: LogicActionPayload;
-}
-
-export interface LogicPayload {
-    logic_id?: string;
-    callsite: string;
-    calldata?: string;
-    manifest?: string;
-}
-
-interface ProcessedParticipantCreatePayload {
-    address: Uint8Array;
-    amount: number | bigint;
-}
-
-interface ProcessedAssetActionPayload {
-    benefactor: Uint8Array;
-    beneficiary: Uint8Array;
-    asset_id: string;
-    amount: number | bigint;
-}
-
-interface ProcessedLogicPayload {
-    logic_id?: string;
-    callsite: string;
-    calldata?: Uint8Array;
-    manifest?: Uint8Array;
-}
-
-type ProcessedOperationPayload = | ProcessedParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | ProcessedAssetActionPayload | ProcessedLogicPayload;
-
-export type OperationPayload = | ParticipantCreatePayload | AssetCreatePayload | AssetSupplyPayload | AssetActionPayload | LogicDeployPayload | LogicActionPayload;
-
-export interface IxAssetFund {
-    asset_id: string;
-    amount: number | bigint;
-}
-
-interface ProcessedIxAssetFund {
-    asset_id: string;
-    amount: string;
-}
-
-export type IxOperation = | ParticipantCreateOperation | AssetCreateOperation | AssetActionOperation | AssetSupplyOperation | LogicDeployOperation | LogicActionOperation;
-
-interface ProcessedIxOperation {
-    type: OpType;
-    payload: string;
-}
-
-export interface IxParticipant {
-    address: string;
-    lock_type: number;
-}
-
-export interface IxPreferences {
-    compute: Uint8Array;
-    consensus: Uint8Array;
-}
-
-interface InteractionObject {
-    nonce?: number | bigint;
-
-    sender?: string;
-    payer?: string;
-
-    fuel_price?: number | bigint;
-    fuel_limit?: number | bigint;
-    
-    funds?: IxAssetFund[]
-    ix_operations: IxOperation[]
-    participants?: IxParticipant[]
-
-    perception?: Uint8Array
-
-    preferences?: IxPreferences
-}
-
-export interface CallorEstimateIxObject extends InteractionObject {
-    nonce: number | bigint;
-    sender: string
+export interface CallorEstimateIxObject {
+    ix_args: InteractionObject,
 }
 
 interface ProcessedCallorEstimateIxObject {
-    nonce: string;
-
-    sender: string;
-    payer?: string;
-
-    funds: ProcessedIxAssetFund[]
-    ix_operations: ProcessedIxOperation[]
-    participants: IxParticipant[]
-
-    fuel_price: string;
-    fuel_limit: string;
-
-    perception?: Uint8Array
-
-    preferences?: IxPreferences
+    ix_args: RawInteractionObject
 }
 
 export type CallorEstimateOptions = Record<string, Options>
+
+interface RpcCommon {
+    id: number | string;
+    jsonrpc: "2.0";
+}
 
 export interface RpcErrorResponse {
     code: number;
     message: string;
 }
 
-export interface RpcError {
-    code: number,
+interface RpcError {
+    code: number | string,
     message: string,
-    data: any
+    data?: unknown
 }
 
-export interface RpcResponse<T> {
-    jsonrpc: string;
+export interface RpcRequest extends RpcCommon {
+    method: string;
+    params: unknown[];
+}
+
+export interface RpcResponse<T=unknown> extends RpcCommon {
     result?: T;
     error?: RpcError;
-    id: 1;
 }
 
 export interface Log {
-    address: string;
+    id: string;
     topics: string[];
     data: string;
     ix_hash: string;
@@ -462,14 +332,14 @@ export interface Log {
 }
 
 export interface LogFilter {
-    address: string;
+    id: string;
     height: [start: number, end: number];
     topics?: NestedArray<string>;
 }
 
 
 export interface Log {
-    address: string;
+    id: string;
     topics: string[];
     data: string;
     ix_hash: string;
@@ -478,7 +348,7 @@ export interface Log {
 }
 
 export interface LogFilter {
-    address: string;
+    id: string;
     height: [start: number, end: number];
     topics?: NestedArray<string>;
 }

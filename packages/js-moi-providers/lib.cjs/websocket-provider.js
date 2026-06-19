@@ -5,9 +5,8 @@ const js_moi_utils_1 = require("js-moi-utils");
 const websocket_1 = require("websocket");
 const base_provider_1 = require("./base-provider");
 const websocket_events_1 = require("./websocket-events");
+const crypto_1 = require("crypto");
 const WEBSOCKET_HOST_REGEX = /^wss?:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+(:[0-9]+)?(\/.*)?$/;
-const crypto = globalThis.crypto ?? global.crypto;
-const randomUUID = crypto.randomUUID;
 class WebsocketProvider extends base_provider_1.BaseProvider {
     ws;
     reconnects = 0;
@@ -45,13 +44,14 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         this.reconnects++;
         this.ws = this.createNewWebsocket(this.host, this.options);
         this.emit('reconnect', this.reconnects);
-        if (this.options.reconnect) {
+        const reconnect = this.options?.reconnect;
+        if (reconnect) {
             const interval = setInterval(() => {
                 if (this.ws.readyState === this.ws.OPEN) {
                     clearInterval(interval);
                     return;
                 }
-                if (this.reconnects >= this.options.reconnect.maxAttempts) {
+                if (this.reconnects >= reconnect.maxAttempts) {
                     this.emit('error', new Error('Max reconnect attempts reached'));
                     clearInterval(interval);
                     return;
@@ -59,7 +59,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                 this.reconnects++;
                 this.ws = this.createNewWebsocket(this.host, this.options);
                 this.emit('reconnect', this.reconnects);
-            }, this.options.reconnect.delay);
+            }, reconnect.delay);
         }
     }
     async disconnect() {
@@ -121,7 +121,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
             method: method,
             params: inputParams,
             jsonrpc: "2.0",
-            id: randomUUID(),
+            id: (0, crypto_1.randomUUID)(),
         };
         return new Promise((resolve) => {
             const handler = (message) => {
@@ -146,7 +146,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     async getSubscription(eventName) {
         const sub = this.subscriptions.get(eventName);
         if (sub?.subID != null) {
-            return await this.subscriptions.get(eventName).subID;
+            return await sub.subID;
         }
         if (sub == null) {
             const promise = super.getSubscription(eventName);
@@ -170,13 +170,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         if (typeof eventName === "object") {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
-                if (_sub?.uuid == null) {
-                    _sub.uuid = `${eventName.event}:${randomUUID()}`;
+                if (_sub.uuid == null) {
+                    _sub.uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 }
                 super.on(_sub.uuid, listener);
             }
             else {
-                const uuid = `${eventName.event}:${randomUUID()}`;
+                const uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 this.subscriptions.set(eventName, { uuid });
                 super.on(uuid, listener);
             }
@@ -197,7 +197,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
                     }
-                    if (typeof eventName === "object" && _sub.uuid != null) {
+                    if (typeof eventName === "object" && _sub?.uuid != null) {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
@@ -220,13 +220,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         if (typeof eventName === "object") {
             if (this.subscriptions.has(eventName)) {
                 const _sub = this.subscriptions.get(eventName);
-                if (_sub?.uuid == null) {
-                    _sub.uuid = `${eventName.event}:${randomUUID()}`;
+                if (_sub.uuid == null) {
+                    _sub.uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 }
                 super.once(_sub.uuid, listener);
             }
             else {
-                const uuid = `${eventName.event}:${randomUUID()}`;
+                const uuid = `${eventName.event}:${(0, crypto_1.randomUUID)()}`;
                 this.subscriptions.set(eventName, { uuid });
                 super.once(uuid, listener);
             }
@@ -247,7 +247,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                         this.emit(eventName, this.processWsResult(eventName, data.params.result));
                         return;
                     }
-                    if (typeof eventName === "object" && _sub.uuid != null) {
+                    if (typeof eventName === "object" && _sub?.uuid != null) {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }

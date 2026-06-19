@@ -46,10 +46,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getBalance(address, assetId, options) {
+    async getBalance(id, assetId, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 asset_id: assetId,
                 options: options ? options : defaultOptions
             };
@@ -71,10 +71,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getContextInfo(address, options) {
+    async getContextInfo(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.ContextInfo", params);
@@ -85,25 +85,48 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
-     * Retrieves the TDU (Total Digital Utility) for the specified address.
+     * Retrieves the TDU (Total Digital Utility) for the specified id.
      *
-     * @param {string} address - The address for which to retrieve the TDU.
+     * @param {string} id - The id for which to retrieve the TDU.
      * @param {Options} options - The tesseract options. (optional)
      * @returns {Promise<TDU[]>} A Promise that resolves to the TDU object.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getTDU(address, options) {
+    async getTDU(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.TDU", params);
             const tdu = this.processResponse(response);
             return tdu.map((asset) => ({
                 asset_id: asset.asset_id,
+                token_id: (0, js_moi_utils_1.hexToBN)(asset.token_id),
                 amount: (0, js_moi_utils_1.hexToBN)(asset.amount)
             }));
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves the sub account count for the specified id.
+     *
+     * @param {string} id - The id for which to retrieve the sub account count.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the sub account count.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getSubAccountCount(id, options) {
+        try {
+            const params = {
+                id: id,
+                options: options ? options : defaultOptions
+            };
+            const response = await this.execute("moi.SubAccountCount", params);
+            const count = this.processResponse(response);
+            return (0, js_moi_utils_1.hexToBN)(count);
         }
         catch (error) {
             throw error;
@@ -175,10 +198,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * of interactions as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getInteractionCount(address, options) {
+    async getInteractionCount(id, keyId, options) {
         try {
             const params = {
-                address: address,
+                id: id,
+                key_id: keyId,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.InteractionCount", params);
@@ -200,10 +224,11 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * as a number or bigint.
      * @throws Error if there is an error executing the RPC call.
      */
-    async getPendingInteractionCount(address) {
+    async getPendingInteractionCount(id, keyId) {
         try {
             const params = {
-                address: address
+                id: id,
+                key_id: keyId
             };
             const response = await this.execute("moi.PendingInteractionCount", params);
             const ixCount = this.processResponse(response);
@@ -223,13 +248,36 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getAccountState(address, options) {
+    async getAccountState(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.AccountState", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves the account state for the specified address.
+     *
+     * @param {string} address - The address for which to retrieve the account
+     * state.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<AccountState>} A Promise that resolves to the account
+     * state.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getAccountKeys(id, options) {
+        try {
+            const params = {
+                id: id,
+                options: options ? options : defaultOptions
+            };
+            const response = await this.execute("moi.AccountKeys", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -245,10 +293,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * account meta information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getAccountMetaInfo(address) {
+    async getAccountMetaInfo(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("moi.AccountMetaInfo", params);
             return this.processResponse(response);
@@ -265,10 +313,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getContentFrom(address) {
+    async getContentFrom(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("ixpool.ContentFrom", params);
             const contentResponse = this.processResponse(response);
@@ -292,10 +340,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * time (in seconds) as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getWaitTime(address) {
+    async getWaitTime(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("ixpool.WaitTime", params);
             return this.processResponse(response);
@@ -370,16 +418,16 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         if (filter.topics == null) {
             filter.topics = [];
         }
-        const { address, height, topics } = filter;
-        if (!(0, js_moi_utils_1.isValidAddress)(address)) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        const { id, height, topics } = filter;
+        if (!(0, js_moi_utils_1.isValidAddress)(id)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid identifier provided", "identifier", id);
         }
         if (!Array.isArray(topics)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
         }
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
@@ -455,7 +503,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         try {
             const params = {};
             if (typeof arg1 === 'string') {
-                params['address'] = arg1;
+                params['id'] = arg1;
                 params['with_interactions'] = arg2;
                 params['with_commit_info'] = arg3;
                 params['options'] = arg4 ?? defaultOptions;
@@ -480,10 +528,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * @returns {Promise<string[]>} A Promise that resolves to an array of logic id's.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getLogicIds(address, options) {
+    async getLogicIds(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
             const response = await this.execute("moi.LogicIDs", params);
@@ -501,13 +549,13 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * @returns {Promise<Registry>} A Promise that resolves to the registry.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getRegistry(address, options) {
+    async getRegistry(id, options) {
         try {
             const params = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             };
-            const response = await this.execute("moi.Registry", params);
+            const response = await this.execute("moi.Deeds", params);
             return this.processResponse(response);
         }
         catch (error) {
@@ -521,10 +569,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    async getSyncStatus(address) {
+    async getSyncStatus(id) {
         try {
             const params = {
-                address: address
+                id: id
             };
             const response = await this.execute("moi.Syncing", params);
             return this.processResponse(response);
@@ -547,7 +595,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async call(ixObject, options) {
         try {
             const params = {
-                ix_args: (0, interaction_1.processIxObject)(ixObject),
+                ix_args: (0, interaction_1.toInteractionArgs)(ixObject),
                 options: options
             };
             const response = await this.execute("moi.Call", params);
@@ -576,7 +624,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
     async estimateFuel(ixObject, options) {
         try {
             const params = {
-                ix_args: (0, interaction_1.processIxObject)(ixObject),
+                ix_args: (0, interaction_1.toInteractionArgs)(ixObject),
                 options: options
             };
             const response = await this.execute("moi.FuelEstimate", params);
@@ -681,10 +729,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
      */
     async getStorageAt(logicId, storageKey, arg3, arg4) {
         try {
-            const address = typeof arg3 === 'string' ? arg3 : undefined;
+            const id = typeof arg3 === 'string' ? arg3 : undefined;
             const options = typeof arg3 === 'object' ? arg3 : arg4;
             const params = {
-                address: address,
+                id: id,
                 logic_id: logicId,
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
@@ -757,16 +805,16 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         if (logFilter.topics == null) {
             logFilter.topics = [];
         }
-        const { address, height, topics } = logFilter;
-        if (!(0, js_moi_utils_1.isValidAddress)(address)) {
-            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        const { id, height, topics } = logFilter;
+        if (!(0, js_moi_utils_1.isValidAddress)(id)) {
+            js_moi_utils_1.ErrorUtils.throwArgumentError("Invalid identifier provided", "id", id);
         }
         if (!Array.isArray(topics)) {
             js_moi_utils_1.ErrorUtils.throwArgumentError("Topics should be an array", "topics", topics);
         }
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
@@ -854,10 +902,10 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             Object.keys(inspectResponse.queued).forEach(key => {
                 inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])));
             });
-            Object.keys(inspect.wait_time).forEach(key => {
+            Object.keys(inspectResponse.wait_time).forEach(key => {
                 inspect.wait_time.set(key, {
-                    ...inspect.wait_time[key],
-                    time: (0, js_moi_utils_1.hexToBN)(inspect.wait_time[key]["time"])
+                    ...inspectResponse.wait_time[key],
+                    time: (0, js_moi_utils_1.hexToBN)(inspectResponse.wait_time[key].time)
                 });
             });
             return inspect;
@@ -924,7 +972,7 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         if (typeof event === "object") {
             params = this.validateAndFormatEvent(event);
         }
-        const response = await this.execute("moi.subscribe", params);
+        const response = await this.execute("moi.Subscribe", params);
         return this.processResponse(response);
     }
     validateAndFormatEvent(event) {
@@ -996,19 +1044,17 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         return receipt.ix_operations.map(operation => {
             switch ((0, js_moi_utils_1.hexToBN)(operation.tx_type)) {
                 case js_moi_utils_1.OpType.PARTICIPANT_CREATE:
-                case js_moi_utils_1.OpType.ASSET_TRANSFER:
-                    return null;
                 case js_moi_utils_1.OpType.ASSET_CREATE:
                     if (operation.data) {
                         return operation.data;
                     }
                     throw new Error("Failed to retrieve asset creation response");
-                case js_moi_utils_1.OpType.ASSET_MINT:
-                case js_moi_utils_1.OpType.ASSET_BURN:
+                case js_moi_utils_1.OpType.ASSET_INVOKE:
                     if (operation.data) {
+                        // Todo: update response type
                         return operation.data;
                     }
-                    throw new Error("Failed to retrieve asset mint/burn response");
+                    throw new Error("Failed to retrieve asset creation response");
                 case js_moi_utils_1.OpType.LOGIC_DEPLOY:
                     if (operation.data) {
                         return operation.data;

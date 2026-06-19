@@ -38,72 +38,71 @@ export class ManifestCoder {
     }
 
     /**
+     * Recursively walks the schema after calldata parsing and replaces all
+     * `struct` nodes with `document`, so the final `documentEncode` call
+     * receives the correct wire types without mutating shared schema references
+     * during recursive parsing.
+     *
+     * @private
+     * @param {PoloSchema} schema - The schema to reconstruct in place.
+     */
+    private reconstructSchema(schema: PoloSchema): void {
+        if (!schema.fields) return;
+
+        for (const key in schema.fields) {
+            const field = schema.fields[key];
+            if (field.kind === "struct") {
+                field.kind = "document";
+                delete field.fields;
+            } else if (field.kind === "array" || field.kind === "map") {
+                this.reconstructSchema(field);
+            }
+            // primitives (string, integer, bytes, bool, …) can be ignored — nothing to recurse
+        }
+    }
+
+    /**
      * Parses the calldata arguments based on the provided POLO Schema.
      * The calldata arguments is recursively processed and transformed according to the schema.
      *
      * @private
      * @param {PoloSchema} schema - The schema definition for the calldata.
      * @param {*} arg - The calldata argument to parse.
-     * @param {boolean} [updateType=true] - Indicates whether to update the schema type during parsing.
      * @returns {*} The parsed calldata argument.
      */
-    private parseCalldata(schema: PoloSchema, arg: any, updateType: boolean = true): any {
+    private parseCalldata(schema: PoloSchema, arg: any): any {
         const parsableKinds = ["bytes", "array", "map", "struct"];
 
-        const reconstructSchema = (schema: PoloSchema): PoloSchema => {
-            Object.keys(schema.fields).forEach(key => {
-                if (schema.fields[key].kind === "struct") {
-                    schema.fields[key].kind = "document";
-                }
-            });
-
-            return schema;
-        }
-
         const parseArray = (schema: PoloSchema, arg: any[]) => {
-            return arg.map((value: any, index: number) =>
-                this.parseCalldata(schema, value, arg.length - 1 === index)
-            );
+            return arg.map((value: any) => this.parseCalldata(schema, value));
         }
 
         const parseMap = (schema: PoloSchema, arg: Map<any, any>) => {
             const map = new Map()
             const entries = Array.from(arg.entries());
 
-            // Loop through the entries of the Map
-            entries.forEach((entry: [any, any], index: number) => {
+            entries.forEach((entry: [any, any]) => {
                 const [key, value] = entry;
 
                 map.set(
-                    this.parseCalldata(
-                        schema.fields.keys,
-                        key,
-                        entries.length - 1 === index
-                    ),
-                    this.parseCalldata(
-                        schema.fields.values,
-                        value,
-                        entries.length - 1 === index
-                    )
+                    this.parseCalldata(schema.fields!.keys, key),
+                    this.parseCalldata(schema.fields!.values, value)
                 );
             });
 
             return map;
         }
 
-        const parseStruct = (schema: PoloSchema, arg: any, updateType: boolean) => {
+        const parseStruct = (schema: PoloSchema, arg: any) => {
+            const copy: Record<string, any> = {};
             Object.keys(arg).forEach(key => {
-                arg[key] = this.parseCalldata(schema.fields[key], arg[key], false)
+                copy[key] = this.parseCalldata((schema.fields as Record<string, PoloSchema>)[key], arg[key]);
             });
 
-            const doc = documentEncode(arg, reconstructSchema(deepCopy(schema)))
+            const schemaCopy = deepCopy(schema);
+            this.reconstructSchema(schemaCopy);
 
-            if (updateType) {
-                schema.kind = "document";
-                delete schema.fields;
-            }
-
-            return doc.getData();
+            return documentEncode(copy, schemaCopy).getData();
         }
 
         switch (schema.kind) {
@@ -117,20 +116,20 @@ export class ManifestCoder {
                 break;
 
             case "array":
-                if (parsableKinds.includes(schema.fields.values.kind)) {
-                    return parseArray(schema.fields.values, arg);
+                if (parsableKinds.includes(schema.fields!.values.kind)) {
+                    return parseArray(schema.fields!.values, arg);
                 }
                 break;
 
             case "map":
-                if ((parsableKinds.includes(schema.fields.keys.kind) ||
-                    parsableKinds.includes(schema.fields.values.kind))) {
+                if ((parsableKinds.includes(schema.fields!.keys.kind) ||
+                    parsableKinds.includes(schema.fields!.values.kind))) {
                     return parseMap(schema, arg);
                 }
                 break;
 
             case "struct":
-                return parseStruct(schema, arg, updateType);
+                return parseStruct(schema, arg);
 
             default:
                 break;
@@ -149,10 +148,12 @@ export class ManifestCoder {
     public encodeArguments(routine: string, ...args: any[]): string {
         const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
         const schema = this.schema.parseFields(element.accepts ?? []);
-        const calldata = Object.values(element.accepts).reduce((acc, field: LogicManifest.TypeField) => {
-            acc[field.label] = this.parseCalldata(schema.fields[field.label], args[field.slot]);
+        const calldata = Object.values(element.accepts!).reduce<Record<string, any>>((acc, field: LogicManifest.TypeField) => {
+            acc[field.label] = this.parseCalldata((schema.fields as Record<string, PoloSchema>)[field.label], args[field.slot]);
             return acc;
         }, {});
+
+        this.reconstructSchema(schema);
 
         return "0x" + bytesToHex((documentEncode(calldata, schema).bytes()))
     }
@@ -169,13 +170,13 @@ export class ManifestCoder {
     public decodeArguments<T>(routine: string, calldata: string): T | null {
         const element = this.elementDescriptor.getRoutineElement(routine).data as LogicManifest.Routine
 
-        if (element && element.accepts.length === 0) {
+        if (element && element.accepts!.length === 0) {
             return null
         }
 
         const schema = this.schema.parseFields(element.accepts ?? []);
         const decodedCalldata = new Depolorizer(hexToBytes(calldata)).depolorize(schema);
-        return element.accepts.map((field: LogicManifest.TypeField) => decodedCalldata[field.label]) as T;
+        return element.accepts!.map((field: LogicManifest.TypeField) => (decodedCalldata as Record<string, any>)[field.label]) as T;
     }
 
     /**

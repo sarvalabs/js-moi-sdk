@@ -2,14 +2,16 @@
   "syntax": 1,
   "engine": {
     "kind": "PISA",
-    "flags": []
+    "flags": [],
+    "version": "0.5.0"
   },
+  "kind": "logic",
   "elements": [
     {
       "ptr": 0,
       "kind": "state",
       "data": {
-        "mode": "persistent",
+        "mode": "logic",
         "fields": [
           {
             "slot": 0,
@@ -24,15 +26,17 @@
       "deps": [
         0
       ],
-      "kind": "routine",
+      "kind": "callable",
       "data": {
         "name": "Init",
-        "mode": "persistent",
+        "mode": "dynamic",
         "kind": "deploy",
         "accepts": [],
         "returns": [],
         "executes": {
-          "bin": []
+          "bin": [],
+          "hex": "",
+          "asm": []
         },
         "catches": []
       }
@@ -43,10 +47,10 @@
         6,
         0
       ],
-      "kind": "routine",
+      "kind": "callable",
       "data": {
         "name": "Seed",
-        "mode": "persistent",
+        "mode": "dynamic",
         "kind": "deploy",
         "accepts": [
           {
@@ -63,7 +67,7 @@
             4,
             1,
             0,
-            83,
+            85,
             0,
             0,
             1,
@@ -74,7 +78,9 @@
             0,
             1,
             0
-          ]
+          ],
+          "hex": "",
+          "asm": []
         },
         "catches": []
       }
@@ -84,10 +90,10 @@
       "deps": [
         0
       ],
-      "kind": "routine",
+      "kind": "callable",
       "data": {
         "name": "Get",
-        "mode": "readonly",
+        "mode": "static",
         "kind": "invoke",
         "accepts": [],
         "returns": [
@@ -99,15 +105,17 @@
         ],
         "executes": {
           "bin": [
-            128,
+            144,
             0,
             0,
             5,
             0,
             0,
-            130,
+            158,
             0
-          ]
+          ],
+          "hex": "",
+          "asm": []
         },
         "catches": []
       }
@@ -115,13 +123,12 @@
     {
       "ptr": 4,
       "deps": [
-        6,
-        0
+        6
       ],
-      "kind": "routine",
+      "kind": "callable",
       "data": {
         "name": "Set",
-        "mode": "persistent",
+        "mode": "dynamic",
         "kind": "invoke",
         "accepts": [
           {
@@ -138,7 +145,7 @@
             4,
             1,
             0,
-            83,
+            85,
             0,
             0,
             1,
@@ -149,7 +156,9 @@
             0,
             1,
             0
-          ]
+          ],
+          "hex": "",
+          "asm": []
         },
         "catches": []
       }
@@ -159,30 +168,32 @@
       "deps": [
         0
       ],
-      "kind": "routine",
+      "kind": "callable",
       "data": {
         "name": "Toggle",
-        "mode": "persistent",
+        "mode": "dynamic",
         "kind": "invoke",
         "accepts": [],
         "returns": [],
         "executes": {
           "bin": [
-            128,
+            144,
             0,
             0,
-            55,
+            156,
             1,
             0,
             98,
             1,
             1,
-            54,
+            155,
             0,
             1,
-            129,
+            159,
             0
-          ]
+          ],
+          "hex": "",
+          "asm": []
         },
         "catches": []
       }
@@ -192,10 +203,10 @@
       "deps": [
         0
       ],
-      "kind": "routine",
+      "kind": "callable",
       "data": {
         "name": "set",
-        "mode": "persistent",
+        "mode": "dynamic",
         "kind": "internal",
         "accepts": [
           {
@@ -207,18 +218,20 @@
         "returns": [],
         "executes": {
           "bin": [
-            128,
+            144,
             0,
             0,
             4,
             1,
             0,
-            54,
+            155,
             0,
             1,
-            129,
+            159,
             0
-          ]
+          ],
+          "hex": "",
+          "asm": []
         },
         "catches": []
       }

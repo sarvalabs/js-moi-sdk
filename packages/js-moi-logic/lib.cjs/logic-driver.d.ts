@@ -1,7 +1,7 @@
 import { LogicManifest } from "js-moi-manifest";
 import { LogicActionPayload, Options } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
+import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
 import { EphemeralState, PersistentState } from "./state";
@@ -10,8 +10,8 @@ import { EphemeralState, PersistentState } from "./state";
  */
 export declare class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
     readonly routines: Routines<T>;
-    readonly persistentState: PersistentState;
-    readonly ephemeralState: EphemeralState;
+    readonly persistentState?: PersistentState;
+    readonly ephemeralState?: EphemeralState;
     constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer);
     /**
      * Creates the persistent and ephemeral states for the logic driver,
@@ -23,29 +23,27 @@ export declare class LogicDriver<T extends Record<string, (...args: any) => any>
      */
     private createRoutines;
     /**
-     * Checks if a routine is mutable based on its name.
+     * Checks if a routine is mutable based on its mode.
      *
-     * @param {string} routineName - The name of the routine.
+     * @param {LogicManifest.Routine} routine - The routine to check.
      * @returns {boolean} True if the routine is mutable, false otherwise.
      */
     private isMutableRoutine;
     /**
-     * Creates the logic payload from the given interaction object.
+     * Creates the logic action payload from the given interaction object.
      *
      * @param {LogicIxObject} ixObject - The interaction object.
      * @returns {LogicActionPayload} The logic action payload.
      */
     protected createPayload(ixObject: LogicIxObject): LogicActionPayload;
     /**
-     * Processes the logic interaction result and returns the decoded data or
-     error, if available.
+     * Processes the logic interaction result and returns the decoded output and error, if available.
      *
      * @param {LogicIxResponse} response - The logic interaction response.
      * @param {number} timeout - The custom timeout for processing the result. (optional)
-     * @returns {Promise<LogicIxResult | null>} A promise that resolves to the
-     logic interaction result or null.
+     * @returns {Promise<LogicIxResult>} A promise that resolves to the logic interaction result.
      */
-    protected processResult(response: LogicIxResponse, timeout?: number): Promise<LogicIxResult>;
+    protected processResult(response: LogicIxResponse | LogicIxCallResponse, timeout?: number): Promise<LogicIxResult>;
 }
 /**
  * Returns a logic driver instance based on the given logic id.

@@ -1,70 +1,23 @@
-import { OpType } from "js-moi-utils";
-import { AssetActionPayload, AssetCreatePayload, AssetSupplyPayload, CallorEstimateIxObject, ParticipantCreatePayload, OperationPayload, ProcessedCallorEstimateIxObject, LogicActionPayload, LogicDeployPayload } from "../types/jsonrpc";
+import { InteractionObject, RawInteractionObject, Signature, RawSignature, InteractionArgs } from "../types/interaction";
+import { AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload } from "../types/operation";
+export declare const validateKeyAdd: (key: KeyAddPayload, index: number) => void;
+export declare const validateKeyRevoke: (key: KeyRevokePayload, index: number) => KeyRevokePayload;
+export declare const validateAssetAction: (value: AssetActionPayload) => void;
+export declare const validateParticipantCreate: (payload: ParticipantCreatePayload) => void;
+export declare const validateAccountConfigure: (payload: AccountConfigurePayload) => void;
+export declare const validateAccountInherit: (payload: AccountInheritPayload) => void;
+export declare const validateLogicPayload: (payload: LogicDeployPayload | LogicActionPayload) => void;
+export declare const validateLogicDeploy: (payload: LogicDeployPayload) => void;
+export declare const validateLogicAction: (payload: LogicActionPayload) => void;
+export declare const validateAssetCreate: (payload: AssetCreatePayload) => AssetCreatePayload;
+export declare const processInteractionObject: (ix: InteractionObject) => InteractionObject;
 /**
- * Validates the payload for PARTICIPANT_CREATE operation type.
+ * Transforms an interaction object to a format that can be serialized to POLO.
  *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetActionPayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
+ * @param ix Interaction object
+ * @returns a raw interaction object
  */
-export declare const validateParticipantCreatePayload: (payload: OperationPayload) => ParticipantCreatePayload;
-/**
- * Validates the payload for ASSET_CREATE operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetCreatePayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export declare const validateAssetCreatePayload: (payload: OperationPayload) => AssetCreatePayload;
-/**
- * Validates the payload for ASSET_MINT and ASSET_BURN operation types.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetSupplyPayload} - The validated payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export declare const validateAssetSupplyPayload: (payload: OperationPayload) => AssetSupplyPayload;
-/**
- * Validates the payload for ASSET_TRANSFER operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {AssetActionPayload} - The validated logic action payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export declare const validateAssetTransferPayload: (payload: OperationPayload) => AssetActionPayload;
-/**
- * Validates the payload for LOGIC_DEPLOY operation type.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicDeployPayload} - The validated logic deploy payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export declare const validateLogicDeployPayload: (payload: OperationPayload) => LogicDeployPayload;
-/**
- * Validates the payload for LOGIC_INVOKE and LOGIC_ENLIST operation types.
- *
- * @param {OperationPayload} payload - The operation payload.
- * @returns {LogicActionPayload} - The validated logic action payload.
- * @throws {Error} - Throws an error if the payload is invalid.
- */
-export declare const validateLogicActionPayload: (payload: OperationPayload) => LogicActionPayload;
-/**
- * Serializes the payload of a operation based on its type.
- * This function polorizes (serializes) the payload using the appropriate schema
- * based on the operation type and returns it as a byte array.
- *
- * @param {OpType} opType - The type of the operation (e.g., ASSET_TRANSFER, ASSET_CREATE).
- * @param {OperationPayload} payload - The payload of the operation to be serialized.
- * @returns {Uint8Array} - A serialized byte array representing the processed payload.
- * @throws {Error} - Throws an error if the operation type is unsupported.
- */
-export declare const serializePayload: (opType: OpType, payload: OperationPayload) => Uint8Array;
-/**
- * Processes the interaction object based on its type and returns the processed object.
- *
- * @param {CallorEstimateIxObject} ixObject - The interaction object to be processed.
- * @returns {ProcessedCallorEstimateIxObject} - The processed interaction object.
- * @throws {Error} - Throws an error if the interaction type is unsupported or if there is a missing payload.
- */
-export declare const processIxObject: (ixObject: CallorEstimateIxObject) => ProcessedCallorEstimateIxObject;
+export declare const toRawInteractionObject: (ix: InteractionObject) => RawInteractionObject;
+export declare const toRawSignatures: (signs: Signature[]) => RawSignature[];
+export declare const toInteractionArgs: (ix: InteractionObject) => InteractionArgs;
 //# sourceMappingURL=interaction.d.ts.map

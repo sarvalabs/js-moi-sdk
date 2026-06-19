@@ -26,6 +26,13 @@ export declare const isBytes: (value: any) => value is Bytes;
  */
 export declare const hexDataLength: (data: string) => number;
 /**
+ * Generates a Uint8Array of the specified size filled with cryptographically secure random bytes.
+ *
+ * @param size - The number of random bytes to generate.
+ * @returns A Uint8Array containing the generated random bytes.
+ */
+export declare const randomBytes: (size: number) => Uint8Array;
+/**
  * Checks if the given value is a valid hexadecimal string.
  *
  * @param {any} value - The value to check.

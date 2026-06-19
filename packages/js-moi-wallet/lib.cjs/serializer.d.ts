@@ -1,4 +1,4 @@
-import { InteractionObject } from "js-moi-providers";
+import { InteractionObject, Signature } from "js-moi-providers";
 /**
  * POLO encodes an interaction object into a Uint8Array representation.
  *
@@ -7,4 +7,5 @@ import { InteractionObject } from "js-moi-providers";
  * @throws {Error} if there is an error during encoding or if the payload is missing.
  */
 export declare const serializeIxObject: (ixObject: InteractionObject) => Uint8Array;
+export declare const serializeIxSignatures: (signatures: Signature[]) => Uint8Array;
 //# sourceMappingURL=serializer.d.ts.map
