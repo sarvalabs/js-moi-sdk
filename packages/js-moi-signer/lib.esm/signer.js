@@ -39,11 +39,12 @@ export class Signer {
     async getNonce(options) {
         try {
             const provider = this.getProvider();
-            const address = this.getAddress();
+            const id = (await this.getIdentifier()).toString();
+            const keyId = await this.getKeyId();
             if (!options) {
-                return await provider.getPendingInteractionCount(address);
+                return await provider.getPendingInteractionCount(id, keyId);
             }
-            return await provider.getInteractionCount(address, options);
+            return await provider.getInteractionCount(id, keyId);
         }
         catch (err) {
             throw err;
@@ -60,10 +61,10 @@ export class Signer {
         if (ixObject.sender == null) {
             ErrorUtils.throwError("Sender address is missing", ErrorCode.MISSING_ARGUMENT);
         }
-        if (!isValidAddress(ixObject.sender)) {
+        if (!isValidAddress(ixObject.sender.id)) {
             ErrorUtils.throwError("Invalid sender address", ErrorCode.INVALID_ARGUMENT);
         }
-        if (this.isInitialized() && ixObject.sender !== this.getAddress()) {
+        if (this.isInitialized() && ixObject.sender.id !== (await this.getIdentifier()).toString()) {
             ErrorUtils.throwError("Sender address mismatches with the signer", ErrorCode.UNEXPECTED_ARGUMENT);
         }
         if (ixObject.ix_operations == null || ixObject.ix_operations.length == 0) {
@@ -88,9 +89,9 @@ export class Signer {
             if (ixObject.fuel_limit <= 0) {
                 ErrorUtils.throwError("Fuel limit must be greater than 0", ErrorCode.INVALID_ARGUMENT);
             }
-            if (ixObject.nonce != null) {
+            if (ixObject.sender?.sequence != null) {
                 const nonce = await this.getNonce({ tesseract_number: -1 });
-                if (ixObject.nonce < nonce) {
+                if (ixObject.sender.sequence < nonce) {
                     ErrorUtils.throwError("Invalid nonce", ErrorCode.NONCE_EXPIRED);
                 }
             }
@@ -108,11 +109,15 @@ export class Signer {
      */
     async prepareInteraction(method, ixObject) {
         if (!ixObject.sender) {
-            ixObject.sender = this.getAddress();
+            ixObject.sender = {
+                id: (await this.getIdentifier()).toHex(),
+                key_id: (await this.getKeyId()),
+                sequence: 0,
+            };
         }
         await this.checkInteraction(method, ixObject);
-        if (method === "send" && ixObject.nonce == null) {
-            ixObject.nonce = await this.getNonce();
+        if (method === "send" && ixObject.sender.sequence == null) {
+            ixObject.sender.sequence = await this.getNonce();
         }
     }
     /**
@@ -167,7 +172,7 @@ export class Signer {
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             await this.prepareInteraction('send', ixObject);
             // Sign the interaction object
-            const ixRequest = this.signInteraction(ixObject, sigAlgo);
+            const ixRequest = await this.signInteraction(ixObject, sigAlgo);
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }

@@ -25,7 +25,7 @@ beforeAll(async () => {
 
 it("should initialize the wallet", async () => {
     expect(wallet).toBeInstanceOf(Wallet);
-    expect(wallet.getAddress()).toBeDefined();
+    expect(wallet.getIdentifier()).toBeDefined();
 });
 
 describe("Logic", () => {
@@ -80,7 +80,7 @@ describe("Logic", () => {
         });
 
         it("should able to retrieve balance of the account", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+            const { balance } = await logic.routines.BalanceOf(wallet.getIdentifier());
 
             expect(balance).toBe(INITIAL_SUPPLY);
         });
@@ -107,7 +107,7 @@ describe("Logic", () => {
         });
 
         it("should throw error when logic execution throw error using `result()`", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+            const { balance } = await logic.routines.BalanceOf(wallet.getIdentifier());
             const amount = balance + 1;
             const ix = await logic.routines.Transfer(amount, RECEIVER);
 
@@ -120,7 +120,7 @@ describe("Logic", () => {
         });
 
         it("should throw error when logic execution throw error using `wait()`", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getAddress());
+            const { balance } = await logic.routines.BalanceOf(wallet.getIdentifier());
             const amount = balance + 1;
             const ix = await logic.routines.Transfer(amount, RECEIVER);
 

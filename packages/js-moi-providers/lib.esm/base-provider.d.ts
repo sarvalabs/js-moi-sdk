@@ -1,8 +1,9 @@
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, Tesseract } from "js-moi-utils";
-import type { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateIxObject, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import type { AccountKey, AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
+import { InteractionObject } from "../types/interaction";
 export interface EventTag {
     event: string;
     params?: unknown;
@@ -35,7 +36,7 @@ export declare class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint>;
+    getBalance(id: string, assetId: string, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the context information for the specified address.
      *
@@ -46,16 +47,25 @@ export declare class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getContextInfo(address: string, options?: Options): Promise<ContextInfo>;
+    getContextInfo(id: string, options?: Options): Promise<ContextInfo>;
     /**
-     * Retrieves the TDU (Total Digital Utility) for the specified address.
+     * Retrieves the TDU (Total Digital Utility) for the specified id.
      *
-     * @param {string} address - The address for which to retrieve the TDU.
+     * @param {string} id - The id for which to retrieve the TDU.
      * @param {Options} options - The tesseract options. (optional)
      * @returns {Promise<TDU[]>} A Promise that resolves to the TDU object.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getTDU(address: string, options?: Options): Promise<TDU[]>;
+    getTDU(id: string, options?: Options): Promise<TDU[]>;
+    /**
+     * Retrieves the sub account count for the specified id.
+     *
+     * @param {string} id - The id for which to retrieve the sub account count.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the sub account count.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getSubAccountCount(id: string, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the interaction information for the specified interaction hash.
      *
@@ -92,7 +102,7 @@ export declare class BaseProvider extends AbstractProvider {
      * of interactions as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getInteractionCount(address: string, options?: Options): Promise<number | bigint>;
+    getInteractionCount(id: string, keyId: number, options?: Options): Promise<number | bigint>;
     /**
      * Retrieves the total number of interactions for the specified address,
      * including the pending interactions in IxPool.
@@ -104,7 +114,7 @@ export declare class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws Error if there is an error executing the RPC call.
      */
-    getPendingInteractionCount(address: string): Promise<number | bigint>;
+    getPendingInteractionCount(id: string, keyId: number): Promise<number | bigint>;
     /**
      * Retrieves the account state for the specified address.
      *
@@ -115,7 +125,18 @@ export declare class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getAccountState(address: string, options?: Options): Promise<AccountState>;
+    getAccountState(id: string, options?: Options): Promise<AccountState>;
+    /**
+     * Retrieves the account state for the specified address.
+     *
+     * @param {string} address - The address for which to retrieve the account
+     * state.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<AccountState>} A Promise that resolves to the account
+     * state.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getAccountKeys(id: string, options?: Options): Promise<AccountKey[]>;
     /**
      * Retrieves the account meta information for the specified address.
      *
@@ -125,7 +146,7 @@ export declare class BaseProvider extends AbstractProvider {
      * account meta information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getAccountMetaInfo(address: string): Promise<AccountMetaInfo>;
+    getAccountMetaInfo(id: string): Promise<AccountMetaInfo>;
     /**
      * Retrieves the content from a specific address.
      *
@@ -134,7 +155,7 @@ export declare class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getContentFrom(address: string): Promise<ContentFrom>;
+    getContentFrom(id: string): Promise<ContentFrom>;
     /**
      * Retrieves the wait time for a specific account in ixpool.
      *
@@ -143,7 +164,7 @@ export declare class BaseProvider extends AbstractProvider {
      * time (in seconds) as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getWaitTime(address: string): Promise<number | bigint>;
+    getWaitTime(id: string): Promise<number | bigint>;
     /**
      * Initializes a filter for retrieving newly detected terreracts.
      * The filter setup triggers a 1-minute timeout period, and with each subsequent query,
@@ -230,7 +251,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<string[]>} A Promise that resolves to an array of logic id's.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getLogicIds(address: string, options?: Options): Promise<string[]>;
+    getLogicIds(id: string, options?: Options): Promise<string[]>;
     /**
      * Retrieves the registry for a specific address.
      *
@@ -239,7 +260,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<Registry>} A Promise that resolves to the registry.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getRegistry(address: string, options?: Options): Promise<Registry>;
+    getRegistry(id: string, options?: Options): Promise<Registry>;
     /**
      * Retrieves the synchronization status for a specific account.
      *
@@ -247,7 +268,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    getSyncStatus(address?: string): Promise<SyncStatus>;
+    getSyncStatus(id?: string): Promise<SyncStatus>;
     /**
      * Handles the interaction without modifying the account's current state.
      *
@@ -258,7 +279,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or
      * processing the response.
      */
-    call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
+    call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse>;
     /**
      * Estimates the amount of fuel required for processing the interaction.
      *
@@ -269,7 +290,7 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or
      * processing the response.
      */
-    estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint>;
+    estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint>;
     /**
      * Sends an interaction request.
      *

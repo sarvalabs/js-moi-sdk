@@ -3,9 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = void 0;
+exports.trimHexPrefix = exports.isHex = exports.bytesToHex = exports.hexToBN = exports.hexToBytes = exports.encodeToString = exports.toQuantity = exports.numToHex = exports.withHexPrefix = void 0;
 const bn_js_1 = __importDefault(require("bn.js"));
 const buffer_1 = require("buffer");
+/**
+ * Ensures that a given string has the '0x' prefix.
+ * If the string already has the prefix, it is returned as is.
+ * Otherwise, the prefix is added to the string.
+ *
+ * @param {string} hex - The input string.
+ * @returns {Hex} The string with the '0x' prefix.
+ */
+const withHexPrefix = (hex) => {
+    if (typeof hex !== "string") {
+        throw new TypeError("Input must be a string");
+    }
+    return (hex.startsWith("0x") ? hex : `0x${hex}`);
+};
+exports.withHexPrefix = withHexPrefix;
 /**
  * Converts a number, bigint, or BN instance to a hexadecimal string representation.
  * If the input value is not already a BN instance, it is converted to one.

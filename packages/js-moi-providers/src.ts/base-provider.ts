@@ -1,6 +1,6 @@
 import { LogicManifest } from "js-moi-manifest";
 import {
-    AssetCreationResult, AssetSupplyResult, ErrorCode, ErrorUtils, Interaction,
+    AssetCreationResult, ErrorCode, ErrorUtils, Interaction,
     LogicDeployResult,
     LogicEnlistResult,
     LogicInvokeResult,
@@ -9,8 +9,10 @@ import {
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
 import type {
+    AccountKey,
+    AccountKeyParams,
     AccountMetaInfo, AccountMetaInfoParams, AccountParamsBase, AccountState, AccountStateParams,
-    AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateIxObject, CallorEstimateOptions,
+    AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding,
     ExecutionResult,
     Filter, FilterDeletionResult, Inspect,
@@ -25,7 +27,8 @@ import type {
 import { type NestedArray } from "../types/util";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
-import { processIxObject } from "./interaction";
+import { toInteractionArgs } from "./interaction";
+import { InteractionObject } from "../types/interaction";
 
 // Default timeout value in seconds
 const defaultTimeout: number = 120;
@@ -65,7 +68,7 @@ export class BaseProvider extends AbstractProvider {
         }
 
         ErrorUtils.throwError(
-            response.error.message, 
+            response.error!.message,
             ErrorCode.SERVER_ERROR,
         );
     }
@@ -82,10 +85,10 @@ export class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getBalance(address: string, assetId: string, options?: Options): Promise<number | bigint> {
+    public async getBalance(id: string, assetId: string, options?: Options): Promise<number | bigint> {
         try {
             const params: BalanceParams = {
-                address: address,
+                id: id,
                 asset_id: assetId,
                 options: options ? options : defaultOptions
             }
@@ -110,10 +113,10 @@ export class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getContextInfo(address: string, options?: Options): Promise<ContextInfo> {
+    public async getContextInfo(id: string, options?: Options): Promise<ContextInfo> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -126,17 +129,17 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
-     * Retrieves the TDU (Total Digital Utility) for the specified address.
+     * Retrieves the TDU (Total Digital Utility) for the specified id.
      *
-     * @param {string} address - The address for which to retrieve the TDU.
+     * @param {string} id - The id for which to retrieve the TDU.
      * @param {Options} options - The tesseract options. (optional)
      * @returns {Promise<TDU[]>} A Promise that resolves to the TDU object.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getTDU(address: string, options?: Options): Promise<TDU[]> {
+    public async getTDU(id: string, options?: Options): Promise<TDU[]> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -146,8 +149,34 @@ export class BaseProvider extends AbstractProvider {
 
             return tdu.map((asset: TDUResponse) => ({
                 asset_id: asset.asset_id,
+                token_id: hexToBN(asset.token_id),
                 amount: hexToBN(asset.amount)
             }));
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves the sub account count for the specified id.
+     *
+     * @param {string} id - The id for which to retrieve the sub account count.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<number | bigint>} A Promise that resolves to the sub account count.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getSubAccountCount(id: string, options?: Options): Promise<number | bigint> {
+        try {
+            const params: AccountParamsBase = {
+                id: id,
+                options: options ? options : defaultOptions
+            }
+
+            const response = await this.execute("moi.SubAccountCount", params);
+
+            const count: string = this.processResponse(response);
+
+            return hexToBN(count)
         } catch (error) {
             throw error;
         }
@@ -214,7 +243,7 @@ export class BaseProvider extends AbstractProvider {
      */
     async getInteractionByTesseract(arg1?: unknown, arg2?: unknown, ix_index?: NumberLike): Promise<Interaction> {
         try {
-            const params = {};
+            const params: Record<string, any> = {};
 
             if(typeof arg1 === "string") {
                 params['address'] = arg1;
@@ -243,10 +272,11 @@ export class BaseProvider extends AbstractProvider {
      * of interactions as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getInteractionCount(address: string, options?: Options): Promise<number | bigint> {
+    public async getInteractionCount(id: string, keyId: number, options?: Options): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
+                key_id: keyId,
                 options: options ? options : defaultOptions
             }
     
@@ -271,10 +301,11 @@ export class BaseProvider extends AbstractProvider {
      * as a number or bigint.
      * @throws Error if there is an error executing the RPC call.
      */
-    public async getPendingInteractionCount(address: string): Promise<number | bigint> {
+    public async getPendingInteractionCount(id: string, keyId: number): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                address: address
+                id: id,
+                key_id: keyId
             }
     
             const response = await this.execute("moi.PendingInteractionCount", params);
@@ -297,14 +328,39 @@ export class BaseProvider extends AbstractProvider {
      * state.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getAccountState(address: string, options?: Options): Promise<AccountState> {
+    public async getAccountState(id: string, options?: Options): Promise<AccountState> {
         try {
             const params: AccountStateParams = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
             const response = await this.execute("moi.AccountState", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves the account state for the specified address.
+     * 
+     * @param {string} address - The address for which to retrieve the account 
+     * state.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<AccountState>} A Promise that resolves to the account 
+     * state.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getAccountKeys(id: string, options?: Options): Promise<AccountKey[]> {
+        try {
+            const params: AccountKeyParams = {
+                id: id,
+                options: options ? options : defaultOptions
+            }
+    
+            const response = await this.execute("moi.AccountKeys", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -321,10 +377,10 @@ export class BaseProvider extends AbstractProvider {
      * account meta information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getAccountMetaInfo(address: string): Promise<AccountMetaInfo> {
+    public async getAccountMetaInfo(id: string): Promise<AccountMetaInfo> {
         try {
             const params: AccountMetaInfoParams = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("moi.AccountMetaInfo", params)
@@ -343,10 +399,10 @@ export class BaseProvider extends AbstractProvider {
      * information.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getContentFrom(address: string): Promise<ContentFrom> {
+    public async getContentFrom(id: string): Promise<ContentFrom> {
         try {
             const params: AccountParamsBase = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("ixpool.ContentFrom", params)
@@ -386,10 +442,10 @@ export class BaseProvider extends AbstractProvider {
      * time (in seconds) as a number or bigint.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getWaitTime(address: string): Promise<number | bigint> {
+    public async getWaitTime(id: string): Promise<number | bigint> {
         try {
             const params: AccountParamsBase = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("ixpool.WaitTime", params)
@@ -472,10 +528,10 @@ export class BaseProvider extends AbstractProvider {
             filter.topics = [];
         }
 
-        const { address, height, topics } = filter;
+        const { id, height, topics } = filter;
         
-        if(!isValidAddress(address)) {
-            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        if(!isValidAddress(id)) {
+            ErrorUtils.throwArgumentError("Invalid identifier provided", "identifier", id);
         }
 
         if (!Array.isArray(topics)) {
@@ -484,7 +540,7 @@ export class BaseProvider extends AbstractProvider {
 
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
@@ -538,7 +594,7 @@ export class BaseProvider extends AbstractProvider {
             const response = await this.execute("moi.GetFilterChanges", params);
             
             if (response.result == null) {
-                return null;
+                return null as T;
             }
 
             return this.processResponse(response);
@@ -587,10 +643,10 @@ export class BaseProvider extends AbstractProvider {
      */
    async getTesseract(arg1: unknown, arg2: unknown, arg3: unknown, arg4?: unknown): Promise<Tesseract> {
         try {
-            const params = {};
+            const params: Record<string, any> = {};
 
             if (typeof arg1 === 'string') {
-                params['address'] = arg1;
+                params['id'] = arg1;
                 params['with_interactions'] = arg2;
                 params['with_commit_info'] = arg3;
                 params['options'] = arg4 ?? defaultOptions;
@@ -617,10 +673,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<string[]>} A Promise that resolves to an array of logic id's.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getLogicIds(address: string, options?: Options): Promise<string[]> {
+    public async getLogicIds(id: string, options?: Options): Promise<string[]> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
@@ -640,14 +696,14 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<Registry>} A Promise that resolves to the registry.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getRegistry(address: string, options?: Options): Promise<Registry> {
+    public async getRegistry(id: string, options?: Options): Promise<Registry> {
         try {
             const params: AccountParamsBase = {
-                address: address,
+                id: id,
                 options: options ? options : defaultOptions
             }
     
-            const response = await this.execute("moi.Registry", params)
+            const response = await this.execute("moi.Deeds", params)
 
             return this.processResponse(response)
         } catch (error) {
@@ -662,10 +718,10 @@ export class BaseProvider extends AbstractProvider {
      * @returns {Promise<SyncStatus>} A Promise that resolves to the synchronization status.
      * @throws {Error} if there is an error executing the RPC call.
      */
-    public async getSyncStatus(address?: string): Promise<SyncStatus> {
+    public async getSyncStatus(id?: string): Promise<SyncStatus> {
         try {
             const params: SyncStatusParams = {
-                address: address
+                id: id
             }
     
             const response = await this.execute("moi.Syncing", params)
@@ -688,10 +744,10 @@ export class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or 
      * processing the response.
      */
-    public async call(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse> {
+    public async call(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<InteractionCallResponse> {
         try {
             const params = {
-                ix_args: processIxObject(ixObject),
+                ix_args: toInteractionArgs(ixObject),
                 options : options
             }
 
@@ -720,10 +776,10 @@ export class BaseProvider extends AbstractProvider {
      * @throws {Error} if there's an issue executing the RPC call or 
      * processing the response.
      */
-    public async estimateFuel(ixObject: CallorEstimateIxObject, options?: CallorEstimateOptions): Promise<number | bigint> {
+    public async estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint> {
         try {
             const params = {
-                ix_args: processIxObject(ixObject),
+                ix_args: toInteractionArgs(ixObject),
                 options : options
             }
 
@@ -759,7 +815,7 @@ export class BaseProvider extends AbstractProvider {
             }
     
             ErrorUtils.throwError(
-                response.error.message, 
+                response.error!.message,
                 ErrorCode.SERVER_ERROR,
             );
         } catch (error) {
@@ -864,11 +920,11 @@ export class BaseProvider extends AbstractProvider {
      */
     public async getStorageAt(logicId: string, storageKey: string, arg3?: string | Options, arg4?: Options): Promise<string> {
         try {
-            const address = typeof arg3 === 'string' ? arg3 : undefined
+            const id = typeof arg3 === 'string' ? arg3 : undefined
             const options = typeof arg3 === 'object' ? arg3 : arg4
 
             const params: StorageParams = {
-                address: address,
+                id: id,
                 logic_id: logicId,
                 storage_key: storageKey,
                 options: options ? options : defaultOptions
@@ -951,10 +1007,10 @@ export class BaseProvider extends AbstractProvider {
             logFilter.topics = [];
         }
 
-        const { address, height, topics } = logFilter;
+        const { id, height, topics } = logFilter;
         
-        if(!isValidAddress(address)) {
-            ErrorUtils.throwArgumentError("Invalid address provided", "address", address);
+        if(!isValidAddress(id)) {
+            ErrorUtils.throwArgumentError("Invalid identifier provided", "id", id);
         }
 
         if (!Array.isArray(topics)) {
@@ -963,7 +1019,7 @@ export class BaseProvider extends AbstractProvider {
 
         const [start, end] = height;
         const payload = {
-            address,
+            id,
             topics: this.hashTopics(topics),
             start_height: start,
             end_height: end
@@ -993,9 +1049,9 @@ export class BaseProvider extends AbstractProvider {
 
             Object.keys(contentResponse.pending).forEach(key => {
                 content.pending.set(key, new Map())
-                Object.keys(contentResponse.pending[key]).forEach(nonce => 
-                    content.pending.get(key).set(
-                        hexToBN(nonce), 
+                Object.keys(contentResponse.pending[key]).forEach(nonce =>
+                    content.pending.get(key)!.set(
+                        hexToBN(nonce),
                         contentResponse.pending[key][nonce]
                     )
                 )
@@ -1003,9 +1059,9 @@ export class BaseProvider extends AbstractProvider {
 
             Object.keys(contentResponse.queued).forEach(key => {
                 content.queued.set(key, new Map())
-                Object.keys(contentResponse.queued[key]).forEach(nonce => 
-                    content.queued.get(key).set(
-                        hexToBN(nonce), 
+                Object.keys(contentResponse.queued[key]).forEach(nonce =>
+                    content.queued.get(key)!.set(
+                        hexToBN(nonce),
                         contentResponse.queued[key][nonce]
                     )
                 )
@@ -1070,10 +1126,10 @@ export class BaseProvider extends AbstractProvider {
                 inspect.queued.set(key, new Map(Object.entries(inspectResponse.queued[key])))
             })
 
-            Object.keys(inspect.wait_time).forEach(key => {
+            Object.keys(inspectResponse.wait_time).forEach(key => {
                 inspect.wait_time.set(key, {
-                    ...inspect.wait_time[key],
-                    time: hexToBN(inspect.wait_time[key]["time"])
+                    ...inspectResponse.wait_time[key],
+                    time: hexToBN(inspectResponse.wait_time[key].time as unknown as string)
                 })
             })
 
@@ -1145,7 +1201,7 @@ export class BaseProvider extends AbstractProvider {
 
         }
         
-        const response = await this.execute("moi.subscribe", params);
+        const response = await this.execute("moi.Subscribe", params);
         return this.processResponse(response);
     }
 
@@ -1234,19 +1290,17 @@ export class BaseProvider extends AbstractProvider {
         return receipt.ix_operations.map(operation => {
             switch (hexToBN(operation.tx_type)) {
                 case OpType.PARTICIPANT_CREATE:
-                case OpType.ASSET_TRANSFER:
-                    return null;
                 case OpType.ASSET_CREATE:
                     if (operation.data) {
                         return operation.data as AssetCreationResult;
                     }
                     throw new Error("Failed to retrieve asset creation response");
-                case OpType.ASSET_MINT:
-                case OpType.ASSET_BURN:
+                case OpType.ASSET_INVOKE:
                     if (operation.data) {
-                        return operation.data as AssetSupplyResult;
+                        // Todo: update response type
+                        return operation.data as any;
                     }
-                    throw new Error("Failed to retrieve asset mint/burn response");
+                    throw new Error("Failed to retrieve asset creation response");
                 case OpType.LOGIC_DEPLOY:
                     if (operation.data) {
                         return operation.data as LogicDeployResult;

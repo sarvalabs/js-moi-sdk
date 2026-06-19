@@ -1,5 +1,7 @@
 import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
 import { SigType, SigningAlgorithms } from "../types";
+import { Identifier } from "js-moi-identifiers";
+type InteractionMethod = "call" | "send" | "estimateFuel";
 /**
  * An abstract class representing a signer responsible for cryptographic
  * activities like signing and verification.
@@ -8,11 +10,12 @@ export declare abstract class Signer {
     provider?: AbstractProvider;
     signingAlgorithms: SigningAlgorithms;
     constructor(provider?: AbstractProvider);
-    abstract getAddress(): string;
     abstract connect(provider: AbstractProvider): void;
-    abstract sign(message: Uint8Array, sigAlgo: SigType): string;
+    abstract getKeyId(): Promise<number>;
+    abstract getIdentifier(): Promise<Identifier>;
+    abstract sign(message: Uint8Array, keyId: number, sigAlgo: SigType): Promise<string>;
     abstract isInitialized(): boolean;
-    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): InteractionRequest;
+    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
     /**
      * Retrieves the connected provider instance.
      *
@@ -49,7 +52,7 @@ export declare abstract class Signer {
      * @throws {Error} if the interaction object is not valid or if there is
      * an error during preparation.
      */
-    private prepareInteraction;
+    prepareInteraction(method: InteractionMethod, ixObject: InteractionObject): Promise<void>;
     /**
      * Initiates an interaction by calling a method on the connected provider.
      * The interaction object is prepared and sent to the provider for execution.
@@ -99,4 +102,5 @@ export declare abstract class Signer {
      */
     verify(message: Uint8Array, signature: string | Uint8Array, publicKey: string | Uint8Array): boolean;
 }
+export {};
 //# sourceMappingURL=signer.d.ts.map

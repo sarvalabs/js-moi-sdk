@@ -4,7 +4,7 @@ import { LogicManifest } from "../types/manifest";
 
 const ARRAY_MATCHER_REGEX = /^\[(\d*)\]/;
 
-const primitiveTypes = ["null", "bool", "bytes", "address", "string", "u64", "u256", "i64", "i256", "bigint"];
+const primitiveTypes = ["null", "bool", "bytes", "identifier", "string", "u64", "u256", "i64", "i256", "bigint"];
 
 export const isPrimitiveType = (type: string): boolean => {
     return primitiveTypes.includes(type);
@@ -52,6 +52,9 @@ export class Schema {
                         kind: "string",
                     },
                 },
+            },
+            version: {
+                kind: "string"
             }
         },
     };
@@ -134,7 +137,7 @@ export class Schema {
         },
     };
 
-    public static PISA_CONSTANT_SCHEMA = {
+    public static PISA_LITERAL_SCHEMA = {
         kind: "struct",
         fields: {
             type: {
@@ -230,6 +233,44 @@ export class Schema {
         },
     };
 
+    public static PISA_EXTERNAL_ROUTINE_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string",
+            },
+            accepts: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
+            },
+            returns: {
+                ...Schema.PISA_TYPE_FIELD_SCHEMA,
+            },
+        }
+    }
+
+    public static PISA_EXTERN_SCHEMA = {
+        kind: "struct",
+        fields: {
+            name: {
+                kind: "string",
+            },
+            logic: {
+                ...Schema.PISA_STATE_SCHEMA,
+            },
+            actor: {
+                ...Schema.PISA_STATE_SCHEMA,
+            },
+            endpoint: {
+                kind: "array",
+                fields: {
+                    values: {
+                        ...Schema.PISA_EXTERNAL_ROUTINE_SCHEMA
+                    }
+                }
+            }
+        }
+    }
+
     public static PISA_EVENT_SCHEMA = {
         kind: "struct",
         fields: {
@@ -279,6 +320,15 @@ export class Schema {
             },
         },
     };
+
+    public static PISA_ASSET_SCHEMA = {
+        kind: "struct",
+        fields: {
+            engine: {
+                kind: "string"
+            }
+        }
+    }
 
     /**
      * Extracts the array data type from the provided data type string.
@@ -358,7 +408,7 @@ export class Schema {
             case "bool":
                 return "bool";
             case "bytes":
-            case "address":
+            case "identifier":
                 return "bytes";
             case "string":
                 return "string";
@@ -387,13 +437,17 @@ export class Schema {
 
         const element = elements.get(ptr);
 
-        const schema = {
+        if (!element) {
+            ErrorUtils.throwError(`Element not found for class: ${className}`, ErrorCode.INVALID_ARGUMENT);
+        }
+
+        const schema: { kind: string; fields: Record<string, PoloSchema> } = {
             kind: "struct",
             fields: {},
         };
 
         element.data = element.data as LogicManifest.Class;
-        Object.values(element.data.fields).forEach((field) => {
+        Object.values(element.data.fields!).forEach((field) => {
             schema.fields[field.label] = Schema.parseDataType(field.type, classDef, elements);
         });
 
@@ -447,7 +501,7 @@ export class Schema {
      * @throws {Error} If the fields are invalid or contain unsupported data types.
      */
     public parseFields(fields: LogicManifest.TypeField[]): PoloSchema {
-        const schema = {
+        const schema: { kind: string; fields: Record<string, PoloSchema> } = {
             kind: "struct",
             fields: {},
         };

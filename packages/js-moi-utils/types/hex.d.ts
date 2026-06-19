@@ -1,1 +1,1 @@
-export type Hex = string & { __hex: 'Hex' };
+export type Hex = `0x${string}`;

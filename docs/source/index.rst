@@ -21,13 +21,9 @@ need to unlock the full potential of the MOI Protocol.
 
    getting-started
    constants
-   manifest-call-encoder
    providers
    signer
-   logic
-   bip39
-   hierarchical-deterministic-node
-   hierarchical-deterministic-wallet
+   interactions
    utilities
    contributions
    license-and-copyright

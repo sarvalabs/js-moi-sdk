@@ -7,12 +7,11 @@ export {
     LogicEnlistResult
 } from "../types/receipt";
 export * from "./address";
-export * from "./asset";
 export * from "./base64";
 export * from "./bytes";
 export * from "./errors";
 export * from "./hex";
-export * from "./interaction";
+export * from "./enums";
 export * from "./json";
 export * from "./object";
 export * from "./properties";

@@ -15,8 +15,8 @@ class VoyageProvider extends base_provider_1.BaseProvider {
     constructor(network) {
         super();
         switch (network) {
-            case 'babylon':
-                this.host = "https://voyage-rpc.moi.technology/babylon/";
+            case 'devnet':
+                this.host = "https://dev.voyage-rpc.moi.technology/devnet/";
                 break;
             default:
                 throw new Error('Unsupported network');

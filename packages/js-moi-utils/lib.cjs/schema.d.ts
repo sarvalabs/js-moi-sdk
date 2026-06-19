@@ -26,37 +26,51 @@ export declare const logicSchema: {
         };
     };
 };
-export declare const participantCreateSchema: {
-    kind: string;
-    fields: {
-        address: {
-            kind: string;
-        };
-        amount: {
-            kind: string;
-        };
-    };
-};
 export declare const assetCreateSchema: {
     kind: string;
     fields: {
         symbol: {
             kind: string;
         };
-        supply: {
+        dimension: {
+            kind: string;
+        };
+        decimals: {
             kind: string;
         };
         standard: {
             kind: string;
         };
-        dimension: {
+        enable_events: {
             kind: string;
         };
-        is_stateful: {
+        manager: {
             kind: string;
         };
-        is_logical: {
+        max_supply: {
             kind: string;
+        };
+        static_metadata: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
+        };
+        dynamic_metadata: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
         };
         logic_payload: {
             kind: string;
@@ -91,27 +105,171 @@ export declare const assetCreateSchema: {
 export declare const assetActionSchema: {
     kind: string;
     fields: {
-        benefactor: {
-            kind: string;
-        };
-        beneficiary: {
-            kind: string;
-        };
         asset_id: {
             kind: string;
         };
-        amount: {
+        callsite: {
+            kind: string;
+        };
+        calldata: {
+            kind: string;
+        };
+        funds: {
+            kind: string;
+            fields: {
+                keys: {
+                    kind: string;
+                };
+                values: {
+                    kind: string;
+                };
+            };
+        };
+    };
+};
+export declare const keyAddSchema: {
+    kind: string;
+    fields: {
+        public_key: {
+            kind: string;
+        };
+        weight: {
+            kind: string;
+        };
+        signature_algorithm: {
             kind: string;
         };
     };
 };
-export declare const assetSupplySchema: {
+export declare const keyRevokeSchema: {
     kind: string;
     fields: {
-        asset_id: {
+        key_id: {
             kind: string;
         };
-        amount: {
+    };
+};
+export declare const participantCreateSchema: {
+    kind: string;
+    fields: {
+        id: {
+            kind: string;
+        };
+        keys_payload: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        public_key: {
+                            kind: string;
+                        };
+                        weight: {
+                            kind: string;
+                        };
+                        signature_algorithm: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        value: {
+            kind: string;
+            fields: {
+                asset_id: {
+                    kind: string;
+                };
+                callsite: {
+                    kind: string;
+                };
+                calldata: {
+                    kind: string;
+                };
+                funds: {
+                    kind: string;
+                    fields: {
+                        keys: {
+                            kind: string;
+                        };
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+export declare const accountConfigureSchema: {
+    kind: string;
+    fields: {
+        add: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        public_key: {
+                            kind: string;
+                        };
+                        weight: {
+                            kind: string;
+                        };
+                        signature_algorithm: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        revoke: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                    fields: {
+                        key_id: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+export declare const accountInheritSchema: {
+    kind: string;
+    fields: {
+        target_account: {
+            kind: string;
+        };
+        value: {
+            kind: string;
+            fields: {
+                asset_id: {
+                    kind: string;
+                };
+                callsite: {
+                    kind: string;
+                };
+                calldata: {
+                    kind: string;
+                };
+                funds: {
+                    kind: string;
+                    fields: {
+                        keys: {
+                            kind: string;
+                        };
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        sub_account_index: {
             kind: string;
         };
     };
@@ -121,11 +279,19 @@ export declare const ixObjectSchema: {
     fields: {
         sender: {
             kind: string;
+            fields: {
+                id: {
+                    kind: string;
+                };
+                sequence: {
+                    kind: string;
+                };
+                key_id: {
+                    kind: string;
+                };
+            };
         };
         payer: {
-            kind: string;
-        };
-        nonce: {
             kind: string;
         };
         fuel_price: {
@@ -172,18 +338,18 @@ export declare const ixObjectSchema: {
                 values: {
                     kind: string;
                     fields: {
-                        address: {
+                        id: {
                             kind: string;
                         };
                         lock_type: {
                             kind: string;
                         };
+                        notary: {
+                            kind: string;
+                        };
                     };
                 };
             };
-        };
-        perception: {
-            kind: string;
         };
         preferences: {
             kind: string;
@@ -192,6 +358,55 @@ export declare const ixObjectSchema: {
                     kind: string;
                 };
                 consensus: {
+                    kind: string;
+                    fields: {
+                        mtq: {
+                            kind: string;
+                        };
+                        trusted_nodes: {
+                            kind: string;
+                            fields: {
+                                values: {
+                                    kind: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        perception: {
+            kind: string;
+        };
+    };
+};
+export declare const ixSignatureSchema: {
+    kind: string;
+    fields: {
+        id: {
+            kind: string;
+        };
+        key_id: {
+            kind: string;
+        };
+        signature: {
+            kind: string;
+        };
+    };
+};
+export declare const ixSignaturesSchema: {
+    kind: string;
+    fields: {
+        values: {
+            kind: string;
+            fields: {
+                id: {
+                    kind: string;
+                };
+                key_id: {
+                    kind: string;
+                };
+                signature: {
                     kind: string;
                 };
             };

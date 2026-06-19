@@ -1,4 +1,4 @@
-import { OpType } from "../src.ts/interaction";
+import { OpType } from "../src.ts/enums";
 
 export interface ContextDelta {
     role: number;

@@ -8,10 +8,10 @@ export default class Signature implements ISignature {
     private name: string
 
     constructor(prefix?: Uint8Array, digest?: Uint8Array, extraData?: Uint8Array, signatureName?: string) {
-        this.prefix = prefix;
-        this.digest = digest;
-        this.extraData = extraData;
-        this.name = signatureName
+        this.prefix = prefix ?? new Uint8Array();
+        this.digest = digest ?? new Uint8Array();
+        this.extraData = extraData ?? new Uint8Array();
+        this.name = signatureName ?? "";
     }
     
     public unmarshall(signature: Uint8Array | String) {

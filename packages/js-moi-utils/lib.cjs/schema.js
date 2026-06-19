@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.builtInLogEventSchema = exports.ixObjectSchema = exports.assetSupplySchema = exports.assetActionSchema = exports.assetCreateSchema = exports.participantCreateSchema = exports.logicSchema = void 0;
+exports.builtInLogEventSchema = exports.ixSignaturesSchema = exports.ixSignatureSchema = exports.ixObjectSchema = exports.accountInheritSchema = exports.accountConfigureSchema = exports.participantCreateSchema = exports.keyRevokeSchema = exports.keyAddSchema = exports.assetActionSchema = exports.assetCreateSchema = exports.logicSchema = void 0;
 exports.logicSchema = {
     kind: "struct",
     fields: {
@@ -8,7 +8,7 @@ exports.logicSchema = {
             kind: "bytes"
         },
         logic_id: {
-            kind: "string"
+            kind: "bytes"
         },
         callsite: {
             kind: "string"
@@ -29,65 +29,142 @@ exports.logicSchema = {
         }
     }
 };
-exports.participantCreateSchema = {
-    kind: "struct",
-    fields: {
-        address: {
-            kind: "bytes"
-        },
-        amount: {
-            kind: "integer"
-        }
-    }
-};
 exports.assetCreateSchema = {
     kind: "struct",
     fields: {
         symbol: {
             kind: "string"
         },
-        supply: {
+        dimension: {
+            kind: "integer"
+        },
+        decimals: {
             kind: "integer"
         },
         standard: {
             kind: "integer"
         },
-        dimension: {
+        enable_events: {
+            kind: "bool"
+        },
+        manager: {
+            kind: "bytes"
+        },
+        max_supply: {
             kind: "integer"
         },
-        is_stateful: {
-            kind: "bool"
+        static_metadata: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "bytes"
+                }
+            }
         },
-        is_logical: {
-            kind: "bool"
+        dynamic_metadata: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "bytes"
+                }
+            }
         },
-        logic_payload: exports.logicSchema
+        logic_payload: exports.logicSchema,
     }
 };
 exports.assetActionSchema = {
     kind: "struct",
     fields: {
-        benefactor: {
-            kind: "bytes"
-        },
-        beneficiary: {
-            kind: "bytes"
-        },
         asset_id: {
+            kind: "bytes"
+        },
+        callsite: {
             kind: "string"
         },
-        amount: {
+        calldata: {
+            kind: "bytes"
+        },
+        funds: {
+            kind: "map",
+            fields: {
+                keys: {
+                    kind: "string"
+                },
+                values: {
+                    kind: "integer"
+                }
+            }
+        }
+    }
+};
+exports.keyAddSchema = {
+    kind: "struct",
+    fields: {
+        public_key: {
+            kind: "bytes"
+        },
+        weight: {
+            kind: "integer"
+        },
+        signature_algorithm: {
             kind: "integer"
         }
     }
 };
-exports.assetSupplySchema = {
+exports.keyRevokeSchema = {
     kind: "struct",
     fields: {
-        asset_id: {
-            kind: "string"
+        key_id: {
+            kind: "integer"
+        }
+    }
+};
+exports.participantCreateSchema = {
+    kind: "struct",
+    fields: {
+        id: {
+            kind: "bytes"
         },
-        amount: {
+        keys_payload: {
+            kind: "array",
+            fields: {
+                values: exports.keyAddSchema
+            }
+        },
+        value: exports.assetActionSchema,
+    }
+};
+exports.accountConfigureSchema = {
+    kind: "struct",
+    fields: {
+        add: {
+            kind: "array",
+            fields: {
+                values: exports.keyAddSchema
+            }
+        },
+        revoke: {
+            kind: "array",
+            fields: {
+                values: exports.keyRevokeSchema
+            }
+        },
+    }
+};
+exports.accountInheritSchema = {
+    kind: "struct",
+    fields: {
+        target_account: {
+            kind: "bytes"
+        },
+        value: exports.assetActionSchema,
+        sub_account_index: {
             kind: "integer"
         }
     }
@@ -96,13 +173,21 @@ exports.ixObjectSchema = {
     kind: "struct",
     fields: {
         sender: {
-            kind: "bytes"
+            kind: "struct",
+            fields: {
+                id: {
+                    kind: "bytes"
+                },
+                sequence: {
+                    kind: "integer"
+                },
+                key_id: {
+                    kind: "integer"
+                }
+            }
         },
         payer: {
             kind: "bytes"
-        },
-        nonce: {
-            kind: "integer"
         },
         fuel_price: {
             kind: "integer"
@@ -117,7 +202,7 @@ exports.ixObjectSchema = {
                     kind: "struct",
                     fields: {
                         asset_id: {
-                            kind: "string"
+                            kind: "bytes"
                         },
                         amount: {
                             kind: "integer"
@@ -148,18 +233,18 @@ exports.ixObjectSchema = {
                 values: {
                     kind: "struct",
                     fields: {
-                        address: {
+                        id: {
                             kind: "bytes"
                         },
                         lock_type: {
                             kind: "integer"
+                        },
+                        notary: {
+                            kind: "bool"
                         }
                     }
                 }
             }
-        },
-        perception: {
-            kind: "bytes"
         },
         preferences: {
             kind: "struct",
@@ -168,10 +253,46 @@ exports.ixObjectSchema = {
                     kind: "bytes"
                 },
                 consensus: {
-                    kind: "bytes"
+                    kind: "struct",
+                    fields: {
+                        mtq: {
+                            kind: "integer"
+                        },
+                        trusted_nodes: {
+                            kind: "array",
+                            fields: {
+                                values: {
+                                    kind: "string"
+                                }
+                            }
+                        }
+                    }
                 }
             }
+        },
+        perception: {
+            kind: "bytes"
+        },
+    }
+};
+exports.ixSignatureSchema = {
+    kind: "struct",
+    fields: {
+        id: {
+            kind: "bytes"
+        },
+        key_id: {
+            kind: "integer"
+        },
+        signature: {
+            kind: "bytes"
         }
+    }
+};
+exports.ixSignaturesSchema = {
+    kind: "array",
+    fields: {
+        values: exports.ixSignatureSchema
     }
 };
 exports.builtInLogEventSchema = {

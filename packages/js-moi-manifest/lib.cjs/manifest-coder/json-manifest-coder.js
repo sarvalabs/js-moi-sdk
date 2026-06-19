@@ -13,6 +13,9 @@ class JsonManifestCoder extends base_manifest_coder_1.BaseManifestCoder {
                 kind: "integer",
             },
             engine: schema_1.Schema.PISA_ENGINE_SCHEMA,
+            kind: {
+                kind: "string",
+            },
             elements: {
                 kind: "array",
                 fields: {
@@ -36,9 +39,9 @@ class JsonManifestCoder extends base_manifest_coder_1.BaseManifestCoder {
         },
     };
     static SCHEMA_CONFIG = {
-        constant: {
+        literal: {
             wireType: js_polo_1.WireType.WIRE_PACK,
-            schema: schema_1.Schema.PISA_CONSTANT_SCHEMA,
+            schema: schema_1.Schema.PISA_LITERAL_SCHEMA,
         },
         typedef: {
             wireType: js_polo_1.WireType.WIRE_WORD,
@@ -48,7 +51,7 @@ class JsonManifestCoder extends base_manifest_coder_1.BaseManifestCoder {
             wireType: js_polo_1.WireType.WIRE_PACK,
             schema: schema_1.Schema.PISA_STATE_SCHEMA,
         },
-        routine: {
+        callable: {
             wireType: js_polo_1.WireType.WIRE_PACK,
             schema: schema_1.Schema.PISA_ROUTINE_SCHEMA,
         },
@@ -60,10 +63,18 @@ class JsonManifestCoder extends base_manifest_coder_1.BaseManifestCoder {
             wireType: js_polo_1.WireType.WIRE_PACK,
             schema: schema_1.Schema.PISA_CLASS_SCHEMA,
         },
+        interface: {
+            wireType: js_polo_1.WireType.WIRE_PACK,
+            schema: schema_1.Schema.PISA_EXTERN_SCHEMA,
+        },
         event: {
             wireType: js_polo_1.WireType.WIRE_PACK,
             schema: schema_1.Schema.PISA_EVENT_SCHEMA,
         },
+        asset: {
+            wireType: js_polo_1.WireType.WIRE_PACK,
+            schema: schema_1.Schema.PISA_ASSET_SCHEMA,
+        }
     };
     /**
      * Serializes a given LogicManifest.Element into a Polorizer instance.
@@ -140,6 +151,7 @@ class JsonManifestCoder extends base_manifest_coder_1.BaseManifestCoder {
         const polorizer = new js_polo_1.Polorizer();
         polorizer.polorizeInteger(manifest.syntax);
         polorizer.polorize(manifest.engine, schema_1.Schema.PISA_ENGINE_SCHEMA);
+        polorizer.polorizeString(manifest.kind);
         const elements = this.serializeElementArray(manifest);
         polorizer.polorizePacked(elements);
         return polorizer.bytes();

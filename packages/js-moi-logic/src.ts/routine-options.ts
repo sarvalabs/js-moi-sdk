@@ -1,16 +1,19 @@
+import { IxParticipant, Sender } from "js-moi-providers";
 
 interface IRoutineOption {
-    nonce?: number;
-    sender?: string;
+    sequence?: number;
+    sender?: Sender;
     fuelLimit?: number;
     fuelPrice?: number;
+    participants?: IxParticipant[];
 }
 
 export class RoutineOption implements IRoutineOption {
-    public nonce?: number;
-    public sender?: string;
+    public sequence?: number;
+    public sender?: Sender;
     public fuelLimit?: number;
     public fuelPrice?: number;
+    public participants?: IxParticipant[];
 
     constructor(options: IRoutineOption = {}) {
         const keys = Object.keys(options) as Array<keyof IRoutineOption>
