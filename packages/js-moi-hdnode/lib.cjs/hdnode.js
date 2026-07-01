@@ -31,6 +31,26 @@ class HDNode {
         }
     }
     /**
+     * Creates an HDNode from a raw private key.
+     * The resulting node can sign but cannot derive child keys in a meaningful way.
+     * Use this when restoring a wallet from a keystore or other raw-key source.
+     *
+     * @param {Buffer} privateKey - The 32-byte private key buffer.
+     * @throws {Error} If an error occurs during the HDNode creation.
+     */
+    static fromPrivateKey(privateKey) {
+        try {
+            const node = new bip32_1.HDKey({
+                privateKey: new Uint8Array(privateKey),
+                chainCode: new Uint8Array(32),
+            });
+            return new HDNode(node);
+        }
+        catch (err) {
+            js_moi_utils_1.ErrorUtils.throwError("Failed to create HDNode from private key", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
      * Generates an HDNode from an extended key.
      *
      * @param {string} extendedKey - The extended key.

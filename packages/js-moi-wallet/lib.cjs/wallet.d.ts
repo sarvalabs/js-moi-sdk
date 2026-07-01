@@ -4,6 +4,7 @@ import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-
 import { SigType, Signer } from "js-moi-signer";
 import { Hex } from "js-moi-utils";
 import { type WalletOption } from "../types/wallet";
+import { type Keystore } from "../types/keystore";
 import { Identifier } from "js-moi-identifiers";
 export declare enum CURVE {
     SECP256K1 = "secp256k1"
@@ -253,5 +254,57 @@ export declare class Wallet extends Signer {
      * @throws {Error} if there is an error generating the random mnemonic.
      */
     static createRandomSync(): Wallet;
+    /**
+     * Exports the wallet's primary key as an encrypted keystore object.
+     *
+     * The primary key is the key that defines the participant's on-chain identity (the key
+     * from which the `Identifier` is derived). It is always the key passed at construction
+     * time, regardless of which key is currently set as the sender via `setKeyId`.
+     *
+     * The returned keystore includes the participant `Identifier` in plaintext under the
+     * `id` field, mirroring the address field in the EIP-55 / Web3 Secret Storage format,
+     * so the wallet can be identified without decrypting.
+     *
+     * Note: Only the primary key is persisted. Additional keys registered via `addKey`
+     * must be re-added after restoring with `fromKeystore`.
+     *
+     * @param {string} password - Password used to encrypt the keystore.
+     * @returns {Keystore} The encrypted keystore containing the participant id and cipher data.
+     * @throws {Error} if the wallet is not initialized or encryption fails.
+     *
+     * @example
+     * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt ...");
+     * const keystore = wallet.generateKeystore("my-password");
+     * fs.writeFileSync("wallet.json", JSON.stringify(keystore));
+     */
+    generateKeystore(password: string): Keystore;
+    /**
+     * Restores a wallet from an encrypted keystore produced by `generateKeystore`.
+     *
+     * After decryption the participant `Identifier` derived from the key is verified
+     * against the `id` field stored in the keystore (if present). This mirrors the
+     * address-verification step in the EIP-55 / Web3 Secret Storage format and ensures
+     * the password was correct and the keystore has not been tampered with.
+     *
+     * Keystores that pre-date the `id` field (or that originate from external tools)
+     * are accepted without verification — the `id` check is skipped when the field
+     * is absent.
+     *
+     * Note: HD derivation data (mnemonic, derivation path) is not stored in the keystore.
+     * Additional multi-sig keys registered via `addKey` must be re-added after loading.
+     *
+     * @param {string | Keystore} keystore - The keystore as a JSON string or parsed object.
+     * @param {string} password - Password used to decrypt the keystore.
+     * @param {WalletOption} options - Optional configuration (subAccountId, provider).
+     *   `subAccountId` must match the value used when the keystore was generated, or
+     *   verification of the stored `id` will fail.
+     * @returns {Wallet} A `Wallet` instance initialized with the decrypted primary key.
+     * @throws {Error} if decryption fails, the password is incorrect, or the participant
+     *   id derived from the decrypted key does not match the `id` stored in the keystore.
+     *
+     * @example
+     * const wallet = Wallet.fromKeystore(fs.readFileSync("wallet.json", "utf8"), "my-password");
+     */
+    static fromKeystore(keystore: string | Keystore, password: string, options?: WalletOption): Wallet;
 }
 //# sourceMappingURL=wallet.d.ts.map

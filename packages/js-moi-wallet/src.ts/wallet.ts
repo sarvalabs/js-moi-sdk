@@ -6,11 +6,13 @@ import { MOI_DERIVATION_PATH } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
 import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
+import { CustomError, ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
 
 import * as SigningKeyErrors from "./errors";
+import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 import { serializeIxObject, serializeIxSignatures } from "./serializer";
 import { type WalletOption } from "../types/wallet";
+import { type Keystore } from "../types/keystore";
 import { Identifier, createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
 
 export enum CURVE {
@@ -583,6 +585,124 @@ export class Wallet extends Signer {
             return Wallet.fromMnemonicSync(mnemonic);
         } catch (err) {
             ErrorUtils.throwError("Failed to create random mnemonic", ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+
+    /**
+     * Exports the wallet's primary key as an encrypted keystore object.
+     *
+     * The primary key is the key that defines the participant's on-chain identity (the key
+     * from which the `Identifier` is derived). It is always the key passed at construction
+     * time, regardless of which key is currently set as the sender via `setKeyId`.
+     *
+     * The returned keystore includes the participant `Identifier` in plaintext under the
+     * `id` field, mirroring the address field in the EIP-55 / Web3 Secret Storage format,
+     * so the wallet can be identified without decrypting.
+     *
+     * Note: Only the primary key is persisted. Additional keys registered via `addKey`
+     * must be re-added after restoring with `fromKeystore`.
+     *
+     * @param {string} password - Password used to encrypt the keystore.
+     * @returns {Keystore} The encrypted keystore containing the participant id and cipher data.
+     * @throws {Error} if the wallet is not initialized or encryption fails.
+     *
+     * @example
+     * const wallet = await Wallet.fromMnemonic("hollow appear story text start mask salt ...");
+     * const keystore = wallet.generateKeystore("my-password");
+     * fs.writeFileSync("wallet.json", JSON.stringify(keystore));
+     */
+    public generateKeystore(password: string): Keystore {
+        if (!this.isInitialized()) {
+            ErrorUtils.throwError(
+                "The wallet has not been loaded or initialized.",
+                ErrorCode.NOT_INITIALIZED
+            );
+        }
+
+        try {
+            const vault = privateMapGet(this, __vault);
+            const keys: Map<number, KeyEntry> = vault._keys;
+            const pkey: string = vault._pkey;
+
+            // Always encrypt the primary key — the one that defines the participant identity
+            const primaryEntry = Array.from(keys.values()).find(e => e.publicKey === pkey);
+            if (!primaryEntry) {
+                ErrorUtils.throwError("Primary key not found in wallet", ErrorCode.NOT_INITIALIZED);
+            }
+
+            // Compute participant identifier from the primary public key (same logic as getIdentifier)
+            const fingerprint = hexToBytes(pkey).slice(1, 25);
+            const id = createParticipantId({ fingerprint, variant: this.sub_account_index, tag: ParticipantTagV0 });
+
+            const keystore = encryptKeystoreData(Buffer.from(primaryEntry.privateKey, "hex"), password);
+            return { ...keystore, id: id.toHex() };
+        } catch (err) {
+            ErrorUtils.throwError(
+                "Failed to generate keystore",
+                ErrorCode.UNKNOWN_ERROR,
+                { originalError: err }
+            );
+        }
+    }
+
+    /**
+     * Restores a wallet from an encrypted keystore produced by `generateKeystore`.
+     *
+     * After decryption the participant `Identifier` derived from the key is verified
+     * against the `id` field stored in the keystore (if present). This mirrors the
+     * address-verification step in the EIP-55 / Web3 Secret Storage format and ensures
+     * the password was correct and the keystore has not been tampered with.
+     *
+     * Keystores that pre-date the `id` field (or that originate from external tools)
+     * are accepted without verification — the `id` check is skipped when the field
+     * is absent.
+     *
+     * Note: HD derivation data (mnemonic, derivation path) is not stored in the keystore.
+     * Additional multi-sig keys registered via `addKey` must be re-added after loading.
+     *
+     * @param {string | Keystore} keystore - The keystore as a JSON string or parsed object.
+     * @param {string} password - Password used to decrypt the keystore.
+     * @param {WalletOption} options - Optional configuration (subAccountId, provider).
+     *   `subAccountId` must match the value used when the keystore was generated, or
+     *   verification of the stored `id` will fail.
+     * @returns {Wallet} A `Wallet` instance initialized with the decrypted primary key.
+     * @throws {Error} if decryption fails, the password is incorrect, or the participant
+     *   id derived from the decrypted key does not match the `id` stored in the keystore.
+     *
+     * @example
+     * const wallet = Wallet.fromKeystore(fs.readFileSync("wallet.json", "utf8"), "my-password");
+     */
+    public static fromKeystore(keystore: string | Keystore, password: string, options?: WalletOption): Wallet {
+        try {
+            const ks: Keystore = typeof keystore === "string" ? JSON.parse(keystore) : keystore;
+            const privKeyBuffer = decryptKeystoreData(ks, password);
+
+            // Verify the decrypted key produces the same participant identifier stored in the keystore
+            if (ks.id != null) {
+                const { pubKey } = Wallet.deriveKeys(privKeyBuffer, CURVE.SECP256K1);
+                const fingerprint = hexToBytes(pubKey).slice(1, 25);
+                const subAccountId = options?.subAccountId ?? DEFAULT_SUB_ACCOUNT_ID;
+                const derivedId = createParticipantId({ fingerprint, variant: subAccountId, tag: ParticipantTagV0 });
+
+                if (derivedId.toHex() !== ks.id) {
+                    ErrorUtils.throwError(
+                        "Keystore participant id does not match the decrypted key",
+                        ErrorCode.INVALID_ARGUMENT
+                    );
+                }
+            }
+
+            const hdNode = HDNode.fromPrivateKey(privKeyBuffer);
+            return new Wallet(hdNode, CURVE.SECP256K1, options);
+        } catch (err) {
+            if (err instanceof CustomError) {
+                throw err;
+            }
+            ErrorUtils.throwError(
+                "Failed to load wallet from keystore",
+                ErrorCode.UNKNOWN_ERROR,
+                { originalError: err }
+            );
         }
     }
 }
