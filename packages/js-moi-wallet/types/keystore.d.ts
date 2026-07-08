@@ -1,4 +1,5 @@
 export interface Keystore {
+    id?: string;
     cipher: string;
     ciphertext: string;
     cipherparams: {

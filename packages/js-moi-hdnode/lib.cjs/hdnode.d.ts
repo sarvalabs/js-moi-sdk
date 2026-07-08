@@ -15,6 +15,15 @@ export declare class HDNode {
      */
     static fromSeed(seed: Buffer): HDNode;
     /**
+     * Creates an HDNode from a raw private key.
+     * The resulting node can sign but cannot derive child keys in a meaningful way.
+     * Use this when restoring a wallet from a keystore or other raw-key source.
+     *
+     * @param {Buffer} privateKey - The 32-byte private key buffer.
+     * @throws {Error} If an error occurs during the HDNode creation.
+     */
+    static fromPrivateKey(privateKey: Buffer): HDNode;
+    /**
      * Generates an HDNode from an extended key.
      *
      * @param {string} extendedKey - The extended key.
