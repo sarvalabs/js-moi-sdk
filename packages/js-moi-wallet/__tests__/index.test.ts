@@ -1,6 +1,7 @@
 import type { InteractionObject, InteractionRequest } from "js-moi-providers";
 import { AssetStandard, type Hex, OpType } from "js-moi-utils";
 import { CURVE, Wallet } from "../src.ts/index";
+import type { Keystore } from "../types/keystore";
 
 const MNEMONIC = "profit behave tribe dash diet stool crawl general country student smooth oxygen";
 const DEVIATION_PATH = "m/44'/6174'/0'/0/1";
@@ -320,6 +321,148 @@ describe("Wallet", () => {
             wallet.connect(provider);
 
             expect(wallet.provider).toBe(provider);
+        });
+    });
+
+    describe("generateKeystore", () => {
+        const PASSWORD = "test-password-123";
+        let wallet: Wallet;
+
+        beforeEach(() => {
+            wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+        });
+
+        test("returns a keystore with all required fields", () => {
+            const keystore = wallet.generateKeystore(PASSWORD);
+
+            expect(keystore).toMatchObject<Keystore>({
+                id: expect.any(String),
+                cipher: "aes-128-ctr",
+                ciphertext: expect.any(String),
+                cipherparams: { IV: expect.any(String) },
+                kdf: "scrypt",
+                kdfparams: {
+                    n: expect.any(Number),
+                    r: expect.any(Number),
+                    p: expect.any(Number),
+                    dklen: expect.any(Number),
+                    salt: expect.any(String),
+                },
+                mac: expect.any(String),
+            });
+        });
+
+        test("id field matches the wallet's participant identifier", async () => {
+            const keystore = wallet.generateKeystore(PASSWORD);
+            const id = await wallet.identifier;
+
+            expect(keystore.id).toBe(id.toHex());
+            expect(keystore.id).toBe(IDENTIFIER_HEX);
+        });
+
+        test("always encrypts the primary key even when the sender key has been changed via setKeyId", () => {
+            wallet.addKey(1, SECOND_PUBLIC_KEY, SECOND_PRIVATE_KEY);
+            wallet.setKeyId(1);
+
+            // sender key is now key 1, but generateKeystore must still save the identity key (key 0)
+            const keystore = wallet.generateKeystore(PASSWORD);
+            const restored = Wallet.fromKeystore(keystore, PASSWORD);
+
+            expect(restored.publicKey).toBe(PUBLIC_KEY);
+            expect(restored.privateKey).toBe(PRIVATE_KEY);
+        });
+
+        test("produces different ciphertext on each call due to random salt and IV", () => {
+            const ks1 = wallet.generateKeystore(PASSWORD);
+            const ks2 = wallet.generateKeystore(PASSWORD);
+
+            expect(ks1.ciphertext).not.toBe(ks2.ciphertext);
+            expect(ks1.kdfparams.salt).not.toBe(ks2.kdfparams.salt);
+            expect(ks1.cipherparams.IV).not.toBe(ks2.cipherparams.IV);
+        });
+
+        test("id reflects the sub-account variant when subAccountId has been set", async () => {
+            wallet.setSubAccountId(3);
+            const keystore = wallet.generateKeystore(PASSWORD);
+            const id = await wallet.identifier;
+
+            expect(keystore.id).toBe(id.toHex());
+            expect(keystore.id).not.toBe(IDENTIFIER_HEX);
+        });
+    });
+
+    describe("fromKeystore", () => {
+        const PASSWORD = "test-password-123";
+        let wallet: Wallet;
+        let keystore: Keystore;
+
+        beforeEach(() => {
+            wallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+            keystore = wallet.generateKeystore(PASSWORD);
+        });
+
+        test("restores the correct private and public keys", () => {
+            const restored = Wallet.fromKeystore(keystore, PASSWORD);
+
+            expect(restored.privateKey).toBe(PRIVATE_KEY);
+            expect(restored.publicKey).toBe(PUBLIC_KEY);
+        });
+
+        test("restored wallet has the same participant identifier as the original", async () => {
+            const restored = Wallet.fromKeystore(keystore, PASSWORD);
+
+            expect((await restored.identifier).toHex()).toBe(IDENTIFIER_HEX);
+            expect((await restored.identifier).toHex()).toBe((await wallet.identifier).toHex());
+        });
+
+        test("accepts a JSON string in addition to a parsed keystore object", () => {
+            const restored = Wallet.fromKeystore(JSON.stringify(keystore), PASSWORD);
+
+            expect(restored.privateKey).toBe(PRIVATE_KEY);
+            expect(restored.publicKey).toBe(PUBLIC_KEY);
+        });
+
+        test("roundtrip preserves key pair and participant identity", async () => {
+            const restored = Wallet.fromKeystore(keystore, PASSWORD);
+
+            expect(restored.privateKey).toBe(wallet.privateKey);
+            expect(restored.publicKey).toBe(wallet.publicKey);
+            expect((await restored.identifier).toHex()).toBe((await wallet.identifier).toHex());
+        });
+
+        test("throws when the password is incorrect", () => {
+            expect(() => Wallet.fromKeystore(keystore, "wrong-password")).toThrow();
+        });
+
+        test("throws when the keystore id does not match the decrypted key", () => {
+            const tampered = { ...keystore, id: "0x" + "00".repeat(32) };
+
+            expect(() => Wallet.fromKeystore(tampered, PASSWORD)).toThrow(
+                "Keystore participant id does not match the decrypted key"
+            );
+        });
+
+        test("loads successfully when the keystore has no id field", () => {
+            const { id: _id, ...withoutId } = keystore;
+            const restored = Wallet.fromKeystore(withoutId as Keystore, PASSWORD);
+
+            expect(restored.privateKey).toBe(PRIVATE_KEY);
+            expect(restored.publicKey).toBe(PUBLIC_KEY);
+        });
+
+        test("respects subAccountId option and verifies it matches the keystore id", () => {
+            wallet.setSubAccountId(2);
+            const ks = wallet.generateKeystore(PASSWORD);
+            const restored = Wallet.fromKeystore(ks, PASSWORD, { subAccountId: 2 });
+
+            expect(restored.subAccountId).toBe(2);
+        });
+
+        test("throws when subAccountId in options conflicts with the participant id in the keystore", () => {
+            // keystore was generated with subAccountId = 0 (default)
+            expect(() => Wallet.fromKeystore(keystore, PASSWORD, { subAccountId: 1 })).toThrow(
+                "Keystore participant id does not match the decrypted key"
+            );
         });
     });
 });
