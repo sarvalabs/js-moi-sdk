@@ -15,7 +15,7 @@ Voyage devnet flows.
 Download
 --------
 
-:download:`js-moi-sdk-skills.zip <_static/downloads/js-moi-sdk-skills.zip>`
+`js-moi-sdk-skills.zip <https://cdn.moi.technology/js-moi-sdk-skills/js-moi-sdk-0.7.1-skills.zip>`_
 
 The archive contains:
 
