@@ -67,12 +67,17 @@ jobs:
         run: |
           mkdir -p release
           cd js-moi-skills
+
+          # Create versioned ZIP
           zip -r ../release/js-moi-sdk-${RELEASE_VERSION}-skills.zip .
+
+          # Create stable/latest ZIP
+          zip -r ../release/js-moi-sdk-skills.zip .
 
       - name: Verify Generated ZIP
         run: |
           unzip -l release/js-moi-sdk-${RELEASE_VERSION}-skills.zip
-
+          unzip -l release/js-moi-sdk-skills.zip
 
       - name: Upload Agent Skill ZIP to Cloudflare R2
         run: |
