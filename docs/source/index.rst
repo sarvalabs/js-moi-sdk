@@ -25,5 +25,6 @@ need to unlock the full potential of the MOI Protocol.
    signer
    interactions
    utilities
+   agent-skill
    contributions
    license-and-copyright
