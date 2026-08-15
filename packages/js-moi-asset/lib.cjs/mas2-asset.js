@@ -7,6 +7,7 @@ const js_polo_1 = require("js-polo");
 const mas2_schema_1 = require("./mas2-schema");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_interactions_1 = require("js-moi-interactions");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const mas1_schema_1 = require("./mas1-schema");
 class MAS2AssetLogic {
     assetId;
@@ -19,12 +20,12 @@ class MAS2AssetLogic {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, supply, manager, enableEvents) {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents).send();
+    static async newAsset(signer, symbol, supply, manager, enableEvents, option) {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, option).send();
         const results = await response.result();
         return new MAS2AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, supply, manager, enableEvents) {
+    static create(signer, symbol, supply, manager, enableEvents, option) {
         const payload = {
             symbol: symbol,
             max_supply: supply,
@@ -42,6 +43,16 @@ class MAS2AssetLogic {
             payload: payload,
             participants: [],
             signer: signer,
+            // A newly created asset self-pays for its own storage the moment it's
+            // created, and a fresh account holds no KMOI - bundle a funding transfer
+            // to the derived asset id, same as AssetFactory.create(). See
+            // deriveAssetId's docs for why this must mirror the blockchain's id derivation
+            // exactly - a wrong prediction sends funds to the wrong account.
+            fundingOperations: (sender) => {
+                const assetId = (0, js_moi_identifiers_1.deriveAssetId)(sender, payload.standard);
+                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, assetId.toHex(), option?.storageFund ?? js_moi_constants_1.DEFAULT_STORAGE_FUND);
+                return [{ type: js_moi_utils_1.OpType.ASSET_INVOKE, payload: transfer }];
+            },
         });
     }
     transfer(tokenId, beneficiary, amount) {
@@ -64,7 +75,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.TRANSFER,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -97,7 +108,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.TRANSFERFROM,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -124,7 +135,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.MINT,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -152,7 +163,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.MINTWITHMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -175,7 +186,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.BURN,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -204,7 +215,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.APPROVE,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -231,7 +242,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.REVOKE,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -263,7 +274,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.LOCKUP,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -296,7 +307,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.RELEASE,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -313,7 +324,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.SETSTATICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -330,7 +341,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.SETDYNAMICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -348,7 +359,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.SETSTATICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -366,7 +377,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.SETDYNAMICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -379,7 +390,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.SYMBOL,
             },
             participants: [],
@@ -395,7 +406,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.BALANCEOF,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -407,7 +418,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.CREATOR,
             },
             participants: [],
@@ -418,7 +429,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.MANAGER,
             },
             participants: [],
@@ -433,7 +444,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.GETSTATICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -449,7 +460,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.GETDYNAMICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -466,7 +477,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.GETSTATICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -483,7 +494,7 @@ class MAS2AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas2_1.MAS2.Endpoint.GETDYNAMICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },

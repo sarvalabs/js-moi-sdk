@@ -35,10 +35,12 @@ export declare class LogicFactory extends LogicBase {
     /**
      * Deploys a logic.
      *
-     * @param {string} builderName - The name of the builder routine. (optional)
+     * @param {string} builderName - The name of the builder routine. Optional only if the
+     * manifest defines no deploy routine at all - required to pick one otherwise.
      * @param {any[]} args - Arguments for the builder routine. (optional)
      * @returns {LogicContext<LogicOps>} The logic interaction context.
-     * @throws {Error} If the builder routine is not found or required arguments are missing.
+     * @throws {Error} If a builder name is required but omitted, the builder routine is not
+     * found, or required arguments are missing.
      */
     deploy(builderName?: string, ...args: any[]): LogicContext<LogicOps>;
 }

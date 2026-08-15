@@ -1,4 +1,5 @@
 import { IdentifierKind } from "./enums";
+import { flagMasks } from "./flags";
 import { Identifier } from "./identifier";
 import { hexToBytes } from "./utils";
 /**
@@ -41,10 +42,10 @@ export class AssetId extends Identifier {
         if (kind !== IdentifierKind.Asset) {
             return { why: "Invalid identifier kind. Expected a asset identifier." };
         }
-        // const hasUnsupportedFlags = (asset[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;
-        // if (hasUnsupportedFlags) {
-        //     return { why: "Invalid Flags. Unsupported flags for identifier" };
-        // }
+        const hasUnsupportedFlags = (asset[1] & (flagMasks.get(tag.value) ?? 0)) !== 0;
+        if (hasUnsupportedFlags) {
+            return { why: "Invalid Flags. Unsupported flags for identifier" };
+        }
         return null;
     }
     /**

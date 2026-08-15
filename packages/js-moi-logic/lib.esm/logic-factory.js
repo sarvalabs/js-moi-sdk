@@ -1,6 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
+import { RoutineOption } from "./routine-options";
 /**
  * This class represents a factory for deploying logic.
  */
@@ -53,26 +54,37 @@ export class LogicFactory extends LogicBase {
     /**
      * Deploys a logic.
      *
-     * @param {string} builderName - The name of the builder routine. (optional)
+     * @param {string} builderName - The name of the builder routine. Optional only if the
+     * manifest defines no deploy routine at all - required to pick one otherwise.
      * @param {any[]} args - Arguments for the builder routine. (optional)
      * @returns {LogicContext<LogicOps>} The logic interaction context.
-     * @throws {Error} If the builder routine is not found or required arguments are missing.
+     * @throws {Error} If a builder name is required but omitted, the builder routine is not
+     * found, or required arguments are missing.
      */
     deploy(builderName, ...args) {
+        // The blockchain only skips the deployer call when the manifest defines no deploy
+        // routine at all - if it defines one or more, a builder name is required to pick one,
+        // and an empty callsite is rejected the same as a mismatched one. Mirror that here
+        // instead of always allowing an omitted builder name (see AssetFactory.create()).
+        const deployRoutines = Object.values(this.manifest.elements)
+            .filter((element) => {
+            return element.kind === "callable" && element.data.kind === "deploy";
+        });
         if (builderName == null) {
+            if (deployRoutines.length > 0) {
+                ErrorUtils.throwError("Manifest defines one or more deploy routines - a builder name is required to select one.", ErrorCode.MISSING_ARGUMENT);
+            }
             const deployRoutine = { name: "", kind: "deploy" };
             return this.createIxObject(deployRoutine, ...args);
         }
-        const builder = Object.values(this.manifest.elements).find(element => {
-            if (element.kind === "callable") {
-                const routine = element.data;
-                return routine.kind === "deploy" && routine.name === builderName;
-            }
-            return false;
-        });
+        const builder = deployRoutines.find(element => element.data.name === builderName);
         if (builder) {
             const builderRoutine = builder.data;
-            if (builderRoutine.accepts && args.length < Object.keys(builderRoutine.accepts).length) {
+            // A trailing RoutineOption isn't a real routine argument - exclude it from the
+            // count, or a call with too few real args but a trailing RoutineOption slips past
+            // this guard and fails later with a confusing encoder error instead.
+            const argsLen = args.at(-1) instanceof RoutineOption ? args.length - 1 : args.length;
+            if (builderRoutine.accepts && argsLen < Object.keys(builderRoutine.accepts).length) {
                 ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.MISSING_ARGUMENT);
             }
             return this.createIxObject(builderRoutine, ...args);

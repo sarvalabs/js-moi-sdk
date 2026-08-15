@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
-import { Interaction, Tesseract } from "js-moi-utils";
+import { Interaction, ResourceType, Tesseract } from "js-moi-utils";
 import {
     AccountMetaInfo,
     AccountState,
@@ -17,7 +17,7 @@ import {
     InteractionRequest, InteractionResponse,
     NodeInfo,
     Options,
-    Registry,
+    Registry, AccessPolicyInfo, StorageMetric, StoragePricing,
     Status,
     SyncStatus,
     TDU,
@@ -63,7 +63,11 @@ export abstract class AbstractProvider extends EventEmitter {
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>
 
     // Query Methods
-    abstract getAssetInfoByAssetID(assetId: string): Promise<AssetInfo>
+    abstract getAssetInfoByAssetID(assetId: string, options?: Options): Promise<AssetInfo>
+    abstract getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<StorageMetric>
+    abstract getStoragePricing(): Promise<StoragePricing>
+    abstract getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<AccessPolicyInfo>
+    abstract getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<AccessPolicyInfo[]>
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>
     abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>
     abstract getStorageAt(logicId: string, storageKey: string, id: string, options?: Options): Promise<string>

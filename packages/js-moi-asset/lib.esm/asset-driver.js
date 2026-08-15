@@ -2,33 +2,33 @@ import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { AssetDescriptor } from "./asset-descriptor";
 import { RoutineOption } from "js-moi-logic";
-import { EphemeralState, PersistentState } from "./state";
+import { ActorState, LogicState } from "./state";
 /**
  * Represents a asset driver that serves as an interface for interacting with logics.
  */
 export class AssetDriver extends AssetDescriptor {
     routines = {};
-    persistentState;
-    ephemeralState;
+    logicState;
+    actorState;
     constructor(assetId, manifest, arg) {
         super(assetId, manifest, arg);
         this.createState();
         this.createRoutines();
     }
     /**
-     * Creates the persistent and ephemeral states for the asset driver,
+     * Creates the logic and actor states for the asset driver,
      if available in logic manifest.
      */
     createState() {
-        const hasPersistance = this.stateMatrix.persistent();
-        const hasEphemeral = this.stateMatrix.ephemeral();
-        if (hasPersistance) {
-            const persistentState = new PersistentState(this, this.provider);
-            defineReadOnly(this, "persistentState", persistentState);
+        const hasLogicState = this.stateMatrix.logic();
+        const hasActorState = this.stateMatrix.actor();
+        if (hasLogicState) {
+            const logicState = new LogicState(this, this.provider);
+            defineReadOnly(this, "logicState", logicState);
         }
-        if (hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.provider);
-            defineReadOnly(this, "ephemeralState", ephemeralState);
+        if (hasActorState) {
+            const actorState = new ActorState(this, this.provider);
+            defineReadOnly(this, "actorState", actorState);
         }
     }
     /**
@@ -86,7 +86,7 @@ export class AssetDriver extends AssetDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            asset_id: this.getAssetId().string(),
+            asset_id: this.getAssetId().hex(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

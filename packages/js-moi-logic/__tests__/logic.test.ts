@@ -39,7 +39,7 @@ describe("Logic", () => {
         manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
 
         const factory = new LogicFactory(manifest, wallet);
-        ix = await factory.deploy("Seed", SYMBOL, INITIAL_SUPPLY);
+        ix = await factory.deploy("Seed", SYMBOL, INITIAL_SUPPLY).send();
         receipt = await ix.wait();
         const result = await ix.result();
 
@@ -57,7 +57,7 @@ describe("Logic", () => {
             const symbol = "MOI";
             const supply = 100000000;
             const option = createRoutineOption({ fuelPrice: 1, fuelLimit: 3000 + Math.floor(Math.random() * 3000) });
-            const ix = await factory.deploy("Seed", symbol, supply, option);
+            const ix = await factory.deploy("Seed", symbol, supply, option).send();
 
             const receipt = await ix.wait();
             const result = await ix.result();
@@ -80,14 +80,17 @@ describe("Logic", () => {
         });
 
         it("should able to retrieve balance of the account", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getIdentifier());
+            const self = (await wallet.getIdentifier()).toHex();
+            const response = await logic.routines.BalanceOf(self).call();
+            const { output } = await response.result();
+            const { balance } = output;
 
             expect(balance).toBe(INITIAL_SUPPLY);
         });
 
         it("should able to transfer without option", async () => {
             const amount = Math.floor(Math.random() * 1000);
-            const ix = await logic.routines.Transfer(amount, RECEIVER);
+            const ix = await logic.routines.Transfer(amount, RECEIVER).send();
             const receipt = await ix.wait();
 
             expect(ix.hash).toBeDefined();
@@ -97,9 +100,11 @@ describe("Logic", () => {
         it("should able to transfer with option", async () => {
             const amount = Math.floor(Math.random() * 1000);
             const option = createRoutineOption({ fuelPrice: 1, fuelLimit: 2000 });
-            const ix = await logic.routines.Transfer(amount, RECEIVER, option);
+            const ix = await logic.routines.Transfer(amount, RECEIVER, option).send();
             const receipt = await ix.wait();
-            const { balance } = await logic.routines.BalanceOf(RECEIVER);
+            const response = await logic.routines.BalanceOf(RECEIVER).call();
+            const { output } = await response.result();
+            const { balance } = output;
 
             expect(balance).toBeGreaterThanOrEqual(amount);
             expect(ix.hash).toBeDefined();
@@ -107,9 +112,12 @@ describe("Logic", () => {
         });
 
         it("should throw error when logic execution throw error using `result()`", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getIdentifier());
+            const self = (await wallet.getIdentifier()).toHex();
+            const balanceResponse = await logic.routines.BalanceOf(self).call();
+            const { output } = await balanceResponse.result();
+            const { balance } = output;
             const amount = balance + 1;
-            const ix = await logic.routines.Transfer(amount, RECEIVER);
+            const ix = await logic.routines.Transfer(amount, RECEIVER).send();
 
             try {
                 await ix.result();
@@ -120,9 +128,12 @@ describe("Logic", () => {
         });
 
         it("should throw error when logic execution throw error using `wait()`", async () => {
-            const { balance } = await logic.routines.BalanceOf(wallet.getIdentifier());
+            const self = (await wallet.getIdentifier()).toHex();
+            const balanceResponse = await logic.routines.BalanceOf(self).call();
+            const { output } = await balanceResponse.result();
+            const { balance } = output;
             const amount = balance + 1;
-            const ix = await logic.routines.Transfer(amount, RECEIVER);
+            const ix = await logic.routines.Transfer(amount, RECEIVER).send();
 
             try {
                 await ix.wait();
@@ -133,7 +144,7 @@ describe("Logic", () => {
         });
 
         it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get((b) => b.entity("Symbol"));
+            const symbol = await logic.logicState.get((b) => b.entity("Symbol"));
 
             expect(symbol).toBe(SYMBOL);
         });
@@ -142,7 +153,7 @@ describe("Logic", () => {
             const invalidKey = "invalid-key";
 
             expect(async () => {
-                await logic.persistentState.get((b) => b.entity(invalidKey));
+                await logic.logicState.get((b) => b.entity(invalidKey));
             }).rejects.toThrow(`'${invalidKey}' is not member of persistent state`);
         });
     });

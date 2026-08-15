@@ -1,11 +1,17 @@
 import { InteractionObject, RawInteractionObject, Signature, RawSignature, InteractionArgs } from "../types/interaction";
-import { AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload } from "../types/operation";
+import { AccessDeletePayload, AccessPayload, AccessPolicy, AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, CallerConstraint, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload, StoragePayload } from "../types/operation";
 export declare const validateKeyAdd: (key: KeyAddPayload, index: number) => void;
 export declare const validateKeyRevoke: (key: KeyRevokePayload, index: number) => KeyRevokePayload;
 export declare const validateAssetAction: (value: AssetActionPayload) => void;
 export declare const validateParticipantCreate: (payload: ParticipantCreatePayload) => void;
 export declare const validateAccountConfigure: (payload: AccountConfigurePayload) => void;
 export declare const validateAccountInherit: (payload: AccountInheritPayload) => void;
+export declare const validateStorageDeposit: (payload: StoragePayload) => void;
+export declare const validateStorageWithdraw: (payload: StoragePayload) => void;
+export declare const validateCallerConstraint: (constraint: CallerConstraint, label: string) => void;
+export declare const validateAccessPolicy: (policy: AccessPolicy) => void;
+export declare const validateAccessCreateOrUpdate: (payload: AccessPayload) => void;
+export declare const validateAccessDelete: (payload: AccessDeletePayload) => void;
 export declare const validateLogicPayload: (payload: LogicDeployPayload | LogicActionPayload) => void;
 export declare const validateLogicDeploy: (payload: LogicDeployPayload) => void;
 export declare const validateLogicAction: (payload: LogicActionPayload) => void;

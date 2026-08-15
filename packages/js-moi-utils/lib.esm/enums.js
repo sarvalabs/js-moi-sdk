@@ -30,7 +30,42 @@ export var OpType;
     OpType[OpType["LOGIC_ENLIST"] = 13] = "LOGIC_ENLIST";
     OpType[OpType["LOGIC_INTERACT"] = 14] = "LOGIC_INTERACT";
     OpType[OpType["LOGIC_UPGRADE"] = 15] = "LOGIC_UPGRADE";
+    OpType[OpType["STORAGE_DEPOSIT"] = 16] = "STORAGE_DEPOSIT";
+    OpType[OpType["STORAGE_WITHDRAW"] = 17] = "STORAGE_WITHDRAW";
+    OpType[OpType["ACCESS_CREATE"] = 18] = "ACCESS_CREATE";
+    OpType[OpType["ACCESS_UPDATE"] = 19] = "ACCESS_UPDATE";
+    OpType[OpType["ACCESS_DELETE"] = 20] = "ACCESS_DELETE";
 })(OpType || (OpType = {}));
+/**
+ * Enumerates the types of resources an access policy can govern.
+ * Only STORAGE is implemented on the network today; ASSET/LOGIC/KEY are
+ * reserved values that validate but are rejected server-side.
+ */
+export var ResourceType;
+(function (ResourceType) {
+    ResourceType[ResourceType["STORAGE"] = 1] = "STORAGE";
+    ResourceType[ResourceType["ASSET"] = 2] = "ASSET";
+    ResourceType[ResourceType["LOGIC"] = 3] = "LOGIC";
+    ResourceType[ResourceType["KEY"] = 4] = "KEY";
+})(ResourceType || (ResourceType = {}));
+/**
+ * Enumerates the actions an access policy can permit. Bitmask - values
+ * can be OR'd together, there's no implication between bits.
+ */
+export var AccessAction;
+(function (AccessAction) {
+    AccessAction[AccessAction["STORAGE_MUTATE"] = 1] = "STORAGE_MUTATE";
+    AccessAction[AccessAction["ASSET_ACCESS"] = 2] = "ASSET_ACCESS";
+    AccessAction[AccessAction["LOGIC_ACCESS"] = 4] = "LOGIC_ACCESS";
+})(AccessAction || (AccessAction = {}));
+/**
+ * Enumerates how a CallerConstraint matches against a caller/origin.
+ */
+export var CallerKind;
+(function (CallerKind) {
+    CallerKind[CallerKind["ANY"] = 0] = "ANY";
+    CallerKind[CallerKind["SET"] = 1] = "SET";
+})(CallerKind || (CallerKind = {}));
 /**
  * Enumerates the types of particpant locks in the system.
  */
@@ -70,19 +105,6 @@ export var EngineKind;
     EngineKind["PISA"] = "PISA";
     EngineKind["MERU"] = "MERU";
 })(EngineKind || (EngineKind = {}));
-// Enumerates the types of logic state
-export var LogicState;
-(function (LogicState) {
-    LogicState["PERSISTENT"] = "persistent";
-    LogicState["EPHEMERAL"] = "ephemeral";
-})(LogicState || (LogicState = {}));
-// Enumerates the kind of routine
-export var RoutineKind;
-(function (RoutineKind) {
-    RoutineKind["PERSISTENT"] = "persistent";
-    RoutineKind["EPHEMERAL"] = "ephemeral";
-    RoutineKind["READ_ONLY"] = "readonly";
-})(RoutineKind || (RoutineKind = {}));
 // Enumerates the types of routine
 export var RoutineType;
 (function (RoutineType) {

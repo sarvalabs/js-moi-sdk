@@ -4,7 +4,8 @@ export {
     AssetSupplyResult,
     LogicDeployResult,
     LogicInvokeResult,
-    LogicEnlistResult
+    LogicEnlistResult,
+    AccountInheritResult
 } from "../types/receipt";
 export * from "./address";
 export * from "./base64";

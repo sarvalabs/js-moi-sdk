@@ -6,15 +6,15 @@ import { AssetIxObject, AssetIxResponse, AssetIxResult } from "../types/interact
 import { Routines } from "../types/asset";
 import { AssetDescriptor } from "./asset-descriptor";
 import { RoutineOption } from "js-moi-logic";
-import { EphemeralState, PersistentState } from "./state";
+import { ActorState, LogicState } from "./state";
 
 /**
  * Represents a asset driver that serves as an interface for interacting with logics.
  */
 export class AssetDriver<T extends Record<string, (...args: any) => any> = any> extends AssetDescriptor {
     public readonly routines: Routines<T> = {} as Routines<T>;
-    public readonly persistentState?: PersistentState;
-    public readonly ephemeralState?: EphemeralState;
+    public readonly logicState?: LogicState;
+    public readonly actorState?: ActorState;
 
     constructor(assetId: string, manifest: LogicManifest.Manifest, arg: Signer) {
         super(assetId, manifest, arg)
@@ -23,21 +23,21 @@ export class AssetDriver<T extends Record<string, (...args: any) => any> = any> 
     }
 
     /**
-     * Creates the persistent and ephemeral states for the asset driver, 
+     * Creates the logic and actor states for the asset driver,
      if available in logic manifest.
      */
     private createState() {
-        const hasPersistance = this.stateMatrix.persistent();
-        const hasEphemeral = this.stateMatrix.ephemeral();
+        const hasLogicState = this.stateMatrix.logic();
+        const hasActorState = this.stateMatrix.actor();
 
-        if(hasPersistance) {
-            const persistentState = new PersistentState(this, this.provider);
-            defineReadOnly(this, "persistentState", persistentState)
+        if(hasLogicState) {
+            const logicState = new LogicState(this, this.provider);
+            defineReadOnly(this, "logicState", logicState)
         }
 
-        if(hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.provider);
-            defineReadOnly(this, "ephemeralState", ephemeralState)
+        if(hasActorState) {
+            const actorState = new ActorState(this, this.provider);
+            defineReadOnly(this, "actorState", actorState)
         }
     }
 
@@ -114,7 +114,7 @@ export class AssetDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     protected createPayload(ixObject: AssetIxObject): LogicActionPayload {
         const payload = {
-            asset_id: this.getAssetId().string(),
+            asset_id: this.getAssetId().hex(),
             callsite: ixObject.routine.name,
         } as LogicActionPayload
 

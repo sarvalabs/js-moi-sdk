@@ -103,14 +103,14 @@ export abstract class AssetDescriptor extends AssetBase {
     }
 
     /**
-     * Checks if the logic has persistent state.
-     * @returns A tuple containing the pointer to the persistent state and a flag indicating if it exists.
-     * 
+     * Checks if the logic has logic state (`state logic:` in the manifest).
+     * @returns A tuple containing the pointer to the logic state and a flag indicating if it exists.
+     *
      @example
-     * const [ptr, exists] = logic.hasPersistentState();
+     * const [ptr, exists] = logic.hasLogicState();
      */
-    public hasPersistentState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(ContextStateKind.PersistentState);
+    public hasLogicState(): [number, boolean] {
+        const ptr = this.stateMatrix.get(ContextStateKind.LogicState);
 
         if(ptr !== undefined) {
             return [ptr, true];
@@ -120,15 +120,15 @@ export abstract class AssetDescriptor extends AssetBase {
     }
 
     /**
-     * Checks if the logic has ephemeral state.
-     * @returns A tuple containing the pointer to the ephemeral state and a flag indicating if it exists.
-     * 
+     * Checks if the logic has actor state (`state actor:` in the manifest).
+     * @returns A tuple containing the pointer to the actor state and a flag indicating if it exists.
+     *
      * @example
-     * const [ptr, exists] = logic.hasEphemeralState();
+     * const [ptr, exists] = logic.hasActorState();
      */
-    public hasEphemeralState(): [number, boolean] {
-        const ptr = this.stateMatrix.get(ContextStateKind.EphemeralState);
-        
+    public hasActorState(): [number, boolean] {
+        const ptr = this.stateMatrix.get(ContextStateKind.ActorState);
+
         if(ptr !== undefined) {
             return [ptr, true];
         }

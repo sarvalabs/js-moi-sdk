@@ -34,6 +34,12 @@ describe("RoutineOption", () => {
         expect(opt.participants).toStrictEqual(participants);
     });
 
+    test("assigns storageFund", () => {
+        const opt = new RoutineOption({ storageFund: 50000 });
+
+        expect(opt.storageFund).toBe(50000);
+    });
+
     test("ignores fields not present in the option object (no extra properties)", () => {
         const opt = new RoutineOption({ fuelLimit: 500 });
 

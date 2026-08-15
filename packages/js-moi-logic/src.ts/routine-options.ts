@@ -6,6 +6,14 @@ interface IRoutineOption {
     fuelLimit?: number;
     fuelPrice?: number;
     participants?: IxParticipant[];
+    /**
+     * KMOI to fund a not-yet-existing account with, bundled as a Transfer op
+     * alongside a deploy/create. Logic/asset accounts now pay for their own
+     * storage on creation (self-billed against their own balance), so a
+     * brand-new account needs funds the moment it's created or the deploy
+     * reverts. Only meaningful for LogicFactory.deploy() / AssetFactory.create().
+     */
+    storageFund?: number | bigint;
 }
 
 export class RoutineOption implements IRoutineOption {
@@ -14,6 +22,7 @@ export class RoutineOption implements IRoutineOption {
     public fuelLimit?: number;
     public fuelPrice?: number;
     public participants?: IxParticipant[];
+    public storageFund?: number | bigint;
 
     constructor(options: IRoutineOption = {}) {
         const keys = Object.keys(options) as Array<keyof IRoutineOption>

@@ -1,4 +1,4 @@
-import type { Address, Hex, AssetStandard, OpType } from "js-moi-utils";
+import type { Address, Hex, AssetStandard, OpType, ResourceType, AccessAction, CallerKind } from "js-moi-utils";
 
 export interface LogicPayload {
     /**
@@ -248,6 +248,119 @@ export interface RawAccountInheritPayload {
 }
 
 /**
+ * `StoragePayload` holds the data for depositing or withdrawing storage rent
+ * on a logic or asset account.
+ */
+export interface StoragePayload {
+    /**
+     * The logic or asset account whose storage is being funded/released.
+     */
+    target_account: Hex;
+    /**
+     * The participant credited with the resulting storage allowance.
+     * Deposit only; defaults to the signer's own identifier if omitted.
+     */
+    deposit_for?: Hex;
+    /**
+     * The amount of KMOI to spend. Deposit only.
+     */
+    amount?: number | bigint;
+    /**
+     * The number of bytes of allowance to release. Withdraw only.
+     * 0 (or omitted) means "release everything currently available".
+     */
+    bytes_to_release?: number;
+}
+
+export interface RawStoragePayload {
+    target_account: Uint8Array;
+    deposit_for: Uint8Array;
+    amount: number | bigint;
+    bytes_to_release: number;
+}
+
+/**
+ * `CallerConstraint` restricts who may satisfy a caller/origin check on an
+ * access policy - either anyone, or an explicit allow-list of ids.
+ */
+export interface CallerConstraint {
+    kind: CallerKind;
+    /**
+     * Participant or logic ids. Required non-empty when kind is CallerKind.SET.
+     */
+    set: Hex[];
+}
+
+export interface RawCallerConstraint {
+    kind: CallerKind;
+    set: Uint8Array[];
+}
+
+/**
+ * `AccessPolicy` describes who may perform which actions on a resource,
+ * optionally narrowed to a subset of it.
+ */
+export interface AccessPolicy {
+    resource: ResourceType;
+    resource_id: Hex;
+    /**
+     * Bitmask of permitted actions - OR multiple AccessAction values together.
+     */
+    actions: AccessAction;
+    scope?: {
+        /**
+         * Key prefixes that narrow the policy within the resource.
+         * Empty/omitted means the policy applies to the whole resource.
+         */
+        prefixes?: Hex[];
+    };
+    caller: CallerConstraint;
+    origin: CallerConstraint;
+}
+
+export interface RawAccessPolicy {
+    resource: ResourceType;
+    resource_id: Uint8Array;
+    actions: AccessAction;
+    scope: {
+        prefixes: Uint8Array[];
+        /** Reserved/unused - always null in v1, but must be present in the wire format. */
+        predicate: null;
+    };
+    caller: RawCallerConstraint;
+    origin: RawCallerConstraint;
+}
+
+/**
+ * `AccessPayload` holds the data for creating or replacing an access policy.
+ */
+export interface AccessPayload {
+    target_account: Hex;
+    access_policy: AccessPolicy;
+}
+
+export interface RawAccessPayload {
+    target_account: Uint8Array;
+    access_policy: RawAccessPolicy;
+}
+
+/**
+ * `AccessDeletePayload` holds the data for removing an access policy - only
+ * the resource key is needed, not the policy body.
+ */
+export interface AccessDeletePayload {
+    target_account: Hex;
+    resource: ResourceType;
+    resource_id: Hex;
+}
+
+export interface RawAccessDeletePayload {
+    target_account: Uint8Array;
+    resource: ResourceType;
+    resource_id: Uint8Array;
+}
+
+/**
  * `OperationPayload` is a type that holds the payload of an operation.
  *
  * @usage
@@ -269,6 +382,12 @@ export type IxOperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_
     ? AccountConfigurePayload
     : T extends OpType.ACCOUNT_INHERIT
     ? AccountInheritPayload
+    : T extends OpType.STORAGE_DEPOSIT | OpType.STORAGE_WITHDRAW
+    ? StoragePayload
+    : T extends OpType.ACCESS_CREATE | OpType.ACCESS_UPDATE
+    ? AccessPayload
+    : T extends OpType.ACCESS_DELETE
+    ? AccessDeletePayload
     : never;
 
 export type RawIxOperationPayload<T extends OpType> = T extends OpType.PARTICIPANT_CREATE
@@ -285,6 +404,12 @@ export type RawIxOperationPayload<T extends OpType> = T extends OpType.PARTICIPA
     ? RawAccountConfigurePayload
     : T extends OpType.ACCOUNT_INHERIT
     ? RawAccountInheritPayload
+    : T extends OpType.STORAGE_DEPOSIT | OpType.STORAGE_WITHDRAW
+    ? RawStoragePayload
+    : T extends OpType.ACCESS_CREATE | OpType.ACCESS_UPDATE
+    ? RawAccessPayload
+    : T extends OpType.ACCESS_DELETE
+    ? RawAccessDeletePayload
     : never;
 
 /**
@@ -325,4 +450,9 @@ export type AnyIxOperation =
     | IxOperation<OpType.LOGIC_UPGRADE>
     | IxOperation<OpType.PARTICIPANT_CREATE>
     | IxOperation<OpType.ACCOUNT_CONFIGURE>
-    | IxOperation<OpType.ACCOUNT_INHERIT>;
+    | IxOperation<OpType.ACCOUNT_INHERIT>
+    | IxOperation<OpType.STORAGE_DEPOSIT>
+    | IxOperation<OpType.STORAGE_WITHDRAW>
+    | IxOperation<OpType.ACCESS_CREATE>
+    | IxOperation<OpType.ACCESS_UPDATE>
+    | IxOperation<OpType.ACCESS_DELETE>;
