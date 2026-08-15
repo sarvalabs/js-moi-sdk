@@ -1,5 +1,4 @@
 import { BN } from "bn.js";
-import { hexToBytes } from "js-moi-utils";
 import { Wallet } from "js-moi-wallet";
 
 import { JsonRpcProvider } from "js-moi-providers";
@@ -121,7 +120,7 @@ describe("Accessing Persistance Storage", () => {
     beforeAll(async () => {
         const manifest = await loadManifestFromFile("../../manifests/tokenledger.json");
         const factory = new LogicFactory(manifest, wallet);
-        const ix = await factory.deploy("Seed", symbol, supply);
+        const ix = await factory.deploy("Seed", symbol, supply).send();
         const result = await ix.result();
 
         await new Promise((resolve) => setTimeout(resolve, 3000)); // This is wait time as instantly fetching logic causing logic not found error
@@ -137,7 +136,7 @@ describe("Accessing Persistance Storage", () => {
     });
 
     test("it should able access value of map", async () => {
-        const address = hexToBytes(wallet.address);
+        const address = (await wallet.getIdentifier()).toBytes();
         const balance = await logic.persistentState.get<string>((accessor) => accessor.entity("Balances").property(address));
 
         expect(typeof balance).toBe("number");

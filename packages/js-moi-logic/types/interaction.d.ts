@@ -1,5 +1,6 @@
 import { LogicManifest, Exception } from "js-moi-manifest";
 import { InteractionCallResponse, InteractionResponse } from "js-moi-providers";
+import type { Hex } from "js-moi-utils";
 
 /**
  * Internal object passed to createPayload() implementations.
@@ -18,7 +19,7 @@ export interface LogicIxCallResponse extends InteractionCallResponse {
 }
 
 export interface LogicIxResult {
-    logic_id?: string;
+    logic_id?: Hex;
     output?: any;
     error: Exception | null
 }

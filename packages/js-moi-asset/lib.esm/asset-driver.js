@@ -86,7 +86,7 @@ export class AssetDriver extends AssetDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            asset_id: this.getAssetId().string(),
+            asset_id: this.getAssetId().hex(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

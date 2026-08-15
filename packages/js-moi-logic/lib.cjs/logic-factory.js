@@ -4,6 +4,7 @@ exports.LogicFactory = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_base_1 = require("./logic-base");
+const routine_options_1 = require("./routine-options");
 /**
  * This class represents a factory for deploying logic.
  */
@@ -75,7 +76,11 @@ class LogicFactory extends logic_base_1.LogicBase {
         });
         if (builder) {
             const builderRoutine = builder.data;
-            if (builderRoutine.accepts && args.length < Object.keys(builderRoutine.accepts).length) {
+            // A trailing RoutineOption isn't a real routine argument - exclude it from the
+            // count, or a call with too few real args but a trailing RoutineOption slips past
+            // this guard and fails later with a confusing encoder error instead.
+            const argsLen = args.at(-1) instanceof routine_options_1.RoutineOption ? args.length - 1 : args.length;
+            if (builderRoutine.accepts && argsLen < Object.keys(builderRoutine.accepts).length) {
                 js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.MISSING_ARGUMENT);
             }
             return this.createIxObject(builderRoutine, ...args);

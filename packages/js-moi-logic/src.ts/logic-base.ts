@@ -1,11 +1,14 @@
 import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
-import type { AbstractProvider, LogicActionPayload, LogicDeployPayload, LogicPayload } from "js-moi-providers";
-import { IxContext } from "js-moi-interactions";
+import type { AssetActionPayload, AbstractProvider, LogicActionPayload, LogicDeployPayload, LogicPayload, Sender } from "js-moi-providers";
+import { buildTransferPayload, IxContext } from "js-moi-interactions";
+import { predictLogicId } from "js-moi-identifiers";
 import { Signer } from "js-moi-signer";
+import { DEFAULT_NEW_ACCOUNT_FUNDING, KMOI_ASSET_ID } from "js-moi-constants";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicContext, LogicOps } from "./logic-context";
 import { LogicId } from "./logic-id";
+import { RoutineOption } from "./routine-options";
 
 /**
  * Abstract base class for logic-related operations.
@@ -87,6 +90,8 @@ export abstract class LogicBase extends ElementDescriptor {
             );
         }
 
+        const option: RoutineOption = args.at(-1) instanceof RoutineOption ? args.pop() : new RoutineOption();
+
         const tempIxObj = { routine, arguments: args } as LogicIxObject;
         const payload = this.createPayload(tempIxObj) as LogicPayload;
         const opType = this.getTxType(routine.kind) as LogicOps;
@@ -97,6 +102,33 @@ export abstract class LogicBase extends ElementDescriptor {
             participants: [],
             signer: this.signer!,
         };
+
+        if (opType === OpType.LOGIC_DEPLOY) {
+            // A newly deployed logic self-pays for its own account-creation storage cost
+            // (billed against its own, currently-zero balance) the moment it's created,
+            // so it needs funds bundled into the same interaction or the deploy reverts.
+            // See predictLogicId's docs for why this must mirror go-moi's id derivation
+            // exactly - a wrong prediction sends funds to the wrong account.
+            //
+            // Note: this covers self-pay account-creation cost only. If the manifest's
+            // deploy routine also writes persistent state without a `payer Logic`
+            // clause, that write is billed to the SENDER against the new logic's
+            // storage registry (the "granted storage" mechanism), which requires a
+            // pre-existing IxStorageDeposit grant - and that can't be bundled into this
+            // same interaction, because the target account doesn't exist yet when
+            // participants are resolved. Manifests intended to be deployable standalone
+            // should declare `payer Logic` on any state their deploy routine writes.
+            ctx.extraOperations = (sender: Sender) => {
+                const logicId = predictLogicId(sender);
+                const transfer: AssetActionPayload = buildTransferPayload(
+                    KMOI_ASSET_ID,
+                    logicId.toHex(),
+                    option.fundNewAccount ?? DEFAULT_NEW_ACCOUNT_FUNDING
+                );
+
+                return [{ type: OpType.ASSET_INVOKE, payload: transfer }];
+            };
+        }
 
         return new LogicContext(ctx, routine.name, this.processResult.bind(this));
     }

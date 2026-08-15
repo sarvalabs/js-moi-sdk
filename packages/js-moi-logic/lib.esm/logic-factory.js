@@ -1,6 +1,7 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils } from "js-moi-utils";
 import { LogicBase } from "./logic-base";
+import { RoutineOption } from "./routine-options";
 /**
  * This class represents a factory for deploying logic.
  */
@@ -72,7 +73,11 @@ export class LogicFactory extends LogicBase {
         });
         if (builder) {
             const builderRoutine = builder.data;
-            if (builderRoutine.accepts && args.length < Object.keys(builderRoutine.accepts).length) {
+            // A trailing RoutineOption isn't a real routine argument - exclude it from the
+            // count, or a call with too few real args but a trailing RoutineOption slips past
+            // this guard and fails later with a confusing encoder error instead.
+            const argsLen = args.at(-1) instanceof RoutineOption ? args.length - 1 : args.length;
+            if (builderRoutine.accepts && argsLen < Object.keys(builderRoutine.accepts).length) {
                 ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.MISSING_ARGUMENT);
             }
             return this.createIxObject(builderRoutine, ...args);

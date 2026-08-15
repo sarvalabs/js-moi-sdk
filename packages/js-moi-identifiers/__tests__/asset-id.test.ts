@@ -34,11 +34,18 @@ describe(AssetId, () => {
             expect(AssetId.validate(hexToBytes(INVALID_ASSET_ID))).not.toBeNull();
         });
 
-        it.concurrent("should return error if the flag is invalid", () => {
+        it.concurrent("should return error if a reserved flag bit is set", () => {
             const asset = hexToBytes(VALID_ASSET_ID);
-            asset[1] = 0x01; // appending invalid flag
+            asset[1] = 0x04; // bit 2 is reserved - only bits 0 (AssetStateful) and 1 (AssetLogical) are defined
 
             expect(AssetId.validate(asset)).not.toBeNull();
+        });
+
+        it.concurrent("should return null when both real asset flags (AssetStateful | AssetLogical) are set", () => {
+            const asset = hexToBytes(VALID_ASSET_ID);
+            asset[1] = 0x03; // every asset created via IxAssetCreate has both bits set
+
+            expect(AssetId.validate(asset)).toBeNull();
         });
     });
 

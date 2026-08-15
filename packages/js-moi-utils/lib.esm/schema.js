@@ -166,6 +166,97 @@ export const accountInheritSchema = {
         }
     }
 };
+export const storagePayloadSchema = {
+    kind: "struct",
+    fields: {
+        target_account: {
+            kind: "bytes"
+        },
+        deposit_for: {
+            kind: "bytes"
+        },
+        amount: {
+            kind: "integer"
+        },
+        bytes_to_release: {
+            kind: "integer"
+        }
+    }
+};
+export const callerConstraintSchema = {
+    kind: "struct",
+    fields: {
+        kind: {
+            kind: "integer"
+        },
+        set: {
+            kind: "array",
+            fields: {
+                values: {
+                    kind: "bytes"
+                }
+            }
+        }
+    }
+};
+export const accessPolicySchema = {
+    kind: "struct",
+    fields: {
+        resource: {
+            kind: "integer"
+        },
+        resource_id: {
+            kind: "bytes"
+        },
+        actions: {
+            kind: "integer"
+        },
+        scope: {
+            kind: "struct",
+            fields: {
+                prefixes: {
+                    kind: "array",
+                    fields: {
+                        values: {
+                            kind: "bytes"
+                        }
+                    }
+                },
+                // Reserved/unused on go-moi's side (always nil in v1), but the field still
+                // occupies its ordered slot on the wire - must encode as an explicit POLO
+                // null, not be omitted, or every field after it misaligns on decode.
+                predicate: {
+                    kind: "null"
+                }
+            }
+        },
+        caller: callerConstraintSchema,
+        origin: callerConstraintSchema,
+    }
+};
+export const accessPayloadSchema = {
+    kind: "struct",
+    fields: {
+        target_account: {
+            kind: "bytes"
+        },
+        access_policy: accessPolicySchema,
+    }
+};
+export const accessDeletePayloadSchema = {
+    kind: "struct",
+    fields: {
+        target_account: {
+            kind: "bytes"
+        },
+        resource: {
+            kind: "integer"
+        },
+        resource_id: {
+            kind: "bytes"
+        }
+    }
+};
 export const ixObjectSchema = {
     kind: "struct",
     fields: {

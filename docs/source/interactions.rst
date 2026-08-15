@@ -150,47 +150,58 @@ AssetFactory
 
 .. class:: AssetFactory
 
-   The ``AssetFactory`` class is responsible for **creating new assets** and deploying
-   their associated custom logic on the MOI network. It defines the static 
-   ``create`` method which constructs an :class:`InteractionContext`
-   for asset creation operations.
+   The ``AssetFactory`` class is responsible for **deploying custom (MASX) asset logic**
+   on the MOI network - assets that ship their own client-supplied manifest. It defines
+   the static ``create`` method which constructs an :class:`InteractionContext` for
+   asset creation operations.
 
    **Method Summary**
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents, manifest, callsite, calldata)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, manifest, callsite, ...calldata)
 
-      Creates a new asset creation interaction context.
+      Creates a new custom (MASX) asset creation interaction context.
 
       :param Signer signer: The signer instance responsible for authorizing the asset creation.
       :param str symbol: The symbol or shorthand name of the asset.
       :param int | bigint supply: The total maximum supply of the asset.
       :param str manager: The manager or owner address (in Hex format).
       :param bool enableEvents: Whether to enable event emission for the asset.
-      :param LogicManifest.Manifest manifest: (Optional) Logic manifest if custom logic is being deployed.
-      :param str callsite: (Optional) Routine name in the manifest corresponding to the deploy logic.
-      :param list calldata: (Optional) Additional initialization arguments for the deploy routine.
+      :param LogicManifest.Manifest manifest: Logic manifest for the custom asset logic being deployed.
+      :param str callsite: Routine name in the manifest corresponding to the deploy logic.
+      :param list calldata: (Optional) Additional initialization arguments for the deploy routine, optionally ending with a :class:`RoutineOption`.
       :returns: An :class:`InteractionContext` configured for asset creation.
       :rtype: InteractionContext<OpType.ASSET_CREATE>
+      :throws: If no deploy routine in ``manifest`` matches ``callsite``, or required calldata arguments are missing.
 
       **Logic**
 
-      1. Builds an :class:`AssetCreatePayload` containing:
-         - ``symbol``
-         - ``max_supply``
-         - ``standard`` (set to :class:`AssetStandard.MAS0`)
-         - ``dimension`` (default 0)
-         - ``enable_events``
-         - ``manager`` (converted to Hex)
-         - ``logic_payload``
+      1. Builds an :class:`AssetCreatePayload` containing ``symbol``, ``max_supply``,
+         ``standard`` (always ``AssetStandard.MASX``), ``dimension`` (default 0),
+         ``enable_events``, and ``manager`` (converted to Hex).
 
-      2. If a ``manifest`` is provided:
-         - Searches for a *deploy* routine matching the given ``callsite``.
-         - Validates argument counts.
-         - Encodes the manifest and the routine calldata (if applicable).
+      2. Finds the *deploy* routine in ``manifest`` matching ``callsite``, validates the
+         calldata argument count against it, then encodes the manifest and deploy calldata
+         into ``logic_payload``.
 
-      3. Returns an :class:`InteractionContext` initialized for ``ASSET_CREATE``.
+      3. **Bundles a funding transfer automatically.** A brand-new asset account self-pays for
+         its own creation-time storage cost, and a fresh account holds no KMOI. ``create()``
+         predicts the new asset's id (:func:`predictAssetId`) and bundles a second
+         ``ASSET_INVOKE`` "Transfer" op funding it, in the same interaction - without this the
+         create reverts. The funded amount defaults to ``DEFAULT_NEW_ACCOUNT_FUNDING``; override
+         it by passing a :class:`RoutineOption` with ``fundNewAccount`` set as the last
+         ``calldata`` argument.
 
-      **Usage Example**
+      4. Returns an :class:`InteractionContext` initialized for ``ASSET_CREATE``.
+
+      **Usage Example - plain native asset (the common case)**
+
+      .. code-block:: javascript
+
+        // Native standard - use MAS0AssetLogic, not AssetFactory (no manifest, node uses its own built-in one).
+        const ctx = MAS0AssetLogic.create(signer, "GOLD", 1000000n, managerAddress, true);
+        const response = await ctx.send();
+
+      **Usage Example - custom (MASX) asset with your own logic**
 
       .. code-block:: javascript
 
@@ -204,6 +215,20 @@ AssetFactory
              callsite,
              1000, // calldata arg 1
              "JOHN" // calldata arg 2
+        );
+
+        const response = await ctx.send();
+
+      **Usage Example - overriding the funding amount**
+
+      .. code-block:: javascript
+
+        import { createRoutineOption } from "js-moi-sdk";
+
+        const ctx = AssetFactory.create(
+             signer, "GOLD", 1000000n, managerAddress, true,
+             manifest, callsite, 1000, "JOHN",
+             createRoutineOption({ fundNewAccount: 50000 })
         );
 
         const response = await ctx.send();
@@ -288,7 +313,10 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
 
    .. method:: static create(signer, symbol, supply, manager, enableEvents)
 
-      Builds an :class:`InteractionContext` for creating a MAS0-standard asset.
+      Builds an :class:`InteractionContext` for creating a MAS0-standard asset. Like
+      :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
+      predicted new asset id (funded at ``DEFAULT_NEW_ACCOUNT_FUNDING``) - a fresh asset
+      account self-pays for its own creation-time storage cost and starts with no KMOI.
 
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
@@ -618,7 +646,10 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
    .. method:: static create(signer, symbol, supply, manager, enableEvents)
 
-      Builds an :class:`InteractionContext` for creating a MAS1-standard asset.
+      Builds an :class:`InteractionContext` for creating a MAS1-standard asset. Like
+      :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
+      predicted new asset id (funded at ``DEFAULT_NEW_ACCOUNT_FUNDING``) - a fresh asset
+      account self-pays for its own creation-time storage cost and starts with no KMOI.
 
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
@@ -982,7 +1013,10 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
 
    .. method:: static create(signer, symbol, supply, manager, enableEvents)
 
-      Builds an :class:`InteractionContext` for creating a MAS2-standard asset.
+      Builds an :class:`InteractionContext` for creating a MAS2-standard asset. Like
+      :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
+      predicted new asset id (funded at ``DEFAULT_NEW_ACCOUNT_FUNDING``) - a fresh asset
+      account self-pays for its own creation-time storage cost and starts with no KMOI.
 
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
@@ -1722,40 +1756,55 @@ applications on the MOI network.
 
 .. autofunction:: LogicFactory#deploy
 
+``deploy()`` returns a :class:`LogicContext` (an :class:`InteractionContext` for
+``OpType.LOGIC_DEPLOY``) - call ``.send()`` on it to actually sign and broadcast.
+
 .. code-block:: javascript
 
     import { LogicFactory } from "js-moi-sdk";
     import { wallet } from "./wallet";
 
     const factory = new LogicFactory(manifest, wallet);
-    
+
     const symbol = "MOI";
     const supply = 1000000;
-    
-    const ix = await factory.deploy("Seed!", symbol, supply);
-    const result = await ix.result();
+
+    const response = await factory.deploy("Seed!", symbol, supply).send();
+    const receipt = await response.wait();
+    const result = await response.result();
 
     console.log(result.logic_id); // 0x0800007d70c34ed6e...
 
-If you wish to externally pass `fuelLimit` or `fuelPrice`, pass the options as
-the last argument in the deploy call.
+**Deploying automatically funds the new logic account.** A brand-new logic self-pays for its
+own creation-time storage cost, and a fresh account holds no KMOI - so ``deploy()`` predicts the
+logic's id (:func:`predictLogicId`) and bundles a second ``ASSET_INVOKE`` "Transfer" op funding
+it, in the same interaction. This is unconditional and needs no setup on your part; the funded
+amount defaults to ``DEFAULT_NEW_ACCOUNT_FUNDING`` (from ``js-moi-constants``) and only needs
+overriding for a manifest whose deploy routine writes more than that default covers.
+
+If you wish to pass ``fuelLimit``, ``fuelPrice``, or override the funding amount, pass a
+:class:`RoutineOption` (built with ``createRoutineOption``) as the last argument in the deploy
+call - a plain object here is silently treated as just another deploy argument, not options,
+since only a real ``RoutineOption`` instance is recognized.
 
 .. code-block:: javascript
 
-    import { LogicFactory } from "js-moi-sdk";
+    import { LogicFactory, createRoutineOption } from "js-moi-sdk";
     import { wallet } from "./wallet";
 
     const factory = new LogicFactory(manifest, wallet);
-    
+
     const symbol = "MOI";
     const supply = 1000000;
-    const option = {
+    const option = createRoutineOption({
         fuelPrice: 1,
         fuelLimit: 6420,
-    }
-    
-    const ix = await factory.deploy("Seed!", symbol, supply, option);
-    const result = await ix.result();
+        fundNewAccount: 50000, // override the default new-account funding amount
+    });
+
+    const response = await factory.deploy("Seed!", symbol, supply, option).send();
+    const receipt = await response.wait();
+    const result = await response.result();
 
     console.log(result.logic_id); // 0x010000423d3233...
 
@@ -1769,11 +1818,45 @@ response and making logic interaction more straightforward.
 
 **Variables**
 
-``routines`` - This variable represents the set of routines defined within the 
-logic manifest. Developers can easily invoke and execute these routines, which 
+``routines`` - This variable represents the set of routines defined within the
+logic manifest. Developers can easily invoke and execute these routines, which
 encapsulate specific functionalities and operations provided by the logic.
 
-``persistentState`` - The persistent state variable provides access to enduring 
+Each mutating routine call returns an interaction context - call ``.send()`` (or ``.call()``
+for a read-only dry run) on it, same as :class:`LogicFactory`'s ``deploy()``:
+
+.. code-block:: javascript
+
+    const logic = await getLogicDriver(logicId, wallet);
+
+    const response = await logic.routines.Transfer(amount, receiver).send();
+    const receipt = await response.wait();
+
+**Calling a routine that touches ANOTHER participant's storage needs that participant added as
+an explicit extra participant.** A routine like ``TickAny(participant)`` that mutates
+``participant``'s own ephemeral/actor storage (as opposed to the logic's own persistent state,
+or the caller's own storage) can't be resolved automatically - the SDK only knows to lock the
+logic account itself for a ``LOGIC_INVOKE``, since it has no way to see which other identifiers
+a routine's opaque calldata references. Without the extra participant, the call fails with
+``builtin.ReferenceNotFound: actor ... not found`` - which looks like an access-policy denial,
+but isn't one; it's a locking problem, and it happens whether or not an access policy is even
+involved.
+
+.. code-block:: javascript
+
+    import { LockType } from "js-moi-sdk";
+
+    const logic = await getLogicDriver(logicId, invokerWallet);
+
+    // TickAny(participant) mutates `participant`'s own storage through this logic,
+    // so `participant` must be locked explicitly - the logic account alone isn't enough.
+    const response = await logic.routines.TickAny(participant).send({
+        participants: [{ id: participant, lock_type: LockType.MUTATE_LOCK }],
+    });
+
+The same applies to a read-only ``.call()`` against another participant's storage.
+
+``persistentState`` - The persistent state variable provides access to enduring
 state associated with the logic. This state persists across different 
 invocations and interactions, defining core attributes and long-term data.
 
@@ -1982,3 +2065,112 @@ the last argument in the deploy call.
 
     const receipt = await ix.wait();
     console.log(receipt); // { ... }
+
+-------------------------------------------------------------------------------
+
+Storage & Access Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Logic and asset accounts pay per-byte rent for their on-chain storage.
+This module covers depositing/withdrawing that rent, and managing access
+policies that govern who may perform which actions on a resource you own.
+
+StorageDeposit
+^^^^^^^^^^^^^^
+The **StorageDeposit** class funds a logic or asset account's storage rent.
+Storage on MOI costs KMOI per byte; depositing converts KMOI into a byte
+allowance credited to a participant's account on that target.
+
+**Key Responsibilities:**
+
+- Set the target logic/asset account whose storage is being funded
+- Optionally credit a different participant (defaults to the signer)
+- Set the KMOI amount to spend
+- Build and send the deposit interaction
+
+**Example:**
+
+.. code-block:: javascript
+
+    const deposit = new StorageDeposit(wallet);
+
+    const response = await deposit
+        .target(logicId)
+        .amount(50000)
+        .send();
+
+    console.log("Hash:", response.hash);
+
+    const receipt = await response.wait();
+    console.log("Receipt:", receipt);
+
+StorageWithdraw
+^^^^^^^^^^^^^^^
+The **StorageWithdraw** class releases previously deposited, unused storage
+allowance on a logic/asset account back into KMOI.
+
+**Key Responsibilities:**
+
+- Set the target logic/asset account to withdraw from
+- Optionally specify how many bytes to release (omit to release everything
+  currently available)
+- Build and send the withdraw interaction
+
+**Example:**
+
+.. code-block:: javascript
+
+    const withdraw = new StorageWithdraw(wallet);
+
+    const response = await withdraw
+        .target(logicId)
+        .send();
+
+    console.log("Hash:", response.hash);
+
+    const receipt = await response.wait();
+    console.log("Receipt:", receipt);
+
+Access
+^^^^^^
+The **Access** class manages access policies — rules that govern who may
+perform which actions on a resource you own. A single builder handles
+creating, updating, and deleting policies, since a policy is always managed
+on the signer's own account.
+
+Only the ``storage`` resource kind is implemented on the network today.
+
+**Key Responsibilities:**
+
+- Name the resource a policy governs (``.storage(resourceId)``)
+- Set which actions the policy permits (``.allow(...)``)
+- Optionally restrict which callers/origins may invoke, and narrow the
+  policy to specific key prefixes
+- Create, update, or delete the policy
+
+**Example:**
+
+.. code-block:: javascript
+
+    const response = await new Access(wallet)
+        .storage(logicId)
+        .allow(AccessAction.STORAGE_MUTATE)
+        .caller(access.callers("0x00000000513b40a069905a1b05bd28d8338ad4a2eff419d7972be75900000000"))
+        .create()
+        .send();
+
+    console.log("Hash:", response.hash);
+
+    const receipt = await response.wait();
+    console.log("Receipt:", receipt);
+
+Deleting a policy only requires naming the resource:
+
+.. code-block:: javascript
+
+    const response = await new Access(wallet)
+        .storage(logicId)
+        .delete()
+        .send();
+
+    console.log("Hash:", response.hash);

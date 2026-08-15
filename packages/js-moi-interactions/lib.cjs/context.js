@@ -65,11 +65,12 @@ class InteractionContext {
      */
     async ixData(option) {
         const sender = await this.buildSender(option);
+        const extraOperations = (await this.ctx.extraOperations?.(sender)) ?? [];
         return {
             sender,
             fuel_price: option?.fuel_price ?? js_moi_constants_1.DEFAULT_FUEL_PRICE,
             fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
-            ix_operations: [this.buildOperation()],
+            ix_operations: [this.buildOperation(), ...extraOperations],
             participants: this.mergeParticipants(option),
         };
     }

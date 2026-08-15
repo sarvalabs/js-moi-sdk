@@ -1,6 +1,6 @@
 import { LogicManifest } from "js-moi-manifest";
-import { Interaction, Tesseract } from "js-moi-utils";
-import type { AccountKey, AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
+import { Interaction, ResourceType, Tesseract } from "js-moi-utils";
+import type { AccountKey, AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, ExecutionResult, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, Log, LogFilter, NodeInfo, Options, Registry, RPCAccessPolicy, RPCStorageMetric, RPCStorageParams, RpcResponse, Status, SyncStatus, TDU } from "../types/jsonrpc";
 import type { ProviderEvents } from "../types/websocket";
 import { AbstractProvider } from "./abstract-provider";
 import { InteractionObject } from "../types/interaction";
@@ -312,6 +312,44 @@ export declare class BaseProvider extends AbstractProvider {
      * @throws {Error} if there is an error executing the RPC call.
      */
     getAssetInfoByAssetID(assetId: string, options?: Options): Promise<AssetInfo>;
+    /**
+     * Retrieves a participant's storage allowance on a logic/asset account.
+     *
+     * @param {string} targetAccount - The logic or asset account the allowance is on.
+     * @param {string} userAccount - The participant whose allowance to look up.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCStorageMetric>} A Promise that resolves to the storage metric.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<RPCStorageMetric>;
+    /**
+     * Retrieves the current network-wide storage rent pricing.
+     *
+     * @returns {Promise<RPCStorageParams>} A Promise that resolves to the storage pricing.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getStoragePricing(): Promise<RPCStorageParams>;
+    /**
+     * Retrieves a single access policy owned by an account.
+     *
+     * @param {string} id - The account that owns the policy.
+     * @param {ResourceType} resourceType - The resource type the policy governs.
+     * @param {string} resourceId - The specific resource instance the policy governs.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCAccessPolicy>} A Promise that resolves to the access policy.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<RPCAccessPolicy>;
+    /**
+     * Retrieves every access policy of a given resource type owned by an account.
+     *
+     * @param {string} id - The account that owns the policies.
+     * @param {ResourceType} resourceType - The resource type to list policies for.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCAccessPolicy[]>} A Promise that resolves to the matching policies.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<RPCAccessPolicy[]>;
     /**
      * Retrieves the interaction receipt for a specific interaction hash.
      *

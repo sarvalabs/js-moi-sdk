@@ -6,6 +6,7 @@ const mas1_1 = require("./mas1");
 const js_polo_1 = require("js-polo");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_interactions_1 = require("js-moi-interactions");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const mas1_schema_1 = require("./mas1-schema");
 class MAS1AssetLogic {
     assetId;
@@ -41,6 +42,16 @@ class MAS1AssetLogic {
             payload: payload,
             participants: [],
             signer: signer,
+            // A newly created asset self-pays for its own storage the moment it's
+            // created, and a fresh account holds no KMOI - bundle a funding transfer
+            // to the predicted asset id, same as AssetFactory.create(). See
+            // predictAssetId's docs for why this must mirror go-moi's id derivation
+            // exactly - a wrong prediction sends funds to the wrong account.
+            extraOperations: (sender) => {
+                const assetId = (0, js_moi_identifiers_1.predictAssetId)(sender, payload.standard);
+                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, assetId.toHex(), js_moi_constants_1.DEFAULT_NEW_ACCOUNT_FUNDING);
+                return [{ type: js_moi_utils_1.OpType.ASSET_INVOKE, payload: transfer }];
+            },
         });
     }
     mint(beneficiary) {
@@ -61,7 +72,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.MINT,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -88,7 +99,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.MINTWITHMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -110,7 +121,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.BURN,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -137,7 +148,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.TRANSFER,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -169,7 +180,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.TRANSFERFROM,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -197,7 +208,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.APPROVE,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -224,7 +235,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.REVOKE,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -255,7 +266,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.LOCKUP,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -287,7 +298,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.RELEASE,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -304,7 +315,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.SETSTATICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -321,7 +332,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.SETDYNAMICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -339,7 +350,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.SETSTATICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -357,7 +368,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -386,7 +397,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.SYMBOL,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -398,7 +409,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.CREATOR,
             },
             participants: [],
@@ -409,7 +420,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.MANAGER,
             },
             participants: [],
@@ -424,7 +435,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.GETSTATICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -440,7 +451,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.GETDYNAMICMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -457,7 +468,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.GETSTATICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },
@@ -474,7 +485,7 @@ class MAS1AssetLogic {
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_INVOKE,
             payload: {
-                asset_id: (0, js_moi_utils_1.trimHexPrefix)(this.assetId),
+                asset_id: this.assetId,
                 callsite: mas1_1.MAS1.Endpoint.GETDYNAMICTOKENMETADATA,
                 calldata: (0, js_moi_utils_1.bytesToHex)(rawPayload),
             },

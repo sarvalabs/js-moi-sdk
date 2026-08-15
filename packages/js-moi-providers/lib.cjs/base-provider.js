@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseProvider = void 0;
+const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_utils_1 = require("js-moi-utils");
 const abstract_provider_1 = require("./abstract-provider");
 const interaction_1 = require("./interaction");
@@ -9,6 +10,9 @@ const defaultTimeout = 120;
 const defaultOptions = {
     tesseract_number: -1
 };
+// The AccessPolicy/AccessPolicies RPCs take resource_type as its lowercase
+// string label (e.g. "storage"), not the numeric ResourceType enum value.
+const resourceTypeToLabel = (resourceType) => js_moi_utils_1.ResourceType[resourceType].toLowerCase();
 ;
 /**
  * Class representing a base provider for interacting with the MOI protocol.
@@ -685,6 +689,94 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
         }
     }
     /**
+     * Retrieves a participant's storage allowance on a logic/asset account.
+     *
+     * @param {string} targetAccount - The logic or asset account the allowance is on.
+     * @param {string} userAccount - The participant whose allowance to look up.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCStorageMetric>} A Promise that resolves to the storage metric.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getStorageMetric(targetAccount, userAccount, options) {
+        try {
+            const params = {
+                target_account: targetAccount,
+                user_account: userAccount,
+                options: options ? options : defaultOptions,
+            };
+            const response = await this.execute("moi.StorageMetric", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves the current network-wide storage rent pricing.
+     *
+     * @returns {Promise<RPCStorageParams>} A Promise that resolves to the storage pricing.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getStoragePricing() {
+        try {
+            const params = {};
+            const response = await this.execute("moi.StoragePricing", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves a single access policy owned by an account.
+     *
+     * @param {string} id - The account that owns the policy.
+     * @param {ResourceType} resourceType - The resource type the policy governs.
+     * @param {string} resourceId - The specific resource instance the policy governs.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCAccessPolicy>} A Promise that resolves to the access policy.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getAccessPolicy(id, resourceType, resourceId, options) {
+        try {
+            const params = {
+                id,
+                resource_type: resourceTypeToLabel(resourceType),
+                resource_id: resourceId,
+                options: options ? options : defaultOptions,
+            };
+            const response = await this.execute("moi.AccessPolicy", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Retrieves every access policy of a given resource type owned by an account.
+     *
+     * @param {string} id - The account that owns the policies.
+     * @param {ResourceType} resourceType - The resource type to list policies for.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCAccessPolicy[]>} A Promise that resolves to the matching policies.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    async getAccessPolicies(id, resourceType, options) {
+        try {
+            const params = {
+                id,
+                resource_type: resourceTypeToLabel(resourceType),
+                resource_id: js_moi_constants_1.ZERO_ADDRESS,
+                options: options ? options : defaultOptions,
+            };
+            const response = await this.execute("moi.AccessPolicies", params);
+            return this.processResponse(response);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    /**
      * Retrieves the interaction receipt for a specific interaction hash.
      *
      * @param {string} ixHash - The hash of the interaction for which to
@@ -1049,6 +1141,15 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                         return operation.data;
                     }
                     throw new Error("Failed to retrieve asset creation response");
+                case js_moi_utils_1.OpType.ACCOUNT_CONFIGURE:
+                    // Status-only op - go-moi never populates a result payload for this,
+                    // every execution path only sets the receipt status.
+                    return null;
+                case js_moi_utils_1.OpType.ACCOUNT_INHERIT:
+                    if (operation.data) {
+                        return operation.data;
+                    }
+                    throw new Error("Failed to retrieve account inherit response");
                 case js_moi_utils_1.OpType.ASSET_INVOKE:
                     if (operation.data) {
                         // Todo: update response type
@@ -1070,6 +1171,14 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
                         return operation.data;
                     }
                     throw new Error("Failed to retrieve logic enlist response");
+                case js_moi_utils_1.OpType.STORAGE_DEPOSIT:
+                case js_moi_utils_1.OpType.STORAGE_WITHDRAW:
+                case js_moi_utils_1.OpType.ACCESS_CREATE:
+                case js_moi_utils_1.OpType.ACCESS_UPDATE:
+                case js_moi_utils_1.OpType.ACCESS_DELETE:
+                    // These ops never populate a result payload on the go-moi side -
+                    // status/exception only, data is always null.
+                    return null;
                 default:
                     throw new Error("Unsupported interaction type encountered");
             }

@@ -114,7 +114,7 @@ export class AssetDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     protected createPayload(ixObject: AssetIxObject): LogicActionPayload {
         const payload = {
-            asset_id: this.getAssetId().string(),
+            asset_id: this.getAssetId().hex(),
             callsite: ixObject.routine.name,
         } as LogicActionPayload
 

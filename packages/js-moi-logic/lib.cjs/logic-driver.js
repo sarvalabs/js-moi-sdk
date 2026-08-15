@@ -4,6 +4,7 @@ exports.getLogicDriver = exports.LogicDriver = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_descriptor_1 = require("./logic-descriptor");
+const routine_options_1 = require("./routine-options");
 const state_1 = require("./state");
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
@@ -47,7 +48,11 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
                 return;
             }
             routines[routine.name] = (...params) => {
-                if (routine.accepts && params.length < routine.accepts.length) {
+                // A trailing RoutineOption isn't a real routine argument - exclude it from the
+                // count, or a call with too few real args but a trailing RoutineOption slips
+                // past this guard and fails later with a confusing encoder error instead.
+                const paramsLen = params.at(-1) instanceof routine_options_1.RoutineOption ? params.length - 1 : params.length;
+                if (routine.accepts && paramsLen < routine.accepts.length) {
                     js_moi_utils_1.ErrorUtils.throwError("One or more required arguments are missing.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }
                 return this.createIxObject(routine, ...params);
@@ -81,7 +86,7 @@ class LogicDriver extends logic_descriptor_1.LogicDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            logic_id: this.getLogicId().string(),
+            logic_id: this.getLogicId().hex(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

@@ -53,6 +53,10 @@ export const getFlag = (value, index) => {
 export const flagMasks = new Map([
     [ParticipantTagV0.value, 0b01111111],
     [LogicTagV0.value, 0b01111000],
-    [AssetTagV0.value, 0b01111111],
+    // Asset v0 defines two flags: AssetStateful (bit 0) and AssetLogical (bit 1) - every
+    // asset created via IxAssetCreate has both set (AssetCreatePayload.Flags() always
+    // returns both), so only bits 2-6 are reserved/unsupported here. Bits 0-1 must NOT be
+    // in this mask, or every real asset id fails validation.
+    [AssetTagV0.value, 0b01111100],
 ]);
 //# sourceMappingURL=flags.js.map

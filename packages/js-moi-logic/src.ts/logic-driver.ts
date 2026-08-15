@@ -5,6 +5,7 @@ import { ErrorCode, ErrorUtils, Hex, defineReadOnly } from "js-moi-utils";
 import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
+import { RoutineOption } from "./routine-options";
 import { EphemeralState, PersistentState } from "./state";
 
 /**
@@ -58,7 +59,12 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             }
 
             routines[routine.name] = (...params: any[]) => {
-                if (routine.accepts && params.length < routine.accepts.length) {
+                // A trailing RoutineOption isn't a real routine argument - exclude it from the
+                // count, or a call with too few real args but a trailing RoutineOption slips
+                // past this guard and fails later with a confusing encoder error instead.
+                const paramsLen = params.at(-1) instanceof RoutineOption ? params.length - 1 : params.length;
+
+                if (routine.accepts && paramsLen < routine.accepts.length) {
                     ErrorUtils.throwError(
                         "One or more required arguments are missing.",
                         ErrorCode.INVALID_ARGUMENT
@@ -102,7 +108,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     protected createPayload(ixObject: LogicIxObject): LogicActionPayload {
         const payload = {
-            logic_id: this.getLogicId().string(),
+            logic_id: this.getLogicId().hex(),
             callsite: ixObject.routine.name,
         } as LogicActionPayload
 

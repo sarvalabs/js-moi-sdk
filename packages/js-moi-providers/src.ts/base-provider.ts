@@ -1,10 +1,13 @@
 import { LogicManifest } from "js-moi-manifest";
+import { ZERO_ADDRESS } from "js-moi-constants";
 import {
+    AccountInheritResult,
     AssetCreationResult, ErrorCode, ErrorUtils, Interaction,
     LogicDeployResult,
     LogicEnlistResult,
     LogicInvokeResult,
     OpType,
+    ResourceType,
     Tesseract, bytesToHex,
     hexToBN, hexToBytes, isValidAddress, toQuantity, topicHash, unmarshal, type NumberLike
 } from "js-moi-utils";
@@ -15,13 +18,13 @@ import type {
     AssetInfo, AssetInfoParams, BalanceParams, CallorEstimateOptions,
     Content, ContentFrom, ContentFromResponse, ContentResponse, ContextInfo, Encoding,
     ExecutionResult,
-    Filter, FilterDeletionResult, Inspect,
+    Filter, FilterDeletionResult, GetAccessPolicyArgs, GetStorageMetricArgs, GetStoragePricingArgs, Inspect,
     InspectResponse,
     InteractionCallResponse, InteractionParams, InteractionReceipt,
     InteractionRequest, InteractionResponse,
     Log, LogFilter,
     LogicManifestParams, NodeInfo, Options,
-    Registry,
+    Registry, RPCAccessPolicy, RPCStorageMetric, RPCStorageParams,
     RpcResponse, Status, StatusResponse, StorageParams, SyncStatus, SyncStatusParams, TDU, TDUResponse
 } from "../types/jsonrpc";
 import { type NestedArray } from "../types/util";
@@ -36,6 +39,10 @@ const defaultTimeout: number = 120;
 const defaultOptions: Options = {
     tesseract_number: -1
 }
+
+// The AccessPolicy/AccessPolicies RPCs take resource_type as its lowercase
+// string label (e.g. "storage"), not the numeric ResourceType enum value.
+const resourceTypeToLabel = (resourceType: ResourceType): string => ResourceType[resourceType].toLowerCase();
 
 export interface EventTag {
     event: string;
@@ -851,6 +858,102 @@ export class BaseProvider extends AbstractProvider {
     }
 
     /**
+     * Retrieves a participant's storage allowance on a logic/asset account.
+     *
+     * @param {string} targetAccount - The logic or asset account the allowance is on.
+     * @param {string} userAccount - The participant whose allowance to look up.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCStorageMetric>} A Promise that resolves to the storage metric.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<RPCStorageMetric> {
+        try {
+            const params: GetStorageMetricArgs = {
+                target_account: targetAccount,
+                user_account: userAccount,
+                options: options ? options : defaultOptions,
+            }
+
+            const response = await this.execute("moi.StorageMetric", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves the current network-wide storage rent pricing.
+     *
+     * @returns {Promise<RPCStorageParams>} A Promise that resolves to the storage pricing.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getStoragePricing(): Promise<RPCStorageParams> {
+        try {
+            const params: GetStoragePricingArgs = {}
+
+            const response = await this.execute("moi.StoragePricing", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves a single access policy owned by an account.
+     *
+     * @param {string} id - The account that owns the policy.
+     * @param {ResourceType} resourceType - The resource type the policy governs.
+     * @param {string} resourceId - The specific resource instance the policy governs.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCAccessPolicy>} A Promise that resolves to the access policy.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<RPCAccessPolicy> {
+        try {
+            const params: GetAccessPolicyArgs = {
+                id,
+                resource_type: resourceTypeToLabel(resourceType),
+                resource_id: resourceId,
+                options: options ? options : defaultOptions,
+            }
+
+            const response = await this.execute("moi.AccessPolicy", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves every access policy of a given resource type owned by an account.
+     *
+     * @param {string} id - The account that owns the policies.
+     * @param {ResourceType} resourceType - The resource type to list policies for.
+     * @param {Options} options - The tesseract options. (optional)
+     * @returns {Promise<RPCAccessPolicy[]>} A Promise that resolves to the matching policies.
+     * @throws {Error} if there is an error executing the RPC call.
+     */
+    public async getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<RPCAccessPolicy[]> {
+        try {
+            const params: GetAccessPolicyArgs = {
+                id,
+                resource_type: resourceTypeToLabel(resourceType),
+                resource_id: ZERO_ADDRESS,
+                options: options ? options : defaultOptions,
+            }
+
+            const response = await this.execute("moi.AccessPolicies", params)
+
+            return this.processResponse(response)
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Retrieves the interaction receipt for a specific interaction hash.
      * 
      * @param {string} ixHash - The hash of the interaction for which to 
@@ -1295,6 +1398,15 @@ export class BaseProvider extends AbstractProvider {
                         return operation.data as AssetCreationResult;
                     }
                     throw new Error("Failed to retrieve asset creation response");
+                case OpType.ACCOUNT_CONFIGURE:
+                    // Status-only op - go-moi never populates a result payload for this,
+                    // every execution path only sets the receipt status.
+                    return null;
+                case OpType.ACCOUNT_INHERIT:
+                    if (operation.data) {
+                        return operation.data as AccountInheritResult;
+                    }
+                    throw new Error("Failed to retrieve account inherit response");
                 case OpType.ASSET_INVOKE:
                     if (operation.data) {
                         // Todo: update response type
@@ -1316,6 +1428,14 @@ export class BaseProvider extends AbstractProvider {
                         return operation.data as LogicEnlistResult;
                     }
                     throw new Error("Failed to retrieve logic enlist response");
+                case OpType.STORAGE_DEPOSIT:
+                case OpType.STORAGE_WITHDRAW:
+                case OpType.ACCESS_CREATE:
+                case OpType.ACCESS_UPDATE:
+                case OpType.ACCESS_DELETE:
+                    // These ops never populate a result payload on the go-moi side -
+                    // status/exception only, data is always null.
+                    return null;
                 default:
                     throw new Error("Unsupported interaction type encountered");
             }

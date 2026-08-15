@@ -1,8 +1,9 @@
-import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, trimHexPrefix } from "js-moi-utils";
+import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode } from "js-polo";
-import { SARGA_ADDRESS } from "js-moi-constants";
-import { InteractionContext } from "js-moi-interactions";
+import { DEFAULT_NEW_ACCOUNT_FUNDING, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
+import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
+import { predictAssetId } from "js-moi-identifiers";
 import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, IS_OWNER_SCHEMA, SET_DYNAMIC_TOKEN_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, MINT_WITH_METADATA_SCHEMA } from "./mas1-schema";
 export class MAS1AssetLogic {
     assetId;
@@ -38,6 +39,16 @@ export class MAS1AssetLogic {
             payload: payload,
             participants: [],
             signer: signer,
+            // A newly created asset self-pays for its own storage the moment it's
+            // created, and a fresh account holds no KMOI - bundle a funding transfer
+            // to the predicted asset id, same as AssetFactory.create(). See
+            // predictAssetId's docs for why this must mirror go-moi's id derivation
+            // exactly - a wrong prediction sends funds to the wrong account.
+            extraOperations: (sender) => {
+                const assetId = predictAssetId(sender, payload.standard);
+                const transfer = buildTransferPayload(KMOI_ASSET_ID, assetId.toHex(), DEFAULT_NEW_ACCOUNT_FUNDING);
+                return [{ type: OpType.ASSET_INVOKE, payload: transfer }];
+            },
         });
     }
     mint(beneficiary) {
@@ -58,7 +69,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.MINT,
                 calldata: bytesToHex(rawPayload),
             },
@@ -85,7 +96,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.MINTWITHMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -107,7 +118,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.BURN,
                 calldata: bytesToHex(rawPayload),
             },
@@ -134,7 +145,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.TRANSFER,
                 calldata: bytesToHex(rawPayload),
             },
@@ -166,7 +177,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.TRANSFERFROM,
                 calldata: bytesToHex(rawPayload),
             },
@@ -194,7 +205,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.APPROVE,
                 calldata: bytesToHex(rawPayload),
             },
@@ -221,7 +232,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.REVOKE,
                 calldata: bytesToHex(rawPayload),
             },
@@ -252,7 +263,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.LOCKUP,
                 calldata: bytesToHex(rawPayload),
             },
@@ -284,7 +295,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.RELEASE,
                 calldata: bytesToHex(rawPayload),
             },
@@ -301,7 +312,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.SETSTATICMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -318,7 +329,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.SETDYNAMICMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -336,7 +347,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.SETSTATICTOKENMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -354,7 +365,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.SETDYNAMICTOKENMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -383,7 +394,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.SYMBOL,
                 calldata: bytesToHex(rawPayload),
             },
@@ -395,7 +406,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.CREATOR,
             },
             participants: [],
@@ -406,7 +417,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.MANAGER,
             },
             participants: [],
@@ -421,7 +432,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.GETSTATICMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -437,7 +448,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.GETDYNAMICMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -454,7 +465,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.GETSTATICTOKENMETADATA,
                 calldata: bytesToHex(rawPayload),
             },
@@ -471,7 +482,7 @@ export class MAS1AssetLogic {
         return new InteractionContext({
             opType: OpType.ASSET_INVOKE,
             payload: {
-                asset_id: trimHexPrefix(this.assetId),
+                asset_id: this.assetId,
                 callsite: MAS1.Endpoint.GETDYNAMICTOKENMETADATA,
                 calldata: bytesToHex(rawPayload),
             },

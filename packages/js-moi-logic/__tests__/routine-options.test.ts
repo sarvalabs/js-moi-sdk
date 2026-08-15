@@ -34,6 +34,12 @@ describe("RoutineOption", () => {
         expect(opt.participants).toStrictEqual(participants);
     });
 
+    test("assigns fundNewAccount", () => {
+        const opt = new RoutineOption({ fundNewAccount: 50000 });
+
+        expect(opt.fundNewAccount).toBe(50000);
+    });
+
     test("ignores fields not present in the option object (no extra properties)", () => {
         const opt = new RoutineOption({ fuelLimit: 500 });
 

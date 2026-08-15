@@ -1,5 +1,5 @@
 export { Hex } from "../types/hex";
-export { AssetCreationResult, AssetSupplyResult, LogicDeployResult, LogicInvokeResult, LogicEnlistResult } from "../types/receipt";
+export { AssetCreationResult, AssetSupplyResult, LogicDeployResult, LogicInvokeResult, LogicEnlistResult, AccountInheritResult } from "../types/receipt";
 export * from "./address";
 export * from "./base64";
 export * from "./bytes";

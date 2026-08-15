@@ -32,6 +32,43 @@ export enum OpType {
     LOGIC_ENLIST,
     LOGIC_INTERACT,
     LOGIC_UPGRADE,
+
+    STORAGE_DEPOSIT,
+    STORAGE_WITHDRAW,
+
+    ACCESS_CREATE,
+    ACCESS_UPDATE,
+    ACCESS_DELETE,
+}
+
+/**
+ * Enumerates the types of resources an access policy can govern.
+ * Only STORAGE is implemented on the network today; ASSET/LOGIC/KEY are
+ * reserved values that validate but are rejected server-side.
+ */
+export enum ResourceType {
+    STORAGE = 1,
+    ASSET = 2,
+    LOGIC = 3,
+    KEY = 4,
+}
+
+/**
+ * Enumerates the actions an access policy can permit. Bitmask - values
+ * can be OR'd together, there's no implication between bits.
+ */
+export enum AccessAction {
+    STORAGE_MUTATE = 1 << 0,
+    ASSET_ACCESS = 1 << 1,
+    LOGIC_ACCESS = 1 << 2,
+}
+
+/**
+ * Enumerates how a CallerConstraint matches against a caller/origin.
+ */
+export enum CallerKind {
+    ANY = 0,
+    SET = 1,
 }
 
 /**

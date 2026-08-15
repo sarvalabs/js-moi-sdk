@@ -1,7 +1,8 @@
+import type { Hex } from "./hex";
 
 export interface AssetCreationResult {
-    asset_id: string;
-    address: string;
+    asset_id: Hex;
+    address: Hex;
 }
 
 export interface AssetSupplyResult {
@@ -9,7 +10,7 @@ export interface AssetSupplyResult {
 }
 
 export interface LogicDeployResult {
-    logic_id?: string;
+    logic_id?: Hex;
     error: string;
 }
 
@@ -20,5 +21,10 @@ export interface LogicInvokeResult {
 
 export interface LogicEnlistResult {
     outputs: string;
+    error: string;
+}
+
+export interface AccountInheritResult {
+    sub_account: Hex;
     error: string;
 }

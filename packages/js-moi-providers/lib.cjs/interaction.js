@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
+exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_constants_1 = require("js-moi-constants");
@@ -106,6 +106,94 @@ const validateAccountInherit = (payload) => {
     }
 };
 exports.validateAccountInherit = validateAccountInherit;
+const validateStorageDeposit = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+        throw new Error("target_account must be a non-empty hex string");
+    }
+    // Note: defaulting deposit_for to the signer's own identifier happens in the
+    // StorageDeposit builder (js-moi-interactions), which has signer context that
+    // this lower-level encoding step does not. By the time a payload reaches here,
+    // deposit_for must already be resolved.
+    if (typeof payload.deposit_for !== "string" || payload.deposit_for.length === 0) {
+        throw new Error("deposit_for must be a non-empty hex string");
+    }
+    if (payload.amount == null || (typeof payload.amount !== "number" && typeof payload.amount !== "bigint")) {
+        throw new Error("amount must be a number or bigint");
+    }
+    if (payload.amount <= 0) {
+        throw new Error("amount must be greater than zero");
+    }
+};
+exports.validateStorageDeposit = validateStorageDeposit;
+const validateStorageWithdraw = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+        throw new Error("target_account must be a non-empty hex string");
+    }
+    if (payload.bytes_to_release !== undefined && (typeof payload.bytes_to_release !== "number" || payload.bytes_to_release < 0)) {
+        throw new Error("bytes_to_release must be a non-negative number if provided (0 or omitted releases everything available)");
+    }
+};
+exports.validateStorageWithdraw = validateStorageWithdraw;
+const validateCallerConstraint = (constraint, label) => {
+    if (!constraint) {
+        throw new Error(`${label} is required`);
+    }
+    if (constraint.kind !== js_moi_utils_1.CallerKind.ANY && constraint.kind !== js_moi_utils_1.CallerKind.SET) {
+        throw new Error(`${label}.kind must be a valid CallerKind`);
+    }
+    if (constraint.kind === js_moi_utils_1.CallerKind.SET && (!Array.isArray(constraint.set) || constraint.set.length === 0)) {
+        throw new Error(`${label}.set must be a non-empty array when kind is CallerKind.SET`);
+    }
+};
+exports.validateCallerConstraint = validateCallerConstraint;
+const validateAccessPolicy = (policy) => {
+    if (!policy) {
+        throw new Error("access_policy is required");
+    }
+    if (policy.resource !== js_moi_utils_1.ResourceType.STORAGE) {
+        throw new Error("only ResourceType.STORAGE is currently supported");
+    }
+    if (typeof policy.resource_id !== "string" || policy.resource_id.length === 0) {
+        throw new Error("resource_id must be a non-empty hex string");
+    }
+    if (!policy.actions || policy.actions <= 0) {
+        throw new Error("actions must be a non-zero bitmask");
+    }
+    (0, exports.validateCallerConstraint)(policy.caller, "caller");
+    (0, exports.validateCallerConstraint)(policy.origin, "origin");
+};
+exports.validateAccessPolicy = validateAccessPolicy;
+const validateAccessCreateOrUpdate = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+        throw new Error("target_account must be a non-empty hex string");
+    }
+    (0, exports.validateAccessPolicy)(payload.access_policy);
+};
+exports.validateAccessCreateOrUpdate = validateAccessCreateOrUpdate;
+const validateAccessDelete = (payload) => {
+    if (!payload) {
+        throw new Error("payload is required");
+    }
+    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+        throw new Error("target_account must be a non-empty hex string");
+    }
+    if (payload.resource == null) {
+        throw new Error("resource is required");
+    }
+    if (typeof payload.resource_id !== "string" || payload.resource_id.length === 0) {
+        throw new Error("resource_id must be a non-empty hex string");
+    }
+};
+exports.validateAccessDelete = validateAccessDelete;
 const validateLogicPayload = (payload) => {
     if (payload.calldata !== undefined) {
         if (typeof payload.calldata !== "string" || payload.calldata.length === 0) {
@@ -251,6 +339,51 @@ function processAccountInherit(payload) {
     };
     return polorize(processed, js_moi_utils_1.accountInheritSchema);
 }
+function processStorageDeposit(payload) {
+    const processed = {
+        target_account: new js_moi_identifiers_1.Identifier(payload.target_account).toBytes(),
+        deposit_for: new js_moi_identifiers_1.ParticipantId(payload.deposit_for).toBytes(),
+        amount: payload.amount,
+        bytes_to_release: 0,
+    };
+    return polorize(processed, js_moi_utils_1.storagePayloadSchema);
+}
+function processStorageWithdraw(payload) {
+    const processed = {
+        target_account: new js_moi_identifiers_1.Identifier(payload.target_account).toBytes(),
+        deposit_for: new Uint8Array(32),
+        amount: 0,
+        bytes_to_release: payload.bytes_to_release ?? 0,
+    };
+    return polorize(processed, js_moi_utils_1.storagePayloadSchema);
+}
+const toRawCallerConstraint = (constraint) => ({
+    kind: constraint.kind,
+    set: constraint.set.map(id => new js_moi_identifiers_1.Identifier(id).toBytes()),
+});
+const toRawAccessPolicy = (policy) => ({
+    resource: policy.resource,
+    resource_id: new js_moi_identifiers_1.Identifier(policy.resource_id).toBytes(),
+    actions: policy.actions,
+    scope: { prefixes: (policy.scope?.prefixes ?? []).map(js_moi_utils_1.hexToBytes), predicate: null },
+    caller: toRawCallerConstraint(policy.caller),
+    origin: toRawCallerConstraint(policy.origin),
+});
+function processAccessCreateOrUpdate(payload) {
+    const processed = {
+        target_account: new js_moi_identifiers_1.Identifier(payload.target_account).toBytes(),
+        access_policy: toRawAccessPolicy(payload.access_policy),
+    };
+    return polorize(processed, js_moi_utils_1.accessPayloadSchema);
+}
+function processAccessDelete(payload) {
+    const processed = {
+        target_account: new js_moi_identifiers_1.Identifier(payload.target_account).toBytes(),
+        resource: payload.resource,
+        resource_id: new js_moi_identifiers_1.Identifier(payload.resource_id).toBytes(),
+    };
+    return polorize(processed, js_moi_utils_1.accessDeletePayloadSchema);
+}
 function processAssetCreate(payload) {
     const createPayload = {
         ...payload,
@@ -334,6 +467,23 @@ const processParticipants = (ixObject) => {
                 const { logic_id } = operation.payload;
                 addParticipant((0, js_moi_utils_1.withHexPrefix)(logic_id), js_moi_utils_1.LockType.MUTATE_LOCK);
                 break;
+            case js_moi_utils_1.OpType.STORAGE_DEPOSIT:
+            case js_moi_utils_1.OpType.STORAGE_WITHDRAW: {
+                const { target_account } = operation.payload;
+                addParticipant((0, js_moi_utils_1.withHexPrefix)(target_account), js_moi_utils_1.LockType.MUTATE_LOCK);
+                break;
+            }
+            case js_moi_utils_1.OpType.ACCESS_CREATE:
+            case js_moi_utils_1.OpType.ACCESS_UPDATE: {
+                const { target_account } = operation.payload;
+                addParticipant((0, js_moi_utils_1.withHexPrefix)(target_account), js_moi_utils_1.LockType.MUTATE_LOCK);
+                break;
+            }
+            case js_moi_utils_1.OpType.ACCESS_DELETE: {
+                const { target_account } = operation.payload;
+                addParticipant((0, js_moi_utils_1.withHexPrefix)(target_account), js_moi_utils_1.LockType.MUTATE_LOCK);
+                break;
+            }
             default:
                 js_moi_utils_1.ErrorUtils.throwError("Unsupported Ix type", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
         }
@@ -415,6 +565,35 @@ const toRawOperation = (operation) => {
             return {
                 ...operation,
                 payload: processLogicAction(operation.payload)
+            };
+        }
+        case js_moi_utils_1.OpType.STORAGE_DEPOSIT: {
+            (0, exports.validateStorageDeposit)(operation.payload);
+            return {
+                ...operation,
+                payload: processStorageDeposit(operation.payload)
+            };
+        }
+        case js_moi_utils_1.OpType.STORAGE_WITHDRAW: {
+            (0, exports.validateStorageWithdraw)(operation.payload);
+            return {
+                ...operation,
+                payload: processStorageWithdraw(operation.payload)
+            };
+        }
+        case js_moi_utils_1.OpType.ACCESS_CREATE:
+        case js_moi_utils_1.OpType.ACCESS_UPDATE: {
+            (0, exports.validateAccessCreateOrUpdate)(operation.payload);
+            return {
+                ...operation,
+                payload: processAccessCreateOrUpdate(operation.payload)
+            };
+        }
+        case js_moi_utils_1.OpType.ACCESS_DELETE: {
+            (0, exports.validateAccessDelete)(operation.payload);
+            return {
+                ...operation,
+                payload: processAccessDelete(operation.payload)
             };
         }
         default:

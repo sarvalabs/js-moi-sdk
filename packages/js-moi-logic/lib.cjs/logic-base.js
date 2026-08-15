@@ -2,10 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogicBase = void 0;
 const js_moi_manifest_1 = require("js-moi-manifest");
+const js_moi_interactions_1 = require("js-moi-interactions");
+const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_signer_1 = require("js-moi-signer");
+const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_utils_1 = require("js-moi-utils");
 const logic_context_1 = require("./logic-context");
 const logic_id_1 = require("./logic-id");
+const routine_options_1 = require("./routine-options");
 /**
  * Abstract base class for logic-related operations.
  * Extends ElementDescriptor and defines the common interface that
@@ -72,6 +76,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
         if (this.getTxType(routine.kind) !== js_moi_utils_1.OpType.LOGIC_DEPLOY && !this.getLogicId()) {
             js_moi_utils_1.ErrorUtils.throwError("This logic object doesn't have logic id assigned yet, please assign a logic id.", js_moi_utils_1.ErrorCode.NOT_INITIALIZED);
         }
+        const option = args.at(-1) instanceof routine_options_1.RoutineOption ? args.pop() : new routine_options_1.RoutineOption();
         const tempIxObj = { routine, arguments: args };
         const payload = this.createPayload(tempIxObj);
         const opType = this.getTxType(routine.kind);
@@ -81,6 +86,27 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             participants: [],
             signer: this.signer,
         };
+        if (opType === js_moi_utils_1.OpType.LOGIC_DEPLOY) {
+            // A newly deployed logic self-pays for its own account-creation storage cost
+            // (billed against its own, currently-zero balance) the moment it's created,
+            // so it needs funds bundled into the same interaction or the deploy reverts.
+            // See predictLogicId's docs for why this must mirror go-moi's id derivation
+            // exactly - a wrong prediction sends funds to the wrong account.
+            //
+            // Note: this covers self-pay account-creation cost only. If the manifest's
+            // deploy routine also writes persistent state without a `payer Logic`
+            // clause, that write is billed to the SENDER against the new logic's
+            // storage registry (the "granted storage" mechanism), which requires a
+            // pre-existing IxStorageDeposit grant - and that can't be bundled into this
+            // same interaction, because the target account doesn't exist yet when
+            // participants are resolved. Manifests intended to be deployable standalone
+            // should declare `payer Logic` on any state their deploy routine writes.
+            ctx.extraOperations = (sender) => {
+                const logicId = (0, js_moi_identifiers_1.predictLogicId)(sender);
+                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, logicId.toHex(), option.fundNewAccount ?? js_moi_constants_1.DEFAULT_NEW_ACCOUNT_FUNDING);
+                return [{ type: js_moi_utils_1.OpType.ASSET_INVOKE, payload: transfer }];
+            };
+        }
         return new logic_context_1.LogicContext(ctx, routine.name, this.processResult.bind(this));
     }
 }

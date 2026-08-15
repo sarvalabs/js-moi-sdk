@@ -59,6 +59,10 @@ exports.getFlag = getFlag;
 exports.flagMasks = new Map([
     [identifier_tag_1.ParticipantTagV0.value, 0b01111111],
     [identifier_tag_1.LogicTagV0.value, 0b01111000],
-    [identifier_tag_1.AssetTagV0.value, 0b01111111],
+    // Asset v0 defines two flags: AssetStateful (bit 0) and AssetLogical (bit 1) - every
+    // asset created via IxAssetCreate has both set (AssetCreatePayload.Flags() always
+    // returns both), so only bits 2-6 are reserved/unsupported here. Bits 0-1 must NOT be
+    // in this mask, or every real asset id fails validation.
+    [identifier_tag_1.AssetTagV0.value, 0b01111100],
 ]);
 //# sourceMappingURL=flags.js.map
