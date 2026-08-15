@@ -1,12 +1,15 @@
 export var ContextStateKind;
 (function (ContextStateKind) {
-    ContextStateKind[ContextStateKind["PersistentState"] = 0] = "PersistentState";
-    ContextStateKind[ContextStateKind["EphemeralState"] = 1] = "EphemeralState";
+    ContextStateKind[ContextStateKind["LogicState"] = 0] = "LogicState";
+    ContextStateKind[ContextStateKind["ActorState"] = 1] = "ActorState";
 })(ContextStateKind || (ContextStateKind = {}));
 /**
  * Represents a matrix of context states defined in the logic manifest.
- * The matrix stores the mapping between context state kinds (persistent and
- ephemeral) and their element pointers.
+ * The matrix stores the mapping between context state kinds - logic state
+ * (`state logic:`, shared/global to the logic itself - what this SDK used to
+ * call "persistent" state) and actor state (`state actor:`, scoped per
+ * calling participant - what this SDK used to call "ephemeral" state) - and
+ * their element pointers.
  */
 export class ContextStateMatrix {
     matrix;
@@ -18,10 +21,10 @@ export class ContextStateMatrix {
             stateElement.data = stateElement.data;
             switch (stateElement.data.mode) {
                 case "logic":
-                    this.matrix.set(ContextStateKind.PersistentState, stateElement.ptr);
+                    this.matrix.set(ContextStateKind.LogicState, stateElement.ptr);
                     break;
                 case "actor":
-                    this.matrix.set(ContextStateKind.EphemeralState, stateElement.ptr);
+                    this.matrix.set(ContextStateKind.ActorState, stateElement.ptr);
                     break;
                 default:
                     break;
@@ -29,20 +32,20 @@ export class ContextStateMatrix {
         }
     }
     /**
-     * Checks if the matrix contains the pointer for persistent state.
+     * Checks if the matrix contains the pointer for logic state.
      *
-     * @returns {boolean} A boolean indicating if persistent state is present.
+     * @returns {boolean} A boolean indicating if logic state is present.
      */
-    persistent() {
-        return this.matrix.has(ContextStateKind.PersistentState);
+    logic() {
+        return this.matrix.has(ContextStateKind.LogicState);
     }
     /**
-     * Checks if the matrix contains the pointer for ephemeral state.
+     * Checks if the matrix contains the pointer for actor state.
      *
-     * @returns {boolean} A boolean indicating if ephemeral state is present.
+     * @returns {boolean} A boolean indicating if actor state is present.
      */
-    ephemeral() {
-        return this.matrix.has(ContextStateKind.EphemeralState);
+    actor() {
+        return this.matrix.has(ContextStateKind.ActorState);
     }
     /**
      * Retrieves the element pointer for the specified context state kind.

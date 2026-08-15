@@ -1,33 +1,34 @@
 import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { RoutineOption } from "./routine-options";
+import { ActorState, LogicState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export class LogicDriver extends LogicDescriptor {
     routines = {};
-    persistentState;
-    ephemeralState;
+    logicState;
+    actorState;
     constructor(logicId, manifest, arg) {
         super(logicId, manifest, arg);
         this.createState();
         this.createRoutines();
     }
     /**
-     * Creates the persistent and ephemeral states for the logic driver,
+     * Creates the logic and actor states for the logic driver,
      if available in logic manifest.
      */
     createState() {
-        const hasPersistance = this.stateMatrix.persistent();
-        const hasEphemeral = this.stateMatrix.ephemeral();
-        if (hasPersistance) {
-            const persistentState = new PersistentState(this, this.provider);
-            defineReadOnly(this, "persistentState", persistentState);
+        const hasLogicState = this.stateMatrix.logic();
+        const hasActorState = this.stateMatrix.actor();
+        if (hasLogicState) {
+            const logicState = new LogicState(this, this.provider);
+            defineReadOnly(this, "logicState", logicState);
         }
-        if (hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.provider);
-            defineReadOnly(this, "ephemeralState", ephemeralState);
+        if (hasActorState) {
+            const actorState = new ActorState(this, this.provider);
+            defineReadOnly(this, "actorState", actorState);
         }
     }
     /**
@@ -44,7 +45,11 @@ export class LogicDriver extends LogicDescriptor {
                 return;
             }
             routines[routine.name] = (...params) => {
-                if (routine.accepts && params.length < routine.accepts.length) {
+                // A trailing RoutineOption isn't a real routine argument - exclude it from the
+                // count, or a call with too few real args but a trailing RoutineOption slips
+                // past this guard and fails later with a confusing encoder error instead.
+                const paramsLen = params.at(-1) instanceof RoutineOption ? params.length - 1 : params.length;
+                if (routine.accepts && paramsLen < routine.accepts.length) {
                     ErrorUtils.throwError("One or more required arguments are missing.", ErrorCode.INVALID_ARGUMENT);
                 }
                 return this.createIxObject(routine, ...params);
@@ -78,7 +83,7 @@ export class LogicDriver extends LogicDescriptor {
      */
     createPayload(ixObject) {
         const payload = {
-            logic_id: this.getLogicId().string(),
+            logic_id: this.getLogicId().hex(),
             callsite: ixObject.routine.name,
         };
         if (ixObject.routine.accepts &&

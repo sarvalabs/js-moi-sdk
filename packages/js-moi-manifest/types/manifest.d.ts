@@ -32,8 +32,8 @@ export declare module LogicManifest {
   }
 
   export enum StateMode {
-    STATIC = "logic",
-    DYNAMIC = "actor",
+    LOGIC = "logic",
+    ACTOR = "actor",
   }
 
   export interface State {

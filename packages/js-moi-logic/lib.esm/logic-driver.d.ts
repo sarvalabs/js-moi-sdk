@@ -4,17 +4,17 @@ import { Signer } from "js-moi-signer";
 import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { ActorState, LogicState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export declare class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
     readonly routines: Routines<T>;
-    readonly persistentState?: PersistentState;
-    readonly ephemeralState?: EphemeralState;
+    readonly logicState?: LogicState;
+    readonly actorState?: ActorState;
     constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer);
     /**
-     * Creates the persistent and ephemeral states for the logic driver,
+     * Creates the logic and actor states for the logic driver,
      if available in logic manifest.
      */
     private createState;

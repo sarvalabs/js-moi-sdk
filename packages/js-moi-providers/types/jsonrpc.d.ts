@@ -6,7 +6,9 @@ import {
     LogicDeployResult,
     LogicInvokeResult,
     LogicEnlistResult,
-    Participants
+    AccountInheritResult,
+    Participants,
+    ResourceType
 } from "js-moi-utils";
 import type { NestedArray } from "./util";
 import { InteractionObject, RawInteractionObject } from "./interaction";
@@ -46,6 +48,9 @@ export interface AccountState {
     logic_root: string;
     file_root: string
     asset_registry: string;
+    storage_registry_root: string;
+    access_policy_root: string;
+    total_storage_consumed: string;
 }
 
 export interface AccountKey {
@@ -92,8 +97,8 @@ export interface ContextHash {
     hash: string;
 }
 
-export type ExecutionResult = AssetCreationResult | AssetSupplyResult | 
-LogicDeployResult | LogicInvokeResult | LogicEnlistResult | null;
+export type ExecutionResult = AssetCreationResult | AssetSupplyResult |
+LogicDeployResult | LogicInvokeResult | LogicEnlistResult | AccountInheritResult | null;
 
 export interface OperationResult {
     tx_type: string;
@@ -180,6 +185,41 @@ export interface TesseractParams extends AccountParamsBase {
 export interface AssetInfoParams {
     asset_id: string;
     options: Options;
+}
+
+export interface GetStorageMetricArgs {
+    target_account: string;
+    user_account: string;
+    options?: Options;
+}
+
+export interface StorageMetric {
+    storage_granted: string;
+    storage_consumed: string;
+    tokens_deposited: string;
+}
+
+export interface GetStoragePricingArgs {}
+
+export interface StoragePricing {
+    storage_price_per_byte: string;
+    storage_multiplier: string;
+    anu_per_byte: string;
+}
+
+export interface GetAccessPolicyArgs {
+    id: string;
+    resource_type: string;
+    resource_id: string;
+    options?: Options;
+}
+
+export interface AccessPolicyInfo {
+    resource_type: string;
+    resource_id: string;
+    action_type: string[];
+    caller_constraint: { kind: number; set: string[] };
+    origin_constraint: { kind: number; set: string[] };
 }
 
 export interface InteractionParams {

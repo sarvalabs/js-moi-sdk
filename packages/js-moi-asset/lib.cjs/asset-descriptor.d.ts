@@ -67,20 +67,20 @@ export declare abstract class AssetDescriptor extends AssetBase {
      */
     isStateful(): boolean;
     /**
-     * Checks if the logic has persistent state.
-     * @returns A tuple containing the pointer to the persistent state and a flag indicating if it exists.
+     * Checks if the logic has logic state (`state logic:` in the manifest).
+     * @returns A tuple containing the pointer to the logic state and a flag indicating if it exists.
      *
      @example
-     * const [ptr, exists] = logic.hasPersistentState();
+     * const [ptr, exists] = logic.hasLogicState();
      */
-    hasPersistentState(): [number, boolean];
+    hasLogicState(): [number, boolean];
     /**
-     * Checks if the logic has ephemeral state.
-     * @returns A tuple containing the pointer to the ephemeral state and a flag indicating if it exists.
+     * Checks if the logic has actor state (`state actor:` in the manifest).
+     * @returns A tuple containing the pointer to the actor state and a flag indicating if it exists.
      *
      * @example
-     * const [ptr, exists] = logic.hasEphemeralState();
+     * const [ptr, exists] = logic.hasActorState();
      */
-    hasEphemeralState(): [number, boolean];
+    hasActorState(): [number, boolean];
 }
 //# sourceMappingURL=asset-descriptor.d.ts.map

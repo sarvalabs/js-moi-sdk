@@ -1,0 +1,39 @@
+import type { AbstractProvider } from "js-moi-providers";
+import type { AssetDriver } from "../asset-driver";
+import { type AccessorBuilder } from "./accessor-builder";
+import { EntityBuilder } from "./entity-builder";
+/**
+ * Represents a function that builds an accessor.
+ * @param builder - The entity builder.
+ * @returns The accessor builder.
+ */
+type AccessorBuilderFunction = (builder: EntityBuilder) => AccessorBuilder | void;
+/**
+ * Represents actor state functionality for a logic element (`state actor:`
+ * in the manifest - scoped per calling participant, not shared/global).
+ * Does not support retrieval of actor state elements.
+ */
+export declare class ActorState {
+    private logicId;
+    private provider;
+    private driver;
+    constructor(asset: AssetDriver, provider: AbstractProvider);
+    /**
+     * Returns an accessor builder for the specified slot.
+     *
+     * @param slot - The slot number.
+     * @param createAccessorBuilder - The function to create the accessor builder.
+     * @returns The accessor builder for the specified slot.
+     */
+    private getBuilder;
+    /**
+     * Retrieves the value from the actor state.
+     *
+     * @param createAccessorBuilder - The function that creates the accessor builder.
+     * @returns A promise that resolves to the retrieved value.
+     * @throws An error if the actor state is not present or if the accessor builder is invalid.
+     */
+    get<T = any>(address: string, createAccessorBuilder: AccessorBuilderFunction): Promise<T>;
+}
+export {};
+//# sourceMappingURL=actor-state.d.ts.map

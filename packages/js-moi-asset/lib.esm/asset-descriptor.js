@@ -91,28 +91,28 @@ export class AssetDescriptor extends AssetBase {
         return this.assetId.isStateful();
     }
     /**
-     * Checks if the logic has persistent state.
-     * @returns A tuple containing the pointer to the persistent state and a flag indicating if it exists.
+     * Checks if the logic has logic state (`state logic:` in the manifest).
+     * @returns A tuple containing the pointer to the logic state and a flag indicating if it exists.
      *
      @example
-     * const [ptr, exists] = logic.hasPersistentState();
+     * const [ptr, exists] = logic.hasLogicState();
      */
-    hasPersistentState() {
-        const ptr = this.stateMatrix.get(ContextStateKind.PersistentState);
+    hasLogicState() {
+        const ptr = this.stateMatrix.get(ContextStateKind.LogicState);
         if (ptr !== undefined) {
             return [ptr, true];
         }
         return [0, false];
     }
     /**
-     * Checks if the logic has ephemeral state.
-     * @returns A tuple containing the pointer to the ephemeral state and a flag indicating if it exists.
+     * Checks if the logic has actor state (`state actor:` in the manifest).
+     * @returns A tuple containing the pointer to the actor state and a flag indicating if it exists.
      *
      * @example
-     * const [ptr, exists] = logic.hasEphemeralState();
+     * const [ptr, exists] = logic.hasActorState();
      */
-    hasEphemeralState() {
-        const ptr = this.stateMatrix.get(ContextStateKind.EphemeralState);
+    hasActorState() {
+        const ptr = this.stateMatrix.get(ContextStateKind.ActorState);
         if (ptr !== undefined) {
             return [ptr, true];
         }

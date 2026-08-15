@@ -5,15 +5,16 @@ import { ErrorCode, ErrorUtils, Hex, defineReadOnly } from "js-moi-utils";
 import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { Routines } from "../types/logic";
 import { LogicDescriptor } from "./logic-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { RoutineOption } from "./routine-options";
+import { ActorState, LogicState } from "./state";
 
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export class LogicDriver<T extends Record<string, (...args: any) => any> = any> extends LogicDescriptor {
     public readonly routines: Routines<T> = {} as Routines<T>;
-    public readonly persistentState?: PersistentState;
-    public readonly ephemeralState?: EphemeralState;
+    public readonly logicState?: LogicState;
+    public readonly actorState?: ActorState;
 
     constructor(logicId: string, manifest: LogicManifest.Manifest, arg: Signer) {
         super(logicId, manifest, arg)
@@ -22,21 +23,21 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
     }
 
     /**
-     * Creates the persistent and ephemeral states for the logic driver, 
+     * Creates the logic and actor states for the logic driver,
      if available in logic manifest.
      */
     private createState() {
-        const hasPersistance = this.stateMatrix.persistent();
-        const hasEphemeral = this.stateMatrix.ephemeral();
+        const hasLogicState = this.stateMatrix.logic();
+        const hasActorState = this.stateMatrix.actor();
 
-        if(hasPersistance) {
-            const persistentState = new PersistentState(this, this.provider);
-            defineReadOnly(this, "persistentState", persistentState)
+        if(hasLogicState) {
+            const logicState = new LogicState(this, this.provider);
+            defineReadOnly(this, "logicState", logicState)
         }
 
-        if(hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.provider);
-            defineReadOnly(this, "ephemeralState", ephemeralState)
+        if(hasActorState) {
+            const actorState = new ActorState(this, this.provider);
+            defineReadOnly(this, "actorState", actorState)
         }
     }
 
@@ -58,7 +59,12 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
             }
 
             routines[routine.name] = (...params: any[]) => {
-                if (routine.accepts && params.length < routine.accepts.length) {
+                // A trailing RoutineOption isn't a real routine argument - exclude it from the
+                // count, or a call with too few real args but a trailing RoutineOption slips
+                // past this guard and fails later with a confusing encoder error instead.
+                const paramsLen = params.at(-1) instanceof RoutineOption ? params.length - 1 : params.length;
+
+                if (routine.accepts && paramsLen < routine.accepts.length) {
                     ErrorUtils.throwError(
                         "One or more required arguments are missing.",
                         ErrorCode.INVALID_ARGUMENT
@@ -102,7 +108,7 @@ export class LogicDriver<T extends Record<string, (...args: any) => any> = any> 
      */
     protected createPayload(ixObject: LogicIxObject): LogicActionPayload {
         const payload = {
-            logic_id: this.getLogicId().string(),
+            logic_id: this.getLogicId().hex(),
             callsite: ixObject.routine.name,
         } as LogicActionPayload
 

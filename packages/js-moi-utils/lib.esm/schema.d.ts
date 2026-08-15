@@ -274,6 +274,185 @@ export declare const accountInheritSchema: {
         };
     };
 };
+export declare const storagePayloadSchema: {
+    kind: string;
+    fields: {
+        target_account: {
+            kind: string;
+        };
+        deposit_for: {
+            kind: string;
+        };
+        amount: {
+            kind: string;
+        };
+        bytes_to_release: {
+            kind: string;
+        };
+    };
+};
+export declare const callerConstraintSchema: {
+    kind: string;
+    fields: {
+        kind: {
+            kind: string;
+        };
+        set: {
+            kind: string;
+            fields: {
+                values: {
+                    kind: string;
+                };
+            };
+        };
+    };
+};
+export declare const accessPolicySchema: {
+    kind: string;
+    fields: {
+        resource: {
+            kind: string;
+        };
+        resource_id: {
+            kind: string;
+        };
+        actions: {
+            kind: string;
+        };
+        scope: {
+            kind: string;
+            fields: {
+                prefixes: {
+                    kind: string;
+                    fields: {
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+                predicate: {
+                    kind: string;
+                };
+            };
+        };
+        caller: {
+            kind: string;
+            fields: {
+                kind: {
+                    kind: string;
+                };
+                set: {
+                    kind: string;
+                    fields: {
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+        origin: {
+            kind: string;
+            fields: {
+                kind: {
+                    kind: string;
+                };
+                set: {
+                    kind: string;
+                    fields: {
+                        values: {
+                            kind: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+export declare const accessPayloadSchema: {
+    kind: string;
+    fields: {
+        target_account: {
+            kind: string;
+        };
+        access_policy: {
+            kind: string;
+            fields: {
+                resource: {
+                    kind: string;
+                };
+                resource_id: {
+                    kind: string;
+                };
+                actions: {
+                    kind: string;
+                };
+                scope: {
+                    kind: string;
+                    fields: {
+                        prefixes: {
+                            kind: string;
+                            fields: {
+                                values: {
+                                    kind: string;
+                                };
+                            };
+                        };
+                        predicate: {
+                            kind: string;
+                        };
+                    };
+                };
+                caller: {
+                    kind: string;
+                    fields: {
+                        kind: {
+                            kind: string;
+                        };
+                        set: {
+                            kind: string;
+                            fields: {
+                                values: {
+                                    kind: string;
+                                };
+                            };
+                        };
+                    };
+                };
+                origin: {
+                    kind: string;
+                    fields: {
+                        kind: {
+                            kind: string;
+                        };
+                        set: {
+                            kind: string;
+                            fields: {
+                                values: {
+                                    kind: string;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+export declare const accessDeletePayloadSchema: {
+    kind: string;
+    fields: {
+        target_account: {
+            kind: string;
+        };
+        resource: {
+            kind: string;
+        };
+        resource_id: {
+            kind: string;
+        };
+    };
+};
 export declare const ixObjectSchema: {
     kind: string;
     fields: {

@@ -1,3 +1,4 @@
+export { newAccountFingerprint, deriveAssetId, deriveLogicId, type AccountIdSender } from "./account-id";
 export { AssetId } from "./asset-id";
 export { IdentifierKind, IdentifierVersion } from "./enums";
 export { Flag } from "./flags";

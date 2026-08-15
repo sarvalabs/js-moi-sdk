@@ -1,6 +1,6 @@
-export { PersistentState } from "./persistent-state";
+export { LogicState } from "./logic-state";
 
-export { EphemeralState } from "./ephemeral-state";
+export { ActorState } from "./actor-state";
 
 export {
     AbstractAccessor,
