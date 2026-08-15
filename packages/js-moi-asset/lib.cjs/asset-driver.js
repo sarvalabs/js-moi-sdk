@@ -11,27 +11,27 @@ const state_1 = require("./state");
  */
 class AssetDriver extends asset_descriptor_1.AssetDescriptor {
     routines = {};
-    persistentState;
-    ephemeralState;
+    logicState;
+    actorState;
     constructor(assetId, manifest, arg) {
         super(assetId, manifest, arg);
         this.createState();
         this.createRoutines();
     }
     /**
-     * Creates the persistent and ephemeral states for the asset driver,
+     * Creates the logic and actor states for the asset driver,
      if available in logic manifest.
      */
     createState() {
-        const hasPersistance = this.stateMatrix.persistent();
-        const hasEphemeral = this.stateMatrix.ephemeral();
-        if (hasPersistance) {
-            const persistentState = new state_1.PersistentState(this, this.provider);
-            (0, js_moi_utils_1.defineReadOnly)(this, "persistentState", persistentState);
+        const hasLogicState = this.stateMatrix.logic();
+        const hasActorState = this.stateMatrix.actor();
+        if (hasLogicState) {
+            const logicState = new state_1.LogicState(this, this.provider);
+            (0, js_moi_utils_1.defineReadOnly)(this, "logicState", logicState);
         }
-        if (hasEphemeral) {
-            const ephemeralState = new state_1.EphemeralState(this, this.provider);
-            (0, js_moi_utils_1.defineReadOnly)(this, "ephemeralState", ephemeralState);
+        if (hasActorState) {
+            const actorState = new state_1.ActorState(this, this.provider);
+            (0, js_moi_utils_1.defineReadOnly)(this, "actorState", actorState);
         }
     }
     /**

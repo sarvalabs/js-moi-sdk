@@ -4,9 +4,10 @@ import { documentEncode, Schema } from "js-polo";
 import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
 import { Signer } from "js-moi-signer";
 import { AssetActionPayload, AssetCreatePayload, IxParticipant, Sender } from "js-moi-providers";
-import { DEFAULT_NEW_ACCOUNT_FUNDING, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
+import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
-import { predictAssetId } from "js-moi-identifiers";
+import { deriveAssetId } from "js-moi-identifiers";
+import { RoutineOption } from "js-moi-logic";
 import { SET_DYNAMIC_TOKEN_METADATA_SCHEMA } from "./mas1-schema";
 
 export class MAS2AssetLogic {
@@ -26,10 +27,11 @@ export class MAS2AssetLogic {
 
     static async newAsset(
         signer: Signer,
-        symbol: string, supply: number | bigint, manager: string, 
-        enableEvents: boolean, 
+        symbol: string, supply: number | bigint, manager: string,
+        enableEvents: boolean,
+        option?: RoutineOption,
     ): Promise<MAS2AssetLogic> {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents).send()
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, option).send()
 
         const results = await response.result()
 
@@ -38,8 +40,9 @@ export class MAS2AssetLogic {
 
     static create(
         signer: Signer,
-        symbol: string, supply: number | bigint, manager: string, 
+        symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
+        option?: RoutineOption,
     ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
             symbol: symbol,
@@ -61,15 +64,15 @@ export class MAS2AssetLogic {
               signer: signer,
               // A newly created asset self-pays for its own storage the moment it's
               // created, and a fresh account holds no KMOI - bundle a funding transfer
-              // to the predicted asset id, same as AssetFactory.create(). See
-              // predictAssetId's docs for why this must mirror go-moi's id derivation
+              // to the derived asset id, same as AssetFactory.create(). See
+              // deriveAssetId's docs for why this must mirror the blockchain's id derivation
               // exactly - a wrong prediction sends funds to the wrong account.
-              extraOperations: (sender: Sender) => {
-                const assetId = predictAssetId(sender, payload.standard);
+              fundingOperations: (sender: Sender) => {
+                const assetId = deriveAssetId(sender, payload.standard);
                 const transfer: AssetActionPayload = buildTransferPayload(
                     KMOI_ASSET_ID,
                     assetId.toHex(),
-                    DEFAULT_NEW_ACCOUNT_FUNDING
+                    option?.storageFund ?? DEFAULT_STORAGE_FUND
                 );
 
                 return [{ type: OpType.ASSET_INVOKE, payload: transfer }];

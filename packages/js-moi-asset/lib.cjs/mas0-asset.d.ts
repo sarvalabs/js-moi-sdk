@@ -1,13 +1,14 @@
 import { OpType } from "js-moi-utils";
 import { Signer } from "js-moi-signer";
 import { InteractionContext } from "js-moi-interactions";
+import { RoutineOption } from "js-moi-logic";
 export declare class MAS0AssetLogic {
     assetId: string;
     signer: Signer;
     constructor(assetId: string, signer: Signer);
     private polorize;
-    static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean): Promise<MAS0AssetLogic>;
-    static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean): InteractionContext<OpType.ASSET_CREATE>;
+    static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption): Promise<MAS0AssetLogic>;
+    static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption): InteractionContext<OpType.ASSET_CREATE>;
     mint(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     mintWithMetadata(beneficiary: string, amount: number | bigint, staticMetadata: Record<string, Uint8Array>): InteractionContext<OpType.ASSET_INVOKE>;
     burn(amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;

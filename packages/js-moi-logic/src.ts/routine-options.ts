@@ -13,7 +13,7 @@ interface IRoutineOption {
      * brand-new account needs funds the moment it's created or the deploy
      * reverts. Only meaningful for LogicFactory.deploy() / AssetFactory.create().
      */
-    fundNewAccount?: number | bigint;
+    storageFund?: number | bigint;
 }
 
 export class RoutineOption implements IRoutineOption {
@@ -22,7 +22,7 @@ export class RoutineOption implements IRoutineOption {
     public fuelLimit?: number;
     public fuelPrice?: number;
     public participants?: IxParticipant[];
-    public fundNewAccount?: number | bigint;
+    public storageFund?: number | bigint;
 
     constructor(options: IRoutineOption = {}) {
         const keys = Object.keys(options) as Array<keyof IRoutineOption>

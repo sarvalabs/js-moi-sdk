@@ -22,12 +22,12 @@ const SENDER: Hex = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed0
 const LOGIC: Hex = "0x208300005edd2b54c4b613883b3eaf5d52d22d185e1d001a023e3f7800000000";
 const OTHER: Hex = "0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000";
 
-const FAKE_SENDER: Hex = `0x${"ab".repeat(32)}`;
-const FAKE_LOGIC: Hex = `0x${"cd".repeat(32)}`;
-const FAKE_OTHER: Hex = `0x${"ef".repeat(32)}`;
+const TEST_SENDER: Hex = `0x${"ab".repeat(32)}`;
+const TEST_LOGIC: Hex = `0x${"cd".repeat(32)}`;
+const TEST_OTHER: Hex = `0x${"ef".repeat(32)}`;
 
 const makeIx = (ops: any[]): InteractionObject => ({
-    sender: { id: FAKE_SENDER, sequence: 0, key_id: 0 },
+    sender: { id: TEST_SENDER, sequence: 0, key_id: 0 },
     fuel_price: 1,
     fuel_limit: 200,
     ix_operations: ops as InteractionObject["ix_operations"],
@@ -39,49 +39,49 @@ const TRANSFER_LIKE_SCHEMA = { kind: "struct", fields: { beneficiary: { kind: "b
 
 describe("validateStorageDeposit", () => {
     test("accepts a valid deposit payload", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, deposit_for: FAKE_SENDER, amount: 1000 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 1000 };
         expect(() => validateStorageDeposit(payload)).not.toThrow();
     });
 
     test("throws when target_account is empty", () => {
-        const payload = { target_account: "" as Hex, deposit_for: FAKE_SENDER, amount: 1000 };
+        const payload = { target_account: "" as Hex, deposit_for: TEST_SENDER, amount: 1000 };
         expect(() => validateStorageDeposit(payload)).toThrow("target_account");
     });
 
     test("throws when deposit_for is missing", () => {
-        const payload = { target_account: FAKE_LOGIC, amount: 1000 } as StoragePayload;
+        const payload = { target_account: TEST_LOGIC, amount: 1000 } as StoragePayload;
         expect(() => validateStorageDeposit(payload)).toThrow("deposit_for");
     });
 
     test("throws when amount is missing", () => {
-        const payload = { target_account: FAKE_LOGIC, deposit_for: FAKE_SENDER } as StoragePayload;
+        const payload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER } as StoragePayload;
         expect(() => validateStorageDeposit(payload)).toThrow("amount");
     });
 
     test("throws when amount is zero", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, deposit_for: FAKE_SENDER, amount: 0 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 0 };
         expect(() => validateStorageDeposit(payload)).toThrow("amount");
     });
 
     test("throws when amount is negative", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, deposit_for: FAKE_SENDER, amount: -1 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: -1 };
         expect(() => validateStorageDeposit(payload)).toThrow("amount");
     });
 
     test("accepts a bigint amount", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, deposit_for: FAKE_SENDER, amount: 1000n };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 1000n };
         expect(() => validateStorageDeposit(payload)).not.toThrow();
     });
 });
 
 describe("validateStorageWithdraw", () => {
     test("accepts a valid withdraw payload", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, bytes_to_release: 500 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, bytes_to_release: 500 };
         expect(() => validateStorageWithdraw(payload)).not.toThrow();
     });
 
     test("accepts bytes_to_release of 0 (release everything available)", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, bytes_to_release: 0 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, bytes_to_release: 0 };
         expect(() => validateStorageWithdraw(payload)).not.toThrow();
     });
 
@@ -91,12 +91,12 @@ describe("validateStorageWithdraw", () => {
     });
 
     test("accepts a missing bytes_to_release (releases everything available)", () => {
-        const payload = { target_account: FAKE_LOGIC } as StoragePayload;
+        const payload = { target_account: TEST_LOGIC } as StoragePayload;
         expect(() => validateStorageWithdraw(payload)).not.toThrow();
     });
 
     test("throws when bytes_to_release is negative", () => {
-        const payload: StoragePayload = { target_account: FAKE_LOGIC, bytes_to_release: -1 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, bytes_to_release: -1 };
         expect(() => validateStorageWithdraw(payload)).toThrow("bytes_to_release");
     });
 });
@@ -107,7 +107,7 @@ describe("validateCallerConstraint", () => {
     });
 
     test("accepts CallerKind.SET with a non-empty set", () => {
-        expect(() => validateCallerConstraint({ kind: CallerKind.SET, set: [FAKE_OTHER] }, "caller")).not.toThrow();
+        expect(() => validateCallerConstraint({ kind: CallerKind.SET, set: [TEST_OTHER] }, "caller")).not.toThrow();
     });
 
     test("throws when CallerKind.SET has an empty set", () => {
@@ -129,7 +129,7 @@ describe("validateAccessPolicy", () => {
     test("accepts a valid storage policy", () => {
         const policy = {
             resource: ResourceType.STORAGE,
-            resource_id: FAKE_LOGIC,
+            resource_id: TEST_LOGIC,
             actions: AccessAction.STORAGE_MUTATE,
             caller: anyConstraint,
             origin: anyConstraint,
@@ -140,7 +140,7 @@ describe("validateAccessPolicy", () => {
     test("throws for a non-storage resource type", () => {
         const policy = {
             resource: ResourceType.ASSET,
-            resource_id: FAKE_LOGIC,
+            resource_id: TEST_LOGIC,
             actions: AccessAction.STORAGE_MUTATE,
             caller: anyConstraint,
             origin: anyConstraint,
@@ -162,7 +162,7 @@ describe("validateAccessPolicy", () => {
     test("throws when actions is zero", () => {
         const policy = {
             resource: ResourceType.STORAGE,
-            resource_id: FAKE_LOGIC,
+            resource_id: TEST_LOGIC,
             actions: 0,
             caller: anyConstraint,
             origin: anyConstraint,
@@ -173,7 +173,7 @@ describe("validateAccessPolicy", () => {
     test("throws when caller constraint is invalid", () => {
         const policy = {
             resource: ResourceType.STORAGE,
-            resource_id: FAKE_LOGIC,
+            resource_id: TEST_LOGIC,
             actions: AccessAction.STORAGE_MUTATE,
             caller: { kind: CallerKind.SET, set: [] },
             origin: anyConstraint,
@@ -195,53 +195,53 @@ describe("validateAccessCreateOrUpdate", () => {
 
 describe("validateAccessDelete", () => {
     test("accepts a valid delete payload", () => {
-        const payload: AccessDeletePayload = { target_account: FAKE_LOGIC, resource: ResourceType.STORAGE, resource_id: FAKE_LOGIC };
+        const payload: AccessDeletePayload = { target_account: TEST_LOGIC, resource: ResourceType.STORAGE, resource_id: TEST_LOGIC };
         expect(() => validateAccessDelete(payload)).not.toThrow();
     });
 
     test("throws when target_account is empty", () => {
-        const payload = { target_account: "" as Hex, resource: ResourceType.STORAGE, resource_id: FAKE_LOGIC };
+        const payload = { target_account: "" as Hex, resource: ResourceType.STORAGE, resource_id: TEST_LOGIC };
         expect(() => validateAccessDelete(payload)).toThrow("target_account");
     });
 
     test("throws when resource is missing", () => {
-        const payload = { target_account: FAKE_LOGIC, resource_id: FAKE_LOGIC } as AccessDeletePayload;
+        const payload = { target_account: TEST_LOGIC, resource_id: TEST_LOGIC } as AccessDeletePayload;
         expect(() => validateAccessDelete(payload)).toThrow("resource");
     });
 
     test("throws when resource_id is empty", () => {
-        const payload = { target_account: FAKE_LOGIC, resource: ResourceType.STORAGE, resource_id: "" as Hex };
+        const payload = { target_account: TEST_LOGIC, resource: ResourceType.STORAGE, resource_id: "" as Hex };
         expect(() => validateAccessDelete(payload)).toThrow("resource_id");
     });
 });
 
 describe("processInteractionObject - participant derivation for the new ops", () => {
     test("STORAGE_DEPOSIT adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.STORAGE_DEPOSIT, payload: { target_account: FAKE_LOGIC, deposit_for: FAKE_SENDER, amount: 1000 } }]);
+        const ix = makeIx([{ type: OpType.STORAGE_DEPOSIT, payload: { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 1000 } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: FAKE_LOGIC, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
     });
 
     test("STORAGE_WITHDRAW adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.STORAGE_WITHDRAW, payload: { target_account: FAKE_LOGIC, bytes_to_release: 0 } }]);
+        const ix = makeIx([{ type: OpType.STORAGE_WITHDRAW, payload: { target_account: TEST_LOGIC, bytes_to_release: 0 } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: FAKE_LOGIC, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
     });
 
     test("ACCESS_CREATE adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.ACCESS_CREATE, payload: { target_account: FAKE_SENDER, access_policy: {} } }]);
+        const ix = makeIx([{ type: OpType.ACCESS_CREATE, payload: { target_account: TEST_SENDER, access_policy: {} } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: FAKE_SENDER, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_SENDER, lock_type: LockType.MUTATE_LOCK });
     });
 
     test("ACCESS_DELETE adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.ACCESS_DELETE, payload: { target_account: FAKE_SENDER, resource: ResourceType.STORAGE, resource_id: FAKE_LOGIC } }]);
+        const ix = makeIx([{ type: OpType.ACCESS_DELETE, payload: { target_account: TEST_SENDER, resource: ResourceType.STORAGE, resource_id: TEST_LOGIC } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: FAKE_SENDER, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_SENDER, lock_type: LockType.MUTATE_LOCK });
     });
 });
 

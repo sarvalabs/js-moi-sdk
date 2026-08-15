@@ -17,7 +17,7 @@ import {
     InteractionRequest, InteractionResponse,
     NodeInfo,
     Options,
-    Registry, RPCAccessPolicy, RPCStorageMetric, RPCStorageParams,
+    Registry, AccessPolicyInfo, StorageMetric, StoragePricing,
     Status,
     SyncStatus,
     TDU,
@@ -64,10 +64,10 @@ export abstract class AbstractProvider extends EventEmitter {
 
     // Query Methods
     abstract getAssetInfoByAssetID(assetId: string, options?: Options): Promise<AssetInfo>
-    abstract getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<RPCStorageMetric>
-    abstract getStoragePricing(): Promise<RPCStorageParams>
-    abstract getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<RPCAccessPolicy>
-    abstract getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<RPCAccessPolicy[]>
+    abstract getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<StorageMetric>
+    abstract getStoragePricing(): Promise<StoragePricing>
+    abstract getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<AccessPolicyInfo>
+    abstract getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<AccessPolicyInfo[]>
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>
     abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>
     abstract getStorageAt(logicId: string, storageKey: string, id: string, options?: Options): Promise<string>

@@ -167,11 +167,13 @@ AssetFactory
       :param str manager: The manager or owner address (in Hex format).
       :param bool enableEvents: Whether to enable event emission for the asset.
       :param LogicManifest.Manifest manifest: Logic manifest for the custom asset logic being deployed.
-      :param str callsite: Routine name in the manifest corresponding to the deploy logic.
+      :param str callsite: (Optional) Routine name in the manifest corresponding to the deploy logic. Required if the manifest defines any deploy routine at all - only omit it for a manifest with none.
       :param list calldata: (Optional) Additional initialization arguments for the deploy routine, optionally ending with a :class:`RoutineOption`.
       :returns: An :class:`InteractionContext` configured for asset creation.
       :rtype: InteractionContext<OpType.ASSET_CREATE>
-      :throws: If no deploy routine in ``manifest`` matches ``callsite``, or required calldata arguments are missing.
+      :throws: If ``callsite`` is omitted but ``manifest`` defines one or more deploy routines,
+         if no deploy routine in ``manifest`` matches a given ``callsite``, or if required
+         calldata arguments are missing.
 
       **Logic**
 
@@ -179,16 +181,20 @@ AssetFactory
          ``standard`` (always ``AssetStandard.MASX``), ``dimension`` (default 0),
          ``enable_events``, and ``manager`` (converted to Hex).
 
-      2. Finds the *deploy* routine in ``manifest`` matching ``callsite``, validates the
+      2. **``callsite`` is only optional when the manifest has nothing to call.** Mirrors
+         the blockchain's ``DeployLogic``: a deployer call is skipped entirely only if the manifest
+         defines *no* deploy routine at all. If it defines one or more, ``callsite`` is
+         required to pick one - an omitted callsite is rejected the same as a mismatched one.
+         When a ``callsite`` is given, finds the matching deploy routine, validates the
          calldata argument count against it, then encodes the manifest and deploy calldata
          into ``logic_payload``.
 
       3. **Bundles a funding transfer automatically.** A brand-new asset account self-pays for
          its own creation-time storage cost, and a fresh account holds no KMOI. ``create()``
-         predicts the new asset's id (:func:`predictAssetId`) and bundles a second
+         derives the new asset's id (:func:`deriveAssetId`) and bundles a second
          ``ASSET_INVOKE`` "Transfer" op funding it, in the same interaction - without this the
-         create reverts. The funded amount defaults to ``DEFAULT_NEW_ACCOUNT_FUNDING``; override
-         it by passing a :class:`RoutineOption` with ``fundNewAccount`` set as the last
+         create reverts. The funded amount defaults to ``DEFAULT_STORAGE_FUND``; override
+         it by passing a :class:`RoutineOption` with ``storageFund`` set as the last
          ``calldata`` argument.
 
       4. Returns an :class:`InteractionContext` initialized for ``ASSET_CREATE``.
@@ -228,7 +234,7 @@ AssetFactory
         const ctx = AssetFactory.create(
              signer, "GOLD", 1000000n, managerAddress, true,
              manifest, callsite, 1000, "JOHN",
-             createRoutineOption({ fundNewAccount: 50000 })
+             createRoutineOption({ storageFund: 50000 })
         );
 
         const response = await ctx.send();
@@ -291,11 +297,12 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents)
+   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option)
 
       Creates a new MAS0-standard asset on-chain, then returns an instance
       of :class:`MAS0AssetLogic` for interacting with it.
 
+      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :returns: An instance of :class:`MAS0AssetLogic`
       :rtype: MAS0AssetLogic
 
@@ -311,13 +318,15 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
              true
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, option)
 
       Builds an :class:`InteractionContext` for creating a MAS0-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
-      predicted new asset id (funded at ``DEFAULT_NEW_ACCOUNT_FUNDING``) - a fresh asset
-      account self-pays for its own creation-time storage cost and starts with no KMOI.
+      derived new asset id (funded at ``DEFAULT_STORAGE_FUND`` by default, override via
+      ``option.storageFund``) - a fresh asset account self-pays for its own
+      creation-time storage cost and starts with no KMOI.
 
+      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
 
@@ -624,11 +633,14 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents)
+   .. method:: static async newAsset(signer, symbol, manager, enableEvents, option)
 
       Creates a new MAS1-standard asset on-chain, then returns an instance
-      of :class:`MAS1AssetLogic` for interacting with it.
+      of :class:`MAS1AssetLogic` for interacting with it. MAS1 is single-unit
+      (NFT-like) - unlike MAS0/MAS2 there is no ``supply`` parameter, ``max_supply``
+      is always 1.
 
+      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :returns: An instance of :class:`MAS1AssetLogic`
       :rtype: MAS1AssetLogic
 
@@ -639,18 +651,19 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
          const gold = await MAS1AssetLogic.newAsset(
              signer,
              "GOLD",
-             1000000n,
              managerAddress,
              true
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents)
+   .. method:: static create(signer, symbol, manager, enableEvents, option)
 
       Builds an :class:`InteractionContext` for creating a MAS1-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
-      predicted new asset id (funded at ``DEFAULT_NEW_ACCOUNT_FUNDING``) - a fresh asset
-      account self-pays for its own creation-time storage cost and starts with no KMOI.
+      derived new asset id (funded at ``DEFAULT_STORAGE_FUND`` by default, override via
+      ``option.storageFund``) - a fresh asset account self-pays for its own
+      creation-time storage cost and starts with no KMOI.
 
+      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
 
@@ -991,11 +1004,12 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents)
+   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option)
 
       Creates a new MAS2-standard asset on-chain, then returns an instance
       of :class:`MAS2AssetLogic` for interacting with it.
 
+      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :returns: An instance of :class:`MAS2AssetLogic`
       :rtype: MAS2AssetLogic
 
@@ -1011,13 +1025,15 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
              true
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, option)
 
       Builds an :class:`InteractionContext` for creating a MAS2-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
-      predicted new asset id (funded at ``DEFAULT_NEW_ACCOUNT_FUNDING``) - a fresh asset
-      account self-pays for its own creation-time storage cost and starts with no KMOI.
+      derived new asset id (funded at ``DEFAULT_STORAGE_FUND`` by default, override via
+      ``option.storageFund``) - a fresh asset account self-pays for its own
+      creation-time storage cost and starts with no KMOI.
 
+      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
 
@@ -1716,9 +1732,9 @@ provides information about a logic.
 
 .. autofunction:: LogicDescriptor#isStateful
 
-.. autofunction:: LogicDescriptor#hasPersistentState
+.. autofunction:: LogicDescriptor#hasLogicState
 
-.. autofunction:: LogicDescriptor#hasEphemeralState
+.. autofunction:: LogicDescriptor#hasActorState
 
 Logic Factory
 ^^^^^^^^^^^^^
@@ -1777,9 +1793,9 @@ applications on the MOI network.
 
 **Deploying automatically funds the new logic account.** A brand-new logic self-pays for its
 own creation-time storage cost, and a fresh account holds no KMOI - so ``deploy()`` predicts the
-logic's id (:func:`predictLogicId`) and bundles a second ``ASSET_INVOKE`` "Transfer" op funding
+logic's id (:func:`deriveLogicId`) and bundles a second ``ASSET_INVOKE`` "Transfer" op funding
 it, in the same interaction. This is unconditional and needs no setup on your part; the funded
-amount defaults to ``DEFAULT_NEW_ACCOUNT_FUNDING`` (from ``js-moi-constants``) and only needs
+amount defaults to ``DEFAULT_STORAGE_FUND`` (from ``js-moi-constants``) and only needs
 overriding for a manifest whose deploy routine writes more than that default covers.
 
 If you wish to pass ``fuelLimit``, ``fuelPrice``, or override the funding amount, pass a
@@ -1799,7 +1815,7 @@ since only a real ``RoutineOption`` instance is recognized.
     const option = createRoutineOption({
         fuelPrice: 1,
         fuelLimit: 6420,
-        fundNewAccount: 50000, // override the default new-account funding amount
+        storageFund: 50000, // override the default new-account funding amount
     });
 
     const response = await factory.deploy("Seed!", symbol, supply, option).send();
@@ -1856,18 +1872,19 @@ involved.
 
 The same applies to a read-only ``.call()`` against another participant's storage.
 
-``persistentState`` - The persistent state variable provides access to enduring
-state associated with the logic. This state persists across different 
-invocations and interactions, defining core attributes and long-term data.
+``logicState`` - The logic state variable provides access to state declared
+``state logic:`` in the manifest - shared/global to the logic itself (not the
+caller). This state persists across different invocations and interactions,
+defining core attributes and long-term data.
 
  It contains the following method:
 
-* ``get`` 
-    This method retrieves a value from persistent state using the storage key. 
-    A builder object is passed to a callback to generate the storage key. The 
+* ``get``
+    This method retrieves a value from logic state using the storage key.
+    A builder object is passed to a callback to generate the storage key. The
     builder object offers the following methods:
 
-    * ``entity`` - This method used to select the member of the state persistent.
+    * ``entity`` - This method used to select the member of the logic state.
     * ``length`` - This method used to access length/size of `Array`, `Varray` and, `Map`.
     * ``property`` - This method used to access the property of map using the passed key.
     * ``at`` - This method used to access the element of `Array` and `Varray` using the passed index.
@@ -1878,7 +1895,7 @@ invocations and interactions, defining core attributes and long-term data.
     // Example
     const logic = await getLogicDriver(logicId, wallet);
 
-    const symbol = await logic.persistentState.get(access => access.entity("symbol"));
+    const symbol = await logic.logicState.get(access => access.entity("symbol"));
     console.log(symbol);
 
     >> MOI
@@ -1888,7 +1905,7 @@ invocations and interactions, defining core attributes and long-term data.
     // Example: if you want to access size of the array/map
     const logic = await getLogicDriver(logicId, wallet);
 
-    const length = await logic.persistentState.get(access => access.entity("persons").length());
+    const length = await logic.logicState.get(access => access.entity("persons").length());
     console.log(length);
 
     >> 10
@@ -1899,7 +1916,7 @@ invocations and interactions, defining core attributes and long-term data.
     const logic = await getLogicDriver(logicId, wallet);
     const address = "0x035dcdaa46f9b8984803b1105d8f327aef97de58481a5d3fea447735cee28fdc";
 
-    const balance = await logic.persistentState.get(access => access.entity("Balances").property(hexToBytes(address)));
+    const balance = await logic.logicState.get(access => access.entity("Balances").property(hexToBytes(address)));
     console.log(balance);
 
     >> 10000
@@ -1909,7 +1926,7 @@ invocations and interactions, defining core attributes and long-term data.
     // Example: if you want to field of the class
     const logic = await getLogicDriver(logicId, wallet);
 
-    const name = await logic.persistentState.get(access => access.entity("persons").field("name"));
+    const name = await logic.logicState.get(access => access.entity("persons").field("name"));
     console.log(name);
 
     >> Alice
@@ -1919,25 +1936,26 @@ invocations and interactions, defining core attributes and long-term data.
     // Example: if you want to access the element of the array
     const logic = await getLogicDriver(logicId, wallet);
 
-    const product = await logic.persistentState.get(access => access.entity("Products").at(0));
+    const product = await logic.logicState.get(access => access.entity("Products").at(0));
     console.log(name);
 
     >> Chocolate
 
-``ephemeralState`` - The ephemeral state variable provides access to transient 
-state associated directly with a participant. This state reflects the state of 
-a participant and can change frequently as interactions occur.
+``actorState`` - The actor state variable provides access to state declared
+``state actor:`` in the manifest - scoped per calling participant (not
+shared/global). This state reflects the calling participant's own state and
+can change frequently as interactions occur.
 
  It contains the following method:
 
-* ``get`` 
-    This method retrieves a value from ephemeral state using the storage key 
+* ``get``
+    This method retrieves a value from actor state using the storage key
     and participant address.
 
-    **Usage**: Similar to persistent state, the get method takes a callback function.
-    In addition to that, it also requires a participant address. The builder 
-    object within the callback defines how to access the state, similar to 
-    persistent state.
+    **Usage**: Similar to logic state, the get method takes a callback function.
+    In addition to that, it also requires a participant address. The builder
+    object within the callback defines how to access the state, similar to
+    logic state.
 
 .. code-block:: javascript
 
@@ -1945,7 +1963,7 @@ a participant and can change frequently as interactions occur.
     const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df"
     const logic = await getLogicDriver(logicId, wallet);
 
-    const spendable = await logic.ephemeralState.get(address, (access) => 
+    const spendable = await logic.actorState.get(address, (access) => 
         access.entity("Spendable")
     );
     console.log(spendable);
@@ -2009,7 +2027,7 @@ a participant and can change frequently as interactions occur.
     const logic = await getLogicDriver(logicId, wallet);
 
     // Get the persistent state
-    const symbol = await logic.persistentState.get(access => access.entity("symbol"));
+    const symbol = await logic.logicState.get(access => access.entity("symbol"));
 
     console.log(symbol); // MOI
 

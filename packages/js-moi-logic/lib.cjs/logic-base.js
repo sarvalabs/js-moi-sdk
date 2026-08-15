@@ -90,7 +90,7 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             // A newly deployed logic self-pays for its own account-creation storage cost
             // (billed against its own, currently-zero balance) the moment it's created,
             // so it needs funds bundled into the same interaction or the deploy reverts.
-            // See predictLogicId's docs for why this must mirror go-moi's id derivation
+            // See deriveLogicId's docs for why this must mirror the blockchain's id derivation
             // exactly - a wrong prediction sends funds to the wrong account.
             //
             // Note: this covers self-pay account-creation cost only. If the manifest's
@@ -101,9 +101,9 @@ class LogicBase extends js_moi_manifest_1.ElementDescriptor {
             // same interaction, because the target account doesn't exist yet when
             // participants are resolved. Manifests intended to be deployable standalone
             // should declare `payer Logic` on any state their deploy routine writes.
-            ctx.extraOperations = (sender) => {
-                const logicId = (0, js_moi_identifiers_1.predictLogicId)(sender);
-                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, logicId.toHex(), option.fundNewAccount ?? js_moi_constants_1.DEFAULT_NEW_ACCOUNT_FUNDING);
+            ctx.fundingOperations = (sender) => {
+                const logicId = (0, js_moi_identifiers_1.deriveLogicId)(sender);
+                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, logicId.toHex(), option.storageFund ?? js_moi_constants_1.DEFAULT_STORAGE_FUND);
                 return [{ type: js_moi_utils_1.OpType.ASSET_INVOKE, payload: transfer }];
             };
         }

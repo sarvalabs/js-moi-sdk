@@ -1,4 +1,4 @@
-import { newAccountFingerprint, predictAssetId, predictLogicId, type AccountIdSender } from "../src.ts";
+import { newAccountFingerprint, deriveAssetId, deriveLogicId, type AccountIdSender } from "../src.ts";
 
 const SENDER: AccountIdSender = {
     id: "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000",
@@ -39,42 +39,42 @@ describe(newAccountFingerprint, () => {
     });
 });
 
-describe(predictLogicId, () => {
+describe(deriveLogicId, () => {
     it.concurrent("produces a valid v0 logic id with the expected byte layout", () => {
-        const logicId = predictLogicId(SENDER);
+        const logicId = deriveLogicId(SENDER);
         const bytes = logicId.toBytes();
 
         expect(bytes[0]).toBe(0x20); // LogicTagV0
-        expect(bytes[1]).toBe(0x00); // flags: always empty per go-moi's LogicPayload.Flags()
+        expect(bytes[1]).toBe(0x00); // flags: always empty per the blockchain's LogicPayload.Flags()
         expect(logicId.getVariant()).toBe(0);
         expect(logicId.getFingerprint()).toEqual(newAccountFingerprint(SENDER));
     });
 
     it.concurrent("is deterministic for the same sender", () => {
-        expect(predictLogicId(SENDER).toHex()).toBe(predictLogicId({ ...SENDER }).toHex());
+        expect(deriveLogicId(SENDER).toHex()).toBe(deriveLogicId({ ...SENDER }).toHex());
     });
 
     it.concurrent("differs for a different sequence", () => {
-        expect(predictLogicId(SENDER).toHex()).not.toBe(predictLogicId({ ...SENDER, sequence: 1 }).toHex());
+        expect(deriveLogicId(SENDER).toHex()).not.toBe(deriveLogicId({ ...SENDER, sequence: 1 }).toHex());
     });
 });
 
-describe(predictAssetId, () => {
+describe(deriveAssetId, () => {
     it.concurrent("produces a valid v0 asset id with the expected byte layout", () => {
-        const assetId = predictAssetId(SENDER, 2);
+        const assetId = deriveAssetId(SENDER, 2);
         const bytes = assetId.toBytes();
 
         expect(bytes[0]).toBe(0x10); // AssetTagV0
-        expect(bytes[1]).toBe(0x03); // flags: AssetLogical | AssetStateful, always set per go-moi
+        expect(bytes[1]).toBe(0x03); // flags: AssetLogical | AssetStateful, always set per the blockchain
         expect(assetId.getStandard()).toBe(2);
         expect(assetId.getFingerprint()).toEqual(newAccountFingerprint(SENDER));
     });
 
     it.concurrent("is deterministic for the same sender and standard", () => {
-        expect(predictAssetId(SENDER, 0).toHex()).toBe(predictAssetId({ ...SENDER }, 0).toHex());
+        expect(deriveAssetId(SENDER, 0).toHex()).toBe(deriveAssetId({ ...SENDER }, 0).toHex());
     });
 
     it.concurrent("differs for a different standard", () => {
-        expect(predictAssetId(SENDER, 0).toHex()).not.toBe(predictAssetId(SENDER, 1).toHex());
+        expect(deriveAssetId(SENDER, 0).toHex()).not.toBe(deriveAssetId(SENDER, 1).toHex());
     });
 });

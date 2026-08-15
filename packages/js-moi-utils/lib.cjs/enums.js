@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Chain = exports.InteractionStatus = exports.ElementType = exports.RoutineType = exports.RoutineKind = exports.LogicState = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.CallerKind = exports.AccessAction = exports.ResourceType = exports.OpType = exports.AssetStandard = void 0;
+exports.Chain = exports.InteractionStatus = exports.ElementType = exports.RoutineType = exports.EngineKind = exports.OperationStatus = exports.ReceiptStatus = exports.AccountType = exports.LockType = exports.CallerKind = exports.AccessAction = exports.ResourceType = exports.OpType = exports.AssetStandard = void 0;
 /**
  * Enumerates the standard of assets in the system.
  * MAS is moi asset standard.
@@ -108,19 +108,6 @@ var EngineKind;
     EngineKind["PISA"] = "PISA";
     EngineKind["MERU"] = "MERU";
 })(EngineKind || (exports.EngineKind = EngineKind = {}));
-// Enumerates the types of logic state
-var LogicState;
-(function (LogicState) {
-    LogicState["PERSISTENT"] = "persistent";
-    LogicState["EPHEMERAL"] = "ephemeral";
-})(LogicState || (exports.LogicState = LogicState = {}));
-// Enumerates the kind of routine
-var RoutineKind;
-(function (RoutineKind) {
-    RoutineKind["PERSISTENT"] = "persistent";
-    RoutineKind["EPHEMERAL"] = "ephemeral";
-    RoutineKind["READ_ONLY"] = "readonly";
-})(RoutineKind || (exports.RoutineKind = RoutineKind = {}));
 // Enumerates the types of routine
 var RoutineType;
 (function (RoutineType) {

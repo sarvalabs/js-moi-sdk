@@ -8,19 +8,19 @@ const js_polo_1 = require("js-polo");
 const secp256k1_1 = require("@noble/secp256k1");
 const validateKeyAdd = (key, index) => {
     if (typeof key.public_key !== "string" || key.public_key.length === 0) {
-        throw new Error("public key must be a non-empty hex string");
+        throw new Error(`keys[${index}]: public key must be a non-empty hex string`);
     }
     if (typeof key.weight !== "number" || key.weight <= 0) {
-        throw new Error("weight must be a positive number");
+        throw new Error(`keys[${index}]: weight must be a positive number`);
     }
     if (key.signature_algorithm !== 0) {
-        throw new Error("signature algorithm must be 0");
+        throw new Error(`keys[${index}]: signature algorithm must be 0`);
     }
 };
 exports.validateKeyAdd = validateKeyAdd;
 const validateKeyRevoke = (key, index) => {
     if (typeof key.key_id !== "number" || key.key_id < 0) {
-        throw new Error("key id must be a non-negative number");
+        throw new Error(`keys[${index}]: key id must be a non-negative number`);
     }
     return key;
 };
@@ -123,8 +123,8 @@ const validateStorageDeposit = (payload) => {
     if (payload.amount == null || (typeof payload.amount !== "number" && typeof payload.amount !== "bigint")) {
         throw new Error("amount must be a number or bigint");
     }
-    if (payload.amount <= 0) {
-        throw new Error("amount must be greater than zero");
+    if (payload.amount < js_moi_constants_1.MIN_STORAGE_DEPOSIT_AMOUNT) {
+        throw new Error(`amount must be at least ${js_moi_constants_1.MIN_STORAGE_DEPOSIT_AMOUNT} (the blockchain's ANUPerByte * StorageMultiplier floor)`);
     }
 };
 exports.validateStorageDeposit = validateStorageDeposit;
@@ -268,9 +268,11 @@ const validateAssetCreate = (payload) => {
     if (typeof payload.manager !== "string" || payload.manager.length === 0) {
         throw new Error("manager must be a non-empty hex string");
     }
-    // max_supply: required non-negative number
-    if (typeof payload.max_supply !== "number" || payload.max_supply < 0) {
-        throw new Error("max_supply must be a non-negative number");
+    // max_supply: required non-negative number or bigint - AssetCreatePayload
+    // types it as `number | bigint` (large supplies overflow a safe number),
+    // and every documented usage passes a bigint literal (e.g. `1000000n`).
+    if ((typeof payload.max_supply !== "number" && typeof payload.max_supply !== "bigint") || payload.max_supply < 0) {
+        throw new Error("max_supply must be a non-negative number or bigint");
     }
     // static metadata: required object with arrays of non-empty hex strings
     if (payload.static_metadata) {

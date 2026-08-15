@@ -2,33 +2,33 @@ import { ManifestCoder } from "js-moi-manifest";
 import { ErrorCode, ErrorUtils, defineReadOnly } from "js-moi-utils";
 import { LogicDescriptor } from "./logic-descriptor";
 import { RoutineOption } from "./routine-options";
-import { EphemeralState, PersistentState } from "./state";
+import { ActorState, LogicState } from "./state";
 /**
  * Represents a logic driver that serves as an interface for interacting with logics.
  */
 export class LogicDriver extends LogicDescriptor {
     routines = {};
-    persistentState;
-    ephemeralState;
+    logicState;
+    actorState;
     constructor(logicId, manifest, arg) {
         super(logicId, manifest, arg);
         this.createState();
         this.createRoutines();
     }
     /**
-     * Creates the persistent and ephemeral states for the logic driver,
+     * Creates the logic and actor states for the logic driver,
      if available in logic manifest.
      */
     createState() {
-        const hasPersistance = this.stateMatrix.persistent();
-        const hasEphemeral = this.stateMatrix.ephemeral();
-        if (hasPersistance) {
-            const persistentState = new PersistentState(this, this.provider);
-            defineReadOnly(this, "persistentState", persistentState);
+        const hasLogicState = this.stateMatrix.logic();
+        const hasActorState = this.stateMatrix.actor();
+        if (hasLogicState) {
+            const logicState = new LogicState(this, this.provider);
+            defineReadOnly(this, "logicState", logicState);
         }
-        if (hasEphemeral) {
-            const ephemeralState = new EphemeralState(this, this.provider);
-            defineReadOnly(this, "ephemeralState", ephemeralState);
+        if (hasActorState) {
+            const actorState = new ActorState(this, this.provider);
+            defineReadOnly(this, "actorState", actorState);
         }
     }
     /**

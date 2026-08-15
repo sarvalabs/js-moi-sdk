@@ -110,19 +110,6 @@ export enum EngineKind {
     MERU = "MERU",
 }
 
-// Enumerates the types of logic state
-export enum LogicState {
-    PERSISTENT = "persistent",
-    EPHEMERAL = "ephemeral",
-}
-
-// Enumerates the kind of routine
-export enum RoutineKind {
-    PERSISTENT = "persistent",
-    EPHEMERAL = "ephemeral",
-    READ_ONLY = "readonly",
-}
-
 // Enumerates the types of routine
 export enum RoutineType {
     INVOKE = "invoke",

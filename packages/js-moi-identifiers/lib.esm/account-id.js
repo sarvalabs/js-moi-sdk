@@ -4,9 +4,9 @@ import { Identifier } from "./identifier";
 import { AssetTagV0, LogicTagV0 } from "./identifier-tag";
 import { LogicId } from "./logic-id";
 /**
- * Derives the 24-byte account fingerprint go-moi hashes into every new
+ * Derives the 24-byte account fingerprint the blockchain hashes into every new
  * logic/asset id: `blake2b256(BE64(sequence) || BE64(key_id) || id)[:24]`
- * (go-moi: `common.NewAccountID`).
+ * (mirrors the blockchain's `common.NewAccountID`).
  */
 export const newAccountFingerprint = (sender) => {
     const id = new Identifier(sender.id).toBytes();
@@ -30,28 +30,29 @@ const layoutIdentifierV0 = (tag, flags, metadata, fingerprint, variant) => {
     return buffer;
 };
 /**
- * Predicts the LogicID a fresh `IxLogicDeploy` from `sender` will produce,
- * before the deploy exists on-chain. Mirrors go-moi's
+ * Derives the LogicID a fresh `IxLogicDeploy` from `sender` will produce,
+ * before the deploy exists on-chain. Mirrors the blockchain's
  * `identifiers.GenerateLogicIDv0(NewAccountID(sender), 0)`.
  *
- * Flags are always 0: go-moi's `LogicPayload.Flags()` is currently a stub
- * that always returns an empty set (as of go-moi `feature/storage-cost`) -
- * update this if/when go-moi starts setting deploy-time logic flags.
+ * Flags are always 0: the blockchain's `LogicPayload.Flags()` is
+ * currently a stub that always returns an empty set (as of the
+ * storage-cost feature work) - update this if/when the blockchain starts
+ * setting deploy-time logic flags.
  */
-export const predictLogicId = (sender) => {
+export const deriveLogicId = (sender) => {
     const fingerprint = newAccountFingerprint(sender);
     return new LogicId(layoutIdentifierV0(LogicTagV0.value, 0x00, 0, fingerprint, 0));
 };
 /**
- * Predicts the AssetID a fresh `IxAssetCreate` from `sender` will produce,
- * before the create exists on-chain. Mirrors go-moi's
+ * Derives the AssetID a fresh `IxAssetCreate` from `sender` will produce,
+ * before the create exists on-chain. Mirrors the blockchain's
  * `identifiers.GenerateAssetIDv0(NewAccountID(sender), 0, standard)`.
  *
- * Flags are always `AssetLogical | AssetStateful` (0x03): go-moi's
- * `AssetCreatePayload.Flags()` returns that pair unconditionally, regardless
- * of the create payload's contents.
+ * Flags are always `AssetLogical | AssetStateful` (0x03): the blockchain's
+ * `AssetCreatePayload.Flags()` returns that pair unconditionally,
+ * regardless of the create payload's contents.
  */
-export const predictAssetId = (sender, standard) => {
+export const deriveAssetId = (sender, standard) => {
     const fingerprint = newAccountFingerprint(sender);
     return new AssetId(layoutIdentifierV0(AssetTagV0.value, 0x03, standard, fingerprint, 0));
 };

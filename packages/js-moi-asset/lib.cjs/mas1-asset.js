@@ -19,12 +19,12 @@ class MAS1AssetLogic {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, manager, enableEvents) {
-        const response = await this.create(signer, symbol, manager, enableEvents).send();
+    static async newAsset(signer, symbol, manager, enableEvents, option) {
+        const response = await this.create(signer, symbol, manager, enableEvents, option).send();
         const results = await response.result();
         return new MAS1AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, manager, enableEvents) {
+    static create(signer, symbol, manager, enableEvents, option) {
         const payload = {
             symbol: symbol,
             max_supply: 1,
@@ -44,12 +44,12 @@ class MAS1AssetLogic {
             signer: signer,
             // A newly created asset self-pays for its own storage the moment it's
             // created, and a fresh account holds no KMOI - bundle a funding transfer
-            // to the predicted asset id, same as AssetFactory.create(). See
-            // predictAssetId's docs for why this must mirror go-moi's id derivation
+            // to the derived asset id, same as AssetFactory.create(). See
+            // deriveAssetId's docs for why this must mirror the blockchain's id derivation
             // exactly - a wrong prediction sends funds to the wrong account.
-            extraOperations: (sender) => {
-                const assetId = (0, js_moi_identifiers_1.predictAssetId)(sender, payload.standard);
-                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, assetId.toHex(), js_moi_constants_1.DEFAULT_NEW_ACCOUNT_FUNDING);
+            fundingOperations: (sender) => {
+                const assetId = (0, js_moi_identifiers_1.deriveAssetId)(sender, payload.standard);
+                const transfer = (0, js_moi_interactions_1.buildTransferPayload)(js_moi_constants_1.KMOI_ASSET_ID, assetId.toHex(), option?.storageFund ?? js_moi_constants_1.DEFAULT_STORAGE_FUND);
                 return [{ type: js_moi_utils_1.OpType.ASSET_INVOKE, payload: transfer }];
             },
         });

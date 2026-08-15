@@ -105,19 +105,6 @@ export var EngineKind;
     EngineKind["PISA"] = "PISA";
     EngineKind["MERU"] = "MERU";
 })(EngineKind || (EngineKind = {}));
-// Enumerates the types of logic state
-export var LogicState;
-(function (LogicState) {
-    LogicState["PERSISTENT"] = "persistent";
-    LogicState["EPHEMERAL"] = "ephemeral";
-})(LogicState || (LogicState = {}));
-// Enumerates the kind of routine
-export var RoutineKind;
-(function (RoutineKind) {
-    RoutineKind["PERSISTENT"] = "persistent";
-    RoutineKind["EPHEMERAL"] = "ephemeral";
-    RoutineKind["READ_ONLY"] = "readonly";
-})(RoutineKind || (RoutineKind = {}));
 // Enumerates the types of routine
 export var RoutineType;
 (function (RoutineType) {

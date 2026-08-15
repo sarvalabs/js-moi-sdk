@@ -48,13 +48,15 @@ export interface IxContext<T extends AllowedOps> {
   participants: IxParticipant[];
   signer: Signer;
   /**
-   * Additional operations to bundle into the same interaction, alongside the
-   * primary op/payload above. Resolved lazily against the sender that will
+   * Bundles a funding transfer to a not-yet-existing account into the same
+   * interaction as the primary op/payload above (e.g. a new asset/logic
+   * account self-paying for its own creation-time storage cost, see
+   * AssetFactory.create()). Resolved lazily against the sender that will
    * actually sign the interaction (participant id + sequence + key id),
-   * since some bundled ops (e.g. funding a not-yet-existing account) depend
-   * on values only known once the sender is finalized.
+   * since the funded account's id can only be derived once the sender is
+   * finalized.
    */
-  extraOperations?: (sender: Sender) => AnyIxOperation[] | Promise<AnyIxOperation[]>;
+  fundingOperations?: (sender: Sender) => AnyIxOperation[] | Promise<AnyIxOperation[]>;
 }
 
 /**

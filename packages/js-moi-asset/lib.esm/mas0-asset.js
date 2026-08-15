@@ -2,9 +2,9 @@ import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType } from "js-moi-
 import { MAS0 } from "./mas0";
 import { documentEncode } from "js-polo";
 import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
-import { DEFAULT_NEW_ACCOUNT_FUNDING, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
+import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
-import { predictAssetId } from "js-moi-identifiers";
+import { deriveAssetId } from "js-moi-identifiers";
 export class MAS0AssetLogic {
     assetId;
     signer;
@@ -16,12 +16,12 @@ export class MAS0AssetLogic {
         const document = documentEncode(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, supply, manager, enableEvents) {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents).send();
+    static async newAsset(signer, symbol, supply, manager, enableEvents, option) {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, option).send();
         const results = await response.result();
         return new MAS0AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, supply, manager, enableEvents) {
+    static create(signer, symbol, supply, manager, enableEvents, option) {
         const payload = {
             symbol: symbol,
             max_supply: supply,
@@ -37,12 +37,12 @@ export class MAS0AssetLogic {
             signer: signer,
             // A newly created asset self-pays for its own storage the moment it's
             // created, and a fresh account holds no KMOI - bundle a funding transfer
-            // to the predicted asset id, same as AssetFactory.create(). See
-            // predictAssetId's docs for why this must mirror go-moi's id derivation
+            // to the derived asset id, same as AssetFactory.create(). See
+            // deriveAssetId's docs for why this must mirror the blockchain's id derivation
             // exactly - a wrong prediction sends funds to the wrong account.
-            extraOperations: (sender) => {
-                const assetId = predictAssetId(sender, payload.standard);
-                const transfer = buildTransferPayload(KMOI_ASSET_ID, assetId.toHex(), DEFAULT_NEW_ACCOUNT_FUNDING);
+            fundingOperations: (sender) => {
+                const assetId = deriveAssetId(sender, payload.standard);
+                const transfer = buildTransferPayload(KMOI_ASSET_ID, assetId.toHex(), option?.storageFund ?? DEFAULT_STORAGE_FUND);
                 return [{ type: OpType.ASSET_INVOKE, payload: transfer }];
             },
         });

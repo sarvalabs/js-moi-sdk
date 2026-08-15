@@ -92,15 +92,6 @@ export declare enum EngineKind {
     PISA = "PISA",
     MERU = "MERU"
 }
-export declare enum LogicState {
-    PERSISTENT = "persistent",
-    EPHEMERAL = "ephemeral"
-}
-export declare enum RoutineKind {
-    PERSISTENT = "persistent",
-    EPHEMERAL = "ephemeral",
-    READ_ONLY = "readonly"
-}
 export declare enum RoutineType {
     INVOKE = "invoke",
     DEPLOY = "deploy",

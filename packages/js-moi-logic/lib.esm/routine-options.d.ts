@@ -12,7 +12,7 @@ interface IRoutineOption {
      * brand-new account needs funds the moment it's created or the deploy
      * reverts. Only meaningful for LogicFactory.deploy() / AssetFactory.create().
      */
-    fundNewAccount?: number | bigint;
+    storageFund?: number | bigint;
 }
 export declare class RoutineOption implements IRoutineOption {
     sequence?: number;
@@ -20,7 +20,7 @@ export declare class RoutineOption implements IRoutineOption {
     fuelLimit?: number;
     fuelPrice?: number;
     participants?: IxParticipant[];
-    fundNewAccount?: number | bigint;
+    storageFund?: number | bigint;
     constructor(options?: IRoutineOption);
 }
 /**

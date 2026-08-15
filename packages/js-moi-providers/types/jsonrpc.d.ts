@@ -193,7 +193,7 @@ export interface GetStorageMetricArgs {
     options?: Options;
 }
 
-export interface RPCStorageMetric {
+export interface StorageMetric {
     storage_granted: string;
     storage_consumed: string;
     tokens_deposited: string;
@@ -201,7 +201,7 @@ export interface RPCStorageMetric {
 
 export interface GetStoragePricingArgs {}
 
-export interface RPCStorageParams {
+export interface StoragePricing {
     storage_price_per_byte: string;
     storage_multiplier: string;
     anu_per_byte: string;
@@ -214,7 +214,7 @@ export interface GetAccessPolicyArgs {
     options?: Options;
 }
 
-export interface RPCAccessPolicy {
+export interface AccessPolicyInfo {
     resource_type: string;
     resource_id: string;
     action_type: string[];

@@ -62,12 +62,12 @@ export class InteractionContext {
      */
     async ixData(option) {
         const sender = await this.buildSender(option);
-        const extraOperations = (await this.ctx.extraOperations?.(sender)) ?? [];
+        const fundingOperations = (await this.ctx.fundingOperations?.(sender)) ?? [];
         return {
             sender,
             fuel_price: option?.fuel_price ?? DEFAULT_FUEL_PRICE,
             fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
-            ix_operations: [this.buildOperation(), ...extraOperations],
+            ix_operations: [this.buildOperation(), ...fundingOperations],
             participants: this.mergeParticipants(option),
         };
     }

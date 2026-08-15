@@ -1,9 +1,9 @@
 import { ElementDescriptor, LogicManifest, ManifestCoder } from "js-moi-manifest";
 import type { AssetActionPayload, AbstractProvider, LogicActionPayload, LogicDeployPayload, LogicPayload, Sender } from "js-moi-providers";
 import { buildTransferPayload, IxContext } from "js-moi-interactions";
-import { predictLogicId } from "js-moi-identifiers";
+import { deriveLogicId } from "js-moi-identifiers";
 import { Signer } from "js-moi-signer";
-import { DEFAULT_NEW_ACCOUNT_FUNDING, KMOI_ASSET_ID } from "js-moi-constants";
+import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID } from "js-moi-constants";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { LogicIxCallResponse, LogicIxObject, LogicIxResponse, LogicIxResult } from "../types/interaction";
 import { LogicContext, LogicOps } from "./logic-context";
@@ -107,7 +107,7 @@ export abstract class LogicBase extends ElementDescriptor {
             // A newly deployed logic self-pays for its own account-creation storage cost
             // (billed against its own, currently-zero balance) the moment it's created,
             // so it needs funds bundled into the same interaction or the deploy reverts.
-            // See predictLogicId's docs for why this must mirror go-moi's id derivation
+            // See deriveLogicId's docs for why this must mirror the blockchain's id derivation
             // exactly - a wrong prediction sends funds to the wrong account.
             //
             // Note: this covers self-pay account-creation cost only. If the manifest's
@@ -118,12 +118,12 @@ export abstract class LogicBase extends ElementDescriptor {
             // same interaction, because the target account doesn't exist yet when
             // participants are resolved. Manifests intended to be deployable standalone
             // should declare `payer Logic` on any state their deploy routine writes.
-            ctx.extraOperations = (sender: Sender) => {
-                const logicId = predictLogicId(sender);
+            ctx.fundingOperations = (sender: Sender) => {
+                const logicId = deriveLogicId(sender);
                 const transfer: AssetActionPayload = buildTransferPayload(
                     KMOI_ASSET_ID,
                     logicId.toHex(),
-                    option.fundNewAccount ?? DEFAULT_NEW_ACCOUNT_FUNDING
+                    option.storageFund ?? DEFAULT_STORAGE_FUND
                 );
 
                 return [{ type: OpType.ASSET_INVOKE, payload: transfer }];

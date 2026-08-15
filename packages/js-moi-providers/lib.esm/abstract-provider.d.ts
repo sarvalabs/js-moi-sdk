@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { LogicManifest } from "js-moi-manifest";
 import { Interaction, ResourceType, Tesseract } from "js-moi-utils";
-import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, RPCAccessPolicy, RPCStorageMetric, RPCStorageParams, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
+import { AccountMetaInfo, AccountState, AssetInfo, CallorEstimateOptions, Content, ContentFrom, ContextInfo, Encoding, Filter, FilterDeletionResult, Inspect, InteractionCallResponse, InteractionReceipt, InteractionRequest, InteractionResponse, NodeInfo, Options, Registry, AccessPolicyInfo, StorageMetric, StoragePricing, Status, SyncStatus, TDU, type Log, type LogFilter } from "../types/jsonrpc";
 import { type ProviderEvents } from "../types/websocket";
 import { InteractionObject } from "../types/interaction";
 /**
@@ -30,10 +30,10 @@ export declare abstract class AbstractProvider extends EventEmitter {
     abstract estimateFuel(ixObject: InteractionObject, options?: CallorEstimateOptions): Promise<number | bigint>;
     abstract sendInteraction(ixObject: InteractionRequest): Promise<InteractionResponse>;
     abstract getAssetInfoByAssetID(assetId: string, options?: Options): Promise<AssetInfo>;
-    abstract getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<RPCStorageMetric>;
-    abstract getStoragePricing(): Promise<RPCStorageParams>;
-    abstract getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<RPCAccessPolicy>;
-    abstract getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<RPCAccessPolicy[]>;
+    abstract getStorageMetric(targetAccount: string, userAccount: string, options?: Options): Promise<StorageMetric>;
+    abstract getStoragePricing(): Promise<StoragePricing>;
+    abstract getAccessPolicy(id: string, resourceType: ResourceType, resourceId: string, options?: Options): Promise<AccessPolicyInfo>;
+    abstract getAccessPolicies(id: string, resourceType: ResourceType, options?: Options): Promise<AccessPolicyInfo[]>;
     abstract getInteractionReceipt(ixHash: string): Promise<InteractionReceipt>;
     abstract getStorageAt(logicId: string, storageKey: string, options?: Options): Promise<string>;
     abstract getStorageAt(logicId: string, storageKey: string, id: string, options?: Options): Promise<string>;

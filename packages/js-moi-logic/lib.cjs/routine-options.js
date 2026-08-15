@@ -7,7 +7,7 @@ class RoutineOption {
     fuelLimit;
     fuelPrice;
     participants;
-    fundNewAccount;
+    storageFund;
     constructor(options = {}) {
         const keys = Object.keys(options);
         for (const key of keys) {

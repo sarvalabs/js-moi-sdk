@@ -4,17 +4,17 @@ import { Signer } from "js-moi-signer";
 import { AssetIxObject, AssetIxResponse, AssetIxResult } from "../types/interaction";
 import { Routines } from "../types/asset";
 import { AssetDescriptor } from "./asset-descriptor";
-import { EphemeralState, PersistentState } from "./state";
+import { ActorState, LogicState } from "./state";
 /**
  * Represents a asset driver that serves as an interface for interacting with logics.
  */
 export declare class AssetDriver<T extends Record<string, (...args: any) => any> = any> extends AssetDescriptor {
     readonly routines: Routines<T>;
-    readonly persistentState?: PersistentState;
-    readonly ephemeralState?: EphemeralState;
+    readonly logicState?: LogicState;
+    readonly actorState?: ActorState;
     constructor(assetId: string, manifest: LogicManifest.Manifest, arg: Signer);
     /**
-     * Creates the persistent and ephemeral states for the asset driver,
+     * Creates the logic and actor states for the asset driver,
      if available in logic manifest.
      */
     private createState;

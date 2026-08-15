@@ -1,13 +1,21 @@
-import { Identifier, predictAssetId } from "js-moi-identifiers";
+import { Identifier, deriveAssetId } from "js-moi-identifiers";
 import { Signer } from "js-moi-signer";
 import { AssetStandard, OpType } from "js-moi-utils";
+import { RoutineOption } from "js-moi-logic";
+import { Depolorizer } from "js-polo";
 import { MAS0AssetLogic } from "../src.ts/mas0-asset";
 import { MAS1AssetLogic } from "../src.ts/mas1-asset";
 import { MAS2AssetLogic } from "../src.ts/mas2-asset";
 
+const decodeTransfer = (calldata: string) =>
+    new Depolorizer(Buffer.from(calldata.replace(/^0x/, ""), "hex")).depolorize({
+        kind: "struct",
+        fields: { beneficiary: { kind: "bytes" }, amount: { kind: "integer" } },
+    }) as { beneficiary: Uint8Array; amount: bigint };
+
 const SENDER_ID = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000";
 
-class FakeSigner extends Signer {
+class TestSigner extends Signer {
     connect(): void {}
     async getKeyId(): Promise<number> {
         return 0;
@@ -33,9 +41,9 @@ class FakeSigner extends Signer {
 }
 
 describe.each([
-    ["MAS0AssetLogic", MAS0AssetLogic, AssetStandard.MAS0, [new FakeSigner(), "MOI", 1000, SENDER_ID, false] as const],
-    ["MAS1AssetLogic", MAS1AssetLogic, AssetStandard.MAS1, [new FakeSigner(), "MOI", SENDER_ID, false] as const],
-    ["MAS2AssetLogic", MAS2AssetLogic, AssetStandard.MAS2, [new FakeSigner(), "MOI", 1000, SENDER_ID, false] as const],
+    ["MAS0AssetLogic", MAS0AssetLogic, AssetStandard.MAS0, [new TestSigner(), "MOI", 1000, SENDER_ID, false] as const],
+    ["MAS1AssetLogic", MAS1AssetLogic, AssetStandard.MAS1, [new TestSigner(), "MOI", SENDER_ID, false] as const],
+    ["MAS2AssetLogic", MAS2AssetLogic, AssetStandard.MAS2, [new TestSigner(), "MOI", 1000, SENDER_ID, false] as const],
 ])("%s.create funding bundle", (_name, cls: any, standard, args) => {
     it("bundles a second ASSET_INVOKE Transfer op alongside ASSET_CREATE", async () => {
         const ctx = cls.create(...args);
@@ -47,18 +55,32 @@ describe.each([
         expect((ixData.ix_operations[1].payload as any).callsite).toBe("Transfer");
     });
 
-    it("targets the bundled transfer at the predicted asset id for that standard", async () => {
+    it("targets the bundled transfer at the derived asset id for that standard", async () => {
         const ctx = cls.create(...args);
         const ixData = await ctx.ixData();
 
-        const expected = predictAssetId({ id: SENDER_ID, sequence: 3, key_id: 0 }, standard);
-        const { Depolorizer } = require("js-polo");
-        const calldata = (ixData.ix_operations[1].payload as any).calldata as string;
-        const decoded = new Depolorizer(Buffer.from(calldata.replace(/^0x/, ""), "hex")).depolorize({
-            kind: "struct",
-            fields: { beneficiary: { kind: "bytes" }, amount: { kind: "integer" } },
-        }) as { beneficiary: Uint8Array };
+        const expected = deriveAssetId({ id: SENDER_ID, sequence: 3, key_id: 0 }, standard);
+        const decoded = decodeTransfer((ixData.ix_operations[1].payload as any).calldata);
 
         expect("0x" + Buffer.from(decoded.beneficiary).toString("hex")).toBe(expected.toHex());
+    });
+
+    it("defaults the funding amount to DEFAULT_STORAGE_FUND", async () => {
+        const { DEFAULT_STORAGE_FUND } = await import("js-moi-constants");
+
+        const ctx = cls.create(...args);
+        const ixData = await ctx.ixData();
+        const decoded = decodeTransfer((ixData.ix_operations[1].payload as any).calldata);
+
+        expect(decoded.amount.toString()).toBe(DEFAULT_STORAGE_FUND.toString());
+    });
+
+    it("honors a custom storageFund amount from RoutineOption", async () => {
+        const option = new RoutineOption({ storageFund: 42 });
+        const ctx = cls.create(...args, option);
+        const ixData = await ctx.ixData();
+        const decoded = decodeTransfer((ixData.ix_operations[1].payload as any).calldata);
+
+        expect(decoded.amount.toString()).toBe("42");
     });
 });

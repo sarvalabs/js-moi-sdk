@@ -265,6 +265,14 @@ describe("validateAssetCreate", () => {
         expect(() => validateAssetCreate({ ...valid, max_supply: -1 })).toThrow("max_supply");
     });
 
+    test("accepts a bigint max_supply - AssetCreatePayload types it as number | bigint", () => {
+        expect(() => validateAssetCreate({ ...valid, max_supply: 1_000_000n })).not.toThrow();
+    });
+
+    test("throws when max_supply is a negative bigint", () => {
+        expect(() => validateAssetCreate({ ...valid, max_supply: -1n })).toThrow("max_supply");
+    });
+
     test("throws when static_metadata value is empty", () => {
         expect(() => validateAssetCreate({ ...valid, static_metadata: { key: "" as Hex } })).toThrow("static metadata");
     });

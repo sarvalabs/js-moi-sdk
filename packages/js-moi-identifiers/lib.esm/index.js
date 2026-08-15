@@ -1,4 +1,4 @@
-export { newAccountFingerprint, predictAssetId, predictLogicId } from "./account-id";
+export { newAccountFingerprint, deriveAssetId, deriveLogicId } from "./account-id";
 export { AssetId } from "./asset-id";
 export { IdentifierKind, IdentifierVersion } from "./enums";
 export { Flag } from "./flags";

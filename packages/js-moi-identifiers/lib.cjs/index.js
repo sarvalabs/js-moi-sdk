@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ParticipantId = exports.createParticipantId = exports.LogicId = exports.KramaIdTag = exports.KramaIdMetadata = exports.NetworkZone = exports.KramaIdVersion = exports.KramaIdKind = exports.KramaId = exports.ParticipantTagV0 = exports.LogicTagV0 = exports.IdentifierTag = exports.AssetTagV0 = exports.isIdentifier = exports.Identifier = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.AssetId = exports.predictLogicId = exports.predictAssetId = exports.newAccountFingerprint = void 0;
+exports.ParticipantId = exports.createParticipantId = exports.LogicId = exports.KramaIdTag = exports.KramaIdMetadata = exports.NetworkZone = exports.KramaIdVersion = exports.KramaIdKind = exports.KramaId = exports.ParticipantTagV0 = exports.LogicTagV0 = exports.IdentifierTag = exports.AssetTagV0 = exports.isIdentifier = exports.Identifier = exports.Flag = exports.IdentifierVersion = exports.IdentifierKind = exports.AssetId = exports.deriveLogicId = exports.deriveAssetId = exports.newAccountFingerprint = void 0;
 var account_id_1 = require("./account-id");
 Object.defineProperty(exports, "newAccountFingerprint", { enumerable: true, get: function () { return account_id_1.newAccountFingerprint; } });
-Object.defineProperty(exports, "predictAssetId", { enumerable: true, get: function () { return account_id_1.predictAssetId; } });
-Object.defineProperty(exports, "predictLogicId", { enumerable: true, get: function () { return account_id_1.predictLogicId; } });
+Object.defineProperty(exports, "deriveAssetId", { enumerable: true, get: function () { return account_id_1.deriveAssetId; } });
+Object.defineProperty(exports, "deriveLogicId", { enumerable: true, get: function () { return account_id_1.deriveLogicId; } });
 var asset_id_1 = require("./asset-id");
 Object.defineProperty(exports, "AssetId", { enumerable: true, get: function () { return asset_id_1.AssetId; } });
 var enums_1 = require("./enums");

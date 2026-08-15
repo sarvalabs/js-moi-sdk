@@ -10,7 +10,7 @@ export declare const access: {
 type AccessOpType = OpType.ACCESS_CREATE | OpType.ACCESS_UPDATE | OpType.ACCESS_DELETE;
 /**
  * A single access op returned by Access.create()/.update()/.delete().
- * The target account is resolved from the signer at send time - go-moi
+ * The target account is resolved from the signer at send time - the network
  * requires the policy owner to equal the sender, so there's nothing else
  * it could legally be.
  */

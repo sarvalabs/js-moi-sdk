@@ -54,23 +54,30 @@ export class LogicFactory extends LogicBase {
     /**
      * Deploys a logic.
      *
-     * @param {string} builderName - The name of the builder routine. (optional)
+     * @param {string} builderName - The name of the builder routine. Optional only if the
+     * manifest defines no deploy routine at all - required to pick one otherwise.
      * @param {any[]} args - Arguments for the builder routine. (optional)
      * @returns {LogicContext<LogicOps>} The logic interaction context.
-     * @throws {Error} If the builder routine is not found or required arguments are missing.
+     * @throws {Error} If a builder name is required but omitted, the builder routine is not
+     * found, or required arguments are missing.
      */
     deploy(builderName, ...args) {
+        // The blockchain only skips the deployer call when the manifest defines no deploy
+        // routine at all - if it defines one or more, a builder name is required to pick one,
+        // and an empty callsite is rejected the same as a mismatched one. Mirror that here
+        // instead of always allowing an omitted builder name (see AssetFactory.create()).
+        const deployRoutines = Object.values(this.manifest.elements)
+            .filter((element) => {
+            return element.kind === "callable" && element.data.kind === "deploy";
+        });
         if (builderName == null) {
+            if (deployRoutines.length > 0) {
+                ErrorUtils.throwError("Manifest defines one or more deploy routines - a builder name is required to select one.", ErrorCode.MISSING_ARGUMENT);
+            }
             const deployRoutine = { name: "", kind: "deploy" };
             return this.createIxObject(deployRoutine, ...args);
         }
-        const builder = Object.values(this.manifest.elements).find(element => {
-            if (element.kind === "callable") {
-                const routine = element.data;
-                return routine.kind === "deploy" && routine.name === builderName;
-            }
-            return false;
-        });
+        const builder = deployRoutines.find(element => element.data.name === builderName);
         if (builder) {
             const builderRoutine = builder.data;
             // A trailing RoutineOption isn't a real routine argument - exclude it from the

@@ -225,7 +225,7 @@ exports.accessPolicySchema = {
                         }
                     }
                 },
-                // Reserved/unused on go-moi's side (always nil in v1), but the field still
+                // Reserved/unused on the blockchain's side (always nil in v1), but the field still
                 // occupies its ordered slot on the wire - must encode as an explicit POLO
                 // null, not be omitted, or every field after it misaligns on decode.
                 predicate: {

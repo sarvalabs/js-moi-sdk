@@ -691,7 +691,7 @@ export class BaseProvider extends AbstractProvider {
      * @param {string} targetAccount - The logic or asset account the allowance is on.
      * @param {string} userAccount - The participant whose allowance to look up.
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<RPCStorageMetric>} A Promise that resolves to the storage metric.
+     * @returns {Promise<StorageMetric>} A Promise that resolves to the storage metric.
      * @throws {Error} if there is an error executing the RPC call.
      */
     async getStorageMetric(targetAccount, userAccount, options) {
@@ -711,7 +711,7 @@ export class BaseProvider extends AbstractProvider {
     /**
      * Retrieves the current network-wide storage rent pricing.
      *
-     * @returns {Promise<RPCStorageParams>} A Promise that resolves to the storage pricing.
+     * @returns {Promise<StoragePricing>} A Promise that resolves to the storage pricing.
      * @throws {Error} if there is an error executing the RPC call.
      */
     async getStoragePricing() {
@@ -731,7 +731,7 @@ export class BaseProvider extends AbstractProvider {
      * @param {ResourceType} resourceType - The resource type the policy governs.
      * @param {string} resourceId - The specific resource instance the policy governs.
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<RPCAccessPolicy>} A Promise that resolves to the access policy.
+     * @returns {Promise<AccessPolicyInfo>} A Promise that resolves to the access policy.
      * @throws {Error} if there is an error executing the RPC call.
      */
     async getAccessPolicy(id, resourceType, resourceId, options) {
@@ -755,7 +755,7 @@ export class BaseProvider extends AbstractProvider {
      * @param {string} id - The account that owns the policies.
      * @param {ResourceType} resourceType - The resource type to list policies for.
      * @param {Options} options - The tesseract options. (optional)
-     * @returns {Promise<RPCAccessPolicy[]>} A Promise that resolves to the matching policies.
+     * @returns {Promise<AccessPolicyInfo[]>} A Promise that resolves to the matching policies.
      * @throws {Error} if there is an error executing the RPC call.
      */
     async getAccessPolicies(id, resourceType, options) {
@@ -1139,7 +1139,7 @@ export class BaseProvider extends AbstractProvider {
                     }
                     throw new Error("Failed to retrieve asset creation response");
                 case OpType.ACCOUNT_CONFIGURE:
-                    // Status-only op - go-moi never populates a result payload for this,
+                    // Status-only op - the blockchain never populates a result payload for this,
                     // every execution path only sets the receipt status.
                     return null;
                 case OpType.ACCOUNT_INHERIT:
@@ -1173,7 +1173,7 @@ export class BaseProvider extends AbstractProvider {
                 case OpType.ACCESS_CREATE:
                 case OpType.ACCESS_UPDATE:
                 case OpType.ACCESS_DELETE:
-                    // These ops never populate a result payload on the go-moi side -
+                    // These ops never populate a result payload on the blockchain's side -
                     // status/exception only, data is always null.
                     return null;
                 default:

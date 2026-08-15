@@ -144,7 +144,7 @@ describe("Logic", () => {
         });
 
         it("should be able to read from persistent storage", async () => {
-            const symbol = await logic.persistentState.get((b) => b.entity("Symbol"));
+            const symbol = await logic.logicState.get((b) => b.entity("Symbol"));
 
             expect(symbol).toBe(SYMBOL);
         });
@@ -153,7 +153,7 @@ describe("Logic", () => {
             const invalidKey = "invalid-key";
 
             expect(async () => {
-                await logic.persistentState.get((b) => b.entity(invalidKey));
+                await logic.logicState.get((b) => b.entity(invalidKey));
             }).rejects.toThrow(`'${invalidKey}' is not member of persistent state`);
         });
     });
