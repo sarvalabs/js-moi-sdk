@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
+import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, validateDecimals } from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode } from "js-polo";
 import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
@@ -16,12 +16,12 @@ export class MAS1AssetLogic {
         const document = documentEncode(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, manager, enableEvents, option) {
-        const response = await this.create(signer, symbol, manager, enableEvents, option).send();
+    static async newAsset(signer, symbol, manager, enableEvents, option, decimals) {
+        const response = await this.create(signer, symbol, manager, enableEvents, option, decimals).send();
         const results = await response.result();
         return new MAS1AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, manager, enableEvents, option) {
+    static create(signer, symbol, manager, enableEvents, option, decimals) {
         const payload = {
             symbol: symbol,
             max_supply: 1,
@@ -34,6 +34,10 @@ export class MAS1AssetLogic {
                 callsite: "Init"
             }
         };
+        if (decimals !== undefined) {
+            validateDecimals(decimals);
+            payload.decimals = decimals;
+        }
         return new InteractionContext({
             opType: OpType.ASSET_CREATE,
             payload: payload,

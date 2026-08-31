@@ -19,12 +19,12 @@ class MAS1AssetLogic {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, manager, enableEvents, option) {
-        const response = await this.create(signer, symbol, manager, enableEvents, option).send();
+    static async newAsset(signer, symbol, manager, enableEvents, option, decimals) {
+        const response = await this.create(signer, symbol, manager, enableEvents, option, decimals).send();
         const results = await response.result();
         return new MAS1AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, manager, enableEvents, option) {
+    static create(signer, symbol, manager, enableEvents, option, decimals) {
         const payload = {
             symbol: symbol,
             max_supply: 1,
@@ -37,6 +37,10 @@ class MAS1AssetLogic {
                 callsite: "Init"
             }
         };
+        if (decimals !== undefined) {
+            (0, js_moi_utils_1.validateDecimals)(decimals);
+            payload.decimals = decimals;
+        }
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_CREATE,
             payload: payload,

@@ -1,1 +1,1 @@
-{"version":3,"file":"kmoi.d.ts","sourceRoot":"","sources":["../src.ts/kmoi.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,aAAa,IAAI,CAAC;AAE/B,eAAO,MAAM,UAAU,QAA+B,CAAC;AAEvD,eAAO,MAAM,YAAY,KAAK,CAAC"}
+{"version":3,"file":"kmoi.d.ts","sourceRoot":"","sources":["../src.ts/kmoi.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,aAAa,IAAI,CAAC;AAE/B,eAAO,MAAM,UAAU,QAA+B,CAAC;AAEvD,eAAO,MAAM,YAAY,KAAK,CAAC;AAE/B,wEAAwE;AACxE,eAAO,MAAM,WAAW,QAAoB,CAAC"}

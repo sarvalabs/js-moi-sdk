@@ -1,3 +1,4 @@
+export declare const validateDecimals: (decimals: number) => void;
 /**
  * Converts an amount in the smallest unit to a decimal string.
  * Mirrors ethers v5 formatUnits.

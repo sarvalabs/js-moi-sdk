@@ -1,10 +1,15 @@
-import { KMOI_DECIMALS, MAX_DECIMALS } from "js-moi-constants";
-const validateDecimals = (decimals) => {
+import { KMOI_DECIMALS, MAX_DECIMALS, UINT256_MAX } from "js-moi-constants";
+export const validateDecimals = (decimals) => {
     if (!Number.isInteger(decimals) || decimals < 0) {
         throw new Error("decimals must be a non-negative integer");
     }
     if (decimals > MAX_DECIMALS) {
         throw new Error(`decimals must not exceed ${MAX_DECIMALS}`);
+    }
+};
+const validateAmountRange = (value) => {
+    if (value > UINT256_MAX) {
+        throw new Error("value overflows uint256");
     }
 };
 /**
@@ -16,6 +21,7 @@ export const formatAmount = (value, decimals) => {
     if (value < 0n) {
         throw new Error("value must be non-negative");
     }
+    validateAmountRange(value);
     const scale = 10n ** BigInt(decimals);
     const whole = value / scale;
     const remainder = value % scale;
@@ -41,7 +47,9 @@ export const parseAmount = (value, decimals) => {
     const scale = 10n ** BigInt(decimals);
     const whole = BigInt(wholePart);
     const fraction = BigInt(fractionPart.padEnd(decimals, "0"));
-    return whole * scale + fraction;
+    const result = whole * scale + fraction;
+    validateAmountRange(result);
+    return result;
 };
 /**
  * Converts an anu amount to a decimal KMOI string.

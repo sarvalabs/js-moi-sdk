@@ -1,4 +1,5 @@
 import { formatAmount, formatKmoi, parseAmount, parseKmoi } from "../src.ts/units";
+import { UINT256_MAX } from "js-moi-constants";
 
 describe("formatAmount", () => {
     test("formats whole numbers without a decimal point", () => {
@@ -34,6 +35,14 @@ describe("formatAmount", () => {
 
     test("throws when decimals is not an integer", () => {
         expect(() => formatAmount(1n, 1.5)).toThrow("decimals must be a non-negative integer");
+    });
+
+    test("accepts the maximum uint256 value", () => {
+        expect(formatAmount(UINT256_MAX, 0)).toBe(UINT256_MAX.toString());
+    });
+
+    test("throws when value overflows uint256", () => {
+        expect(() => formatAmount(UINT256_MAX + 1n, 0)).toThrow("value overflows uint256");
     });
 });
 
@@ -79,6 +88,16 @@ describe("parseAmount", () => {
 
     test("throws when decimals exceeds MAX_DECIMALS", () => {
         expect(() => parseAmount("1", 19)).toThrow("decimals must not exceed 18");
+    });
+
+    test("accepts the maximum uint256 value", () => {
+        expect(parseAmount(UINT256_MAX.toString(), 0)).toBe(UINT256_MAX);
+    });
+
+    test("throws when parsed value overflows uint256", () => {
+        expect(() => parseAmount(`${UINT256_MAX + 1n}`, 0)).toThrow("value overflows uint256");
+        expect(() => parseAmount("1", 18)).not.toThrow();
+        expect(() => parseAmount("9".repeat(80), 18)).toThrow("value overflows uint256");
     });
 });
 

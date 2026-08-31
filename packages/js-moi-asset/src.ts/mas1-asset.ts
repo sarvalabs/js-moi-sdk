@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType } from "js-moi-utils";
+import { AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, validateDecimals } from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode, Schema } from "js-polo";
 import { Signer } from "js-moi-signer";
@@ -29,8 +29,9 @@ export class MAS1AssetLogic {
         symbol: string, manager: string,
         enableEvents: boolean,
         option?: RoutineOption,
+        decimals?: number,
     ): Promise<MAS1AssetLogic> {
-        const response = await this.create(signer, symbol, manager, enableEvents, option).send()
+        const response = await this.create(signer, symbol, manager, enableEvents, option, decimals).send()
 
         const results = await response.result()
 
@@ -42,6 +43,7 @@ export class MAS1AssetLogic {
         symbol: string, manager: string,
         enableEvents: boolean,
         option?: RoutineOption,
+        decimals?: number,
     ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
             symbol: symbol,
@@ -54,6 +56,11 @@ export class MAS1AssetLogic {
                 manifest: "0x",
                 callsite: "Init"
             }
+        }
+
+        if (decimals !== undefined) {
+            validateDecimals(decimals);
+            payload.decimals = decimals;
         }
 
         return new InteractionContext<OpType.ASSET_CREATE>({

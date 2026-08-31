@@ -1,12 +1,18 @@
-import { KMOI_DECIMALS, MAX_DECIMALS } from "js-moi-constants";
+import { KMOI_DECIMALS, MAX_DECIMALS, UINT256_MAX } from "js-moi-constants";
 
-const validateDecimals = (decimals: number): void => {
+export const validateDecimals = (decimals: number): void => {
     if (!Number.isInteger(decimals) || decimals < 0) {
         throw new Error("decimals must be a non-negative integer");
     }
 
     if (decimals > MAX_DECIMALS) {
         throw new Error(`decimals must not exceed ${MAX_DECIMALS}`);
+    }
+};
+
+const validateAmountRange = (value: bigint): void => {
+    if (value > UINT256_MAX) {
+        throw new Error("value overflows uint256");
     }
 };
 
@@ -20,6 +26,8 @@ export const formatAmount = (value: bigint, decimals: number): string => {
     if (value < 0n) {
         throw new Error("value must be non-negative");
     }
+
+    validateAmountRange(value);
 
     const scale = 10n ** BigInt(decimals);
     const whole = value / scale;
@@ -53,8 +61,11 @@ export const parseAmount = (value: string, decimals: number): bigint => {
     const scale = 10n ** BigInt(decimals);
     const whole = BigInt(wholePart);
     const fraction = BigInt(fractionPart.padEnd(decimals, "0"));
+    const result = whole * scale + fraction;
 
-    return whole * scale + fraction;
+    validateAmountRange(result);
+
+    return result;
 };
 
 /**
