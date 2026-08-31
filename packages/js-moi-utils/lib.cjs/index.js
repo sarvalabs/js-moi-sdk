@@ -27,4 +27,5 @@ __exportStar(require("./properties"), exports);
 __exportStar(require("./schema"), exports);
 var logic_events_1 = require("./logic-events");
 Object.defineProperty(exports, "topicHash", { enumerable: true, get: function () { return logic_events_1.topicHash; } });
+__exportStar(require("./units"), exports);
 //# sourceMappingURL=index.js.map
