@@ -19,5 +19,5 @@ export const DEFAULT_STORAGE_FUND = 1_000_000;
  * always the source of truth; this only lets an obviously-too-small deposit
  * fail fast client-side instead of round-tripping to the blockchain first.
  */
-export const MIN_STORAGE_DEPOSIT_AMOUNT = 1;
+export const MIN_STORAGE_DEPOSIT_AMOUNT = 1_000_000;
 //# sourceMappingURL=storage.js.map
