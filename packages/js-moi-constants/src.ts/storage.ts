@@ -10,13 +10,13 @@
  * artifact size, which only the blockchain computes). Override via
  * `RoutineOption.storageFund` for larger manifests.
  */
-export const DEFAULT_STORAGE_FUND = 1_000_000;
+export const DEFAULT_STORAGE_FUND = 10_000_000_000;
 
 /**
  * Minimum amount accepted for an IxStorageDeposit, mirroring the blockchain's
  * `ANUPerByte * StorageMultiplier` floor in
  * `StoragePayload.ValidateStorageDeposit` (common/ixpayload.go) - both
- * currently 1, so the floor is 1. The blockchain is
+ * currently 1, so the floor is 1_000_000. The blockchain is
  * always the source of truth; this only lets an obviously-too-small deposit
  * fail fast client-side instead of round-tripping to the blockchain first.
  */
