@@ -386,7 +386,7 @@ export class Wallet extends Signer {
             };
         }
         catch (err) {
-            ErrorUtils.throwError("Failed to sign interaction", ErrorCode.UNKNOWN_ERROR, { originalError: err });
+            ErrorUtils.throwError(`Failed to sign interaction: ${err instanceof Error ? err.message : err}`, ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     /**

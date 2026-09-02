@@ -1,3 +1,4 @@
+import { MIN_STORAGE_DEPOSIT_AMOUNT } from "js-moi-constants";
 import { LockType, OpType, ResourceType, AccessAction, CallerKind } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
 import type { InteractionObject } from "../types/interaction";
@@ -39,7 +40,7 @@ const TRANSFER_LIKE_SCHEMA = { kind: "struct", fields: { beneficiary: { kind: "b
 
 describe("validateStorageDeposit", () => {
     test("accepts a valid deposit payload", () => {
-        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 1000 };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: MIN_STORAGE_DEPOSIT_AMOUNT };
         expect(() => validateStorageDeposit(payload)).not.toThrow();
     });
 
@@ -69,7 +70,7 @@ describe("validateStorageDeposit", () => {
     });
 
     test("accepts a bigint amount", () => {
-        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 1000n };
+        const payload: StoragePayload = { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: BigInt(MIN_STORAGE_DEPOSIT_AMOUNT) };
         expect(() => validateStorageDeposit(payload)).not.toThrow();
     });
 });
@@ -217,7 +218,7 @@ describe("validateAccessDelete", () => {
 
 describe("processInteractionObject - participant derivation for the new ops", () => {
     test("STORAGE_DEPOSIT adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.STORAGE_DEPOSIT, payload: { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: 1000 } }]);
+        const ix = makeIx([{ type: OpType.STORAGE_DEPOSIT, payload: { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: MIN_STORAGE_DEPOSIT_AMOUNT } }]);
         const result = processInteractionObject(ix);
 
         expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
@@ -231,17 +232,17 @@ describe("processInteractionObject - participant derivation for the new ops", ()
     });
 
     test("ACCESS_CREATE adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.ACCESS_CREATE, payload: { target_account: TEST_SENDER, access_policy: {} } }]);
+        const ix = makeIx([{ type: OpType.ACCESS_CREATE, payload: { target_account: TEST_LOGIC, access_policy: {} } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: TEST_SENDER, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
     });
 
     test("ACCESS_DELETE adds the target account as a MUTATE_LOCK participant", () => {
-        const ix = makeIx([{ type: OpType.ACCESS_DELETE, payload: { target_account: TEST_SENDER, resource: ResourceType.STORAGE, resource_id: TEST_LOGIC } }]);
+        const ix = makeIx([{ type: OpType.ACCESS_DELETE, payload: { target_account: TEST_LOGIC, resource: ResourceType.STORAGE, resource_id: TEST_OTHER } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: TEST_SENDER, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
     });
 });
 
@@ -254,7 +255,7 @@ describe("toRawInteractionObject - wire encoding for the new ops", () => {
     });
 
     test("STORAGE_DEPOSIT encodes target_account, deposit_for, and amount correctly", () => {
-        const ix = baseIx({ type: OpType.STORAGE_DEPOSIT, payload: { target_account: LOGIC, deposit_for: SENDER, amount: 5000 } });
+        const ix = baseIx({ type: OpType.STORAGE_DEPOSIT, payload: { target_account: LOGIC, deposit_for: SENDER, amount: MIN_STORAGE_DEPOSIT_AMOUNT } });
         const raw = toRawInteractionObject(ix);
 
         expect(raw.ix_operations).toHaveLength(1);

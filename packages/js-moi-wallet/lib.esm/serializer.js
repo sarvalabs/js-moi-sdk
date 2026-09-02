@@ -16,7 +16,7 @@ export const serializeIxObject = (ixObject) => {
         return polorizer.bytes();
     }
     catch (err) {
-        ErrorUtils.throwError("Failed to serialize interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        ErrorUtils.throwError(`Failed to serialize interaction object: ${err instanceof Error ? err.message : err}`, ErrorCode.UNKNOWN_ERROR, { originalError: err });
     }
 };
 export const serializeIxSignatures = (signatures) => {
