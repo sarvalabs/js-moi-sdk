@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
+exports.validatePayerSignature = exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_constants_1 = require("js-moi-constants");
@@ -537,8 +537,8 @@ const processParticipants = (ixObject) => {
     }
     // Merge additional participants (if not already present)
     if (ixObject.participants) {
-        for (const { id, lock_type } of ixObject.participants) {
-            addParticipant(id, lock_type);
+        for (const { id, lock_type, notary } of ixObject.participants) {
+            addParticipant(id, lock_type, notary);
         }
     }
     return [...participants.values()];
@@ -717,4 +717,23 @@ const toInteractionArgs = (ix) => {
     };
 };
 exports.toInteractionArgs = toInteractionArgs;
+/**
+ * Validates that a payer signature is present when the interaction has a non-zero payer.
+ *
+ * @param {InteractionRequest} ixRequest - The signed interaction request to validate.
+ * @throws {Error} if a payer is set but no matching signature entry is found.
+ */
+const validatePayerSignature = (ixRequest) => {
+    const decoded = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(ixRequest.ix_args)).depolorize(js_moi_utils_1.ixObjectSchema);
+    const payerHex = (0, js_moi_utils_1.withHexPrefix)((0, secp256k1_1.bytesToHex)(decoded.payer));
+    if (payerHex === js_moi_constants_1.ZERO_ADDRESS) {
+        return;
+    }
+    const signatures = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(ixRequest.signatures)).depolorize(js_moi_utils_1.ixSignaturesSchema);
+    const hasPayerSignature = signatures.some((entry) => (0, js_moi_utils_1.withHexPrefix)((0, secp256k1_1.bytesToHex)(entry.id)).toLowerCase() === payerHex.toLowerCase());
+    if (!hasPayerSignature) {
+        js_moi_utils_1.ErrorUtils.throwError("Payer signature is missing. Call signAsPayer on the payer wallet and addSignature before sending.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+    }
+};
+exports.validatePayerSignature = validatePayerSignature;
 //# sourceMappingURL=interaction.js.map

@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Signer = void 0;
+const js_moi_providers_1 = require("js-moi-providers");
 const js_moi_utils_1 = require("js-moi-utils");
 const ecdsa_1 = __importDefault(require("./ecdsa"));
 const signature_1 = __importDefault(require("./signature"));
@@ -179,6 +180,7 @@ class Signer {
             await this.prepareInteraction('send', ixObject);
             // Sign the interaction object
             const ixRequest = await this.signInteraction(ixObject, sigAlgo);
+            (0, js_moi_providers_1.validatePayerSignature)(ixRequest);
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }

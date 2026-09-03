@@ -195,6 +195,14 @@ export declare class Wallet extends Signer {
      */
     signInteraction(ixObject: InteractionObject, _sigAlgo: SigType): Promise<InteractionRequest>;
     /**
+     * Signs serialized interaction bytes as the payer identified in `ix_args`.
+     * The payer address encoded in `ix_args` must match this wallet's identity.
+     *
+     * @param {Hex} ixArgs - Serialized interaction bytes from a signed interaction request.
+     * @returns {Promise<Hex>} POLO-encoded signature bytes for the payer entry.
+     */
+    signAsPayer(ixArgs: Hex): Promise<Hex>;
+    /**
      * Initializes the wallet from a provided mnemonic.
      *
      * @param {string} mnemonic - The mnemonic to initialize the wallet with.

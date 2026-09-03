@@ -19,6 +19,8 @@ import {
   toQuantity,
   trimHexPrefix,
   withHexPrefix,
+  ixObjectSchema,
+  ixSignaturesSchema,
 } from "js-moi-utils";
 import {
   InteractionObject,
@@ -67,7 +69,7 @@ import {
   KMOI_ASSET_ID,
   MIN_STORAGE_DEPOSIT_AMOUNT,
 } from "js-moi-constants";
-import { Polorizer } from "js-polo";
+import { Polorizer, Depolorizer } from "js-polo";
 import { bytesToHex } from "@noble/secp256k1";
 
 // KMOI reserves these five endpoints for protocol code only. go-moi rejects
@@ -973,4 +975,31 @@ export const toInteractionArgs = (ix: InteractionObject): InteractionArgs => {
       : undefined,
     participants: ix.participants,
   };
+};
+
+/**
+ * Validates that a payer signature is present when the interaction has a non-zero payer.
+ *
+ * @param {InteractionRequest} ixRequest - The signed interaction request to validate.
+ * @throws {Error} if a payer is set but no matching signature entry is found.
+ */
+export const validatePayerSignature = (ixRequest: { ix_args: string; signatures: string }): void => {
+  const decoded = new Depolorizer(hexToBytes(ixRequest.ix_args)).depolorize(ixObjectSchema) as RawInteractionObject;
+  const payerHex = withHexPrefix(bytesToHex(decoded.payer));
+
+  if (payerHex === ZERO_ADDRESS) {
+    return;
+  }
+
+  const signatures = new Depolorizer(hexToBytes(ixRequest.signatures)).depolorize(ixSignaturesSchema) as RawSignature[];
+  const hasPayerSignature = signatures.some(
+    (entry) => withHexPrefix(bytesToHex(entry.id)).toLowerCase() === payerHex.toLowerCase()
+  );
+
+  if (!hasPayerSignature) {
+    ErrorUtils.throwError(
+      "Payer signature is missing. Call signAsPayer on the payer wallet and addSignature before sending.",
+      ErrorCode.INVALID_ARGUMENT
+    );
+  }
 };

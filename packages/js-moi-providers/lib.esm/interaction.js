@@ -1,7 +1,7 @@
-import { accessDeletePayloadSchema, accessPayloadSchema, accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, CallerKind, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, ResourceType, storagePayloadSchema, toQuantity, trimHexPrefix, withHexPrefix, } from "js-moi-utils";
+import { accessDeletePayloadSchema, accessPayloadSchema, accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, CallerKind, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, ResourceType, storagePayloadSchema, toQuantity, trimHexPrefix, withHexPrefix, ixObjectSchema, ixSignaturesSchema, } from "js-moi-utils";
 import { ParticipantId, AssetId, Identifier, LogicId, } from "js-moi-identifiers";
 import { ZERO_ADDRESS, KMOI_ASSET_ID, MIN_STORAGE_DEPOSIT_AMOUNT, } from "js-moi-constants";
-import { Polorizer } from "js-polo";
+import { Polorizer, Depolorizer } from "js-polo";
 import { bytesToHex } from "@noble/secp256k1";
 // KMOI reserves these five endpoints for protocol code only. go-moi rejects
 // a call to any of them on the KMOI asset with ErrKMOIReservedEndpoint
@@ -693,5 +693,23 @@ export const toInteractionArgs = (ix) => {
             : undefined,
         participants: ix.participants,
     };
+};
+/**
+ * Validates that a payer signature is present when the interaction has a non-zero payer.
+ *
+ * @param {InteractionRequest} ixRequest - The signed interaction request to validate.
+ * @throws {Error} if a payer is set but no matching signature entry is found.
+ */
+export const validatePayerSignature = (ixRequest) => {
+    const decoded = new Depolorizer(hexToBytes(ixRequest.ix_args)).depolorize(ixObjectSchema);
+    const payerHex = withHexPrefix(bytesToHex(decoded.payer));
+    if (payerHex === ZERO_ADDRESS) {
+        return;
+    }
+    const signatures = new Depolorizer(hexToBytes(ixRequest.signatures)).depolorize(ixSignaturesSchema);
+    const hasPayerSignature = signatures.some((entry) => withHexPrefix(bytesToHex(entry.id)).toLowerCase() === payerHex.toLowerCase());
+    if (!hasPayerSignature) {
+        ErrorUtils.throwError("Payer signature is missing. Call signAsPayer on the payer wallet and addSignature before sending.", ErrorCode.INVALID_ARGUMENT);
+    }
 };
 //# sourceMappingURL=interaction.js.map

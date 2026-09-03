@@ -45,6 +45,7 @@ const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_hdnode_1 = require("js-moi-hdnode");
 const js_moi_signer_1 = require("js-moi-signer");
 const js_moi_utils_1 = require("js-moi-utils");
+const js_polo_1 = require("js-polo");
 const SigningKeyErrors = __importStar(require("./errors"));
 const keystore_1 = require("./keystore");
 const serializer_1 = require("./serializer");
@@ -403,6 +404,12 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     async signInteraction(ixObject, _sigAlgo) {
         try {
+            if (ixObject.payer && ixObject.payer !== js_moi_constants_1.ZERO_ADDRESS) {
+                const payerId = new js_moi_identifiers_1.Identifier(ixObject.payer);
+                if (payerId.getKind() !== js_moi_identifiers_1.IdentifierKind.Participant) {
+                    js_moi_utils_1.ErrorUtils.throwError("Payer must be a participant account. Logic and asset accounts cannot be payers.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+                }
+            }
             const ixData = (0, serializer_1.serializeIxObject)(ixObject);
             const participantId = ixObject.sender.id;
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
@@ -426,6 +433,41 @@ class Wallet extends js_moi_signer_1.Signer {
         }
         catch (err) {
             js_moi_utils_1.ErrorUtils.throwError(`Failed to sign interaction: ${err instanceof Error ? err.message : err}`, js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+    /**
+     * Signs serialized interaction bytes as the payer identified in `ix_args`.
+     * The payer address encoded in `ix_args` must match this wallet's identity.
+     *
+     * @param {Hex} ixArgs - Serialized interaction bytes from a signed interaction request.
+     * @returns {Promise<Hex>} POLO-encoded signature bytes for the payer entry.
+     */
+    async signAsPayer(ixArgs) {
+        try {
+            const ixArgsBytes = (0, js_moi_utils_1.hexToBytes)(ixArgs);
+            const decoded = new js_polo_1.Depolorizer(ixArgsBytes).depolorize(js_moi_utils_1.ixObjectSchema);
+            const selfId = await this.getIdentifier();
+            const payerHex = (0, js_moi_utils_1.withHexPrefix)((0, js_moi_utils_1.bytesToHex)(decoded.payer));
+            if (payerHex.toLowerCase() !== selfId.toHex().toLowerCase()) {
+                js_moi_utils_1.ErrorUtils.throwError("Payer address does not match wallet identity", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+            const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+            const keys = privateMapGet(this, __vault)._keys;
+            if (!keys.has(this.key_index)) {
+                js_moi_utils_1.ErrorUtils.throwError(`Payer key ${this.key_index} is not registered`, js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
+            }
+            const rawSigHex = await this.sign(buffer_1.Buffer.from(ixArgsBytes), this.key_index, sigAlgo);
+            const rawSign = (0, serializer_1.serializeIxSignatures)([
+                {
+                    id: selfId.toHex(),
+                    key_id: this.key_index,
+                    signature: rawSigHex,
+                },
+            ]);
+            return (0, js_moi_utils_1.bytesToHex)(rawSign);
+        }
+        catch (err) {
+            js_moi_utils_1.ErrorUtils.throwError(`Failed to sign as payer: ${err instanceof Error ? err.message : err}`, js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     /**

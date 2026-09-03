@@ -26,4 +26,14 @@ export declare const processInteractionObject: (ix: InteractionObject) => Intera
 export declare const toRawInteractionObject: (ix: InteractionObject) => RawInteractionObject;
 export declare const toRawSignatures: (signs: Signature[]) => RawSignature[];
 export declare const toInteractionArgs: (ix: InteractionObject) => InteractionArgs;
+/**
+ * Validates that a payer signature is present when the interaction has a non-zero payer.
+ *
+ * @param {InteractionRequest} ixRequest - The signed interaction request to validate.
+ * @throws {Error} if a payer is set but no matching signature entry is found.
+ */
+export declare const validatePayerSignature: (ixRequest: {
+    ix_args: string;
+    signatures: string;
+}) => void;
 //# sourceMappingURL=interaction.d.ts.map

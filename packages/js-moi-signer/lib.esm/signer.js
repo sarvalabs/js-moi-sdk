@@ -1,3 +1,4 @@
+import { validatePayerSignature } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, isValidAddress } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
@@ -173,6 +174,7 @@ export class Signer {
             await this.prepareInteraction('send', ixObject);
             // Sign the interaction object
             const ixRequest = await this.signInteraction(ixObject, sigAlgo);
+            validatePayerSignature(ixRequest);
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }

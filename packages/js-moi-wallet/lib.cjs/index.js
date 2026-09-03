@@ -14,5 +14,10 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.addSignature = exports.serializeIxSignatures = exports.serializeIxObject = void 0;
 __exportStar(require("./wallet"), exports);
+var serializer_1 = require("./serializer");
+Object.defineProperty(exports, "serializeIxObject", { enumerable: true, get: function () { return serializer_1.serializeIxObject; } });
+Object.defineProperty(exports, "serializeIxSignatures", { enumerable: true, get: function () { return serializer_1.serializeIxSignatures; } });
+Object.defineProperty(exports, "addSignature", { enumerable: true, get: function () { return serializer_1.addSignature; } });
 //# sourceMappingURL=index.js.map

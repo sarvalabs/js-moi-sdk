@@ -1,4 +1,4 @@
-import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
+import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options, validatePayerSignature } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, isValidAddress } from "js-moi-utils";
 import { SigType, SigningAlgorithms } from "../types";
 import ECDSA_S256 from "./ecdsa";
@@ -219,6 +219,8 @@ export abstract class Signer {
 
             // Sign the interaction object
             const ixRequest = await this.signInteraction(ixObject, sigAlgo)
+
+            validatePayerSignature(ixRequest);
 
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);

@@ -69,6 +69,7 @@ export class InteractionContext {
             fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
             ix_operations: [this.buildOperation(), ...fundingOperations],
             participants: this.mergeParticipants(option),
+            payer: option?.payer,
         };
     }
     /**
