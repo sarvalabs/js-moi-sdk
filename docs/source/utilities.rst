@@ -297,6 +297,63 @@ Bytes
 
     >> [1, 2, 3]
 
+Units
+-----
+
+Helpers for converting between human-readable decimal amounts and on-chain
+integer amounts. ``formatAmount`` / ``parseAmount`` work with any asset
+decimals (0–18). ``formatKmoi`` / ``parseKmoi`` are convenience wrappers
+that always use ``KMOI_DECIMALS`` (9).
+
+.. autofunction:: formatAmount
+
+.. code-block:: javascript
+
+    // Example
+    console.log(formatAmount(1500000000n, 9))
+
+    >> 1.5
+
+.. autofunction:: parseAmount
+
+.. code-block:: javascript
+
+    // Example
+    console.log(parseAmount("1.5", 9))
+
+    >> 1500000000n
+
+    // Round-trip
+    const raw = parseAmount("1.000000001", 9)
+    console.log(formatAmount(raw, 9))
+
+    >> 1.000000001
+
+.. autofunction:: formatKmoi
+
+.. code-block:: javascript
+
+    // Example
+    console.log(formatKmoi(1500000000n))
+
+    >> 1.5
+
+    console.log(formatKmoi(5000000n))
+
+    >> 0.005
+
+.. autofunction:: parseKmoi
+
+.. code-block:: javascript
+
+    // Example
+    console.log(parseKmoi("1.5"))
+
+    >> 1500000000n
+
+    const amount = parseKmoi("100")
+    const response = await masn.transfer(beneficiary, amount).send()
+
 Json
 ----
 

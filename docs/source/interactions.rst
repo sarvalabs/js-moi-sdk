@@ -138,11 +138,12 @@ Asset Management
 ~~~~~~~~~~~~~~~~
 
 This module provides classes and utilities for creating, managing, and interacting with on-chain assets
-within the MOI framework. It defines three main components:
+within the MOI framework. It defines the following main components:
 
 - :class:`AssetFactory` – Responsible for asset creation.
 - :class:`AssetDriver` – Provides a driver abstraction for asset logic execution.
 - :class:`MAS0AssetLogic` – Implements the standard MAS0 asset logic and operations such as mint, burn, and transfer.
+- :class:`MASNAssetLogic` – Implements the reserved MASN (native KMOI) asset logic.
 
 
 AssetFactory
@@ -204,7 +205,17 @@ AssetFactory
       .. code-block:: javascript
 
         // Native standard - use MAS0AssetLogic, not AssetFactory (no manifest, node uses its own built-in one).
-        const ctx = MAS0AssetLogic.create(signer, "GOLD", 1000000n, managerAddress, true);
+        const ASSET_DECIMALS = 12;
+        const supply = parseAmount("10", ASSET_DECIMALS);
+        const ctx = MAS0AssetLogic.create(
+            signer,
+            "GOLD",
+            supply,
+            managerAddress,
+            true,
+            option,
+            ASSET_DECIMALS
+        );
         const response = await ctx.send();
 
       **Usage Example - custom (MASX) asset with your own logic**
@@ -297,12 +308,17 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option)
+   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals)
 
       Creates a new MAS0-standard asset on-chain, then returns an instance
       of :class:`MAS0AssetLogic` for interacting with it.
 
+      Pass ``decimals`` to set the asset's decimal places at creation (0–18).
+      ``supply`` must be expressed in the smallest unit for those decimals;
+      convert a human-readable amount with :func:`parseAmount`.
+
       :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
+      :param int decimals: (Optional) Number of decimal places for the asset. Omit to use the protocol default.
       :returns: An instance of :class:`MAS0AssetLogic`
       :rtype: MAS0AssetLogic
 
@@ -310,15 +326,20 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
 
       .. code-block:: javascript
 
+         const ASSET_DECIMALS = 12;
+         const supply = parseAmount("10", ASSET_DECIMALS);
+
          const gold = await MAS0AssetLogic.newAsset(
              signer,
              "GOLD",
-             1000000n,
+             supply,
              managerAddress,
-             true
+             true,
+             option,
+             ASSET_DECIMALS
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents, option)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, option, decimals)
 
       Builds an :class:`InteractionContext` for creating a MAS0-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
@@ -326,8 +347,32 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
       ``option.storageFund``) - a fresh asset account self-pays for its own
       creation-time storage cost and starts with no KMOI.
 
+      Users can provide ``decimals`` at creation time. When set, ``supply``
+      must already be scaled to that precision (use :func:`parseAmount` with
+      the same decimal count).
+
       :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
+      :param int decimals: (Optional) Number of decimal places for the asset (0–18).
       :returns: InteractionContext<OpType.ASSET_CREATE>
+
+      **Example**
+
+      .. code-block:: javascript
+
+         const ASSET_DECIMALS = 12;
+         const amount = parseAmount("10", ASSET_DECIMALS);
+
+         const interactionObj = await MAS0AssetLogic.create(
+             wallet,
+             "GOLD",
+             amount,
+             id,
+             true,
+             option,
+             ASSET_DECIMALS
+         ).ixData();
+
+         const response = await wallet.sendInteraction(interactionObj);
 
 
 **MAS0 Operations**
@@ -633,14 +678,17 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, manager, enableEvents, option)
+   .. method:: static async newAsset(signer, symbol, manager, enableEvents, option, decimals)
 
       Creates a new MAS1-standard asset on-chain, then returns an instance
       of :class:`MAS1AssetLogic` for interacting with it. MAS1 is single-unit
-      (NFT-like) - unlike MAS0/MAS2 there is no ``supply`` parameter, ``max_supply``
-      is always 1.
+      (NFT-like) - unlike MAS0/MAS2 there is no ``supply`` parameter; ``max_supply``
+      is encoded as ``parseAmount("1", decimals ?? 0)``.
+
+      Pass ``decimals`` to set the asset's decimal places at creation (0–18).
 
       :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
+      :param int decimals: (Optional) Number of decimal places for the asset. Omit to use the protocol default.
       :returns: An instance of :class:`MAS1AssetLogic`
       :rtype: MAS1AssetLogic
 
@@ -648,14 +696,18 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
       .. code-block:: javascript
 
+         const ASSET_DECIMALS = 10;
+
          const gold = await MAS1AssetLogic.newAsset(
              signer,
              "GOLD",
              managerAddress,
-             true
+             true,
+             option,
+             ASSET_DECIMALS
          );
 
-   .. method:: static create(signer, symbol, manager, enableEvents, option)
+   .. method:: static create(signer, symbol, manager, enableEvents, option, decimals)
 
       Builds an :class:`InteractionContext` for creating a MAS1-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
@@ -663,8 +715,30 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
       ``option.storageFund``) - a fresh asset account self-pays for its own
       creation-time storage cost and starts with no KMOI.
 
+      Users can provide ``decimals`` at creation time. MAS1 still has a
+      unit supply of 1; that value is scaled with :func:`parseAmount` using
+      the given decimals.
+
       :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
+      :param int decimals: (Optional) Number of decimal places for the asset (0–18).
       :returns: InteractionContext<OpType.ASSET_CREATE>
+
+      **Example**
+
+      .. code-block:: javascript
+
+         const ASSET_DECIMALS = 10;
+
+         const interactionObj = await MAS1AssetLogic.create(
+             wallet,
+             "GOLD",
+             id,
+             true,
+             option,
+             ASSET_DECIMALS
+         ).ixData();
+
+         const response = await wallet.sendInteraction(interactionObj);
 
 
 **MAS1 Operations**
@@ -1004,12 +1078,17 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option)
+   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals)
 
       Creates a new MAS2-standard asset on-chain, then returns an instance
       of :class:`MAS2AssetLogic` for interacting with it.
 
+      Pass ``decimals`` to set the asset's decimal places at creation (0–18).
+      ``supply`` must be expressed in the smallest unit for those decimals;
+      convert a human-readable amount with :func:`parseAmount`.
+
       :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
+      :param int decimals: (Optional) Number of decimal places for the asset. Omit to use the protocol default.
       :returns: An instance of :class:`MAS2AssetLogic`
       :rtype: MAS2AssetLogic
 
@@ -1017,15 +1096,20 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
 
       .. code-block:: javascript
 
+         const ASSET_DECIMALS = 10;
+         const supply = parseAmount("10", ASSET_DECIMALS);
+
          const gold = await MAS2AssetLogic.newAsset(
              signer,
              "GOLD",
-             1000000n,
+             supply,
              managerAddress,
-             true
+             true,
+             option,
+             ASSET_DECIMALS
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents, option)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, option, decimals)
 
       Builds an :class:`InteractionContext` for creating a MAS2-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
@@ -1033,8 +1117,32 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
       ``option.storageFund``) - a fresh asset account self-pays for its own
       creation-time storage cost and starts with no KMOI.
 
+      Users can provide ``decimals`` at creation time. When set, ``supply``
+      must already be scaled to that precision (use :func:`parseAmount` with
+      the same decimal count).
+
       :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
+      :param int decimals: (Optional) Number of decimal places for the asset (0–18).
       :returns: InteractionContext<OpType.ASSET_CREATE>
+
+      **Example**
+
+      .. code-block:: javascript
+
+         const ASSET_DECIMALS = 10;
+         const amount = parseAmount("10", ASSET_DECIMALS);
+
+         const interactionObj = await MAS2AssetLogic.create(
+             wallet,
+             "GOLD",
+             amount,
+             id,
+             true,
+             option,
+             ASSET_DECIMALS
+         ).ixData();
+
+         const response = await wallet.sendInteraction(interactionObj);
 
 
 **MAS2 Operations**
@@ -1351,6 +1459,266 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
    .. code-block:: javascript
 
       const response = await mas2.getDynamicMetadata(tokenId, key).send();
+
+MASNAssetLogic
+^^^^^^^^^^^^^^
+MASN (``AssetStandard.MASN``, ``0xFFFE``) is the reserved native-asset standard
+used exclusively by KMOI. Unlike MAS0–MAS2, MASN assets cannot be created by
+clients — the standard is reserved, and ``MASNAssetLogic`` always operates on
+``KMOI_ASSET_ID``.
+
+MASN reuses the MAS0 wire format for its supported endpoints. Mint, burn, and
+metadata mutation are not available. The 15 supported endpoints are transfer,
+transferFrom, lockup, release, approve, revoke, symbol, balanceOf, creator,
+manager, decimals, maxSupply, circulatingSupply, getStaticMetadata, and
+getDynamicMetadata.
+
+.. class:: MASNAssetLogic
+
+   Implements the reserved **MASN asset logic** for KMOI. All operations target
+   ``KMOI_ASSET_ID``; there is no ``assetId`` constructor argument and no
+   ``create`` / ``newAsset`` factory.
+
+   **Constructor**
+
+   .. method:: constructor(signer)
+
+      Initializes a new ``MASNAssetLogic`` instance bound to native KMOI.
+
+      :param Signer signer: The signer instance for authorization.
+
+      **Example**
+
+      .. code-block:: javascript
+
+         const masn = new MASNAssetLogic(wallet);
+
+
+**MASN Operations**
+
+The following methods correspond to MASN-standard KMOI operations.
+Each mutating operation returns an :class:`InteractionContext`, which can be
+executed by calling ``.send()``. Amounts should be expressed in the smallest
+unit (anu); use :func:`parseKmoi` to convert a decimal KMOI string.
+
+.. method:: transfer(beneficiary, amount)
+
+   Transfers KMOI to another account.
+
+   :param str beneficiary: Recipient participant id.
+   :param int | bigint amount: Amount to transfer, in anu.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("100");
+      const response = await masn.transfer(beneficiary, amount).send();
+
+
+.. method:: transferFrom(benefactor, beneficiary, amount)
+
+   Transfers KMOI from a benefactor to a beneficiary (if approved).
+
+   :param str benefactor: The participant id of the original holder.
+   :param str beneficiary: The receiver participant id.
+   :param int | bigint amount: Amount to transfer, in anu.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("1");
+      const response = await masn.transferFrom(benefactor, beneficiary, amount).send();
+
+
+.. method:: approve(beneficiary, amount, expiresAt)
+
+   Grants spending permission to another account.
+
+   :param str beneficiary: The spender participant id.
+   :param int | bigint amount: Allowance amount, in anu.
+   :param int expiresAt: Expiration timestamp (UNIX time).
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("10");
+      const response = await masn.approve(beneficiary, amount, 1765650600).send();
+
+
+.. method:: revoke(beneficiary)
+
+   Revokes a previously approved allowance.
+
+   :param str beneficiary: Account to revoke approval from.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const response = await masn.revoke(beneficiary).send();
+
+
+.. method:: lockup(beneficiary, amount)
+
+   Locks up a specified amount of KMOI under ``SARGA_ADDRESS``.
+
+   :param str beneficiary: Participant id of whose tokens are being locked.
+   :param int | bigint amount: Amount to lock, in anu.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("1");
+      const response = await masn.lockup(beneficiary, amount).send();
+
+
+.. method:: release(benefactor, beneficiary, amount)
+
+   Releases locked-up KMOI back to a beneficiary.
+
+   :param str benefactor: The original owner of the locked tokens.
+   :param str beneficiary: The receiver of the released tokens.
+   :param int | bigint amount: Amount to release, in anu.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("1");
+      const response = await masn.release(benefactor, beneficiary, amount).send();
+
+**Readonly Routines**
+
+
+.. method:: symbol()
+
+   Returns an interaction context for retrieving the KMOI symbol.
+
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const response = await masn.symbol().call();
+
+
+.. method:: balanceOf(id)
+
+   Retrieves the KMOI balance of a given account.
+
+   :param str id: The participant id to query.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const balance = await masn.balanceOf(walletAddress).call();
+
+.. method:: creator()
+
+   Returns an interaction context for retrieving the KMOI creator.
+
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const response = await masn.creator().call();
+
+.. method:: manager()
+
+   Returns an interaction context for retrieving the KMOI manager.
+
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const response = await masn.manager().call();
+
+.. method:: Decimals()
+
+   Returns an interaction context for retrieving KMOI decimals (9).
+
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const response = await masn.Decimals().call();
+
+.. method:: MaxSupply()
+
+   Returns an interaction context for retrieving the KMOI max supply.
+
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const response = await masn.MaxSupply().call();
+
+.. method:: CirculatingSupply()
+
+   Returns an interaction context for retrieving the KMOI circulating supply.
+
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const response = await masn.CirculatingSupply().call();
+
+.. method:: GetStaticMetadata(key)
+
+   Retrieves a static metadata entry for KMOI.
+
+   :param str key: The metadata key.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const response = await masn.GetStaticMetadata("name").call();
+
+.. method:: GetDynamicMetadata(key)
+
+   Retrieves a dynamic metadata entry for KMOI.
+
+   :param str key: The metadata key.
+   :returns: InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const masn = new MASNAssetLogic(wallet);
+      const response = await masn.GetDynamicMetadata(key).call();
 
 -------------------------------------------------------------------------------
 

@@ -148,7 +148,7 @@ The ``SyncStatus`` interface represents synchronization status information of an
 The ``InteractionRequest`` interface represents a signed interaction request. It has the following properties:
 
 * ``ix_args`` - ``string``: The encoded interaction parameters.
-* ``signature`` - ``string``: The signature for the interaction.
+* ``signatures`` - ``string``: The POLO-encoded signature blob for the interaction (one or more entries).
 
 **InteractionResponse**
 
@@ -425,6 +425,28 @@ Execution Methods
 .. autofunction:: BaseProvider#estimateFuel
 
 .. autofunction:: BaseProvider#sendInteraction
+
+.. autofunction:: validatePayerSignature
+
+Validates that a payer signature is present when the interaction has a
+non-zero payer. If ``payer`` in ``ix_args`` is ``ZERO_ADDRESS``, the check
+is skipped. Otherwise the ``signatures`` blob must contain an entry whose
+``id`` matches the payer.
+
+``Signer#sendInteraction`` calls this automatically after signing. Call it
+explicitly when assembling a sponsored request with
+:func:`Wallet#signAsPayer` and :func:`addSignature` before
+``provider.sendInteraction``.
+
+.. code-block:: javascript
+
+    const ixRequest = await senderWallet.signInteraction(interaction, sigAlgo);
+    const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args);
+    const sponsoredRequest = addSignature(ixRequest, payerSig);
+
+    validatePayerSignature(sponsoredRequest);
+
+    const response = await provider.sendInteraction(sponsoredRequest);
 
 Query Methods
 ~~~~~~~~~~~~~

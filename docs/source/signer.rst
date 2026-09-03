@@ -78,6 +78,13 @@ Regular Methods
 
 .. autofunction:: Signer#sendInteraction
 
+When the interaction object includes a non-zero ``payer``,
+``sendInteraction`` calls :func:`validatePayerSignature` after signing.
+The sender wallet only attaches sender-key signatures, so a sponsored
+interaction must be assembled with :func:`Wallet#signAsPayer` and
+:func:`addSignature` (then sent via ``provider.sendInteraction``) rather
+than calling ``wallet.sendInteraction`` directly.
+
 .. code-block:: javascript
 
     // Example 1
@@ -532,6 +539,44 @@ Wallet
                 signatures: '...'   // POLO-encoded array, one entry per registered key
             }
         */
+
+    .. autofunction:: Wallet#signAsPayer
+
+    Signs serialized interaction bytes as the payer identified in ``ix_args``.
+    The payer address encoded in ``ix_args`` must match this wallet's identity,
+    and the current sender key (``key_index``) must be registered. Returns a
+    POLO-encoded signature blob containing a single payer entry.
+
+    Use this when another participant pays fuel. The sender signs first with
+    ``signInteraction``, then the payer wallet signs the same ``ix_args``.
+    Merge the blobs with :func:`addSignature` before sending.
+
+    .. code-block:: javascript
+
+        const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+        const ixRequest = await senderWallet.signInteraction(interaction, sigAlgo);
+
+        const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args);
+        const sponsoredRequest = addSignature(ixRequest, payerSig);
+
+        const response = await provider.sendInteraction(sponsoredRequest);
+
+    .. autofunction:: addSignature
+
+    Appends a new POLO-encoded signature blob to an existing signed
+    :class:`InteractionRequest`. Typically used to merge a payer signature
+    from :func:`Wallet#signAsPayer` into the sender's request. ``ix_args``
+    is left unchanged; the returned request contains a concatenated
+    ``signatures`` blob.
+
+    .. code-block:: javascript
+
+        const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args);
+        const sponsoredRequest = addSignature(ixRequest, payerSig);
+
+        validatePayerSignature(sponsoredRequest);
+
+        const response = await provider.sendInteraction(sponsoredRequest);
 
     Key Management
     ==============
