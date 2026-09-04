@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 import { HDNode } from "js-moi-hdnode";
-import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
+import { AbstractProvider, InteractionObject, InteractionRequest, Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { Hex } from "js-moi-utils";
 import { type WalletOption } from "../types/wallet";
@@ -189,19 +189,26 @@ export declare class Wallet extends Signer {
      * The interaction object is serialized into POLO bytes before signing.
      *
      * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} _sigAlgo - The signature algorithm to use.
+     * @param {Signature[]} [participantSignatures] - Optional signatures from
+     * other participants to merge with the wallet signatures.
      * @returns {InteractionRequest} The signed interaction request containing
      * the serialized interaction object and all signatures.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    signInteraction(ixObject: InteractionObject, _sigAlgo: SigType): Promise<InteractionRequest>;
+    signInteraction(ixObject: InteractionObject, _sigAlgo: SigType, participantSignatures?: Signature[]): Promise<InteractionRequest>;
     /**
-     * Signs serialized interaction bytes as the payer identified in `ix_args`.
-     * The payer address encoded in `ix_args` must match this wallet's identity.
+     * Signs an interaction object using all registered keys on this wallet and
+     * returns the raw signature entries without POLO serialization.
      *
-     * @param {Hex} ixArgs - Serialized interaction bytes from a signed interaction request.
-     * @returns {Promise<Hex>} POLO-encoded signature bytes for the payer entry.
+     * Unlike `signInteraction`, this method does not validate the payer field or
+     * require the sender key to be registered on the wallet.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} _sigAlgo - The signature algorithm to use.
+     * @returns {Promise<Signature[]>} Raw signature entries for all wallet keys.
      */
-    signAsPayer(ixArgs: Hex): Promise<Hex>;
+    signRawInteractionObject(ixObject: InteractionObject, _sigAlgo: SigType): Promise<Signature[]>;
     /**
      * Initializes the wallet from a provided mnemonic.
      *

@@ -1,5 +1,5 @@
-import type { InteractionObject, InteractionRequest } from "js-moi-providers";
-import { validatePayerSignature } from "js-moi-providers";
+import type { InteractionObject, InteractionRequest, RawSignature, Signature } from "js-moi-providers";
+import { checkSignature, rawSignaturesToSignatures } from "js-moi-providers";
 import {
   DEFAULT_FUEL_LIMIT,
   DEFAULT_FUEL_PRICE,
@@ -8,15 +8,13 @@ import {
 import { deriveAssetId, deriveLogicId } from "js-moi-identifiers";
 import {
   AssetStandard,
-  bytesToHex,
-  hexToBytes,
   type Hex,
+  hexToBytes,
   ixSignaturesSchema,
   OpType,
-  withHexPrefix,
 } from "js-moi-utils";
 import { Depolorizer } from "js-polo";
-import { addSignature, CURVE, Wallet } from "../src.ts/index";
+import { CURVE, Wallet } from "../src.ts/index";
 import type { Keystore } from "../types/keystore";
 
 const MNEMONIC =
@@ -73,14 +71,12 @@ const buildIxObject = (
   ...(payer !== undefined ? { payer } : {}),
 });
 
-const decodeSignatures = (signaturesHex: string) =>
-  new Depolorizer(hexToBytes(signaturesHex)).depolorize(
-    ixSignaturesSchema,
-  ) as Array<{
-    id: Uint8Array;
-    key_id: number;
-    signature: Uint8Array;
-  }>;
+const decodeSignatures = (signaturesHex: Hex): Signature[] =>
+  rawSignaturesToSignatures(
+    new Depolorizer(hexToBytes(signaturesHex)).depolorize(
+      ixSignaturesSchema,
+    ) as RawSignature[],
+  );
 
 const makeMockProvider = () => ({
   sendInteraction: jest.fn().mockResolvedValue({
@@ -416,6 +412,36 @@ describe("Wallet", () => {
     });
   });
 
+  describe("signInteraction: participant signatures", () => {
+    test("merges wallet signatures with participant signatures", async () => {
+      const senderWallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
+      const payerWallet = Wallet.fromMnemonicSync(MNEMONIC, PAYER_PATH);
+      const senderId = (await senderWallet.identifier).toHex();
+      const payerId = (await payerWallet.identifier).toHex();
+      const ixObject = buildIxObject(
+        senderId,
+        await senderWallet.getKeyId(),
+        payerId,
+      );
+      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const payerSignatures = await payerWallet.signRawInteractionObject(
+        ixObject,
+        algo,
+      );
+
+      const result = await senderWallet.signInteraction(
+        ixObject,
+        algo,
+        payerSignatures,
+      );
+      const mergedSignatures = decodeSignatures(result.signatures as Hex);
+
+      expect(checkSignature(mergedSignatures, senderId)).toBe(true);
+      expect(checkSignature(mergedSignatures, payerId)).toBe(true);
+      expect(checkSignature(payerSignatures, payerId)).toBe(true);
+    });
+  });
+
   describe("connect", () => {
     test("attaches a provider to the wallet", async () => {
       const { VoyageProvider } = await import("js-moi-providers");
@@ -667,208 +693,74 @@ describe("Wallet", () => {
     });
   });
 
-  describe("signAsPayer", () => {
+  describe("signRawInteractionObject", () => {
     let senderWallet: Wallet;
     let payerWallet: Wallet;
     let senderId: Hex;
     let payerId: Hex;
-    let ixRequest: InteractionRequest;
+    let ixObject: InteractionObject;
 
     beforeEach(async () => {
       senderWallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
       payerWallet = Wallet.fromMnemonicSync(MNEMONIC, PAYER_PATH);
       senderId = (await senderWallet.identifier).toHex();
       payerId = (await payerWallet.identifier).toHex();
-
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      ixRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId(), payerId),
-        algo,
-      );
+      ixObject = buildIxObject(senderId, await senderWallet.getKeyId(), payerId);
     });
 
-    test("returns a hex-encoded POLO signature blob", async () => {
-      const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args as Hex);
+    test("returns an array of Signature objects", async () => {
+      const algo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const signatures = await payerWallet.signRawInteractionObject(ixObject, algo);
 
-      expect(typeof payerSig).toBe("string");
-      expect(payerSig.length).toBeGreaterThan(0);
+      expect(Array.isArray(signatures)).toBe(true);
+      expect(signatures).toHaveLength(1);
+      expect(signatures[0]).toMatchObject({
+        id: payerId,
+        key_id: 0,
+        signature: expect.any(String),
+      });
     });
 
-    test("produces a single signature entry tagged with the payer id", async () => {
-      const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args as Hex);
-      const decoded = decodeSignatures(payerSig);
+    test("produces a single signature entry tagged with the wallet id", async () => {
+      const algo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const signatures = await payerWallet.signRawInteractionObject(ixObject, algo);
 
-      expect(decoded).toHaveLength(1);
-      expect(withHexPrefix(bytesToHex(decoded[0].id))).toBe(payerId);
+      expect(signatures).toHaveLength(1);
+      expect(signatures[0].id).toBe(payerId);
     });
 
-    test("uses the payer wallet sender key_id by default", async () => {
-      const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args as Hex);
-      const decoded = decodeSignatures(payerSig);
+    test("uses all registered wallet keys", async () => {
+      const algo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const signatures = await payerWallet.signRawInteractionObject(ixObject, algo);
 
-      expect(decoded[0].key_id).toBe(0);
+      expect(signatures[0].key_id).toBe(0);
     });
 
-    test("throws when the wallet identity does not match the payer in ix_args", async () => {
-      await expect(
-        senderWallet.signAsPayer(ixRequest.ix_args as Hex),
-      ).rejects.toThrow("Payer address does not match wallet identity");
-    });
-
-    test("throws when ix_args has no payer set", async () => {
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      const noPayerRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId()),
-        algo,
-      );
+    test("signs without requiring the sender key to be registered on the wallet", async () => {
+      const algo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const ixObjectWithForeignSenderKey = buildIxObject(senderId, 99, payerId);
 
       await expect(
-        payerWallet.signAsPayer(noPayerRequest.ix_args as Hex),
-      ).rejects.toThrow("Payer address does not match wallet identity");
+        payerWallet.signRawInteractionObject(ixObjectWithForeignSenderKey, algo),
+      ).resolves.toHaveLength(1);
     });
 
-    test("uses the updated key_id after setKeyId", async () => {
+    test("signs with all registered keys after addKey", async () => {
       const { privKey, pubKey } = await Wallet.deriveAccountKey(
         MNEMONIC,
         PAYER_SECOND_PATH,
       );
       payerWallet.addKey(1, pubKey, privKey);
-      payerWallet.setKeyId(1);
 
-      const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args as Hex);
-      const decoded = decodeSignatures(payerSig);
+      const algo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const signatures = await payerWallet.signRawInteractionObject(ixObject, algo);
 
-      expect(decoded[0].key_id).toBe(1);
+      expect(signatures).toHaveLength(2);
+      expect(signatures.map((entry) => entry.key_id).sort()).toEqual([0, 1]);
     });
   });
 
-  describe("addSignature", () => {
-    let senderWallet: Wallet;
-    let payerWallet: Wallet;
-    let senderId: Hex;
-    let payerId: Hex;
-    let ixRequest: InteractionRequest;
-    let payerSig: Hex;
-
-    beforeEach(async () => {
-      senderWallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
-      payerWallet = Wallet.fromMnemonicSync(MNEMONIC, PAYER_PATH);
-      senderId = (await senderWallet.identifier).toHex();
-      payerId = (await payerWallet.identifier).toHex();
-
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      ixRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId(), payerId),
-        algo,
-      );
-      payerSig = await payerWallet.signAsPayer(ixRequest.ix_args as Hex);
-    });
-
-    test("merges sender and payer signatures into two entries", () => {
-      const merged = addSignature(ixRequest, payerSig);
-      const decoded = decodeSignatures(merged.signatures);
-
-      expect(decoded).toHaveLength(2);
-    });
-
-    test("preserves sender signature before payer signature", () => {
-      const merged = addSignature(ixRequest, payerSig);
-      const decoded = decodeSignatures(merged.signatures);
-
-      expect(withHexPrefix(bytesToHex(decoded[0].id))).toBe(senderId);
-      expect(withHexPrefix(bytesToHex(decoded[1].id))).toBe(payerId);
-    });
-
-    test("does not modify ix_args", () => {
-      const merged = addSignature(ixRequest, payerSig);
-
-      expect(merged.ix_args).toBe(ixRequest.ix_args);
-    });
-
-    test("stacks additional signatures when called multiple times", async () => {
-      const mergedOnce = addSignature(ixRequest, payerSig);
-      const mergedTwice = addSignature(mergedOnce, payerSig);
-      const decoded = decodeSignatures(mergedTwice.signatures);
-
-      expect(decoded).toHaveLength(3);
-    });
-
-    test("throws when newSig is not a valid POLO blob", () => {
-      expect(() => addSignature(ixRequest, "0xdeadbeef" as Hex)).toThrow();
-    });
-  });
-
-  describe("validatePayerSignature", () => {
-    let senderWallet: Wallet;
-    let payerWallet: Wallet;
-    let senderId: Hex;
-    let payerId: Hex;
-    let senderOnlyRequest: InteractionRequest;
-    let mergedRequest: InteractionRequest;
-
-    beforeEach(async () => {
-      senderWallet = Wallet.fromMnemonicSync(MNEMONIC, DEVIATION_PATH);
-      payerWallet = Wallet.fromMnemonicSync(MNEMONIC, PAYER_PATH);
-      senderId = (await senderWallet.identifier).toHex();
-      payerId = (await payerWallet.identifier).toHex();
-
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      senderOnlyRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId()),
-        algo,
-      );
-
-      const payerRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId(), payerId),
-        algo,
-      );
-      const payerSig = await payerWallet.signAsPayer(
-        payerRequest.ix_args as Hex,
-      );
-      mergedRequest = addSignature(payerRequest, payerSig);
-    });
-
-    test("no-ops when payer is ZERO_ADDRESS", () => {
-      expect(() => validatePayerSignature(senderOnlyRequest)).not.toThrow();
-    });
-
-    test("no-ops when payer field is absent and serialized as ZERO_ADDRESS", () => {
-      expect(() => validatePayerSignature(senderOnlyRequest)).not.toThrow();
-    });
-
-    test("passes when a matching payer signature entry is present", () => {
-      expect(() => validatePayerSignature(mergedRequest)).not.toThrow();
-    });
-
-    test("throws when payer is set but only the sender signature is present", async () => {
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      const payerOnlySenderSig = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId(), payerId),
-        algo,
-      );
-
-      expect(() => validatePayerSignature(payerOnlySenderSig)).toThrow(
-        "Payer signature is missing",
-      );
-    });
-
-    test("throws when the signatures blob is empty", async () => {
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      const payerRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, await senderWallet.getKeyId(), payerId),
-        algo,
-      );
-
-      expect(() =>
-        validatePayerSignature({
-          ix_args: payerRequest.ix_args,
-          signatures: "0x",
-        }),
-      ).toThrow();
-    });
-  });
-
-  describe("sendInteraction: payer enforcement", () => {
+  describe("sendInteraction", () => {
     let senderWallet: Wallet;
     let payerWallet: Wallet;
     let senderId: Hex;
@@ -890,8 +782,8 @@ describe("Wallet", () => {
         key_id: 0,
         sequence: 0,
       },
-      fuel_price: 1,
-      fuel_limit: 200,
+      fuel_price: DEFAULT_FUEL_PRICE,
+      fuel_limit: DEFAULT_FUEL_LIMIT,
       ix_operations: [
         makeAssetCreateOp(senderId),
       ] as InteractionObject["ix_operations"],
@@ -904,32 +796,30 @@ describe("Wallet", () => {
       expect(mockProvider.sendInteraction).toHaveBeenCalledTimes(1);
     });
 
-    test("sends successfully when payer signature is present in the signed request", async () => {
-      const algo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
-      const payerRequest = await senderWallet.signInteraction(
-        buildIxObject(senderId, 0, payerId),
-        algo,
-      );
-      const payerSig = await payerWallet.signAsPayer(
-        payerRequest.ix_args as Hex,
-      );
-      const mergedRequest = addSignature(payerRequest, payerSig);
-
-      jest
-        .spyOn(senderWallet, "signInteraction")
-        .mockResolvedValue(mergedRequest);
-
+    test("sends successfully when a payer is set", async () => {
       await senderWallet.sendInteraction(buildSendIxObject(payerId));
 
-      expect(mockProvider.sendInteraction).toHaveBeenCalledWith(mergedRequest);
+      expect(mockProvider.sendInteraction).toHaveBeenCalledTimes(1);
     });
 
-    test("throws before provider is called when payer signature is missing", async () => {
-      await expect(
-        senderWallet.sendInteraction(buildSendIxObject(payerId)),
-      ).rejects.toThrow("Payer signature is missing");
+    test("sends successfully with merged payer participant signatures", async () => {
+      const ixObject = buildSendIxObject(payerId);
+      const algo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
 
-      expect(mockProvider.sendInteraction).not.toHaveBeenCalled();
+      await senderWallet.prepareInteraction("send", ixObject);
+      const payerSignatures = await payerWallet.signRawInteractionObject(
+        ixObject,
+        algo,
+      );
+
+      await senderWallet.sendInteraction(ixObject, payerSignatures);
+
+      expect(mockProvider.sendInteraction).toHaveBeenCalledTimes(1);
+      const ixRequest = mockProvider.sendInteraction.mock
+        .calls[0][0] as InteractionRequest;
+      const mergedSignatures = decodeSignatures(ixRequest.signatures as Hex);
+      expect(checkSignature(mergedSignatures, senderId)).toBe(true);
+      expect(checkSignature(mergedSignatures, payerId)).toBe(true);
     });
 
     test("sends successfully when payer is explicitly ZERO_ADDRESS", async () => {

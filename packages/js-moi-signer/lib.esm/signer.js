@@ -1,4 +1,3 @@
-import { validatePayerSignature } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, isValidAddress } from "js-moi-utils";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
@@ -160,12 +159,14 @@ export class Signer {
      * and forwarding it to the connected provider.
      *
      * @param {InteractionObject} ixObject - The interaction object to send.
+     * @param {Signature[]} [participantSignatures] - Optional signatures from
+     * other participants (for example a payer) to merge with the wallet signatures.
      * @returns {Promise<InteractionResponse>} A Promise that resolves to the
      * interaction response.
      * @throws {Error} if there is an error sending the interaction, if the provider
      * is not initialized, or if the interaction object fails the validity checks.
      */
-    async sendInteraction(ixObject) {
+    async sendInteraction(ixObject, participantSignatures) {
         try {
             // Get the provider
             const provider = this.getProvider();
@@ -173,8 +174,7 @@ export class Signer {
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             await this.prepareInteraction('send', ixObject);
             // Sign the interaction object
-            const ixRequest = await this.signInteraction(ixObject, sigAlgo);
-            validatePayerSignature(ixRequest);
+            const ixRequest = await this.signInteraction(ixObject, sigAlgo, participantSignatures);
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }

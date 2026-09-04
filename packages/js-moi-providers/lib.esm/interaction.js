@@ -1,7 +1,7 @@
-import { accessDeletePayloadSchema, accessPayloadSchema, accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, CallerKind, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, ResourceType, storagePayloadSchema, toQuantity, trimHexPrefix, withHexPrefix, ixObjectSchema, ixSignaturesSchema, } from "js-moi-utils";
-import { ParticipantId, AssetId, Identifier, LogicId, } from "js-moi-identifiers";
-import { ZERO_ADDRESS, KMOI_ASSET_ID, MIN_STORAGE_DEPOSIT_AMOUNT, } from "js-moi-constants";
-import { Polorizer, Depolorizer } from "js-polo";
+import { accessDeletePayloadSchema, accessPayloadSchema, accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, CallerKind, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, ResourceType, storagePayloadSchema, toQuantity, trimHexPrefix, withHexPrefix } from "js-moi-utils";
+import { AssetId, Identifier, LogicId, ParticipantId } from "js-moi-identifiers";
+import { ZERO_ADDRESS, KMOI_ASSET_ID, MIN_STORAGE_DEPOSIT_AMOUNT } from "js-moi-constants";
+import { Polorizer } from "js-polo";
 import { bytesToHex } from "@noble/secp256k1";
 // KMOI reserves these five endpoints for protocol code only. go-moi rejects
 // a call to any of them on the KMOI asset with ErrKMOIReservedEndpoint
@@ -40,8 +40,7 @@ export const validateAssetAction = (value) => {
     if (typeof callsite !== "string" || callsite.length === 0) {
         throw new Error("callsite must be a non-empty string");
     }
-    if (asset_id.toLowerCase() === KMOI_ASSET_ID.toLowerCase() &&
-        KMOI_RESERVED_ENDPOINTS.has(callsite)) {
+    if (asset_id === KMOI_ASSET_ID && KMOI_RESERVED_ENDPOINTS.has(callsite)) {
         throw new Error(`callsite "${callsite}" is reserved for protocol code and cannot be called on the KMOI asset`);
     }
     if (calldata !== undefined) {
@@ -452,13 +451,13 @@ function processLogicAction(payload) {
 const processParticipants = (ixObject) => {
     const participants = new Map();
     const addParticipant = (id, lock_type, notary) => {
-        const normalizedId = trimHexPrefix(id).toLowerCase();
-        if (normalizedId === trimHexPrefix(ixObject.sender.id).toLowerCase()) {
+        const normalizedId = trimHexPrefix(id);
+        if (normalizedId === trimHexPrefix(ixObject.sender.id)) {
             return;
         }
         if (ixObject.payer &&
             ixObject.payer != ZERO_ADDRESS &&
-            normalizedId === trimHexPrefix(ixObject.payer).toLowerCase() &&
+            normalizedId === trimHexPrefix(ixObject.payer) &&
             !notary) {
             return;
         }
@@ -660,6 +659,11 @@ export const toRawSignatures = (signs) => {
         signature: hexToBytes(sign.signature),
     }));
 };
+export const rawSignaturesToSignatures = (rawSignatures) => rawSignatures.map((entry) => ({
+    id: bytesToHex(entry.id),
+    key_id: entry.key_id,
+    signature: bytesToHex(entry.signature),
+}));
 const toFundArgs = (fund) => {
     return {
         ...fund,
@@ -695,21 +699,15 @@ export const toInteractionArgs = (ix) => {
     };
 };
 /**
- * Validates that a payer signature is present when the interaction has a non-zero payer.
+ * Checks whether a signature array contains an entry for the given participant
+ * identifier.
  *
- * @param {InteractionRequest} ixRequest - The signed interaction request to validate.
- * @throws {Error} if a payer is set but no matching signature entry is found.
+ * @param {Signature[]} signatures - Parsed signature entries.
+ * @param {Hex} participantId - Participant identifier to look for.
+ * @returns {boolean} `true` when a matching signature entry exists.
  */
-export const validatePayerSignature = (ixRequest) => {
-    const decoded = new Depolorizer(hexToBytes(ixRequest.ix_args)).depolorize(ixObjectSchema);
-    const payerHex = withHexPrefix(bytesToHex(decoded.payer));
-    if (payerHex === ZERO_ADDRESS) {
-        return;
-    }
-    const signatures = new Depolorizer(hexToBytes(ixRequest.signatures)).depolorize(ixSignaturesSchema);
-    const hasPayerSignature = signatures.some((entry) => withHexPrefix(bytesToHex(entry.id)).toLowerCase() === payerHex.toLowerCase());
-    if (!hasPayerSignature) {
-        ErrorUtils.throwError("Payer signature is missing. Call signAsPayer on the payer wallet and addSignature before sending.", ErrorCode.INVALID_ARGUMENT);
-    }
+export const checkSignature = (signatures, participantId) => {
+    const normalizedParticipantId = trimHexPrefix(participantId);
+    return signatures.some((entry) => trimHexPrefix(entry.id) === normalizedParticipantId);
 };
 //# sourceMappingURL=interaction.js.map

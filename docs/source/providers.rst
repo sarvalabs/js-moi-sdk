@@ -426,27 +426,40 @@ Execution Methods
 
 .. autofunction:: BaseProvider#sendInteraction
 
-.. autofunction:: validatePayerSignature
+.. autofunction:: checkSignature
 
-Validates that a payer signature is present when the interaction has a
-non-zero payer. If ``payer`` in ``ix_args`` is ``ZERO_ADDRESS``, the check
-is skipped. Otherwise the ``signatures`` blob must contain an entry whose
-``id`` matches the payer.
+Checks whether a parsed :class:`Signature` array contains an entry for the
+given participant identifier. Use this when assembling sponsored interactions
+to confirm that a payer (or any other co-signer) has signed before sending.
 
-``Signer#sendInteraction`` calls this automatically after signing. Call it
-explicitly when assembling a sponsored request with
-:func:`Wallet#signAsPayer` and :func:`addSignature` before
-``provider.sendInteraction``.
+The payer typically produces signatures with
+:func:`Wallet#signRawInteractionObject`. The sender merges those entries into
+the final request through the ``participantSignatures`` argument of
+:func:`Wallet#signInteraction` or :func:`Signer#sendInteraction`.
 
 .. code-block:: javascript
 
-    const ixRequest = await senderWallet.signInteraction(interaction, sigAlgo);
-    const payerSig = await payerWallet.signAsPayer(ixRequest.ix_args);
-    const sponsoredRequest = addSignature(ixRequest, payerSig);
+    const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+    const payerId = (await payerWallet.getIdentifier()).toHex();
 
-    validatePayerSignature(sponsoredRequest);
+    await senderWallet.prepareInteraction("send", interaction);
 
-    const response = await provider.sendInteraction(sponsoredRequest);
+    const payerSignatures = await payerWallet.signRawInteractionObject(
+        interaction,
+        sigAlgo,
+    );
+
+    if (!checkSignature(payerSignatures, payerId)) {
+        throw new Error("Payer signature is missing");
+    }
+
+    const ixRequest = await senderWallet.signInteraction(
+        interaction,
+        sigAlgo,
+        payerSignatures,
+    );
+
+    const response = await provider.sendInteraction(ixRequest);
 
 Query Methods
 ~~~~~~~~~~~~~

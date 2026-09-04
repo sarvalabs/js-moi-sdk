@@ -4,10 +4,9 @@ import elliptic from "elliptic";
 import * as bip39 from "js-moi-bip39";
 import { MOI_DERIVATION_PATH, ZERO_ADDRESS } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
-import { AbstractProvider, InteractionObject, InteractionRequest, RawInteractionObject } from "js-moi-providers";
+import { AbstractProvider, InteractionObject, InteractionRequest, Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
-import { CustomError, ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes, ixObjectSchema, withHexPrefix } from "js-moi-utils";
-import { Depolorizer } from "js-polo";
+import { CustomError, ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
 
 import * as SigningKeyErrors from "./errors";
 import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
@@ -429,11 +428,18 @@ export class Wallet extends Signer {
      * The interaction object is serialized into POLO bytes before signing.
      *
      * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} _sigAlgo - The signature algorithm to use.
+     * @param {Signature[]} [participantSignatures] - Optional signatures from
+     * other participants to merge with the wallet signatures.
      * @returns {InteractionRequest} The signed interaction request containing
      * the serialized interaction object and all signatures.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    public async signInteraction(ixObject: InteractionObject, _sigAlgo: SigType): Promise<InteractionRequest> {
+    public async signInteraction(
+        ixObject: InteractionObject,
+        _sigAlgo: SigType,
+        participantSignatures?: Signature[],
+    ): Promise<InteractionRequest> {
         try {
             if (ixObject.payer && ixObject.payer !== ZERO_ADDRESS) {
                 const payerId = new Identifier(ixObject.payer);
@@ -468,7 +474,11 @@ export class Wallet extends Signer {
                 })
             );
 
-            const rawSign = serializeIxSignatures(signatures)
+            const mergedSignatures = [
+                ...signatures,
+                ...(participantSignatures ?? []),
+            ];
+            const rawSign = serializeIxSignatures(mergedSignatures);
 
             return {
                 ix_args: bytesToHex(ixData),
@@ -480,48 +490,35 @@ export class Wallet extends Signer {
     }
 
     /**
-     * Signs serialized interaction bytes as the payer identified in `ix_args`.
-     * The payer address encoded in `ix_args` must match this wallet's identity.
+     * Signs an interaction object using all registered keys on this wallet and
+     * returns the raw signature entries without POLO serialization.
      *
-     * @param {Hex} ixArgs - Serialized interaction bytes from a signed interaction request.
-     * @returns {Promise<Hex>} POLO-encoded signature bytes for the payer entry.
+     * Unlike `signInteraction`, this method does not validate the payer field or
+     * require the sender key to be registered on the wallet.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} _sigAlgo - The signature algorithm to use.
+     * @returns {Promise<Signature[]>} Raw signature entries for all wallet keys.
      */
-    public async signAsPayer(ixArgs: Hex): Promise<Hex> {
+    public async signRawInteractionObject(ixObject: InteractionObject, _sigAlgo: SigType): Promise<Signature[]> {
         try {
-            const ixArgsBytes = hexToBytes(ixArgs);
-            const decoded = new Depolorizer(ixArgsBytes).depolorize(ixObjectSchema) as RawInteractionObject;
-            const selfId = await this.getIdentifier();
-            const payerHex = withHexPrefix(bytesToHex(decoded.payer));
-
-            if (payerHex.toLowerCase() !== selfId.toHex().toLowerCase()) {
-                ErrorUtils.throwError(
-                    "Payer address does not match wallet identity",
-                    ErrorCode.INVALID_ARGUMENT
-                );
-            }
-
+            const ixData = serializeIxObject(ixObject);
+            const participantId = (await this.getIdentifier()).toHex();
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             const keys: Map<number, KeyEntry> = privateMapGet(this, __vault)._keys;
 
-            if (!keys.has(this.key_index)) {
-                ErrorUtils.throwError(
-                    `Payer key ${this.key_index} is not registered`,
-                    ErrorCode.INVALID_ARGUMENT
-                );
-            }
-
-            const rawSigHex = await this.sign(Buffer.from(ixArgsBytes), this.key_index, sigAlgo);
-            const rawSign = serializeIxSignatures([
-                {
-                    id: selfId.toHex(),
-                    key_id: this.key_index,
-                    signature: rawSigHex as Hex,
-                },
-            ]);
-
-            return bytesToHex(rawSign) as Hex;
+            return Promise.all(
+                Array.from(keys.keys()).map(async (keyId) => {
+                    const signature = await this.sign(Buffer.from(ixData), keyId, sigAlgo);
+                    return {
+                        id: participantId as Hex,
+                        key_id: keyId,
+                        signature: signature as Hex,
+                    };
+                })
+            );
         } catch (err) {
-            ErrorUtils.throwError(`Failed to sign as payer: ${err instanceof Error ? err.message : err}`, ErrorCode.UNKNOWN_ERROR, { originalError: err });
+            ErrorUtils.throwError("Failed to sign raw interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
 

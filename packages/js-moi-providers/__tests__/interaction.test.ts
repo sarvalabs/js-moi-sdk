@@ -2,7 +2,9 @@ import { KMOI_ASSET_ID, ZERO_ADDRESS } from "js-moi-constants";
 import { LockType, OpType } from "js-moi-utils";
 import type { InteractionObject, Signature } from "../types/interaction";
 import {
+    checkSignature,
     processInteractionObject,
+    rawSignaturesToSignatures,
     toRawSignatures,
     validateAccountConfigure,
     validateAccountInherit,
@@ -483,5 +485,76 @@ describe("toRawSignatures", () => {
 
     test("returns an empty array when given an empty input", () => {
         expect(toRawSignatures([])).toEqual([]);
+    });
+});
+
+describe("rawSignaturesToSignatures", () => {
+    const raw = [
+        { id: new Uint8Array([0x12, 0x34]), key_id: 0, signature: new Uint8Array([0xde, 0xad, 0xbe, 0xef]) },
+        { id: new Uint8Array([0xab, 0xcd]), key_id: 1, signature: new Uint8Array([0xca, 0xfe, 0xba, 0xbe]) },
+    ];
+
+    test("converts id and signature from Uint8Array to hex strings", () => {
+        const signs = rawSignaturesToSignatures(raw);
+
+        expect(typeof signs[0].id).toBe("string");
+        expect(typeof signs[0].signature).toBe("string");
+        expect(typeof signs[1].id).toBe("string");
+        expect(typeof signs[1].signature).toBe("string");
+    });
+
+    test("preserves the key_id field unchanged", () => {
+        const signs = rawSignaturesToSignatures(raw);
+
+        expect(signs[0].key_id).toBe(0);
+        expect(signs[1].key_id).toBe(1);
+    });
+
+    test("converts Uint8Array bytes to the correct hex values", () => {
+        const signs = rawSignaturesToSignatures([
+            { id: new Uint8Array([0x12, 0x34]), key_id: 0, signature: new Uint8Array([0xab, 0xcd]) },
+        ]);
+
+        expect(signs[0].id).toBe("1234");
+        expect(signs[0].signature).toBe("abcd");
+    });
+
+    test("returns an empty array when given an empty input", () => {
+        expect(rawSignaturesToSignatures([])).toEqual([]);
+    });
+});
+
+describe("checkSignature", () => {
+    const senderSignature: Signature = {
+        id: SENDER,
+        key_id: 0,
+        signature: "abcd" as Hex,
+    };
+
+    const payerSignature: Signature = {
+        id: PAYER,
+        key_id: 0,
+        signature: "ef01" as Hex,
+    };
+
+    test("returns true when a signature array contains the participant id", () => {
+        expect(checkSignature([senderSignature, payerSignature], PAYER)).toBe(true);
+    });
+
+    test("returns false when a signature array does not contain the participant id", () => {
+        expect(checkSignature([senderSignature], PAYER)).toBe(false);
+    });
+
+    test("matches participant ids after trimming the 0x prefix", () => {
+        const payerSignatureWithoutPrefix: Signature = {
+            ...payerSignature,
+            id: PAYER.slice(2) as Hex,
+        };
+
+        expect(checkSignature([payerSignatureWithoutPrefix], PAYER)).toBe(true);
+    });
+
+    test("returns false for an empty signature array", () => {
+        expect(checkSignature([], PAYER)).toBe(false);
     });
 });

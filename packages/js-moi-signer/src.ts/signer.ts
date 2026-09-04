@@ -1,4 +1,4 @@
-import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options, validatePayerSignature } from "js-moi-providers";
+import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options, Signature as ParticipantSignature } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, isValidAddress } from "js-moi-utils";
 import { SigType, SigningAlgorithms } from "../types";
 import ECDSA_S256 from "./ecdsa";
@@ -27,7 +27,7 @@ export abstract class Signer {
     abstract getIdentifier(): Promise<Identifier>;
     abstract sign(message: Uint8Array, keyId: number, sigAlgo: SigType): Promise<string>;
     abstract isInitialized(): boolean;
-    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
+    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType, participantSignatures?: ParticipantSignature[]): Promise<InteractionRequest>;
 
 
     /**
@@ -197,30 +197,30 @@ export abstract class Signer {
         return await provider.estimateFuel(ixObject)
     }
 
-    /**
-     * Sends an interaction object by signing it with the appropriate signature algorithm
-     * and forwarding it to the connected provider.
-     *
-     * @param {InteractionObject} ixObject - The interaction object to send.
-     * @returns {Promise<InteractionResponse>} A Promise that resolves to the 
-     * interaction response.
-     * @throws {Error} if there is an error sending the interaction, if the provider 
-     * is not initialized, or if the interaction object fails the validity checks.
-     */
-    public async sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse> {
-        try {
-            // Get the provider
-            const provider = this.getProvider();
+	/**
+	 * Sends an interaction object by signing it with the appropriate signature algorithm
+	 * and forwarding it to the connected provider.
+	 *
+	 * @param {InteractionObject} ixObject - The interaction object to send.
+	 * @param {Signature[]} [participantSignatures] - Optional signatures from
+	 * other participants (for example a payer) to merge with the wallet signatures.
+	 * @returns {Promise<InteractionResponse>} A Promise that resolves to the
+	 * interaction response.
+	 * @throws {Error} if there is an error sending the interaction, if the provider
+	 * is not initialized, or if the interaction object fails the validity checks.
+	 */
+	public async sendInteraction(ixObject: InteractionObject,participantSignatures?: ParticipantSignature[]): Promise<InteractionResponse> {
+		try {
+			// Get the provider
+			const provider = this.getProvider();
 
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
 
             await this.prepareInteraction('send', ixObject);
 
-            // Sign the interaction object
-            const ixRequest = await this.signInteraction(ixObject, sigAlgo)
-
-            validatePayerSignature(ixRequest);
+			// Sign the interaction object
+			const ixRequest = await this.signInteraction(ixObject,sigAlgo,participantSignatures);
 
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
@@ -250,9 +250,9 @@ export abstract class Signer {
             verificationKey = publicKey as Uint8Array
         }
 
-        if (verificationKey.length === 33) {
-            verificationKey = verificationKey.slice(1);
-        }
+		if (verificationKey.length === 33) {
+			verificationKey = verificationKey.slice(1);
+		}
 
         const sig = new Signature();
         sig.unmarshall(signature);

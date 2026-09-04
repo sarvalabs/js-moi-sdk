@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validatePayerSignature = exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
+exports.checkSignature = exports.toInteractionArgs = exports.rawSignaturesToSignatures = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_constants_1 = require("js-moi-constants");
@@ -45,8 +45,7 @@ const validateAssetAction = (value) => {
     if (typeof callsite !== "string" || callsite.length === 0) {
         throw new Error("callsite must be a non-empty string");
     }
-    if (asset_id.toLowerCase() === js_moi_constants_1.KMOI_ASSET_ID.toLowerCase() &&
-        KMOI_RESERVED_ENDPOINTS.has(callsite)) {
+    if (asset_id === js_moi_constants_1.KMOI_ASSET_ID && KMOI_RESERVED_ENDPOINTS.has(callsite)) {
         throw new Error(`callsite "${callsite}" is reserved for protocol code and cannot be called on the KMOI asset`);
     }
     if (calldata !== undefined) {
@@ -471,13 +470,13 @@ function processLogicAction(payload) {
 const processParticipants = (ixObject) => {
     const participants = new Map();
     const addParticipant = (id, lock_type, notary) => {
-        const normalizedId = (0, js_moi_utils_1.trimHexPrefix)(id).toLowerCase();
-        if (normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.sender.id).toLowerCase()) {
+        const normalizedId = (0, js_moi_utils_1.trimHexPrefix)(id);
+        if (normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.sender.id)) {
             return;
         }
         if (ixObject.payer &&
             ixObject.payer != js_moi_constants_1.ZERO_ADDRESS &&
-            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.payer).toLowerCase() &&
+            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.payer) &&
             !notary) {
             return;
         }
@@ -682,6 +681,12 @@ const toRawSignatures = (signs) => {
     }));
 };
 exports.toRawSignatures = toRawSignatures;
+const rawSignaturesToSignatures = (rawSignatures) => rawSignatures.map((entry) => ({
+    id: (0, secp256k1_1.bytesToHex)(entry.id),
+    key_id: entry.key_id,
+    signature: (0, secp256k1_1.bytesToHex)(entry.signature),
+}));
+exports.rawSignaturesToSignatures = rawSignaturesToSignatures;
 const toFundArgs = (fund) => {
     return {
         ...fund,
@@ -718,22 +723,16 @@ const toInteractionArgs = (ix) => {
 };
 exports.toInteractionArgs = toInteractionArgs;
 /**
- * Validates that a payer signature is present when the interaction has a non-zero payer.
+ * Checks whether a signature array contains an entry for the given participant
+ * identifier.
  *
- * @param {InteractionRequest} ixRequest - The signed interaction request to validate.
- * @throws {Error} if a payer is set but no matching signature entry is found.
+ * @param {Signature[]} signatures - Parsed signature entries.
+ * @param {Hex} participantId - Participant identifier to look for.
+ * @returns {boolean} `true` when a matching signature entry exists.
  */
-const validatePayerSignature = (ixRequest) => {
-    const decoded = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(ixRequest.ix_args)).depolorize(js_moi_utils_1.ixObjectSchema);
-    const payerHex = (0, js_moi_utils_1.withHexPrefix)((0, secp256k1_1.bytesToHex)(decoded.payer));
-    if (payerHex === js_moi_constants_1.ZERO_ADDRESS) {
-        return;
-    }
-    const signatures = new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(ixRequest.signatures)).depolorize(js_moi_utils_1.ixSignaturesSchema);
-    const hasPayerSignature = signatures.some((entry) => (0, js_moi_utils_1.withHexPrefix)((0, secp256k1_1.bytesToHex)(entry.id)).toLowerCase() === payerHex.toLowerCase());
-    if (!hasPayerSignature) {
-        js_moi_utils_1.ErrorUtils.throwError("Payer signature is missing. Call signAsPayer on the payer wallet and addSignature before sending.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
-    }
+const checkSignature = (signatures, participantId) => {
+    const normalizedParticipantId = (0, js_moi_utils_1.trimHexPrefix)(participantId);
+    return signatures.some((entry) => (0, js_moi_utils_1.trimHexPrefix)(entry.id) === normalizedParticipantId);
 };
-exports.validatePayerSignature = validatePayerSignature;
+exports.checkSignature = checkSignature;
 //# sourceMappingURL=interaction.js.map

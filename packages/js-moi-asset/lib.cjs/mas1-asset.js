@@ -26,7 +26,6 @@ class MAS1AssetLogic {
     }
     static create(signer, symbol, manager, enableEvents, option, decimals) {
         const maxSupply = (0, js_moi_utils_1.parseAmount)("1", decimals ?? 0);
-        console.log("Max supply", maxSupply);
         const payload = {
             symbol: symbol,
             max_supply: maxSupply,

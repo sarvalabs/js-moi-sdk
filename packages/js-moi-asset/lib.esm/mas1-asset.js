@@ -1,10 +1,10 @@
-import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, parseAmount, validateDecimals, } from "js-moi-utils";
+import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, parseAmount, validateDecimals } from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode } from "js-polo";
-import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS, } from "js-moi-constants";
+import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
 import { deriveAssetId } from "js-moi-identifiers";
-import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, IS_OWNER_SCHEMA, SET_DYNAMIC_TOKEN_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, MINT_WITH_METADATA_SCHEMA, } from "./mas1-schema";
+import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, IS_OWNER_SCHEMA, SET_DYNAMIC_TOKEN_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, MINT_WITH_METADATA_SCHEMA } from "./mas1-schema";
 export class MAS1AssetLogic {
     assetId;
     signer;
@@ -23,7 +23,6 @@ export class MAS1AssetLogic {
     }
     static create(signer, symbol, manager, enableEvents, option, decimals) {
         const maxSupply = parseAmount("1", decimals ?? 0);
-        console.log("Max supply", maxSupply);
         const payload = {
             symbol: symbol,
             max_supply: maxSupply,

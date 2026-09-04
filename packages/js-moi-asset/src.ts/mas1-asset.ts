@@ -1,50 +1,13 @@
-import {
-  AssetStandard,
-  bytesToHex,
-  Hex,
-  hexToBytes,
-  LockType,
-  OpType,
-  parseAmount,
-  validateDecimals,
-} from "js-moi-utils";
+import {AssetStandard,bytesToHex,Hex,hexToBytes,LockType,OpType,parseAmount,validateDecimals} from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode, Schema } from "js-polo";
 import { Signer } from "js-moi-signer";
-import {
-  AssetActionPayload,
-  AssetCreatePayload,
-  IxParticipant,
-  Sender,
-} from "js-moi-providers";
-import {
-  DEFAULT_STORAGE_FUND,
-  KMOI_ASSET_ID,
-  SARGA_ADDRESS,
-} from "js-moi-constants";
+import {AssetActionPayload,AssetCreatePayload,IxParticipant,Sender} from "js-moi-providers";
+import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
 import { deriveAssetId } from "js-moi-identifiers";
 import { RoutineOption } from "js-moi-logic";
-import {
-  APPROVE_SCHEMA,
-  BURN_SCHEMA,
-  LOCKUP_SCHEMA,
-  MINT_SCHEMA,
-  RELEASE_SCHEMA,
-  REVOKE_SCHEMA,
-  SET_DYNAMIC_METADATA_SCHEMA,
-  SET_STATIC_METADATA_SCHEMA,
-  TRANSFER_FROM_SCHEMA,
-  TRANSFER_SCHEMA,
-  GET_DYNAMIC_METADATA_SCHEMA,
-  GET_DYNAMIC_TOKEN_METADATA_SCHEMA,
-  GET_STATIC_METADATA_SCHEMA,
-  GET_STATIC_TOKEN_METADATA_SCHEMA,
-  IS_OWNER_SCHEMA,
-  SET_DYNAMIC_TOKEN_METADATA_SCHEMA,
-  SET_STATIC_TOKEN_METADATA_SCHEMA,
-  MINT_WITH_METADATA_SCHEMA,
-} from "./mas1-schema";
+import { APPROVE_SCHEMA, BURN_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, IS_OWNER_SCHEMA, SET_DYNAMIC_TOKEN_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, MINT_WITH_METADATA_SCHEMA } from "./mas1-schema";
 
 export class MAS1AssetLogic {
   assetId: string;
@@ -95,8 +58,6 @@ export class MAS1AssetLogic {
     decimals?: number,
   ): InteractionContext<OpType.ASSET_CREATE> {
     const maxSupply = parseAmount("1", decimals ?? 0);
-
-    console.log("Max supply", maxSupply);
 
     const payload: AssetCreatePayload = {
       symbol: symbol,
