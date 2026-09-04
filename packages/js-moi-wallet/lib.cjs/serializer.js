@@ -19,7 +19,7 @@ const serializeIxObject = (ixObject) => {
         return polorizer.bytes();
     }
     catch (err) {
-        js_moi_utils_1.ErrorUtils.throwError("Failed to serialize interaction object", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        js_moi_utils_1.ErrorUtils.throwError(`Failed to serialize interaction object: ${err instanceof Error ? err.message : err}`, js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
     }
 };
 exports.serializeIxObject = serializeIxObject;

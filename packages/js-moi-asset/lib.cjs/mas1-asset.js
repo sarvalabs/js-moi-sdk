@@ -19,24 +19,29 @@ class MAS1AssetLogic {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, manager, enableEvents, option) {
-        const response = await this.create(signer, symbol, manager, enableEvents, option).send();
+    static async newAsset(signer, symbol, manager, enableEvents, option, decimals) {
+        const response = await this.create(signer, symbol, manager, enableEvents, option, decimals).send();
         const results = await response.result();
         return new MAS1AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, manager, enableEvents, option) {
+    static create(signer, symbol, manager, enableEvents, option, decimals) {
+        const maxSupply = (0, js_moi_utils_1.parseAmount)("1", decimals ?? 0);
         const payload = {
             symbol: symbol,
-            max_supply: 1,
+            max_supply: maxSupply,
             standard: js_moi_utils_1.AssetStandard.MAS1,
             dimension: 0,
             enable_events: enableEvents,
             manager: manager,
             logic_payload: {
                 manifest: "0x",
-                callsite: "Init"
-            }
+                callsite: "Init",
+            },
         };
+        if (decimals !== undefined) {
+            (0, js_moi_utils_1.validateDecimals)(decimals);
+            payload.decimals = decimals;
+        }
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_CREATE,
             payload: payload,
@@ -66,7 +71,7 @@ class MAS1AssetLogic {
             {
                 id: beneficiary,
                 lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.MINT_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -83,7 +88,7 @@ class MAS1AssetLogic {
     mintWithMetadata(beneficiary, staticMetadata) {
         const payload = {
             beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
-            static_metadata: new Map(Object.entries(staticMetadata))
+            static_metadata: new Map(Object.entries(staticMetadata)),
         };
         const participants = [
             {
@@ -93,7 +98,7 @@ class MAS1AssetLogic {
             {
                 id: beneficiary,
                 lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.MINT_WITH_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -115,7 +120,7 @@ class MAS1AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.BURN_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -142,7 +147,7 @@ class MAS1AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.NO_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.TRANSFER_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -174,7 +179,7 @@ class MAS1AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.NO_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.TRANSFER_FROM_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -192,7 +197,7 @@ class MAS1AssetLogic {
         const payload = {
             token_id: tokenId,
             beneficiary: (0, js_moi_utils_1.hexToBytes)(beneficiary),
-            expires_at: expiresAt
+            expires_at: expiresAt,
         };
         const participants = [
             {
@@ -202,7 +207,7 @@ class MAS1AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.NO_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.APPROVE_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -229,7 +234,7 @@ class MAS1AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.NO_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.REVOKE_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -259,8 +264,8 @@ class MAS1AssetLogic {
             },
             {
                 id: js_moi_constants_1.SARGA_ADDRESS,
-                lock_type: js_moi_utils_1.LockType.MUTATE_LOCK
-            }
+                lock_type: js_moi_utils_1.LockType.MUTATE_LOCK,
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.LOCKUP_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -292,7 +297,7 @@ class MAS1AssetLogic {
             {
                 id: this.assetId,
                 lock_type: js_moi_utils_1.LockType.NO_LOCK,
-            }
+            },
         ];
         const rawPayload = this.polorize(payload, mas1_schema_1.RELEASE_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -309,7 +314,7 @@ class MAS1AssetLogic {
     SetStaticMetadata(key, value) {
         const payload = {
             key: key,
-            value: value
+            value: value,
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.SET_STATIC_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -326,7 +331,7 @@ class MAS1AssetLogic {
     SetDynamicMetadata(key, value) {
         const payload = {
             key: key,
-            value: value
+            value: value,
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.SET_DYNAMIC_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -344,7 +349,7 @@ class MAS1AssetLogic {
         const payload = {
             token_id: tokenId,
             key: key,
-            value: value
+            value: value,
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.SET_STATIC_TOKEN_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -362,7 +367,7 @@ class MAS1AssetLogic {
         const payload = {
             token_id: tokenId,
             key: key,
-            value: value
+            value: value,
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.SET_DYNAMIC_TOKEN_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({
@@ -479,7 +484,7 @@ class MAS1AssetLogic {
     GetDynamicTokenMetadata(tokenId, key) {
         const payload = {
             token_id: tokenId,
-            key: key
+            key: key,
         };
         const rawPayload = this.polorize(payload, mas1_schema_1.GET_DYNAMIC_TOKEN_METADATA_SCHEMA);
         return new js_moi_interactions_1.InteractionContext({

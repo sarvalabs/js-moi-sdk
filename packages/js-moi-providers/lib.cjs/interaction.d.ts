@@ -1,3 +1,4 @@
+import { Hex } from "js-moi-utils";
 import { InteractionObject, RawInteractionObject, Signature, RawSignature, InteractionArgs } from "../types/interaction";
 import { AccessDeletePayload, AccessPayload, AccessPolicy, AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, CallerConstraint, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload, StoragePayload } from "../types/operation";
 export declare const validateKeyAdd: (key: KeyAddPayload, index: number) => void;
@@ -25,5 +26,15 @@ export declare const processInteractionObject: (ix: InteractionObject) => Intera
  */
 export declare const toRawInteractionObject: (ix: InteractionObject) => RawInteractionObject;
 export declare const toRawSignatures: (signs: Signature[]) => RawSignature[];
+export declare const rawSignaturesToSignatures: (rawSignatures: RawSignature[]) => Signature[];
 export declare const toInteractionArgs: (ix: InteractionObject) => InteractionArgs;
+/**
+ * Checks whether a signature array contains an entry for the given participant
+ * identifier.
+ *
+ * @param {Signature[]} signatures - Parsed signature entries.
+ * @param {Hex} participantId - Participant identifier to look for.
+ * @returns {boolean} `true` when a matching signature entry exists.
+ */
+export declare const checkSignature: (signatures: Signature[], participantId: Hex) => boolean;
 //# sourceMappingURL=interaction.d.ts.map

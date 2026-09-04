@@ -7,8 +7,8 @@ export declare class MAS0AssetLogic {
     signer: Signer;
     constructor(assetId: string, signer: Signer);
     private polorize;
-    static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption): Promise<MAS0AssetLogic>;
-    static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption): InteractionContext<OpType.ASSET_CREATE>;
+    static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption, decimals?: number): Promise<MAS0AssetLogic>;
+    static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption, decimals?: number): InteractionContext<OpType.ASSET_CREATE>;
     mint(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     mintWithMetadata(beneficiary: string, amount: number | bigint, staticMetadata: Record<string, Uint8Array>): InteractionContext<OpType.ASSET_INVOKE>;
     burn(amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;

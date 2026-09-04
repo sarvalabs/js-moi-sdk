@@ -1,11 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
+exports.checkSignature = exports.toInteractionArgs = exports.rawSignaturesToSignatures = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_polo_1 = require("js-polo");
 const secp256k1_1 = require("@noble/secp256k1");
+// KMOI reserves these five endpoints for protocol code only. go-moi rejects
+// a call to any of them on the KMOI asset with ErrKMOIReservedEndpoint
+// (common/kmoi.go). Mirrored here so a bad call fails before it costs fuel.
+const KMOI_RESERVED_ENDPOINTS = new Set([
+    "Mint",
+    "MintWithMetadata",
+    "Burn",
+    "SetStaticMetadata",
+    "SetDynamicMetadata",
+]);
 const validateKeyAdd = (key, index) => {
     if (typeof key.public_key !== "string" || key.public_key.length === 0) {
         throw new Error(`keys[${index}]: public key must be a non-empty hex string`);
@@ -34,6 +44,9 @@ const validateAssetAction = (value) => {
     }
     if (typeof callsite !== "string" || callsite.length === 0) {
         throw new Error("callsite must be a non-empty string");
+    }
+    if (asset_id === js_moi_constants_1.KMOI_ASSET_ID && KMOI_RESERVED_ENDPOINTS.has(callsite)) {
+        throw new Error(`callsite "${callsite}" is reserved for protocol code and cannot be called on the KMOI asset`);
     }
     if (calldata !== undefined) {
         if (typeof calldata !== "string" || calldata.length === 0) {
@@ -96,12 +109,14 @@ const validateAccountInherit = (payload) => {
     if (!payload) {
         throw new Error("payload is required");
     }
-    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+    if (typeof payload.target_account !== "string" ||
+        payload.target_account.length === 0) {
         throw new Error("target account must be a non-empty hex string");
     }
     (0, exports.validateAssetAction)(payload.value);
     // sub_account_index must be a non-negative number
-    if (typeof payload.sub_account_index !== "number" || payload.sub_account_index < 0) {
+    if (typeof payload.sub_account_index !== "number" ||
+        payload.sub_account_index < 0) {
         throw new Error("sub account index must be a non-negative number");
     }
 };
@@ -110,17 +125,20 @@ const validateStorageDeposit = (payload) => {
     if (!payload) {
         throw new Error("payload is required");
     }
-    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+    if (typeof payload.target_account !== "string" ||
+        payload.target_account.length === 0) {
         throw new Error("target_account must be a non-empty hex string");
     }
     // Note: defaulting deposit_for to the signer's own identifier happens in the
     // StorageDeposit builder (js-moi-interactions), which has signer context that
     // this lower-level encoding step does not. By the time a payload reaches here,
     // deposit_for must already be resolved.
-    if (typeof payload.deposit_for !== "string" || payload.deposit_for.length === 0) {
+    if (typeof payload.deposit_for !== "string" ||
+        payload.deposit_for.length === 0) {
         throw new Error("deposit_for must be a non-empty hex string");
     }
-    if (payload.amount == null || (typeof payload.amount !== "number" && typeof payload.amount !== "bigint")) {
+    if (payload.amount == null ||
+        (typeof payload.amount !== "number" && typeof payload.amount !== "bigint")) {
         throw new Error("amount must be a number or bigint");
     }
     if (payload.amount < js_moi_constants_1.MIN_STORAGE_DEPOSIT_AMOUNT) {
@@ -132,10 +150,13 @@ const validateStorageWithdraw = (payload) => {
     if (!payload) {
         throw new Error("payload is required");
     }
-    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+    if (typeof payload.target_account !== "string" ||
+        payload.target_account.length === 0) {
         throw new Error("target_account must be a non-empty hex string");
     }
-    if (payload.bytes_to_release !== undefined && (typeof payload.bytes_to_release !== "number" || payload.bytes_to_release < 0)) {
+    if (payload.bytes_to_release !== undefined &&
+        (typeof payload.bytes_to_release !== "number" ||
+            payload.bytes_to_release < 0)) {
         throw new Error("bytes_to_release must be a non-negative number if provided (0 or omitted releases everything available)");
     }
 };
@@ -144,10 +165,12 @@ const validateCallerConstraint = (constraint, label) => {
     if (!constraint) {
         throw new Error(`${label} is required`);
     }
-    if (constraint.kind !== js_moi_utils_1.CallerKind.ANY && constraint.kind !== js_moi_utils_1.CallerKind.SET) {
+    if (constraint.kind !== js_moi_utils_1.CallerKind.ANY &&
+        constraint.kind !== js_moi_utils_1.CallerKind.SET) {
         throw new Error(`${label}.kind must be a valid CallerKind`);
     }
-    if (constraint.kind === js_moi_utils_1.CallerKind.SET && (!Array.isArray(constraint.set) || constraint.set.length === 0)) {
+    if (constraint.kind === js_moi_utils_1.CallerKind.SET &&
+        (!Array.isArray(constraint.set) || constraint.set.length === 0)) {
         throw new Error(`${label}.set must be a non-empty array when kind is CallerKind.SET`);
     }
 };
@@ -159,7 +182,8 @@ const validateAccessPolicy = (policy) => {
     if (policy.resource !== js_moi_utils_1.ResourceType.STORAGE) {
         throw new Error("only ResourceType.STORAGE is currently supported");
     }
-    if (typeof policy.resource_id !== "string" || policy.resource_id.length === 0) {
+    if (typeof policy.resource_id !== "string" ||
+        policy.resource_id.length === 0) {
         throw new Error("resource_id must be a non-empty hex string");
     }
     if (!policy.actions || policy.actions <= 0) {
@@ -173,7 +197,8 @@ const validateAccessCreateOrUpdate = (payload) => {
     if (!payload) {
         throw new Error("payload is required");
     }
-    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+    if (typeof payload.target_account !== "string" ||
+        payload.target_account.length === 0) {
         throw new Error("target_account must be a non-empty hex string");
     }
     (0, exports.validateAccessPolicy)(payload.access_policy);
@@ -183,13 +208,15 @@ const validateAccessDelete = (payload) => {
     if (!payload) {
         throw new Error("payload is required");
     }
-    if (typeof payload.target_account !== "string" || payload.target_account.length === 0) {
+    if (typeof payload.target_account !== "string" ||
+        payload.target_account.length === 0) {
         throw new Error("target_account must be a non-empty hex string");
     }
     if (payload.resource == null) {
         throw new Error("resource is required");
     }
-    if (typeof payload.resource_id !== "string" || payload.resource_id.length === 0) {
+    if (typeof payload.resource_id !== "string" ||
+        payload.resource_id.length === 0) {
         throw new Error("resource_id must be a non-empty hex string");
     }
 };
@@ -201,7 +228,8 @@ const validateLogicPayload = (payload) => {
         }
     }
     if (payload.interfaces !== undefined) {
-        if (typeof payload.interfaces !== "object" || Array.isArray(payload.interfaces)) {
+        if (typeof payload.interfaces !== "object" ||
+            Array.isArray(payload.interfaces)) {
             throw new Error("interfaces must be an object");
         }
         for (const [k, v] of Object.entries(payload.interfaces)) {
@@ -271,12 +299,15 @@ const validateAssetCreate = (payload) => {
     // max_supply: required non-negative number or bigint - AssetCreatePayload
     // types it as `number | bigint` (large supplies overflow a safe number),
     // and every documented usage passes a bigint literal (e.g. `1000000n`).
-    if ((typeof payload.max_supply !== "number" && typeof payload.max_supply !== "bigint") || payload.max_supply < 0) {
+    if ((typeof payload.max_supply !== "number" &&
+        typeof payload.max_supply !== "bigint") ||
+        payload.max_supply < 0) {
         throw new Error("max_supply must be a non-negative number or bigint");
     }
     // static metadata: required object with arrays of non-empty hex strings
     if (payload.static_metadata) {
-        if (typeof payload.static_metadata !== "object" || Array.isArray(payload.static_metadata)) {
+        if (typeof payload.static_metadata !== "object" ||
+            Array.isArray(payload.static_metadata)) {
             throw new Error("static metadata must be a non-empty object");
         }
         for (const [k, v] of Object.entries(payload.static_metadata)) {
@@ -287,7 +318,8 @@ const validateAssetCreate = (payload) => {
     }
     // dynamic metadata: required object with arrays of non-empty hex strings
     if (payload.dynamic_metadata) {
-        if (typeof payload.dynamic_metadata !== "object" || Array.isArray(payload.dynamic_metadata)) {
+        if (typeof payload.dynamic_metadata !== "object" ||
+            Array.isArray(payload.dynamic_metadata)) {
             throw new Error("dynamic metadata must be a non-empty object");
         }
         for (const [k, v] of Object.entries(payload.dynamic_metadata)) {
@@ -316,10 +348,10 @@ const withAssetId = (payload) => ({
     ...payload,
     asset_id: new js_moi_identifiers_1.Identifier(payload.asset_id).toBytes(),
 });
-const mapPublicKeys = (keys) => keys?.map(k => ({ ...k, public_key: (0, js_moi_utils_1.hexToBytes)(k.public_key) }));
+const mapPublicKeys = (keys) => keys?.map((k) => ({ ...k, public_key: (0, js_moi_utils_1.hexToBytes)(k.public_key) }));
 const mapHexValues = (obj = {}) => {
     const out = new Map();
-    Object.keys(obj).forEach(k => out.set(k, (0, js_moi_utils_1.hexToBytes)(obj[k])));
+    Object.keys(obj).forEach((k) => out.set(k, (0, js_moi_utils_1.hexToBytes)(obj[k])));
     return out;
 };
 function processParticipantCreate(payload) {
@@ -361,13 +393,16 @@ function processStorageWithdraw(payload) {
 }
 const toRawCallerConstraint = (constraint) => ({
     kind: constraint.kind,
-    set: constraint.set.map(id => new js_moi_identifiers_1.Identifier(id).toBytes()),
+    set: constraint.set.map((id) => new js_moi_identifiers_1.Identifier(id).toBytes()),
 });
 const toRawAccessPolicy = (policy) => ({
     resource: policy.resource,
     resource_id: new js_moi_identifiers_1.Identifier(policy.resource_id).toBytes(),
     actions: policy.actions,
-    scope: { prefixes: (policy.scope?.prefixes ?? []).map(js_moi_utils_1.hexToBytes), predicate: null },
+    scope: {
+        prefixes: (policy.scope?.prefixes ?? []).map(js_moi_utils_1.hexToBytes),
+        predicate: null,
+    },
     caller: toRawCallerConstraint(policy.caller),
     origin: toRawCallerConstraint(policy.origin),
 });
@@ -418,8 +453,9 @@ function processLogicDeploy(payload) {
 function processLogicAction(payload) {
     const processed = {
         ...withCalldata(payload),
-        logic_id: js_moi_identifiers_1.LogicId.isValid(payload.logic_id) ? new js_moi_identifiers_1.LogicId(payload.logic_id).toBytes() :
-            new js_moi_identifiers_1.AssetId(payload.logic_id).toBytes(),
+        logic_id: js_moi_identifiers_1.LogicId.isValid(payload.logic_id)
+            ? new js_moi_identifiers_1.LogicId(payload.logic_id).toBytes()
+            : new js_moi_identifiers_1.AssetId(payload.logic_id).toBytes(),
         interfaces: mapHexValues(payload.interfaces),
     };
     return polorize(processed, js_moi_utils_1.logicSchema);
@@ -433,15 +469,23 @@ function processLogicAction(payload) {
  */
 const processParticipants = (ixObject) => {
     const participants = new Map();
-    const addParticipant = (id, lock_type) => {
-        participants.set((0, js_moi_utils_1.trimHexPrefix)(id), { id, lock_type });
+    const addParticipant = (id, lock_type, notary) => {
+        const normalizedId = (0, js_moi_utils_1.trimHexPrefix)(id);
+        if (normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.sender.id)) {
+            return;
+        }
+        if (ixObject.payer &&
+            ixObject.payer != js_moi_constants_1.ZERO_ADDRESS &&
+            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.payer) &&
+            !notary) {
+            return;
+        }
+        participants.set(normalizedId, {
+            id,
+            lock_type,
+            ...(notary ? { notary: true } : {}),
+        });
     };
-    // Add sender
-    addParticipant(ixObject.sender.id, js_moi_utils_1.LockType.MUTATE_LOCK);
-    // Add payer if present
-    if (ixObject.payer && ixObject.payer != js_moi_constants_1.ZERO_ADDRESS) {
-        addParticipant(ixObject.payer, js_moi_utils_1.LockType.MUTATE_LOCK);
-    }
     // Process operations
     for (const operation of ixObject.ix_operations) {
         switch (operation.type) {
@@ -492,8 +536,8 @@ const processParticipants = (ixObject) => {
     }
     // Merge additional participants (if not already present)
     if (ixObject.participants) {
-        for (const { id, lock_type } of ixObject.participants) {
-            addParticipant(id, lock_type);
+        for (const { id, lock_type, notary } of ixObject.participants) {
+            addParticipant(id, lock_type, notary);
         }
     }
     return [...participants.values()];
@@ -523,42 +567,42 @@ const toRawOperation = (operation) => {
             (0, exports.validateParticipantCreate)(operation.payload);
             return {
                 ...operation,
-                payload: processParticipantCreate(operation.payload)
+                payload: processParticipantCreate(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.ACCOUNT_CONFIGURE: {
             (0, exports.validateAccountConfigure)(operation.payload);
             return {
                 ...operation,
-                payload: processAccountConfigure(operation.payload)
+                payload: processAccountConfigure(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.ACCOUNT_INHERIT: {
             (0, exports.validateAccountInherit)(operation.payload);
             return {
                 ...operation,
-                payload: processAccountInherit(operation.payload)
+                payload: processAccountInherit(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.ASSET_CREATE: {
             (0, exports.validateAssetCreate)(operation.payload);
             return {
                 ...operation,
-                payload: processAssetCreate(operation.payload)
+                payload: processAssetCreate(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.ASSET_INVOKE: {
             (0, exports.validateAssetAction)(operation.payload);
             return {
                 ...operation,
-                payload: processAssetInvoke(operation.payload)
+                payload: processAssetInvoke(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.LOGIC_DEPLOY: {
             (0, exports.validateLogicDeploy)(operation.payload);
             return {
                 ...operation,
-                payload: processLogicDeploy(operation.payload)
+                payload: processLogicDeploy(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.LOGIC_INVOKE:
@@ -566,21 +610,21 @@ const toRawOperation = (operation) => {
             (0, exports.validateLogicAction)(operation.payload);
             return {
                 ...operation,
-                payload: processLogicAction(operation.payload)
+                payload: processLogicAction(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.STORAGE_DEPOSIT: {
             (0, exports.validateStorageDeposit)(operation.payload);
             return {
                 ...operation,
-                payload: processStorageDeposit(operation.payload)
+                payload: processStorageDeposit(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.STORAGE_WITHDRAW: {
             (0, exports.validateStorageWithdraw)(operation.payload);
             return {
                 ...operation,
-                payload: processStorageWithdraw(operation.payload)
+                payload: processStorageWithdraw(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.ACCESS_CREATE:
@@ -588,14 +632,14 @@ const toRawOperation = (operation) => {
             (0, exports.validateAccessCreateOrUpdate)(operation.payload);
             return {
                 ...operation,
-                payload: processAccessCreateOrUpdate(operation.payload)
+                payload: processAccessCreateOrUpdate(operation.payload),
             };
         }
         case js_moi_utils_1.OpType.ACCESS_DELETE: {
             (0, exports.validateAccessDelete)(operation.payload);
             return {
                 ...operation,
-                payload: processAccessDelete(operation.payload)
+                payload: processAccessDelete(operation.payload),
             };
         }
         default:
@@ -613,37 +657,47 @@ const toRawInteractionObject = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
-        payer: ix.payer ? new js_moi_identifiers_1.ParticipantId(ix.payer).toBytes() : (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
+        payer: ix.payer
+            ? new js_moi_identifiers_1.ParticipantId(ix.payer).toBytes()
+            : (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
         ix_operations: ix.ix_operations?.map((operation) => toRawOperation(operation)),
-        preferences: ix.preferences ? {
-            ...ix.preferences,
-            compute: (0, js_moi_utils_1.hexToBytes)(ix.preferences.compute),
-        } : undefined,
+        preferences: ix.preferences
+            ? {
+                ...ix.preferences,
+                compute: (0, js_moi_utils_1.hexToBytes)(ix.preferences.compute),
+            }
+            : undefined,
         perception: ix.perception ? (0, js_moi_utils_1.hexToBytes)(ix.perception) : undefined,
     };
 };
 exports.toRawInteractionObject = toRawInteractionObject;
 const toRawSignatures = (signs) => {
-    return signs.map(sign => ({
+    return signs.map((sign) => ({
         ...sign,
         id: (0, js_moi_utils_1.hexToBytes)(sign.id),
-        signature: (0, js_moi_utils_1.hexToBytes)(sign.signature)
+        signature: (0, js_moi_utils_1.hexToBytes)(sign.signature),
     }));
 };
 exports.toRawSignatures = toRawSignatures;
+const rawSignaturesToSignatures = (rawSignatures) => rawSignatures.map((entry) => ({
+    id: (0, secp256k1_1.bytesToHex)(entry.id),
+    key_id: entry.key_id,
+    signature: (0, secp256k1_1.bytesToHex)(entry.signature),
+}));
+exports.rawSignaturesToSignatures = rawSignaturesToSignatures;
 const toFundArgs = (fund) => {
     return {
         ...fund,
-        amount: (0, js_moi_utils_1.toQuantity)(fund.amount)
+        amount: (0, js_moi_utils_1.toQuantity)(fund.amount),
     };
 };
 const toOperationArgs = (operation) => {
     const rawOpPayload = toRawOperation(operation);
     return {
         ...operation,
-        payload: "0x" + (0, secp256k1_1.bytesToHex)(rawOpPayload.payload)
+        payload: "0x" + (0, secp256k1_1.bytesToHex)(rawOpPayload.payload),
     };
 };
 const toInteractionArgs = (ix) => {
@@ -655,15 +709,30 @@ const toInteractionArgs = (ix) => {
         fuel_limit: (0, js_moi_utils_1.toQuantity)(ix.fuel_limit),
         funds: ix.funds?.map((fund) => toFundArgs(fund)),
         ix_operations: ix.ix_operations?.map((operation) => toOperationArgs(operation)),
-        preferences: ix.preferences ? {
-            ...ix.preferences,
-            consensus: {
-                ...ix.preferences.consensus,
-                mtq: (0, js_moi_utils_1.toQuantity)(ix.preferences.consensus.mtq ?? 0)
-            },
-        } : undefined,
-        participants: ix.participants
+        preferences: ix.preferences
+            ? {
+                ...ix.preferences,
+                consensus: {
+                    ...ix.preferences.consensus,
+                    mtq: (0, js_moi_utils_1.toQuantity)(ix.preferences.consensus.mtq ?? 0),
+                },
+            }
+            : undefined,
+        participants: ix.participants,
     };
 };
 exports.toInteractionArgs = toInteractionArgs;
+/**
+ * Checks whether a signature array contains an entry for the given participant
+ * identifier.
+ *
+ * @param {Signature[]} signatures - Parsed signature entries.
+ * @param {Hex} participantId - Participant identifier to look for.
+ * @returns {boolean} `true` when a matching signature entry exists.
+ */
+const checkSignature = (signatures, participantId) => {
+    const normalizedParticipantId = (0, js_moi_utils_1.trimHexPrefix)(participantId);
+    return signatures.some((entry) => (0, js_moi_utils_1.trimHexPrefix)(entry.id) === normalizedParticipantId);
+};
+exports.checkSignature = checkSignature;
 //# sourceMappingURL=interaction.js.map

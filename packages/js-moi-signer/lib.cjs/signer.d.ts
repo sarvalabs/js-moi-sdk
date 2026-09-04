@@ -1,4 +1,4 @@
-import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options } from "js-moi-providers";
+import { AbstractProvider, InteractionCallResponse, InteractionObject, InteractionRequest, InteractionResponse, Options, Signature as ParticipantSignature } from "js-moi-providers";
 import { SigType, SigningAlgorithms } from "../types";
 import { Identifier } from "js-moi-identifiers";
 type InteractionMethod = "call" | "send" | "estimateFuel";
@@ -15,7 +15,7 @@ export declare abstract class Signer {
     abstract getIdentifier(): Promise<Identifier>;
     abstract sign(message: Uint8Array, keyId: number, sigAlgo: SigType): Promise<string>;
     abstract isInitialized(): boolean;
-    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType): Promise<InteractionRequest>;
+    abstract signInteraction(ixObject: InteractionObject, sigAlgo: SigType, participantSignatures?: ParticipantSignature[]): Promise<InteractionRequest>;
     /**
      * Retrieves the connected provider instance.
      *
@@ -82,12 +82,14 @@ export declare abstract class Signer {
      * and forwarding it to the connected provider.
      *
      * @param {InteractionObject} ixObject - The interaction object to send.
+     * @param {Signature[]} [participantSignatures] - Optional signatures from
+     * other participants (for example a payer) to merge with the wallet signatures.
      * @returns {Promise<InteractionResponse>} A Promise that resolves to the
      * interaction response.
      * @throws {Error} if there is an error sending the interaction, if the provider
      * is not initialized, or if the interaction object fails the validity checks.
      */
-    sendInteraction(ixObject: InteractionObject): Promise<InteractionResponse>;
+    sendInteraction(ixObject: InteractionObject, participantSignatures?: ParticipantSignature[]): Promise<InteractionResponse>;
     /**
      * Verifies the authenticity of a signature by performing signature verification
      * using the provided parameters.

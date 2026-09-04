@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
+import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, validateDecimals } from "js-moi-utils";
 import { MAS2 } from "./mas2";
 import { documentEncode } from "js-polo";
 import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
@@ -17,12 +17,12 @@ export class MAS2AssetLogic {
         const document = documentEncode(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, supply, manager, enableEvents, option) {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents, option).send();
+    static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals) {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, option, decimals).send();
         const results = await response.result();
         return new MAS2AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, supply, manager, enableEvents, option) {
+    static create(signer, symbol, supply, manager, enableEvents, option, decimals) {
         const payload = {
             symbol: symbol,
             max_supply: supply,
@@ -35,6 +35,10 @@ export class MAS2AssetLogic {
                 callsite: "Init"
             }
         };
+        if (decimals !== undefined) {
+            validateDecimals(decimals);
+            payload.decimals = decimals;
+        }
         return new InteractionContext({
             opType: OpType.ASSET_CREATE,
             payload: payload,

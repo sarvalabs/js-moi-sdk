@@ -1,11 +1,4 @@
-import {
-  IxParticipant,
-  InteractionResponse,
-  AnyIxOperation,
-  InteractionCallResponse,
-  InteractionObject,
-} from "js-moi-providers";
-
+import {IxParticipant,InteractionResponse,AnyIxOperation,InteractionCallResponse,InteractionObject} from "js-moi-providers";
 import { OpType, trimHexPrefix } from "js-moi-utils";
 import { DEFAULT_FUEL_PRICE, DEFAULT_FUEL_LIMIT } from "js-moi-constants";
 import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context";
@@ -51,7 +44,7 @@ export class InteractionContext<T extends AllowedOps> {
 
     return {
       id: identifier.toHex(),
-      sequence: option?.sequence ?? (await signer.getNonce()) as number,
+      sequence: option?.sequence ?? ((await signer.getNonce()) as number),
       key_id: keyId,
     };
   }
@@ -85,7 +78,8 @@ export class InteractionContext<T extends AllowedOps> {
    */
   public async ixData(option?: IxOption): Promise<InteractionObject> {
     const sender = await this.buildSender(option);
-    const fundingOperations = (await this.ctx.fundingOperations?.(sender)) ?? [];
+    const fundingOperations =
+      (await this.ctx.fundingOperations?.(sender)) ?? [];
 
     return {
       sender,
@@ -93,6 +87,7 @@ export class InteractionContext<T extends AllowedOps> {
       fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
       ix_operations: [this.buildOperation(), ...fundingOperations],
       participants: this.mergeParticipants(option),
+      payer: option?.payer,
     };
   }
 
