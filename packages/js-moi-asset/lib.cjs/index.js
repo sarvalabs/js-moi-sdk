@@ -16,6 +16,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./mas0"), exports);
 __exportStar(require("./mas0-asset"), exports);
+__exportStar(require("./masn-asset"), exports);
 __exportStar(require("./mas1"), exports);
 __exportStar(require("./mas1-asset"), exports);
 __exportStar(require("./mas2"), exports);

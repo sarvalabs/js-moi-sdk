@@ -7,8 +7,8 @@ export declare class MAS2AssetLogic {
     signer: Signer;
     constructor(assetId: string, signer: Signer);
     private polorize;
-    static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption): Promise<MAS2AssetLogic>;
-    static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption): InteractionContext<OpType.ASSET_CREATE>;
+    static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption, decimals?: number): Promise<MAS2AssetLogic>;
+    static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, option?: RoutineOption, decimals?: number): InteractionContext<OpType.ASSET_CREATE>;
     transfer(tokenId: number | bigint, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     transferFrom(tokenId: number | bigint, benefactor: string, beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;
     mint(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;

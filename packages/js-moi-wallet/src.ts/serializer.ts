@@ -19,7 +19,7 @@ export const serializeIxObject = (ixObject: InteractionObject): Uint8Array => {
         return polorizer.bytes();
     } catch(err) {
         ErrorUtils.throwError(
-            "Failed to serialize interaction object",
+            `Failed to serialize interaction object: ${err instanceof Error ? err.message : err}`,
             ErrorCode.UNKNOWN_ERROR,
             { originalError: err }
         )

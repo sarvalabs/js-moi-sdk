@@ -318,27 +318,40 @@ describe("validateParticipantCreate", () => {
 });
 
 describe("processInteractionObject", () => {
-    test("always includes the sender as a MUTATE_LOCK participant", () => {
+    test("does not include the sender in the participant list", () => {
         const result = processInteractionObject(makeIx([{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }]));
 
-        expect(result.participants).toHaveLength(1);
-        expect(result.participants![0].id).toBe(SENDER);
-        expect(result.participants![0].lock_type).toBe(LockType.MUTATE_LOCK);
+        expect(result.participants).toHaveLength(0);
+        expect(result.participants!.find((p) => p.id === SENDER)).toBeUndefined();
     });
 
-    test("adds a non-zero payer as a MUTATE_LOCK participant", () => {
+    test("does not add a plain payer as a participant", () => {
         const result = processInteractionObject(makeIx([{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }], PAYER));
 
-        expect(result.participants).toHaveLength(2);
+        expect(result.participants).toHaveLength(0);
+        expect(result.participants!.find((p) => p.id === PAYER)).toBeUndefined();
+    });
+
+    test("adds a notary payer to the participant list with notary: true", () => {
+        const result = processInteractionObject(
+            makeIx(
+                [{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }],
+                PAYER,
+                { participants: [{ id: PAYER, lock_type: LockType.MUTATE_LOCK, notary: true }] }
+            )
+        );
+
+        expect(result.participants).toHaveLength(1);
         const payerParticipant = result.participants!.find((p) => p.id === PAYER);
         expect(payerParticipant).toBeDefined();
         expect(payerParticipant!.lock_type).toBe(LockType.MUTATE_LOCK);
+        expect(payerParticipant!.notary).toBe(true);
     });
 
     test("does not add the payer when it equals ZERO_ADDRESS", () => {
         const result = processInteractionObject(makeIx([{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }], ZERO_ADDRESS as Hex));
 
-        expect(result.participants).toHaveLength(1);
+        expect(result.participants).toHaveLength(0);
     });
 
     test("ASSET_INVOKE adds the asset as a MUTATE_LOCK participant", () => {
@@ -346,7 +359,7 @@ describe("processInteractionObject", () => {
             makeIx([{ type: OpType.ASSET_INVOKE, payload: { asset_id: ASSET, callsite: "Transfer" } }])
         );
 
-        expect(result.participants).toHaveLength(2);
+        expect(result.participants).toHaveLength(1);
         const assetParticipant = result.participants!.find((p) => p.id.toLowerCase().includes("cd"));
         expect(assetParticipant).toBeDefined();
         expect(assetParticipant!.lock_type).toBe(LockType.MUTATE_LOCK);
@@ -376,26 +389,26 @@ describe("processInteractionObject", () => {
             makeIx([{ type: OpType.LOGIC_INVOKE, payload: { logic_id: LOGIC } }])
         );
 
-        expect(result.participants).toHaveLength(2);
+        expect(result.participants).toHaveLength(1);
         const logicParticipant = result.participants!.find((p) => p.id.toLowerCase().includes("ef"));
         expect(logicParticipant).toBeDefined();
         expect(logicParticipant!.lock_type).toBe(LockType.MUTATE_LOCK);
     });
 
-    test("LOGIC_DEPLOY adds no extra participants beyond the sender", () => {
+    test("LOGIC_DEPLOY adds no participants", () => {
         const result = processInteractionObject(
             makeIx([{ type: OpType.LOGIC_DEPLOY, payload: { manifest: "0x1234" } }])
         );
 
-        expect(result.participants).toHaveLength(1);
+        expect(result.participants).toHaveLength(0);
     });
 
-    test("ASSET_CREATE adds no extra participants beyond the sender", () => {
+    test("ASSET_CREATE adds no participants", () => {
         const result = processInteractionObject(
             makeIx([{ type: OpType.ASSET_CREATE, payload: { symbol: "MOI", standard: 0, enable_events: true, manager: SENDER, max_supply: 1000 } }])
         );
 
-        expect(result.participants).toHaveLength(1);
+        expect(result.participants).toHaveLength(0);
     });
 
     test("deduplicates participants with the same id", () => {
@@ -403,30 +416,30 @@ describe("processInteractionObject", () => {
             makeIx(
                 [{ type: OpType.ASSET_INVOKE, payload: { asset_id: ASSET, callsite: "Transfer" } }],
                 undefined,
-                { participants: [{ id: SENDER, lock_type: LockType.NO_LOCK }] }
+                { participants: [{ id: ASSET, lock_type: LockType.NO_LOCK }] }
             )
         );
 
-        const senderCount = result.participants!.filter((p) =>
-            p.id.toLowerCase() === SENDER.toLowerCase()
+        const assetCount = result.participants!.filter((p) =>
+            p.id.toLowerCase() === ASSET.toLowerCase()
         ).length;
-        expect(senderCount).toBe(1);
+        expect(assetCount).toBe(1);
     });
 
     test("explicit participants override auto-derived participants by id", () => {
         const customLockType = LockType.NO_LOCK;
         const result = processInteractionObject(
             makeIx(
-                [{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }],
+                [{ type: OpType.ASSET_INVOKE, payload: { asset_id: ASSET, callsite: "Transfer" } }],
                 undefined,
-                { participants: [{ id: SENDER, lock_type: customLockType }] }
+                { participants: [{ id: ASSET, lock_type: customLockType }] }
             )
         );
 
-        const senderParticipant = result.participants!.find((p) =>
-            p.id.toLowerCase() === SENDER.toLowerCase()
+        const assetParticipant = result.participants!.find((p) =>
+            p.id.toLowerCase() === ASSET.toLowerCase()
         );
-        expect(senderParticipant!.lock_type).toBe(customLockType);
+        expect(assetParticipant!.lock_type).toBe(customLockType);
     });
 
     test("does not mutate the original interaction object", () => {

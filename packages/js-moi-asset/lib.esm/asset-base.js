@@ -1,12 +1,9 @@
-import { ElementDescriptor, ManifestCoder } from "js-moi-manifest";
+import { ElementDescriptor, ManifestCoder, } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { ErrorCode, ErrorUtils, OpType } from "js-moi-utils";
 import { AssetId } from "./asset-id";
 import { RoutineOption } from "js-moi-logic";
-/**
- * The default fuel price used for logic interactions.
- */
-const DEFAULT_FUEL_PRICE = 1;
+import { DEFAULT_FUEL_PRICE } from "js-moi-constants";
 /**
  * This abstract class extends the ElementDescriptor class and serves as a base
  * class for logic-related operations.
@@ -69,7 +66,8 @@ export class AssetBase extends ElementDescriptor {
      * or if the sendInteraction operation fails.
      */
     async executeRoutine(ixObject, method, option) {
-        if (this.getTxType(ixObject.routine.kind) !== OpType.ASSET_CREATE && !this.getLogicId()) {
+        if (this.getTxType(ixObject.routine.kind) !== OpType.ASSET_CREATE &&
+            !this.getLogicId()) {
             ErrorUtils.throwError("This asset object doesn't have asset id assigned yet, please assign an asset id.", ErrorCode.NOT_INITIALIZED);
         }
         const { type, params } = await this.processArguments(ixObject, method, option);
@@ -118,11 +116,14 @@ export class AssetBase extends ElementDescriptor {
      */
     async processArguments(ixObject, type, option) {
         const params = {
-            sender: option.sender ?? {
-                id: ((await this.signer.getIdentifier()).toString()),
-                key_id: (await this.signer?.getKeyId()),
-                sequence: option.sequence != null ? option.sequence : (await this.signer?.getNonce()),
-            },
+            sender: option.sender ??
+                {
+                    id: (await this.signer.getIdentifier()).toString(),
+                    key_id: await this.signer?.getKeyId(),
+                    sequence: option.sequence != null
+                        ? option.sequence
+                        : await this.signer?.getNonce(),
+                },
             fuel_price: option.fuelPrice ?? 0,
             fuel_limit: option.fuelLimit ?? 0,
             ix_operations: [],
@@ -167,7 +168,7 @@ export class AssetBase extends ElementDescriptor {
             unwrap,
             call: ixObject.call.bind(ixObject),
             send: ixObject.send.bind(ixObject),
-            estimateFuel: ixObject.estimateFuel.bind(ixObject)
+            estimateFuel: ixObject.estimateFuel.bind(ixObject),
         };
     }
     /**
@@ -181,13 +182,13 @@ export class AssetBase extends ElementDescriptor {
         const option = args.at(-1) && args.at(-1) instanceof RoutineOption ? args.pop() : {};
         const ixObject = {
             routine: routine,
-            arguments: args
+            arguments: args,
         };
         ixObject.call = async () => {
             return this.executeRoutine(ixObject, "call", option);
         };
         ixObject.send = async () => {
-            option.fuelLimit = option.fuelLimit ?? await ixObject.estimateFuel();
+            option.fuelLimit = option.fuelLimit ?? (await ixObject.estimateFuel());
             option.fuelPrice = option.fuelPrice ?? DEFAULT_FUEL_PRICE;
             return this.executeRoutine(ixObject, "send", option);
         };

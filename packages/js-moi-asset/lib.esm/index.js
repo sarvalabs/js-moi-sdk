@@ -1,5 +1,6 @@
 export * from "./mas0";
 export * from "./mas0-asset";
+export * from "./masn-asset";
 export * from "./mas1";
 export * from "./mas1-asset";
 export * from "./mas2";

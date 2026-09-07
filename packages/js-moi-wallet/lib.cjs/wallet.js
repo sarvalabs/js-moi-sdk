@@ -425,7 +425,7 @@ class Wallet extends js_moi_signer_1.Signer {
             };
         }
         catch (err) {
-            js_moi_utils_1.ErrorUtils.throwError("Failed to sign interaction", js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
+            js_moi_utils_1.ErrorUtils.throwError(`Failed to sign interaction: ${err instanceof Error ? err.message : err}`, js_moi_utils_1.ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
     /**
