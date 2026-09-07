@@ -11,6 +11,7 @@ import {
   LogicActionPayload,
   IxParticipant,
   Sender,
+  Signature,
   StoragePayload,
 } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
@@ -85,4 +86,13 @@ export interface IxOption {
   fuel_limit?: number;
   participants?: IxParticipant[];
   payer?: Hex;
+  /**
+   * Signatures collected from other participants (for example a payer),
+   * produced by `Wallet#signRawInteractionObject` against the same
+   * interaction object this option is used to build. Forwarded to
+   * `Signer#send` so a sponsored interaction can be sent in one call.
+   * Ignored by `call()` and `estimateFuel()`, which never need a payer's
+   * signature.
+   */
+  participantSignatures?: Signature[];
 }

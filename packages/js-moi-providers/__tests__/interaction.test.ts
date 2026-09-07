@@ -1,5 +1,5 @@
 import { KMOI_ASSET_ID, ZERO_ADDRESS } from "js-moi-constants";
-import { LockType, OpType } from "js-moi-utils";
+import { AssetStandard, LockType, OpType } from "js-moi-utils";
 import type { InteractionObject, Signature } from "../types/interaction";
 import {
     checkSignature,
@@ -104,6 +104,23 @@ describe("validateAssetAction", () => {
 
     test("throws when funds contain a negative number", () => {
         expect(() => validateAssetAction({ ...valid, funds: { "0xkey": -1 } })).toThrow("non-negative");
+    });
+
+    describe("KMOI reserved endpoints", () => {
+        test.each(["Mint", "MintWithMetadata", "Burn", "SetStaticMetadata", "SetDynamicMetadata"])(
+            "throws when callsite is %s on the KMOI asset",
+            (callsite) => {
+                expect(() => validateAssetAction({ asset_id: KMOI_ASSET_ID, callsite })).toThrow("reserved");
+            },
+        );
+
+        test("accepts Transfer on the KMOI asset", () => {
+            expect(() => validateAssetAction({ asset_id: KMOI_ASSET_ID, callsite: "Transfer" })).not.toThrow();
+        });
+
+        test("accepts Mint on a non-KMOI asset - the restriction is scoped to KMOI only", () => {
+            expect(() => validateAssetAction({ asset_id: ASSET, callsite: "Mint" })).not.toThrow();
+        });
     });
 });
 
@@ -247,12 +264,32 @@ describe("validateAssetCreate", () => {
         expect(() => validateAssetCreate({ ...valid, dimension: -1 })).toThrow("dimension");
     });
 
+    test("throws when dimension exceeds 1", () => {
+        expect(() => validateAssetCreate({ ...valid, dimension: 2 })).toThrow("dimension");
+    });
+
+    test("accepts dimension 1 (Possession)", () => {
+        expect(() => validateAssetCreate({ ...valid, dimension: 1 })).not.toThrow();
+    });
+
     test("throws when decimals is negative", () => {
         expect(() => validateAssetCreate({ ...valid, decimals: -1 })).toThrow("decimals");
     });
 
+    test("throws when decimals exceeds 18", () => {
+        expect(() => validateAssetCreate({ ...valid, decimals: 19 })).toThrow("decimals");
+    });
+
+    test("accepts decimals at the boundary of 18", () => {
+        expect(() => validateAssetCreate({ ...valid, decimals: 18 })).not.toThrow();
+    });
+
     test("throws when standard is missing", () => {
         expect(() => validateAssetCreate({ ...valid, standard: null as any })).toThrow("standard is required");
+    });
+
+    test("throws when standard is MASN - reserved for KMOI, created only at genesis", () => {
+        expect(() => validateAssetCreate({ ...valid, standard: AssetStandard.MASN })).toThrow("MASN");
     });
 
     test("throws when enable_events is not a boolean", () => {
@@ -265,6 +302,10 @@ describe("validateAssetCreate", () => {
 
     test("throws when max_supply is negative", () => {
         expect(() => validateAssetCreate({ ...valid, max_supply: -1 })).toThrow("max_supply");
+    });
+
+    test("throws when max_supply is zero", () => {
+        expect(() => validateAssetCreate({ ...valid, max_supply: 0 })).toThrow("max_supply");
     });
 
     test("accepts a bigint max_supply - AssetCreatePayload types it as number | bigint", () => {
@@ -348,6 +389,27 @@ describe("processInteractionObject", () => {
         expect(payerParticipant).toBeDefined();
         expect(payerParticipant!.lock_type).toBe(LockType.MUTATE_LOCK);
         expect(payerParticipant!.notary).toBe(true);
+    });
+
+    test("throws when a notary payer does not hold a mutate lock", () => {
+        expect(() =>
+            processInteractionObject(
+                makeIx(
+                    [{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }],
+                    PAYER,
+                    { participants: [{ id: PAYER, lock_type: LockType.NO_LOCK, notary: true }] }
+                )
+            )
+        ).toThrow("mutate lock");
+    });
+
+    test("always writes notary as an explicit boolean, not undefined", () => {
+        const result = processInteractionObject(
+            makeIx([{ type: OpType.ASSET_INVOKE, payload: { asset_id: ASSET, callsite: "Transfer" } }])
+        );
+
+        const assetParticipant = result.participants!.find((p) => p.id === ASSET);
+        expect(assetParticipant).toHaveProperty("notary", false);
     });
 
     test("does not add the payer when it equals ZERO_ADDRESS", () => {

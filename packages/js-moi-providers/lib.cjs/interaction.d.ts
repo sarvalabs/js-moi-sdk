@@ -1,5 +1,5 @@
 import { Hex } from "js-moi-utils";
-import { InteractionObject, RawInteractionObject, Signature, RawSignature, InteractionArgs } from "../types/interaction";
+import { InteractionArgs, InteractionObject, RawInteractionObject, RawSignature, Signature } from "../types/interaction";
 import { AccessDeletePayload, AccessPayload, AccessPolicy, AccountConfigurePayload, AccountInheritPayload, AssetActionPayload, AssetCreatePayload, CallerConstraint, KeyAddPayload, KeyRevokePayload, LogicActionPayload, LogicDeployPayload, ParticipantCreatePayload, StoragePayload } from "../types/operation";
 export declare const validateKeyAdd: (key: KeyAddPayload, index: number) => void;
 export declare const validateKeyRevoke: (key: KeyRevokePayload, index: number) => KeyRevokePayload;

@@ -28,10 +28,10 @@ export class MAS0AssetLogic {
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
-        option?: RoutineOption,
         decimals?: number,
+        option?: RoutineOption,
     ): Promise<MAS0AssetLogic> {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents, option, decimals).send()
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send()
 
         const results = await response.result()
 
@@ -42,8 +42,8 @@ export class MAS0AssetLogic {
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
-        option?: RoutineOption,
         decimals?: number,
+        option?: RoutineOption,
     ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
             symbol: symbol,

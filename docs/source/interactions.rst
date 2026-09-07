@@ -308,7 +308,7 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals)
+   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Creates a new MAS0-standard asset on-chain, then returns an instance
       of :class:`MAS0AssetLogic` for interacting with it.
@@ -317,8 +317,8 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
       ``supply`` must be expressed in the smallest unit for those decimals;
       convert a human-readable amount with :func:`parseAmount`.
 
-      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :param int decimals: (Optional) Number of decimal places for the asset. Omit to use the protocol default.
+      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :returns: An instance of :class:`MAS0AssetLogic`
       :rtype: MAS0AssetLogic
 
@@ -335,11 +335,10 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
              supply,
              managerAddress,
              true,
-             option,
              ASSET_DECIMALS
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents, option, decimals)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Builds an :class:`InteractionContext` for creating a MAS0-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
@@ -351,8 +350,8 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
       must already be scaled to that precision (use :func:`parseAmount` with
       the same decimal count).
 
-      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :param int decimals: (Optional) Number of decimal places for the asset (0–18).
+      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
       **Example**
@@ -368,7 +367,6 @@ MAS0 defines the standard contract for fungible assets, where all units belong t
              amount,
              id,
              true,
-             option,
              ASSET_DECIMALS
          ).ixData();
 
@@ -678,17 +676,17 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, manager, enableEvents, option, decimals)
+   .. method:: static async newAsset(signer, symbol, manager, enableEvents, option)
 
       Creates a new MAS1-standard asset on-chain, then returns an instance
       of :class:`MAS1AssetLogic` for interacting with it. MAS1 is single-unit
-      (NFT-like) - unlike MAS0/MAS2 there is no ``supply`` parameter; ``max_supply``
-      is encoded as ``parseAmount("1", decimals ?? 0)``.
-
-      Pass ``decimals`` to set the asset's decimal places at creation (0–18).
+      (NFT-like) - unlike MAS0/MAS2 there is no ``supply`` parameter, and no
+      ``decimals`` parameter either; ``max_supply`` is always ``1``. MAS1 has
+      no ``Decimals`` endpoint and no operation that carries an amount, so
+      there is nothing for a decimals value to describe or anywhere to read
+      one back.
 
       :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
-      :param int decimals: (Optional) Number of decimal places for the asset. Omit to use the protocol default.
       :returns: An instance of :class:`MAS1AssetLogic`
       :rtype: MAS1AssetLogic
 
@@ -696,18 +694,15 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
 
       .. code-block:: javascript
 
-         const ASSET_DECIMALS = 10;
-
          const gold = await MAS1AssetLogic.newAsset(
              signer,
              "GOLD",
              managerAddress,
              true,
-             option,
-             ASSET_DECIMALS
+             option
          );
 
-   .. method:: static create(signer, symbol, manager, enableEvents, option, decimals)
+   .. method:: static create(signer, symbol, manager, enableEvents, option)
 
       Builds an :class:`InteractionContext` for creating a MAS1-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
@@ -715,27 +710,19 @@ MAS1 defines the standard contract for non-fungible assets, where each token has
       ``option.storageFund``) - a fresh asset account self-pays for its own
       creation-time storage cost and starts with no KMOI.
 
-      Users can provide ``decimals`` at creation time. MAS1 still has a
-      unit supply of 1; that value is scaled with :func:`parseAmount` using
-      the given decimals.
-
       :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
-      :param int decimals: (Optional) Number of decimal places for the asset (0–18).
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
       **Example**
 
       .. code-block:: javascript
 
-         const ASSET_DECIMALS = 10;
-
          const interactionObj = await MAS1AssetLogic.create(
              wallet,
              "GOLD",
              id,
              true,
-             option,
-             ASSET_DECIMALS
+             option
          ).ixData();
 
          const response = await wallet.sendInteraction(interactionObj);
@@ -1078,7 +1065,7 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
 
    **Static Methods**
 
-   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals)
+   .. method:: static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Creates a new MAS2-standard asset on-chain, then returns an instance
       of :class:`MAS2AssetLogic` for interacting with it.
@@ -1087,8 +1074,8 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
       ``supply`` must be expressed in the smallest unit for those decimals;
       convert a human-readable amount with :func:`parseAmount`.
 
-      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :param int decimals: (Optional) Number of decimal places for the asset. Omit to use the protocol default.
+      :param RoutineOption option: (Optional) Override ``storageFund`` (defaults to ``DEFAULT_STORAGE_FUND``) to fund the new asset's creation-time storage cost with.
       :returns: An instance of :class:`MAS2AssetLogic`
       :rtype: MAS2AssetLogic
 
@@ -1105,11 +1092,10 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
              supply,
              managerAddress,
              true,
-             option,
              ASSET_DECIMALS
          );
 
-   .. method:: static create(signer, symbol, supply, manager, enableEvents, option, decimals)
+   .. method:: static create(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Builds an :class:`InteractionContext` for creating a MAS2-standard asset. Like
       :func:`AssetFactory.create`, this automatically bundles a funding transfer to the
@@ -1121,8 +1107,8 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
       must already be scaled to that precision (use :func:`parseAmount` with
       the same decimal count).
 
-      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :param int decimals: (Optional) Number of decimal places for the asset (0–18).
+      :param RoutineOption option: (Optional) Override ``storageFund`` to fund the new asset with.
       :returns: InteractionContext<OpType.ASSET_CREATE>
 
       **Example**
@@ -1138,7 +1124,6 @@ MAS2 defines the standard contract for multi-token (semi-fungible) assets, where
              amount,
              id,
              true,
-             option,
              ASSET_DECIMALS
          ).ixData();
 
@@ -1459,6 +1444,28 @@ Each operation returns an :class:`InteractionContext`, which can be executed by 
    .. code-block:: javascript
 
       const response = await mas2.getDynamicMetadata(tokenId, key).send();
+
+.. method:: async getAssetInfo()
+
+   Reads this asset's stored metadata directly: ``symbol``, ``dimension``,
+   ``decimals``, ``creator``, ``manager``, ``max_supply``,
+   ``circulating_supply``, ``enable_events``, and ``metadata``.
+
+   MAS2's manifest has no ``Decimals``, ``MaxSupply``, or
+   ``CirculatingSupply`` endpoint, unlike MAS0 and MASN, so those values
+   cannot be read through a callsite method the way
+   :func:`MAS0AssetLogic.Decimals` can. This method reads them instead
+   through the node's generic, standard-agnostic asset-info RPC, which
+   every asset exposes.
+
+   :returns: Promise<AssetInfo>
+
+   **Example**
+
+   .. code-block:: javascript
+
+      const info = await mas2.getAssetInfo();
+      console.log(info.decimals);
 
 MASNAssetLogic
 ^^^^^^^^^^^^^^

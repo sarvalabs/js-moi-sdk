@@ -796,10 +796,12 @@ describe("Wallet", () => {
       expect(mockProvider.sendInteraction).toHaveBeenCalledTimes(1);
     });
 
-    test("sends successfully when a payer is set", async () => {
-      await senderWallet.sendInteraction(buildSendIxObject(payerId));
+    test("throws when a payer is set but no participant signature is provided", async () => {
+      await expect(
+        senderWallet.sendInteraction(buildSendIxObject(payerId)),
+      ).rejects.toThrow("Payer signature is missing");
 
-      expect(mockProvider.sendInteraction).toHaveBeenCalledTimes(1);
+      expect(mockProvider.sendInteraction).not.toHaveBeenCalled();
     });
 
     test("sends successfully with merged payer participant signatures", async () => {

@@ -1,4 +1,10 @@
-import {IxParticipant,InteractionResponse,AnyIxOperation,InteractionCallResponse,InteractionObject} from "js-moi-providers";
+import {
+  AnyIxOperation,
+  InteractionCallResponse,
+  InteractionObject,
+  InteractionResponse,
+  IxParticipant,
+} from "js-moi-providers";
 import { OpType, trimHexPrefix } from "js-moi-utils";
 import { DEFAULT_FUEL_PRICE, DEFAULT_FUEL_LIMIT } from "js-moi-constants";
 import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context";
@@ -93,10 +99,15 @@ export class InteractionContext<T extends AllowedOps> {
 
   /**
    * Sends a transaction to the network, committing changes.
-   * @param option Optional configuration such as fuel price or participants
+   * @param option Optional configuration such as fuel price, participants,
+   * or a payer's pre-collected `participantSignatures` for a sponsored
+   * interaction (see `IxOption.participantSignatures`).
    */
   public async send(option?: IxOption): Promise<InteractionResponse> {
-    return this.ctx.signer.sendInteraction(await this.ixData(option));
+    return this.ctx.signer.sendInteraction(
+      await this.ixData(option),
+      option?.participantSignatures,
+    );
   }
 
   /**

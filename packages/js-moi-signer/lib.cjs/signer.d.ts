@@ -87,7 +87,8 @@ export declare abstract class Signer {
      * @returns {Promise<InteractionResponse>} A Promise that resolves to the
      * interaction response.
      * @throws {Error} if there is an error sending the interaction, if the provider
-     * is not initialized, or if the interaction object fails the validity checks.
+     * is not initialized, if the interaction object fails the validity checks, or
+     * if the interaction has a non-zero payer with no matching signature.
      */
     sendInteraction(ixObject: InteractionObject, participantSignatures?: ParticipantSignature[]): Promise<InteractionResponse>;
     /**

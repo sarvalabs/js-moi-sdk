@@ -77,10 +77,12 @@ class InteractionContext {
     }
     /**
      * Sends a transaction to the network, committing changes.
-     * @param option Optional configuration such as fuel price or participants
+     * @param option Optional configuration such as fuel price, participants,
+     * or a payer's pre-collected `participantSignatures` for a sponsored
+     * interaction (see `IxOption.participantSignatures`).
      */
     async send(option) {
-        return this.ctx.signer.sendInteraction(await this.ixData(option));
+        return this.ctx.signer.sendInteraction(await this.ixData(option), option?.participantSignatures);
     }
     /**
      * Executes a read-only call (no state changes).
