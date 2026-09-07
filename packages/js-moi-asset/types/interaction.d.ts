@@ -11,17 +11,8 @@ export interface AssetIxObject {
     createPayload(): AssetCreatePayload | AssetActionPayload;
 }
 
-// Deliberately not extending InteractionResponse: processResult() is called
-// for both the "call" and "send" branches of executeRoutine (asset-base.ts),
-// and only ever uses routine_name and result(). "call" responses come from
-// InteractionCallResponse (receipt + a zero-arg result()), which has no
-// hash or wait, so requiring them here would make that branch impossible to
-// type correctly. A zero-arg result() is still structurally assignable to
-// the (timeout?: number) => Promise<any> shape below, since a function
-// declaring fewer parameters can always stand in for one declaring more.
-export interface AssetIxResponse {
+export interface AssetIxResponse extends InteractionResponse {
     routine_name: string;
-    result: (timeout?: number) => Promise<any>;
 }
 
 export interface AssetIxResult {

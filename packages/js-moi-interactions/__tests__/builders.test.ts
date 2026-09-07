@@ -61,49 +61,6 @@ describe("InteractionContext", () => {
         expect(ctx.participants()).toStrictEqual(participants);
     });
 
-    describe("send (payer / participantSignatures)", () => {
-        const PAYER_SIGNATURE = [{ id: TARGET, key_id: 0, signature: "0x00" as Hex }];
-
-        const makeSendSigner = () => ({
-            getIdentifier: jest.fn().mockResolvedValue({ toHex: () => BENEFICIARY }),
-            getKeyId: jest.fn().mockResolvedValue(0),
-            getNonce: jest.fn().mockResolvedValue(0),
-            sendInteraction: jest.fn().mockResolvedValue({ hash: "0x00" }),
-        });
-
-        test("send() with no payer option calls sendInteraction with no participantSignatures", async () => {
-            const signer = makeSendSigner();
-            const ctx = makeCtx({
-                opType: OpType.ACCOUNT_CONFIGURE,
-                payload: { add: [], revoke: [{ key_id: 0 }] },
-                participants: [],
-                signer: signer as any,
-            });
-
-            await ctx.send();
-
-            expect(signer.sendInteraction).toHaveBeenCalledTimes(1);
-            expect(signer.sendInteraction.mock.calls[0][1]).toBeUndefined();
-        });
-
-        test("send({ payer, participantSignatures }) forwards both to the interaction object and to sendInteraction", async () => {
-            const signer = makeSendSigner();
-            const ctx = makeCtx({
-                opType: OpType.ACCOUNT_CONFIGURE,
-                payload: { add: [], revoke: [{ key_id: 0 }] },
-                participants: [],
-                signer: signer as any,
-            });
-
-            await ctx.send({ payer: TARGET, participantSignatures: PAYER_SIGNATURE });
-
-            expect(signer.sendInteraction).toHaveBeenCalledTimes(1);
-            const [ixObject, forwardedSignatures] = signer.sendInteraction.mock.calls[0];
-            expect(ixObject.payer).toBe(TARGET);
-            expect(forwardedSignatures).toBe(PAYER_SIGNATURE);
-        });
-    });
-
     describe("mergeParticipants (via buildOperation)", () => {
         test("buildOperation returns the correct type and payload object", () => {
             const payload = { add: [], revoke: [{ key_id: 1 }] };

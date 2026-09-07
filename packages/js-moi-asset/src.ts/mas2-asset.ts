@@ -3,7 +3,7 @@ import { MAS2 } from "./mas2";
 import { documentEncode, Schema } from "js-polo";
 import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_TOKEN_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_TOKEN_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, SET_STATIC_TOKEN_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas2-schema";
 import { Signer } from "js-moi-signer";
-import { AssetActionPayload, AssetCreatePayload, AssetInfo, IxParticipant, Sender } from "js-moi-providers";
+import { AssetActionPayload, AssetCreatePayload, IxParticipant, Sender } from "js-moi-providers";
 import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
 import { deriveAssetId } from "js-moi-identifiers";
@@ -29,10 +29,10 @@ export class MAS2AssetLogic {
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
-        decimals?: number,
         option?: RoutineOption,
+        decimals?: number,
     ): Promise<MAS2AssetLogic> {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send()
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, option, decimals).send()
 
         const results = await response.result()
 
@@ -43,8 +43,8 @@ export class MAS2AssetLogic {
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
-        decimals?: number,
         option?: RoutineOption,
+        decimals?: number,
     ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
             symbol: symbol,
@@ -597,10 +597,6 @@ export class MAS2AssetLogic {
             },
             participants: [],
             signer: this.signer,
-        })
-    }
-
-    public async getAssetInfo(): Promise<AssetInfo> {
-        return this.signer.getProvider().getAssetInfoByAssetID(this.assetId);
+        })  
     }
 }

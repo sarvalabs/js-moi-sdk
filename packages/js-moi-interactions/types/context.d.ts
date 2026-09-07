@@ -1,21 +1,6 @@
-import {
-  AccessDeletePayload,
-  AccessPayload,
-  AnyIxOperation,
-  AssetCreatePayload,
-  AssetActionPayload,
-  ParticipantCreatePayload,
-  AccountConfigurePayload,
-  AccountInheritPayload,
-  LogicDeployPayload,
-  LogicActionPayload,
-  IxParticipant,
-  Sender,
-  Signature,
-  StoragePayload,
-} from "js-moi-providers";
+import { AccessDeletePayload, AccessPayload, AnyIxOperation, AssetCreatePayload, AssetActionPayload, ParticipantCreatePayload, AccountConfigurePayload, AccountInheritPayload, LogicDeployPayload, LogicActionPayload, IxParticipant, Sender, StoragePayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
-import { Hex, OpType } from "js-moi-utils";
+import { OpType } from "js-moi-utils";
 
 /**
  * Represents all valid operation types supported by InteractionContext.
@@ -71,9 +56,7 @@ export interface IxContext<T extends AllowedOps> {
    * since the funded account's id can only be derived once the sender is
    * finalized.
    */
-  fundingOperations?: (
-    sender: Sender,
-  ) => AnyIxOperation[] | Promise<AnyIxOperation[]>;
+  fundingOperations?: (sender: Sender) => AnyIxOperation[] | Promise<AnyIxOperation[]>;
 }
 
 /**
@@ -85,14 +68,4 @@ export interface IxOption {
   fuel_price?: number;
   fuel_limit?: number;
   participants?: IxParticipant[];
-  payer?: Hex;
-  /**
-   * Signatures collected from other participants (for example a payer),
-   * produced by `Wallet#signRawInteractionObject` against the same
-   * interaction object this option is used to build. Forwarded to
-   * `Signer#send` so a sponsored interaction can be sent in one call.
-   * Ignored by `call()` and `estimateFuel()`, which never need a payer's
-   * signature.
-   */
-  participantSignatures?: Signature[];
 }

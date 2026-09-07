@@ -16,12 +16,12 @@ export class MAS0AssetLogic {
         const document = documentEncode(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option) {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send();
+    static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals) {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, option, decimals).send();
         const results = await response.result();
         return new MAS0AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, supply, manager, enableEvents, decimals, option) {
+    static create(signer, symbol, supply, manager, enableEvents, option, decimals) {
         const payload = {
             symbol: symbol,
             max_supply: supply,

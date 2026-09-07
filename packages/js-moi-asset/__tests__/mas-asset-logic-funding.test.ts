@@ -41,31 +41,10 @@ class TestSigner extends Signer {
 }
 
 describe.each([
-    // Each row's last column builds the args for a call with a RoutineOption
-    // set, in that class's own positional order. MAS0/MAS2 take decimals
-    // before option; MAS1 has no decimals parameter at all.
-    [
-        "MAS0AssetLogic",
-        MAS0AssetLogic,
-        AssetStandard.MAS0,
-        [new TestSigner(), "MOI", 1000, SENDER_ID, false] as const,
-        (option: RoutineOption) => [new TestSigner(), "MOI", 1000, SENDER_ID, false, undefined, option] as const,
-    ],
-    [
-        "MAS1AssetLogic",
-        MAS1AssetLogic,
-        AssetStandard.MAS1,
-        [new TestSigner(), "MOI", SENDER_ID, false] as const,
-        (option: RoutineOption) => [new TestSigner(), "MOI", SENDER_ID, false, option] as const,
-    ],
-    [
-        "MAS2AssetLogic",
-        MAS2AssetLogic,
-        AssetStandard.MAS2,
-        [new TestSigner(), "MOI", 1000, SENDER_ID, false] as const,
-        (option: RoutineOption) => [new TestSigner(), "MOI", 1000, SENDER_ID, false, undefined, option] as const,
-    ],
-])("%s.create funding bundle", (_name, cls: any, standard, args, argsWithOption) => {
+    ["MAS0AssetLogic", MAS0AssetLogic, AssetStandard.MAS0, [new TestSigner(), "MOI", 1000, SENDER_ID, false] as const],
+    ["MAS1AssetLogic", MAS1AssetLogic, AssetStandard.MAS1, [new TestSigner(), "MOI", SENDER_ID, false] as const],
+    ["MAS2AssetLogic", MAS2AssetLogic, AssetStandard.MAS2, [new TestSigner(), "MOI", 1000, SENDER_ID, false] as const],
+])("%s.create funding bundle", (_name, cls: any, standard, args) => {
     it("bundles a second ASSET_INVOKE Transfer op alongside ASSET_CREATE", async () => {
         const ctx = cls.create(...args);
         const ixData = await ctx.ixData();
@@ -98,7 +77,7 @@ describe.each([
 
     it("honors a custom storageFund amount from RoutineOption", async () => {
         const option = new RoutineOption({ storageFund: 42 });
-        const ctx = cls.create(...argsWithOption(option));
+        const ctx = cls.create(...args, option);
         const ixData = await ctx.ixData();
         const decoded = decodeTransfer((ixData.ix_operations[1].payload as any).calldata);
 

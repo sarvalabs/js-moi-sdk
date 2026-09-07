@@ -6,8 +6,8 @@ export declare enum AssetStandard {
     MAS0 = 0,
     MAS1 = 1,
     MAS2 = 2,
-    MASN = 65534,
-    MASX = 65535
+    MASX = 65535,
+    MASN = 65534
 }
 /**
  * Enumerates the types of operations in the system.
