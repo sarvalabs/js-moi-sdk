@@ -17,12 +17,12 @@ export class MAS2AssetLogic {
         const document = documentEncode(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, supply, manager, enableEvents, option, decimals) {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents, option, decimals).send();
+    static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option) {
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send();
         const results = await response.result();
         return new MAS2AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, supply, manager, enableEvents, option, decimals) {
+    static create(signer, symbol, supply, manager, enableEvents, decimals, option) {
         const payload = {
             symbol: symbol,
             max_supply: supply,
@@ -502,6 +502,9 @@ export class MAS2AssetLogic {
             participants: [],
             signer: this.signer,
         });
+    }
+    async getAssetInfo() {
+        return this.signer.getProvider().getAssetInfoByAssetID(this.assetId);
     }
 }
 //# sourceMappingURL=mas2-asset.js.map

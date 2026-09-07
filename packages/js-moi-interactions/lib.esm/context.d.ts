@@ -1,4 +1,4 @@
-import { IxParticipant, InteractionResponse, AnyIxOperation, InteractionCallResponse, InteractionObject } from "js-moi-providers";
+import { AnyIxOperation, InteractionCallResponse, InteractionObject, InteractionResponse, IxParticipant } from "js-moi-providers";
 import { OpType } from "js-moi-utils";
 import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context";
 /**
@@ -30,7 +30,9 @@ export declare class InteractionContext<T extends AllowedOps> {
     ixData(option?: IxOption): Promise<InteractionObject>;
     /**
      * Sends a transaction to the network, committing changes.
-     * @param option Optional configuration such as fuel price or participants
+     * @param option Optional configuration such as fuel price, participants,
+     * or a payer's pre-collected `participantSignatures` for a sponsored
+     * interaction (see `IxOption.participantSignatures`).
      */
     send(option?: IxOption): Promise<InteractionResponse>;
     /**

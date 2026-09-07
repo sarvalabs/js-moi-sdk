@@ -56,6 +56,17 @@ implement this method to provide the logic for signing the interactions. When
 a wallet has multiple keys registered, all keys contribute signatures to satisfy
 multisig threshold requirements.
 
+An optional ``participantSignatures`` argument accepts signature entries from
+other participants (for example a payer). These entries are merged with the
+wallet's own signatures before the request is serialized.
+
+**signRawInteractionObject**
+
+Wallet implementations expose this method to sign an interaction object with the
+wallet's registered keys and return the raw :class:`Signature` entries without
+POLO serialization. Use it when another participant must sign the same
+interaction object and return signatures to the sender.
+
 Regular Methods
 ~~~~~~~~~~~~~~~
 
@@ -77,6 +88,12 @@ Regular Methods
     >> 5
 
 .. autofunction:: Signer#sendInteraction
+
+When an interaction specifies a non-zero ``payer``, the sender wallet signs as
+the sender and the payer wallet must also sign the same interaction object.
+Pass the payer's signatures to ``participantSignatures`` so they are merged
+before the request is sent. See :ref:`sponsored-interactions` for the full
+workflow.
 
 .. code-block:: javascript
 
@@ -499,9 +516,13 @@ Wallet
 
     .. autofunction:: Wallet#signInteraction
 
-    Signs an interaction using all registered keys. Each key produces its own
-    signature entry in the response. The sender key (``key_index``) must be
-    registered or an error is thrown before signing.
+    Signs an interaction using all registered keys on the wallet. Each key
+    produces its own signature entry in the response. The sender key
+    (``key_index``) must be registered or an error is thrown before signing.
+
+    When the interaction requires signatures from other participants, pass their
+    entries through the optional ``participantSignatures`` argument. The wallet
+    signatures are merged with ``participantSignatures`` before serialization.
 
     .. code-block:: javascript
 
@@ -532,6 +553,116 @@ Wallet
                 signatures: '...'   // POLO-encoded array, one entry per registered key
             }
         */
+
+    .. autofunction:: Wallet#signRawInteractionObject
+
+    Signs an interaction object with all keys registered on the wallet and
+    returns the raw :class:`Signature` array. Unlike ``signInteraction``, this
+    method does not validate the payer field, does not require the sender key
+    to be registered on the wallet, and does not POLO-encode the result.
+
+    Use this method when you need signature entries for an interaction object
+    using your wallet instance keys—for example, when another participant asks
+    you to sign an interaction they intend to send.
+
+    .. code-block:: javascript
+
+        const sigAlgo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+        const payerSignatures = await payerWallet.signRawInteractionObject(
+            interaction,
+            sigAlgo,
+        );
+
+        console.log(payerSignatures);
+
+        // Output
+        /*
+            [
+                {
+                    id: '0x...',       // payer participant identifier
+                    key_id: 0,
+                    signature: '...'
+                }
+            ]
+        */
+
+    .. _sponsored-interactions:
+
+    Sponsored Interactions
+    ======================
+
+    Some interactions require signatures from more than one participant. A
+    common case is fuel sponsorship: the sender initiates the interaction while
+    a separate payer account covers the fuel cost. In that case, both the
+    sender and the payer must sign the **same** interaction object.
+
+    **Workflow**
+
+    1. The sender builds the interaction object and sets the ``payer`` field to
+       the payer's participant identifier.
+    2. The sender prepares the interaction (for example by calling
+       ``prepareInteraction`` or ``sendInteraction``), so fields such as
+       ``sender.sequence`` are populated.
+    3. The sender shares the prepared interaction object with the payer.
+    4. The payer signs it with ``signRawInteractionObject`` and returns the
+       resulting :class:`Signature` array.
+    5. The sender passes those entries to ``signInteraction`` or
+       ``sendInteraction`` through ``participantSignatures``.
+
+    All participants must sign the identical interaction object. If the object
+    changes after the payer signs (for example because the nonce is updated),
+    the payer signatures will no longer be valid.
+
+    .. code-block:: javascript
+
+        const { checkSignature } = require("js-moi-providers");
+
+        const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+        const payerId = (await payerWallet.getIdentifier()).toHex();
+
+        const interaction = {
+            sender: {
+                id: (await senderWallet.getIdentifier()).toHex(),
+                key_id: await senderWallet.getKeyId(),
+            },
+            payer: payerId,
+            fuel_price: 1,
+            fuel_limit: 200,
+            ix_operations: [
+                {
+                    type: OpType.ASSET_CREATE,
+                    payload: {
+                        standard: AssetStandard.MAS0,
+                        symbol: "TOKYO",
+                        supply: 1248577,
+                    },
+                },
+            ],
+        };
+
+        // Prepare once so sender.sequence and other fields are final
+        await senderWallet.prepareInteraction("send", interaction);
+
+        // Payer signs the prepared interaction object
+        const payerSignatures = await payerWallet.signRawInteractionObject(
+            interaction,
+            sigAlgo,
+        );
+
+        if (!checkSignature(payerSignatures, payerId)) {
+            throw new Error("Payer signature is missing");
+        }
+
+        // Option 1: sign and send via the provider separately
+        const ixRequest = await senderWallet.signInteraction(
+            interaction,
+            sigAlgo,
+            payerSignatures,
+        );
+        await provider.sendInteraction(ixRequest);
+
+        // Option 2: sign and send in one step
+        await senderWallet.sendInteraction(interaction, payerSignatures);
 
     Key Management
     ==============

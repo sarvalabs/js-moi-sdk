@@ -5,45 +5,34 @@ import {
   hexToBytes,
   LockType,
   OpType,
-  parseAmount,
-  validateDecimals,
 } from "js-moi-utils";
 import { MAS1 } from "./mas1";
 import { documentEncode, Schema } from "js-polo";
 import { Signer } from "js-moi-signer";
-import {
-  AssetActionPayload,
-  AssetCreatePayload,
-  IxParticipant,
-  Sender,
-} from "js-moi-providers";
-import {
-  DEFAULT_STORAGE_FUND,
-  KMOI_ASSET_ID,
-  SARGA_ADDRESS,
-} from "js-moi-constants";
+import { AssetActionPayload, AssetCreatePayload, IxParticipant, Sender } from "js-moi-providers";
+import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
 import { deriveAssetId } from "js-moi-identifiers";
 import { RoutineOption } from "js-moi-logic";
 import {
   APPROVE_SCHEMA,
   BURN_SCHEMA,
-  LOCKUP_SCHEMA,
-  MINT_SCHEMA,
-  RELEASE_SCHEMA,
-  REVOKE_SCHEMA,
-  SET_DYNAMIC_METADATA_SCHEMA,
-  SET_STATIC_METADATA_SCHEMA,
-  TRANSFER_FROM_SCHEMA,
-  TRANSFER_SCHEMA,
   GET_DYNAMIC_METADATA_SCHEMA,
   GET_DYNAMIC_TOKEN_METADATA_SCHEMA,
   GET_STATIC_METADATA_SCHEMA,
   GET_STATIC_TOKEN_METADATA_SCHEMA,
   IS_OWNER_SCHEMA,
-  SET_DYNAMIC_TOKEN_METADATA_SCHEMA,
-  SET_STATIC_TOKEN_METADATA_SCHEMA,
+  LOCKUP_SCHEMA,
+  MINT_SCHEMA,
   MINT_WITH_METADATA_SCHEMA,
+  RELEASE_SCHEMA,
+  REVOKE_SCHEMA,
+  SET_DYNAMIC_METADATA_SCHEMA,
+  SET_DYNAMIC_TOKEN_METADATA_SCHEMA,
+  SET_STATIC_METADATA_SCHEMA,
+  SET_STATIC_TOKEN_METADATA_SCHEMA,
+  TRANSFER_FROM_SCHEMA,
+  TRANSFER_SCHEMA,
 } from "./mas1-schema";
 
 export class MAS1AssetLogic {
@@ -70,7 +59,6 @@ export class MAS1AssetLogic {
     manager: string,
     enableEvents: boolean,
     option?: RoutineOption,
-    decimals?: number,
   ): Promise<MAS1AssetLogic> {
     const response = await this.create(
       signer,
@@ -78,7 +66,6 @@ export class MAS1AssetLogic {
       manager,
       enableEvents,
       option,
-      decimals,
     ).send();
 
     const results = await response.result();
@@ -92,15 +79,17 @@ export class MAS1AssetLogic {
     manager: string,
     enableEvents: boolean,
     option?: RoutineOption,
-    decimals?: number,
   ): InteractionContext<OpType.ASSET_CREATE> {
-    const maxSupply = parseAmount("1", decimals ?? 0);
-
-    console.log("Max supply", maxSupply);
-
+    // MAS1 is single-unit (NFT-like): every asset under this standard has a
+    // fixed max_supply of 1. There is no decimals parameter here, unlike
+    // MAS0 and MAS2: MAS1 has no endpoint that ever reads decimals back
+    // (there is no Decimals callsite in its manifest), and none of its
+    // operations carry an amount for decimals to describe in the first
+    // place, every operation moves a whole tokenId, never a divisible
+    // quantity. A decimals value here would be write-only and unreachable.
     const payload: AssetCreatePayload = {
       symbol: symbol,
-      max_supply: maxSupply,
+      max_supply: 1,
       standard: AssetStandard.MAS1,
       dimension: 0,
       enable_events: enableEvents,
@@ -110,11 +99,6 @@ export class MAS1AssetLogic {
         callsite: "Init",
       },
     };
-
-    if (decimals !== undefined) {
-      validateDecimals(decimals);
-      payload.decimals = decimals;
-    }
 
     return new InteractionContext<OpType.ASSET_CREATE>({
       opType: OpType.ASSET_CREATE,

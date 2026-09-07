@@ -1,8 +1,10 @@
 import { KMOI_ASSET_ID, ZERO_ADDRESS } from "js-moi-constants";
-import { LockType, OpType } from "js-moi-utils";
+import { AssetStandard, LockType, OpType } from "js-moi-utils";
 import type { InteractionObject, Signature } from "../types/interaction";
 import {
+    checkSignature,
     processInteractionObject,
+    rawSignaturesToSignatures,
     toRawSignatures,
     validateAccountConfigure,
     validateAccountInherit,
@@ -102,6 +104,23 @@ describe("validateAssetAction", () => {
 
     test("throws when funds contain a negative number", () => {
         expect(() => validateAssetAction({ ...valid, funds: { "0xkey": -1 } })).toThrow("non-negative");
+    });
+
+    describe("KMOI reserved endpoints", () => {
+        test.each(["Mint", "MintWithMetadata", "Burn", "SetStaticMetadata", "SetDynamicMetadata"])(
+            "throws when callsite is %s on the KMOI asset",
+            (callsite) => {
+                expect(() => validateAssetAction({ asset_id: KMOI_ASSET_ID, callsite })).toThrow("reserved");
+            },
+        );
+
+        test("accepts Transfer on the KMOI asset", () => {
+            expect(() => validateAssetAction({ asset_id: KMOI_ASSET_ID, callsite: "Transfer" })).not.toThrow();
+        });
+
+        test("accepts Mint on a non-KMOI asset - the restriction is scoped to KMOI only", () => {
+            expect(() => validateAssetAction({ asset_id: ASSET, callsite: "Mint" })).not.toThrow();
+        });
     });
 });
 
@@ -245,12 +264,32 @@ describe("validateAssetCreate", () => {
         expect(() => validateAssetCreate({ ...valid, dimension: -1 })).toThrow("dimension");
     });
 
+    test("throws when dimension exceeds 1", () => {
+        expect(() => validateAssetCreate({ ...valid, dimension: 2 })).toThrow("dimension");
+    });
+
+    test("accepts dimension 1 (Possession)", () => {
+        expect(() => validateAssetCreate({ ...valid, dimension: 1 })).not.toThrow();
+    });
+
     test("throws when decimals is negative", () => {
         expect(() => validateAssetCreate({ ...valid, decimals: -1 })).toThrow("decimals");
     });
 
+    test("throws when decimals exceeds 18", () => {
+        expect(() => validateAssetCreate({ ...valid, decimals: 19 })).toThrow("decimals");
+    });
+
+    test("accepts decimals at the boundary of 18", () => {
+        expect(() => validateAssetCreate({ ...valid, decimals: 18 })).not.toThrow();
+    });
+
     test("throws when standard is missing", () => {
         expect(() => validateAssetCreate({ ...valid, standard: null as any })).toThrow("standard is required");
+    });
+
+    test("throws when standard is MASN - reserved for KMOI, created only at genesis", () => {
+        expect(() => validateAssetCreate({ ...valid, standard: AssetStandard.MASN })).toThrow("MASN");
     });
 
     test("throws when enable_events is not a boolean", () => {
@@ -263,6 +302,10 @@ describe("validateAssetCreate", () => {
 
     test("throws when max_supply is negative", () => {
         expect(() => validateAssetCreate({ ...valid, max_supply: -1 })).toThrow("max_supply");
+    });
+
+    test("throws when max_supply is zero", () => {
+        expect(() => validateAssetCreate({ ...valid, max_supply: 0 })).toThrow("max_supply");
     });
 
     test("accepts a bigint max_supply - AssetCreatePayload types it as number | bigint", () => {
@@ -346,6 +389,27 @@ describe("processInteractionObject", () => {
         expect(payerParticipant).toBeDefined();
         expect(payerParticipant!.lock_type).toBe(LockType.MUTATE_LOCK);
         expect(payerParticipant!.notary).toBe(true);
+    });
+
+    test("throws when a notary payer does not hold a mutate lock", () => {
+        expect(() =>
+            processInteractionObject(
+                makeIx(
+                    [{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }],
+                    PAYER,
+                    { participants: [{ id: PAYER, lock_type: LockType.NO_LOCK, notary: true }] }
+                )
+            )
+        ).toThrow("mutate lock");
+    });
+
+    test("always writes notary as an explicit boolean, not undefined", () => {
+        const result = processInteractionObject(
+            makeIx([{ type: OpType.ASSET_INVOKE, payload: { asset_id: ASSET, callsite: "Transfer" } }])
+        );
+
+        const assetParticipant = result.participants!.find((p) => p.id === ASSET);
+        expect(assetParticipant).toHaveProperty("notary", false);
     });
 
     test("does not add the payer when it equals ZERO_ADDRESS", () => {
@@ -483,5 +547,76 @@ describe("toRawSignatures", () => {
 
     test("returns an empty array when given an empty input", () => {
         expect(toRawSignatures([])).toEqual([]);
+    });
+});
+
+describe("rawSignaturesToSignatures", () => {
+    const raw = [
+        { id: new Uint8Array([0x12, 0x34]), key_id: 0, signature: new Uint8Array([0xde, 0xad, 0xbe, 0xef]) },
+        { id: new Uint8Array([0xab, 0xcd]), key_id: 1, signature: new Uint8Array([0xca, 0xfe, 0xba, 0xbe]) },
+    ];
+
+    test("converts id and signature from Uint8Array to hex strings", () => {
+        const signs = rawSignaturesToSignatures(raw);
+
+        expect(typeof signs[0].id).toBe("string");
+        expect(typeof signs[0].signature).toBe("string");
+        expect(typeof signs[1].id).toBe("string");
+        expect(typeof signs[1].signature).toBe("string");
+    });
+
+    test("preserves the key_id field unchanged", () => {
+        const signs = rawSignaturesToSignatures(raw);
+
+        expect(signs[0].key_id).toBe(0);
+        expect(signs[1].key_id).toBe(1);
+    });
+
+    test("converts Uint8Array bytes to the correct hex values", () => {
+        const signs = rawSignaturesToSignatures([
+            { id: new Uint8Array([0x12, 0x34]), key_id: 0, signature: new Uint8Array([0xab, 0xcd]) },
+        ]);
+
+        expect(signs[0].id).toBe("1234");
+        expect(signs[0].signature).toBe("abcd");
+    });
+
+    test("returns an empty array when given an empty input", () => {
+        expect(rawSignaturesToSignatures([])).toEqual([]);
+    });
+});
+
+describe("checkSignature", () => {
+    const senderSignature: Signature = {
+        id: SENDER,
+        key_id: 0,
+        signature: "abcd" as Hex,
+    };
+
+    const payerSignature: Signature = {
+        id: PAYER,
+        key_id: 0,
+        signature: "ef01" as Hex,
+    };
+
+    test("returns true when a signature array contains the participant id", () => {
+        expect(checkSignature([senderSignature, payerSignature], PAYER)).toBe(true);
+    });
+
+    test("returns false when a signature array does not contain the participant id", () => {
+        expect(checkSignature([senderSignature], PAYER)).toBe(false);
+    });
+
+    test("matches participant ids after trimming the 0x prefix", () => {
+        const payerSignatureWithoutPrefix: Signature = {
+            ...payerSignature,
+            id: PAYER.slice(2) as Hex,
+        };
+
+        expect(checkSignature([payerSignatureWithoutPrefix], PAYER)).toBe(true);
+    });
+
+    test("returns false for an empty signature array", () => {
+        expect(checkSignature([], PAYER)).toBe(false);
     });
 });

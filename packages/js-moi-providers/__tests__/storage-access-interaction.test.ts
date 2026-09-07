@@ -221,28 +221,28 @@ describe("processInteractionObject - participant derivation for the new ops", ()
         const ix = makeIx([{ type: OpType.STORAGE_DEPOSIT, payload: { target_account: TEST_LOGIC, deposit_for: TEST_SENDER, amount: MIN_STORAGE_DEPOSIT_AMOUNT } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK, notary: false });
     });
 
     test("STORAGE_WITHDRAW adds the target account as a MUTATE_LOCK participant", () => {
         const ix = makeIx([{ type: OpType.STORAGE_WITHDRAW, payload: { target_account: TEST_LOGIC, bytes_to_release: 0 } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK, notary: false });
     });
 
     test("ACCESS_CREATE adds the target account as a MUTATE_LOCK participant", () => {
         const ix = makeIx([{ type: OpType.ACCESS_CREATE, payload: { target_account: TEST_LOGIC, access_policy: {} } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK, notary: false });
     });
 
     test("ACCESS_DELETE adds the target account as a MUTATE_LOCK participant", () => {
         const ix = makeIx([{ type: OpType.ACCESS_DELETE, payload: { target_account: TEST_LOGIC, resource: ResourceType.STORAGE, resource_id: TEST_OTHER } }]);
         const result = processInteractionObject(ix);
 
-        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK });
+        expect(result.participants).toContainEqual({ id: TEST_LOGIC, lock_type: LockType.MUTATE_LOCK, notary: false });
     });
 });
 

@@ -26,6 +26,7 @@
     "js-moi-providers": "0.8.0",
     "js-moi-identifiers": "0.8.0",
     "js-moi-utils": "0.8.0",
+    "js-moi-constants": "0.8.0",
     "buffer": "^6.0.3",
     "@noble/hashes": "^1.1.5",
     "@noble/secp256k1": "^1.7.1"
