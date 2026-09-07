@@ -19,17 +19,22 @@ class MAS1AssetLogic {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
     }
-    static async newAsset(signer, symbol, manager, enableEvents, option, decimals) {
-        const response = await this.create(signer, symbol, manager, enableEvents, option, decimals).send();
+    static async newAsset(signer, symbol, manager, enableEvents, option) {
+        const response = await this.create(signer, symbol, manager, enableEvents, option).send();
         const results = await response.result();
         return new MAS1AssetLogic(results[0].asset_id, signer);
     }
-    static create(signer, symbol, manager, enableEvents, option, decimals) {
-        const maxSupply = (0, js_moi_utils_1.parseAmount)("1", decimals ?? 0);
-        console.log("Max supply", maxSupply);
+    static create(signer, symbol, manager, enableEvents, option) {
+        // MAS1 is single-unit (NFT-like): every asset under this standard has a
+        // fixed max_supply of 1. There is no decimals parameter here, unlike
+        // MAS0 and MAS2: MAS1 has no endpoint that ever reads decimals back
+        // (there is no Decimals callsite in its manifest), and none of its
+        // operations carry an amount for decimals to describe in the first
+        // place, every operation moves a whole tokenId, never a divisible
+        // quantity. A decimals value here would be write-only and unreachable.
         const payload = {
             symbol: symbol,
-            max_supply: maxSupply,
+            max_supply: 1,
             standard: js_moi_utils_1.AssetStandard.MAS1,
             dimension: 0,
             enable_events: enableEvents,
@@ -39,10 +44,6 @@ class MAS1AssetLogic {
                 callsite: "Init",
             },
         };
-        if (decimals !== undefined) {
-            (0, js_moi_utils_1.validateDecimals)(decimals);
-            payload.decimals = decimals;
-        }
         return new js_moi_interactions_1.InteractionContext({
             opType: js_moi_utils_1.OpType.ASSET_CREATE,
             payload: payload,

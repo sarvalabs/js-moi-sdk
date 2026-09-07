@@ -1,4 +1,6 @@
+import { checkSignature } from "js-moi-providers";
 import { ErrorCode, ErrorUtils, hexToBytes, isValidAddress } from "js-moi-utils";
+import { ZERO_ADDRESS } from "js-moi-constants";
 import ECDSA_S256 from "./ecdsa";
 import Signature from "./signature";
 /**
@@ -159,20 +161,29 @@ export class Signer {
      * and forwarding it to the connected provider.
      *
      * @param {InteractionObject} ixObject - The interaction object to send.
+     * @param {Signature[]} [participantSignatures] - Optional signatures from
+     * other participants (for example a payer) to merge with the wallet signatures.
      * @returns {Promise<InteractionResponse>} A Promise that resolves to the
      * interaction response.
      * @throws {Error} if there is an error sending the interaction, if the provider
-     * is not initialized, or if the interaction object fails the validity checks.
+     * is not initialized, if the interaction object fails the validity checks, or
+     * if the interaction has a non-zero payer with no matching signature.
      */
-    async sendInteraction(ixObject) {
+    async sendInteraction(ixObject, participantSignatures) {
         try {
             // Get the provider
             const provider = this.getProvider();
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             await this.prepareInteraction('send', ixObject);
+            if (ixObject.payer && ixObject.payer !== ZERO_ADDRESS) {
+                const hasPayerSignature = checkSignature(participantSignatures ?? [], ixObject.payer);
+                if (!hasPayerSignature) {
+                    ErrorUtils.throwError("Payer signature is missing.", ErrorCode.MISSING_ARGUMENT);
+                }
+            }
             // Sign the interaction object
-            const ixRequest = await this.signInteraction(ixObject, sigAlgo);
+            const ixRequest = await this.signInteraction(ixObject, sigAlgo, participantSignatures);
             // Send the interaction request and return the response
             return await provider.sendInteraction(ixRequest);
         }

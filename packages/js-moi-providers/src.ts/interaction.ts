@@ -5,6 +5,7 @@ import {
   accountInheritSchema,
   assetActionSchema,
   assetCreateSchema,
+  AssetStandard,
   CallerKind,
   ErrorCode,
   ErrorUtils,
@@ -18,27 +19,22 @@ import {
   storagePayloadSchema,
   toQuantity,
   trimHexPrefix,
+  validateDecimals,
   withHexPrefix,
 } from "js-moi-utils";
 import {
+  InteractionArgs,
   InteractionObject,
   IxFund,
+  IxFundArgs,
+  IxOperationArgs,
   IxParticipant,
   RawInteractionObject,
   RawIxFund,
   RawIxParticipant,
-  Signature,
   RawSignature,
-  InteractionArgs,
-  IxFundArgs,
-  IxOperationArgs,
+  Signature,
 } from "../types/interaction";
-import {
-  ParticipantId,
-  AssetId,
-  Identifier,
-  LogicId,
-} from "js-moi-identifiers";
 import {
   AccessDeletePayload,
   AccessPayload,
@@ -62,11 +58,8 @@ import {
   RawStoragePayload,
   StoragePayload,
 } from "../types/operation";
-import {
-  ZERO_ADDRESS,
-  KMOI_ASSET_ID,
-  MIN_STORAGE_DEPOSIT_AMOUNT,
-} from "js-moi-constants";
+import { AssetId, Identifier, LogicId, ParticipantId } from "js-moi-identifiers";
+import { KMOI_ASSET_ID, MIN_STORAGE_DEPOSIT_AMOUNT, ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 import { bytesToHex } from "@noble/secp256k1";
 
@@ -118,10 +111,7 @@ export const validateAssetAction = (value: AssetActionPayload) => {
     throw new Error("callsite must be a non-empty string");
   }
 
-  if (
-    asset_id.toLowerCase() === KMOI_ASSET_ID.toLowerCase() &&
-    KMOI_RESERVED_ENDPOINTS.has(callsite)
-  ) {
+  if (asset_id === KMOI_ASSET_ID && KMOI_RESERVED_ENDPOINTS.has(callsite)) {
     throw new Error(
       `callsite "${callsite}" is reserved for protocol code and cannot be called on the KMOI asset`,
     );
@@ -435,23 +425,32 @@ export const validateAssetCreate = (payload: AssetCreatePayload) => {
     throw new Error("symbol must be a non-empty string");
   }
 
-  // dimension: optional, must be non-negative number if provided
+  // dimension: optional, must be Economic (0) or Possession (1) if provided
   if (payload.dimension !== undefined) {
-    if (typeof payload.dimension !== "number" || payload.dimension < 0) {
-      throw new Error("dimension must be a non-negative number if provided");
+    if (
+      typeof payload.dimension !== "number" ||
+      payload.dimension < 0 ||
+      payload.dimension > 1
+    ) {
+      throw new Error("dimension must be 0 (Economic) or 1 (Possession) if provided");
     }
   }
 
-  // decimals: optional, must be non-negative number if provided
+  // decimals: optional, capped at MAX_DECIMALS if provided (mirrors the node's
+  // ValidateAssetProperties check, so a bad value fails before it costs fuel)
   if (payload.decimals !== undefined) {
-    if (typeof payload.decimals !== "number" || payload.decimals < 0) {
-      throw new Error("decimals must be a non-negative number if provided");
-    }
+    validateDecimals(payload.decimals);
   }
 
   // standard: required
   if (payload.standard == null) {
     throw new Error("standard is required");
+  }
+
+  // MASN is reserved for KMOI, created once by genesis. A client can never
+  // create one (mirrors the node's ErrReservedAssetStandard).
+  if (payload.standard === AssetStandard.MASN) {
+    throw new Error("standard MASN is reserved and cannot be used to create an asset");
   }
 
   // enable_events: required boolean
@@ -464,15 +463,16 @@ export const validateAssetCreate = (payload: AssetCreatePayload) => {
     throw new Error("manager must be a non-empty hex string");
   }
 
-  // max_supply: required non-negative number or bigint - AssetCreatePayload
-  // types it as `number | bigint` (large supplies overflow a safe number),
-  // and every documented usage passes a bigint literal (e.g. `1000000n`).
+  // max_supply: required positive number or bigint - AssetCreatePayload types
+  // it as `number | bigint` (large supplies overflow a safe number), and
+  // every documented usage passes a bigint literal (e.g. `1000000n`). Zero is
+  // rejected to mirror the node's floor.
   if (
     (typeof payload.max_supply !== "number" &&
       typeof payload.max_supply !== "bigint") ||
-    payload.max_supply < 0
+    payload.max_supply <= 0
   ) {
-    throw new Error("max_supply must be a non-negative number or bigint");
+    throw new Error("max_supply must be greater than zero");
   }
 
   // static metadata: required object with arrays of non-empty hex strings
@@ -692,25 +692,31 @@ const processParticipants = (ixObject: InteractionObject): IxParticipant[] => {
   const participants = new Map<string, IxParticipant>();
 
   const addParticipant = (id: Hex, lock_type: LockType, notary?: boolean) => {
-    const normalizedId = trimHexPrefix(id).toLowerCase();
+    const normalizedId = trimHexPrefix(id);
+    const isPayer =
+      ixObject.payer != null &&
+      ixObject.payer != ZERO_ADDRESS &&
+      normalizedId === trimHexPrefix(ixObject.payer);
 
-    if (normalizedId === trimHexPrefix(ixObject.sender.id).toLowerCase()) {
+    if (normalizedId === trimHexPrefix(ixObject.sender.id)) {
       return;
     }
 
-    if (
-      ixObject.payer &&
-      ixObject.payer != ZERO_ADDRESS &&
-      normalizedId === trimHexPrefix(ixObject.payer).toLowerCase() &&
-      !notary
-    ) {
+    if (isPayer && !notary) {
       return;
+    }
+
+    // A notary payer must hold a mutate lock, matching the node's
+    // ErrInvalidPayerLock check. Enforced here, not just at the node, so a
+    // bad entry fails before an interaction is signed and submitted.
+    if (isPayer && notary && lock_type !== LockType.MUTATE_LOCK) {
+      throw new Error("a notary payer must hold a mutate lock");
     }
 
     participants.set(normalizedId, {
       id,
       lock_type,
-      ...(notary ? { notary: true } : {}),
+      notary: Boolean(notary),
     });
   };
 
@@ -935,6 +941,15 @@ export const toRawSignatures = (signs: Signature[]): RawSignature[] => {
   }));
 };
 
+export const rawSignaturesToSignatures = (
+  rawSignatures: RawSignature[],
+): Signature[] =>
+  rawSignatures.map((entry) => ({
+    id: bytesToHex(entry.id) as Hex,
+    key_id: entry.key_id,
+    signature: bytesToHex(entry.signature) as Hex,
+  }));
+
 const toFundArgs = (fund: IxFund): IxFundArgs => {
   return {
     ...fund,
@@ -973,4 +988,23 @@ export const toInteractionArgs = (ix: InteractionObject): InteractionArgs => {
       : undefined,
     participants: ix.participants,
   };
+};
+
+/**
+ * Checks whether a signature array contains an entry for the given participant
+ * identifier.
+ *
+ * @param {Signature[]} signatures - Parsed signature entries.
+ * @param {Hex} participantId - Participant identifier to look for.
+ * @returns {boolean} `true` when a matching signature entry exists.
+ */
+export const checkSignature = (
+  signatures: Signature[],
+  participantId: Hex,
+): boolean => {
+  const normalizedParticipantId = trimHexPrefix(participantId);
+
+  return signatures.some(
+    (entry) => trimHexPrefix(entry.id) === normalizedParticipantId,
+  );
 };

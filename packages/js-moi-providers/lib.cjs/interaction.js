@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toInteractionArgs = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
+exports.checkSignature = exports.toInteractionArgs = exports.rawSignaturesToSignatures = exports.toRawSignatures = exports.toRawInteractionObject = exports.processInteractionObject = exports.validateAssetCreate = exports.validateLogicAction = exports.validateLogicDeploy = exports.validateLogicPayload = exports.validateAccessDelete = exports.validateAccessCreateOrUpdate = exports.validateAccessPolicy = exports.validateCallerConstraint = exports.validateStorageWithdraw = exports.validateStorageDeposit = exports.validateAccountInherit = exports.validateAccountConfigure = exports.validateParticipantCreate = exports.validateAssetAction = exports.validateKeyRevoke = exports.validateKeyAdd = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
 const js_moi_constants_1 = require("js-moi-constants");
@@ -45,8 +45,7 @@ const validateAssetAction = (value) => {
     if (typeof callsite !== "string" || callsite.length === 0) {
         throw new Error("callsite must be a non-empty string");
     }
-    if (asset_id.toLowerCase() === js_moi_constants_1.KMOI_ASSET_ID.toLowerCase() &&
-        KMOI_RESERVED_ENDPOINTS.has(callsite)) {
+    if (asset_id === js_moi_constants_1.KMOI_ASSET_ID && KMOI_RESERVED_ENDPOINTS.has(callsite)) {
         throw new Error(`callsite "${callsite}" is reserved for protocol code and cannot be called on the KMOI asset`);
     }
     if (calldata !== undefined) {
@@ -273,21 +272,27 @@ const validateAssetCreate = (payload) => {
     if (typeof payload.symbol !== "string" || payload.symbol.length === 0) {
         throw new Error("symbol must be a non-empty string");
     }
-    // dimension: optional, must be non-negative number if provided
+    // dimension: optional, must be Economic (0) or Possession (1) if provided
     if (payload.dimension !== undefined) {
-        if (typeof payload.dimension !== "number" || payload.dimension < 0) {
-            throw new Error("dimension must be a non-negative number if provided");
+        if (typeof payload.dimension !== "number" ||
+            payload.dimension < 0 ||
+            payload.dimension > 1) {
+            throw new Error("dimension must be 0 (Economic) or 1 (Possession) if provided");
         }
     }
-    // decimals: optional, must be non-negative number if provided
+    // decimals: optional, capped at MAX_DECIMALS if provided (mirrors the node's
+    // ValidateAssetProperties check, so a bad value fails before it costs fuel)
     if (payload.decimals !== undefined) {
-        if (typeof payload.decimals !== "number" || payload.decimals < 0) {
-            throw new Error("decimals must be a non-negative number if provided");
-        }
+        (0, js_moi_utils_1.validateDecimals)(payload.decimals);
     }
     // standard: required
     if (payload.standard == null) {
         throw new Error("standard is required");
+    }
+    // MASN is reserved for KMOI, created once by genesis. A client can never
+    // create one (mirrors the node's ErrReservedAssetStandard).
+    if (payload.standard === js_moi_utils_1.AssetStandard.MASN) {
+        throw new Error("standard MASN is reserved and cannot be used to create an asset");
     }
     // enable_events: required boolean
     if (typeof payload.enable_events !== "boolean") {
@@ -297,13 +302,14 @@ const validateAssetCreate = (payload) => {
     if (typeof payload.manager !== "string" || payload.manager.length === 0) {
         throw new Error("manager must be a non-empty hex string");
     }
-    // max_supply: required non-negative number or bigint - AssetCreatePayload
-    // types it as `number | bigint` (large supplies overflow a safe number),
-    // and every documented usage passes a bigint literal (e.g. `1000000n`).
+    // max_supply: required positive number or bigint - AssetCreatePayload types
+    // it as `number | bigint` (large supplies overflow a safe number), and
+    // every documented usage passes a bigint literal (e.g. `1000000n`). Zero is
+    // rejected to mirror the node's floor.
     if ((typeof payload.max_supply !== "number" &&
         typeof payload.max_supply !== "bigint") ||
-        payload.max_supply < 0) {
-        throw new Error("max_supply must be a non-negative number or bigint");
+        payload.max_supply <= 0) {
+        throw new Error("max_supply must be greater than zero");
     }
     // static metadata: required object with arrays of non-empty hex strings
     if (payload.static_metadata) {
@@ -471,20 +477,26 @@ function processLogicAction(payload) {
 const processParticipants = (ixObject) => {
     const participants = new Map();
     const addParticipant = (id, lock_type, notary) => {
-        const normalizedId = (0, js_moi_utils_1.trimHexPrefix)(id).toLowerCase();
-        if (normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.sender.id).toLowerCase()) {
+        const normalizedId = (0, js_moi_utils_1.trimHexPrefix)(id);
+        const isPayer = ixObject.payer != null &&
+            ixObject.payer != js_moi_constants_1.ZERO_ADDRESS &&
+            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.payer);
+        if (normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.sender.id)) {
             return;
         }
-        if (ixObject.payer &&
-            ixObject.payer != js_moi_constants_1.ZERO_ADDRESS &&
-            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.payer).toLowerCase() &&
-            !notary) {
+        if (isPayer && !notary) {
             return;
+        }
+        // A notary payer must hold a mutate lock, matching the node's
+        // ErrInvalidPayerLock check. Enforced here, not just at the node, so a
+        // bad entry fails before an interaction is signed and submitted.
+        if (isPayer && notary && lock_type !== js_moi_utils_1.LockType.MUTATE_LOCK) {
+            throw new Error("a notary payer must hold a mutate lock");
         }
         participants.set(normalizedId, {
             id,
             lock_type,
-            ...(notary ? { notary: true } : {}),
+            notary: Boolean(notary),
         });
     };
     // Process operations
@@ -537,8 +549,8 @@ const processParticipants = (ixObject) => {
     }
     // Merge additional participants (if not already present)
     if (ixObject.participants) {
-        for (const { id, lock_type } of ixObject.participants) {
-            addParticipant(id, lock_type);
+        for (const { id, lock_type, notary } of ixObject.participants) {
+            addParticipant(id, lock_type, notary);
         }
     }
     return [...participants.values()];
@@ -682,6 +694,12 @@ const toRawSignatures = (signs) => {
     }));
 };
 exports.toRawSignatures = toRawSignatures;
+const rawSignaturesToSignatures = (rawSignatures) => rawSignatures.map((entry) => ({
+    id: (0, secp256k1_1.bytesToHex)(entry.id),
+    key_id: entry.key_id,
+    signature: (0, secp256k1_1.bytesToHex)(entry.signature),
+}));
+exports.rawSignaturesToSignatures = rawSignaturesToSignatures;
 const toFundArgs = (fund) => {
     return {
         ...fund,
@@ -717,4 +735,17 @@ const toInteractionArgs = (ix) => {
     };
 };
 exports.toInteractionArgs = toInteractionArgs;
+/**
+ * Checks whether a signature array contains an entry for the given participant
+ * identifier.
+ *
+ * @param {Signature[]} signatures - Parsed signature entries.
+ * @param {Hex} participantId - Participant identifier to look for.
+ * @returns {boolean} `true` when a matching signature entry exists.
+ */
+const checkSignature = (signatures, participantId) => {
+    const normalizedParticipantId = (0, js_moi_utils_1.trimHexPrefix)(participantId);
+    return signatures.some((entry) => (0, js_moi_utils_1.trimHexPrefix)(entry.id) === normalizedParticipantId);
+};
+exports.checkSignature = checkSignature;
 //# sourceMappingURL=interaction.js.map
