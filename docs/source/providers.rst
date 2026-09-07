@@ -148,7 +148,7 @@ The ``SyncStatus`` interface represents synchronization status information of an
 The ``InteractionRequest`` interface represents a signed interaction request. It has the following properties:
 
 * ``ix_args`` - ``string``: The encoded interaction parameters.
-* ``signature`` - ``string``: The signature for the interaction.
+* ``signatures`` - ``string``: The POLO-encoded signature blob for the interaction (one or more entries).
 
 **InteractionResponse**
 
@@ -425,6 +425,41 @@ Execution Methods
 .. autofunction:: BaseProvider#estimateFuel
 
 .. autofunction:: BaseProvider#sendInteraction
+
+.. autofunction:: checkSignature
+
+Checks whether a parsed :class:`Signature` array contains an entry for the
+given participant identifier. Use this when assembling sponsored interactions
+to confirm that a payer (or any other co-signer) has signed before sending.
+
+The payer typically produces signatures with
+:func:`Wallet#signRawInteractionObject`. The sender merges those entries into
+the final request through the ``participantSignatures`` argument of
+:func:`Wallet#signInteraction` or :func:`Signer#sendInteraction`.
+
+.. code-block:: javascript
+
+    const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+    const payerId = (await payerWallet.getIdentifier()).toHex();
+
+    await senderWallet.prepareInteraction("send", interaction);
+
+    const payerSignatures = await payerWallet.signRawInteractionObject(
+        interaction,
+        sigAlgo,
+    );
+
+    if (!checkSignature(payerSignatures, payerId)) {
+        throw new Error("Payer signature is missing");
+    }
+
+    const ixRequest = await senderWallet.signInteraction(
+        interaction,
+        sigAlgo,
+        payerSignatures,
+    );
+
+    const response = await provider.sendInteraction(ixRequest);
 
 Query Methods
 ~~~~~~~~~~~~~

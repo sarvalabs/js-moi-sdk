@@ -72,14 +72,17 @@ class InteractionContext {
             fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
             ix_operations: [this.buildOperation(), ...fundingOperations],
             participants: this.mergeParticipants(option),
+            payer: option?.payer,
         };
     }
     /**
      * Sends a transaction to the network, committing changes.
-     * @param option Optional configuration such as fuel price or participants
+     * @param option Optional configuration such as fuel price, participants,
+     * or a payer's pre-collected `participantSignatures` for a sponsored
+     * interaction (see `IxOption.participantSignatures`).
      */
     async send(option) {
-        return this.ctx.signer.sendInteraction(await this.ixData(option));
+        return this.ctx.signer.sendInteraction(await this.ixData(option), option?.participantSignatures);
     }
     /**
      * Executes a read-only call (no state changes).

@@ -1,3 +1,3 @@
-export const DEFAULT_FUEL_PRICE = 1;
-export const DEFAULT_FUEL_LIMIT = 10000;
+export const DEFAULT_FUEL_PRICE = 50;
+export const DEFAULT_FUEL_LIMIT = 100000;
 //# sourceMappingURL=fuel.js.map

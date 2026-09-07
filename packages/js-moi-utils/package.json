@@ -1,6 +1,6 @@
 {
   "name": "js-moi-utils",
-  "version": "0.8.0",
+  "version": "0.9.0-rc1",
   "description": "Collection of utility functions used in js-moi-sdk.",
   "main": "./lib.cjs/index.js",
   "module": "./lib.esm/index.js",
@@ -24,7 +24,8 @@
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
     "bn.js": "^5.2.1",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "js-moi-constants": "0.9.0-rc1"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5"

@@ -1,4 +1,4 @@
-import { AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType } from "js-moi-utils";
+import { AssetStandard, bytesToHex, Hex, hexToBytes, LockType, OpType, validateDecimals } from "js-moi-utils";
 import { MAS0 } from "./mas0";
 import { documentEncode, Schema } from "js-polo";
 import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
@@ -28,9 +28,10 @@ export class MAS0AssetLogic {
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
+        decimals?: number,
         option?: RoutineOption,
     ): Promise<MAS0AssetLogic> {
-        const response = await this.create(signer, symbol, supply, manager, enableEvents, option).send()
+        const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send()
 
         const results = await response.result()
 
@@ -41,6 +42,7 @@ export class MAS0AssetLogic {
         signer: Signer,
         symbol: string, supply: number | bigint, manager: string,
         enableEvents: boolean,
+        decimals?: number,
         option?: RoutineOption,
     ): InteractionContext<OpType.ASSET_CREATE> {
         const payload: AssetCreatePayload = {
@@ -50,6 +52,11 @@ export class MAS0AssetLogic {
             dimension: 0,
             enable_events: enableEvents,
             manager: manager as Hex,
+        }
+
+        if (decimals !== undefined) {
+            validateDecimals(decimals);
+            payload.decimals = decimals;
         }
 
         return new InteractionContext<OpType.ASSET_CREATE>({

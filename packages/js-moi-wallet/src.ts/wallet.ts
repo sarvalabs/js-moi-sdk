@@ -2,9 +2,9 @@ import { randomBytes } from "@noble/hashes/utils";
 import { Buffer } from "buffer";
 import elliptic from "elliptic";
 import * as bip39 from "js-moi-bip39";
-import { MOI_DERIVATION_PATH } from "js-moi-constants";
+import { MOI_DERIVATION_PATH, ZERO_ADDRESS } from "js-moi-constants";
 import { HDNode } from "js-moi-hdnode";
-import { AbstractProvider, InteractionObject, InteractionRequest } from "js-moi-providers";
+import { AbstractProvider, InteractionObject, InteractionRequest, Signature } from "js-moi-providers";
 import { SigType, Signer } from "js-moi-signer";
 import { CustomError, ErrorCode, ErrorUtils, Hex, bufferToUint8, bytesToHex, hexToBytes } from "js-moi-utils";
 
@@ -13,7 +13,7 @@ import { decryptKeystoreData, encryptKeystoreData } from "./keystore";
 import { serializeIxObject, serializeIxSignatures } from "./serializer";
 import { type WalletOption } from "../types/wallet";
 import { type Keystore } from "../types/keystore";
-import { Identifier, createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
+import { Identifier, IdentifierKind, createParticipantId, ParticipantTagV0 } from "js-moi-identifiers";
 
 export enum CURVE {
     SECP256K1 = "secp256k1",
@@ -428,12 +428,29 @@ export class Wallet extends Signer {
      * The interaction object is serialized into POLO bytes before signing.
      *
      * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} _sigAlgo - The signature algorithm to use.
+     * @param {Signature[]} [participantSignatures] - Optional signatures from
+     * other participants to merge with the wallet signatures.
      * @returns {InteractionRequest} The signed interaction request containing
      * the serialized interaction object and all signatures.
      * @throws {Error} if there is an error during signing or serialization.
      */
-    public async signInteraction(ixObject: InteractionObject, _sigAlgo: SigType): Promise<InteractionRequest> {
+    public async signInteraction(
+        ixObject: InteractionObject,
+        _sigAlgo: SigType,
+        participantSignatures?: Signature[],
+    ): Promise<InteractionRequest> {
         try {
+            if (ixObject.payer && ixObject.payer !== ZERO_ADDRESS) {
+                const payerId = new Identifier(ixObject.payer);
+                if (payerId.getKind() !== IdentifierKind.Participant) {
+                    ErrorUtils.throwError(
+                        "Payer must be a participant account. Logic and asset accounts cannot be payers.",
+                        ErrorCode.INVALID_ARGUMENT
+                    );
+                }
+            }
+
             const ixData = serializeIxObject(ixObject);
             const participantId = ixObject.sender.id;
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
@@ -457,14 +474,51 @@ export class Wallet extends Signer {
                 })
             );
 
-            const rawSign = serializeIxSignatures(signatures)
+            const mergedSignatures = [
+                ...signatures,
+                ...(participantSignatures ?? []),
+            ];
+            const rawSign = serializeIxSignatures(mergedSignatures);
 
             return {
                 ix_args: bytesToHex(ixData),
                 signatures: bytesToHex(rawSign),
             };
         } catch (err) {
-            ErrorUtils.throwError("Failed to sign interaction", ErrorCode.UNKNOWN_ERROR, { originalError: err });
+            ErrorUtils.throwError(`Failed to sign interaction: ${err instanceof Error ? err.message : err}`, ErrorCode.UNKNOWN_ERROR, { originalError: err });
+        }
+    }
+
+    /**
+     * Signs an interaction object using all registered keys on this wallet and
+     * returns the raw signature entries without POLO serialization.
+     *
+     * Unlike `signInteraction`, this method does not validate the payer field or
+     * require the sender key to be registered on the wallet.
+     *
+     * @param {InteractionObject} ixObject - The interaction object to sign.
+     * @param {SigType} _sigAlgo - The signature algorithm to use.
+     * @returns {Promise<Signature[]>} Raw signature entries for all wallet keys.
+     */
+    public async signRawInteractionObject(ixObject: InteractionObject, _sigAlgo: SigType): Promise<Signature[]> {
+        try {
+            const ixData = serializeIxObject(ixObject);
+            const participantId = (await this.getIdentifier()).toHex();
+            const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
+            const keys: Map<number, KeyEntry> = privateMapGet(this, __vault)._keys;
+
+            return Promise.all(
+                Array.from(keys.keys()).map(async (keyId) => {
+                    const signature = await this.sign(Buffer.from(ixData), keyId, sigAlgo);
+                    return {
+                        id: participantId as Hex,
+                        key_id: keyId,
+                        signature: signature as Hex,
+                    };
+                })
+            );
+        } catch (err) {
+            ErrorUtils.throwError("Failed to sign raw interaction object", ErrorCode.UNKNOWN_ERROR, { originalError: err });
         }
     }
 
