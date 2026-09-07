@@ -2,7 +2,7 @@ name: Publish
 
 on:
   release:
-    types: 
+    types:
       - created
 
   workflow_dispatch:
@@ -41,3 +41,55 @@ jobs:
             sleep 10
             cd ..
           done
+
+  upload-agent-skill:
+    name: Upload Agent Skill ZIP
+    needs: publish
+    runs-on: ubuntu-latest
+
+    env:
+      R2_BUCKET: ${{ vars.R2_BUCKET }}
+      R2_ACCOUNT_ID: ${{ vars.R2_ACCOUNT_ID }}
+      R2_PREFIX: ${{ vars.R2_PREFIX }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Determine Release Version
+        run: |
+          echo "RELEASE_VERSION=$(node -p "require('./packages/js-moi/package.json').version")" >> "$GITHUB_ENV"
+
+      - name: Prepare Release Artifact
+        run: |
+          mkdir -p release
+          cd js-moi-skills
+
+          # Create versioned ZIP
+          zip -r ../release/js-moi-sdk-${RELEASE_VERSION}-skills.zip .
+
+          # Create stable/latest ZIP
+          zip -r ../release/js-moi-sdk-skills.zip .
+
+      - name: Verify Generated ZIP
+        run: |
+          unzip -l release/js-moi-sdk-${RELEASE_VERSION}-skills.zip
+          unzip -l release/js-moi-sdk-skills.zip
+
+      - name: Upload Agent Skill ZIP to Cloudflare R2
+        run: |
+          aws s3 cp \
+            release/ \
+            s3://${R2_BUCKET}/${R2_PREFIX}/ \
+            --recursive \
+            --endpoint-url=https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
+
+      - name: Verify uploaded files
+        run: |
+          aws s3 ls \
+            s3://${R2_BUCKET}/${R2_PREFIX}/ \
+            --recursive \
+            --endpoint-url=https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
