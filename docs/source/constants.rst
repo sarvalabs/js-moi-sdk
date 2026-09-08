@@ -1,3 +1,6 @@
+.. meta::
+   :description: Protocol constants exposed by js-moi-sdk for the MOI network.
+
 =========
 Constants
 =========

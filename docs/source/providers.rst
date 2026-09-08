@@ -1,3 +1,6 @@
+.. meta::
+   :description: Connect to MOI nodes with js-moi-sdk providers - JSON-RPC and WebSocket providers for reading state, balances, tesseracts, and submitting interactions.
+
 =========
 Providers
 =========

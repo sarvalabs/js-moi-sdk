@@ -1,3 +1,6 @@
+.. meta::
+   :description: License and copyright terms for js-moi-sdk.
+
 =====================
 License and Copyright
 =====================
