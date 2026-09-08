@@ -1,3 +1,6 @@
+.. meta::
+   :description: A downloadable SKILL.md package that teaches AI coding agents (Claude Code, Cursor) the js-moi-sdk API surface, including Voyage devnet flows.
+
 ============
 Agent Skill
 ============

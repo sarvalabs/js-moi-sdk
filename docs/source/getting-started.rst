@@ -1,3 +1,6 @@
+.. meta::
+   :description: Install js-moi-sdk with npm and make your first calls to the MOI network - providers, wallet setup, and a first interaction in JavaScript or TypeScript.
+
 ===============
 Getting Started
 ===============

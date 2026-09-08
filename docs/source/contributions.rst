@@ -1,3 +1,6 @@
+.. meta::
+   :description: How to contribute to js-moi-sdk - repository layout, development setup, and pull request guidelines.
+
 =============
 Contributions
 =============

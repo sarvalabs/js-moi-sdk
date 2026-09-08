@@ -1,0 +1,35 @@
+# js-moi-sdk.docs.moi.technology — allow all crawlers, including AI answer
+# engines.
+# NOTE: the hosting serves existing root-level files correctly but rewrites
+# NONEXISTENT paths to index.html with HTTP 200 (soft-200 fallback). After
+# deploy, verify this file returns text/plain, and consider replacing the
+# fallback with a real 404 so unknown URLs stop soft-200ing.
+
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://js-moi-sdk.docs.moi.technology/sitemap.xml
