@@ -41,19 +41,26 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
         return ws;
     }
     reconnect() {
+        if (this.reconnectInterval) {
+            // a reconnect cycle is already running; let it keep retrying
+            // at the configured delay instead of starting another one.
+            return;
+        }
         this.reconnects++;
         this.ws = this.createNewWebsocket(this.host, this.options);
         this.emit('reconnect', this.reconnects);
         const reconnect = this.options?.reconnect;
         if (reconnect) {
-            const interval = setInterval(() => {
+            this.reconnectInterval = setInterval(() => {
                 if (this.ws.readyState === this.ws.OPEN) {
-                    clearInterval(interval);
+                    clearInterval(this.reconnectInterval);
+                    this.reconnectInterval = undefined;
                     return;
                 }
                 if (this.reconnects >= reconnect.maxAttempts) {
                     this.emit('error', new Error('Max reconnect attempts reached'));
-                    clearInterval(interval);
+                    clearInterval(this.reconnectInterval);
+                    this.reconnectInterval = undefined;
                     return;
                 }
                 this.reconnects++;
@@ -87,6 +94,18 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     }
     handleOnConnect() {
         this.reconnects = 0;
+        // Any subID cached from a prior connection is no longer known to
+        // the (possibly restarted) node, so drop it - and the listener
+        // matching against it - to force a fresh `moi_subscribe` the next
+        // time `on()`/`once()` is called for that event.
+        for (const sub of this.subscriptions.values()) {
+            if (sub.messageHandler) {
+                // @ts-ignore - don't want to expose the message event
+                this.removeListener('message', sub.messageHandler);
+                sub.messageHandler = undefined;
+            }
+            sub.subID = undefined;
+        }
         this.emit('connect');
     }
     handleOnError(error) {
@@ -94,14 +113,9 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
     }
     handleOnClose(event) {
         const isError = event.code !== 1000;
-        if (isError) {
-            if (this.options?.reconnect && this.reconnects < this.options.reconnect.maxAttempts) {
-                if (this.reconnectInterval) {
-                    clearInterval(this.reconnectInterval);
-                }
-                this.reconnect();
-                return;
-            }
+        if (isError && this.options?.reconnect && this.reconnects < this.options.reconnect.maxAttempts) {
+            this.reconnect();
+            return;
         }
         this.emit('close');
     }
@@ -187,8 +201,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                 return this;
             }
             this.getSubscription(eventName).then((subscription) => {
-                // @ts-ignore - don't want to expose the message event
-                this.on("message", (message) => {
+                const messageHandler = (message) => {
                     const data = JSON.parse(message.data);
                     if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
                         return;
@@ -201,7 +214,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
-                });
+                };
+                const sub = this.subscriptions.get(eventName);
+                if (sub) {
+                    sub.messageHandler = messageHandler;
+                }
+                // @ts-ignore - don't want to expose the message event
+                this.on("message", messageHandler);
             });
         }
         return this;
@@ -237,8 +256,7 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                 return this;
             }
             this.getSubscription(eventName).then((subscription) => {
-                // @ts-ignore - don't want to expose the message event
-                this.on("message", (message) => {
+                const messageHandler = (message) => {
                     const data = JSON.parse(message.data);
                     if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
                         return;
@@ -251,7 +269,13 @@ class WebsocketProvider extends base_provider_1.BaseProvider {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
-                });
+                };
+                const sub = this.subscriptions.get(eventName);
+                if (sub) {
+                    sub.messageHandler = messageHandler;
+                }
+                // @ts-ignore - don't want to expose the message event
+                this.on("message", messageHandler);
             });
         }
         return this;

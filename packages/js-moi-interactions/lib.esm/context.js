@@ -7,8 +7,14 @@ import { DEFAULT_FUEL_PRICE, DEFAULT_FUEL_LIMIT } from "js-moi-constants";
  */
 export class InteractionContext {
     ctx;
+    _payer;
     constructor(ctx) {
         this.ctx = ctx;
+    }
+    /** Sets the payer for this interaction, sponsoring its fuel cost. */
+    payer(id) {
+        this._payer = id;
+        return this;
     }
     /** Returns the operation type for this interaction. */
     type() {
@@ -69,7 +75,7 @@ export class InteractionContext {
             fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
             ix_operations: [this.buildOperation(), ...fundingOperations],
             participants: this.mergeParticipants(option),
-            payer: option?.payer,
+            payer: option?.payer ?? this._payer,
         };
     }
     /**

@@ -1,6 +1,6 @@
 {
   "name": "moi",
-  "version": "0.9.0-rc1",
+  "version": "0.9.0-rc2",
   "description": "JavaScript library to interact with MOI Protocol via RPC API",
   "private": true,
   "main": "packages/js-moi/lib.cjs/index.js",
@@ -53,7 +53,7 @@
     "buffer": "^6.0.3",
     "cross-fetch": "^4.0.0",
     "elliptic": "^6.5.4",
-    "js-polo": "0.1.4",
+    "js-polo": "0.1.5",
     "stream": "npm:stream-browserify",
     "websocket": "^1.0.34"
   },

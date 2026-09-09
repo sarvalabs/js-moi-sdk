@@ -28,7 +28,7 @@ export class WebsocketProvider extends BaseProvider {
     private reconnectInterval?: NodeJS.Timeout;
     private readonly host: string;
     private readonly options?: WebsocketConnection;
-    private readonly subscriptions: Map<ProviderEvents, { subID?: Promise<string>, uuid?: string }> = new Map();
+    private readonly subscriptions: Map<ProviderEvents, { subID?: Promise<string>, uuid?: string, messageHandler?: (message: MessageEvent<string>) => void }> = new Map();
 
     constructor(host: string, options?: WebsocketConnection) {
         if (!WEBSOCKET_HOST_REGEX.test(host)) {
@@ -63,21 +63,29 @@ export class WebsocketProvider extends BaseProvider {
     }
 
     private reconnect(): void {
+        if (this.reconnectInterval) {
+            // a reconnect cycle is already running; let it keep retrying
+            // at the configured delay instead of starting another one.
+            return;
+        }
+
         this.reconnects++;
         this.ws = this.createNewWebsocket(this.host, this.options);
         this.emit('reconnect', this.reconnects);
 
         const reconnect = this.options?.reconnect;
         if (reconnect) {
-            const interval = setInterval(() => {
+            this.reconnectInterval = setInterval(() => {
                 if (this.ws.readyState === this.ws.OPEN) {
-                    clearInterval(interval);
+                    clearInterval(this.reconnectInterval);
+                    this.reconnectInterval = undefined;
                     return;
                 }
 
                 if (this.reconnects >= reconnect.maxAttempts) {
                     this.emit('error', new Error('Max reconnect attempts reached'));
-                    clearInterval(interval);
+                    clearInterval(this.reconnectInterval);
+                    this.reconnectInterval = undefined;
                     return;
                 }
 
@@ -117,6 +125,21 @@ export class WebsocketProvider extends BaseProvider {
 
     private handleOnConnect(): void {
         this.reconnects = 0;
+
+        // Any subID cached from a prior connection is no longer known to
+        // the (possibly restarted) node, so drop it - and the listener
+        // matching against it - to force a fresh `moi_subscribe` the next
+        // time `on()`/`once()` is called for that event.
+        for (const sub of this.subscriptions.values()) {
+            if (sub.messageHandler) {
+                // @ts-ignore - don't want to expose the message event
+                this.removeListener('message', sub.messageHandler);
+                sub.messageHandler = undefined;
+            }
+
+            sub.subID = undefined;
+        }
+
         this.emit('connect');
     }
 
@@ -127,15 +150,9 @@ export class WebsocketProvider extends BaseProvider {
     private handleOnClose(event: ICloseEvent): void {
         const isError = event.code !== 1000;
 
-        if (isError) {
-            if (this.options?.reconnect && this.reconnects < this.options.reconnect.maxAttempts) {
-                if (this.reconnectInterval) {
-                    clearInterval(this.reconnectInterval);
-                }
-
-                this.reconnect();
-                return;
-            }
+        if (isError && this.options?.reconnect && this.reconnects < this.options.reconnect.maxAttempts) {
+            this.reconnect();
+            return;
         }
 
         this.emit('close');
@@ -243,8 +260,7 @@ export class WebsocketProvider extends BaseProvider {
 
 
             this.getSubscription(eventName).then((subscription) => {
-                // @ts-ignore - don't want to expose the message event
-                this.on("message", (message: MessageEvent<string>) => {
+                const messageHandler = (message: MessageEvent<string>) => {
                     const data = JSON.parse(message.data);
 
                     if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
@@ -260,8 +276,15 @@ export class WebsocketProvider extends BaseProvider {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
+                };
 
-                });
+                const sub = this.subscriptions.get(eventName);
+                if (sub) {
+                    sub.messageHandler = messageHandler;
+                }
+
+                // @ts-ignore - don't want to expose the message event
+                this.on("message", messageHandler);
             });
         }
 
@@ -307,8 +330,7 @@ export class WebsocketProvider extends BaseProvider {
 
 
             this.getSubscription(eventName).then((subscription) => {
-                // @ts-ignore - don't want to expose the message event
-                this.on("message", (message: MessageEvent<string>) => {
+                const messageHandler = (message: MessageEvent<string>) => {
                     const data = JSON.parse(message.data);
 
                     if (!("method" in data) || data.method !== "moi.subscription" || data.params.subscription !== subscription) {
@@ -324,8 +346,15 @@ export class WebsocketProvider extends BaseProvider {
                         this.emit(_sub.uuid, this.processWsResult(eventName, data.params.result));
                         return;
                     }
+                };
 
-                });
+                const sub = this.subscriptions.get(eventName);
+                if (sub) {
+                    sub.messageHandler = messageHandler;
+                }
+
+                // @ts-ignore - don't want to expose the message event
+                this.on("message", messageHandler);
             });
         }
 

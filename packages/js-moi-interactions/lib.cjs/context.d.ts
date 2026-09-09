@@ -1,5 +1,5 @@
 import { AnyIxOperation, InteractionCallResponse, InteractionObject, InteractionResponse, IxParticipant } from "js-moi-providers";
-import { OpType } from "js-moi-utils";
+import { Hex, OpType } from "js-moi-utils";
 import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context";
 /**
  * A unified context class that encapsulates the full lifecycle of
@@ -8,7 +8,10 @@ import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context"
  */
 export declare class InteractionContext<T extends AllowedOps> {
     private readonly ctx;
+    private _payer?;
     constructor(ctx: IxContext<T>);
+    /** Sets the payer for this interaction, sponsoring its fuel cost. */
+    payer(id: Hex): this;
     /** Returns the operation type for this interaction. */
     type(): OpType;
     /** Returns the payload associated with this interaction. */
