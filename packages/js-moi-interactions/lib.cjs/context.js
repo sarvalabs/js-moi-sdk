@@ -10,8 +10,14 @@ const js_moi_constants_1 = require("js-moi-constants");
  */
 class InteractionContext {
     ctx;
+    _payer;
     constructor(ctx) {
         this.ctx = ctx;
+    }
+    /** Sets the payer for this interaction, sponsoring its fuel cost. */
+    payer(id) {
+        this._payer = id;
+        return this;
     }
     /** Returns the operation type for this interaction. */
     type() {
@@ -72,7 +78,7 @@ class InteractionContext {
             fuel_limit: option?.fuel_limit ?? js_moi_constants_1.DEFAULT_FUEL_LIMIT,
             ix_operations: [this.buildOperation(), ...fundingOperations],
             participants: this.mergeParticipants(option),
-            payer: option?.payer,
+            payer: option?.payer ?? this._payer,
         };
     }
     /**
