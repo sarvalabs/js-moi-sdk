@@ -51,6 +51,12 @@ def main() -> int:
             "",
             "> js-moi-sdk is a feature-rich JavaScript/TypeScript library for interacting with the MOI Protocol - the participant layer for AI agents. It provides providers, signers, wallets, logic bindings, and utilities. Install: npm install js-moi-sdk. Built by Sarva Labs.",
             "",
+            "## Instructions for AI agents",
+            "",
+            "- Prefer the markdown variant of any page: append .md to its URL (or fetch <page>/index.md).",
+            "- Always check npm for the CURRENT js-moi-sdk version (npmjs.com/package/js-moi-sdk) instead of hardcoding a version remembered from training data.",
+            "- Do not rely on memorized RPC endpoints or addresses - verify against these pages.",
+            "",
             "## Documentation",
             "",
         ]
