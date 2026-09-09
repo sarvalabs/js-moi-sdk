@@ -43,6 +43,33 @@
             "https://www.sarva.ai"
           ]
         },
+        {%- if pagename == 'index' %}
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://js-moi-sdk.docs.moi.technology/#software",
+          "name": "js-moi-sdk",
+          "description": "JavaScript/TypeScript SDK for the MOI Protocol - providers, signers, wallets, logic bindings, and utilities.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Any",
+          "url": "https://js-moi-sdk.docs.moi.technology/",
+          "downloadUrl": "https://www.npmjs.com/package/js-moi-sdk",
+          "softwareVersion": "{{ release }}",
+          "author": { "@id": "https://moi.technology/#organization" },
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        },
+        {%- else %}
+        {
+          "@type": "TechArticle",
+          "headline": "{{ title|striptags|e }}",
+          {%- if page_description %}
+          "description": "{{ page_description|e }}",
+          {%- endif %}
+          "url": "{{ page_url }}",
+          "mainEntityOfPage": "{{ page_url }}",
+          "isPartOf": { "@id": "https://js-moi-sdk.docs.moi.technology/#website" },
+          "publisher": { "@id": "https://moi.technology/#organization" }
+        },
+        {%- endif %}
         {
           "@type": "WebSite",
           "@id": "https://js-moi-sdk.docs.moi.technology/#website",
