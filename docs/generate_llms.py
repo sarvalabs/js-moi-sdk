@@ -82,6 +82,20 @@ def main() -> int:
             f.write("\n".join(index) + "\n")
         with open("source/_extra/llms-full.txt", "w", encoding="utf-8") as f:
             f.write("\n".join(full) + "\n")
+        # Markdown negotiation: emit each page's rendered text at both
+        # fallback forms agents probe - /<page>.md and /<page>/index.md
+        # (html_extra_path copies _extra/ to the site root).
+        for name, (title, desc) in PAGES.items():
+            with open(os.path.join(tmp, f"{name}.txt"), encoding="utf-8") as f:
+                text = f.read().strip()
+            md = f"# {title}\n\n> {desc}\n\n{text}\n"
+            base = "index" if name == "index" else name
+            for out in (f"source/_extra/{base}.md", f"source/_extra/{name}/index.md" if name != "index" else None):
+                if out is None:
+                    continue
+                os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+                with open(out, "w", encoding="utf-8") as f:
+                    f.write(md)
     size = os.path.getsize("source/_extra/llms-full.txt")
     print(f"generated source/_extra/llms.txt and llms-full.txt ({size} bytes)")
     return 0
