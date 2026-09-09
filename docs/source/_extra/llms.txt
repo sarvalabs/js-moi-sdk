@@ -1,0 +1,27 @@
+# js-moi-sdk
+
+> js-moi-sdk is a feature-rich JavaScript/TypeScript library for interacting with the MOI Protocol - the participant layer for AI agents. It provides providers, signers, wallets, logic bindings, and utilities. Install: npm install js-moi-sdk. Built by Sarva Labs.
+
+## Documentation
+
+- [js-moi-sdk documentation](https://js-moi-sdk.docs.moi.technology/): js-moi-sdk is a feature-rich JavaScript/TypeScript library for interacting with the MOI Protocol - providers, signers, wallets, logic, and utilities in one SDK.
+- [Getting Started](https://js-moi-sdk.docs.moi.technology/getting-started): Install js-moi-sdk with npm and make your first calls to the MOI network - providers, wallet setup, and a first interaction in JavaScript or TypeScript.
+- [Constants](https://js-moi-sdk.docs.moi.technology/constants): Protocol constants exposed by js-moi-sdk for the MOI network: fuel prices, interaction types, and other fixed values used across the SDK packages.
+- [Providers](https://js-moi-sdk.docs.moi.technology/providers): Connect to MOI nodes with js-moi-sdk providers - JSON-RPC and WebSocket providers for reading state, balances, tesseracts, and submitting interactions.
+- [Signer](https://js-moi-sdk.docs.moi.technology/signer): Sign MOI interactions and messages with js-moi-sdk: the Signer API, HD wallets and keypairs, and cryptographic proof of account authority on MOI.
+- [Interactions](https://js-moi-sdk.docs.moi.technology/interactions): Create, sign, and send MOI interactions with js-moi-sdk - transfers, asset creation, logic deploy and invoke, with complete API reference and examples.
+- [Utilities](https://js-moi-sdk.docs.moi.technology/utilities): js-moi-sdk utility functions for MOI development: encoding and decoding, address and identifier helpers, unit conversion, and byte-level tools.
+- [Agent Skill](https://js-moi-sdk.docs.moi.technology/agent-skill): A downloadable SKILL.md package that teaches AI coding agents (Claude Code, Cursor) the js-moi-sdk API surface, including Voyage devnet flows.
+- [Contributions](https://js-moi-sdk.docs.moi.technology/contributions): How to contribute to js-moi-sdk: the monorepo layout, development setup, build and test workflow, and pull request guidelines for the MOI SDK.
+- [License and Copyright](https://js-moi-sdk.docs.moi.technology/license-and-copyright): License and copyright terms for js-moi-sdk: the open-source licenses the SDK is released under and the copyright held by Sarva Labs and contributors.
+
+## For AI coding agents
+
+- [Agent Skill](https://js-moi-sdk.docs.moi.technology/agent-skill): download the SKILL.md package that teaches AI coding agents the js-moi-sdk API surface
+
+## MOI ecosystem
+
+- [MOI](https://moi.technology/): the participant layer for AI agents
+- [MOI protocol docs](https://docs.moi.technology/): concepts, tutorials, APIs
+- [Coco language docs](https://cocolang.dev/): the language for writing MOI logics
+- [GitHub](https://github.com/sarvalabs/js-moi-sdk)

@@ -1,0 +1,6756 @@
+# js-moi-sdk documentation - full text
+
+> Full rendered text of js-moi-sdk.docs.moi.technology (Sphinx text build, autodoc expanded). See /llms.txt for the index.
+
+---
+# js-moi-sdk documentation
+URL: https://js-moi-sdk.docs.moi.technology/
+Description: js-moi-sdk is a feature-rich JavaScript/TypeScript library for interacting with the MOI Protocol - providers, signers, wallets, logic, and utilities in one SDK.
+
+Documentation
+*************
+
+This documentation is for js-moi-sdk v0.8.0
+
+======================================================================
+
+
+What is js-moi-sdk?
+===================
+
+The js-moi-sdk is a feature-rich library designed to seamlessly
+interact with the MOI Protocol and its extensive ecosystem.  It
+strives to be a compact and comprehensive solution, providing
+developers with all the necessary tools they need to unlock the full
+potential of the MOI Protocol.
+
+======================================================================
+
+
+Developer Documentation
+^^^^^^^^^^^^^^^^^^^^^^^
+
+* Getting Started
+
+  * How do I install js-moi-sdk?
+
+  * How do I import js-moi-sdk?
+
+  * Key Concepts
+
+* Constants
+
+  * Version
+
+  * MOI Derivation Path
+
+  * MOI Derivation Base Path
+
+* Providers
+
+  * Types
+
+  * Abstract Provider
+
+  * Base Provider
+
+  * Json Rpc Provider
+
+  * WebSocket Provider
+
+  * Browser Provider
+
+  * Voyage Provider
+
+* Signer
+
+  * Types
+
+  * Abstract Methods
+
+  * Regular Methods
+
+  * Key Management & Wallets
+
+* Interactions
+
+  * Overview
+
+  * Core Classes
+
+* Utilities
+
+  * Types
+
+  * Address
+
+  * Base64
+
+  * Hex
+
+  * Bytes
+
+  * Json
+
+  * Properties
+
+  * Errors
+
+  * CustomError
+
+  * ErrorUtils
+
+* Agent Skill
+
+  * How do I download the skill?
+
+  * How do I use the skill with my coding agent?
+
+* Contributions
+
+* License and Copyright
+
+---
+# Getting Started
+URL: https://js-moi-sdk.docs.moi.technology/getting-started
+Description: Install js-moi-sdk with npm and make your first calls to the MOI network - providers, wallet setup, and a first interaction in JavaScript or TypeScript.
+
+Getting Started
+***************
+
+======================================================================
+
+Kickstart your journey with js-moi-sdk by installing and importing it.
+Unleash its potential through comprehensive documentation and
+resources to supercharge your application development.
+
+
+How do I install js-moi-sdk?
+============================
+
+Install the latest release using the following command:
+
+   npm install js-moi-sdk
+
+
+How do I import js-moi-sdk?
+===========================
+
+If you are using CommonJS or ES5, the require statement is used for
+importing *js-moi-sdk*.
+
+   const moi = require("js-moi-sdk")
+
+If you are using ES6 or above, you can use the import statement to
+import *js-moi-sdk*.
+
+   import * as moi from "js-moi-sdk"
+
+
+Key Concepts
+============
+
+To begin, it's crucial to grasp the fundamental concepts that underpin
+the js-moi-sdk framework. Acquainting yourself with these concepts
+will empower you to utilize the js-moi-sdk package efficiently during
+your application development process.
+
+**Tesseract**
+
+It act as the fundamental unit of value space in MOI, Tesseract holds
+the outcome of an interaction's execution. It also holds various
+information like the latest state of the participant, interaction
+payloads, consensus data, and so on.
+
+**Interaction**
+
+An Interaction can be created, signed, and send to the MOI network.
+This library provides a convenient interface for constructing
+interactions by specifying essential details such as the recipient
+address, interaction type, fule price, fuel limit, and so on.
+
+**Operation**
+
+An Operation is a discrete action encapsulated within an Interaction.
+It is responsible for executing specific actions, such as asset
+creation, transfer, minting, burning, logic deployment, invocation, or
+enlist. Each operation includes key details like the type of action
+being performed and the associated payload. Operations are processed
+as part of an interaction, and their execution directly impacts the
+state of participants and contributes to changes in the overall
+network state.
+
+**Asset**
+
+An Asset in MOI is simply an exchangeable digital asset that is
+managed and recognized natively by the MOI Protocol. Unlike other
+blockchain protocols, all Assets in MOI are directly owned and managed
+by participants in their accounts.
+
+Retrieving the balances of a participant will return a composite
+object with all Assets held in that account indexed by their Asset ID,
+which is a unique identifier for the Asset.
+
+**Logic**
+
+Logic is a program stored on the blockchain that operates based on
+predefined rules and conditions, eliminating the need for
+intermediaries and ensuring transparency, security, and immutability
+of interactions.
+
+Logic is typically used to facilitate and automate various types of
+digital interactions, ranging from financial interactions to supply
+chain management and decentralized applications (DApps).
+
+**Manifest**
+
+Manifest is a specification that defines the structure of logic object
+which includes routines, classes, methods, and state. It facilitates
+seamless interaction, accurate encoding and decoding of data for
+invoking routines.
+
+**Receipt**
+
+After an interaction is executed on the network, a receipt is
+generated and stored on the blockchain as a record of that
+interaction's execution. Receipts contains detailed information about
+the interaction's execution, including whether it was successful, the
+fuel used, and other relevant data.
+
+**Provider**
+
+A Provider provides a convenient interface for connecting to MOI nodes
+and retrieving data from the blockchain. These providers serve as
+gateways to the MOI network, enabling users to access data like
+account balances, interaction history, logic information, and more.
+
+**Signer**
+
+A Signer acts as a representation of an MOI account and possesses the
+ability to sign interactions and messages. It abstracts away the low-
+level cryptographic operations required for signing and allows users
+to interact securely with the MOI network.
+
+In addition to interaction signing, the signer module supports message
+signing, which is widely used for identity verification and
+authentication purposes in decentralized applications. Developers can
+utilize the signer's capabilities to sign and verify arbitrary
+messages, providing cryptographic proof of the message's origin and
+integrity.
+
+**Account**
+
+An Account is a fundamental state-holding entity in the MOI network,
+identified by a unique address. Participant accounts, asset accounts,
+and logic accounts are all forms of accounts, each maintaining state
+and participating in interactions according to their type.
+
+---
+# Constants
+URL: https://js-moi-sdk.docs.moi.technology/constants
+Description: Protocol constants exposed by js-moi-sdk for the MOI network: fuel prices, interaction types, and other fixed values used across the SDK packages.
+
+Constants
+*********
+
+======================================================================
+
+The constants module contains the following constant variables.
+
+
+Version
+=======
+
+The "VERSION" constant represents the version number of the js-moi-sdk
+package.
+
+   // Example
+   import * as moi from "js-moi-sdk";
+
+   console.log(moi.VERSION)
+
+   >> 0.8.0
+
+
+MOI Derivation Path
+===================
+
+The "MOI_DERIVATION_PATH" constant is the path used to derive MOI
+account addresses. It specifies the sequence of steps and indices
+involved in the derivation process.
+
+   // Example
+   import * as moi from "js-moi-sdk";
+
+   console.log(moi.MOI_DERIVATION_PATH)
+
+   >> "m/44'/6174'/0'/0/0"
+
+
+MOI Derivation Base Path
+========================
+
+The "MOI_DERIVATION_BASE_PATH" constant represents the foundational
+path for generating MOI account addresses. It serves as the initial
+part of the derivation path, with additional indices appended to
+create unique MOI account addresses.
+
+   // Example
+   import * as moi from "js-moi-sdk";
+
+   console.log(moi.MOI_DERIVATION_BASE_PATH)
+
+   >> "m/44'/6174'/0'/0"
+
+---
+# Providers
+URL: https://js-moi-sdk.docs.moi.technology/providers
+Description: Connect to MOI nodes with js-moi-sdk providers - JSON-RPC and WebSocket providers for reading state, balances, tesseracts, and submitting interactions.
+
+Providers
+*********
+
+======================================================================
+
+A Provider is a convenient interface for connecting to MOI nodes and
+retrieving data from the blockchain. With the providers module,
+developers can choose from various MOI providers such as Voyage to
+establish a connection with the MOI network.
+
+The Provider class abstracts away the complexities of interacting
+directly with the MOI network and provides a consistent and
+straightforward API for retrieving blockchain data. Whether it's
+querying account balances, interaction history, or logic information,
+the providers module simplifies the process of connecting to MOI nodes
+and fetching data, making it easier for developers to build
+applications that interact with the MOI network.
+
+
+Types
+=====
+
+**InteractionInfo**
+
+The "InteractionInfo" interface represents information about an
+interaction. It has the following properties:
+
+* "nonce" - "string": The nonce value.
+
+* "type" - "string": The type of the interaction.
+
+* "sender" - "string": The sender of the interaction.
+
+* "receiver" - "string": The receiver of the interaction.
+
+* "cost" - "string": The cost of the interaction.
+
+* "fuel_price" - "string": The fuel price for the interaction.
+
+* "fuel_limit" - "string": The fuel limit for the interaction.
+
+* "input" - "string": The input data for the interaction.
+
+* "hash" - "string": The hash of the interaction.
+
+**Content**
+
+The "Content" interface represents ixpool information. It has the
+following properties:
+
+* "pending" - "Map<string, Map<number | bigint, InteractionInfo>>": A
+  map representing pending interactions in the ixpool.
+
+* "queued" - "Map<string, Map<number | bigint, InteractionInfo>>": A
+  map representing queued interactions in the ixpool.
+
+**ContentFrom**
+
+The "ContentFrom" interface represents ixpool information based on the
+sender. It has the following properties:
+
+* "pending" - "Map<number | bigint, InteractionInfo>": A map
+  representing pending interactions in the ixpool belonging to a
+  specific sender.
+
+* "queued" - "Map<number | bigint, InteractionInfo>": A map
+  representing queued interactions in the ixpool belonging to a
+  specific sender.
+
+**Status**
+
+The "Status" interface represents the status of ixpool. It has the
+following properties:
+
+* "pending" - "number | bigint": The number or bigint value
+  representing the number of pending interactions in ixpool.
+
+* "queued" - "number | bigint": The number or bigint value
+  representing the number of queued interactions in ixpool.
+
+**WaitTime**
+
+The "WaitTime" interface represents ixpool wait time information. It
+has the following properties:
+
+* "expired" - "boolean": A boolean indicating if the wait time has
+  expired.
+
+* "time" - "number | bigint": The number or bigint value representing
+  the wait time.
+
+**Inspect**
+
+The "Inspect" interface represents ixpool inspection information. It
+has the following properties:
+
+* "pending" - "Map<string, Map<string, string>>": A map representing
+  the pending interactions in ixpool.
+
+* "queued" - "Map<string, Map<string, string>>": A map representing
+  the queued interactions in ixpool.
+
+* "wait_time" - "Map<string, WaitTime>": A map representing the wait
+  times of each account in ixpool.
+
+**Options**
+
+The "Options" interface represents the **tesseract** options. It has
+the following properties:
+
+* "tesseract_number" (optional) - "number": The Tesseract number.
+
+* "tesseract_hash" (optional) - "string": The Tesseract hash.
+
+**ContextInfo**
+
+The "ContextInfo" interface represents information about the context.
+It has the following properties:
+
+* "behaviour_nodes" - "string[]": An array of strings representing
+  behavior nodes.
+
+* "random_nodes" - "string[]": An array of strings representing random
+  nodes.
+
+* "storage_nodes" - "string[]": An array of strings representing
+  storage nodes.
+
+**TDUBase**
+
+The "TDUBase" interface represents the base structure for TDU (Total
+Digital Utility). It has the following properties:
+
+* "asset_id" - "string": The asset id.
+
+**TDU**
+
+The "TDU" interface extends "TDUBase" and represents a Total Digital
+Utility. It has the following additional property:
+
+* "amount" - "number | bigint": The amount associated with the asset
+  id.
+
+**AccountState**
+
+The "AccountState" interface represents the state of an account. It
+has the following properties:
+
+* "nonce" - "string": The nonce value.
+
+* "acc_type" - "number": The account type.
+
+* "balance" - "string": The account balance.
+
+* "asset_approvals" - "string": The asset approvals.
+
+* "context_hash" - "string": The context hash.
+
+* "storage_root" - "string": The storage root.
+
+* "logic_root" - "string": The logic root.
+
+* "file_root" - "string": The file root.
+
+**AccountMetaInfo**
+
+The "AccountMetaInfo" interface represents meta-information about an
+account. It has the following properties:
+
+* "type" - "number": The account type.
+
+* "address" - "string": The account address.
+
+* "height" - "string": The account height.
+
+* "tesseract_hash" - "string": The Tesseract hash.
+
+* "lattice_exists" - "boolean": Indicates whether a lattice exists for
+  the account.
+
+* "state_exists" - "boolean": Indicates whether a state exists for the
+  account.
+
+**AccSyncStatus**
+
+The "AccSyncStatus" interface encapsulates information about account
+synchronization. It includes the following properties:
+
+* "current_height" - "string": The current tesseract height.
+
+* "expected_height" - "string": The expected tesseract height.
+
+* "is_primary_sync_done" - "boolean": Indicates whether the primary
+  sync is completed.
+
+**NodeSyncStatus**
+
+The "NodeSyncStatus" interface encapsulates information about node
+synchronization. It includes the following properties:
+
+* "total_pending_accounts" - "string": The total no of unsynced
+  accounts.
+
+* "is_principal_sync_done" - "boolean": Indicates whether the
+  principal sync is completed.
+
+* "principal_sync_done_time" - "string": The time at which principal
+  sync got completed.
+
+* "is_initial_sync_done" - "boolean": Indicates whether the initial
+  sync is completed.
+
+**SyncStatus**
+
+The "SyncStatus" interface represents synchronization status
+information of an account and it's nodes. It has the following
+properties:
+
+* "acc_sync_status" - "AccSyncStatus": The account sync information.
+
+* "node_sync_status" - "NodeSyncStatus | null": The node sync
+  information.
+
+**InteractionRequest**
+
+The "InteractionRequest" interface represents a signed interaction
+request. It has the following properties:
+
+* "ix_args" - "string": The encoded interaction parameters.
+
+* "signature" - "string": The signature for the interaction.
+
+**InteractionResponse**
+
+The "InteractionResponse" interface represents a response to an
+interaction. It has the following properties:
+
+* "hash" - "string": The hash of the interaction.
+
+* "wait" - "function": A function that returns a promise for the
+  interaction receipt after waiting for a specified timeout.
+
+* "result" - "function": A function that returns a promise for the
+  result of the interaction after waiting for a specified timeout.
+
+**InteractionCallResponse**
+
+The "InteractionCallResponse" interface represents a response to an
+interaction. It has the following properties:
+
+* "receipt" - "InteractionReceipt": The receipt of the interaction.
+
+* "result" - "function": A function that returns the result of an
+  interaction.
+
+**StateHash**
+
+The "StateHash" interface represents state hash information. It has
+the following properties:
+
+* "address" - "string": The address associated with the state hash.
+
+* "hash" - "string": The state hash value.
+
+**ContextHash**
+
+The "ContextHash" interface represents context hash information. It
+has the following properties:
+
+* "address" - "string": The address associated with the context hash.
+
+* "hash" - "string": The context hash value.
+
+**ExecutionResult**
+
+The "ExecutionResult" - "AssetCreationResult", "AssetSupplyResult",
+"LogicDeployResult", "LogicInvokeResult", or "null": represents the
+detailed outcome of a operation execution. It can vary based on the
+specific type of operation.
+
+**OperationResult**
+
+The "OperationResult" interface represents the outcome of a processed
+operation, including its type, execution status, and resulting data.
+
+* "tx_type" - "string": The type of operation.
+
+* "status" - "number": The status code indicating the result of the
+  operation.
+
+* "data" - "ExecutionResult": The detailed operation execution result
+  specific to the operation type or null
+
+**InteractionReceipt**
+
+The "InteractionReceipt" interface represents a receipt for an
+interaction. It has the following properties:
+
+* "ix_hash" - "string": The hash of the interaction.
+
+* "status" - "number": The status of the interaction.
+
+* "fuel_used" - "string": The amount of fuel used for the interaction.
+
+* "participants" - "Participant[]": The participants involved in the
+  interaction.
+
+* "ix_operations" - "OperationResult[]": A list of operation results.
+
+* "from" - "string": The sender of the interaction.
+
+* "ix_index" - "string": The index of the interaction.
+
+* "ts_hash" - "string": The hash of the tesseract.
+
+**AssetInfo**
+
+The "AssetInfo" interface represents information about an asset. It
+has the following properties:
+
+* "symbol" - "string": The symbol of the asset.
+
+* "operator" - "string": The operator of the asset.
+
+* "supply" - "string": The supply of the asset.
+
+* "dimension" - "string": The dimension of the asset.
+
+* "standard" - "string": The standard of the asset.
+
+* "is_logical" - "boolean": Indicates whether the asset is logical.
+
+* "is_stateful" - "boolean": Indicates whether the asset is stateful.
+
+* "logic_id" (optional) - "string": The ID of the logic associated
+  with the asset (if applicable).
+
+**Registry**
+
+The "Registry" interface represents registry information. It has the
+following properties:
+
+* "asset_id" - "string": The ID of the asset in the registry.
+
+* "asset_info" - "AssetInfo": Information about the asset in the
+  registry.
+
+**Filter**
+
+The "Filter" interface represents a filter with a unique identifier.
+It has the following properties:
+
+* "id" - "string": The unique identifier for the filter.
+
+**FilterDeletionResult**
+
+The "FilterDeletionResult" interface represents the result of a
+deletion operation. It has the following properties:
+
+* "status" - "boolean": Indicates whether the deletion was successful
+  (true) or not (false).
+
+**NodeInfo**
+
+The "NodeInfo" interface represents information about a node. It has
+the following property:
+
+* "krama_id" - "string": The krama id associated with the node.
+
+**ConnectionsInfo**
+
+The "ConnectionsInfo" interface provides information about connections
+and active pub-sub topics. It consists of the following properties:
+
+* "connections" - A list of connections, each containing:
+     * "peer_id" - "string": The ID of the peer associated with the
+       connection.
+
+     * "streams" - A list of streams, each containing:
+          * "protocol" - "string": The protocol of the stream.
+
+          * "direction" - "number": The direction of the stream.
+
+* "inbound_conn_count" - "number": The count of inbound connections.
+
+* "outbound_conn_count" - "number": The count of outbound connections.
+
+* "active_pub_sub_topics" - A dictionary where the keys are topic
+  strings and the values are numbers representing the count of active
+  connections for each topic.
+
+**ParticipantCreatePayload**
+
+The "ParticipantCreatePayload" interface represents a payload for
+creating an participant. It has the following properties:
+
+* "address" - "string": The participant's address to register on the
+  network.
+
+* "amount" - "number | bigint": The initial deposit amount.
+
+**AssetActionPayload**
+
+The "AssetActionPayload" interface represents a payload for
+transferring/approving/revoking an asset. It has the following
+properties:
+
+* "benefactor" - "string": The address that authorized access to his
+  asset funds.
+
+* "beneficiary" - "string": The recipient address for the
+  transfer/approve/revoke operation.
+
+* "asset_id" - "string": The ID of the asset for which to
+  transfer/approve/revoke.
+
+* "amount" - "number | bigint": The amount for
+  transfer/approve/revoke.
+
+**AssetCreatePayload**
+
+The "AssetCreatePayload" interface represents a payload for creating
+an asset. It has the following properties:
+
+* "symbol" - "string": The symbol of the asset.
+
+* "supply" - "number | bigint": The supply of the asset.
+
+* "standard" - "AssetStandard": The asset standard (optional).
+
+* "dimension" - "number": The dimension of the asset (optional).
+
+* "is_stateful" - "boolean": Indicates whether the asset is stateful
+  (optional).
+
+* "is_logical" - "boolean": Indicates whether the asset is logical
+  (optional).
+
+* "logic_payload" - "LogicPayload": The payload for the associated
+  logic (optional).
+
+**AssetSupplyPayload**
+
+The "AssetSupplyPayload" interface represents a payload for minting or
+burning an asset. It has the following properties:
+
+* "asset_id" - "string": The ID of the asset.
+
+* "amount" - "number | bigint": The amount to mint or burn.
+
+**LogicPayload**
+
+The "LogicPayload" interface represents a payload for logic deployment
+or invokation. It has the following properties:
+
+* "logic_id" - "string": The ID of the logic (optional).
+
+* "callsite" - "string": The callsite for the logic execution.
+
+* "calldata" - "Uint8Array": The calldata for the logic execution.
+
+* "manifest" - "Uint8Array": The encoded manifest to deploy
+  (optional).
+
+**OperationPayload**
+
+The "OperationPayload" type represents a payload for an operation. It
+can be one of the following types: "ParticipantCreatePayload",
+"AssetActionPayload", "AssetCreatePayload", "AssetSupplyPayload", or
+"LogicPayload".
+
+**IxFund**
+
+The "IxFund" type represents the asset and the amount required for
+validating the interaction before processing.
+
+* "asset_id" - "string": The unique identifier of the asset.
+
+* "amount" - "number | bigint": The total required amount for the
+  interaction,
+
+specified as either a "number" or a "bigint".
+
+**IxOperation**
+
+The "IxOperation" type represents an individual operation that is part
+of a larger interaction.
+
+* "type" - "string": The type of the operation.
+
+* "payload" - "OperationPayload": The specific payload corresponding
+  to the operation.
+
+**IxParticipant**
+
+The "IxParticipant" type represents a participant involved in the
+interaction and their corresponding lock type.
+
+* "address" - "string": The address of the participant involved in the
+  interaction.
+
+* "lock_type" - "number": The type of lock to acquire while processing
+  the interaction.
+
+**InteractionObject**
+
+The "InteractionObject" interface represents an interaction object. It
+has the following properties:
+
+* "sender" - "string": The address of the participant initiating the
+  interaction (optional).
+
+* "payer" - "string": The address of the participant responsible for
+  covering the interaction's fuel costs. (optional).
+
+* "nonce" - "number | bigint": A unique value used to ensure the
+  interaction's uniqueness (optional).
+
+* "funds" - "IxFund": The list of asset funds required for the
+  interaction (optional).
+
+* "ix_operations" - "IxOperation": The list of ix_operations that are
+  part of the interaction and are to be executed.
+
+* "pariticipants" - "IxParticipant": The list of participants involved
+  in the interaction, along with their respective lock types
+  (optional).
+
+* "fuel_price" - "number | bigint": The price per unit of fuel for
+  executing the interaction.
+
+* "fuel_limit" - "number | bigint": The maximum amount of fuel that
+  can be consumed during the processing of the interaction.
+
+**CallorEstimateIxObject**
+
+The "CallorEstimateIxObject" interface extends "InteractionObject" and
+represents an interaction object. It has the following properties:
+
+* "nonce" - "number | bigint": The nonce value.
+
+* "sender" - "string": The sender of the interaction.
+
+**WebsocketConnection**
+
+The "WebsocketConnection" interface represents options for a websocket
+provider. It has the following properties:
+
+* "protocols" - "object": The protocols for the websocket connection
+  (optional).
+
+* "headers" - "object": The headers for the websocket connection
+  (optional).
+
+* "requestOptions" - "object": The request options for the websocket
+  connection (optional).
+
+* "clientConfig" - "object": Configuration options for the websocket
+  client (optional).
+
+* "reconnect" - "object": Configuration options for websocket
+  reconnection (optional).
+
+* "timeout" - "number": The timeout duration in milliseconds for the
+  websocket connection (optional).
+
+Note:
+
+  **Important:** Please note that the current version of js-moi-sdk
+  only supports the *reconnectOptions* property of
+  *WebsocketProviderOptions*. Other properties may not be available or
+  functional in the current version.
+
+
+Abstract Provider
+=================
+
+AbstractProvider is an abstract class that defines the common
+interface and methods for all providers. It serves as a blueprint for
+other provider classes, enforcing consistent behavior and
+standardizing the processing of input arguments, output results, and
+event tracking within an environment where network consistency is
+achieved gradually.
+
+
+Base Provider
+=============
+
+A BaseProvider is a subclass of AbstractProvider and acts as a
+fundamental building block for other subclasses. The BaseProvider
+class promotes code reusability and modularity by defining common
+methods and attributes. It facilitates the development of provider
+classes with a cohesive and consistent approach, reducing redundancy
+and enhancing maintainability.
+
+
+Account Methods
+---------------
+
+getBalance(address, assetId, options)
+
+   Retrieves the balance of the specified address for the given asset
+   id.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the balance.
+
+      * **assetId** (**string**) -- The asset id for which to retrieve
+        the balance.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<(number|bigint)>** -- A Promise that resolves to the
+      balance as a number or bigint.
+
+getContextInfo(address, options)
+
+   Retrieves the context information for the specified address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the context information.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<ContextInfo>** -- A Promise that resolves to the
+      context information.
+
+getTDU(id, options)
+
+   Retrieves the TDU (Total Digital Utility) for the specified id.
+
+   Arguments:
+      * **id** (**string**) -- The id for which to retrieve the TDU.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<Array.<TDU>>** -- A Promise that resolves to the TDU
+      object.
+
+getInteractionByHash(ixHash)
+
+   Retrieves the interaction information for the specified interaction
+   hash.
+
+   Arguments:
+      * **ixHash** (**string**) -- The hash of the interaction to
+        retrieve.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<Interaction>** -- A Promise that resolves to the
+      interaction information.
+
+getInteractionByTesseract(address, options, ix_index)
+
+   Retrieves the interaction information for the specified address and
+   tesseract options.
+
+   If only tesseract options are provided, the address parameter can
+   be omitted.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the interaction. Omit if using only tesseract options.
+
+      * **options** (**Object**) -- The tesseract options. Should be
+        an object with either 'tesseract_number' or 'tesseract_hash'.
+        (optional)
+
+      * **ix_index** (**number|undefined**) -- The index of the
+        interaction to retrieve. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<Interaction>** -- A Promise that resolves to the
+      interaction information.
+
+   Example:
+
+      // Retrieve interaction by address and tesseract options
+      provider.getInteractionByTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', { tesseract_number: 0 }, 1)
+
+   Example:
+
+      // Retrieve interaction by tesseract options only
+      provider.getInteractionByTesseract({ tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' }, 2)
+
+getInteractionCount(address, options)
+
+   Retrieves the total number of interactions for the specified
+   address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the interaction count.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<(number|bigint)>** -- A Promise that resolves to the
+      number of interactions as a number or bigint.
+
+getPendingInteractionCount(address)
+
+   Retrieves the total number of interactions for the specified
+   address, including the pending interactions in IxPool.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the pending interaction count.
+
+   Throws:
+      Error if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<(number|bigint)>** -- A Promise that resolves to the
+      number of pending interactions as a number or bigint.
+
+getAccountState(address, options)
+
+   Retrieves the account state for the specified address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the account state.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<AccountState>** -- A Promise that resolves to the
+      account state.
+
+getAccountMetaInfo(address)
+
+   Retrieves the account meta information for the specified address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the account meta information.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<AccountMetaInfo>** -- A Promise that resolves to the
+      account meta information.
+
+getContentFrom(address)
+
+   Retrieves the content from a specific address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the content.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<ContentFrom>** -- A Promise that resolves to the
+      content information.
+
+getWaitTime(address)
+
+   Retrieves the wait time for a specific account in ixpool.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the wait time.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<(number|bigint)>** -- A promise that resolves to the
+      wait time (in seconds) as a number or bigint.
+
+getTesseract(address, with_interactions, options)
+
+   Retrieves a Tesseract for a specific address or tesseract hash.
+
+   Arguments:
+      * **address** (**string|boolean**) -- The address for which to
+        retrieve the Tesseract or a boolean indicating whether to
+        include interactions.
+
+      * **with_interactions** (**boolean|Options**) -- A boolean value
+        indicating whether to include interactions in the Tesseract.
+
+      * **options** (**Options|undefined**) -- The tesseract options.
+        (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<Tesseract>** -- A promise that resolves to the
+      Tesseract.
+
+   Example:
+
+      // Retrieve Tesseract by address with interactions, commit_info and options
+      provider.getTesseract('0x55425876a7bdad21068d629e290b22b564c4f596fdf008db47c037da0cb146db', true, true, { tesseract_number: '0' })
+
+   Example:
+
+      // Retrieve Tesseract by tesseract hash with interactions, commit_info and options
+      provider.getTesseract(true, true, { tesseract_hash: '0xf1e6274efa43da9fecbb7e970be4b37e6f8f4e66eea7e323a671f02ef7a5e001' })
+
+getLogicIds(address, options)
+
+   Retrieves the logic id's associated with a specific address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the logic id's.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<Array.<string>>** -- A Promise that resolves to an
+      array of logic id's.
+
+getRegistry(address, options)
+
+   Retrieves the registry for a specific address.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the registry.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<Registry>** -- A Promise that resolves to the
+      registry.
+
+getSyncStatus(address)
+
+   Retrieves the synchronization status for a specific account.
+
+   Arguments:
+      * **address** (**string|undefined**) -- The address for which to
+        retrieve the synchronization status.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<SyncStatus>** -- A Promise that resolves to the
+      synchronization status.
+
+
+Execution Methods
+-----------------
+
+BaseProvider.call(ixObject, options)
+
+   Handles the interaction without modifying the account's current
+   state.
+
+   Arguments:
+      * **ixObject** (**CallorEstimateIxObject**) -- The interaction
+        object.
+
+      * **options** (**CallorEstimateOptions**) -- The interaction
+        options. (optional)
+
+   Throws:
+      **Error** -- if there's an issue executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<InteractionCallResponse>** -- A Promise resolving to
+      the interaction call response.
+
+BaseProvider.estimateFuel(ixObject, options)
+
+   Estimates the amount of fuel required for processing the
+   interaction.
+
+   Arguments:
+      * **ixObject** (**CallorEstimateIxObject**) -- The interaction
+        object.
+
+      * **options** (**CallorEstimateOptions**) -- The interaction
+        options. (optional)
+
+   Throws:
+      **Error** -- if there's an issue executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<(number|bigint)>** -- A Promise resolving to the
+      estimated fuel amount.
+
+BaseProvider.sendInteraction(ixObject)
+
+   Sends an interaction request.
+
+   Arguments:
+      * **ixObject** (**InteractionRequest**) -- The interaction
+        request object.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<InteractionResponse>** -- A Promise that resolves to
+      the interaction response.
+
+
+Query Methods
+-------------
+
+getAssetInfoByAssetID(assetId, options)
+
+   Retrieves the asset information for a specific asset id.
+
+   Arguments:
+      * **assetId** (**string**) -- The asset id for which to retrieve
+        the asset information.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<AssetInfo>** -- A Promise that resolves to the asset
+      information.
+
+getLogs(address, height, topics)
+
+   Retrieves all tesseract logs associated with a specified account
+   within the provided tesseract range. If the topics are not
+   provided, all logs are returned.
+
+   Arguments:
+      * **address** (**string**) -- The address for which to retrieve
+        the tesseract logs.
+
+      * **height** (**Tuple.<number>**) -- The height range for the
+        tesseracts. The start height is inclusive, and the end height
+        is exclusive.
+
+      * **topics** (**NestedArray.<string>**) -- The topics to filter
+        the logs. (optional)
+
+   Throws:
+      Error if difference between start height and end height is
+      greater than 10.
+
+   Returns:
+      A Promise that resolves to an array of logs.
+
+getInteractionReceipt(ixHash)
+
+   Retrieves the interaction receipt for a specific interaction hash.
+
+   Arguments:
+      * **ixHash** (**string**) -- The hash of the interaction for
+        which to retrieve the receipt.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<InteractionReceipt>** -- A Promise that resolves to
+      the interaction receipt.
+
+getStorageAt(logicId, storageKey, address, options)
+
+   Retrieves the storage entry corresponding to a specific storage key
+   and logic id.
+
+   Arguments:
+      * **logicId** (**string**) -- The logic id for which to retrieve
+        the storage value.
+
+      * **storageKey** (**string**) -- The storage key for which to
+        retrieve the value.
+
+      * **address** (**string**) -- The address related to the storage
+        key (optional).
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call.
+
+   Returns:
+      **Promise.<string>** -- A Promise that resolves to the storage
+      value as a string.
+
+   Example:
+
+      // Retrieve storage value by logic id, storage key and address
+      provider.getStorageAt('logicId123', '0x7890..', '0xb456..')
+
+   Example:
+
+      // Retrieve storage value by logic id, storage key, address and options
+      provider.getStorageAt('logicId123', '0x7890..', '0xb456..', { from: '0xb456..' })
+
+   Example:
+
+      // Retrieve storage value by logic id, storage key, and options
+      provider.getStorageAt('logicId123', '0x7890..', { from: '0xb456..' })
+
+getLogicManifest(logicId, encoding, options)
+
+   Retrieves the logic manifest for a specific logic id.
+
+   Arguments:
+      * **logicId** (**string**) -- The logic id for which to retrieve
+        the logic manifest.
+
+      * **encoding** (**Encoding**) -- The encoding format of the
+        manifest.
+
+      * **options** (**Options**) -- The tesseract options. (optional)
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<(string|LogicManifest.Manifest)>** -- A Promise that
+      resolves to the logic manifest as a POLO encode string or a
+      parsed JSON object.
+
+getContent()
+
+   Retrieves all the interactions that are pending for inclusion in
+   the next Tesseract(s) or are scheduled for future execution.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<Content>** -- A Promise that resolves to the content
+      of the interaction pool.
+
+getStatus()
+
+   Retrieves the total number of pending and queued interactions in
+   the interaction pool.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<Status>** -- A Promise that resolves to the status of
+      the interaction pool.
+
+getInspect()
+
+   Retrieves all the interactions that are pending for inclusion in
+   the next Tesseract(s) or are scheduled for future execution.
+   Additionally, it provides a list of all the accounts in the ixpool
+   with their respective wait times. This method is particularly
+   useful for developers, as it can help them quickly review
+   interactions in the pool and identify any potential issues.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<Inspect>** -- A Promise that resolves to the
+      inspection data of the interaction pool.
+
+getPeers()
+
+   Retrieves the list of peers connected to the specific moipod.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<Array.<string>>** -- A Promise that resolves to the
+      list of peers.
+
+BaseProvider.getVersion()
+
+   Retrieves the version of the connected network.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<string>** -- A Promise that resolves to the network
+      version as a string.
+
+getNodeInfo()
+
+   Retrieves detailed information about the connected node.
+
+   Throws:
+      **Error** -- if there is an error executing the RPC call or
+      processing the response.
+
+   Returns:
+      **Promise.<NodeInfo>** -- A Promise that resolves to an object
+      containing node information.
+
+getNewTesseractFilter()
+
+   Initializes a filter for retrieving newly detected terreracts. The
+   filter setup triggers a 1-minute timeout period, and with each
+   subsequent query, the timeout is reset to 1 minute.
+
+   Throws:
+      **Error** -- Throws an error if there is an issue executing the
+      RPC call.
+
+   Returns:
+      **Promise.<Filter>** -- An object containing the filter id for
+      the NewTesseractFilter.
+
+getNewTesseractsByAccountFilter(address)
+
+   Initiates a filtering mechanism to fetch recently identified
+   tesseracts associated with a specific account. The filter setup
+   triggers a 1-minute timeout period, and with each subsequent
+   request, the timeout is reset to 1 minute.
+
+   Arguments:
+      * **address** (**string**) -- The address of the target account
+        for which new tesseracts are filtered.
+
+   Throws:
+      **Error** -- Throws an error if there is an error executing the
+      RPC call.
+
+   Returns:
+      **Promise.<Filter>** -- An object containing the filter id for
+      the NewTesseractFilter.
+
+getPendingInteractionFilter()
+
+   Initiates a filtering mechanism to fetch recently identified
+   pending interaction. The filter setup triggers a 1-minute timeout
+   period, and with each subsequent request, the timeout is reset to 1
+   minute.
+
+   Throws:
+      **Error** -- Throws an error if there is an error executing the
+      RPC call.
+
+   Returns:
+      **Promise.<Filter>** -- A object containing the Filter ID for
+      PendingIxnsFilter
+
+getLogsFilter(filter)
+
+   Create a filter object for the logs.
+
+   Arguments:
+      * **filter** (**LogFilter**) -- The log filter object.
+
+   Returns:
+      **Promise.<Filter>** -- A promise that resolves to a Filter
+      object.
+
+getFilterChanges(filter)
+
+   Retrieves all filter changes since the last poll.
+
+   The specific result varies depending on the type of filter used.
+
+   Arguments:
+      * **filter** (**Filter**) -- The filter object for which changes
+        are to be retrieved.
+
+   Throws:
+      **Error** -- Throws an error if there is an issue executing the
+      RPC call.
+
+   Returns:
+      **Promise.<T>** -- A promise that resolves to an object
+      containing information about the changes made to the specified
+      filter since the last poll. The structure of the object is
+      determined by the type of filter provided.
+
+removeFilter(filter)
+
+   Asynchronously removes the filter and returns a Promise that
+   resolves to a object. The object has a *status* property, which is
+   true if the filter is successfully removed, otherwise false.
+
+   Throws:
+      **Error** -- Throws an error if there is an error executing the
+      RPC call.
+
+   Returns:
+      **Promise.<FilterDeletionResult>** -- A Promise that resolves to
+      an object with a *status* property indicating the success of the
+      filter removal.
+
+
+Event Methods
+-------------
+
+on(eventName, listener)
+
+   This method listens to events emitted by the provider for the given
+   event
+
+   Arguments:
+      * **eventName** -- The event to listen to this can be a string
+        or an object
+
+      * **listener** -- The callback function to be called when the
+        event is emitted
+
+   Returns:
+      * The provider instance
+
+off(eventName, listener)
+
+   This method removes a listener from the provider
+
+   Arguments:
+      * **eventName** -- The event to remove the listener from
+
+      * **listener** -- The listener to remove
+
+   Returns:
+      * The provider instance
+
+once(eventName, listener)
+
+   Adds a one-time listener function for the specified event.
+
+   Arguments:
+      * **eventName** -- The name of the event to listen for.
+
+      * **listener** -- A function to be called when the event is
+        triggered.
+
+   Returns:
+      The WebSocketProvider instance.
+
+listeners(eventName)
+
+   This methods returns all the listeners for a given event
+
+   Arguments:
+      * **eventName** -- The event to get the listeners for
+
+   Returns:
+      * An array of listeners
+
+listenerCount(eventName, listener)
+
+   Returns the number of listeners for the specified event name.
+
+   Arguments:
+      * **eventName** -- The name of the event.
+
+      * **listener** -- (Optional) The listener function.
+
+   Returns:
+      The number of listeners for the specified event name.
+
+removeAllListeners(event)
+
+   Removes all event listeners for the specified event or all events.
+
+   Arguments:
+      * **event** -- The event to remove listeners for. If not
+        specified, all listeners for all events will be removed.
+
+   Returns:
+      The instance of the class with all listeners removed.
+
+
+Json Rpc Provider
+=================
+
+The JsonRpcProvider is a subclass of "BaseProvider" it facilitates
+interaction with MOI nodes using the JSON-RPC protocol. It offers a
+flexible interface to send HTTP (or HTTPS) requests and retrieve data
+from the blockchain.
+
+   // Example
+   const provider = new JsonRpcProvider("http://localhost:1600");
+
+
+Usage
+-----
+
+
+Tesseract
+~~~~~~~~~
+
+   // Example
+   const address  = "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08";
+   const options = {
+       tesseract_number: 1
+   }
+   const tesseract = await provider.getTesseract(address, true, options);
+   console.log(tesseract)
+
+   // Output:
+   /*
+       {
+           "participants": [
+               {
+                   "address": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+                   "height": "0x2",
+                   ...
+               },
+               {
+                   "address": "0x96c93a80bc13e4864b485937d5aca52a2e61135b03e4918c58cc2bcc1b9e7a6b",
+                   "height": "0x0",
+                   ...
+               },
+               {
+                   "address": "0xa6ba9853f131679d00da0f033516a2efe9cd53c3d54e1f9a6e60e9077e9f9384",
+                   "height": "0x2",
+                   ...
+               }
+           ],
+           "interactions_hash": "0x0b702b5451387ab6611fe790e81e235f7b67e88ed010a5687e6a0befbea211a7",
+           "receipts_hash": "0xa777c6da47a2e2c47ff03fd8e8ba98f56dbda6f889112d6cd4c516c9b5ba54f5",
+           ...
+           "consensus_info": {
+               "evidence_hash": "0xf02307c9cc0428a59025ab4d61add5a9c5808f7de59ce16070f05117ab88329d",
+               ...
+           },
+           "seal": "0x0460aed71dc4bc5cbd827791c342af7de2ed23ec6c44accc3a3fc37aa419c11ae673efed217f7c8e3df602fc7798bb989c10096615983ed2ebeebf83d62c28da2c7f4bbbe5623b1d704e752ab7ae9516b49c5171bf6febbb5d04af5fcadd0694e880",
+           "hash": "0x9230bc7fa374304d5137fe8528b57b4b5c36763f867e2424cbc2114d07499035",
+           "ixns": [
+               {
+                   "nonce": "0x1",
+                   "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+                   "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                   "fuel_price": "0x1",
+                   "fuel_limit": "0xc8",
+                   "ix_operations": [
+                       {
+                           "type": 3,
+                           "payload": {
+                               "symbol": "TOKYO",
+                               "supply": "0xc350",
+                               ...
+                           }
+                       }
+                   ],
+                   ...
+               }
+           ]
+       }
+   */
+
+
+Context Info
+~~~~~~~~~~~~
+
+   // Example
+   const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b"
+   const contextInfo = await provider.getContextInfo(address)
+   console.log(contextInfo)
+
+   // Output
+   /*
+       {
+           "behaviour_nodes": [
+               "3Wywv4WykAqs6mH1YAWNHKYFw77tuF4iFkcQPxyFgzT9XEPPEkaK.16Uiu2HAkzhT4eoJoQWz9P7S65j6F6dSHEVGN925AXg5kqhisgSai",
+               "3Wy3MY7saXna1ypZMYVooUPD9k3hU7vWXQvTRFdpabmSC7pr8om9.16Uiu2HAm3hy8wAw9hjuxXqGGmnpQQrU7ouZWwJuDAQJbesvg49hX"
+           ],
+           "random_nodes": [],
+           "storage_nodes": []
+       }
+   */
+
+
+WebSocket Provider
+==================
+
+The WebSocketProvider is a subclass of "BaseProvider" that enables
+interaction with MOI nodes using the WebSocket protocol. It provides a
+flexible interface for sending and receiving data from the blockchain
+in real-time.
+
+Using WebSocket, the provider establishes a persistent connection with
+the MOI node, allowing for efficient and continuous communication.
+This is particularly useful for applications requiring real-time
+updates or streaming data from the blockchain.
+
+The WebSocketProvider offers similar functionality as the
+JsonRpcProvider but operates over WebSocket instead of HTTP or HTTPS.
+It allows for subscribing to specific events or filters, receiving
+instant notifications when relevant data changes on the blockchain.
+
+The MOI protocol has incorporated support for invoking JSON-RPC
+methods over a WebSocket connection, facilitating real-time
+interaction with the blockchain.
+
+   // Example
+   const provider = new WebsocketProvider("wss://localhost:8080", {
+       timeout: 20000,
+       reconnect: {
+           delay: 1000,
+           maxAttempts: 5000
+       }
+   });
+
+
+WebSocket Events
+----------------
+
+The event's listed below are related to the WebSocketProvider itself
+and its connection status and operation. These are not specific to
+blockchain data.
+
+"WebSocketEvent.Connect" - This event is triggered when the
+WebSocketProvider successfully establishes a connection with the MOI
+node. It indicates that the WebSocket connection has been established
+and is ready for sending and receiving data.
+
+"WebSocketEvent.Reconnect" - This event occurs when the
+WebSocketProvider attempts to reconnect to the MOI node after a
+disconnection.
+
+"WebSocketEvent.Close" - This event is emitted when the WebSocket
+connection is closed intentionally or due to an error. It provides
+information about the reason for the closure, such as a manual
+disconnection or a network failure.
+
+"WebSocketEvent.Error" - This event is emitted when an error occurs
+during the WebSocketProvider's operation. It indicates that something
+unexpected or erroneous has happened, such as a network error, an
+invalid response from the MOI node, or any other unforeseen issue.
+
+
+Protocol Events
+---------------
+
+The event's listed below are specific to blockchain data.
+
+"WebSocketEvent.NewTesseracts" - This event is triggered when a new
+tesseract is mined on the blockchain. It provides information about
+the tesseract, such as its height, hash, timestamp, and other relevant
+data.
+
+"WebSocketEvent.NewTesseractsByAccount" - This event is triggered when
+a new tesseract belonging to the given address is mined on the
+blockchain. It provides information about the tesseract.
+
+"WebSocketEvent.NewPendingInteractions" - This event is emitted when a
+new interaction is added to interaction pool. It provides an
+interaction hash.
+
+"WebSocketEvent.NewLogs" - This event is triggered when new logs are
+added for a given address and topics.
+
+
+Usage
+-----
+
+
+Subscribing to all tesseracts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const handleTesseracts = async (tesseract) => {
+       console.log("New tesseract finalized", tesseract);
+   };
+
+   provider.on(WebSocketEvent.NewTesseracts, handleTesseracts);
+
+   provider.on(WebSocketEvent.Error, (err) => {
+       console.log("WebSocket connection error:", err);
+   });
+
+   provider.on(WebSocketEvent.Close, (info) => {
+       console.log("WebSocket connection closed: ", info);
+
+       // Remove "tesseracts" event listener
+       provider.off(WebSocketEvent.NewTesseracts, handleTesseracts);
+   });
+
+
+Subscribing to tesseracts by address
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const ws = new WebsocketProvider("ws://localhost:8080");
+
+   ws.on({ event: WebSocketEvent.NewTesseractsByAccount, params: { address: "0x...abc" } }, (tesseract) => {
+       console.log(tesseract);
+   });
+
+
+Subscribing to new logs
+~~~~~~~~~~~~~~~~~~~~~~~
+
+   provider.on({ event: WebSocketEvent.NewLog, params: { address: "0x..abc", height: [-1, -1], topics: [] } }, (log) => {
+       console.log("New log", log);
+   });
+
+
+Subscribing to pending interactions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   provider.on(WebSocketEvent.NewPendingInteractions, (log) => {
+       console.log("New log", log);
+   });
+
+
+Websocket enabled JSON-RPC communication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const address = "0x...abc";
+   const tdu = await provider.getTDU(address)
+   console.log(tdu)
+
+   // Output
+   /*
+       [
+           {
+               "asset_id": "0x...xyz",
+               "amount": "0xF4161"
+           }
+       ]
+   */
+
+
+Browser Provider
+================
+
+The **BrowserProvider** is a subclass of "BaseProvider" that wraps a
+browser-injected "Transport" (e.g. "window.moi") to provide wallet-
+aware RPC access in a browser environment. It is the recommended
+provider for decentralized applications running in the browser.
+
+All standard MOI RPC calls inherited from "BaseProvider" and wallet-
+specific calls are routed through the injected transport, so no HTTP
+host URL is needed. The provider also delegates wallet events such as
+account and network changes directly from the transport, so callers
+interact with a single unified object.
+
+
+Types
+-----
+
+**NetworkConfiguration**
+
+The "NetworkConfiguration" interface represents the network
+configuration returned by the wallet. It has the following properties:
+
+* "id" - "string": The unique identifier of the network.
+
+* "name" - "string": The human-readable name of the network.
+
+* "jsonRpcHost" - "string": The JSON-RPC endpoint URL for the network.
+
+* "blockExplorer" (optional) - "string": The block explorer URL for
+  the network.
+
+**WalletAccount**
+
+The "WalletAccount" interface represents an individual account stored
+in the wallet. It has the following properties:
+
+* "id" - "Hex": The unique identifier (address) of the account.
+
+* "name" (optional) - "string": A human-readable label for the
+  account.
+
+* "path" - "string": The derivation path of the account.
+
+* "pubkey" - "string": The public key associated with the account.
+
+**WalletParticipant**
+
+The "WalletParticipant" interface represents a wallet participant
+(identity) that groups one or more accounts. It has the following
+properties:
+
+* "id" - "string": The unique identifier of the participant.
+
+* "name" - "Hex": The name of the participant.
+
+* "accounts" - "WalletAccount[]": The list of accounts belonging to
+  this participant.
+
+**RequestPermissions**
+
+The "RequestPermissions" interface maps permission keys to their
+request payload shapes. Currently supported:
+
+* ""wallet.Accounts"" - "{}": Requests access to the wallet's account
+  list.
+
+**RequestPermissionsResult**
+
+The "RequestPermissionsResult" interface maps permission keys to their
+result shapes. For ""wallet.Accounts"" it has the following
+properties:
+
+* "capability" - "string": The capability granted (e.g.
+  ""wallet.Accounts"").
+
+* "id" - "string": The unique identifier of the granted permission.
+
+* "invoker" - "string": The origin that was granted the permission.
+
+* "caveats" - "{ type: "returnAddress"; value: Hex[] }[]":
+  Restrictions placed on the granted permission.
+
+**WalletEventListenerMap**
+
+The "WalletEventListenerMap" interface defines the events emitted by
+the wallet transport. It has the following entries:
+
+* "accountChange" - "(identifier: Hex) => void": Emitted when the
+  active wallet account changes.
+
+* "networkChange" - "(host: NetworkConfiguration) => void": Emitted
+  when the connected network changes.
+
+   // Example
+   const provider = new BrowserProvider(globalThis.moi);
+
+
+Usage
+-----
+
+
+Wallet Version
+~~~~~~~~~~~~~~
+
+   // Example
+   const version = await provider.getWalletVersion();
+   console.log(version);
+
+   // Output
+   /*
+       "0.1.0"
+   */
+
+
+Wallet Accounts
+~~~~~~~~~~~~~~~
+
+   // Example
+   const accounts = await provider.getWalletAccounts();
+   console.log(accounts);
+
+   // Output
+   /*
+       [
+           "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+           "0x96c93a80bc13e4864b485937d5aca52a2e61135b03e4918c58cc2bcc1b9e7a6b"
+       ]
+   */
+
+
+Wallet Account
+~~~~~~~~~~~~~~
+
+   // Example — get the master (currently active) participant
+   const participant = await provider.getWalletAccount();
+   console.log(participant);
+
+   // Output
+   /*
+       {
+           "id": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+           "name": "0x...",
+           "account_keys": [
+               {
+                   "id": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+                   "path": "m/44'/6174'/0'/0/0",
+                   "pubkey": "0x..."
+               }
+           ]
+       }
+   */
+
+   // Example — get a specific participant by address
+   const specific = await provider.getWalletAccount("0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08");
+   console.log(specific);
+
+
+Network
+~~~~~~~
+
+   // Example
+   const network = await provider.getNetwork();
+   console.log(network);
+
+   // Output
+   /*
+       {
+           "id": "devnet",
+           "name": "MOI Devnet",
+           "jsonRpcHost": "http://localhost:1600",
+           "blockExplorer": "https://explorer.moi.technology"
+       }
+   */
+
+
+Requesting Permissions
+~~~~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const result = await provider.requestPermissions("wallet.Accounts", {});
+   console.log(result);
+
+   // Output
+   /*
+       [
+           {
+               "capability": "wallet.Accounts",
+               "id": "abc123",
+               "invoker": "https://my-dapp.example.com",
+               "caveats": [
+                   {
+                       "type": "returnAddress",
+                       "value": [
+                           "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08"
+                       ]
+                   }
+               ]
+           }
+       ]
+   */
+
+
+Getting Permissions
+~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const permissions = await provider.getPermissions();
+   console.log(permissions);
+
+   // Output
+   /*
+       [
+           {
+               "capability": "wallet.Accounts",
+               "id": "abc123",
+               "invoker": "https://my-dapp.example.com",
+               "caveats": [...]
+           }
+       ]
+   */
+
+
+Revoking Permissions
+~~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   await provider.revokePermissions("wallet.Accounts", {});
+
+
+Sending an Interaction
+~~~~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const response = await provider.sendInteraction(signedIxRequest);
+   console.log(response.hash);
+
+   // Wait for the interaction to be confirmed
+   const receipt = await response.wait();
+   console.log(receipt);
+
+
+Listening to Wallet Events
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   // Example — react to account changes
+   provider.on("accountChange", (identifier) => {
+       console.log("Active account changed to:", identifier);
+   });
+
+   // Example — react to network changes
+   provider.on("networkChange", (network) => {
+       console.log("Network changed:", network.name, network.jsonRpcHost);
+   });
+
+   // Example — remove a listener
+   const handleAccountChange = (identifier) => {
+       console.log("Account:", identifier);
+   };
+
+   provider.on("accountChange", handleAccountChange);
+   provider.off("accountChange", handleAccountChange);
+
+
+Voyage Provider
+===============
+
+The **VoyageProvider** is a subclass of "BaseProvider" it allows users
+to connect their applications to the MOI network using the voyage
+service. Voyage is a reliable and scalable infrastructure provider for
+MOI, offering a convenient way to access the MOI blockchain without
+the need to run a full node. It acts as a middle layer between
+applications and the blockchain, handling the complexities of node
+management, synchronization, and data retrieval.
+
+   // Example
+   const provider = new VoyageProvider("devnet");
+
+
+Usage
+-----
+
+
+Account State
+~~~~~~~~~~~~~
+
+   // Example
+   const address = "0xf350520ebca8c09efa19f2ed13012ceb70b2e710241748f4ac11bd4a9b43949b";
+   const options = {
+       tesseract_number: 1
+   }
+   const account = await provider.getAccountState(address, options)
+   console.log(account)
+
+   // Output
+   /*
+       {
+           "acc_type": 2,
+           "asset_approvals": "0x0000000000000000000000000000000000000000000000000000000000000000",
+           "asset_registry": "0x6800fedfcca2fa63d9b404d09c2b206476930468013e6150178d7f37aad120ac",
+           "balance": "0x48b8dbcc3d7979c47f6272010ed74f59101b2bfe9d261d6797772dacd37f4400",
+           "context_hash": "0xa1058908a4db1594632be49790b24211cd4920a0f27b3d2b876808f910b3e320",
+           "file_root": "0x0000000000000000000000000000000000000000000000000000000000000000",
+           "logic_root": "0x0000000000000000000000000000000000000000000000000000000000000000",
+           "nonce": "0x1",
+           "storage_root": "0x0000000000000000000000000000000000000000000000000000000000000000"
+       }
+   */
+
+
+Interaction By Hash
+~~~~~~~~~~~~~~~~~~~
+
+   // Example
+   const ixHash = "0x836dd0fd460f2fe3e6690d2552399e2ab9e9022819586b0392bc214841ff6a3a";
+   const interaction = await provider.getInteractionByHash(ixHash)
+   console.log(interaction)
+
+   // Output
+   /*
+       {
+           "nonce": "0x1",
+           "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+           "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+           "fuel_price": "0x1",
+           "fuel_limit": "0xc8",
+           "ix_operations": [
+               {
+                   "type": 3,
+                   "payload": {
+                       "symbol": "TOKYO",
+                       "supply": "0xc350",
+                       ...
+                   }
+               }
+           ],
+           "hash": "0x836dd0fd460f2fe3e6690d2552399e2ab9e9022819586b0392bc214841ff6a3a",
+           "signature": "0x01473045022100bebcfc9653585af851017c5dd7ad590a29a180eee5c25f4c321049d7bef35c300220520f56228b2f93098adc54aab3647fa1951ec5404bed3bb79add72eaa199761e03",
+           "ts_hash": "0x9230bc7fa374304d5137fe8528b57b4b5c36763f867e2424cbc2114d07499035",
+           "participants": [
+               {
+                   "address": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
+                   "height": "0x2",
+                   ...
+               },
+               {
+                   "address": "0x96c93a80bc13e4864b485937d5aca52a2e61135b03e4918c58cc2bcc1b9e7a6b",
+                   "height": "0x0",
+                   ...
+               },
+               {
+                   "address": "0xa6ba9853f131679d00da0f033516a2efe9cd53c3d54e1f9a6e60e9077e9f9384",
+                   "height": "0x2",
+                   ...
+               }
+           ],
+           "ix_index": "0x0"
+       }
+   */
+
+---
+# Signer
+URL: https://js-moi-sdk.docs.moi.technology/signer
+Description: Sign MOI interactions and messages with js-moi-sdk: the Signer API, HD wallets and keypairs, and cryptographic proof of account authority on MOI.
+
+Signer
+******
+
+The Signer class serves as a base class for various signer
+implementations and defines the common interface for signing
+interactions and messages.
+
+Being an abstract class, the Signer class cannot be instantiated
+directly but serves as a blueprint for derived classes that provide
+concrete implementations. These derived classes include Wallet, and
+others. Each derived class represents a different way of signing
+interactions or messages.
+
+The Signer class defines methods such as "sign", "signInteractions",
+"connect" and "getAddress", which derived classes must implement.
+These methods handle the signing process and address retrieval. By
+adhering to the Signer class's interface, derived classes ensure
+compatibility and consistency when working with different types of
+signers.
+
+
+Types
+=====
+
+**SigningAlgorithms**
+
+The "SigningAlgorithms" interface represents signing algorithms for
+cryptographic operations. It has the following property:
+
+* "ecdsa_secp256k1" - "ECDSA_S256": The ECDSA with secp256k1 signing
+  algorithm.
+
+
+Abstract Methods
+================
+
+**getAddress**
+
+This method is used to retrieve the moi account address associated
+with the signer. Concrete classes that inherit from Signer must
+implement this method to provide the functionality of retrieving the
+address.
+
+**connect**
+
+This method is responsible for creating a new instance of the signer
+with a different provider. It allows switching the underlying provider
+while keeping the same signer configuration. Concrete classes need to
+implement this method to enable the functionality of connecting the
+signer to a different provider.
+
+**sign**
+
+This method is responsible for signing arbitrary messages using the
+MOI signing scheme. It accepts a "keyId" parameter to specify which
+registered key should be used for signing. Concrete classes need to
+implement this method to enable the functionality of signing messages.
+
+**signInteraction**
+
+This method is used to sign MOI interactions. Concrete classes must
+implement this method to provide the logic for signing the
+interactions. When a wallet has multiple keys registered, all keys
+contribute signatures to satisfy multisig threshold requirements.
+
+
+Regular Methods
+===============
+
+getProvider()
+
+   Retrieves the connected provider instance.
+
+   Throws:
+      **Error** -- if the provider is not initialized.
+
+   Returns:
+      The connected provider instance.
+
+   // Example
+   const provider = signer.getProvider();
+
+getNonce(options)
+
+   Retrieves the nonce (interaction count) for the signer's address
+   from the provider.
+
+   Arguments:
+      * **options** (**Options**) -- The options for retrieving the
+        nonce. (optional)
+
+   Throws:
+      **Error** -- if there is an error retrieving the nonce or the
+      provider is not initialized.
+
+   Returns:
+      **Promise.<(number|bigint)>** -- A Promise that resolves to the
+      nonce as a number or bigint.
+
+   // Example
+   const nonce = await signer.getNonce();
+   console.log(nonce)
+
+   >> 5
+
+Signer.sendInteraction(ixObject)
+
+   Sends an interaction object by signing it with the appropriate
+   signature algorithm and forwarding it to the connected provider.
+
+   Arguments:
+      * **ixObject** (**InteractionObject**) -- The interaction object
+        to send.
+
+   Throws:
+      **Error** -- if there is an error sending the interaction, if
+      the provider is not initialized, or if the interaction object
+      fails the validity checks.
+
+   Returns:
+      **Promise.<InteractionResponse>** -- A Promise that resolves to
+      the interaction response.
+
+   // Example 1
+   const response = await signer.sendInteraction({
+       fuel_price: 1,
+       fuel_limit: 200,
+       ix_operations: [
+           {
+               type: OpType.ASSET_CREATE,
+               payload: {
+                   standard: AssetStandard.MAS0,
+                   symbol: "TOKYO",
+                   supply: 1248577
+               }
+           }
+       ]
+   })
+
+   console.log(response)
+
+   // Output
+   /*
+       {
+           hash: '0x3492b59462fc7b8b9ec83296c6e04f314d0c93beb1cb2bfd267874b8e17c702c',
+           wait: [Function: bound waitForInteraction] AsyncFunction,
+           result: [Function: bound processResult] AsyncFunction
+       }
+   */
+
+   // Example 2
+   const response = await signer.sendInteraction({
+       fuel_price: 1,
+       fuel_limit: 200,
+       ix_operations: [
+           {
+               type: OpType.ASSET_CREATE,
+               payload: {
+                   standard: AssetStandard.MAS0,
+                   symbol: "NOVA",
+                   supply: 1248577
+               }
+           },
+           {
+               type: OpType.ASSET_MINT,
+               payload: {
+                   asset_id: "0x00000000b9a9d618867bec092db71c06c368a6d7f78dc01cf36f86a35991fee11303c3d9",
+                   amount: 50000
+               }
+           },
+       ]
+   })
+
+   console.log(response)
+
+   // Output
+   /*
+       {
+           hash: '0xcade1ded604767e847a4a116b014a09c01347742de330869cf108d5f1fe2733a',
+           wait: [Function: bound waitForInteraction] AsyncFunction,
+           result: [Function: bound processResult] AsyncFunction
+       }
+   */
+
+Signer.verify(message, signature, publicKey)
+
+   Verifies the authenticity of a signature by performing signature
+   verification using the provided parameters.
+
+   Arguments:
+      * **message** (**Uint8Array**) -- The message that was signed.
+
+      * **signature** (**string|Uint8Array**) -- The signature to
+        verify, as a string or Buffer.
+
+      * **publicKey** (**string|Uint8Array**) -- The public key used
+        for verification, as a string or Buffer.
+
+   Throws:
+      **Error** -- if the signature is invalid or the signature byte
+      is not recognized.
+
+   Returns:
+      **boolean** -- A boolean indicating whether the signature is
+      valid or not.
+
+   // Example
+   const message = Buffer.from("Hello, MOI", "utf-8");
+   const signature = "0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee01788aac726402"
+   const publicKey = Buffer.from(wallet.publicKey(), 'hex')
+   const isVerified = signer.verify(message, signature, publicKey)
+   console.log(isVerified)
+
+   >> true
+
+
+Key Management & Wallets
+========================
+
+
+BIP39
+-----
+
+The BIP39 module provides utility functions for working with mnemonic
+phrases, entropy, and seed generation. It includes methods for
+converting mnemonic phrases to seeds synchronously and asynchronously,
+converting mnemonic phrases to their corresponding entropy values and
+vice versa, generating mnemonic phrases with specified strengths, and
+validating the correctness of mnemonic phrases.
+
+   bip39.mnemonicToSeed(mnemonic, password)
+
+      Asynchronously convert a mnemonic to a seed.
+
+      Arguments:
+         * **mnemonic** (**string**) -- The mnemonic phrase.
+
+         * **password** (**string**) -- The optional password.
+
+      Throws:
+         **Error** -- If an error occurs during the conversion.
+
+      Returns:
+         **Promise.<Buffer>** -- The generated seed.
+
+      // Example
+      const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+      const password = 'password';
+      const seed = await mnemonicToSeed(mnemonic, password);
+      console.log(seed)
+
+      >> Buffer
+
+   bip39.mnemonicToSeedSync(mnemonic, password)
+
+      Synchronously convert a mnemonic to a seed.
+
+      Arguments:
+         * **mnemonic** (**string**) -- The mnemonic phrase.
+
+         * **password** (**string**) -- The optional password.
+
+      Returns:
+         **Buffer** -- The generated seed.
+
+      // Example
+      const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+      const password = 'password';
+      const seed = mnemonicToSeedSync(mnemonic, password);
+      console.log(seed)
+
+      >> Buffer
+
+   bip39.mnemonicToEntropy(mnemonic, wordlist)
+
+      Convert a mnemonic to its corresponding entropy value.
+
+      Arguments:
+         * **mnemonic** (**string**) -- The mnemonic phrase.
+
+         * **wordlist** (**Array.<string>**) -- The optional wordlist.
+
+      Throws:
+         **Error** -- If the mnemonic is invalid or a wordlist is
+         required but not found.
+
+      Returns:
+         **string** -- The corresponding entropy.
+
+      // Example
+      const mnemonic = 'hollow appear story text start mask salt social child space aspect hurdle';
+      const entropy = mnemonicToEntropy(mnemonic);
+      console.log(entropy)
+
+      >> 6ce1535a6fdd4b10efae6f27fa0835b7
+
+   bip39.entropyToMnemonic(entropy, wordlist)
+
+      Convert entropy to its corresponding mnemonic.
+
+      Arguments:
+         * **entropy** (**Buffer|string**) -- The entropy value or
+           buffer.
+
+         * **wordlist** (**Array.<string>**) -- The optional wordlist.
+
+      Throws:
+         **Error** -- If the entropy is invalid or a wordlist is
+         required but not found.
+
+      Returns:
+         **string** -- The corresponding mnemonic phrase.
+
+      // Example
+      const entropy = 'c1f651a1fb62bebf8db1ecacf66a6a3d';
+      const mnemonic = entropyToMnemonic(entropy);
+      console.log(mnemonic)
+
+      >> sea raw half walnut cloud garlic cycle diesel provide rebuild once key
+
+   bip39.generateMnemonic(strength, rng, wordlist)
+
+      Generate a mnemonic phrase with the specified strength (in
+      bits).
+
+      Arguments:
+         * **strength** (**number**) -- The strength of the mnemonic
+           in bits.
+
+         * **rng** (**function**) -- The random number generator
+           function.
+
+         * **wordlist** (**Array.<string>**) -- The optional wordlist.
+
+      Throws:
+         **TypeError** -- If the strength is not divisible by 32.
+
+      Returns:
+         **string** -- The generated mnemonic phrase.
+
+      // Example
+      const mnemonic = generateMnemonic();
+      console.log(mnemonic)
+
+      >> gaze hole neither spring effort fringe kit neck girl lamp smart afraid
+
+   bip39.validateMnemonic(mnemonic, wordlist)
+
+      Validate a mnemonic phrase.
+
+      Arguments:
+         * **mnemonic** (**string**) -- The mnemonic phrase to
+           validate.
+
+         * **wordlist** (**Array.<string>**) -- The optional wordlist.
+
+      Returns:
+         **boolean** -- True if the mnemonic is valid, false
+         otherwise.
+
+      // Example
+      const mnemonic = 'invalid mnemonic';
+      const isValid = validateMnemonic(mnemonic);
+      console.log(isValid)
+
+      >> false
+
+   bip39.getDefaultWordlist()
+
+      Get the currently set default wordlist.
+
+      Throws:
+         **Error** -- If the default wordlist is not set.
+
+      Returns:
+         **string** -- The language code of the default wordlist.
+
+      // Example
+      const language = getDefaultWordlist();
+      console.log(language)
+
+      >> english
+
+
+Hierarchical Deterministic Node
+-------------------------------
+
+The HDNode class in js-moi-sdk represents a Hierarchical Deterministic
+(HD) Node used for cryptographic key generation and derivation. It
+follows the BIP-32 standard and allows the creation of hierarchical
+deterministic wallets. With HDNode, developers can generate and derive
+child keys, create private and public keys, derive MOI account
+addresses, and serialize/deserialize HDNode instances. It simplifies
+the management of multiple addresses and keys within a single wallet,
+enhancing security and organization.
+
+   A class representing a Hierarchical Deterministic (HD) Node used in
+   cryptographic key generation and derivation.
+
+   static HDNode.fromSeed(seed)
+
+      Generates an HDNode from a seed buffer.
+
+      Arguments:
+         * **seed** (**Buffer**) -- The seed buffer.
+
+      Throws:
+         **Error** -- If an error occurs during the HDNode generation.
+
+      // Example
+      const mnemonic = "behind wish visual father ...";
+      const seed = await mnemonicToSeed(mnemonic);
+      const hdNode = HDNode.fromSeed(seed);
+      console.log(hdNode)
+
+      >> HDNode
+
+   static HDNode.fromExtendedKey(extendedKey)
+
+      Generates an HDNode from an extended key.
+
+      Arguments:
+         * **extendedKey** (**string**) -- The extended key.
+
+      Throws:
+         **Error** -- If an error occurs during the HDNode generation.
+
+      // Example
+      const hdNode = HDNode.fromExtendedKey(...);
+      console.log(hdNode)
+
+      >> HDNode
+
+   HDNode.derivePath(path)
+
+      Derives a child HDNode from the current HDNode using the
+      specified path.
+
+      Arguments:
+         * **path** (**string**) -- The derivation path for the child
+           HDNode.
+
+      Throws:
+         **Error** -- If the HDNode is not initialized.
+
+      Returns:
+         **HDNode** -- The derived child HDNode.
+
+      // Example
+      const hdNode = HDNode.fromSeed(...);
+      const childHDNode = hdNode.derivePath("m/44'/7567'/0'/0/1");
+      console.log(childHDNode)
+
+      >> HDNode
+
+   HDNode.deriveChild(index)
+
+      Derives a child HDNode from the current HDNode using the
+      specified index.
+
+      Arguments:
+         * **index** (**number**) -- The child index.
+
+      Throws:
+         **Error** -- If the HDNode is not initialized.
+
+      Returns:
+         **HDNode** -- The derived child HDNode.
+
+      // Example
+      const hdNode = HDNode.fromSeed(...);
+      const childHDNode = hdNode.deriveChild(1);
+      console.log(childHDNode)
+
+      >> HDNode
+
+   HDNode.publicKey()
+
+      Retrieves the public key associated with the HDNode.
+
+      Throws:
+         **Error** -- If the HDNode is not initialized.
+
+      Returns:
+         **Buffer** -- The public key.
+
+      // Example
+      const hdNode = HDNode.fromSeed(...);
+      const publicKey = hdNode.publicKey();
+      console.log(publicKey)
+
+      >> Buffer
+
+   HDNode.privateKey()
+
+      Retrieves the private key associated with the HDNode.
+
+      Throws:
+         **Error** -- If the HDNode is not initialized or private key
+         is not available.
+
+      Returns:
+         **Buffer** -- The private key.
+
+      // Example
+      const hdNode = HDNode.fromSeed(...);
+      const privateKey = hdNode.privateKey();
+      console.log(privateKey)
+
+      >> Buffer
+
+
+Hierarchical Deterministic Wallet
+---------------------------------
+
+The Wallet module extends the functionality of the Signer class,
+enhancing the management and interaction with MOI accounts. By
+extending the signer class, the wallet module inherits and adds
+additional features that simplify the process of handling
+cryptographic signing operations. Moreover, the wallet module supports
+Hierarchical Deterministic (HD) wallets, allowing users to generate
+master seeds, derive child keys, and organize multiple accounts within
+a single wallet. With the extended functionality of the signer class
+in the wallet module, users can seamlessly manage tasks such as
+checking nonce, sending interactions, and interacting with logic
+objects, providing a streamlined experience for MOI applications.
+
+
+Types
+~~~~~
+
+**Keystore**
+
+The "Keystore" interface represents a keystore object. It has the
+following properties:
+
+* "cipher" - "string": The cipher used for encryption.
+
+* "ciphertext" - "string": The encrypted ciphertext.
+
+* "cipherparams" - "object": Parameters for the cipher, containing the
+  following property:
+
+  * "IV" - "string": The initialization vector used for encryption.
+
+* "kdf" - "string": The key derivation function used.
+
+* "kdfparams" - "object": Parameters for the key derivation function,
+  containing the following properties:
+
+  * "dklen" - "number": The length of the derived key.
+
+  * "n" - "number": The iteration count.
+
+  * "p" - "number": The parallelization factor.
+
+  * "r" - "number": The block size.
+
+  * "salt" - "string": The salt value.
+
+* "mac" - "string": The message authentication code.
+
+
+Wallet
+~~~~~~
+
+   A class representing a Hierarchical Deterministic Wallet that can
+   sign interactions and manage accounts.
+
+   A wallet is always initialized for a specific account. Additional
+   keys belonging to the same account can be registered via "addKey".
+   All registered keys contribute signatures when "signInteraction" is
+   called, enabling multisig interactions.
+
+      // Example
+      const mnemonic = "hollow appear story text start mask salt social child ...";
+
+      const wallet = await Wallet.fromMnemonic(mnemonic);
+
+   * Create a wallet instance from private key
+
+           const privateKey = "0x...";
+
+           const wallet = new Wallet(privateKey, CURVE.SECP256K1);
+
+   * Create a wallet instance from a mnemonic
+
+           const mnemonic = "hollow appear story text start mask salt social child ...";
+
+           const wallet = await Wallet.fromMnemonic(mnemonic);
+
+   * Create a wallet instance from JSON keystore
+
+           const keystore = `{
+               "cipher": "aes-128-ctr",
+               "ciphertext": "...",
+               "cipherparams": {
+                   "IV": "..."
+               },
+               "kdf": "scrypt",
+               "kdfparams": {
+                   "n": 4096,
+                   "r": 8,
+                   "p": 1,
+                   "dklen": 32,
+                   "salt": "..."
+               },
+               "mac": "..."
+           }`;
+           const password = "YOUR_PASSWORD_HERE";
+
+           const wallet = await Wallet.fromKeystore(keystore, password);
+
+   * Create a wallet instance from a random mnemonic
+
+           const wallet = await Wallet.createRandom();
+
+   * "address" - "readonly" "string" : The address of the wallet.
+
+      console.log(wallet.address);
+      >> "0x87925..."
+
+   * "publicKey" - "readonly" "string": The public key of the sender
+     key (key at "key_index").
+
+      console.log(wallet.publicKey);
+      >> "038792..."
+
+   * "privateKey" - "readonly" "string": The private key of the sender
+     key (key at "key_index").
+
+      console.log(wallet.privateKey);
+      >> "0x87925..."
+
+   * "mnemonic" - "readonly" "string": The mnemonic of the wallet.
+
+      console.log(wallet.mnemonic);
+      >> "hollow appear story text start mask salt social child ..."
+
+   * "curve" - "readonly" "string": The curve of the wallet.
+
+      console.log(wallet.curve);
+      >> "secp256k1"
+
+   Wallet.sign(message, sigAlgo)
+
+      Signs a message using the sender key's private key and the
+      specified signature algorithm.
+
+      Arguments:
+         * **message** (**Uint8Array**) -- The message to sign as a
+           Uint8Array.
+
+         * **sigAlgo** (**SigType**) -- The signature algorithm to
+           use.
+
+      Throws:
+         **Error** -- if the signature type is unsupported or
+         undefined, or if there is an error during signing.
+
+      Returns:
+         **string** -- The signature as a string.
+
+   Signs a message using the specified key. The "keyId" must be
+   registered on the wallet via "addKey".
+
+   **Example**
+
+      const message = "Hello, MOI";
+      const algo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+      const keyId = await wallet.getKeyId();
+
+      const signature = await wallet.sign(Buffer.from(message), keyId, algo);
+      >>"0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee..."
+
+   Wallet.signInteraction(ixObject)
+
+      Signs an interaction object using all registered keys on this
+      wallet. Each key produces its own signature entry, enabling
+      multisig interactions. The interaction object is serialized into
+      POLO bytes before signing.
+
+      Arguments:
+         * **ixObject** (**InteractionObject**) -- The interaction
+           object to sign.
+
+      Throws:
+         **Error** -- if there is an error during signing or
+         serialization.
+
+      Returns:
+         **InteractionRequest** -- The signed interaction request
+         containing the serialized interaction object and all
+         signatures.
+
+   Signs an interaction using all registered keys. Each key produces
+   its own signature entry in the response. The sender key
+   ("key_index") must be registered or an error is thrown before
+   signing.
+
+      const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
+      const interaction = {
+          sender: { id: address, key_id: 0, sequence: 0 },
+          fuel_price: 1,
+          fuel_limit: 200,
+          ix_operations: [
+              {
+                  type: OpType.ASSET_CREATE,
+                  payload: {
+                      standard: AssetStandard.MAS0,
+                      symbol: "SIG",
+                      supply: 1248577
+                  }
+              }
+          ]
+      }
+      const sigAlgo = wallet.signingAlgorithms["ecdsa_secp256k1"];
+      const signedIxn = await wallet.signInteraction(interaction, sigAlgo);
+      console.log(signedIxn)
+
+      // Output
+      /*
+          {
+              ix_args: '0e9f02...',
+              signatures: '...'   // POLO-encoded array, one entry per registered key
+          }
+      */
+
+   Wallet.addKey(keyId, publicKey, privateKey)
+
+      Adds a key to the wallet. All keys registered on this wallet
+      belong to the same participant and will each contribute a
+      signature when *signInteraction* is called, satisfying multisig
+      threshold requirements.
+
+      Arguments:
+         * **keyId** (**number**) -- The key's position in the
+           participant's key list.
+
+         * **publicKey** (**string**) -- The public key as a hex
+           string.
+
+         * **privateKey** (**string**) -- The private key as a hex
+           string.
+
+      Returns:
+         **Wallet** -- The current wallet instance for chaining.
+
+   Registers an additional key for this participant. All registered
+   keys will sign the interaction when "signInteraction" is called.
+
+      // Single key (default)
+      const wallet = await Wallet.fromMnemonic(mnemonic);
+
+      // Add more keys for multisig
+      wallet.addKey(1, pubKey1, privKey1)
+            .addKey(2, pubKey2, privKey2);
+
+   Wallet.setKeyId(keyId)
+
+      Updates the sender key. The key must already be registered via
+      *addKey*. The sender key is used as *sender.key_id* in
+      interactions and must always be present in the signatures.
+
+      Arguments:
+         * **keyId** (**number**) -- The key ID to set as the sender
+           key.
+
+      Throws:
+         **Error** -- if the key is not registered on this wallet.
+
+   Updates which key is the sender key. The key must already be
+   registered via "addKey".
+
+      wallet.addKey(1, pubKey1, privKey1);
+      wallet.setKeyId(1); // interactions will now use key 1 as sender
+
+   Wallet.getKeys()
+
+      Returns the list of keys currently registered on this wallet.
+
+      Returns:
+   Returns the list of key IDs currently registered on the wallet.
+
+      wallet.addKey(1, pubKey1, privKey1).addKey(2, pubKey2, privKey2);
+      console.log(wallet.getKeys());
+      >> [0, 1, 2]
+
+   Wallet.removeKey(keyId)
+
+      Removes a key from the wallet.
+
+      Arguments:
+         * **keyId** (**number**) -- The key ID to remove.
+
+      Throws:
+         **Error** -- if attempting to remove the sender key
+         (*key_index*), as it is required for signing.
+
+      Returns:
+         **Wallet** -- The current wallet instance for chaining.
+
+   Removes a key from the wallet. Throws if the key is the current
+   sender key.
+
+      wallet.removeKey(2); // removes key 2
+
+      // To remove the sender key, switch to another key first
+      wallet.setKeyId(1);
+      wallet.removeKey(0);
+
+   static Wallet.fromMnemonic(mnemonic, path, wordlist)
+
+      Initializes the wallet from a provided mnemonic.
+
+      Arguments:
+         * **mnemonic** (**string**) -- The mnemonic to initialize the
+           wallet with.
+
+         * **path** (**string|undefined**) -- The derivation path to
+           use for key generation. (optional)
+
+         * **wordlist** (**Array.<string>|undefined**) -- The wordlist
+           to use for mnemonic generation. (optional)
+
+      Throws:
+         **Error** -- if there is an error during initialization.
+
+      Returns:
+         **Promise.<Wallet>** -- a promise that resolves to a *Wallet*
+         instance.
+
+      Example:
+
+         // Initializing a wallet from mnemonic
+         const mnemonic = "hollow appear story text start mask salt social child ..."
+         const wallet = await Wallet.fromMnemonic(mnemonic);
+
+      Example:
+
+         // Initializing a wallet from mnemonic with custom path
+         const mnemonic = "hollow appear story text start mask salt social child ...";
+         const path = "m/44'/60'/0'/0/0";
+         const wallet = await Wallet.fromMnemonic(mnemonic, path);
+
+   static Wallet.fromMnemonicSync(mnemonic, path, wordlist)
+
+      Initializes the wallet from a provided mnemonic synchronously.
+
+      Arguments:
+         * **mnemonic** (**string**) -- The mnemonic to initialize the
+           wallet with.
+
+         * **path** (**string|undefined**) -- The derivation path to
+           use for key generation. (optional)
+
+         * **wordlist** (**Array.<string>|undefined**) -- The wordlist
+           to use for mnemonic generation. (optional)
+
+      Throws:
+         **Error** -- if there is an error during initialization.
+
+      Returns:
+         **Promise.<Wallet>** -- a promise that resolves to a *Wallet*
+         instance.
+
+      Example:
+
+         // Initializing a wallet from mnemonic
+         const mnemonic = "hollow appear story text start mask salt social child ..."
+         const wallet = Wallet.fromMnemonicSync();
+
+      Example:
+
+         // Initializing a wallet from mnemonic with custom path
+         const mnemonic = "hollow appear story text start mask salt social child ...";
+         const path = "m/44'/60'/0'/0/0";
+         const wallet = Wallet.fromMnemonicSync(mnemonic, path);
+
+   static Wallet.createRandom()
+
+      Generates a random mnemonic and initializes the wallet from it.
+
+      Throws:
+         **Error** -- if there is an error generating the random
+         mnemonic.
+
+      Returns:
+         **Promise.<Wallet>** -- a promise that resolves to a *Wallet*
+         instance.
+
+   static Wallet.createRandomSync()
+
+      Generates a random mnemonic and initializes the wallet from it.
+
+      Throws:
+         **Error** -- if there is an error generating the random
+         mnemonic.
+
+      Returns:
+         **Wallet** -- a instance of *Wallet*.
+
+
+Identifier
+----------
+
+Identifiers are unique values used to reference and interact with
+different types of accounts on the MOI network. Every account—whether
+it represents a participant, asset, or logic—is uniquely identified
+and addressable using its corresponding identifier.
+
+
+Participant ID
+~~~~~~~~~~~~~~
+
+A Participant ID uniquely identifies a participant account on the MOI
+network. It represents an externally owned account (EOA) that can hold
+assets, initiate interactions, pay fuel costs, and sign messages or
+interactions using a signer.
+
+Participant IDs are typically derived from public keys and are
+controlled by private keys managed through wallets and signers.
+
+**Example**
+
+   0x000000001ec28dabfc3e4ac4dfc2084b45785b5e9cf1287b63a4f46900000000
+
+
+Asset ID
+~~~~~~~~
+
+An Asset ID uniquely identifies an asset account in the MOI network.
+Each asset exists as its own account with independent state and logic
+defined by the MOI protocol.
+
+Asset IDs are used to reference assets during operations such as
+creation, transfer, minting, and burning, and to query balances held
+by participant accounts.
+
+**Example**
+
+   0x108000004cd973c4eb83cdb8870c0de209736270491b7acc99873da100000000
+
+
+Logic ID
+~~~~~~~~
+
+A Logic ID uniquely identifies a logic account deployed on the MOI
+network. Logic accounts store executable programs along with their
+state and exposed routines.
+
+Logic IDs are used when invoking logic methods, querying logic state,
+or interacting with decentralized applications built on MOI.
+
+**Example**
+
+   0x1003ffffb9b7c1b6a7c13ba64db5c93c5135f2ba3cfc70ec7575a52f00000000
+
+
+Account Keys
+~~~~~~~~~~~~
+
+Account keys are cryptographic keys associated with MOI accounts and
+are used to establish ownership, authorization, and identity. These
+keys enable secure signing of interactions and messages and ensure
+that only authorized entities can mutate account state.
+
+In the js-moi-sdk, account keys are typically derived and managed
+using wallets and exposed through signers, abstracting low-level
+cryptographic operations from application developers.
+
+---
+# Interactions
+URL: https://js-moi-sdk.docs.moi.technology/interactions
+Description: Create, sign, and send MOI interactions with js-moi-sdk - transfers, asset creation, logic deploy and invoke, with complete API reference and examples.
+
+Interactions
+************
+
+
+Overview
+========
+
+The Interactions package provides high-level abstractions to construct
+and send **participant** and **account-related interactions** in the
+MOI protocol.
+
+These interactions are essential for managing identity, access
+control, and account configuration within the decentralized MOI
+ecosystem.
+
+This package offers a set of structured builder classes that help
+developers create valid, signed transactions with minimal boilerplate.
+Each interaction is represented by an "InteractionContext" that
+defines the operation type, payload, participants, and signer.
+
+======================================================================
+
+
+Core Classes
+============
+
+
+Account Management
+------------------
+
+
+ParticipantCreate
+~~~~~~~~~~~~~~~~~
+
+The **ParticipantCreate** class is responsible for creating new
+participants within the MOI network. A participant can represent a
+user, organization, or entity that interacts with assets and logic
+instances.
+
+This builder helps define the participant’s unique ID, attach
+cryptographic keys, and optionally include an asset payload for
+initial value assignment.
+
+**Key Responsibilities:**
+
+* Initialize a new participant ID
+
+* Add one or more cryptographic keys with configurable weights
+
+* Define asset payloads (e.g: token allocations)
+
+* Construct and send the participant creation request
+
+**Example:**
+
+   const participant = new ParticipantCreate(wallet);
+
+   const response = await participant
+       .id("0x000000004678e9f5bf2f66362ef5367fbc72efe7b419a5e7d851f57b00000000")
+       .addKey(
+           "0x00000000513b40a069905a1b05bd28d8338ad4a2eff419d7972be75900000000",
+           1000,
+           0
+       )
+       .value(
+           KMOI_ASSET_ID,
+           "0x00000000513b40a069905a1b05bd28d8338ad4a2eff419d7972be75900000000",
+           5000
+       )
+       .send();
+
+   console.log("Hash:", response.hash);
+
+   const receipt = await response.wait();
+   console.log("Receipt:", receipt);
+
+
+AccountConfigure
+~~~~~~~~~~~~~~~~
+
+The **AccountConfigure** class allows you to modify the key
+configuration of an existing account. It supports both **adding new
+keys** and **revoking old ones**, enabling dynamic control over
+account authorization and key rotation.
+
+**Key Responsibilities:**
+
+* Add new keys with specific weights and signature algorithms
+
+* Revoke existing keys by their IDs
+
+* Build and send the account configuration interaction
+
+**Example:**
+
+   const account = new AccountConfigure(wallet);
+
+   const response = await account
+       .addKey(
+           "0x000000004678e9f5bf2f66362ef5367fbc72efe7b419a5e7d851f57b00000000",
+           1000
+       )
+       .send();
+
+   console.log("Hash:", response.hash);
+
+   const receipt = await response.wait();
+   console.log("Receipt:", receipt);
+
+
+AccountInherit
+~~~~~~~~~~~~~~
+
+The **AccountInherit** class handles inheritance operations between
+accounts on the MOI network. It enables one account to inherit
+ownership or value from another through a controlled, logic-based
+transfer process.
+
+**Key Responsibilities:**
+
+* Set the target account to inherit from
+
+* Attach an asset payload defining transfer details
+
+* Specify a sub-account index for hierarchical inheritance
+
+* Construct and send the inheritance interaction
+
+**Example:**
+
+   const account = new AccountInherit(wallet);
+
+   const response = await account
+       .index(0)
+       .target(logicId)
+       .value(
+           KMOI_ASSET_ID,
+           "0x00000000513b40a069905a1b05bd28d8338ad4a2eff419d7972be75900000000",
+           5000
+       )
+       .send();
+
+   console.log("Hash:", response.hash);
+
+   const receipt = await response.wait();
+   console.log("Receipt:", receipt);
+
+======================================================================
+
+
+Asset Management
+----------------
+
+This module provides classes and utilities for creating, managing, and
+interacting with on-chain assets within the MOI framework. It defines
+three main components:
+
+* "AssetFactory" – Responsible for asset creation.
+
+* "AssetDriver" – Provides a driver abstraction for asset logic
+  execution.
+
+* "MAS0AssetLogic" – Implements the standard MAS0 asset logic and
+  operations such as mint, burn, and transfer.
+
+
+AssetFactory
+~~~~~~~~~~~~
+
+class AssetFactory()
+
+   The "AssetFactory" class is responsible for **deploying custom
+   (MASX) asset logic** on the MOI network - assets that ship their
+   own client-supplied manifest. It defines the static "create" method
+   which constructs an "InteractionContext" for asset creation
+   operations.
+
+   **Method Summary**
+
+   AssetFactory.static create(signer, symbol, supply, manager, enableEvents, manifest, callsite, ...calldata)
+
+      Creates a new custom (MASX) asset creation interaction context.
+
+      Arguments:
+         * **signer** (*Signer*) -- The signer instance responsible
+           for authorizing the asset creation.
+
+         * **symbol** (*str*) -- The symbol or shorthand name of the
+           asset.
+
+         * **supply** (*int | bigint*) -- The total maximum supply of
+           the asset.
+
+         * **manager** (*str*) -- The manager or owner address (in Hex
+           format).
+
+         * **enableEvents** (*bool*) -- Whether to enable event
+           emission for the asset.
+
+         * **manifest** (*LogicManifest.Manifest*) -- Logic manifest
+           for the custom asset logic being deployed.
+
+         * **callsite** (*str*) -- (Optional) Routine name in the
+           manifest corresponding to the deploy logic. Required if the
+           manifest defines any deploy routine at all - only omit it
+           for a manifest with none.
+
+         * **calldata** (*list*) -- (Optional) Additional
+           initialization arguments for the deploy routine, optionally
+           ending with a "RoutineOption".
+
+      Returns:
+         An "InteractionContext" configured for asset creation.
+
+      Return type:
+         InteractionContext<OpType.ASSET_CREATE>
+
+      Throws:
+         If "callsite" is omitted but "manifest" defines one or more
+         deploy routines, if no deploy routine in "manifest" matches a
+         given "callsite", or if required calldata arguments are
+         missing.
+
+      **Logic**
+
+      1. Builds an "AssetCreatePayload" containing "symbol",
+         "max_supply", "standard" (always "AssetStandard.MASX"),
+         "dimension" (default 0), "enable_events", and "manager"
+         (converted to Hex).
+
+      2. **``callsite`` is only optional when the manifest has nothing
+         to call.** Mirrors the blockchain's "DeployLogic": a deployer
+         call is skipped entirely only if the manifest defines *no*
+         deploy routine at all. If it defines one or more, "callsite"
+         is required to pick one - an omitted callsite is rejected the
+         same as a mismatched one. When a "callsite" is given, finds
+         the matching deploy routine, validates the calldata argument
+         count against it, then encodes the manifest and deploy
+         calldata into "logic_payload".
+
+      3. **Bundles a funding transfer automatically.** A brand-new
+         asset account self-pays for its own creation-time storage
+         cost, and a fresh account holds no KMOI. "create()" derives
+         the new asset's id ("deriveAssetId()") and bundles a second
+         "ASSET_INVOKE" "Transfer" op funding it, in the same
+         interaction - without this the create reverts. The funded
+         amount defaults to "DEFAULT_STORAGE_FUND"; override it by
+         passing a "RoutineOption" with "storageFund" set as the last
+         "calldata" argument.
+
+      4. Returns an "InteractionContext" initialized for
+         "ASSET_CREATE".
+
+      **Usage Example - plain native asset (the common case)**
+
+         // Native standard - use MAS0AssetLogic, not AssetFactory (no manifest, node uses its own built-in one).
+         const ctx = MAS0AssetLogic.create(signer, "GOLD", 1000000n, managerAddress, true);
+         const response = await ctx.send();
+
+      **Usage Example - custom (MASX) asset with your own logic**
+
+         const ctx = AssetFactory.create(
+              signer,
+              "GOLD",
+              1000000n,
+              managerAddress,
+              true,
+              manifest,
+              callsite,
+              1000, // calldata arg 1
+              "JOHN" // calldata arg 2
+         );
+
+         const response = await ctx.send();
+
+      **Usage Example - overriding the funding amount**
+
+         import { createRoutineOption } from "js-moi-sdk";
+
+         const ctx = AssetFactory.create(
+              signer, "GOLD", 1000000n, managerAddress, true,
+              manifest, callsite, 1000, "JOHN",
+              createRoutineOption({ storageFund: 50000 })
+         );
+
+         const response = await ctx.send();
+
+
+AssetDriver
+~~~~~~~~~~~
+
+class AssetDriver()
+
+   The "AssetDriver" class extends "LogicDriver" and represents a
+   **driver interface** for interacting with a deployed custom asset
+   logic.
+
+   **Constructor**
+
+   AssetDriver.constructor(assetId, manifest, signer)
+
+      Initializes a new "AssetDriver" instance.
+
+      Arguments:
+         * **assetId** (*str*) -- The unique identifier (asset ID) of
+           the asset.
+
+         * **manifest** (*LogicManifest.Manifest*) -- The logic
+           manifest associated with the asset.
+
+         * **signer** (*Signer*) -- The signer responsible for
+           authorization.
+
+      **Logic**
+
+      The constructor simply calls the base "LogicDriver" constructor
+      with the provided parameters, enabling interaction with the
+      deployed asset logic.
+
+      **Usage Example**
+
+         const driver = new AssetDriver(assetId, manifest, signer);
+         const response = driver.routines.mint(beneficiary, 5000).send();
+
+
+MAS Asset Standards
+~~~~~~~~~~~~~~~~~~~
+
+The MOI Asset Standards (MAS) define a series of progressively capable
+asset logic specifications on the MOI network. Each standard builds on
+the previous one, enabling developers to choose the appropriate level
+of functionality and complexity for their asset use case.
+
+
+MAS0AssetLogic
+~~~~~~~~~~~~~~
+
+MAS0 defines the standard contract for fungible assets, where all
+units belong to a single token ID and are fully interchangeable. It
+supports minting, burning, transfers, approvals, lockups, and asset-
+level metadata, making it suitable for currencies and utility tokens.
+
+class MAS0AssetLogic()
+
+   Implements the standard **MAS0 asset logic**, which provides a set
+   of default routines for asset lifecycle management — including
+   minting, burning, transferring, approving, locking, and querying
+   balances.
+
+   **Constructor**
+
+   MAS0AssetLogic.constructor(assetId, signer)
+
+      Initializes a new "MAS0AssetLogic" instance.
+
+      Arguments:
+         * **assetId** (*str*) -- The asset ID to operate on.
+
+         * **signer** (*Signer*) -- The signer instance for
+           authorization.
+
+   **Static Methods**
+
+   MAS0AssetLogic.static async newAsset(signer, symbol, supply, manager, enableEvents, option)
+
+      Creates a new MAS0-standard asset on-chain, then returns an
+      instance of "MAS0AssetLogic" for interacting with it.
+
+      Arguments:
+         * **option** (*RoutineOption*) -- (Optional) Override
+           "storageFund" (defaults to "DEFAULT_STORAGE_FUND") to fund
+           the new asset's creation-time storage cost with.
+
+      Returns:
+         An instance of "MAS0AssetLogic"
+
+      Return type:
+         MAS0AssetLogic
+
+      **Example**
+
+         const gold = await MAS0AssetLogic.newAsset(
+             signer,
+             "GOLD",
+             1000000n,
+             managerAddress,
+             true
+         );
+
+   MAS0AssetLogic.static create(signer, symbol, supply, manager, enableEvents, option)
+
+      Builds an "InteractionContext" for creating a MAS0-standard
+      asset. Like "AssetFactory.create()", this automatically bundles
+      a funding transfer to the derived new asset id (funded at
+      "DEFAULT_STORAGE_FUND" by default, override via
+      "option.storageFund") - a fresh asset account self-pays for its
+      own creation-time storage cost and starts with no KMOI.
+
+      Arguments:
+         * **option** (*RoutineOption*) -- (Optional) Override
+           "storageFund" to fund the new asset with.
+
+      Returns:
+         InteractionContext<OpType.ASSET_CREATE>
+
+**MAS0 Operations**
+
+The following methods correspond to MAS0-standard asset operations.
+Each operation returns an "InteractionContext", which can be executed
+by calling ".send()".
+
+mint(beneficiary, amount)
+
+   Mints new asset units to the specified beneficiary.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+      * **amount** (*int | bigint*) -- Amount to mint.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.mint(beneficiary, 5000).send();
+
+burn(amount)
+
+   Burns a specified amount of the asset, reducing total supply.
+
+   Arguments:
+      * **amount** (*int | bigint*) -- Amount to burn.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.burn(1000).send();
+
+transfer(beneficiary, amount)
+
+   Transfers asset units to another account.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+      * **amount** (*int | bigint*) -- Amount to transfer.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.transfer(beneficiary, 2500).send();
+
+transferFrom(benefactor, beneficiary, amount)
+
+   Transfers asset units from a benefactor to a beneficiary (if
+   approved).
+
+   Arguments:
+      * **benefactor** (*str*) -- The participant id of the original
+        holder.
+
+      * **beneficiary** (*str*) -- The receiver participant id.
+
+      * **amount** (*int | bigint*) -- Amount to transfer.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.transferFrom(benefactor, beneficiary, 100000).send();
+
+approve(beneficiary, amount, expiresAt)
+
+   Grants spending permission to another account.
+
+   Arguments:
+      * **beneficiary** (*str*) -- The spender participant id.
+
+      * **amount** (*int | bigint*) -- Allowance amount.
+
+      * **expiresAt** (*int*) -- Expiration timestamp (UNIX time).
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.approve(beneficiary, 100000, 1765650600).send();
+
+revoke(beneficiary)
+
+   Revokes a previously approved allowance.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Account to revoke approval from.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.revoke(beneficiary).send();
+
+lockup(beneficiary, amount)
+
+   Locks up a specified amount of tokens under "SARGA_ADDRESS".
+
+   Arguments:
+      * **beneficiary** (*str*) -- Participant id of whose tokens are
+        being locked.
+
+      * **amount** (*int | bigint*) -- Amount to lock.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.lockup(beneficiary, 10000).send();
+
+release(benefactor, beneficiary, amount)
+
+   Releases locked-up tokens back to a beneficiary.
+
+   Arguments:
+      * **benefactor** (*str*) -- The original owner of the locked
+        tokens.
+
+      * **beneficiary** (*str*) -- The receiver of the released
+        tokens.
+
+      * **amount** (*int | bigint*) -- Amount to release.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.release(benefactor, beneficiary, 100).send();
+
+SetStaticMetadata(key, value)
+
+   Sets or updates a static metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.setStaticMetadata(key, value).send();
+
+SetDynamicMetadata(key, value)
+
+   Sets or updates a dynamic metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.setDynamicMetadata(key, value).send();
+
+**Readonly Routines**
+
+symbol()
+
+   Returns an interaction context for retrieving the asset symbol.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas0.symbol().call();
+
+balanceOf(id)
+
+   Retrieves the balance of a given account.
+
+   Arguments:
+      * **id** (*str*) -- The participant id to query.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const balance = await mas0.balanceOf(walletAddress).call();
+
+creator()
+
+   Returns an interaction context for retrieving the asset creator.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.creator().call();
+
+manager()
+
+   Returns an interaction context for retrieving the asset manager.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.manager().call();
+
+decimals()
+
+   Returns an interaction context for retrieving the asset decimals.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.decimals().call();
+
+maxSupply()
+
+   Returns an interaction context for retrieving the asset max supply.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.maxSupply().call();
+
+circulatingSupply()
+
+   Returns an interaction context for retrieving the asset circulating
+   supply.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.circulatingSupply().call();
+
+getStaticMetadata(key, value)
+
+   Retrieves the static metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.getStaticMetadata(key, value).send();
+
+getDynamicMetadata(key, value)
+
+   Retrieves the dynamic metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas0 = new MAS0AssetLogic(assetId, wallet);
+      const response = await mas0.getDynamicMetadata(key, value).send();
+
+
+MAS1AssetLogic
+~~~~~~~~~~~~~~
+
+MAS1 defines the standard contract for non-fungible assets, where each
+token has a unique token ID and a supply of one. It supports per-token
+ownership, transfers, approvals, lockups, and both asset-level and
+token-level metadata, making it suitable for collectibles and
+identity-like assets.
+
+class MAS1AssetLogic()
+
+   Implements the standard **MAS1 asset logic**, which provides a set
+   of default routines for asset lifecycle management — including
+   minting, burning, transferring, approving, locking, and querying
+   balances.
+
+   **Constructor**
+
+   MAS1AssetLogic.constructor(assetId, signer)
+
+      Initializes a new "MAS1AssetLogic" instance.
+
+      Arguments:
+         * **assetId** (*str*) -- The asset ID to operate on.
+
+         * **signer** (*Signer*) -- The signer instance for
+           authorization.
+
+   **Static Methods**
+
+   MAS1AssetLogic.static async newAsset(signer, symbol, manager, enableEvents, option)
+
+      Creates a new MAS1-standard asset on-chain, then returns an
+      instance of "MAS1AssetLogic" for interacting with it. MAS1 is
+      single-unit (NFT-like) - unlike MAS0/MAS2 there is no "supply"
+      parameter, "max_supply" is always 1.
+
+      Arguments:
+         * **option** (*RoutineOption*) -- (Optional) Override
+           "storageFund" (defaults to "DEFAULT_STORAGE_FUND") to fund
+           the new asset's creation-time storage cost with.
+
+      Returns:
+         An instance of "MAS1AssetLogic"
+
+      Return type:
+         MAS1AssetLogic
+
+      **Example**
+
+         const gold = await MAS1AssetLogic.newAsset(
+             signer,
+             "GOLD",
+             managerAddress,
+             true
+         );
+
+   MAS1AssetLogic.static create(signer, symbol, manager, enableEvents, option)
+
+      Builds an "InteractionContext" for creating a MAS1-standard
+      asset. Like "AssetFactory.create()", this automatically bundles
+      a funding transfer to the derived new asset id (funded at
+      "DEFAULT_STORAGE_FUND" by default, override via
+      "option.storageFund") - a fresh asset account self-pays for its
+      own creation-time storage cost and starts with no KMOI.
+
+      Arguments:
+         * **option** (*RoutineOption*) -- (Optional) Override
+           "storageFund" to fund the new asset with.
+
+      Returns:
+         InteractionContext<OpType.ASSET_CREATE>
+
+**MAS1 Operations**
+
+The following methods correspond to MAS1-standard asset operations.
+Each operation returns an "InteractionContext", which can be executed
+by calling ".send()".
+
+mint(beneficiary)
+
+   Mints new asset units to the specified beneficiary.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.mint(beneficiary).send();
+
+mintWithMetadata(beneficiary, staticMetadata)
+
+   Mints new asset units to the specified beneficiary.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+      * **static_metadata** (*record*) -- Static metadata to mint.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.mintWithMetadata(beneficiary, staticMetadata).send();
+
+burn(tokenId)
+
+   Burns a specified token, reducing total supply.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to burn.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.burn(tokenId).send();
+
+transfer(tokenId, beneficiary)
+
+   Transfers asset units to another account.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to transfer.
+
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.transfer(tokenId, beneficiary).send();
+
+transferFrom(tokenId, benefactor, beneficiary)
+
+   Transfers asset units from a benefactor to a beneficiary (if
+   approved).
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to transfer.
+
+      * **benefactor** (*str*) -- The participant id of the original
+        holder.
+
+      * **beneficiary** (*str*) -- The receiver participant id.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.transferFrom(tokenId, benefactor, beneficiary).send();
+
+approve(tokenId, beneficiary, expiresAt)
+
+   Grants spending permission to another account.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to approve.
+
+      * **beneficiary** (*str*) -- The spender participant id.
+
+      * **expiresAt** (*int*) -- Expiration timestamp (UNIX time).
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.approve(tokenId, beneficiary, 1765650600).send();
+
+revoke(tokenId, beneficiary)
+
+   Revokes a previously approved allowance.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to revoke.
+
+      * **beneficiary** (*str*) -- Account to revoke approval from.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.revoke(tokenId, beneficiary).send();
+
+lockup(tokenId, beneficiary)
+
+   Locks up a specified amount of tokens under "SARGA_ADDRESS".
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to lockup.
+
+      * **beneficiary** (*str*) -- Participant id of whose tokens are
+        being locked.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.lockup(tokenId, beneficiary).send();
+
+release(tokenId, benefactor, beneficiary)
+
+   Releases locked-up tokens back to a beneficiary.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to release.
+
+      * **benefactor** (*str*) -- The original owner of the locked
+        tokens.
+
+      * **beneficiary** (*str*) -- The receiver of the released
+        tokens.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.release(tokenId, benefactor, beneficiary).send();
+
+setStaticMetadata(key, value)
+
+   Sets or updates a static metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.setStaticMetadata(key, value).send();
+
+setDynamicMetadata(key, value)
+
+   Sets or updates a dynamic metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.setDynamicMetadata(key, value).send();
+
+setStaticTokenMetadata(tokenId, key, value)
+
+   Sets or updates a static token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to set token
+        metadata.
+
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.setStaticMetadata(tokenId, key, value).send();
+
+setDynamicTokenMetadata(tokenId, key, value)
+
+   Sets or updates a dynamic token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to set token
+        metadata.
+
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas1 = new MAS1AssetLogic(assetId, wallet);
+      const response = await mas1.setDynamicMetadata(tokenId, key, value).send();
+
+**Readonly Routines**
+
+symbol()
+
+   Returns an interaction context for retrieving the asset symbol.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.symbol().call();
+
+isOwner(tokenId, address)
+
+   Retrieves the balance of a given account.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- The token id.
+
+      * **address** (*str*) -- The participant address to query
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const balance = await mas1.isOwner(tokenId, walletAddress).call();
+
+creator()
+
+   Returns an interaction context for retrieving the asset creator.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.creator().call();
+
+manager()
+
+   Returns an interaction context for retrieving the asset manager.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas1.manager().call();
+
+getStaticMetadata(key)
+
+   Retrieves the static metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas0.getStaticMetadata(key, value).send();
+
+getDynamicMetadata(key)
+
+   Retrieves the dynamic metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas0.getDynamicMetadata(key, value).send();
+
+getStaticTokenMetadata(tokenId, key)
+
+   Retrieves the static token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- The token id.
+
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.getStaticMetadata(tokenId, key).send();
+
+getDynamicTokenMetadata(tokenId, key)
+
+   Retrieves the dynamic token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- The token id.
+
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.getDynamicMetadata(tokenId, key).send();
+
+
+MAS2AssetLogic
+~~~~~~~~~~~~~~
+
+MAS2 defines the standard contract for multi-token (semi-fungible)
+assets, where each token ID represents a distinct class with its own
+variable supply. It supports partial transfers, approvals, lockups,
+burns, and token-level metadata, making it suitable for batch-based,
+editioned, or class-based assets.
+
+class MAS2AssetLogic()
+
+   Implements the standard **MAS2 asset logic**, which provides a set
+   of default routines for asset lifecycle management — including
+   minting, burning, transferring, approving, locking, and querying
+   balances.
+
+   **Constructor**
+
+   MAS2AssetLogic.constructor(assetId, signer)
+
+      Initializes a new "MAS2AssetLogic" instance.
+
+      Arguments:
+         * **assetId** (*str*) -- The asset ID to operate on.
+
+         * **signer** (*Signer*) -- The signer instance for
+           authorization.
+
+   **Static Methods**
+
+   MAS2AssetLogic.static async newAsset(signer, symbol, supply, manager, enableEvents, option)
+
+      Creates a new MAS2-standard asset on-chain, then returns an
+      instance of "MAS2AssetLogic" for interacting with it.
+
+      Arguments:
+         * **option** (*RoutineOption*) -- (Optional) Override
+           "storageFund" (defaults to "DEFAULT_STORAGE_FUND") to fund
+           the new asset's creation-time storage cost with.
+
+      Returns:
+         An instance of "MAS2AssetLogic"
+
+      Return type:
+         MAS2AssetLogic
+
+      **Example**
+
+         const gold = await MAS2AssetLogic.newAsset(
+             signer,
+             "GOLD",
+             1000000n,
+             managerAddress,
+             true
+         );
+
+   MAS2AssetLogic.static create(signer, symbol, supply, manager, enableEvents, option)
+
+      Builds an "InteractionContext" for creating a MAS2-standard
+      asset. Like "AssetFactory.create()", this automatically bundles
+      a funding transfer to the derived new asset id (funded at
+      "DEFAULT_STORAGE_FUND" by default, override via
+      "option.storageFund") - a fresh asset account self-pays for its
+      own creation-time storage cost and starts with no KMOI.
+
+      Arguments:
+         * **option** (*RoutineOption*) -- (Optional) Override
+           "storageFund" to fund the new asset with.
+
+      Returns:
+         InteractionContext<OpType.ASSET_CREATE>
+
+**MAS2 Operations**
+
+The following methods correspond to MAS2-standard asset operations.
+Each operation returns an "InteractionContext", which can be executed
+by calling ".send()".
+
+mint(beneficiary)
+
+   Mints new asset units to the specified beneficiary.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.mint(beneficiary).send();
+
+mintWithMetadata(beneficiary, staticMetadata)
+
+   Mints new asset units to the specified beneficiary.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+      * **staticMetadata** (*record*) -- Static metadata to mint.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.mintWithMetadata(beneficiary, staticMetadata).send();
+
+burn(tokenId)
+
+   Burns a specified token, reducing total supply.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to burn.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.burn(tokenId).send();
+
+transfer(tokenId, beneficiary)
+
+   Transfers asset units to another account.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to transfer.
+
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.transfer(tokenId, beneficiary).send();
+
+transferFrom(tokenId, benefactor, beneficiary)
+
+   Transfers asset units from a benefactor to a beneficiary (if
+   approved).
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to transfer.
+
+      * **benefactor** (*str*) -- The participant id of the original
+        holder.
+
+      * **beneficiary** (*str*) -- The receiver participant id.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.transferFrom(tokenId, benefactor, beneficiary).send();
+
+approve(tokenId, beneficiary, expiresAt)
+
+   Grants spending permission to another account.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to approve.
+
+      * **beneficiary** (*str*) -- The spender participant id.
+
+      * **expiresAt** (*int*) -- Expiration timestamp (UNIX time).
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.approve(tokenId, beneficiary, 1765650600).send();
+
+revoke(tokenId, beneficiary)
+
+   Revokes a previously approved allowance.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to revoke.
+
+      * **beneficiary** (*str*) -- Account to revoke approval from.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.revoke(tokenId, beneficiary).send();
+
+lockup(tokenId, beneficiary)
+
+   Locks up a specified amount of tokens under "SARGA_ADDRESS".
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to lockup.
+
+      * **beneficiary** (*str*) -- Participant id of whose tokens are
+        being locked.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.lockup(tokenId, beneficiary).send();
+
+release(tokenId, benefactor, beneficiary)
+
+   Releases locked-up tokens back to a beneficiary.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to release.
+
+      * **benefactor** (*str*) -- The original owner of the locked
+        tokens.
+
+      * **beneficiary** (*str*) -- The receiver of the released
+        tokens.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.release(tokenId, benefactor, beneficiary).send();
+
+setStaticMetadata(key, value)
+
+   Sets or updates a static metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.setStaticMetadata(key, value).send();
+
+setDynamicMetadata(key, value)
+
+   Sets or updates a dynamic metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.setDynamicMetadata(key, value).send();
+
+setStaticTokenMetadata(tokenId, key, value)
+
+   Sets or updates a static token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to set token
+        metadata.
+
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.setStaticMetadata(tokenId, key, value).send();
+
+setDynamicTokenMetadata(tokenId, key, value)
+
+   Sets or updates a dynamic token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- Token id to set token
+        metadata.
+
+      * **key** (*str*) -- The metadata key.
+
+      * **value** (*str*) -- The metadata value.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const mas2 = new MAS2AssetLogic(assetId, wallet);
+      const response = await mas2.setDynamicMetadata(tokenId, key, value).send();
+
+**Readonly Routines**
+
+symbol()
+
+   Returns an interaction context for retrieving the asset symbol.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.symbol().call();
+
+isOwner(tokenId, address)
+
+   Retrieves the balance of a given account.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- The token id.
+
+      * **address** (*str*) -- The participant address to query
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const balance = await mas2.isOwner(tokenId, walletAddress).call();
+
+creator()
+
+   Returns an interaction context for retrieving the asset creator.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.creator().call();
+
+manager()
+
+   Returns an interaction context for retrieving the asset manager.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.manager().call();
+
+getStaticMetadata(tokenId, key)
+
+   Retrieves the static metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.getStaticMetadata(key).send();
+
+getDynamicMetadata(tokenId, key)
+
+   Retrieves the dynamic metadata entry for the asset.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.getDynamicMetadata(key).send();
+
+getStaticTokenMetadata(tokenId, key)
+
+   Retrieves the static token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- The token id.
+
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.getStaticMetadata(tokenId, key).send();
+
+getDynamicTokenMetadata(tokenId, key)
+
+   Retrieves the dynamic token metadata entry for the asset.
+
+   Arguments:
+      * **tokenId** (*int | bigint*) -- The token id.
+
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await mas2.getDynamicMetadata(tokenId, key).send();
+
+======================================================================
+
+
+Logic Management
+----------------
+
+The logic module in js-moi-sdk is a powerful component that simplifies
+the interaction with MOI logic objects. It provides a user-friendly
+interface for deploying, interacting with, and querying logic objects
+on the MOI network.
+
+With the logic module, the logic manifests can be easily deployed
+using logic factory. This includes the ability to encode and deploy
+logics with builder arguments.
+
+Once deployed, the module handles routine calls, interaction sending,
+and state queries, abstracting away complexities like parameter
+encoding, fuel and interaction signing.
+
+Integration with the wallet and signer modules ensures secure
+interaction signing and authorization. Users can choose from different
+signers, such as wallet-based signers, or custom signers.
+
+
+Types
+~~~~~
+
+**LogicIxRequest**
+
+The "LogicIxRequest" interface represents a request to deploy or
+execute a logic. It has the following properties:
+
+* "call" - "function": A function that facilitates the execution of an
+  logic interaction request, while maintaining the integrity of the
+  current state. It returns a promise that resolves to an
+  "InteractionCallResponse".
+
+* "send" - "function": A function that sends the logic interaction
+  request and returns a promise that resolves to an
+  "InteractionResponse".
+
+* "estimateFuel" - "function": A function that estimates the fuel
+  required for the interaction request and returns a promise.
+
+**Routine**
+
+The "Routine" interface represents a routine function. It has the
+following properties:
+
+* A function that can be called with an optional array of arguments
+  and returns a value.
+
+* "isMutable" - "function": A function that returns a boolean
+  indicating whether the routine is mutable.
+
+* "accepts" - "function": A function that returns an array of
+  "TypeField" representing the types of arguments accepted by the
+  routine, or "null" if no arguments are accepted.
+
+* "returns" - "function": A function that returns an array of
+  "TypeField" representing the types of values returned by the
+  routine, or "null" if no values are returned.
+
+**Routines**
+
+The "Routines" interface represents a collection of routines. It is an
+object with named properties where the property name is the routine
+name and the property value is a "Routine".
+
+**CallSite**
+
+The "CallSite" interface represents a callsite. It has the following
+properties:
+
+* "ptr" - "number": The pointer to the callsite.
+
+* "kind" - "string": The kind of the callsite.
+
+**MethodDef**
+
+The "MethodDef" interface represents a method definition. It has the
+following properties:
+
+* "ptr" - "number": The pointer to the method.
+
+* "class" - "string": The name of the class.
+
+
+Manifest Encoder
+~~~~~~~~~~~~~~~~
+
+The Manifest Encoder module enables the encoding and decoding of data
+according to the MOI Manifest specification. This specification
+defines the structure of routines, classes, methods, and state within
+logic object, allowing for seamless interaction with their properties.
+
+Through this module, developers can encode data in compliance with the
+expected format specified by the logic Manifest. This is particularly
+valuable when preparing data for invoking routines on logic object. By
+correctly encoding routine parameters according to the logic Manifest,
+developers can generate accurate input data that aligns with the logic
+objects's expectations.
+
+In addition, this facilitates the decoding of data received from the
+blockchain or logic objects. Developers can decode routine call
+results, and other Manifest-encoded data structures, enabling them to
+extract meaningful information. This capability greatly aids in the
+efficient processing and interpretation of data obtained from the MOI
+network.
+
+**Types**
+
+**LogicManifest**
+
+The "LogicManifest" module defines the schema for a logic manifest.
+
+   **EngineConfig**
+
+   The "EngineConfig" interface defines the configuration for the
+   logic engine. It has two properties:
+
+   * "kind" - "string": The type of logic engine.
+
+   * "flags" - "string[]": A list of flags.
+
+   **TypeField**
+
+   The "TypeField" interface defines a field type. It has three
+   properties:
+
+   * "slot" - "number": The slot number of the field.
+
+   * "label" - "string": The label or name of the field.
+
+   * "type" - "string": The type of the field.
+
+   **MethodField**
+
+   The "MethodField" interface defines a method field. It has two
+   properties:
+
+   * "ptr" - "number | bigint": The pointer value of the field.
+
+   * "code" - "number | bigint": The code value of the field.
+
+   **Class**
+
+   The "Class" interface defines a class within the logic manifest. It
+   has three properties:
+
+   * "name" - "string": The name of the class.
+
+   * "fields" - "TypeField[] | null": An optional array of fields
+     within the class.
+
+   * "methods" - "MethodField[] | null": An optional array of methods
+     within the class.
+
+   **State**
+
+   The "State" interface defines the state within the logic manifest.
+   It has two properties:
+
+   * "kind" - "string": The kind or type of the state.
+
+   * "fields" - "TypeField[]": An array of fields within the state.
+
+   **Constant**
+
+   The "Constant" interface defines a constant within the logic
+   manifest. It has two properties:
+
+   * "type" - "string": The type of the constant.
+
+   * "value" - "string": The value of the constant.
+
+   **Instructions**
+
+   The "Instructions" interface defines the instructions within the
+   logic manifest. It has three optional properties:
+
+   * "bin" - "number[] | null": An optional array of binary values.
+
+   * "hex" - "string": A hexadecimal representation of the
+     instructions (optional).
+
+   * "asm" - "string[] | null": An optional array of assembly
+     instructions.
+
+   **Routine**
+
+   The "Routine" interface defines a routine within the logic
+   manifest. It has five properties:
+
+   * "name" - "string": The name of the routine.
+
+   * "kind" - "string": The kind or type of the routine.
+
+   * "accepts" - "TypeField[] | null": An optional array of input
+     fields that the routine accepts.
+
+   * "returns" - "TypeField[] | null": An optional array of output
+     fields that the routine returns.
+
+   * "executes" - "Instructions": The instructions executed by the
+     routine.
+
+   * "catches" - "string[] | null": An optional array of exceptions
+     caught by the routine.
+
+   **Method**
+
+   The "Method" interface defines a method within a class in the logic
+   manifest. It has six properties:
+
+   * "name" - "string": The name of the method.
+
+   * "class" - "string": The name of the class the method belongs to.
+
+   * "accepts" - "TypeField[] | null": An optional array of input
+     fields that the method accepts.
+
+   * "returns" - "TypeField[] | null": An optional array of output
+     fields that the method returns.
+
+   * "executes" - "Instructions": The instructions executed by the
+     method.
+
+   * "catches" - "string[] | null": An optional array of exceptions
+     caught by the method.
+
+   **TypeDef**
+
+   The "TypeDef" represents a "string" type definition.
+
+   **Element**
+
+   The "Element" interface represents an element within the logic
+   manifest. It has four properties:
+
+   * "ptr" - "number": The pointer value of the element.
+
+   * "kind" - "string": The kind or type of the element.
+
+   * "deps" - "number[] | null": An optional array of dependencies for
+     the element.
+
+   * "data" - "State | Constant | TypeDef | Routine | Class | Method":
+     The data associated with the element.
+
+   **Manifest**
+
+   The "Manifest" interface represents the overall logic manifest. It
+   has three properties:
+
+   * "syntax" - "string": The syntax used in the manifest.
+
+   * "engine" - "EngineConfig": The configuration of the logic engine.
+
+   * "elements" - "Element[]": An array of elements within the
+     manifest.
+
+**Exception**
+
+The *Exception* interface defines an exception. It has three
+properties:
+
+* "class" - "string": The exception class.
+
+* "data" - "string": The exception message.
+
+* "trace" - "string[]": The stack trace of the exception.
+
+* "revert" - "boolean": Represents the interaction revert status.
+
+**PoloSchema**
+
+The *PoloSchema* interface defines a schema used by polo of
+serialization and deserialization. It has two properties:
+
+* "kind" - "string": The type or kind of the schema.
+
+* "fields" - "Record<string, any>": The fields within the schema. It
+  is a dictionary-like structure where keys are strings and values are
+  object (optional).
+
+**ManifestCoder**
+
+ManifestCoder is a class that provides encoding and decoding
+functionality for Manifest Call Encoder. It allows encoding manifests
+and arguments, as well as decoding output, exceptions and logic states
+based on both predefined and runtime schema.
+
+   // Example
+   import { ManifestCoder } from "js-moi-sdk";
+
+   const manifest = { ... }
+   const manifestCoder = new ManifestCoder(manifest);
+
+**Methods**
+
+static encodeManifest(manifest)
+
+   Encodes a manifest into a hexadecimal string.
+
+   This function supports encoding both JSON and YAML manifest
+   formats. If the input manifest is an object, it is assumed to be a
+   JSON manifest and is encoded using the *JsonManifestCoder*. If the
+   input manifest is a string, it is assumed to be a YAML manifest and
+   is encoded using the *YamlManifestCoder*.
+
+   Arguments:
+      * **manifest** -- The manifest to encode. It can be either a
+        string (YAML) or an object (JSON).
+
+   Throws:
+      Will throw an error if the manifest type is unsupported.
+
+   Returns:
+      The encoded manifest as a hexadecimal string prefixed with "0x".
+
+   // Example
+   const encodedManifest = ManifestCoder.encodeManifest(manifest)
+   console.log(encodedManifest)
+
+   >> "0x0e4f065...50000"
+
+static decodeManifest(manifest, format)
+
+   Decodes a given manifest in either JSON or YAML format.
+
+   Arguments:
+      * **manifest** (**string|Uint8Array**) -- The manifest data to
+        decode, provided as a string or Uint8Array.
+
+      * **format** (**ManifestCoderFormat**) -- The format of the
+        manifest, either JSON or YAML.
+
+   Throws:
+      **Error** --
+
+      * Throws an error if the format is unsupported.
+
+   Returns:
+      **LogicManifest.Manifest|string** -- - Returns a
+      *LogicManifest.Manifest* object if JSON format is used or a
+      string representation if YAML format is used.
+
+   // Example
+   const decodedManifest = ManifestCoder.decodeManifest(encodedManifest, ManifestFormat.JSON);
+   console.log(decodedManifest)
+
+   >> { syntax: 1, engine: { kind: "PISA", flags: [] }, elements: [...] }
+
+encodeArguments(routine, ...args)
+
+   Encodes the arguments for a specified routine into a hexadecimal
+   string.
+
+   Arguments:
+      * **routine** -- The name of the routine for which the arguments
+        are being encoded.
+
+      * **args** -- The arguments to be encoded, passed as a variadic
+        parameter.
+
+   Returns:
+      A hexadecimal string representing the encoded arguments.
+
+   // Example
+   const calldata = manifestCoder.encodeArguments("Seeder", "MOI", 100_000_000);
+
+   console.log(calldata)
+
+   >> "0x0d6f0665...d4f49"
+
+decodeArguments(routine, calldata)
+
+   Decodes the provided calldata into the expected arguments for a
+   given routine.
+
+   Arguments:
+      * **routine** (**string**) -- The name of the routine whose
+        arguments are to be decoded.
+
+      * **calldata** (**string**) -- The calldata to decode.
+
+   Returns:
+      **T|null** -- - The decoded arguments as an object of type T, or
+      null if the routine accepts no arguments.
+
+decodeOutput(routine, output)
+
+   Decodes the output of a routine.
+
+   Arguments:
+      * **routine** (**string**) -- The name of the routine whose
+        output is to be decoded.
+
+      * **output** (**string**) -- The output string to decode.
+
+   Returns:
+      **T|null** -- - The decoded output as type T, or null if the
+      output is invalid or the routine has no return schema.
+
+   // Example
+   const callsite = "BalanceOf";
+   const output = "0x0e1f0305f5e100";
+   const args = manifestCoder.decodeOutput(callsite, output);
+
+   console.log(decodedOutput);
+
+   >> { balance: 100000000 }
+
+static decodeException(error)
+
+   Decodes an exception thrown by a logic routine call. The exception
+   data is decoded using the predefined exception schema. Returns the
+   decoded exception object, or null if the error is empty.
+
+   Arguments:
+      * **error** (**string**) -- The error data to decode,
+        represented as a hexadecimal string prefixed with "0x".
+
+   Returns:
+      **Exception|null** -- The decoded exception object, or null if
+      the error is empty.
+
+   // Example
+   const error = "0x0e6f0666d104de04737472696e67696e73756666696369656e742062616c616e636520666f722073656e6465723f06e60172756e74696d652e726f6f742829726f7574696e652e5472616e736665722829205b3078635d202e2e2e205b307831623a205448524f57203078355d";
+
+   const exception = ManifestCoder.decodeException(error);
+
+   console.log(exception)
+
+   >> {
+           class: "string",
+           error: "insufficient balance for sender",
+           revert: false,
+           trace: [
+               "runtime.root()",
+               "routine.Transfer() [0xc] ... [0x1b: THROW 0x5]"
+           ],
+       }
+
+decodeEventOutput(event, logData)
+
+   Decodes a log data from an event emitted in a logic.
+
+   Arguments:
+      * **event** (**string**) -- The name of the event.
+
+      * **logData** (**string**) -- The POLO encoded log data to be
+        decoded.
+
+   Returns:
+      **T|null** -- The decoded event log data, or null if the log
+      data is empty.
+
+**Schema**
+
+Schema is a class that provides schema parsing functionality for
+encoding and decoding manifest, arguments, logic states and other data
+based on a predefined schema. It supports parsing fields and
+generating a schema for decoding purposes.
+
+   // Example
+   const manifest = { ... }
+   const elements = new Map();
+   const classDefs = new Map();
+
+   manifest.elements.forEach(element => {
+       elements.set(element.ptr, element);
+
+       if(element.kind === "class") {
+           classDefs.set(element.data.name, element.ptr);
+       }
+   })
+
+   const schema = new Schema(elements, classDefs);
+
+**Methods**
+
+parseFields(fields)
+
+   Parses an array of fields and generates the schema based on the
+   fields.
+
+   Arguments:
+      * **fields** (**Array.<LogicManifest.TypeField>**) -- The array
+        of fields.
+
+   Throws:
+      **Error** -- If the fields are invalid or contain unsupported
+      data types.
+
+   Returns:
+      **PoloSchema** -- The generated schema based on the fields.
+
+   // Example
+   const routine = manifest.elements.find(element =>
+       // BalanceOf is the name of a routine which is available in the manifest
+       element.data.name === "BalanceOf"
+   )
+   const fields = routine.data.accepts ? routine.data.accepts : [];
+   const routineSchema = schema.parseFields(fields)
+
+   console.log(routineSchema)
+
+   >> { kind: "struct", fields: { addr: { kind: "bytes" } } }
+
+
+Element Descriptor
+~~~~~~~~~~~~~~~~~~
+
+The ElementDescriptor class represents a descriptor for elements in
+the logic manifest.
+
+getStateMatrix()
+
+   Retrieves the state matrix associated with the ElementDescriptor.
+
+   Returns:
+      **ContextStateMatrix** -- The state matrix.
+
+getElements()
+
+   Retrieves the map of elements associated with the
+   ElementDescriptor.
+
+   Returns:
+      **Map.<number, LogicManifest.Element>** -- The elements map.
+
+getCallsites()
+
+   Retrieves the map of call sites associated with the
+   ElementDescriptor.
+
+   Returns:
+      **Map.<string, CallSite>** -- The call sites map.
+
+getClassDefs()
+
+   Retrieves the map of class definitions associated with the
+   ElementDescriptor.
+
+   Returns:
+      **Map.<string, number>** -- The class definitions map.
+
+getMethodDefs()
+
+   Retrieves the map of method definitions associated with the
+   ElementDescriptor.
+
+   Returns:
+      **Map.<string, MethodDef>** -- The method definitions map.
+
+getClassMethods(className)
+
+   Retrieves the methods of a class based on the given class name.
+
+   Arguments:
+      * **className** (**string**) -- The name of the class.
+
+   Throws:
+      **Error** -- if the class name is invalid.
+
+   Returns:
+      **Map.<string, LogicManifest.Method>** -- The methods of the
+      class.
+
+getRoutineElement(routineName)
+
+   Retrieves the element from the logic manifest based on the given
+   routine name.
+
+   Arguments:
+      * **routineName** (**string**) -- The name of the routine.
+
+   Throws:
+      **Error** -- if the routine name is invalid.
+
+   Returns:
+      **LogicManifest.Element** -- The routine element.
+
+getClassElement(className)
+
+   Retrieves the element from the logic manifest based on the given
+   class name.
+
+   Throws:
+      **Error** -- if the class name is invalid.
+
+   Returns:
+      **LogicManifest.Element** -- The class element.
+
+getMethodElement(methodName)
+
+   Retrieves the element from the logic manifest based on the given
+   method name.
+
+   Arguments:
+      * **methodName** (**string**) -- The name of the method.
+
+   Throws:
+      **Error** -- if the method name is invalid.
+
+   Returns:
+      **LogicManifest.Element** -- The method element.
+
+
+Logic Base
+~~~~~~~~~~
+
+The LogicBase is a abstract class extends the ElementDescriptor class
+and serves as a base class for logic-related operations. It defines
+common properties and abstract methods that subclasses should
+implement.
+
+LogicBase.connect(signer)
+
+   Connects a signer and updates the provider reference.
+
+   Arguments:
+      * **signer** (**Signer**) -- The signer instance to connect.
+
+
+Logic Descriptor
+~~~~~~~~~~~~~~~~
+
+The **LogicDescriptor** is a abstract class extends the **LogicBase**
+class and provides information about a logic.
+
+**Methods**
+
+LogicDescriptor.getLogicId()
+
+   Returns the logic id of the logic.
+
+   Returns:
+      **string** -- The logic id.
+
+LogicDescriptor.getEngine()
+
+   Returns the logic execution engine type.
+
+   Returns:
+      **EngineKind** -- The engine type.
+
+LogicDescriptor.getManifest()
+
+   Returns the logic manifest.
+
+   Returns:
+      **LogicManifest.Manifest** -- The logic manifest.
+
+LogicDescriptor.getEncodedManifest()
+
+   Returns the POLO encoded logic manifest.
+
+   Returns:
+      **string** -- The POLO encoded logic manifest.
+
+LogicDescriptor.isSealed()
+
+   Checks if the logic is sealed.
+
+   Returns:
+      **boolean** -- True if the logic is sealed, false otherwise.
+
+LogicDescriptor.isAssetLogic()
+
+   Checks if the logic represents an asset logic.
+
+   Returns:
+      **boolean** -- True if the logic is an representation of asset
+      logic, false otherwise.
+
+LogicDescriptor.allowsInteractions()
+
+   Checks if the logic allows interactions.
+
+   Returns:
+      **boolean** -- True if the logic allows interactions, false
+      otherwise.
+
+LogicDescriptor.isStateful()
+
+   Checks if the logic is stateful.
+
+   Returns:
+      **boolean** -- True if the logic is stateful, false otherwise.
+
+LogicDescriptor.hasLogicState()
+
+   Checks if the logic has logic state (*state logic:* in the
+   manifest).
+
+   Returns:
+      A tuple containing the pointer to the logic state and a flag
+      indicating if it exists.
+
+   Example:
+
+      const [ptr, exists] = logic.hasLogicState();
+
+LogicDescriptor.hasActorState()
+
+   Checks if the logic has actor state (*state actor:* in the
+   manifest).
+
+   Returns:
+      A tuple containing the pointer to the actor state and a flag
+      indicating if it exists.
+
+   Example:
+
+      const [ptr, exists] = logic.hasActorState();
+
+
+Logic Factory
+~~~~~~~~~~~~~
+
+The **LogicFactory** class provides a convenient way to deploy
+multiple instances of logic. This feature simplifies the deployment
+process, enhances code reusability, and supports the scalability and
+maintenance of decentralized applications on the MOI network.
+
+   // Example
+   const initWallet = async () => {
+       const mnemonic = "mother clarify push liquid ordinary social track ...";
+       const wallet = await Wallet.fromMnemonic(mnemonic);
+       const provider = new JsonRpcProvider("http://localhost:1600/");
+       wallet.connect(provider);
+
+       return wallet;
+   }
+
+   const manifest = { ... }
+   const wallet = await initWallet(manifest);
+   const logicFactory = new LogicFactory(manifest, wallet);
+
+**Methods**
+
+LogicFactory.getEncodedManifest()
+
+   Returns the POLO encoded manifest in hexadecimal format.
+
+   Returns:
+      **string** -- The encoded manifest.
+
+   const encodedManifest = logicFactory.getEncodedManifest();
+   console.log(encodedManifest);
+
+   >> 0x56b34f...
+
+LogicFactory.deploy(builderName, ...args)
+
+   Deploys a logic.
+
+   Arguments:
+      * **builderName** (**string**) -- The name of the builder
+        routine. Optional only if the manifest defines no deploy
+        routine at all - required to pick one otherwise.
+
+      * **args** (**Array.<any>**) -- Arguments for the builder
+        routine. (optional)
+
+   Throws:
+      **Error** -- If a builder name is required but omitted, the
+      builder routine is not found, or required arguments are missing.
+
+   Returns:
+      **LogicContext.<LogicOps>** -- The logic interaction context.
+
+"deploy()" returns a "LogicContext" (an "InteractionContext" for
+"OpType.LOGIC_DEPLOY") - call ".send()" on it to actually sign and
+broadcast.
+
+   import { LogicFactory } from "js-moi-sdk";
+   import { wallet } from "./wallet";
+
+   const factory = new LogicFactory(manifest, wallet);
+
+   const symbol = "MOI";
+   const supply = 1000000;
+
+   const response = await factory.deploy("Seed!", symbol, supply).send();
+   const receipt = await response.wait();
+   const result = await response.result();
+
+   console.log(result.logic_id); // 0x0800007d70c34ed6e...
+
+**Deploying automatically funds the new logic account.** A brand-new
+logic self-pays for its own creation-time storage cost, and a fresh
+account holds no KMOI - so "deploy()" predicts the logic's id
+("deriveLogicId()") and bundles a second "ASSET_INVOKE" "Transfer" op
+funding it, in the same interaction. This is unconditional and needs
+no setup on your part; the funded amount defaults to
+"DEFAULT_STORAGE_FUND" (from "js-moi-constants") and only needs
+overriding for a manifest whose deploy routine writes more than that
+default covers.
+
+If you wish to pass "fuelLimit", "fuelPrice", or override the funding
+amount, pass a "RoutineOption" (built with "createRoutineOption") as
+the last argument in the deploy call - a plain object here is silently
+treated as just another deploy argument, not options, since only a
+real "RoutineOption" instance is recognized.
+
+   import { LogicFactory, createRoutineOption } from "js-moi-sdk";
+   import { wallet } from "./wallet";
+
+   const factory = new LogicFactory(manifest, wallet);
+
+   const symbol = "MOI";
+   const supply = 1000000;
+   const option = createRoutineOption({
+       fuelPrice: 1,
+       fuelLimit: 6420,
+       storageFund: 50000, // override the default new-account funding amount
+   });
+
+   const response = await factory.deploy("Seed!", symbol, supply, option).send();
+   const receipt = await response.wait();
+   const result = await response.result();
+
+   console.log(result.logic_id); // 0x010000423d3233...
+
+
+Logic Driver
+~~~~~~~~~~~~
+
+The **LogicDriver** enables seamless interaction with MOI Logic by
+providing a user-friendly and intuitive interface. It allows
+developers to  easily interact with deployed logics, execute their
+routines, and retrieve their states. The interface abstracts away the
+complexities of encoding parameters, decoding response and making
+logic interaction more straightforward.
+
+**Variables**
+
+"routines" - This variable represents the set of routines defined
+within the logic manifest. Developers can easily invoke and execute
+these routines, which encapsulate specific functionalities and
+operations provided by the logic.
+
+Each mutating routine call returns an interaction context - call
+".send()" (or ".call()" for a read-only dry run) on it, same as
+"LogicFactory"'s "deploy()":
+
+   const logic = await getLogicDriver(logicId, wallet);
+
+   const response = await logic.routines.Transfer(amount, receiver).send();
+   const receipt = await response.wait();
+
+**Calling a routine that touches ANOTHER participant's storage needs
+that participant added as an explicit extra participant.** A routine
+like "TickAny(participant)" that mutates "participant"'s own
+ephemeral/actor storage (as opposed to the logic's own persistent
+state, or the caller's own storage) can't be resolved automatically -
+the SDK only knows to lock the logic account itself for a
+"LOGIC_INVOKE", since it has no way to see which other identifiers a
+routine's opaque calldata references. Without the extra participant,
+the call fails with "builtin.ReferenceNotFound: actor ... not found" -
+which looks like an access-policy denial, but isn't one; it's a
+locking problem, and it happens whether or not an access policy is
+even involved.
+
+   import { LockType } from "js-moi-sdk";
+
+   const logic = await getLogicDriver(logicId, invokerWallet);
+
+   // TickAny(participant) mutates `participant`'s own storage through this logic,
+   // so `participant` must be locked explicitly - the logic account alone isn't enough.
+   const response = await logic.routines.TickAny(participant).send({
+       participants: [{ id: participant, lock_type: LockType.MUTATE_LOCK }],
+   });
+
+The same applies to a read-only ".call()" against another
+participant's storage.
+
+"logicState" - The logic state variable provides access to state
+declared "state logic:" in the manifest - shared/global to the logic
+itself (not the caller). This state persists across different
+invocations and interactions, defining core attributes and long-term
+data.
+
+   It contains the following method:
+
+* "get"
+     This method retrieves a value from logic state using the storage
+     key. A builder object is passed to a callback to generate the
+     storage key. The builder object offers the following methods:
+
+     * "entity" - This method used to select the member of the logic
+       state.
+
+     * "length" - This method used to access length/size of *Array*,
+       *Varray* and, *Map*.
+
+     * "property" - This method used to access the property of map
+       using the passed key.
+
+     * "at" - This method used to access the element of *Array* and
+       *Varray* using the passed index.
+
+     * "field" - This method used to access the field of *Class* using
+       the passed field name.
+
+   // Example
+   const logic = await getLogicDriver(logicId, wallet);
+
+   const symbol = await logic.logicState.get(access => access.entity("symbol"));
+   console.log(symbol);
+
+   >> MOI
+
+   // Example: if you want to access size of the array/map
+   const logic = await getLogicDriver(logicId, wallet);
+
+   const length = await logic.logicState.get(access => access.entity("persons").length());
+   console.log(length);
+
+   >> 10
+
+   // Example: if you want to access the balance of the address from the map
+   const logic = await getLogicDriver(logicId, wallet);
+   const address = "0x035dcdaa46f9b8984803b1105d8f327aef97de58481a5d3fea447735cee28fdc";
+
+   const balance = await logic.logicState.get(access => access.entity("Balances").property(hexToBytes(address)));
+   console.log(balance);
+
+   >> 10000
+
+   // Example: if you want to field of the class
+   const logic = await getLogicDriver(logicId, wallet);
+
+   const name = await logic.logicState.get(access => access.entity("persons").field("name"));
+   console.log(name);
+
+   >> Alice
+
+   // Example: if you want to access the element of the array
+   const logic = await getLogicDriver(logicId, wallet);
+
+   const product = await logic.logicState.get(access => access.entity("Products").at(0));
+   console.log(name);
+
+   >> Chocolate
+
+"actorState" - The actor state variable provides access to state
+declared "state actor:" in the manifest - scoped per calling
+participant (not shared/global). This state reflects the calling
+participant's own state and can change frequently as interactions
+occur.
+
+   It contains the following method:
+
+* "get"
+     This method retrieves a value from actor state using the storage
+     key and participant address.
+
+     **Usage**: Similar to logic state, the get method takes a
+     callback function. In addition to that, it also requires a
+     participant address. The builder object within the callback
+     defines how to access the state, similar to logic state.
+
+   // Example
+   const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df"
+   const logic = await getLogicDriver(logicId, wallet);
+
+   const spendable = await logic.actorState.get(address, (access) =>
+       access.entity("Spendable")
+   );
+   console.log(spendable);
+
+   >> 10000
+
+**Functions**
+
+getLogicDriver(logicId, signer, options)
+
+   Returns a logic driver instance based on the given logic id.
+
+   Arguments:
+      * **logicId** (**string**) -- The logic id of the logic.
+
+      * **signer** (**Signer**) -- The signer instance for the logic
+        driver.
+
+      * **options** (**Options**) -- The custom tesseract options for
+        retrieving
+
+   Returns:
+      **Promise.<LogicDriver>** -- A promise that resolves to a
+      LogicDriver instance.
+
+   // Example
+   const initWallet = async () => {
+       const mnemonic = "mother clarify push liquid ordinary social track ...";
+       const wallet = await Wallet.fromMnemonic(mnemonic);
+       const provider = new JsonRpcProvider("http://localhost:1600/");
+
+       wallet.connect(provider);
+
+       return wallet;
+   }
+
+   const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+   const wallet = await initWallet();
+   const logicDriver = await getLogicDriver(logicId, wallet);
+
+createRoutineOption(option)
+
+   Creates a new RoutineOption instance with the given option object.
+
+   Arguments:
+      * **option** -- The option object used to create the
+        RoutineOption.
+
+   Returns:
+      A new RoutineOption instance.
+
+**Usage**
+
+**Example 1**: Calling a routine using the logic driver
+
+   import { getLogicDriver } from "js-moi-sdk";
+   import { wallet } from "./wallet";
+
+   const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+   const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+   // Get logic driver
+   const logic = await getLogicDriver(logicId, wallet);
+
+   // Call the logic routine
+   const { balance } = await logic.routines.BalanceOf(address);
+
+   console.log(balance); // 1000000
+
+**Example 2**: Retrieving from the persistent state of a logic
+
+   import { getLogicDriver } from "js-moi-sdk";
+   import { wallet } from "./wallet";
+
+   const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+   const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+   // Get logic driver
+   const logic = await getLogicDriver(logicId, wallet);
+
+   // Get the persistent state
+   const symbol = await logic.logicState.get(access => access.entity("symbol"));
+
+   console.log(symbol); // MOI
+
+**Example 3**: Executing a mutating routine call
+
+   import { getLogicDriver } from "js-moi-sdk";
+   import { wallet } from "./wallet";
+
+   const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+   const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+   // Get logic driver
+   const logic = await getLogicDriver(logicId, wallet);
+
+   // Execute a mutating routine call
+   const ix = await logic.routines.Transfer(address, 1000);
+   console.log(ix.hash); //  0x010000423d3233...
+
+   const receipt = await ix.wait();
+   console.log(receipt); // { ... }
+
+   // if you want to view the result of the logic interaction
+   // you can use the result() method
+
+   // for example
+   // const result = await ix.result(); // { ... }
+
+If you wish to externally pass *fuelLimit* or *fuelPrice*, pass the
+options as the last argument in the deploy call.
+
+   import { getLogicDriver } from "js-moi-sdk";
+   import { wallet } from "./wallet";
+
+   const logicId = "0x0800007d70c34ed6ec4384c75d469894052647a078b33ac0f08db0d3751c1fce29a49a";
+   const address = "0x996ab2197faa069202f83d7993f174e7a3635f3278d3745d6a9fe89d75b854df";
+
+   // Get logic driver
+   const logic = await getLogicDriver(logicId, wallet);
+
+   // Execute a mutating routine call
+   const option = createRoutineOption({
+       fuelPrice: 1,
+       fuelLimit: 6420,
+   });
+
+   const ix = await logic.routines.Transfer(address, 1000, option);
+   console.log(ix.hash); //  0x010000423d3233...
+
+   const receipt = await ix.wait();
+   console.log(receipt); // { ... }
+
+======================================================================
+
+
+Storage & Access Management
+---------------------------
+
+Logic and asset accounts pay per-byte rent for their on-chain storage.
+This module covers depositing/withdrawing that rent, and managing
+access policies that govern who may perform which actions on a
+resource you own.
+
+
+StorageDeposit
+~~~~~~~~~~~~~~
+
+The **StorageDeposit** class funds a logic or asset account's storage
+rent. Storage on MOI costs KMOI per byte; depositing converts KMOI
+into a byte allowance credited to a participant's account on that
+target.
+
+**Key Responsibilities:**
+
+* Set the target logic/asset account whose storage is being funded
+
+* Optionally credit a different participant (defaults to the signer)
+
+* Set the KMOI amount to spend
+
+* Build and send the deposit interaction
+
+**Example:**
+
+   const deposit = new StorageDeposit(wallet);
+
+   const response = await deposit
+       .target(logicId)
+       .amount(50000)
+       .send();
+
+   console.log("Hash:", response.hash);
+
+   const receipt = await response.wait();
+   console.log("Receipt:", receipt);
+
+
+StorageWithdraw
+~~~~~~~~~~~~~~~
+
+The **StorageWithdraw** class releases previously deposited, unused
+storage allowance on a logic/asset account back into KMOI.
+
+**Key Responsibilities:**
+
+* Set the target logic/asset account to withdraw from
+
+* Optionally specify how many bytes to release (omit to release
+  everything currently available)
+
+* Build and send the withdraw interaction
+
+**Example:**
+
+   const withdraw = new StorageWithdraw(wallet);
+
+   const response = await withdraw
+       .target(logicId)
+       .send();
+
+   console.log("Hash:", response.hash);
+
+   const receipt = await response.wait();
+   console.log("Receipt:", receipt);
+
+
+Access
+~~~~~~
+
+The **Access** class manages access policies — rules that govern who
+may perform which actions on a resource you own. A single builder
+handles creating, updating, and deleting policies, since a policy is
+always managed on the signer's own account.
+
+Only the "storage" resource kind is implemented on the network today.
+
+**Key Responsibilities:**
+
+* Name the resource a policy governs (".storage(resourceId)")
+
+* Set which actions the policy permits (".allow(...)")
+
+* Optionally restrict which callers/origins may invoke, and narrow the
+  policy to specific key prefixes
+
+* Create, update, or delete the policy
+
+**Example:**
+
+   const response = await new Access(wallet)
+       .storage(logicId)
+       .allow(AccessAction.STORAGE_MUTATE)
+       .caller(access.callers("0x00000000513b40a069905a1b05bd28d8338ad4a2eff419d7972be75900000000"))
+       .create()
+       .send();
+
+   console.log("Hash:", response.hash);
+
+   const receipt = await response.wait();
+   console.log("Receipt:", receipt);
+
+Deleting a policy only requires naming the resource:
+
+   const response = await new Access(wallet)
+       .storage(logicId)
+       .delete()
+       .send();
+
+   console.log("Hash:", response.hash);
+
+---
+# Utilities
+URL: https://js-moi-sdk.docs.moi.technology/utilities
+Description: js-moi-sdk utility functions for MOI development: encoding and decoding, address and identifier helpers, unit conversion, and byte-level tools.
+
+Utilities
+*********
+
+The utilities module offers a comprehensive set of tools and functions
+to simplify development process. This package encompasses various
+utility functions designed to enhance the overall development
+experience when working with MOI.
+
+The utilities package offers a range of features, including address
+validation, data format conversion and cryptographic operations. These
+features are designed to ensure accuracy, security, and convenience
+throughout the development process.
+
+
+Types
+=====
+
+**ContextDelta**
+
+The "ContextDelta" interface represents a context delta object. It has
+the following properties:
+
+* "role" - "number": The role of the participant.
+
+* "behavioural_nodes" - "string[] | null": An array of behavioural
+  nodes.
+
+* "random_nodes" - "string | null": An array of compute nodes.
+
+* "replaced_nodes" - "string[] | null": An array of trust nodes.
+
+**Participant**
+
+The "Participant" interface represents a participant object. It has
+the following properties:
+
+* "address" - "string": The address of the participant.
+
+* "height" - "string": The height of the participant.
+
+* "transitive_link" - "string": The transitive link of the
+  participant.
+
+* "prev_context" - "string": The previous context of the participant.
+
+* "latest_context" - "string": The latest context of the participant.
+
+* "context_delta" - "ContextDelta": The object representing the
+  context delta of the participant.
+
+* "state_delta" - "string": The state delta of the participant.
+
+**Operation**
+
+The "Operation" interface represents an individual operation within an
+interaction. It contains the following properties:
+
+* "type" - "number": The type of the operation.
+
+* "payload" - "Uint8Array": The serialized payload containing the
+  operation data.
+
+**Interaction**
+
+The "Interaction" interface represents a complete interaction, which
+bundles multiple ix_operations and metadata to be processed on the MOI
+network. It includes the following properties:
+
+* "sender" - "string": The address of the participant initiating the
+  interaction.
+
+* "payer" - "string": The address of the participant responsible for
+  covering the interaction's fuel costs.
+
+* "nonce" - "string": The nonce value.
+
+* "fuel_price" - "string": The price per unit of fuel for processing
+  the interaction.
+
+* "fuel_limit" - "string": The maximum amount of fuel allocated for
+  the interaction execution.
+
+* "ix_operations" - "string": The serialized representation of the
+  ix_operations included in the interaction.
+
+* "hash" - "string": The unique cryptographic hash of the interaction,
+  used for identification and verification.
+
+* "signature" - "string": The cryptographic signature of the
+  interaction, ensuring its authenticity.
+
+* "ts_hash" - "string": The hash of the associated tesseract,
+  representing the outcome of the interaction.
+
+* "participants" - "Participants[]": An array of participants involved
+  in the interaction.
+
+* "ix_index" - "string": The index indicating the order or position of
+  the interaction in the sequence of interactions.
+
+**Interactions**
+
+The "Interactions" type represents an array of interactions.
+
+**AssetCreationResult**
+
+The "AssetCreationResult" interface represents a receipt for asset
+creation. It has the following properties:
+
+* "asset_id" - "string": The ID of the created asset.
+
+* "address" - "string": The address associated with the asset.
+
+**AssetSupplyResult**
+
+The "AssetSupplyResult" interface represents a receipt for asset
+minting or burning. It has the following properties:
+
+* "total_supply" - "string": The total supply of the asset.
+
+**LogicDeployResult**
+
+The "LogicDeployResult" interface represents a receipt for logic
+deployment. It has the following properties:
+
+* "logic_id" - "string" (optional): The ID of the deployed logic.
+
+* "error" - "string": The error message associated with the
+  deployment.
+
+**LogicInvokeResult**
+
+The "LogicInvokeResult" interface represents a receipt for logic
+execution. It has the following properties:
+
+* "outputs" - "string": The outputs of the logic execution.
+
+* "error" - "string": The error message associated with the execution.
+
+**LogicEnlistResult**
+
+The "LogicEnlistResult" interface represents a receipt for logic
+enlist. It has the following properties:
+
+* "outputs" - "string": The outputs of the logic enlist.
+
+* "error" - "string": The error message associated with the enlist.
+
+**ConsensusInfo**
+
+The "ConsensusInfo" interface represents the consensus information. It
+has the following properties:
+
+* "evidence_hash" - "string": The hash of the evidence.
+
+* "binary_hash" - "string": The hash of the binary.
+
+* "identity_hash" - "string": The hash of the identity.
+
+* "ics_hash" - "string": The hash representing the ICS.
+
+* "cluster_id" - "string": The hash representing the cluster id.
+
+* "ics_signature" - "string": The hash representing the ICS signature.
+
+* "ics_vote_set" - "string": The hash representing the ICS vote set.
+
+* "round" - "string": The string representing the round.
+
+* "commit_signature" - "string": The hash representing the commit
+  signature.
+
+* "bft_vote_set" - "string": The string representing the BFT vote set.
+
+**Tesseract**
+
+The "Tesseract" interface represents a tesseract object. It has the
+following properties:
+
+* "hash" - "string": The hash of the tesseract.
+
+* "interactions_hash" - "string": The hash of the interactions.
+
+* "receipts_hash" - "string": The hash of the receipts.
+
+* "epoch" - "string": The hex value represents the fixed time slot.
+
+* "time_stamp" - "string": The hex value represents the ICS request
+  time.
+
+* "operator" - "string": The Krama ID of the operator.
+
+* "fuel_used" - "string": The hex value representing fuel used to
+  process the interaction.
+
+* "fuel_limit" - "string": The hex value representing fuel limit of
+  the interaction.
+
+* "consensus_info" - "ConsensusInfo": The object representing the
+  consensus information.
+
+* "seal" - "string": The hex value representing the The signature of
+  node which executed the tesseract.
+
+* "ixns" - "Interaction[]": An array of interactions.
+
+* "participants" - "Participant[]": An array of participants.
+
+
+Address
+=======
+
+isValidAddress(address)
+
+   Checks if the given address is a valid address.
+
+   Arguments:
+      * **address** (**string**) -- The address to validate.
+
+   Returns:
+      **boolean** -- Returns true if the address is valid, otherwise
+      false.
+
+   // Example
+   const isValid = isValidAddress("0xd210e094cd2432ef7d488d4310759b6bd81a0cda35a5fcce3dab87c0a841bdba")
+   console.log(isValid)
+
+   >> true
+
+
+Base64
+======
+
+encodeBase64(uint8Array)
+
+   encodeBase64
+
+   Encodes a Uint8Array into a base64 string.
+
+   Arguments:
+      * **uint8Array** (**Uint8Array**) -- The Uint8Array to encode.
+
+   Returns:
+      **string** -- The base64 encoded string.
+
+   // Example
+   const uint8Array = new Uint8Array([72, 101, 108, 108, 111]);
+   const encoded = encodeBase64(uint8Array);
+   console.log(encoded)
+
+   >> SGVsbG8=
+
+decodeBase64(base64String)
+
+   Decodes a base64 string into a Uint8Array.
+
+   Arguments:
+      * **base64String** (**string**) -- The base64 string to decode.
+
+   Returns:
+      **Uint8Array** -- The decoded Uint8Array.
+
+   // Example
+   const uint8Array = new Uint8Array([72, 101, 108, 108, 111]);
+   const encoded = encodeBase64(uint8Array);
+   console.log(encoded)
+
+   >> [ 72, 101, 108, 108, 111 ]
+
+
+Hex
+===
+
+numToHex(value)
+
+   Converts a number, bigint, or BN instance to a hexadecimal string
+   representation. If the input value is not already a BN instance, it
+   is converted to one. Throws an error if the input value is a
+   negative number.
+
+   Arguments:
+      * **value** (**NumberLike**) -- The value to convert to a
+        hexadecimal string.
+
+   Throws:
+      **Error** -- If the input value is a negative number.
+
+   Returns:
+      **string** -- - The hexadecimal string representation of the
+      value.
+
+   // Example
+   console.log(numToHex(123))
+
+   >> 7B
+
+toQuantity(value)
+
+   Converts a number, bigint, or BN instance to a quantity string
+   representation. The quantity string is prefixed with "0x" and is
+   obtained by calling *numToHex* function.
+
+   Arguments:
+      * **value** (**NumberLike**) -- The value to convert to a
+        quantity string.
+
+   Throws:
+      **Error** -- If an error occurs during the conversion.
+
+   Returns:
+      **string** -- - The quantity string representation of the value.
+
+   // Example
+   console.log(toQuantity(123))
+
+   >> 0x7B
+
+encodeToString(data)
+
+   Converts a Uint8Array to a hexadecimal string representation.
+
+   Arguments:
+      * **data** (**Uint8Array**) -- The Uint8Array to encode as a
+        hexadecimal string.
+
+   Returns:
+      **string** -- The hexadecimal string representation of the
+      Uint8Array.
+
+   // Example
+   const data = new Uint8Array([1, 2, 3, 4])
+   console.log(encodeToString(data))
+
+   >> 0x01020304
+
+hexToBytes(str)
+
+   Converts a hexadecimal string to a Uint8Array.
+
+   Arguments:
+      * **str** (**string**) -- The hexadecimal string to convert to a
+        Uint8Array.
+
+   Throws:
+      **Error** -- If the input string is not a valid hexadecimal
+      string.
+
+   Returns:
+      **Uint8Array** -- - The Uint8Array representation of the
+      hexadecimal string.
+
+   // Example
+   console.log(hexToBytes("0x01020304"))
+
+   >> [1, 2, 3, 4]
+
+hexToBN(hex)
+
+   Converts a hexadecimal string to a bigint or number. If the
+   resulting value is too large to fit in a number, it is returned as
+   a BigInt. Otherwise, it is returned as a number.
+
+   Arguments:
+      * **hex** (**string**) -- The hexadecimal string to convert.
+
+   Returns:
+      **bigint|number** -- The resulting value as a bigint or number.
+
+   // Example
+   console.log(hexToBN("0x123"))
+
+   >> 291
+
+bytesToHex(data)
+
+   Converts a Uint8Array to a hexadecimal string representation.
+
+   Arguments:
+      * **data** (**Uint8Array**) -- The Uint8Array to convert to a
+        hexadecimal string.
+
+   Returns:
+      **string** -- The hexadecimal string representation of the
+      Uint8Array.
+
+   // Example
+   const data = new Uint8Array([1, 2, 3, 4]);
+   console.log(bytesToHex(data))
+
+   >> 01020304
+
+isHex(data)
+
+   Checks if a given string is a valid hexadecimal value.
+
+   Arguments:
+      * **data** (**string**) -- The input string.
+
+   Returns:
+      **boolean** -- True if the input is a valid hexadecimal string,
+      false otherwise.
+
+   // Example
+   console.log(isHex("0x1234ABCD"))
+
+   >> true
+
+trimHexPrefix(data)
+
+   Removes the '0x' prefix from a hexadecimal string if present.
+
+   Arguments:
+      * **data** (**string**) -- The input string.
+
+   Returns:
+      **string** -- The trimmed hexadecimal string.
+
+   // Example
+   console.log(trimHexPrefix("0xABCDEF"))
+
+   >> ABCDEF
+
+
+Bytes
+=====
+
+isInteger(value)
+
+   Checks if the given value is an integer.
+
+   Arguments:
+      * **value** (**number**) -- The value to check.
+
+   Returns:
+      **boolean** -- - Returns true if the value is an integer,
+      otherwise false.
+
+   // Example
+   console.log(isInteger(42))
+
+   >> true
+
+isBytes(value)
+
+   Checks if the given value is a valid byte array.
+
+   Arguments:
+      * **value** (**any**) -- The value to check.
+
+   Returns:
+      **boolean** -- - Returns true if the value is a valid byte
+      array, otherwise false.
+
+   // Example
+   console.log(isBytes([0, 255, 128]))
+
+   >> true
+
+hexDataLength(data)
+
+   Calculates the length of the data represented by a hexadecimal
+   string.
+
+   Arguments:
+      * **data** (**string**) -- The hexadecimal string.
+
+   Returns:
+      **number|null** -- - The length of the data, or null if the
+      input is not a valid hexadecimal string.
+
+   // Example
+   console.log(hexDataLength('0xabcdef'))
+
+   >> true
+
+isHexString(value, length)
+
+   Checks if the given value is a valid hexadecimal string.
+
+   Arguments:
+      * **value** (**any**) -- The value to check.
+
+      * **length** (**number**) -- Optional. The expected length of
+        the hexadecimal string.
+
+   Returns:
+      **boolean** -- Returns true if the value is a valid hexadecimal
+      string, otherwise false.
+
+   // Example
+   console.log(isHexString('0x1234', 3))
+
+   >> false
+
+bufferToUint8(target)
+
+   Converts a Buffer to a Uint8Array.
+
+   Arguments:
+      * **target** (**Buffer**) -- The Buffer to convert.
+
+   Returns:
+      **Uint8Array** -- The Uint8Array representation of the Buffer.
+
+   // Example
+   const buffer = Buffer.from([1, 2, 3]);
+   const uint8Array = bufferToUint8(buffer);
+   console.log(uint8Array)
+
+   >> [1, 2, 3]
+
+
+Json
+====
+
+marshal(data)
+
+   Marshals the given json object into a Uint8Array by converting it
+   to JSON string and encoding as UTF-8.
+
+   Arguments:
+      * **data** (**object**) -- The data object to marshal.
+
+   Returns:
+      **Uint8Array** -- The marshaled data as a Uint8Array.
+
+   // Example
+   const data = { name: "John", age: 30 }
+   console.log(marshal(data))
+
+   // Output
+
+   /*
+       [
+           123, 34, 110,  97, 109, 101, 34,
+           58, 34,  74, 111, 104, 110, 34,
+           44, 34,  97, 103, 101,  34, 58,
+           51, 48, 125
+       ]
+   */
+
+unmarshal(bytes)
+
+   Unmarshals the given Uint8Array into its original json object by
+   decoding it as UTF-8 and parsing the JSON string.
+
+   Arguments:
+      * **bytes** (**Uint8Array**) -- The bytes to unmarshal.
+
+   Throws:
+      **Error** -- If there is an error while deserializing the data.
+
+   Returns:
+      **any** -- The unmarshaled data object.
+
+   // Example
+   const bytes = Buffer.from([
+     123, 34, 110,  97, 109, 101, 34,
+      58, 34,  74, 111, 104, 110, 34,
+      44, 34,  97, 103, 101,  34, 58,
+      51, 48, 125
+   ]);
+   console.log(unmarshal(bytes))
+
+   >> { name: "John", age: 30 }
+
+
+Properties
+==========
+
+defineReadOnly(object, name, value)
+
+   Defines a read-only property on an object with the specified name
+   and value.
+
+   Arguments:
+      * **object** (**object**) -- The object on which to define the
+        property.
+
+      * **name** (**string|symbol**) -- The name of the property.
+
+      * **value** (**any**) -- The value of the property.
+
+   // Example
+   const data = {}
+   defineReadOnly(data, "foo", true)
+
+
+Errors
+======
+
+
+CustomError
+===========
+
+The CustomError class extends the Error class and provides additional
+utility methods.
+
+   // Example
+   const error = new CustomError("Invalid argument provided")
+
+toString()
+
+   Overrides the toString() method to provide a string representation
+   of the error.
+
+   Returns:
+      **string** -- - The string representation of the error.
+
+   // Example
+   const error = error.toString();
+
+
+ErrorUtils
+==========
+
+The ErrorUtils class contains static helper methods for handling
+errors.
+
+static throwError(message, code, params)
+
+   Throws a CustomError with the specified message, error code, and
+   parameters.
+
+   Arguments:
+      * **message** (**string**) -- The error message.
+
+      * **code** (**ErrorCode**) -- The error code.
+
+      * **params** (**ErrorParams**) -- The parameters of the error.
+
+   Throws:
+      **CustomError** --
+
+      * Throws a CustomError.
+
+   // Example
+   ErrorUtils.throwError("Invalid argument provided", ErrorCode.INVALID_ARGUMENT)
+
+static throwArgumentError(message, name, value)
+
+   Throws a CustomError with the specified argument-related error
+   message, argument name, and value.
+
+   Arguments:
+      * **message** (**string**) -- The error message.
+
+      * **name** (**string**) -- The name of the argument.
+
+      * **value** (**any**) -- The value of the argument.
+
+   Throws:
+      **CustomError** --
+
+      * Throws a CustomError.
+
+   // Example
+   ErrorUtils.throwArgumentError("Invalid argument provided", "nonce", "2")
+
+---
+# Agent Skill
+URL: https://js-moi-sdk.docs.moi.technology/agent-skill
+Description: A downloadable SKILL.md package that teaches AI coding agents (Claude Code, Cursor) the js-moi-sdk API surface, including Voyage devnet flows.
+
+Agent Skill
+***********
+
+======================================================================
+
+The **js-moi-sdk agent skill** teaches AI coding agents (Claude Code,
+Cursor, and any tool that supports the "SKILL.md" format) the API
+surface of js-moi-sdk v0.8.0 — plus practical examples covering fuel
+reservation, nonce serialization, event decoding, keystore round-
+trips, MAS1/MAS2 differences, and Voyage devnet flows.
+
+======================================================================
+
+
+How do I download the skill?
+============================
+
+"js-moi-sdk-skills.zip"
+
+The archive contains:
+
+* "SKILL.md" — entry point: the 60-second flow, cross-cutting gotchas,
+  and a map of which reference to read for which task.
+
+* "references/" — ten deep-dive references (providers, wallet/signer,
+  logic, manifest, assets, interactions, identifiers, utils/constants,
+  MOI concepts, and battle-tested patterns).
+
+* "examples/" — lived, end-to-end flows in plain JavaScript against
+  Voyage devnet (NFT mint/transfer, Flipper, native assets + TaxToken,
+  lockup swap).
+
+======================================================================
+
+
+How do I use the skill with my coding agent?
+============================================
+
+**1. Unzip it into your agent's skills directory.**
+
+   unzip js-moi-sdk-skills.zip -d js-moi-sdk-skills
+
+Then place the "js-moi-sdk-skills/" folder where your agent looks for
+skills:
+
+* **Claude Code / Cursor** — put it under your project's or user's
+  skills directory (any tool that reads the "SKILL.md" format will
+  pick it up).
+
+* **OpenClaw** — install directly:
+
+     openclaw skills install js-moi-sdk
+
+**2. Let the agent read it on demand.** The agent loads "SKILL.md"
+first (the map), then opens only the reference or example it needs for
+the task at hand — you do not need to paste anything manually.
+
+======================================================================
+
+Note:
+
+  The skill targets js-moi-sdk v0.8.0.
+
+---
+# Contributions
+URL: https://js-moi-sdk.docs.moi.technology/contributions
+Description: How to contribute to js-moi-sdk: the monorepo layout, development setup, build and test workflow, and pull request guidelines for the MOI SDK.
+
+Contributions
+*************
+
+======================================================================
+
+Unless you explicitly state otherwise, any contribution intentionally
+submitted for inclusion in the work by you, as defined in the
+Apache-2.0 license, shall be dual licensed as below, without any
+additional terms or conditions.
+
+---
+# License and Copyright
+URL: https://js-moi-sdk.docs.moi.technology/license-and-copyright
+Description: License and copyright terms for js-moi-sdk: the open-source licenses the SDK is released under and the copyright held by Sarva Labs and contributors.
+
+License and Copyright
+*********************
+
+The js-polo package is licensed under either of Apache License,
+Version 2.0 or MIT License at your option. These licenses provide
+extensive permissions for a wide range of uses.
+
+The SPDX license identifier for this project is "MIT OR Apache-2.0".
+

@@ -1,0 +1,85 @@
+{% extends "!layout.html" %}
+{#
+  SEO/GEO head tags. The host serves extensionless URLs (308s /page.html to
+  /page), so canonicals are emitted here without the .html suffix rather than
+  via html_baseurl, which would point every canonical at a redirect.
+  Per-page meta descriptions come from the ".. meta::" directive at the top of
+  each .rst source.
+#}
+{% set page_url = 'https://js-moi-sdk.docs.moi.technology/' + (pagename if pagename != 'index' else '') %}
+{% block extrahead %}
+  <link rel="canonical" href="{{ page_url }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="{{ page_url }}" />
+  <meta property="og:title" content="{{ title|striptags|e }} — js-moi-sdk documentation" />
+  {%- if page_description %}
+  <meta property="og:description" content="{{ page_description|e }}" />
+  <meta name="twitter:description" content="{{ page_description|e }}" />
+  {%- endif %}
+  <meta property="og:image" content="https://js-moi-sdk.docs.moi.technology/_static/img/social-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@moi_tech" />
+  <meta name="twitter:title" content="{{ title|striptags|e }} — js-moi-sdk documentation" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://moi.technology/#organization",
+          "name": "MOI",
+          "legalName": "Sarva Labs Inc",
+          "url": "https://moi.technology",
+          "logo": "https://docs.moi.technology/img/logo.png",
+          "description": "MOI is the participant layer for AI agents - an on-chain authority layer where you monitor, scope, and revoke your AI agents in real time.",
+          "sameAs": [
+            "https://github.com/sarvalabs",
+            "https://twitter.com/moi_tech",
+            "https://t.me/moi_tech",
+            "https://discord.com/invite/4mUq3GeBMx",
+            "https://medium.com/moi-technology",
+            "https://www.youtube.com/channel/UCit7h30bhrwxBd1Yt_bmPvg",
+            "https://www.linkedin.com/company/moi-tech",
+            "https://www.sarva.ai"
+          ]
+        },
+        {%- if pagename == 'index' %}
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://js-moi-sdk.docs.moi.technology/#software",
+          "name": "js-moi-sdk",
+          "description": "JavaScript/TypeScript SDK for the MOI Protocol - providers, signers, wallets, logic bindings, and utilities.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Any",
+          "url": "https://js-moi-sdk.docs.moi.technology/",
+          "downloadUrl": "https://www.npmjs.com/package/js-moi-sdk",
+          "softwareVersion": "{{ release }}",
+          "author": { "@id": "https://moi.technology/#organization" },
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        },
+        {%- else %}
+        {
+          "@type": "TechArticle",
+          "headline": "{{ title|striptags|e }}",
+          {%- if page_description %}
+          "description": "{{ page_description|e }}",
+          {%- endif %}
+          "url": "{{ page_url }}",
+          "mainEntityOfPage": "{{ page_url }}",
+          "isPartOf": { "@id": "https://js-moi-sdk.docs.moi.technology/#website" },
+          "publisher": { "@id": "https://moi.technology/#organization" }
+        },
+        {%- endif %}
+        {
+          "@type": "WebSite",
+          "@id": "https://js-moi-sdk.docs.moi.technology/#website",
+          "name": "js-moi-sdk documentation",
+          "url": "https://js-moi-sdk.docs.moi.technology",
+          "about": "js-moi-sdk - the JavaScript/TypeScript SDK for the MOI Protocol",
+          "publisher": { "@id": "https://moi.technology/#organization" }
+        }
+      ]
+    }
+  </script>
+  {{ super() }}
+{% endblock %}
