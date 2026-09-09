@@ -5,7 +5,7 @@ import {
   InteractionResponse,
   IxParticipant,
 } from "js-moi-providers";
-import { OpType, trimHexPrefix } from "js-moi-utils";
+import { Hex, OpType, trimHexPrefix } from "js-moi-utils";
 import { DEFAULT_FUEL_PRICE, DEFAULT_FUEL_LIMIT } from "js-moi-constants";
 import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context";
 
@@ -16,9 +16,16 @@ import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context"
  */
 export class InteractionContext<T extends AllowedOps> {
   private readonly ctx: IxContext<T>;
+  private _payer?: Hex;
 
   constructor(ctx: IxContext<T>) {
     this.ctx = ctx;
+  }
+
+  /** Sets the payer for this interaction, sponsoring its fuel cost. */
+  public payer(id: Hex): this {
+    this._payer = id;
+    return this;
   }
 
   /** Returns the operation type for this interaction. */
@@ -93,7 +100,7 @@ export class InteractionContext<T extends AllowedOps> {
       fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
       ix_operations: [this.buildOperation(), ...fundingOperations],
       participants: this.mergeParticipants(option),
-      payer: option?.payer,
+      payer: option?.payer ?? this._payer,
     };
   }
 
