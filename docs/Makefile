@@ -22,3 +22,5 @@ help:
 # Watch target: automatically rebuild documentation on changes
 watch:
 	@sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)"
+llms:
+	python3 generate_llms.py

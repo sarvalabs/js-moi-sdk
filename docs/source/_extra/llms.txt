@@ -17,7 +17,7 @@
 
 ## For AI coding agents
 
-- [Agent Skill](https://js-moi-sdk.docs.moi.technology/agent-skill): download the SKILL.md package that teaches AI coding agents the js-moi-sdk v0.8.0 API surface
+- [Agent Skill](https://js-moi-sdk.docs.moi.technology/agent-skill): download the SKILL.md package that teaches AI coding agents the js-moi-sdk API surface
 
 ## MOI ecosystem
 
