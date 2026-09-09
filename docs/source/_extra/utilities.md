@@ -1,6 +1,6 @@
 # Utilities
 
-> js-moi-sdk utility functions - encoding, address and identifier helpers, unit conversion, and other tools for MOI development.
+> js-moi-sdk utility functions for MOI development: encoding and decoding, address and identifier helpers, unit conversion, and byte-level tools.
 
 Utilities
 *********

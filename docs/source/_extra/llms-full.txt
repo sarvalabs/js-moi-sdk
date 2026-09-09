@@ -248,7 +248,7 @@ and participating in interactions according to their type.
 ---
 # Constants
 URL: https://js-moi-sdk.docs.moi.technology/constants
-Description: Protocol constants exposed by js-moi-sdk for the MOI network.
+Description: Protocol constants exposed by js-moi-sdk for the MOI network: fuel prices, interaction types, and other fixed values used across the SDK packages.
 
 Constants
 *********
@@ -2238,7 +2238,7 @@ Interaction By Hash
 ---
 # Signer
 URL: https://js-moi-sdk.docs.moi.technology/signer
-Description: Sign MOI interactions and messages with js-moi-sdk - the Signer API, wallets, and cryptographic proof of account authority.
+Description: Sign MOI interactions and messages with js-moi-sdk: the Signer API, HD wallets and keypairs, and cryptographic proof of account authority on MOI.
 
 Signer
 ******
@@ -5996,7 +5996,7 @@ Deleting a policy only requires naming the resource:
 ---
 # Utilities
 URL: https://js-moi-sdk.docs.moi.technology/utilities
-Description: js-moi-sdk utility functions - encoding, address and identifier helpers, unit conversion, and other tools for MOI development.
+Description: js-moi-sdk utility functions for MOI development: encoding and decoding, address and identifier helpers, unit conversion, and byte-level tools.
 
 Utilities
 *********
@@ -6728,7 +6728,7 @@ Note:
 ---
 # Contributions
 URL: https://js-moi-sdk.docs.moi.technology/contributions
-Description: How to contribute to js-moi-sdk - repository layout, development setup, and pull request guidelines.
+Description: How to contribute to js-moi-sdk: the monorepo layout, development setup, build and test workflow, and pull request guidelines for the MOI SDK.
 
 Contributions
 *************
@@ -6743,7 +6743,7 @@ additional terms or conditions.
 ---
 # License and Copyright
 URL: https://js-moi-sdk.docs.moi.technology/license-and-copyright
-Description: License and copyright terms for js-moi-sdk.
+Description: License and copyright terms for js-moi-sdk: the open-source licenses the SDK is released under and the copyright held by Sarva Labs and contributors.
 
 License and Copyright
 *********************

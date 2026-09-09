@@ -1,6 +1,6 @@
 # Contributions
 
-> How to contribute to js-moi-sdk - repository layout, development setup, and pull request guidelines.
+> How to contribute to js-moi-sdk: the monorepo layout, development setup, build and test workflow, and pull request guidelines for the MOI SDK.
 
 Contributions
 *************
