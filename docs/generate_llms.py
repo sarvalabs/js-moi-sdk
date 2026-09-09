@@ -23,14 +23,14 @@ BASE = "https://js-moi-sdk.docs.moi.technology/"
 PAGES = {
     "index": ("js-moi-sdk documentation", "js-moi-sdk is a feature-rich JavaScript/TypeScript library for interacting with the MOI Protocol - providers, signers, wallets, logic, and utilities in one SDK."),
     "getting-started": ("Getting Started", "Install js-moi-sdk with npm and make your first calls to the MOI network - providers, wallet setup, and a first interaction in JavaScript or TypeScript."),
-    "constants": ("Constants", "Protocol constants exposed by js-moi-sdk for the MOI network."),
+    "constants": ("Constants", "Protocol constants exposed by js-moi-sdk for the MOI network: fuel prices, interaction types, and other fixed values used across the SDK packages."),
     "providers": ("Providers", "Connect to MOI nodes with js-moi-sdk providers - JSON-RPC and WebSocket providers for reading state, balances, tesseracts, and submitting interactions."),
-    "signer": ("Signer", "Sign MOI interactions and messages with js-moi-sdk - the Signer API, wallets, and cryptographic proof of account authority."),
+    "signer": ("Signer", "Sign MOI interactions and messages with js-moi-sdk: the Signer API, HD wallets and keypairs, and cryptographic proof of account authority on MOI."),
     "interactions": ("Interactions", "Create, sign, and send MOI interactions with js-moi-sdk - transfers, asset creation, logic deploy and invoke, with complete API reference and examples."),
-    "utilities": ("Utilities", "js-moi-sdk utility functions - encoding, address and identifier helpers, unit conversion, and other tools for MOI development."),
+    "utilities": ("Utilities", "js-moi-sdk utility functions for MOI development: encoding and decoding, address and identifier helpers, unit conversion, and byte-level tools."),
     "agent-skill": ("Agent Skill", "A downloadable SKILL.md package that teaches AI coding agents (Claude Code, Cursor) the js-moi-sdk API surface, including Voyage devnet flows."),
-    "contributions": ("Contributions", "How to contribute to js-moi-sdk - repository layout, development setup, and pull request guidelines."),
-    "license-and-copyright": ("License and Copyright", "License and copyright terms for js-moi-sdk."),
+    "contributions": ("Contributions", "How to contribute to js-moi-sdk: the monorepo layout, development setup, build and test workflow, and pull request guidelines for the MOI SDK."),
+    "license-and-copyright": ("License and Copyright", "License and copyright terms for js-moi-sdk: the open-source licenses the SDK is released under and the copyright held by Sarva Labs and contributors."),
 }
 
 
