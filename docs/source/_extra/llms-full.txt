@@ -32,9 +32,9 @@ Developer Documentation
 
 * Getting Started
 
-  * Installing
+  * How do I install js-moi-sdk?
 
-  * Importing
+  * How do I import js-moi-sdk?
 
   * Key Concepts
 
@@ -102,9 +102,9 @@ Developer Documentation
 
 * Agent Skill
 
-  * Download
+  * How do I download the skill?
 
-  * Using the skill
+  * How do I use the skill with my coding agent?
 
 * Contributions
 
@@ -125,16 +125,16 @@ Unleash its potential through comprehensive documentation and
 resources to supercharge your application development.
 
 
-Installing
-==========
+How do I install js-moi-sdk?
+============================
 
 Install the latest release using the following command:
 
    npm install js-moi-sdk
 
 
-Importing
-=========
+How do I import js-moi-sdk?
+===========================
 
 If you are using CommonJS or ES5, the require statement is used for
 importing *js-moi-sdk*.
@@ -6676,8 +6676,8 @@ trips, MAS1/MAS2 differences, and Voyage devnet flows.
 ======================================================================
 
 
-Download
-========
+How do I download the skill?
+============================
 
 "js-moi-sdk-skills.zip"
 
@@ -6697,8 +6697,8 @@ The archive contains:
 ======================================================================
 
 
-Using the skill
-===============
+How do I use the skill with my coding agent?
+============================================
 
 **1. Unzip it into your agent's skills directory.**
 

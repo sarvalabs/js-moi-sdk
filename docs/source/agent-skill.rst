@@ -15,8 +15,8 @@ Voyage devnet flows.
 
 --------------------------------------------------------------------------------
 
-Download
---------
+How do I download the skill?
+----------------------------
 
 :download:`js-moi-sdk-skills.zip <_static/downloads/js-moi-sdk-skills.zip>`
 
@@ -32,8 +32,8 @@ The archive contains:
 
 --------------------------------------------------------------------------------
 
-Using the skill
----------------
+How do I use the skill with my coding agent?
+--------------------------------------------
 
 **1. Unzip it into your agent's skills directory.**
 

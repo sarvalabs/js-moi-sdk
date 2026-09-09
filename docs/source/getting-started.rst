@@ -11,8 +11,8 @@ Kickstart your journey with js-moi-sdk by installing and importing it. Unleash i
 potential through comprehensive documentation and resources to supercharge 
 your application development.
 
-Installing
-------------
+How do I install js-moi-sdk?
+----------------------------
 Install the latest `release <https://github.com/sarvalabs/js-moi-sdk/releases>`_ 
 using the following command:
 
@@ -20,8 +20,8 @@ using the following command:
 
     npm install js-moi-sdk
 
-Importing
------------
+How do I import js-moi-sdk?
+---------------------------
 If you are using CommonJS or ES5, the require statement is used for 
 importing `js-moi-sdk`.
 
