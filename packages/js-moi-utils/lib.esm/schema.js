@@ -274,7 +274,7 @@ export const ixObjectSchema = {
                 }
             }
         },
-        payer: {
+        fee_payer: {
             kind: "bytes"
         },
         fuel_price: {

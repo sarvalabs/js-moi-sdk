@@ -2,7 +2,7 @@ import { AccessDeletePayload, AccessPayload, AccessPolicy, CallerConstraint, Int
 import { Signer } from "js-moi-signer";
 import { AccessAction, CallerKind, Hex, OpType, ResourceType } from "js-moi-utils";
 import { InteractionContext } from "./context";
-import { OperationMap } from "../types/context";
+import { OperationMap, type IxOption } from "../types/context";
 
 /** Builds CallerConstraint values for Access.caller()/.origin(). */
 export const access = {
@@ -29,7 +29,7 @@ class PendingAccessOp<T extends AccessOpType> {
     private readonly buildPayload: (target: Hex) => OperationMap[T],
   ) {}
 
-  public async send(): Promise<InteractionResponse> {
+  public async send(option?: IxOption): Promise<InteractionResponse> {
     const target = (await this.signer.getIdentifier()).toHex();
 
     const ixnContext = new InteractionContext<T>({
@@ -39,7 +39,7 @@ class PendingAccessOp<T extends AccessOpType> {
       signer: this.signer,
     });
 
-    return await ixnContext.send();
+    return await ixnContext.send(option);
   }
 }
 

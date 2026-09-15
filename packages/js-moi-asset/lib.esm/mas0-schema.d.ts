@@ -157,4 +157,76 @@ export declare const GET_DYNAMIC_METADATA_SCHEMA: {
         };
     };
 };
+export declare const SYMBOL_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        symbol: {
+            kind: string;
+        };
+    };
+};
+export declare const BALANCEOF_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        balance: {
+            kind: string;
+        };
+    };
+};
+export declare const CREATOR_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        creator: {
+            kind: string;
+        };
+    };
+};
+export declare const MANAGER_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        manager: {
+            kind: string;
+        };
+    };
+};
+export declare const DECIMALS_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        decimals: {
+            kind: string;
+        };
+    };
+};
+export declare const MAX_SUPPLY_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        max_supply: {
+            kind: string;
+        };
+    };
+};
+export declare const CIRCULATING_SUPPLY_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        circulating_supply: {
+            kind: string;
+        };
+    };
+};
+export declare const GET_STATIC_METADATA_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        value: {
+            kind: string;
+        };
+    };
+};
+export declare const GET_DYNAMIC_METADATA_RESULT_SCHEMA: {
+    kind: string;
+    fields: {
+        value: {
+            kind: string;
+        };
+    };
+};
 //# sourceMappingURL=mas0-schema.d.ts.map

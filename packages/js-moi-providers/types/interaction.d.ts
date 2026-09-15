@@ -50,9 +50,9 @@ export interface InteractionObject {
      */
     sender: Sender;
     /**
-     * The entity responsible for paying for the interaction.
+     * The entity responsible for paying the fuel cost of the interaction.
      */
-    payer?: Hex;
+    fee_payer?: Hex;
     /**
      * The price multiplier for fuel for the interaction.
      */
@@ -85,7 +85,7 @@ export interface InteractionObject {
 
 export interface RawInteractionObject {
     sender: RawSender;
-    payer?: Uint8Array;
+    fee_payer?: Uint8Array;
     fuel_price: number | bigint;
     fuel_limit: number | bigint;
     funds?: RawIxFund[];
@@ -126,7 +126,7 @@ export type IxPreferenceArgs = Omit<IxPreference, "consensus"> & {
 
 export interface InteractionArgs {
     sender: IxSenderArgs;
-    payer?: Hex;
+    fee_payer?: Hex;
     fuel_price: Hex;
     fuel_limit: Hex;
     funds?: IxFundArgs[];

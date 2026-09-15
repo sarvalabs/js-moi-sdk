@@ -598,8 +598,8 @@ Wallet
 
     **Workflow**
 
-    1. The sender builds the interaction object and sets the ``payer`` field to
-       the payer's participant identifier.
+    1. The sender builds the interaction object and sets the ``fee_payer``
+       field to the payer's participant identifier.
     2. The sender prepares the interaction (for example by calling
        ``prepareInteraction`` or ``sendInteraction``), so fields such as
        ``sender.sequence`` are populated.
@@ -625,7 +625,7 @@ Wallet
                 id: (await senderWallet.getIdentifier()).toHex(),
                 key_id: await senderWallet.getKeyId(),
             },
-            payer: payerId,
+            fee_payer: payerId,
             fuel_price: 1,
             fuel_limit: 200,
             ix_operations: [

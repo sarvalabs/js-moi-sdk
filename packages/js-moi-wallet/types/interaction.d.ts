@@ -24,7 +24,7 @@ interface ProcessedIxObject {
     nonce?: number | bigint;
 
     sender?: Uint8Array;
-    payer?: Uint8Array;
+    fee_payer?: Uint8Array;
 
     fuel_price?: number | bigint;
     fuel_limit?: number | bigint;

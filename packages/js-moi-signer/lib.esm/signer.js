@@ -176,8 +176,8 @@ export class Signer {
             // Get the signature algorithm
             const sigAlgo = this.signingAlgorithms["ecdsa_secp256k1"];
             await this.prepareInteraction('send', ixObject);
-            if (ixObject.payer && ixObject.payer !== ZERO_ADDRESS) {
-                const hasPayerSignature = checkSignature(participantSignatures ?? [], ixObject.payer);
+            if (ixObject.fee_payer && ixObject.fee_payer !== ZERO_ADDRESS) {
+                const hasPayerSignature = checkSignature(participantSignatures ?? [], ixObject.fee_payer);
                 if (!hasPayerSignature) {
                     ErrorUtils.throwError("Payer signature is missing.", ErrorCode.MISSING_ARGUMENT);
                 }

@@ -8,9 +8,9 @@ import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context"
  */
 export declare class InteractionContext<T extends AllowedOps> {
     private readonly ctx;
-    private _payer?;
+    private _feePayer?;
     constructor(ctx: IxContext<T>);
-    /** Sets the payer for this interaction, sponsoring its fuel cost. */
+    /** Sets the fee payer for this interaction, sponsoring its fuel cost. */
     payer(id: Hex): this;
     /** Returns the operation type for this interaction. */
     type(): OpType;
@@ -34,7 +34,7 @@ export declare class InteractionContext<T extends AllowedOps> {
     /**
      * Sends a transaction to the network, committing changes.
      * @param option Optional configuration such as fuel price, participants,
-     * or a payer's pre-collected `participantSignatures` for a sponsored
+     * or a fee payer's pre-collected `participantSignatures` for a sponsored
      * interaction (see `IxOption.participantSignatures`).
      */
     send(option?: IxOption): Promise<InteractionResponse>;

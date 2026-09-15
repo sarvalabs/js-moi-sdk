@@ -1,3 +1,4 @@
+import { MIN_KEY_WEIGHT } from "js-moi-constants";
 import { bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
 import { documentEncode } from "js-polo";
 import { InteractionContext } from "./context";
@@ -15,6 +16,9 @@ export class ParticipantCreate {
         return this;
     }
     addKey(publicKey, weight, signatureAlgorithm = 0) {
+        if (weight < MIN_KEY_WEIGHT) {
+            throw new Error(`weight cannot be less than ${MIN_KEY_WEIGHT}`);
+        }
         this._keys.push({
             public_key: publicKey, weight,
             signature_algorithm: signatureAlgorithm

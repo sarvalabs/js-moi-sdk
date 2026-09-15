@@ -23,7 +23,13 @@ type Hex = `0x${string}`;
 const SENDER: Hex = `0x${"ab".repeat(32)}`;
 const ASSET: Hex = `0x${"cd".repeat(32)}`;
 const LOGIC: Hex = `0x${"ef".repeat(32)}`;
-const PAYER: Hex = `0x${"12".repeat(32)}`;
+// Tag byte 0x00 => IdentifierKind.Participant (identifier-tag.ts, getKind = byte >> 4).
+// A fee payer must decode as a participant account for the notary/lock checks below.
+const PAYER: Hex = `0x00${"12".repeat(31)}`;
+// Tag byte 0x10 => IdentifierKind.Asset, 0x20 => IdentifierKind.Logic. Used to exercise
+// the ErrInvalidNotaryAccount mirror: a logic or asset account cannot be a notary.
+const NOTARY_ASSET: Hex = `0x10${"ab".repeat(31)}`;
+const NOTARY_LOGIC: Hex = `0x20${"ab".repeat(31)}`;
 const PUBLIC_KEY: Hex = "0x02870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
 
 const makeIx = (ops: any[], payer?: Hex, extra?: Partial<InteractionObject>): InteractionObject => ({
@@ -31,7 +37,7 @@ const makeIx = (ops: any[], payer?: Hex, extra?: Partial<InteractionObject>): In
     fuel_price: 1,
     fuel_limit: 200,
     ix_operations: ops as InteractionObject["ix_operations"],
-    ...(payer !== undefined ? { payer } : {}),
+    ...(payer !== undefined ? { fee_payer: payer } : {}),
     ...extra,
 });
 
@@ -316,6 +322,14 @@ describe("validateAssetCreate", () => {
         expect(() => validateAssetCreate({ ...valid, max_supply: -1n })).toThrow("max_supply");
     });
 
+    test("accepts a max_supply that fits exactly in 256 bits", () => {
+        expect(() => validateAssetCreate({ ...valid, max_supply: 2n ** 256n - 1n })).not.toThrow();
+    });
+
+    test("throws when max_supply overflows 256 bits", () => {
+        expect(() => validateAssetCreate({ ...valid, max_supply: 2n ** 256n })).toThrow("max_supply must fit in 256 bits");
+    });
+
     test("throws when static_metadata value is empty", () => {
         expect(() => validateAssetCreate({ ...valid, static_metadata: { key: "" as Hex } })).toThrow("static metadata");
     });
@@ -401,6 +415,38 @@ describe("processInteractionObject", () => {
                 )
             )
         ).toThrow("mutate lock");
+    });
+
+    test("throws when a notary participant is an asset account", () => {
+        expect(() =>
+            processInteractionObject(
+                makeIx(
+                    [{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }],
+                    undefined,
+                    { participants: [{ id: NOTARY_ASSET, lock_type: LockType.MUTATE_LOCK, notary: true }] }
+                )
+            )
+        ).toThrow("logic or asset account cannot be a notary");
+    });
+
+    test("throws when a notary participant is a logic account", () => {
+        expect(() =>
+            processInteractionObject(
+                makeIx(
+                    [{ type: OpType.ACCOUNT_CONFIGURE, payload: { add: [], revoke: [{ key_id: 0 }] } }],
+                    undefined,
+                    { participants: [{ id: NOTARY_LOGIC, lock_type: LockType.MUTATE_LOCK, notary: true }] }
+                )
+            )
+        ).toThrow("logic or asset account cannot be a notary");
+    });
+
+    test("does not throw for a non-notary asset participant (e.g. an ASSET_INVOKE asset_id)", () => {
+        expect(() =>
+            processInteractionObject(
+                makeIx([{ type: OpType.ASSET_INVOKE, payload: { asset_id: NOTARY_ASSET, callsite: "Transfer" } }])
+            )
+        ).not.toThrow();
     });
 
     test("always writes notary as an explicit boolean, not undefined", () => {

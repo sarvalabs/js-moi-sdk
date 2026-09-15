@@ -2,6 +2,7 @@ import { InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { Hex, OpType } from "js-moi-utils";
 import { InteractionContext } from "./context";
+import type { IxOption } from "../types/context";
 
 export class StorageDeposit {
   private _target?: Hex;
@@ -50,10 +51,10 @@ export class StorageDeposit {
     });
   }
 
-  public async send(): Promise<InteractionResponse> {
+  public async send(option?: IxOption): Promise<InteractionResponse> {
     const ixnContext = await this.build();
 
-    return await ixnContext.send();
+    return await ixnContext.send(option);
   }
 }
 
@@ -93,9 +94,9 @@ export class StorageWithdraw {
     });
   }
 
-  public async send(): Promise<InteractionResponse> {
+  public async send(option?: IxOption): Promise<InteractionResponse> {
     const ixnContext = this.build();
 
-    return await ixnContext.send();
+    return await ixnContext.send(option);
   }
 }

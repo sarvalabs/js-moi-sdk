@@ -132,4 +132,19 @@ describe("Access", () => {
             resource_id: RESOURCE_ID,
         });
     });
+
+    test("create().send(option) forwards fuel_price/fuel_limit through to the signer", async () => {
+        const signer = makeSigner();
+
+        await new Access(signer)
+            .storage(RESOURCE_ID)
+            .allow(AccessAction.STORAGE_MUTATE)
+            .create()
+            .send({ fuel_price: 50, fuel_limit: 5_000_000 });
+
+        expect(signer.sendInteraction).toHaveBeenCalledWith(
+            expect.objectContaining({ fuel_price: 50, fuel_limit: 5_000_000 }),
+            undefined,
+        );
+    });
 });

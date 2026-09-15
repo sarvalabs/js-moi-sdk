@@ -51,6 +51,25 @@ describe("StorageDeposit", () => {
     test("build() throws when amount is not set", async () => {
         await expect(new StorageDeposit(mockSigner).target(TARGET).build()).rejects.toThrow("amount is required");
     });
+
+    test("send() forwards fuel_price/fuel_limit through to the signer", async () => {
+        const sendingSigner = {
+            getIdentifier: jest.fn().mockResolvedValue({ toHex: () => SIGNER_ID }),
+            getKeyId: jest.fn().mockResolvedValue(0),
+            getNonce: jest.fn().mockResolvedValue(0),
+            sendInteraction: jest.fn().mockResolvedValue({ hash: "0x1" }),
+        } as any;
+
+        await new StorageDeposit(sendingSigner)
+            .target(TARGET)
+            .amount(5000)
+            .send({ fuel_price: 50, fuel_limit: 5_000_000 });
+
+        expect(sendingSigner.sendInteraction).toHaveBeenCalledWith(
+            expect.objectContaining({ fuel_price: 50, fuel_limit: 5_000_000 }),
+            undefined,
+        );
+    });
 });
 
 describe("StorageWithdraw", () => {
@@ -77,5 +96,21 @@ describe("StorageWithdraw", () => {
 
     test("build() throws when target is not set", () => {
         expect(() => new StorageWithdraw(mockSigner).build()).toThrow("target account is required");
+    });
+
+    test("send() forwards fuel_price/fuel_limit through to the signer", async () => {
+        const sendingSigner = {
+            getIdentifier: jest.fn().mockResolvedValue({ toHex: () => SIGNER_ID }),
+            getKeyId: jest.fn().mockResolvedValue(0),
+            getNonce: jest.fn().mockResolvedValue(0),
+            sendInteraction: jest.fn().mockResolvedValue({ hash: "0x1" }),
+        } as any;
+
+        await new StorageWithdraw(sendingSigner).target(TARGET).send({ fuel_price: 50, fuel_limit: 5_000_000 });
+
+        expect(sendingSigner.sendInteraction).toHaveBeenCalledWith(
+            expect.objectContaining({ fuel_price: 50, fuel_limit: 5_000_000 }),
+            undefined,
+        );
     });
 });

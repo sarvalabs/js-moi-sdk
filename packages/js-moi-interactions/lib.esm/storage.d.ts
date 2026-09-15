@@ -2,6 +2,7 @@ import { InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { Hex, OpType } from "js-moi-utils";
 import { InteractionContext } from "./context";
+import type { IxOption } from "../types/context";
 export declare class StorageDeposit {
     private _target?;
     private _depositFor?;
@@ -13,7 +14,7 @@ export declare class StorageDeposit {
     for(participant: Hex): StorageDeposit;
     amount(kmoi: number | bigint): StorageDeposit;
     build(): Promise<InteractionContext<OpType.STORAGE_DEPOSIT>>;
-    send(): Promise<InteractionResponse>;
+    send(option?: IxOption): Promise<InteractionResponse>;
 }
 export declare class StorageWithdraw {
     private _target?;
@@ -24,6 +25,6 @@ export declare class StorageWithdraw {
     /** Bytes to release. Omit to release everything currently available. */
     release(bytesToRelease: number): StorageWithdraw;
     build(): InteractionContext<OpType.STORAGE_WITHDRAW>;
-    send(): Promise<InteractionResponse>;
+    send(option?: IxOption): Promise<InteractionResponse>;
 }
 //# sourceMappingURL=storage.d.ts.map

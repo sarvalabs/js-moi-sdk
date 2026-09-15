@@ -604,8 +604,6 @@ class BaseProvider extends abstract_provider_1.AbstractProvider {
             };
             const response = await this.execute("moi.Call", params);
             const receipt = this.processResponse(response);
-            // TODO: overwritten ix_type has to be removed once the interaction 
-            // call receipt bug is resolved in the protocol.
             return {
                 receipt: receipt,
                 result: this.processReceipt.bind(this, receipt)

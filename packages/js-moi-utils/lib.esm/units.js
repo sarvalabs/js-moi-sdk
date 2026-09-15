@@ -63,4 +63,13 @@ export const formatKmoi = (value) => {
 export const parseKmoi = (value) => {
     return parseAmount(value, KMOI_DECIMALS);
 };
+/**
+ * Converts an interaction's fuel cost (`fuel_used * fuel_price`, both anu-denominated
+ * quantities) into a decimal KMOI string in one call. `InteractionReceipt` doesn't carry
+ * `fuel_price` itself (only `fuel_used`), so pass the `fuel_price` the interaction was
+ * originally submitted with.
+ */
+export const formatFuelFee = (fuelUsed, fuelPrice) => {
+    return formatKmoi(fuelUsed * fuelPrice);
+};
 //# sourceMappingURL=units.js.map

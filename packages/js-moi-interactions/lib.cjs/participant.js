@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipantCreate = void 0;
+const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_utils_1 = require("js-moi-utils");
 const js_polo_1 = require("js-polo");
 const context_1 = require("./context");
@@ -18,6 +19,9 @@ class ParticipantCreate {
         return this;
     }
     addKey(publicKey, weight, signatureAlgorithm = 0) {
+        if (weight < js_moi_constants_1.MIN_KEY_WEIGHT) {
+            throw new Error(`weight cannot be less than ${js_moi_constants_1.MIN_KEY_WEIGHT}`);
+        }
         this._keys.push({
             public_key: publicKey, weight,
             signature_algorithm: signatureAlgorithm

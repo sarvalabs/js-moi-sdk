@@ -17,4 +17,11 @@ export declare const formatKmoi: (value: bigint) => string;
  * Converts a decimal KMOI string to an anu amount.
  */
 export declare const parseKmoi: (value: string) => bigint;
+/**
+ * Converts an interaction's fuel cost (`fuel_used * fuel_price`, both anu-denominated
+ * quantities) into a decimal KMOI string in one call. `InteractionReceipt` doesn't carry
+ * `fuel_price` itself (only `fuel_used`), so pass the `fuel_price` the interaction was
+ * originally submitted with.
+ */
+export declare const formatFuelFee: (fuelUsed: bigint, fuelPrice: bigint) => string;
 //# sourceMappingURL=units.d.ts.map

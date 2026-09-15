@@ -19,6 +19,7 @@ __exportStar(require("./version"), exports);
 __exportStar(require("./address"), exports);
 __exportStar(require("./asset"), exports);
 __exportStar(require("./fuel"), exports);
+__exportStar(require("./key"), exports);
 __exportStar(require("./kmoi"), exports);
 __exportStar(require("./storage"), exports);
 //# sourceMappingURL=index.js.map
