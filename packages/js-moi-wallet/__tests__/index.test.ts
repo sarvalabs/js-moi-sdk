@@ -68,7 +68,7 @@ const buildIxObject = (
   ix_operations: [
     makeAssetCreateOp(managerId),
   ] as InteractionObject["ix_operations"],
-  ...(payer !== undefined ? { payer } : {}),
+  ...(payer !== undefined ? { fee_payer: payer } : {}),
 });
 
 const decodeSignatures = (signaturesHex: Hex): Signature[] =>
@@ -787,7 +787,7 @@ describe("Wallet", () => {
       ix_operations: [
         makeAssetCreateOp(senderId),
       ] as InteractionObject["ix_operations"],
-      ...(payer !== undefined ? { payer } : {}),
+      ...(payer !== undefined ? { fee_payer: payer } : {}),
     });
 
     test("sends successfully when no payer is set", async () => {

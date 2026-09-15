@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseKmoi = exports.formatKmoi = exports.parseAmount = exports.formatAmount = exports.validateDecimals = void 0;
+exports.formatFuelFee = exports.parseKmoi = exports.formatKmoi = exports.parseAmount = exports.formatAmount = exports.validateDecimals = void 0;
 const js_moi_constants_1 = require("js-moi-constants");
 const validateDecimals = (decimals) => {
     if (!Number.isInteger(decimals) || decimals < 0) {
@@ -71,4 +71,14 @@ const parseKmoi = (value) => {
     return (0, exports.parseAmount)(value, js_moi_constants_1.KMOI_DECIMALS);
 };
 exports.parseKmoi = parseKmoi;
+/**
+ * Converts an interaction's fuel cost (`fuel_used * fuel_price`, both anu-denominated
+ * quantities) into a decimal KMOI string in one call. `InteractionReceipt` doesn't carry
+ * `fuel_price` itself (only `fuel_used`), so pass the `fuel_price` the interaction was
+ * originally submitted with.
+ */
+const formatFuelFee = (fuelUsed, fuelPrice) => {
+    return (0, exports.formatKmoi)(fuelUsed * fuelPrice);
+};
+exports.formatFuelFee = formatFuelFee;
 //# sourceMappingURL=units.js.map

@@ -26,6 +26,7 @@
     "cross-fetch": "^4.0.0",
     "events": "npm:events@^3.3.0",
     "js-moi-constants": "0.9.0-rc2",
+    "js-moi-identifiers": "0.9.0-rc2",
     "js-moi-manifest": "0.9.0-rc2",
     "js-moi-utils": "0.9.0-rc2",
     "websocket": "^1.0.35",

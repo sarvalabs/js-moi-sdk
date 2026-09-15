@@ -50,7 +50,7 @@ multiple ix_operations and metadata to be processed on the MOI network.
 It includes the following properties:
 
 * ``sender`` - ``string``: The address of the participant initiating the interaction.
-* ``payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs.
+* ``fee_payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs.
 * ``nonce`` - ``string``: The nonce value.
 * ``fuel_price`` - ``string``: The price per unit of fuel for processing the interaction.
 * ``fuel_limit`` - ``string``: The maximum amount of fuel allocated for the interaction execution.
@@ -303,7 +303,8 @@ Units
 Helpers for converting between human-readable decimal amounts and on-chain
 integer amounts. ``formatAmount`` / ``parseAmount`` work with any asset
 decimals (0–18). ``formatKmoi`` / ``parseKmoi`` are convenience wrappers
-that always use ``KMOI_DECIMALS`` (9).
+that always use ``KMOI_DECIMALS`` (9). ``formatFuelFee`` further wraps
+``formatKmoi`` for the specific case of an interaction's fuel cost.
 
 .. autofunction:: formatAmount
 
@@ -353,6 +354,17 @@ that always use ``KMOI_DECIMALS`` (9).
 
     const amount = parseKmoi("100")
     const response = await masn.transfer(beneficiary, amount).send()
+
+.. autofunction:: formatFuelFee
+
+.. code-block:: javascript
+
+    // Example - InteractionReceipt only carries fuel_used, not fuel_price,
+    // so pass the fuel_price the interaction was submitted with.
+    const receipt = await response.wait()
+    console.log(formatFuelFee(BigInt(receipt.fuel_used), 50n))
+
+    >> 0.0001702
 
 Json
 ----

@@ -28,7 +28,7 @@ export interface Interaction {
     nonce: string;
     
     sender: string;
-    payer: string;
+    fee_payer: string;
 
     fuel_price: string;
     fuel_limit: string;

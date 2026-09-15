@@ -1,5 +1,6 @@
 import { AssetActionPayload, InteractionResponse, KeyAddPayload } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
+import { MIN_KEY_WEIGHT } from "js-moi-constants";
 import { bytesToHex, hexToBytes, LockType, OpType, type Hex } from "js-moi-utils";
 import { documentEncode } from "js-polo";
 import { InteractionContext } from "./context";
@@ -22,9 +23,13 @@ export class ParticipantCreate {
   }
 
   public addKey(publicKey: Hex, weight: number, signatureAlgorithm = 0): ParticipantCreate {
-    this._keys.push({ 
-        public_key: publicKey, weight, 
-        signature_algorithm: signatureAlgorithm 
+    if (weight < MIN_KEY_WEIGHT) {
+        throw new Error(`weight cannot be less than ${MIN_KEY_WEIGHT}`);
+    }
+
+    this._keys.push({
+        public_key: publicKey, weight,
+        signature_algorithm: signatureAlgorithm
     });
 
     return this;

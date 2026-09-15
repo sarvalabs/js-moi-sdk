@@ -1,4 +1,4 @@
-import { formatAmount, formatKmoi, parseAmount, parseKmoi } from "../src.ts/units";
+import { formatAmount, formatFuelFee, formatKmoi, parseAmount, parseKmoi } from "../src.ts/units";
 import { UINT256_MAX } from "js-moi-constants";
 
 describe("formatAmount", () => {
@@ -121,5 +121,19 @@ describe("parseKmoi", () => {
         for (const value of values) {
             expect(parseKmoi(formatKmoi(value))).toBe(value);
         }
+    });
+});
+
+describe("formatFuelFee", () => {
+    test("multiplies fuel_used by fuel_price and formats the result as KMOI", () => {
+        expect(formatFuelFee(3404n, 50n)).toBe("0.0001702");
+    });
+
+    test("equals formatKmoi(fuelUsed * fuelPrice)", () => {
+        expect(formatFuelFee(20_000_000n, 50n)).toBe(formatKmoi(20_000_000n * 50n));
+    });
+
+    test("handles a zero fee", () => {
+        expect(formatFuelFee(0n, 50n)).toBe("0");
     });
 });

@@ -1,4 +1,6 @@
-import { OpType } from "js-moi-utils";
+import { Hex, OpType } from "js-moi-utils";
+import { MAS0 } from "./mas0";
+import { Exception } from "js-moi-manifest";
 import { Signer } from "js-moi-signer";
 import { InteractionContext } from "js-moi-interactions";
 import { RoutineOption } from "js-moi-logic";
@@ -7,6 +9,27 @@ export declare class MAS0AssetLogic {
     signer: Signer;
     constructor(assetId: string, signer: Signer);
     private polorize;
+    /**
+     * Decodes a read-only (static) callsite's raw `.call()` result - the
+     * `{ outputs, error }` entry a `.result()` call returns for an
+     * ASSET_INVOKE op - into a real value, the same way `js-moi-logic`'s
+     * routine `.call()` already does via `ManifestCoder`. Without this,
+     * `outputs` is undecoded POLO-encoded bytes.
+     *
+     * @param {MAS0.Endpoint} callsite - The read-only callsite that
+     * produced this result (e.g. `MAS0.Endpoint.BALANCEOF`).
+     * @param {{ outputs: Hex; error: Hex }} result - One entry of the array
+     * `InteractionCallResponse.result()` resolves to.
+     * @returns {{ output: T; error: Exception | null }} The decoded output
+     * and, if the call reverted, the decoded exception.
+     */
+    decodeResult<T = unknown>(callsite: MAS0.Endpoint, result: {
+        outputs: Hex;
+        error: Hex;
+    }): {
+        output: T;
+        error: Exception | null;
+    };
     static newAsset(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, decimals?: number, option?: RoutineOption): Promise<MAS0AssetLogic>;
     static create(signer: Signer, symbol: string, supply: number | bigint, manager: string, enableEvents: boolean, decimals?: number, option?: RoutineOption): InteractionContext<OpType.ASSET_CREATE>;
     mint(beneficiary: string, amount: number | bigint): InteractionContext<OpType.ASSET_INVOKE>;

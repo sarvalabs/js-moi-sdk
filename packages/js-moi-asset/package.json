@@ -30,6 +30,7 @@
     "js-moi-interactions": "0.9.0-rc2",
     "js-moi-identifiers": "0.9.0-rc2",
     "js-moi-logic": "0.9.0-rc2",
+    "js-moi-manifest": "0.9.0-rc2",
     "js-polo": "0.1.5"
   }
 }

@@ -61,7 +61,7 @@ describe("InteractionContext", () => {
         expect(ctx.participants()).toStrictEqual(participants);
     });
 
-    describe("send (payer / participantSignatures)", () => {
+    describe("send (fee_payer / participantSignatures)", () => {
         const PAYER_SIGNATURE = [{ id: TARGET, key_id: 0, signature: "0x00" as Hex }];
 
         const makeSendSigner = () => ({
@@ -71,7 +71,7 @@ describe("InteractionContext", () => {
             sendInteraction: jest.fn().mockResolvedValue({ hash: "0x00" }),
         });
 
-        test("send() with no payer option calls sendInteraction with no participantSignatures", async () => {
+        test("send() with no fee_payer option calls sendInteraction with no participantSignatures", async () => {
             const signer = makeSendSigner();
             const ctx = makeCtx({
                 opType: OpType.ACCOUNT_CONFIGURE,
@@ -86,7 +86,7 @@ describe("InteractionContext", () => {
             expect(signer.sendInteraction.mock.calls[0][1]).toBeUndefined();
         });
 
-        test("send({ payer, participantSignatures }) forwards both to the interaction object and to sendInteraction", async () => {
+        test("send({ fee_payer, participantSignatures }) forwards both to the interaction object and to sendInteraction", async () => {
             const signer = makeSendSigner();
             const ctx = makeCtx({
                 opType: OpType.ACCOUNT_CONFIGURE,
@@ -95,11 +95,11 @@ describe("InteractionContext", () => {
                 signer: signer as any,
             });
 
-            await ctx.send({ payer: TARGET, participantSignatures: PAYER_SIGNATURE });
+            await ctx.send({ fee_payer: TARGET, participantSignatures: PAYER_SIGNATURE });
 
             expect(signer.sendInteraction).toHaveBeenCalledTimes(1);
             const [ixObject, forwardedSignatures] = signer.sendInteraction.mock.calls[0];
-            expect(ixObject.payer).toBe(TARGET);
+            expect(ixObject.fee_payer).toBe(TARGET);
             expect(forwardedSignatures).toBe(PAYER_SIGNATURE);
         });
     });
@@ -175,9 +175,15 @@ describe("InteractionContext", () => {
 describe("AccountConfigure", () => {
     test("addKey accumulates keys and returns the builder for chaining", () => {
         const builder = new AccountConfigure(mockSigner);
-        const result = builder.addKey(PUBLIC_KEY as Hex, 1);
+        const result = builder.addKey(PUBLIC_KEY as Hex, 1000);
 
         expect(result).toBe(builder);
+    });
+
+    test("addKey throws when weight is below the minimum", () => {
+        const builder = new AccountConfigure(mockSigner);
+
+        expect(() => builder.addKey(PUBLIC_KEY as Hex, 999)).toThrow("weight cannot be less than 1000");
     });
 
     test("revokeKey accumulates revoke entries and returns the builder for chaining", () => {
@@ -189,13 +195,13 @@ describe("AccountConfigure", () => {
 
     test("build() with only add entries returns a ACCOUNT_CONFIGURE context", () => {
         const ctx = new AccountConfigure(mockSigner)
-            .addKey(PUBLIC_KEY as Hex, 1)
+            .addKey(PUBLIC_KEY as Hex, 1000)
             .build();
 
         expect(ctx.type()).toBe(OpType.ACCOUNT_CONFIGURE);
         expect(ctx.payload().add).toHaveLength(1);
         expect(ctx.payload().add![0].public_key).toBe(PUBLIC_KEY);
-        expect(ctx.payload().add![0].weight).toBe(1);
+        expect(ctx.payload().add![0].weight).toBe(1000);
         expect(ctx.payload().add![0].signature_algorithm).toBe(0);
     });
 
@@ -211,7 +217,7 @@ describe("AccountConfigure", () => {
 
     test("build() with both add and revoke entries succeeds", () => {
         const ctx = new AccountConfigure(mockSigner)
-            .addKey(PUBLIC_KEY as Hex, 1)
+            .addKey(PUBLIC_KEY as Hex, 1000)
             .revokeKey(3)
             .build();
 
@@ -220,7 +226,7 @@ describe("AccountConfigure", () => {
     });
 
     test("build() uses the default signature_algorithm of 0 when not specified", () => {
-        const ctx = new AccountConfigure(mockSigner).addKey(PUBLIC_KEY as Hex, 1).build();
+        const ctx = new AccountConfigure(mockSigner).addKey(PUBLIC_KEY as Hex, 1000).build();
 
         expect(ctx.payload().add![0].signature_algorithm).toBe(0);
     });
@@ -296,7 +302,7 @@ describe("ParticipantCreate", () => {
     const validCtx = () =>
         new ParticipantCreate(mockSigner)
             .id(TARGET)
-            .addKey(PUBLIC_KEY as Hex, 1)
+            .addKey(PUBLIC_KEY as Hex, 1000)
             .value(ASSET_ID, BENEFICIARY, 50)
             .build();
 
@@ -307,7 +313,7 @@ describe("ParticipantCreate", () => {
         expect(ctx.payload().id).toBe(TARGET);
         expect(ctx.payload().keys_payload).toHaveLength(1);
         expect(ctx.payload().keys_payload[0].public_key).toBe(PUBLIC_KEY);
-        expect(ctx.payload().keys_payload[0].weight).toBe(1);
+        expect(ctx.payload().keys_payload[0].weight).toBe(1000);
         expect(ctx.payload().value.asset_id).toBe(ASSET_ID);
         expect(ctx.payload().value.callsite).toBe("Transfer");
     });
@@ -324,8 +330,8 @@ describe("ParticipantCreate", () => {
     test("addKey() supports multiple keys", () => {
         const ctx = new ParticipantCreate(mockSigner)
             .id(TARGET)
-            .addKey(PUBLIC_KEY as Hex, 1)
-            .addKey(PUBLIC_KEY as Hex, 2)
+            .addKey(PUBLIC_KEY as Hex, 1000)
+            .addKey(PUBLIC_KEY as Hex, 1000)
             .value(ASSET_ID, BENEFICIARY, 50)
             .build();
 
@@ -339,7 +345,12 @@ describe("ParticipantCreate", () => {
 
     test("addKey() returns the builder for chaining", () => {
         const builder = new ParticipantCreate(mockSigner);
-        expect(builder.addKey(PUBLIC_KEY as Hex, 1)).toBe(builder);
+        expect(builder.addKey(PUBLIC_KEY as Hex, 1000)).toBe(builder);
+    });
+
+    test("addKey() throws when weight is below the minimum", () => {
+        const builder = new ParticipantCreate(mockSigner);
+        expect(() => builder.addKey(PUBLIC_KEY as Hex, 999)).toThrow("weight cannot be less than 1000");
     });
 
     test("value() returns the builder for chaining", () => {
@@ -349,13 +360,13 @@ describe("ParticipantCreate", () => {
 
     test("build() throws when id is not set", () => {
         expect(() =>
-            new ParticipantCreate(mockSigner).addKey(PUBLIC_KEY as Hex, 1).value(ASSET_ID, BENEFICIARY, 50).build()
+            new ParticipantCreate(mockSigner).addKey(PUBLIC_KEY as Hex, 1000).value(ASSET_ID, BENEFICIARY, 50).build()
         ).toThrow("participant id is required");
     });
 
     test("build() throws when value is not set", () => {
         expect(() =>
-            new ParticipantCreate(mockSigner).id(TARGET).addKey(PUBLIC_KEY as Hex, 1).build()
+            new ParticipantCreate(mockSigner).id(TARGET).addKey(PUBLIC_KEY as Hex, 1000).build()
         ).toThrow("asset payload is required");
     });
 

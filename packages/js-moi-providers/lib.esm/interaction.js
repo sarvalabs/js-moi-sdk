@@ -1,5 +1,5 @@
 import { accessDeletePayloadSchema, accessPayloadSchema, accountConfigureSchema, accountInheritSchema, assetActionSchema, assetCreateSchema, AssetStandard, CallerKind, ErrorCode, ErrorUtils, hexToBytes, LockType, logicSchema, OpType, participantCreateSchema, ResourceType, storagePayloadSchema, toQuantity, trimHexPrefix, validateDecimals, withHexPrefix, } from "js-moi-utils";
-import { AssetId, Identifier, LogicId, ParticipantId } from "js-moi-identifiers";
+import { AssetId, Identifier, IdentifierKind, LogicId, ParticipantId } from "js-moi-identifiers";
 import { KMOI_ASSET_ID, MIN_STORAGE_DEPOSIT_AMOUNT, ZERO_ADDRESS } from "js-moi-constants";
 import { Polorizer } from "js-polo";
 import { bytesToHex } from "@noble/secp256k1";
@@ -293,6 +293,10 @@ export const validateAssetCreate = (payload) => {
         payload.max_supply <= 0) {
         throw new Error("max_supply must be greater than zero");
     }
+    // max_supply must fit in 256 bits.
+    if (BigInt(payload.max_supply) >= 2n ** 256n) {
+        throw new Error("max_supply must fit in 256 bits");
+    }
     // static metadata: required object with arrays of non-empty hex strings
     if (payload.static_metadata) {
         if (typeof payload.static_metadata !== "object" ||
@@ -451,7 +455,7 @@ function processLogicAction(payload) {
 /**
  * Processes ix_operations and returns an array of processed participants.
  *
- * @param {InteractionObject} ixObject - The interaction object containing sender, payer, operations, etc.
+ * @param {InteractionObject} ixObject - The interaction object containing sender, fee payer, operations, etc.
  * @returns {IxParticipant[]} - The processed participants.
  * @throws {Error} - If an unsupported operation type is encountered.
  */
@@ -459,9 +463,9 @@ const processParticipants = (ixObject) => {
     const participants = new Map();
     const addParticipant = (id, lock_type, notary) => {
         const normalizedId = trimHexPrefix(id);
-        const isPayer = ixObject.payer != null &&
-            ixObject.payer != ZERO_ADDRESS &&
-            normalizedId === trimHexPrefix(ixObject.payer);
+        const isPayer = ixObject.fee_payer != null &&
+            ixObject.fee_payer != ZERO_ADDRESS &&
+            normalizedId === trimHexPrefix(ixObject.fee_payer);
         if (normalizedId === trimHexPrefix(ixObject.sender.id)) {
             return;
         }
@@ -473,6 +477,17 @@ const processParticipants = (ixObject) => {
         // bad entry fails before an interaction is signed and submitted.
         if (isPayer && notary && lock_type !== LockType.MUTATE_LOCK) {
             throw new Error("a notary payer must hold a mutate lock");
+        }
+        // A logic or asset account cannot sign, so it cannot notarize, matching
+        // the node's ErrInvalidNotaryAccount check (common/interaction.go,
+        // go-moi PR #1371). Only applies to entries explicitly flagged as a
+        // notary; a plain asset/logic participant (e.g. the asset_id or logic_id
+        // added automatically below) is unaffected.
+        if (notary) {
+            const kind = new Identifier(id).getKind();
+            if (kind === IdentifierKind.Logic || kind === IdentifierKind.Asset) {
+                throw new Error("a logic or asset account cannot be a notary");
+            }
         }
         participants.set(normalizedId, {
             id,
@@ -650,8 +665,8 @@ export const toRawInteractionObject = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new ParticipantId(ix.sender.id).toBytes() },
-        payer: ix.payer
-            ? new ParticipantId(ix.payer).toBytes()
+        fee_payer: ix.fee_payer
+            ? new ParticipantId(ix.fee_payer).toBytes()
             : hexToBytes(ZERO_ADDRESS),
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
@@ -694,7 +709,7 @@ export const toInteractionArgs = (ix) => {
     ix.participants = processParticipants(ix);
     return {
         sender: ix.sender,
-        payer: ix.payer ?? ZERO_ADDRESS,
+        fee_payer: ix.fee_payer ?? ZERO_ADDRESS,
         fuel_price: toQuantity(ix.fuel_price),
         fuel_limit: toQuantity(ix.fuel_limit),
         funds: ix.funds?.map((fund) => toFundArgs(fund)),

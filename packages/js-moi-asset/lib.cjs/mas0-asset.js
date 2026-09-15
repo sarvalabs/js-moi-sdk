@@ -4,10 +4,24 @@ exports.MAS0AssetLogic = void 0;
 const js_moi_utils_1 = require("js-moi-utils");
 const mas0_1 = require("./mas0");
 const js_polo_1 = require("js-polo");
+const js_moi_manifest_1 = require("js-moi-manifest");
 const mas0_schema_1 = require("./mas0-schema");
 const js_moi_constants_1 = require("js-moi-constants");
 const js_moi_interactions_1 = require("js-moi-interactions");
 const js_moi_identifiers_1 = require("js-moi-identifiers");
+// Result schema for each read-only (static) MAS0 callsite, keyed by its
+// Endpoint name - see mas0-schema.ts for where each one comes from.
+const READ_RESULT_SCHEMAS = {
+    [mas0_1.MAS0.Endpoint.SYMBOL]: mas0_schema_1.SYMBOL_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.BALANCEOF]: mas0_schema_1.BALANCEOF_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.CREATOR]: mas0_schema_1.CREATOR_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.MANAGER]: mas0_schema_1.MANAGER_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.DECIMALS]: mas0_schema_1.DECIMALS_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.MAXSUPPLY]: mas0_schema_1.MAX_SUPPLY_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.CIRCULATINGSUPPLY]: mas0_schema_1.CIRCULATING_SUPPLY_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.GETSTATICMETADATA]: mas0_schema_1.GET_STATIC_METADATA_RESULT_SCHEMA,
+    [mas0_1.MAS0.Endpoint.GETDYNAMICMETADATA]: mas0_schema_1.GET_DYNAMIC_METADATA_RESULT_SCHEMA,
+};
 class MAS0AssetLogic {
     assetId;
     signer;
@@ -18,6 +32,33 @@ class MAS0AssetLogic {
     polorize(payload, schema) {
         const document = (0, js_polo_1.documentEncode)(payload, schema);
         return document.bytes();
+    }
+    /**
+     * Decodes a read-only (static) callsite's raw `.call()` result - the
+     * `{ outputs, error }` entry a `.result()` call returns for an
+     * ASSET_INVOKE op - into a real value, the same way `js-moi-logic`'s
+     * routine `.call()` already does via `ManifestCoder`. Without this,
+     * `outputs` is undecoded POLO-encoded bytes.
+     *
+     * @param {MAS0.Endpoint} callsite - The read-only callsite that
+     * produced this result (e.g. `MAS0.Endpoint.BALANCEOF`).
+     * @param {{ outputs: Hex; error: Hex }} result - One entry of the array
+     * `InteractionCallResponse.result()` resolves to.
+     * @returns {{ output: T; error: Exception | null }} The decoded output
+     * and, if the call reverted, the decoded exception.
+     */
+    decodeResult(callsite, result) {
+        const schema = READ_RESULT_SCHEMAS[callsite];
+        if (schema == null) {
+            throw new Error(`"${callsite}" is not a read-only MAS0 callsite, or has no result schema.`);
+        }
+        const output = result.outputs && result.outputs !== "0x"
+            ? new js_polo_1.Depolorizer((0, js_moi_utils_1.hexToBytes)(result.outputs)).depolorize(schema)
+            : null;
+        return {
+            output,
+            error: js_moi_manifest_1.ManifestCoder.decodeException(result.error),
+        };
     }
     static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option) {
         const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send();

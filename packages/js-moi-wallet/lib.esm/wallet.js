@@ -367,8 +367,8 @@ export class Wallet extends Signer {
      */
     async signInteraction(ixObject, _sigAlgo, participantSignatures) {
         try {
-            if (ixObject.payer && ixObject.payer !== ZERO_ADDRESS) {
-                const payerId = new Identifier(ixObject.payer);
+            if (ixObject.fee_payer && ixObject.fee_payer !== ZERO_ADDRESS) {
+                const payerId = new Identifier(ixObject.fee_payer);
                 if (payerId.getKind() !== IdentifierKind.Participant) {
                     ErrorUtils.throwError("Payer must be a participant account. Logic and asset accounts cannot be payers.", ErrorCode.INVALID_ARGUMENT);
                 }

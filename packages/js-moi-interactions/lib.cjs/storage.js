@@ -41,9 +41,9 @@ class StorageDeposit {
             signer: this.signer,
         });
     }
-    async send() {
+    async send(option) {
         const ixnContext = await this.build();
-        return await ixnContext.send();
+        return await ixnContext.send(option);
     }
 }
 exports.StorageDeposit = StorageDeposit;
@@ -76,9 +76,9 @@ class StorageWithdraw {
             signer: this.signer,
         });
     }
-    async send() {
+    async send(option) {
         const ixnContext = this.build();
-        return await ixnContext.send();
+        return await ixnContext.send(option);
     }
 }
 exports.StorageWithdraw = StorageWithdraw;

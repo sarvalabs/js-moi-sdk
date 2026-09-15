@@ -7,13 +7,13 @@ import { DEFAULT_FUEL_PRICE, DEFAULT_FUEL_LIMIT } from "js-moi-constants";
  */
 export class InteractionContext {
     ctx;
-    _payer;
+    _feePayer;
     constructor(ctx) {
         this.ctx = ctx;
     }
-    /** Sets the payer for this interaction, sponsoring its fuel cost. */
+    /** Sets the fee payer for this interaction, sponsoring its fuel cost. */
     payer(id) {
-        this._payer = id;
+        this._feePayer = id;
         return this;
     }
     /** Returns the operation type for this interaction. */
@@ -75,13 +75,13 @@ export class InteractionContext {
             fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
             ix_operations: [this.buildOperation(), ...fundingOperations],
             participants: this.mergeParticipants(option),
-            payer: option?.payer ?? this._payer,
+            fee_payer: option?.fee_payer ?? this._feePayer,
         };
     }
     /**
      * Sends a transaction to the network, committing changes.
      * @param option Optional configuration such as fuel price, participants,
-     * or a payer's pre-collected `participantSignatures` for a sponsored
+     * or a fee payer's pre-collected `participantSignatures` for a sponsored
      * interaction (see `IxOption.participantSignatures`).
      */
     async send(option) {

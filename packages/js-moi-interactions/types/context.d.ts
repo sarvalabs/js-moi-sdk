@@ -85,14 +85,14 @@ export interface IxOption {
   fuel_price?: number;
   fuel_limit?: number;
   participants?: IxParticipant[];
-  payer?: Hex;
+  fee_payer?: Hex;
   /**
-   * Signatures collected from other participants (for example a payer),
+   * Signatures collected from other participants (for example a fee payer),
    * produced by `Wallet#signRawInteractionObject` against the same
    * interaction object this option is used to build. Forwarded to
    * `Signer#send` so a sponsored interaction can be sent in one call.
-   * Ignored by `call()` and `estimateFuel()`, which never need a payer's
-   * signature.
+   * Ignored by `call()` and `estimateFuel()`, which never need a fee
+   * payer's signature.
    */
   participantSignatures?: Signature[];
 }

@@ -16,15 +16,15 @@ import { AllowedOps, IxContext, IxOption, OperationMap } from "../types/context"
  */
 export class InteractionContext<T extends AllowedOps> {
   private readonly ctx: IxContext<T>;
-  private _payer?: Hex;
+  private _feePayer?: Hex;
 
   constructor(ctx: IxContext<T>) {
     this.ctx = ctx;
   }
 
-  /** Sets the payer for this interaction, sponsoring its fuel cost. */
+  /** Sets the fee payer for this interaction, sponsoring its fuel cost. */
   public payer(id: Hex): this {
-    this._payer = id;
+    this._feePayer = id;
     return this;
   }
 
@@ -100,14 +100,14 @@ export class InteractionContext<T extends AllowedOps> {
       fuel_limit: option?.fuel_limit ?? DEFAULT_FUEL_LIMIT,
       ix_operations: [this.buildOperation(), ...fundingOperations],
       participants: this.mergeParticipants(option),
-      payer: option?.payer ?? this._payer,
+      fee_payer: option?.fee_payer ?? this._feePayer,
     };
   }
 
   /**
    * Sends a transaction to the network, committing changes.
    * @param option Optional configuration such as fuel price, participants,
-   * or a payer's pre-collected `participantSignatures` for a sponsored
+   * or a fee payer's pre-collected `participantSignatures` for a sponsored
    * interaction (see `IxOption.participantSignatures`).
    */
   public async send(option?: IxOption): Promise<InteractionResponse> {

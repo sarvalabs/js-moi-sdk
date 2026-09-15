@@ -470,7 +470,7 @@ export declare const ixObjectSchema: {
                 };
             };
         };
-        payer: {
+        fee_payer: {
             kind: string;
         };
         fuel_price: {

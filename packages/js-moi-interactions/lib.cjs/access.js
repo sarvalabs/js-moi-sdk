@@ -27,7 +27,7 @@ class PendingAccessOp {
         this.signer = signer;
         this.buildPayload = buildPayload;
     }
-    async send() {
+    async send(option) {
         const target = (await this.signer.getIdentifier()).toHex();
         const ixnContext = new context_1.InteractionContext({
             opType: this.opType,
@@ -35,7 +35,7 @@ class PendingAccessOp {
             participants: [],
             signer: this.signer,
         });
-        return await ixnContext.send();
+        return await ixnContext.send(option);
     }
 }
 class Access {

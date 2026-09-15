@@ -406,8 +406,8 @@ class Wallet extends js_moi_signer_1.Signer {
      */
     async signInteraction(ixObject, _sigAlgo, participantSignatures) {
         try {
-            if (ixObject.payer && ixObject.payer !== js_moi_constants_1.ZERO_ADDRESS) {
-                const payerId = new js_moi_identifiers_1.Identifier(ixObject.payer);
+            if (ixObject.fee_payer && ixObject.fee_payer !== js_moi_constants_1.ZERO_ADDRESS) {
+                const payerId = new js_moi_identifiers_1.Identifier(ixObject.fee_payer);
                 if (payerId.getKind() !== js_moi_identifiers_1.IdentifierKind.Participant) {
                     js_moi_utils_1.ErrorUtils.throwError("Payer must be a participant account. Logic and asset accounts cannot be payers.", js_moi_utils_1.ErrorCode.INVALID_ARGUMENT);
                 }

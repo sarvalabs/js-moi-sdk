@@ -335,7 +335,7 @@ The ``IxParticipant`` type represents a participant involved in the interaction 
 The ``InteractionObject`` interface represents an interaction object. It has the following properties:
 
 * ``sender`` - ``string``: The address of the participant initiating the interaction (optional).
-* ``payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs. (optional).
+* ``fee_payer`` - ``string``: The address of the participant responsible for covering the interaction's fuel costs. (optional).
 * ``nonce`` - ``number | bigint``: A unique value used to ensure the interaction's uniqueness (optional).
 * ``funds`` - ``IxFund``: The list of asset funds required for the interaction (optional).
 * ``ix_operations`` - ``IxOperation``: The list of ix_operations that are part of the interaction and are to be executed.
@@ -573,7 +573,7 @@ Tesseract
                 {
                     "nonce": "0x1",
                     "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
-                    "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "fee_payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
                     "fuel_price": "0x1",
                     "fuel_limit": "0xc8",
                     "ix_operations": [
@@ -1067,7 +1067,7 @@ Interaction By Hash
         {
             "nonce": "0x1",
             "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
-            "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "fee_payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
             "fuel_price": "0x1",
             "fuel_limit": "0xc8",
             "ix_operations": [

@@ -14,6 +14,9 @@ class AccountConfigure {
         this.signer = signer;
     }
     addKey(publicKey, weight, signatureAlgorithm = 0) {
+        if (weight < js_moi_constants_1.MIN_KEY_WEIGHT) {
+            throw new Error(`weight cannot be less than ${js_moi_constants_1.MIN_KEY_WEIGHT}`);
+        }
         this._add.push({
             public_key: publicKey,
             weight,

@@ -1,5 +1,5 @@
 import { bytesToHex, hexToBytes, LockType, OpType } from "js-moi-utils";
-import { KMOI_ASSET_ID } from "js-moi-constants";
+import { KMOI_ASSET_ID, MIN_KEY_WEIGHT } from "js-moi-constants";
 import { documentEncode } from "js-polo";
 import { InteractionContext } from "./context";
 import { TRANSFER_SCHEMA } from "./schema";
@@ -11,6 +11,9 @@ export class AccountConfigure {
         this.signer = signer;
     }
     addKey(publicKey, weight, signatureAlgorithm = 0) {
+        if (weight < MIN_KEY_WEIGHT) {
+            throw new Error(`weight cannot be less than ${MIN_KEY_WEIGHT}`);
+        }
         this._add.push({
             public_key: publicKey,
             weight,

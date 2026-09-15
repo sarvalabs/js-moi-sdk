@@ -1,7 +1,7 @@
 import { CallerConstraint, InteractionResponse } from "js-moi-providers";
 import { Signer } from "js-moi-signer";
 import { AccessAction, Hex, OpType } from "js-moi-utils";
-import { OperationMap } from "../types/context";
+import { OperationMap, type IxOption } from "../types/context";
 /** Builds CallerConstraint values for Access.caller()/.origin(). */
 export declare const access: {
     anyCaller(): CallerConstraint;
@@ -19,7 +19,7 @@ declare class PendingAccessOp<T extends AccessOpType> {
     private readonly signer;
     private readonly buildPayload;
     constructor(opType: T, signer: Signer, buildPayload: (target: Hex) => OperationMap[T]);
-    send(): Promise<InteractionResponse>;
+    send(option?: IxOption): Promise<InteractionResponse>;
 }
 export declare class Access {
     private _resource?;

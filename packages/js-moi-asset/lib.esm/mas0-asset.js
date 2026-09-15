@@ -1,10 +1,24 @@
 import { AssetStandard, bytesToHex, hexToBytes, LockType, OpType, validateDecimals } from "js-moi-utils";
 import { MAS0 } from "./mas0";
-import { documentEncode } from "js-polo";
-import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BURN_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_STATIC_METADATA_SCHEMA, LOCKUP_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
+import { Depolorizer, documentEncode } from "js-polo";
+import { ManifestCoder } from "js-moi-manifest";
+import { APPROVE_SCHEMA, BALANCEOF_SCHEMA, BALANCEOF_RESULT_SCHEMA, BURN_SCHEMA, CIRCULATING_SUPPLY_RESULT_SCHEMA, CREATOR_RESULT_SCHEMA, DECIMALS_RESULT_SCHEMA, GET_DYNAMIC_METADATA_SCHEMA, GET_DYNAMIC_METADATA_RESULT_SCHEMA, GET_STATIC_METADATA_SCHEMA, GET_STATIC_METADATA_RESULT_SCHEMA, LOCKUP_SCHEMA, MANAGER_RESULT_SCHEMA, MAX_SUPPLY_RESULT_SCHEMA, MINT_SCHEMA, MINT_WITH_METADATA_SCHEMA, RELEASE_SCHEMA, REVOKE_SCHEMA, SET_DYNAMIC_METADATA_SCHEMA, SET_STATIC_METADATA_SCHEMA, SYMBOL_RESULT_SCHEMA, TRANSFER_FROM_SCHEMA, TRANSFER_SCHEMA } from "./mas0-schema";
 import { DEFAULT_STORAGE_FUND, KMOI_ASSET_ID, SARGA_ADDRESS } from "js-moi-constants";
 import { buildTransferPayload, InteractionContext } from "js-moi-interactions";
 import { deriveAssetId } from "js-moi-identifiers";
+// Result schema for each read-only (static) MAS0 callsite, keyed by its
+// Endpoint name - see mas0-schema.ts for where each one comes from.
+const READ_RESULT_SCHEMAS = {
+    [MAS0.Endpoint.SYMBOL]: SYMBOL_RESULT_SCHEMA,
+    [MAS0.Endpoint.BALANCEOF]: BALANCEOF_RESULT_SCHEMA,
+    [MAS0.Endpoint.CREATOR]: CREATOR_RESULT_SCHEMA,
+    [MAS0.Endpoint.MANAGER]: MANAGER_RESULT_SCHEMA,
+    [MAS0.Endpoint.DECIMALS]: DECIMALS_RESULT_SCHEMA,
+    [MAS0.Endpoint.MAXSUPPLY]: MAX_SUPPLY_RESULT_SCHEMA,
+    [MAS0.Endpoint.CIRCULATINGSUPPLY]: CIRCULATING_SUPPLY_RESULT_SCHEMA,
+    [MAS0.Endpoint.GETSTATICMETADATA]: GET_STATIC_METADATA_RESULT_SCHEMA,
+    [MAS0.Endpoint.GETDYNAMICMETADATA]: GET_DYNAMIC_METADATA_RESULT_SCHEMA,
+};
 export class MAS0AssetLogic {
     assetId;
     signer;
@@ -15,6 +29,33 @@ export class MAS0AssetLogic {
     polorize(payload, schema) {
         const document = documentEncode(payload, schema);
         return document.bytes();
+    }
+    /**
+     * Decodes a read-only (static) callsite's raw `.call()` result - the
+     * `{ outputs, error }` entry a `.result()` call returns for an
+     * ASSET_INVOKE op - into a real value, the same way `js-moi-logic`'s
+     * routine `.call()` already does via `ManifestCoder`. Without this,
+     * `outputs` is undecoded POLO-encoded bytes.
+     *
+     * @param {MAS0.Endpoint} callsite - The read-only callsite that
+     * produced this result (e.g. `MAS0.Endpoint.BALANCEOF`).
+     * @param {{ outputs: Hex; error: Hex }} result - One entry of the array
+     * `InteractionCallResponse.result()` resolves to.
+     * @returns {{ output: T; error: Exception | null }} The decoded output
+     * and, if the call reverted, the decoded exception.
+     */
+    decodeResult(callsite, result) {
+        const schema = READ_RESULT_SCHEMAS[callsite];
+        if (schema == null) {
+            throw new Error(`"${callsite}" is not a read-only MAS0 callsite, or has no result schema.`);
+        }
+        const output = result.outputs && result.outputs !== "0x"
+            ? new Depolorizer(hexToBytes(result.outputs)).depolorize(schema)
+            : null;
+        return {
+            output,
+            error: ManifestCoder.decodeException(result.error),
+        };
     }
     static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option) {
         const response = await this.create(signer, symbol, supply, manager, enableEvents, decimals, option).send();

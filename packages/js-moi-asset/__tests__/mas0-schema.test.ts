@@ -1,17 +1,30 @@
+import { Identifier } from "js-moi-identifiers";
+import { Signer } from "js-moi-signer";
+import { documentEncode } from "js-polo";
 import { MAS0 } from "../src.ts/mas0";
+import { MAS0AssetLogic } from "../src.ts/mas0-asset";
 import {
     APPROVE_SCHEMA,
     BALANCEOF_SCHEMA,
+    BALANCEOF_RESULT_SCHEMA,
     BURN_SCHEMA,
+    CIRCULATING_SUPPLY_RESULT_SCHEMA,
+    CREATOR_RESULT_SCHEMA,
+    DECIMALS_RESULT_SCHEMA,
     GET_DYNAMIC_METADATA_SCHEMA,
+    GET_DYNAMIC_METADATA_RESULT_SCHEMA,
     GET_STATIC_METADATA_SCHEMA,
+    GET_STATIC_METADATA_RESULT_SCHEMA,
     LOCKUP_SCHEMA,
+    MANAGER_RESULT_SCHEMA,
+    MAX_SUPPLY_RESULT_SCHEMA,
     MINT_SCHEMA,
     MINT_WITH_METADATA_SCHEMA,
     RELEASE_SCHEMA,
     REVOKE_SCHEMA,
     SET_DYNAMIC_METADATA_SCHEMA,
     SET_STATIC_METADATA_SCHEMA,
+    SYMBOL_RESULT_SCHEMA,
     TRANSFER_FROM_SCHEMA,
     TRANSFER_SCHEMA,
 } from "../src.ts/mas0-schema";
@@ -183,5 +196,133 @@ describe("MAS0.Endpoint", () => {
         const all = Object.values(MAS0.Endpoint);
 
         expect(all).toHaveLength(20);
+    });
+});
+
+describe("MAS0 read-only result schemas", () => {
+    // Field names and types mirror go-moi's mas0.yaml `returns` block for
+    // the matching callsite - these are what a `.call()`'s raw POLO output
+    // actually decodes into, not an SDK-side invention.
+
+    test("SYMBOL_RESULT_SCHEMA is a struct with a symbol (string) field", () => {
+        expectStruct(SYMBOL_RESULT_SCHEMA);
+        expectField(SYMBOL_RESULT_SCHEMA, "symbol", "string");
+    });
+
+    test("BALANCEOF_RESULT_SCHEMA is a struct with a balance (integer) field", () => {
+        expectStruct(BALANCEOF_RESULT_SCHEMA);
+        expectField(BALANCEOF_RESULT_SCHEMA, "balance", "integer");
+    });
+
+    test("CREATOR_RESULT_SCHEMA is a struct with a creator (bytes) field", () => {
+        expectStruct(CREATOR_RESULT_SCHEMA);
+        expectField(CREATOR_RESULT_SCHEMA, "creator", "bytes");
+    });
+
+    test("MANAGER_RESULT_SCHEMA is a struct with a manager (bytes) field", () => {
+        expectStruct(MANAGER_RESULT_SCHEMA);
+        expectField(MANAGER_RESULT_SCHEMA, "manager", "bytes");
+    });
+
+    test("DECIMALS_RESULT_SCHEMA is a struct with a decimals (integer) field", () => {
+        expectStruct(DECIMALS_RESULT_SCHEMA);
+        expectField(DECIMALS_RESULT_SCHEMA, "decimals", "integer");
+    });
+
+    test("MAX_SUPPLY_RESULT_SCHEMA is a struct with a max_supply (integer) field", () => {
+        expectStruct(MAX_SUPPLY_RESULT_SCHEMA);
+        expectField(MAX_SUPPLY_RESULT_SCHEMA, "max_supply", "integer");
+    });
+
+    test("CIRCULATING_SUPPLY_RESULT_SCHEMA is a struct with a circulating_supply (integer) field", () => {
+        expectStruct(CIRCULATING_SUPPLY_RESULT_SCHEMA);
+        expectField(CIRCULATING_SUPPLY_RESULT_SCHEMA, "circulating_supply", "integer");
+    });
+
+    test("GET_STATIC_METADATA_RESULT_SCHEMA is a struct with a value (bytes) field", () => {
+        expectStruct(GET_STATIC_METADATA_RESULT_SCHEMA);
+        expectField(GET_STATIC_METADATA_RESULT_SCHEMA, "value", "bytes");
+    });
+
+    test("GET_DYNAMIC_METADATA_RESULT_SCHEMA is a struct with a value (bytes) field", () => {
+        expectStruct(GET_DYNAMIC_METADATA_RESULT_SCHEMA);
+        expectField(GET_DYNAMIC_METADATA_RESULT_SCHEMA, "value", "bytes");
+    });
+});
+
+describe("MAS0AssetLogic.decodeResult", () => {
+    const SENDER_ID = "0x0000000067bc504a470c5e31586eeedbefe73ccef20e0a49e1dc75ed00000000";
+    const ASSET_ID = "0x10030000034baa47d734e845102563dd576e7572d1ab0b6a0d84d6b300000000";
+
+    class TestSigner extends Signer {
+        connect(): void {}
+        async getKeyId(): Promise<number> {
+            return 0;
+        }
+        async getIdentifier(): Promise<Identifier> {
+            return new Identifier(SENDER_ID);
+        }
+        async sign(): Promise<string> {
+            return "0x";
+        }
+        isInitialized(): boolean {
+            return true;
+        }
+        async signInteraction(): Promise<never> {
+            throw new Error("not used in this test");
+        }
+        async getNonce(): Promise<number> {
+            return 0;
+        }
+        getProvider(): any {
+            return {};
+        }
+    }
+
+    const asset = new MAS0AssetLogic(ASSET_ID, new TestSigner());
+
+    // This exact hex ("0d2f067562616c616e63650303e8") was observed live
+    // against a real devnet's BalanceOf response for a balance of 1000
+    // (0x3e8) - see /Users/gokul/Documents/payer-spec/full-test/05c-asset-invoke-approval.js.
+    // Re-derived here via documentEncode rather than hardcoded, so this test
+    // fails if the schema ever stops matching what the node actually sends.
+    test("decodes a BalanceOf result into { output: { balance } }", () => {
+        const outputs = ("0x" + Buffer.from(documentEncode({ balance: 1000 }, BALANCEOF_RESULT_SCHEMA).bytes()).toString("hex")) as `0x${string}`;
+
+        expect(outputs).toBe("0x0d2f067562616c616e63650303e8");
+
+        const decoded = asset.decodeResult<{ balance: bigint | number }>(MAS0.Endpoint.BALANCEOF, {
+            outputs,
+            error: "0x",
+        });
+
+        expect(decoded.error).toBeNull();
+        expect(BigInt(decoded.output.balance)).toBe(1000n);
+    });
+
+    test("decodes a GetStaticMetadata result into { output: { value } }", () => {
+        const value = new TextEncoder().encode("hello-static");
+        const outputs = ("0x" + Buffer.from(documentEncode({ value }, GET_STATIC_METADATA_RESULT_SCHEMA).bytes()).toString("hex")) as `0x${string}`;
+
+        const decoded = asset.decodeResult<{ value: Uint8Array }>(MAS0.Endpoint.GETSTATICMETADATA, {
+            outputs,
+            error: "0x",
+        });
+
+        expect(decoded.error).toBeNull();
+        expect(new TextDecoder().decode(decoded.output.value)).toBe("hello-static");
+    });
+
+    test("returns a null output for an empty result", () => {
+        const decoded = asset.decodeResult(MAS0.Endpoint.SYMBOL, { outputs: "0x", error: "0x" });
+
+        expect(decoded.output).toBeNull();
+        expect(decoded.error).toBeNull();
+    });
+
+    test("throws for a callsite with no result schema (not read-only)", () => {
+        expect(() => asset.decodeResult(MAS0.Endpoint.TRANSFER, { outputs: "0x", error: "0x" })).toThrow(
+            /not a read-only MAS0 callsite/,
+        );
     });
 });

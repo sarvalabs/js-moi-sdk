@@ -311,6 +311,10 @@ const validateAssetCreate = (payload) => {
         payload.max_supply <= 0) {
         throw new Error("max_supply must be greater than zero");
     }
+    // max_supply must fit in 256 bits.
+    if (BigInt(payload.max_supply) >= 2n ** 256n) {
+        throw new Error("max_supply must fit in 256 bits");
+    }
     // static metadata: required object with arrays of non-empty hex strings
     if (payload.static_metadata) {
         if (typeof payload.static_metadata !== "object" ||
@@ -470,7 +474,7 @@ function processLogicAction(payload) {
 /**
  * Processes ix_operations and returns an array of processed participants.
  *
- * @param {InteractionObject} ixObject - The interaction object containing sender, payer, operations, etc.
+ * @param {InteractionObject} ixObject - The interaction object containing sender, fee payer, operations, etc.
  * @returns {IxParticipant[]} - The processed participants.
  * @throws {Error} - If an unsupported operation type is encountered.
  */
@@ -478,9 +482,9 @@ const processParticipants = (ixObject) => {
     const participants = new Map();
     const addParticipant = (id, lock_type, notary) => {
         const normalizedId = (0, js_moi_utils_1.trimHexPrefix)(id);
-        const isPayer = ixObject.payer != null &&
-            ixObject.payer != js_moi_constants_1.ZERO_ADDRESS &&
-            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.payer);
+        const isPayer = ixObject.fee_payer != null &&
+            ixObject.fee_payer != js_moi_constants_1.ZERO_ADDRESS &&
+            normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.fee_payer);
         if (normalizedId === (0, js_moi_utils_1.trimHexPrefix)(ixObject.sender.id)) {
             return;
         }
@@ -492,6 +496,17 @@ const processParticipants = (ixObject) => {
         // bad entry fails before an interaction is signed and submitted.
         if (isPayer && notary && lock_type !== js_moi_utils_1.LockType.MUTATE_LOCK) {
             throw new Error("a notary payer must hold a mutate lock");
+        }
+        // A logic or asset account cannot sign, so it cannot notarize, matching
+        // the node's ErrInvalidNotaryAccount check (common/interaction.go,
+        // go-moi PR #1371). Only applies to entries explicitly flagged as a
+        // notary; a plain asset/logic participant (e.g. the asset_id or logic_id
+        // added automatically below) is unaffected.
+        if (notary) {
+            const kind = new js_moi_identifiers_1.Identifier(id).getKind();
+            if (kind === js_moi_identifiers_1.IdentifierKind.Logic || kind === js_moi_identifiers_1.IdentifierKind.Asset) {
+                throw new Error("a logic or asset account cannot be a notary");
+            }
         }
         participants.set(normalizedId, {
             id,
@@ -670,8 +685,8 @@ const toRawInteractionObject = (ix) => {
     return {
         ...ix,
         sender: { ...ix.sender, id: new js_moi_identifiers_1.ParticipantId(ix.sender.id).toBytes() },
-        payer: ix.payer
-            ? new js_moi_identifiers_1.ParticipantId(ix.payer).toBytes()
+        fee_payer: ix.fee_payer
+            ? new js_moi_identifiers_1.ParticipantId(ix.fee_payer).toBytes()
             : (0, js_moi_utils_1.hexToBytes)(js_moi_constants_1.ZERO_ADDRESS),
         funds: ix.funds?.map((fund) => toRawFund(fund)),
         participants: ix.participants?.map((participant) => toRawParticipant(participant)),
@@ -717,7 +732,7 @@ const toInteractionArgs = (ix) => {
     ix.participants = processParticipants(ix);
     return {
         sender: ix.sender,
-        payer: ix.payer ?? js_moi_constants_1.ZERO_ADDRESS,
+        fee_payer: ix.fee_payer ?? js_moi_constants_1.ZERO_ADDRESS,
         fuel_price: (0, js_moi_utils_1.toQuantity)(ix.fuel_price),
         fuel_limit: (0, js_moi_utils_1.toQuantity)(ix.fuel_limit),
         funds: ix.funds?.map((fund) => toFundArgs(fund)),
