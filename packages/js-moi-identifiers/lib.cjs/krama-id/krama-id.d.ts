@@ -1,4 +1,4 @@
-import PeerId from "peer-id";
+import type { PeerId } from "@libp2p/interface";
 import type { InvalidReason } from "../identifier";
 import { type Hex } from "../utils";
 import { KramaIdKind, KramaIdVersion, NetworkZone } from "./krama-id-enums";

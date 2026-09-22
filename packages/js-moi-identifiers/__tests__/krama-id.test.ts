@@ -33,11 +33,11 @@ describe(KramaId, () => {
         const kramaId = await callback();
         expect(kramaId.toString()).toBe(expected);
         expect(kramaId.toJSON()).toBe(expected);
-        expect(kramaId.getDecodedPeerId().toB58String()).toBe(validPeerId);
+        expect(kramaId.getDecodedPeerId().toString()).toBe(validPeerId);
     });
 
     it.concurrent("should throw an error when creating from invalid peer id", async () => {
-        expect(() => KramaId.fromPeerId(KramaIdKind.Guardian, KramaIdVersion.V0, NetworkZone.Zone0, invalidPeerId)).toThrow("Unable to decode multibase string");
+        expect(() => KramaId.fromPeerId(KramaIdKind.Guardian, KramaIdVersion.V0, NetworkZone.Zone0, invalidPeerId)).toThrow(/Please pass a multibase decoder/);
     });
 
     it.concurrent("should throw an error when creating from unsupported version", async () => {
@@ -60,7 +60,7 @@ describe(KramaId, () => {
         {
             name: "when invalid peer id is provided",
             value: invalidPeerId,
-            error: /Unable to decode multibase string/,
+            error: /Please pass a multibase decoder/,
         },
     ])("should thrown an error $name", ({ value, error }) => {
         expect(() => new KramaId(value)).toThrow(error);

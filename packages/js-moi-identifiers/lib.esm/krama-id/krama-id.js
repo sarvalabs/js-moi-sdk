@@ -1,5 +1,6 @@
+import { peerIdFromMultihash, peerIdFromString } from "@libp2p/peer-id";
 import elliptic from "elliptic";
-import { createFromB58String, createFromPubKey, parse } from "peer-id";
+import * as Digest from "multiformats/hashes/digest";
 import { decodeBase58, encodeBase58, hexToBytes } from "../utils";
 import { KramaIdKind } from "./krama-id-enums";
 import { KramaIdMetadata } from "./krama-id-metadata";
@@ -57,7 +58,7 @@ export class KramaId {
      * @returns A promise that resolves to the decoded peer ID.
      */
     getDecodedPeerId() {
-        return createFromB58String(this.getPeerId());
+        return peerIdFromString(this.getPeerId());
     }
     toString() {
         return this.value;
@@ -74,7 +75,7 @@ export class KramaId {
         }
         const compressedPubKey = new elliptic.ec("secp256k1").keyFromPrivate(privateKey).getPublic(true, "array");
         const raw = new Uint8Array([0, 37, 8, 2, 18, 33, ...compressedPubKey]);
-        return await createFromPubKey(raw);
+        return peerIdFromMultihash(Digest.decode(raw));
     }
     /**
      * Creates a `KramaId` instance from a given private key.
@@ -100,7 +101,7 @@ export class KramaId {
         const tag = new KramaIdTag((kind << 4) | version);
         const metadata = zone << 4;
         const encoded = encodeBase58(new Uint8Array([tag.value, metadata]));
-        const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
+        const peerIdString = typeof peerId === "string" ? peerId : peerId.toString();
         return new KramaId(encoded + peerIdString);
     }
     static validate(value) {
@@ -111,7 +112,7 @@ export class KramaId {
             }
             const tag = id.getTag();
             const metadata = id.getMetadata();
-            parse(id.getPeerId());
+            peerIdFromString(id.getPeerId());
             return KramaIdTag.validate(tag) ?? KramaIdMetadata.validate(metadata) ?? null;
         }
         catch (error) {
