@@ -10,7 +10,7 @@ Description: js-moi-sdk is a feature-rich JavaScript/TypeScript library for inte
 Documentation
 *************
 
-This documentation is for js-moi-sdk v0.8.0
+This documentation is for js-moi-sdk v0.9.0-rc3
 
 ======================================================================
 
@@ -45,6 +45,8 @@ Developer Documentation
   * MOI Derivation Path
 
   * MOI Derivation Base Path
+
+  * KMOI Decimals
 
 * Providers
 
@@ -89,6 +91,8 @@ Developer Documentation
   * Hex
 
   * Bytes
+
+  * Units
 
   * Json
 
@@ -269,7 +273,7 @@ package.
 
    console.log(moi.VERSION)
 
-   >> 0.8.0
+   >> 0.9.0-rc3
 
 
 MOI Derivation Path
@@ -301,6 +305,21 @@ create unique MOI account addresses.
    console.log(moi.MOI_DERIVATION_BASE_PATH)
 
    >> "m/44'/6174'/0'/0"
+
+
+KMOI Decimals
+=============
+
+The "KMOI_DECIMALS" constant is the number of decimal places used by
+native KMOI. "formatKmoi()" and "parseKmoi()" always convert using
+this value (9). The smallest KMOI unit is anu: "1 KMOI = 10 ** 9" anu.
+
+   // Example
+   import * as moi from "js-moi-sdk";
+
+   console.log(moi.KMOI_DECIMALS)
+
+   >> 9
 
 ---
 # Providers
@@ -537,7 +556,8 @@ request. It has the following properties:
 
 * "ix_args" - "string": The encoded interaction parameters.
 
-* "signature" - "string": The signature for the interaction.
+* "signatures" - "string": The POLO-encoded signature blob for the
+  interaction (one or more entries).
 
 **InteractionResponse**
 
@@ -819,8 +839,8 @@ has the following properties:
 * "sender" - "string": The address of the participant initiating the
   interaction (optional).
 
-* "payer" - "string": The address of the participant responsible for
-  covering the interaction's fuel costs. (optional).
+* "fee_payer" - "string": The address of the participant responsible
+  for covering the interaction's fuel costs. (optional).
 
 * "nonce" - "number | bigint": A unique value used to ensure the
   interaction's uniqueness (optional).
@@ -1248,6 +1268,53 @@ BaseProvider.sendInteraction(ixObject)
    Returns:
       **Promise.<InteractionResponse>** -- A Promise that resolves to
       the interaction response.
+
+checkSignature(signatures, participantId)
+
+   Checks whether a signature array contains an entry for the given
+   participant identifier.
+
+   Arguments:
+      * **signatures** (**Array.<Signature>**) -- Parsed signature
+        entries.
+
+      * **participantId** (**Hex**) -- Participant identifier to look
+        for.
+
+   Returns:
+      **boolean** -- *true* when a matching signature entry exists.
+
+Checks whether a parsed "Signature" array contains an entry for the
+given participant identifier. Use this when assembling sponsored
+interactions to confirm that a payer (or any other co-signer) has
+signed before sending.
+
+The payer typically produces signatures with
+"Wallet#signRawInteractionObject()". The sender merges those entries
+into the final request through the "participantSignatures" argument of
+"Wallet#signInteraction()" or "Signer#sendInteraction()".
+
+   const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+   const payerId = (await payerWallet.getIdentifier()).toHex();
+
+   await senderWallet.prepareInteraction("send", interaction);
+
+   const payerSignatures = await payerWallet.signRawInteractionObject(
+       interaction,
+       sigAlgo,
+   );
+
+   if (!checkSignature(payerSignatures, payerId)) {
+       throw new Error("Payer signature is missing");
+   }
+
+   const ixRequest = await senderWallet.signInteraction(
+       interaction,
+       sigAlgo,
+       payerSignatures,
+   );
+
+   const response = await provider.sendInteraction(ixRequest);
 
 
 Query Methods
@@ -1681,7 +1748,7 @@ Tesseract
                {
                    "nonce": "0x1",
                    "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
-                   "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                   "fee_payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
                    "fuel_price": "0x1",
                    "fuel_limit": "0xc8",
                    "ix_operations": [
@@ -2198,7 +2265,7 @@ Interaction By Hash
        {
            "nonce": "0x1",
            "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
-           "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+           "fee_payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
            "fuel_price": "0x1",
            "fuel_limit": "0xc8",
            "ix_operations": [
@@ -2305,6 +2372,19 @@ implement this method to provide the logic for signing the
 interactions. When a wallet has multiple keys registered, all keys
 contribute signatures to satisfy multisig threshold requirements.
 
+An optional "participantSignatures" argument accepts signature entries
+from other participants (for example a payer). These entries are
+merged with the wallet's own signatures before the request is
+serialized.
+
+**signRawInteractionObject**
+
+Wallet implementations expose this method to sign an interaction
+object with the wallet's registered keys and return the raw
+"Signature" entries without POLO serialization. Use it when another
+participant must sign the same interaction object and return
+signatures to the sender.
+
 
 Regular Methods
 ===============
@@ -2345,7 +2425,7 @@ getNonce(options)
 
    >> 5
 
-Signer.sendInteraction(ixObject)
+Signer.sendInteraction(ixObject, participantSignatures)
 
    Sends an interaction object by signing it with the appropriate
    signature algorithm and forwarding it to the connected provider.
@@ -2354,14 +2434,25 @@ Signer.sendInteraction(ixObject)
       * **ixObject** (**InteractionObject**) -- The interaction object
         to send.
 
+      * **participantSignatures** (**Array.<Signature>**) -- Optional
+        signatures from other participants (for example a payer) to
+        merge with the wallet signatures.
+
    Throws:
       **Error** -- if there is an error sending the interaction, if
-      the provider is not initialized, or if the interaction object
-      fails the validity checks.
+      the provider is not initialized, if the interaction object fails
+      the validity checks, or if the interaction has a non-zero payer
+      with no matching signature.
 
    Returns:
       **Promise.<InteractionResponse>** -- A Promise that resolves to
       the interaction response.
+
+When an interaction specifies a non-zero "payer", the sender wallet
+signs as the sender and the payer wallet must also sign the same
+interaction object. Pass the payer's signatures to
+"participantSignatures" so they are merged before the request is sent.
+See *sponsored-interactions* for the full workflow.
 
    // Example 1
    const response = await signer.sendInteraction({
@@ -2915,7 +3006,7 @@ Wallet
       const signature = await wallet.sign(Buffer.from(message), keyId, algo);
       >>"0146304402201546497d46ed2ad7b1b77d1cdf383a28d988197bcad268be7163ebdf2f70645002207768e4225951c02a488713caf32d76ed8ea0bf3d7706128c59ee..."
 
-   Wallet.signInteraction(ixObject)
+   Wallet.signInteraction(ixObject, _sigAlgo, participantSignatures)
 
       Signs an interaction object using all registered keys on this
       wallet. Each key produces its own signature entry, enabling
@@ -2926,6 +3017,13 @@ Wallet
          * **ixObject** (**InteractionObject**) -- The interaction
            object to sign.
 
+         * **_sigAlgo** (**SigType**) -- The signature algorithm to
+           use.
+
+         * **participantSignatures** (**Array.<Signature>**) --
+           Optional signatures from other participants to merge with
+           the wallet signatures.
+
       Throws:
          **Error** -- if there is an error during signing or
          serialization.
@@ -2935,10 +3033,15 @@ Wallet
          containing the serialized interaction object and all
          signatures.
 
-   Signs an interaction using all registered keys. Each key produces
-   its own signature entry in the response. The sender key
-   ("key_index") must be registered or an error is thrown before
+   Signs an interaction using all registered keys on the wallet. Each
+   key produces its own signature entry in the response. The sender
+   key ("key_index") must be registered or an error is thrown before
    signing.
+
+   When the interaction requires signatures from other participants,
+   pass their entries through the optional "participantSignatures"
+   argument. The wallet signatures are merged with
+   "participantSignatures" before serialization.
 
       const address = "0x870ad6c5150ea8c0355316974873313004c6b9425a855a06fff16f408b0e0a8b";
       const interaction = {
@@ -2967,6 +3070,133 @@ Wallet
               signatures: '...'   // POLO-encoded array, one entry per registered key
           }
       */
+
+   Wallet.signRawInteractionObject(ixObject, _sigAlgo)
+
+      Signs an interaction object using all registered keys on this
+      wallet and returns the raw signature entries without POLO
+      serialization.
+
+      Unlike *signInteraction*, this method does not validate the
+      payer field or require the sender key to be registered on the
+      wallet.
+
+      Arguments:
+         * **ixObject** (**InteractionObject**) -- The interaction
+           object to sign.
+
+         * **_sigAlgo** (**SigType**) -- The signature algorithm to
+           use.
+
+      Returns:
+         **Promise.<Array.<Signature>>** -- Raw signature entries for
+         all wallet keys.
+
+   Signs an interaction object with all keys registered on the wallet
+   and returns the raw "Signature" array. Unlike "signInteraction",
+   this method does not validate the payer field, does not require the
+   sender key to be registered on the wallet, and does not POLO-encode
+   the result.
+
+   Use this method when you need signature entries for an interaction
+   object using your wallet instance keys—for example, when another
+   participant asks you to sign an interaction they intend to send.
+
+      const sigAlgo = payerWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const payerSignatures = await payerWallet.signRawInteractionObject(
+          interaction,
+          sigAlgo,
+      );
+
+      console.log(payerSignatures);
+
+      // Output
+      /*
+          [
+              {
+                  id: '0x...',       // payer participant identifier
+                  key_id: 0,
+                  signature: '...'
+              }
+          ]
+      */
+
+   Some interactions require signatures from more than one
+   participant. A common case is fuel sponsorship: the sender
+   initiates the interaction while a separate payer account covers the
+   fuel cost. In that case, both the sender and the payer must sign
+   the **same** interaction object.
+
+   **Workflow**
+
+   1. The sender builds the interaction object and sets the
+      "fee_payer" field to the payer's participant identifier.
+
+   2. The sender prepares the interaction (for example by calling
+      "prepareInteraction" or "sendInteraction"), so fields such as
+      "sender.sequence" are populated.
+
+   3. The sender shares the prepared interaction object with the
+      payer.
+
+   4. The payer signs it with "signRawInteractionObject" and returns
+      the resulting "Signature" array.
+
+   5. The sender passes those entries to "signInteraction" or
+      "sendInteraction" through "participantSignatures".
+
+   All participants must sign the identical interaction object. If the
+   object changes after the payer signs (for example because the nonce
+   is updated), the payer signatures will no longer be valid.
+
+      const { checkSignature } = require("js-moi-providers");
+
+      const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+      const payerId = (await payerWallet.getIdentifier()).toHex();
+
+      const interaction = {
+          sender: {
+              id: (await senderWallet.getIdentifier()).toHex(),
+              key_id: await senderWallet.getKeyId(),
+          },
+          fee_payer: payerId,
+          fuel_price: 1,
+          fuel_limit: 200,
+          ix_operations: [
+              {
+                  type: OpType.ASSET_CREATE,
+                  payload: {
+                      standard: AssetStandard.MAS0,
+                      symbol: "TOKYO",
+                      supply: 1248577,
+                  },
+              },
+          ],
+      };
+
+      // Prepare once so sender.sequence and other fields are final
+      await senderWallet.prepareInteraction("send", interaction);
+
+      // Payer signs the prepared interaction object
+      const payerSignatures = await payerWallet.signRawInteractionObject(
+          interaction,
+          sigAlgo,
+      );
+
+      if (!checkSignature(payerSignatures, payerId)) {
+          throw new Error("Payer signature is missing");
+      }
+
+      // Option 1: sign and send via the provider separately
+      const ixRequest = await senderWallet.signInteraction(
+          interaction,
+          sigAlgo,
+          payerSignatures,
+      );
+      await provider.sendInteraction(ixRequest);
+
+      // Option 2: sign and send in one step
+      await senderWallet.sendInteraction(interaction, payerSignatures);
 
    Wallet.addKey(keyId, publicKey, privateKey)
 
@@ -3371,7 +3601,7 @@ Asset Management
 
 This module provides classes and utilities for creating, managing, and
 interacting with on-chain assets within the MOI framework. It defines
-three main components:
+the following main components:
 
 * "AssetFactory" – Responsible for asset creation.
 
@@ -3380,6 +3610,9 @@ three main components:
 
 * "MAS0AssetLogic" – Implements the standard MAS0 asset logic and
   operations such as mint, burn, and transfer.
+
+* "MASNAssetLogic" – Implements the reserved MASN (native KMOI) asset
+  logic.
 
 
 AssetFactory
@@ -3472,7 +3705,17 @@ class AssetFactory()
       **Usage Example - plain native asset (the common case)**
 
          // Native standard - use MAS0AssetLogic, not AssetFactory (no manifest, node uses its own built-in one).
-         const ctx = MAS0AssetLogic.create(signer, "GOLD", 1000000n, managerAddress, true);
+         const ASSET_DECIMALS = 12;
+         const supply = parseAmount("10", ASSET_DECIMALS);
+         const ctx = MAS0AssetLogic.create(
+             signer,
+             "GOLD",
+             supply,
+             managerAddress,
+             true,
+             option,
+             ASSET_DECIMALS
+         );
          const response = await ctx.send();
 
       **Usage Example - custom (MASX) asset with your own logic**
@@ -3579,12 +3822,20 @@ class MAS0AssetLogic()
 
    **Static Methods**
 
-   MAS0AssetLogic.static async newAsset(signer, symbol, supply, manager, enableEvents, option)
+   MAS0AssetLogic.static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Creates a new MAS0-standard asset on-chain, then returns an
       instance of "MAS0AssetLogic" for interacting with it.
 
+      Pass "decimals" to set the asset's decimal places at creation
+      (0–18). "supply" must be expressed in the smallest unit for
+      those decimals; convert a human-readable amount with
+      "parseAmount()".
+
       Arguments:
+         * **decimals** (*int*) -- (Optional) Number of decimal places
+           for the asset. Omit to use the protocol default.
+
          * **option** (*RoutineOption*) -- (Optional) Override
            "storageFund" (defaults to "DEFAULT_STORAGE_FUND") to fund
            the new asset's creation-time storage cost with.
@@ -3597,15 +3848,19 @@ class MAS0AssetLogic()
 
       **Example**
 
+         const ASSET_DECIMALS = 12;
+         const supply = parseAmount("10", ASSET_DECIMALS);
+
          const gold = await MAS0AssetLogic.newAsset(
              signer,
              "GOLD",
-             1000000n,
+             supply,
              managerAddress,
-             true
+             true,
+             ASSET_DECIMALS
          );
 
-   MAS0AssetLogic.static create(signer, symbol, supply, manager, enableEvents, option)
+   MAS0AssetLogic.static create(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Builds an "InteractionContext" for creating a MAS0-standard
       asset. Like "AssetFactory.create()", this automatically bundles
@@ -3614,12 +3869,35 @@ class MAS0AssetLogic()
       "option.storageFund") - a fresh asset account self-pays for its
       own creation-time storage cost and starts with no KMOI.
 
+      Users can provide "decimals" at creation time. When set,
+      "supply" must already be scaled to that precision (use
+      "parseAmount()" with the same decimal count).
+
       Arguments:
+         * **decimals** (*int*) -- (Optional) Number of decimal places
+           for the asset (0–18).
+
          * **option** (*RoutineOption*) -- (Optional) Override
            "storageFund" to fund the new asset with.
 
       Returns:
          InteractionContext<OpType.ASSET_CREATE>
+
+      **Example**
+
+         const ASSET_DECIMALS = 12;
+         const amount = parseAmount("10", ASSET_DECIMALS);
+
+         const interactionObj = await MAS0AssetLogic.create(
+             wallet,
+             "GOLD",
+             amount,
+             id,
+             true,
+             ASSET_DECIMALS
+         ).ixData();
+
+         const response = await wallet.sendInteraction(interactionObj);
 
 **MAS0 Operations**
 
@@ -3957,7 +4235,10 @@ class MAS1AssetLogic()
       Creates a new MAS1-standard asset on-chain, then returns an
       instance of "MAS1AssetLogic" for interacting with it. MAS1 is
       single-unit (NFT-like) - unlike MAS0/MAS2 there is no "supply"
-      parameter, "max_supply" is always 1.
+      parameter, and no "decimals" parameter either; "max_supply" is
+      always "1". MAS1 has no "Decimals" endpoint and no operation
+      that carries an amount, so there is nothing for a decimals value
+      to describe or anywhere to read one back.
 
       Arguments:
          * **option** (*RoutineOption*) -- (Optional) Override
@@ -3976,7 +4257,8 @@ class MAS1AssetLogic()
              signer,
              "GOLD",
              managerAddress,
-             true
+             true,
+             option
          );
 
    MAS1AssetLogic.static create(signer, symbol, manager, enableEvents, option)
@@ -3994,6 +4276,18 @@ class MAS1AssetLogic()
 
       Returns:
          InteractionContext<OpType.ASSET_CREATE>
+
+      **Example**
+
+         const interactionObj = await MAS1AssetLogic.create(
+             wallet,
+             "GOLD",
+             id,
+             true,
+             option
+         ).ixData();
+
+         const response = await wallet.sendInteraction(interactionObj);
 
 **MAS1 Operations**
 
@@ -4377,12 +4671,20 @@ class MAS2AssetLogic()
 
    **Static Methods**
 
-   MAS2AssetLogic.static async newAsset(signer, symbol, supply, manager, enableEvents, option)
+   MAS2AssetLogic.static async newAsset(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Creates a new MAS2-standard asset on-chain, then returns an
       instance of "MAS2AssetLogic" for interacting with it.
 
+      Pass "decimals" to set the asset's decimal places at creation
+      (0–18). "supply" must be expressed in the smallest unit for
+      those decimals; convert a human-readable amount with
+      "parseAmount()".
+
       Arguments:
+         * **decimals** (*int*) -- (Optional) Number of decimal places
+           for the asset. Omit to use the protocol default.
+
          * **option** (*RoutineOption*) -- (Optional) Override
            "storageFund" (defaults to "DEFAULT_STORAGE_FUND") to fund
            the new asset's creation-time storage cost with.
@@ -4395,15 +4697,19 @@ class MAS2AssetLogic()
 
       **Example**
 
+         const ASSET_DECIMALS = 10;
+         const supply = parseAmount("10", ASSET_DECIMALS);
+
          const gold = await MAS2AssetLogic.newAsset(
              signer,
              "GOLD",
-             1000000n,
+             supply,
              managerAddress,
-             true
+             true,
+             ASSET_DECIMALS
          );
 
-   MAS2AssetLogic.static create(signer, symbol, supply, manager, enableEvents, option)
+   MAS2AssetLogic.static create(signer, symbol, supply, manager, enableEvents, decimals, option)
 
       Builds an "InteractionContext" for creating a MAS2-standard
       asset. Like "AssetFactory.create()", this automatically bundles
@@ -4412,12 +4718,35 @@ class MAS2AssetLogic()
       "option.storageFund") - a fresh asset account self-pays for its
       own creation-time storage cost and starts with no KMOI.
 
+      Users can provide "decimals" at creation time. When set,
+      "supply" must already be scaled to that precision (use
+      "parseAmount()" with the same decimal count).
+
       Arguments:
+         * **decimals** (*int*) -- (Optional) Number of decimal places
+           for the asset (0–18).
+
          * **option** (*RoutineOption*) -- (Optional) Override
            "storageFund" to fund the new asset with.
 
       Returns:
          InteractionContext<OpType.ASSET_CREATE>
+
+      **Example**
+
+         const ASSET_DECIMALS = 10;
+         const amount = parseAmount("10", ASSET_DECIMALS);
+
+         const interactionObj = await MAS2AssetLogic.create(
+             wallet,
+             "GOLD",
+             amount,
+             id,
+             true,
+             ASSET_DECIMALS
+         ).ixData();
+
+         const response = await wallet.sendInteraction(interactionObj);
 
 **MAS2 Operations**
 
@@ -4769,6 +5098,299 @@ getDynamicTokenMetadata(tokenId, key)
    **Example**
 
       const response = await mas2.getDynamicMetadata(tokenId, key).send();
+
+async getAssetInfo()
+
+   Reads this asset's stored metadata directly: "symbol", "dimension",
+   "decimals", "creator", "manager", "max_supply",
+   "circulating_supply", "enable_events", and "metadata".
+
+   MAS2's manifest has no "Decimals", "MaxSupply", or
+   "CirculatingSupply" endpoint, unlike MAS0 and MASN, so those values
+   cannot be read through a callsite method the way
+   "MAS0AssetLogic.Decimals()" can. This method reads them instead
+   through the node's generic, standard-agnostic asset-info RPC, which
+   every asset exposes.
+
+   Returns:
+      Promise<AssetInfo>
+
+   **Example**
+
+      const info = await mas2.getAssetInfo();
+      console.log(info.decimals);
+
+
+MASNAssetLogic
+~~~~~~~~~~~~~~
+
+MASN ("AssetStandard.MASN", "0xFFFE") is the reserved native-asset
+standard used exclusively by KMOI. Unlike MAS0–MAS2, MASN assets
+cannot be created by clients — the standard is reserved, and
+"MASNAssetLogic" always operates on "KMOI_ASSET_ID".
+
+MASN reuses the MAS0 wire format for its supported endpoints. Mint,
+burn, and metadata mutation are not available. The 15 supported
+endpoints are transfer, transferFrom, lockup, release, approve,
+revoke, symbol, balanceOf, creator, manager, decimals, maxSupply,
+circulatingSupply, getStaticMetadata, and getDynamicMetadata.
+
+class MASNAssetLogic()
+
+   Implements the reserved **MASN asset logic** for KMOI. All
+   operations target "KMOI_ASSET_ID"; there is no "assetId"
+   constructor argument and no "create" / "newAsset" factory.
+
+   **Constructor**
+
+   MASNAssetLogic.constructor(signer)
+
+      Initializes a new "MASNAssetLogic" instance bound to native
+      KMOI.
+
+      Arguments:
+         * **signer** (*Signer*) -- The signer instance for
+           authorization.
+
+      **Example**
+
+         const masn = new MASNAssetLogic(wallet);
+
+**MASN Operations**
+
+The following methods correspond to MASN-standard KMOI operations.
+Each mutating operation returns an "InteractionContext", which can be
+executed by calling ".send()". Amounts should be expressed in the
+smallest unit (anu); use "parseKmoi()" to convert a decimal KMOI
+string.
+
+transfer(beneficiary, amount)
+
+   Transfers KMOI to another account.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Recipient participant id.
+
+      * **amount** (*int | bigint*) -- Amount to transfer, in anu.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("100");
+      const response = await masn.transfer(beneficiary, amount).send();
+
+transferFrom(benefactor, beneficiary, amount)
+
+   Transfers KMOI from a benefactor to a beneficiary (if approved).
+
+   Arguments:
+      * **benefactor** (*str*) -- The participant id of the original
+        holder.
+
+      * **beneficiary** (*str*) -- The receiver participant id.
+
+      * **amount** (*int | bigint*) -- Amount to transfer, in anu.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("1");
+      const response = await masn.transferFrom(benefactor, beneficiary, amount).send();
+
+approve(beneficiary, amount, expiresAt)
+
+   Grants spending permission to another account.
+
+   Arguments:
+      * **beneficiary** (*str*) -- The spender participant id.
+
+      * **amount** (*int | bigint*) -- Allowance amount, in anu.
+
+      * **expiresAt** (*int*) -- Expiration timestamp (UNIX time).
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("10");
+      const response = await masn.approve(beneficiary, amount, 1765650600).send();
+
+revoke(beneficiary)
+
+   Revokes a previously approved allowance.
+
+   Arguments:
+      * **beneficiary** (*str*) -- Account to revoke approval from.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const response = await masn.revoke(beneficiary).send();
+
+lockup(beneficiary, amount)
+
+   Locks up a specified amount of KMOI under "SARGA_ADDRESS".
+
+   Arguments:
+      * **beneficiary** (*str*) -- Participant id of whose tokens are
+        being locked.
+
+      * **amount** (*int | bigint*) -- Amount to lock, in anu.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("1");
+      const response = await masn.lockup(beneficiary, amount).send();
+
+release(benefactor, beneficiary, amount)
+
+   Releases locked-up KMOI back to a beneficiary.
+
+   Arguments:
+      * **benefactor** (*str*) -- The original owner of the locked
+        tokens.
+
+      * **beneficiary** (*str*) -- The receiver of the released
+        tokens.
+
+      * **amount** (*int | bigint*) -- Amount to release, in anu.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const amount = parseKmoi("1");
+      const response = await masn.release(benefactor, beneficiary, amount).send();
+
+**Readonly Routines**
+
+symbol()
+
+   Returns an interaction context for retrieving the KMOI symbol.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await masn.symbol().call();
+
+balanceOf(id)
+
+   Retrieves the KMOI balance of a given account.
+
+   Arguments:
+      * **id** (*str*) -- The participant id to query.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const balance = await masn.balanceOf(walletAddress).call();
+
+creator()
+
+   Returns an interaction context for retrieving the KMOI creator.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await masn.creator().call();
+
+manager()
+
+   Returns an interaction context for retrieving the KMOI manager.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await masn.manager().call();
+
+Decimals()
+
+   Returns an interaction context for retrieving KMOI decimals (9).
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await masn.Decimals().call();
+
+MaxSupply()
+
+   Returns an interaction context for retrieving the KMOI max supply.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await masn.MaxSupply().call();
+
+CirculatingSupply()
+
+   Returns an interaction context for retrieving the KMOI circulating
+   supply.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const response = await masn.CirculatingSupply().call();
+
+GetStaticMetadata(key)
+
+   Retrieves a static metadata entry for KMOI.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const response = await masn.GetStaticMetadata("name").call();
+
+GetDynamicMetadata(key)
+
+   Retrieves a dynamic metadata entry for KMOI.
+
+   Arguments:
+      * **key** (*str*) -- The metadata key.
+
+   Returns:
+      InteractionContext<OpType.ASSET_INVOKE>
+
+   **Example**
+
+      const masn = new MASNAssetLogic(wallet);
+      const response = await masn.GetDynamicMetadata(key).call();
 
 ======================================================================
 
@@ -6069,8 +6691,8 @@ network. It includes the following properties:
 * "sender" - "string": The address of the participant initiating the
   interaction.
 
-* "payer" - "string": The address of the participant responsible for
-  covering the interaction's fuel costs.
+* "fee_payer" - "string": The address of the participant responsible
+  for covering the interaction's fuel costs.
 
 * "nonce" - "string": The nonce value.
 
@@ -6510,6 +7132,83 @@ bufferToUint8(target)
    >> [1, 2, 3]
 
 
+Units
+=====
+
+Helpers for converting between human-readable decimal amounts and on-
+chain integer amounts. "formatAmount" / "parseAmount" work with any
+asset decimals (0–18). "formatKmoi" / "parseKmoi" are convenience
+wrappers that always use "KMOI_DECIMALS" (9). "formatFuelFee" further
+wraps "formatKmoi" for the specific case of an interaction's fuel
+cost.
+
+formatAmount()
+
+   Converts an amount in the smallest unit to a decimal string.
+   Mirrors ethers v5 formatUnits.
+
+   // Example
+   console.log(formatAmount(1500000000n, 9))
+
+   >> 1.5
+
+parseAmount()
+
+   Converts a decimal string to an amount in the smallest unit.
+   Mirrors ethers v5 parseUnits.
+
+   // Example
+   console.log(parseAmount("1.5", 9))
+
+   >> 1500000000n
+
+   // Round-trip
+   const raw = parseAmount("1.000000001", 9)
+   console.log(formatAmount(raw, 9))
+
+   >> 1.000000001
+
+formatKmoi()
+
+   Converts an anu amount to a decimal KMOI string.
+
+   // Example
+   console.log(formatKmoi(1500000000n))
+
+   >> 1.5
+
+   console.log(formatKmoi(5000000n))
+
+   >> 0.005
+
+parseKmoi()
+
+   Converts a decimal KMOI string to an anu amount.
+
+   // Example
+   console.log(parseKmoi("1.5"))
+
+   >> 1500000000n
+
+   const amount = parseKmoi("100")
+   const response = await masn.transfer(beneficiary, amount).send()
+
+formatFuelFee()
+
+   Converts an interaction's fuel cost (*fuel_used * fuel_price*, both
+   anu-denominated quantities) into a decimal KMOI string in one call.
+   *InteractionReceipt* doesn't carry *fuel_price* itself (only
+   *fuel_used*), so pass the *fuel_price* the interaction was
+   originally submitted with.
+
+   // Example - InteractionReceipt only carries fuel_used, not fuel_price,
+   // so pass the fuel_price the interaction was submitted with.
+   const receipt = await response.wait()
+   console.log(formatFuelFee(BigInt(receipt.fuel_used), 50n))
+
+   >> 0.0001702
+
+
 Json
 ====
 
@@ -6669,8 +7368,8 @@ Agent Skill
 
 The **js-moi-sdk agent skill** teaches AI coding agents (Claude Code,
 Cursor, and any tool that supports the "SKILL.md" format) the API
-surface of js-moi-sdk v0.8.0 — plus practical examples covering fuel
-reservation, nonce serialization, event decoding, keystore round-
+surface of js-moi-sdk v0.9.0-rc3 — plus practical examples covering
+fuel reservation, nonce serialization, event decoding, keystore round-
 trips, MAS1/MAS2 differences, and Voyage devnet flows.
 
 ======================================================================
@@ -6679,7 +7378,7 @@ trips, MAS1/MAS2 differences, and Voyage devnet flows.
 How do I download the skill?
 ============================
 
-"js-moi-sdk-skills.zip"
+js-moi-sdk-skills.zip
 
 The archive contains:
 
@@ -6723,7 +7422,7 @@ the task at hand — you do not need to paste anything manually.
 
 Note:
 
-  The skill targets js-moi-sdk v0.8.0.
+  The skill targets js-moi-sdk v0.9.0-rc3.
 
 ---
 # Contributions

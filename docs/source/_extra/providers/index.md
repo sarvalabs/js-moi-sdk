@@ -232,7 +232,8 @@ request. It has the following properties:
 
 * "ix_args" - "string": The encoded interaction parameters.
 
-* "signature" - "string": The signature for the interaction.
+* "signatures" - "string": The POLO-encoded signature blob for the
+  interaction (one or more entries).
 
 **InteractionResponse**
 
@@ -514,8 +515,8 @@ has the following properties:
 * "sender" - "string": The address of the participant initiating the
   interaction (optional).
 
-* "payer" - "string": The address of the participant responsible for
-  covering the interaction's fuel costs. (optional).
+* "fee_payer" - "string": The address of the participant responsible
+  for covering the interaction's fuel costs. (optional).
 
 * "nonce" - "number | bigint": A unique value used to ensure the
   interaction's uniqueness (optional).
@@ -943,6 +944,53 @@ BaseProvider.sendInteraction(ixObject)
    Returns:
       **Promise.<InteractionResponse>** -- A Promise that resolves to
       the interaction response.
+
+checkSignature(signatures, participantId)
+
+   Checks whether a signature array contains an entry for the given
+   participant identifier.
+
+   Arguments:
+      * **signatures** (**Array.<Signature>**) -- Parsed signature
+        entries.
+
+      * **participantId** (**Hex**) -- Participant identifier to look
+        for.
+
+   Returns:
+      **boolean** -- *true* when a matching signature entry exists.
+
+Checks whether a parsed "Signature" array contains an entry for the
+given participant identifier. Use this when assembling sponsored
+interactions to confirm that a payer (or any other co-signer) has
+signed before sending.
+
+The payer typically produces signatures with
+"Wallet#signRawInteractionObject()". The sender merges those entries
+into the final request through the "participantSignatures" argument of
+"Wallet#signInteraction()" or "Signer#sendInteraction()".
+
+   const sigAlgo = senderWallet.signingAlgorithms["ecdsa_secp256k1"];
+   const payerId = (await payerWallet.getIdentifier()).toHex();
+
+   await senderWallet.prepareInteraction("send", interaction);
+
+   const payerSignatures = await payerWallet.signRawInteractionObject(
+       interaction,
+       sigAlgo,
+   );
+
+   if (!checkSignature(payerSignatures, payerId)) {
+       throw new Error("Payer signature is missing");
+   }
+
+   const ixRequest = await senderWallet.signInteraction(
+       interaction,
+       sigAlgo,
+       payerSignatures,
+   );
+
+   const response = await provider.sendInteraction(ixRequest);
 
 
 Query Methods
@@ -1376,7 +1424,7 @@ Tesseract
                {
                    "nonce": "0x1",
                    "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
-                   "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                   "fee_payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
                    "fuel_price": "0x1",
                    "fuel_limit": "0xc8",
                    "ix_operations": [
@@ -1893,7 +1941,7 @@ Interaction By Hash
        {
            "nonce": "0x1",
            "sender": "0x45b9906e65c9bdf4703918aa2c78fe139ba8e32c5e0dcda585dac4c584651f08",
-           "payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+           "fee_payer": "0x0000000000000000000000000000000000000000000000000000000000000000",
            "fuel_price": "0x1",
            "fuel_limit": "0xc8",
            "ix_operations": [

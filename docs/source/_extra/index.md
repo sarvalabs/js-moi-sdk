@@ -5,7 +5,7 @@
 Documentation
 *************
 
-This documentation is for js-moi-sdk v0.8.0
+This documentation is for js-moi-sdk v0.9.0-rc3
 
 ======================================================================
 
@@ -40,6 +40,8 @@ Developer Documentation
   * MOI Derivation Path
 
   * MOI Derivation Base Path
+
+  * KMOI Decimals
 
 * Providers
 
@@ -84,6 +86,8 @@ Developer Documentation
   * Hex
 
   * Bytes
+
+  * Units
 
   * Json
 

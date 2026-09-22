@@ -73,8 +73,8 @@ network. It includes the following properties:
 * "sender" - "string": The address of the participant initiating the
   interaction.
 
-* "payer" - "string": The address of the participant responsible for
-  covering the interaction's fuel costs.
+* "fee_payer" - "string": The address of the participant responsible
+  for covering the interaction's fuel costs.
 
 * "nonce" - "string": The nonce value.
 
@@ -512,6 +512,83 @@ bufferToUint8(target)
    console.log(uint8Array)
 
    >> [1, 2, 3]
+
+
+Units
+=====
+
+Helpers for converting between human-readable decimal amounts and on-
+chain integer amounts. "formatAmount" / "parseAmount" work with any
+asset decimals (0–18). "formatKmoi" / "parseKmoi" are convenience
+wrappers that always use "KMOI_DECIMALS" (9). "formatFuelFee" further
+wraps "formatKmoi" for the specific case of an interaction's fuel
+cost.
+
+formatAmount()
+
+   Converts an amount in the smallest unit to a decimal string.
+   Mirrors ethers v5 formatUnits.
+
+   // Example
+   console.log(formatAmount(1500000000n, 9))
+
+   >> 1.5
+
+parseAmount()
+
+   Converts a decimal string to an amount in the smallest unit.
+   Mirrors ethers v5 parseUnits.
+
+   // Example
+   console.log(parseAmount("1.5", 9))
+
+   >> 1500000000n
+
+   // Round-trip
+   const raw = parseAmount("1.000000001", 9)
+   console.log(formatAmount(raw, 9))
+
+   >> 1.000000001
+
+formatKmoi()
+
+   Converts an anu amount to a decimal KMOI string.
+
+   // Example
+   console.log(formatKmoi(1500000000n))
+
+   >> 1.5
+
+   console.log(formatKmoi(5000000n))
+
+   >> 0.005
+
+parseKmoi()
+
+   Converts a decimal KMOI string to an anu amount.
+
+   // Example
+   console.log(parseKmoi("1.5"))
+
+   >> 1500000000n
+
+   const amount = parseKmoi("100")
+   const response = await masn.transfer(beneficiary, amount).send()
+
+formatFuelFee()
+
+   Converts an interaction's fuel cost (*fuel_used * fuel_price*, both
+   anu-denominated quantities) into a decimal KMOI string in one call.
+   *InteractionReceipt* doesn't carry *fuel_price* itself (only
+   *fuel_used*), so pass the *fuel_price* the interaction was
+   originally submitted with.
+
+   // Example - InteractionReceipt only carries fuel_used, not fuel_price,
+   // so pass the fuel_price the interaction was submitted with.
+   const receipt = await response.wait()
+   console.log(formatFuelFee(BigInt(receipt.fuel_used), 50n))
+
+   >> 0.0001702
 
 
 Json

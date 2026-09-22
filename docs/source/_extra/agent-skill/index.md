@@ -9,8 +9,8 @@ Agent Skill
 
 The **js-moi-sdk agent skill** teaches AI coding agents (Claude Code,
 Cursor, and any tool that supports the "SKILL.md" format) the API
-surface of js-moi-sdk v0.8.0 — plus practical examples covering fuel
-reservation, nonce serialization, event decoding, keystore round-
+surface of js-moi-sdk v0.9.0-rc3 — plus practical examples covering
+fuel reservation, nonce serialization, event decoding, keystore round-
 trips, MAS1/MAS2 differences, and Voyage devnet flows.
 
 ======================================================================
@@ -19,7 +19,7 @@ trips, MAS1/MAS2 differences, and Voyage devnet flows.
 How do I download the skill?
 ============================
 
-"js-moi-sdk-skills.zip"
+js-moi-sdk-skills.zip
 
 The archive contains:
 
@@ -63,4 +63,4 @@ the task at hand — you do not need to paste anything manually.
 
 Note:
 
-  The skill targets js-moi-sdk v0.8.0.
+  The skill targets js-moi-sdk v0.9.0-rc3.

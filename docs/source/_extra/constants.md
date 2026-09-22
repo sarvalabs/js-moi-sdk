@@ -21,7 +21,7 @@ package.
 
    console.log(moi.VERSION)
 
-   >> 0.8.0
+   >> 0.9.0-rc3
 
 
 MOI Derivation Path
@@ -53,3 +53,18 @@ create unique MOI account addresses.
    console.log(moi.MOI_DERIVATION_BASE_PATH)
 
    >> "m/44'/6174'/0'/0"
+
+
+KMOI Decimals
+=============
+
+The "KMOI_DECIMALS" constant is the number of decimal places used by
+native KMOI. "formatKmoi()" and "parseKmoi()" always convert using
+this value (9). The smallest KMOI unit is anu: "1 KMOI = 10 ** 9" anu.
+
+   // Example
+   import * as moi from "js-moi-sdk";
+
+   console.log(moi.KMOI_DECIMALS)
+
+   >> 9
