@@ -1,11 +1,45 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KramaId = void 0;
+const peer_id_1 = require("@libp2p/peer-id");
 const elliptic_1 = __importDefault(require("elliptic"));
-const peer_id_1 = require("peer-id");
+const Digest = __importStar(require("multiformats/hashes/digest"));
 const utils_1 = require("../utils");
 const krama_id_enums_1 = require("./krama-id-enums");
 const krama_id_metadata_1 = require("./krama-id-metadata");
@@ -63,7 +97,7 @@ class KramaId {
      * @returns A promise that resolves to the decoded peer ID.
      */
     getDecodedPeerId() {
-        return (0, peer_id_1.createFromB58String)(this.getPeerId());
+        return (0, peer_id_1.peerIdFromString)(this.getPeerId());
     }
     toString() {
         return this.value;
@@ -80,7 +114,7 @@ class KramaId {
         }
         const compressedPubKey = new elliptic_1.default.ec("secp256k1").keyFromPrivate(privateKey).getPublic(true, "array");
         const raw = new Uint8Array([0, 37, 8, 2, 18, 33, ...compressedPubKey]);
-        return await (0, peer_id_1.createFromPubKey)(raw);
+        return (0, peer_id_1.peerIdFromMultihash)(Digest.decode(raw));
     }
     /**
      * Creates a `KramaId` instance from a given private key.
@@ -106,7 +140,7 @@ class KramaId {
         const tag = new krama_id_tag_1.KramaIdTag((kind << 4) | version);
         const metadata = zone << 4;
         const encoded = (0, utils_1.encodeBase58)(new Uint8Array([tag.value, metadata]));
-        const peerIdString = typeof peerId === "string" ? peerId : peerId.toB58String();
+        const peerIdString = typeof peerId === "string" ? peerId : peerId.toString();
         return new KramaId(encoded + peerIdString);
     }
     static validate(value) {
@@ -117,7 +151,7 @@ class KramaId {
             }
             const tag = id.getTag();
             const metadata = id.getMetadata();
-            (0, peer_id_1.parse)(id.getPeerId());
+            (0, peer_id_1.peerIdFromString)(id.getPeerId());
             return krama_id_tag_1.KramaIdTag.validate(tag) ?? krama_id_metadata_1.KramaIdMetadata.validate(metadata) ?? null;
         }
         catch (error) {

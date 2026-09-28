@@ -26,9 +26,10 @@
   "author": "Sarva Labs Inc. & MOI Protocol Developers",
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
+    "@libp2p/peer-id": "^6.0.14",
     "@noble/hashes": "^1.1.5",
     "elliptic": "^6.6.1",
-    "peer-id": "^0.16.0"
+    "multiformats": "^14.0.0"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.18"

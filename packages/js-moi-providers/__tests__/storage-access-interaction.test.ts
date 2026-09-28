@@ -1,6 +1,6 @@
 import { MIN_STORAGE_DEPOSIT_AMOUNT } from "js-moi-constants";
 import { LockType, OpType, ResourceType, AccessAction, CallerKind } from "js-moi-utils";
-import { Depolorizer } from "js-polo";
+import { Depolorizer, Polorizer } from "js-polo";
 import type { InteractionObject } from "../types/interaction";
 import type { AccessDeletePayload, AccessPayload, StoragePayload } from "../types/operation";
 import {
@@ -301,7 +301,6 @@ describe("toRawInteractionObject - wire encoding for the new ops", () => {
     test("bundled Transfer-shaped calldata (from js-moi-interactions) decodes back to the right beneficiary/amount", () => {
         // Sanity check that the generic POLO round-trip machinery this suite exercises is
         // consistent with how js-moi-interactions builds its own bundled funding transfers.
-        const { Polorizer } = require("js-polo");
         const polorizer = new Polorizer();
         polorizer.polorize({ beneficiary: Buffer.from(LOGIC.slice(2), "hex"), amount: 42 }, TRANSFER_LIKE_SCHEMA);
         const bytes = polorizer.bytes();
