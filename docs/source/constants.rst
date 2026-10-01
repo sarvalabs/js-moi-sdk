@@ -1,3 +1,6 @@
+.. meta::
+   :description: Protocol constants exposed by js-moi-sdk for the MOI network: fuel prices, interaction types, and other fixed values used across the SDK packages.
+
 =========
 Constants
 =========

@@ -1,3 +1,6 @@
+.. meta::
+   :description: Sign MOI interactions and messages with js-moi-sdk: the Signer API, HD wallets and keypairs, and cryptographic proof of account authority on MOI.
+
 ======
 Signer
 ======
