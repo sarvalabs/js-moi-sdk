@@ -4,51 +4,15 @@
 # NONEXISTENT paths to index.html with HTTP 200 (soft-200 fallback). After
 # deploy, verify this file returns text/plain, and consider replacing the
 # fallback with a real 404 so unknown URLs stop soft-200ing.
-
+#
 # Content Signals (contentsignals.org): search indexing, AI answer/input use,
-# and AI training use are all welcome.
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
+# and AI training use are all welcome. Content-Signal belongs inside a
+# User-agent group, and a crawler obeys only the most specific group that
+# names it, so keep a single group: a per-crawler group (GPTBot, ClaudeBot,
+# ...) would take those crawlers out of this one and drop the signals for them.
 
 User-agent: *
-Allow: /
-
-User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: Claude-User
-Allow: /
-
-User-agent: Claude-SearchBot
-Allow: /
-
-User-agent: Perplexity-User
-Allow: /
-
-User-agent: Applebot-Extended
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 
 Sitemap: https://js-moi-sdk.docs.moi.technology/sitemap.xml
