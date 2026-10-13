@@ -2,25 +2,29 @@
 
 An [agent skill](https://docs.openclaw.ai/tools/creating-skills) that teaches
 coding agents the real, verified API surface of
-[js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk) — the JavaScript/TypeScript
-SDK for the MOI Protocol blockchain — plus the gotchas that cost hours when
-learned the hard way (fuel reservation, nonce serialization, event decoding,
-keystore round-trips, MAS1/MAS2 signature differences, and more).
+[js-moi-sdk](https://github.com/sarvalabs/js-moi-sdk), the JavaScript/TypeScript
+SDK for the MOI Protocol blockchain, plus the gotchas that cost hours when
+learned the hard way (fuel reservation, the storage fund every create carries,
+nonce serialization, event decoding, keystore round-trips, MAS1/MAS2 signature
+differences, fee payer signatures, and more).
 
-**Currently verified against js-moi-sdk v0.7.1.**
+**Currently verified against js-moi-sdk v0.9.0-rc2** (npm `latest`). The rc3
+tag on GitHub is a one-commit hotfix; its differences (notably `payer` →
+`fee_payer`) are called out inline wherever they matter.
 
 ## Layout
 
-- `SKILL.md` — entry point: the 60-second flow, cross-cutting gotchas, and a
-  map of which reference to read for which task.
-- `references/` — ten deep-dive references (providers, wallet/signer, logic,
+- `SKILL.md`: entry point: the 0.7.x → 0.9.0 migration table, the 60-second
+  flow, cross-cutting gotchas, and a map of which reference to read for which
+  task.
+- `references/`: ten deep-dive references (providers, wallet/signer, logic,
   manifest, assets, interactions, identifiers, utils/constants, MOI concepts,
   and battle-tested patterns), each stating the SDK sources it was verified
   against (some also carry file:line citations).
-- `examples/` — lived, end-to-end flows in plain JS (e.g. Voyage devnet NFT
+- `examples/`: lived, end-to-end flows in plain JS (e.g. Voyage devnet NFT
   mint→transfer) that pin the network-specific choices the references leave open.
-- `AGENTS.md` — maintenance process for anyone (agent or human) editing this
-  skill; `CHANGELOG.md` — version history and SDK-version stamps.
+- `AGENTS.md`: maintenance process for anyone (agent or human) editing this
+  skill; `CHANGELOG.md`: version history and SDK-version stamps.
 
 ## Install
 
@@ -36,15 +40,15 @@ the `SKILL.md` format).
 ## Revalidating after an SDK release
 
 ```bash
-cd /path/to/js-moi-sdk && git pull && npm install
+cd /path/to/js-moi-sdk && git fetch --tags && git checkout vX.Y.Z && npm install
 ```
 
-Then re-check the reference claims against the updated `src.ts/` sources and bump
-the "verified against" stamps.
-
-Fix any reference claim that drifted, bump the "verified against" stamps in
-`SKILL.md` and `references/*.md`, and publish with a changelog noting the new SDK
-version.
+Then re-check the reference claims against that tag's `src.ts/` sources (the
+procedure is in `AGENTS.md`), run the examples against devnet with the matching
+npm package, fix what drifted, bump the "verified against" stamps in `SKILL.md`
+and `references/*.md`, and note the new SDK version in `CHANGELOG.md`. The
+publish workflow in `.github/workflows/publish.yml` zips this folder on every
+GitHub release.
 
 ## License
 

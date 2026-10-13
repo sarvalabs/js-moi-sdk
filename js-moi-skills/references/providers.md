@@ -1,9 +1,12 @@
-# js-moi-providers — reading the chain, submitting, subscribing
+# js-moi-providers: reading the chain, submitting, subscribing
 
-Verified against `packages/js-moi-providers/src.ts/` (v0.7.1). Line refs are
-relative to that package.
+Verified against `packages/js-moi-providers/src.ts/` (v0.9.0-rc2). Line refs are
+relative to that package. New since 0.7.1: `getStorageMetric`,
+`getStoragePricing`, `getAccessPolicy`, `getAccessPolicies`, an `options`
+parameter on `getAssetInfoByAssetID`, receipt decoding for the new op types, and
+a reconnect fix in `WebsocketProvider`. The read API is otherwise unchanged.
 
-## Quick start — Voyage devnet (the default for MOI Builders)
+## Quick start: Voyage devnet (the default for MOI Builders)
 
 For the hosted Voyage **devnet**, this is the whole setup:
 
@@ -16,19 +19,21 @@ wallet.connect(provider);
 
 Only `"devnet"` is accepted (any other string throws `Unsupported network`).
 Use `JsonRpcProvider("http://localhost:1600")` + path `m/44'/6174'/0'/0/0` only
-for a **local** node — those defaults land an unfunded account on devnet. See
+for a **local** node; those defaults land an unfunded account on devnet. See
 `examples/nft-mint-transfer.md` for the full devnet flow and its landmines.
+Devnet answered `net.Version` `0.13.0` on 13 October 2026; the same host also
+serves a `/babylon/` path that answered the same version.
 
 ## Classes
 
 `EventEmitter → AbstractProvider → BaseProvider →` the four concrete providers.
 `BaseProvider` implements **every** read/query/submit method; the concrete
 classes differ only in transport, so all methods below exist on all of them.
-(`AbstractProvider` is exported too — extend it for a custom transport.)
+(`AbstractProvider` is exported too; extend it for a custom transport.)
 
 | Class | Constructor | Use |
 |---|---|---|
-| `JsonRpcProvider` | `new JsonRpcProvider(host: string)` | HTTP(S) transport. Accepts `http(s)://` and, by regex only, `ws(s)://` — but it **POSTs over HTTP**; it does NOT do real WebSocket. `jsonrpc-provider.ts:12` |
+| `JsonRpcProvider` | `new JsonRpcProvider(host: string)` | HTTP(S) transport. Accepts `http(s)://` and, by regex only, `ws(s)://`, but it **POSTs over HTTP**; it does NOT do real WebSocket. `jsonrpc-provider.ts:12` |
 | `WebsocketProvider` | `new WebsocketProvider(host, options?: WebsocketConnection)` | Real WS transport + subscriptions. `host` must be `ws(s)://`. `websocket-provider.ts:33` |
 | `VoyageProvider` | `new VoyageProvider("devnet")` | Hosted devnet; only `"devnet"` supported. `voyage-provider.ts:12` |
 | `BrowserProvider` | `new BrowserProvider(transport)` | Wraps an injected wallet (e.g. `globalThis.moi`); wallet signs. `browser-provider.ts:27` |
@@ -36,9 +41,13 @@ classes differ only in transport, so all methods below exist on all of them.
 `WebsocketConnection` (`websocket-provider.ts:11`): `{ protocols?, headers?,
 requestOptions?, clientConfig?, reconnect?: { delay, maxAttempts }, timeout? }`.
 Auto-reconnect on non-1000 close happens **only if you pass the `reconnect`
-option** (up to `maxAttempts`, polling every `delay` ms) — without it a drop
+option** (up to `maxAttempts`, polling every `delay` ms); without it a drop
 just emits `'close'`. RPC calls made before the socket is OPEN queue until
-`connect`. `disconnect(): Promise<void>` closes cleanly.
+`connect`. `disconnect(): Promise<void>` closes cleanly. **0.9.0-rc2 fixed
+reconnect** (release note "fix: websocket reconnect issue"): only one reconnect
+cycle runs at a time, and on reconnect every cached subscription id and its
+message listener are dropped, so the next `on()`/`once()` for that event sends a
+fresh `moi.Subscribe`. Re-attach your listeners after a `'reconnect'` event.
 
 ## `Options` (tesseract selector)
 
@@ -50,18 +59,18 @@ Most reads take an optional `options?: Options` =
 
 Numeric fields are hex on the wire; the methods marked "hex→BN" decode with
 `hexToBN` and return `number | bigint`. **Many methods do NOT decode** (see
-Gotchas) — you get raw hex strings.
+Gotchas); you get raw hex strings.
 
 | Method | Signature | RPC | Notes |
 |---|---|---|---|
 | `getBalance` | `(id, assetId, options?) → number\|bigint` | `moi.Balance` | one asset's balance, hex→BN |
 | `getTDU` | `(id, options?) → TDU[]` | `moi.TDU` | everything held; `{asset_id, token_id, amount}` amounts hex→BN |
-| `getContextInfo` | `(id, options?) → ContextInfo` | `moi.ContextInfo` | `{behaviour_nodes, random_nodes, storage_nodes}` — logic links |
+| `getContextInfo` | `(id, options?) → ContextInfo` | `moi.ContextInfo` | `{behaviour_nodes, random_nodes, storage_nodes}`: logic links |
 | `getInteractionByHash` | `(ixHash) → Interaction` | `moi.InteractionByHash` | ix + `participants` (there is no `participants_state` field) |
 | `getInteractionByTesseract` | `(id?, options?, ix_index=1)` | `moi.InteractionByTesseract` | overloaded by first-arg type |
 | `getInteractionCount` | `(id, keyId, options?) → number\|bigint` | `moi.InteractionCount` | next nonce for that key; **keyId is required** |
 | `getPendingInteractionCount` | `(id, keyId) → number\|bigint` | `moi.PendingInteractionCount` | includes ixpool |
-| `getAccountState` | `(id, options?) → AccountState` | `moi.AccountState` | nonce, balance, roots… (raw hex) |
+| `getAccountState` | `(id, options?) → AccountState` | `moi.AccountState` | nonce, balance, roots… (raw hex); 0.8.0 adds `storage_registry_root`, `access_policy_root`, `total_storage_consumed` |
 | `getAccountKeys` | `(id, options?) → AccountKey[]` | `moi.AccountKeys` | `{id, publicKey, weight, …}` |
 | `getAccountMetaInfo` | `(id) → AccountMetaInfo` | `moi.AccountMetaInfo` | `{type, id, height, tesseract_hash, …}`; **ignores options** |
 | `getSubAccountCount` | `(id, options?) → number\|bigint` | `moi.SubAccountCount` | how many sub-accounts a primary has |
@@ -71,6 +80,10 @@ Gotchas) — you get raw hex strings.
 | `getLogicIds` | `(id, options?) → string[]` | `moi.LogicIDs` | logics an account owns/deployed |
 | `getRegistry` | `(id, options?) → Registry` | `moi.Deeds` | |
 | `getSyncStatus` | `(id?) → SyncStatus` | `moi.Syncing` | |
+| `getStorageMetric` | `(targetAccount, userAccount, options?) → StorageMetric` | `moi.StorageMetric` | **new 0.8.0**; `{storage_granted, storage_consumed, tokens_deposited}` raw hex: a participant's storage allowance on a logic/asset account |
+| `getStoragePricing` | `() → StoragePricing` | `moi.StoragePricing` | **new 0.8.0**; `{storage_price_per_byte, storage_multiplier, anu_per_byte}` raw hex |
+| `getAccessPolicy` | `(id, resourceType: ResourceType, resourceId, options?) → AccessPolicyInfo` | `moi.AccessPolicy` | **new 0.8.0**; `resource_type` is sent as the lowercase label (`"storage"`), not the enum number |
+| `getAccessPolicies` | `(id, resourceType, options?) → AccessPolicyInfo[]` | `moi.AccessPolicies` | **new 0.8.0**; sends `resource_id: ZERO_ADDRESS` to list all |
 
 ### Overloads
 
@@ -95,17 +108,23 @@ getInteractionByTesseract(options: Options, ix_index = 1)
 | `estimateFuel` | `(ixObject, options?) → number\|bigint` | `moi.FuelEstimate` | |
 | `sendInteraction` | `(request: InteractionRequest) → InteractionResponse` | `moi.SendInteractions` | **request must already be signed** (see below) |
 
-- **`InteractionRequest` = `{ ix_args: string; signatures: string }`** — an
+- **`InteractionRequest` = `{ ix_args: string; signatures: string }`**: an
   already-serialized, already-signed interaction. You normally do NOT build this
   by hand: the driver / asset / builder `.send()` and `wallet.signInteraction`
   produce it. **`BrowserProvider.sendInteraction` takes the same signed
-  `InteractionRequest`** (it forwards to `wallet.SendInteraction`) — signing
+  `InteractionRequest`** (it forwards to `wallet.SendInteraction`); signing
   always happens in `Signer.signInteraction`, never in a provider.
 - **`InteractionResponse`** = `{ hash, wait(timeout?), result(timeout?) }`:
   - `wait(timeoutSeconds = 120)` polls `moi.InteractionReceipt` every 5s and
     resolves to an `InteractionReceipt`, or on timeout rejects with the object
     `{ message: "failed to fetch receipt" }` (not an `Error`).
-  - `result(timeout?)` waits then decodes to per-operation `ExecutionResult[]`.
+  - `result(timeout?)` waits then decodes to per-operation `ExecutionResult[]`
+    (`processReceipt`): `ASSET_CREATE` → `AssetCreationResult`, `ASSET_INVOKE`
+    → `AssetSupplyResult` or the raw `{outputs, error}`, `LOGIC_*` → the logic
+    results, `ACCOUNT_INHERIT` → `AccountInheritResult {sub_account, error}`
+    (new), and `null` for `ACCOUNT_CONFIGURE`, `STORAGE_*` and `ACCESS_*`, which
+    carry no result payload. **Creates and deploys now produce two entries**
+    (the op, then the bundled funding transfer); index 0 is yours.
 - **`InteractionReceipt`** = `{ ix_hash, status: number, fuel_used, ix_operations:
   OperationResult[], from, ix_index, ts_hash, participants }`.
   `OperationResult = { tx_type, status: number, data: ExecutionResult }`.
@@ -117,9 +136,9 @@ getInteractionByTesseract(options: Options, ix_index = 1)
 
 | Method | Signature | RPC | Notes |
 |---|---|---|---|
-| `getAssetInfoByAssetID` | `(assetId, options?) → AssetInfo` | `moi.AssetInfoByAssetID` | `{symbol, decimals, max_supply, …}` — numeric fields stay **raw hex** |
+| `getAssetInfoByAssetID` | `(assetId, options?) → AssetInfo` | `moi.AssetInfoByAssetID` | `{asset_id, symbol, dimension, decimals, creator, manager, max_supply, circulating_supply, enable_events, metadata, logic_id?}`; numeric fields stay **raw hex** (KMOI answers `decimals: "0x9"`) |
 | `getInteractionReceipt` | `(ixHash) → InteractionReceipt` | `moi.InteractionReceipt` | |
-| `getStorageAt` | `(logicId, storageKey, options?)` / `(logicId, storageKey, address, options?)` | `moi.LogicStorage` | raw persistent/ephemeral slot; the logic driver's state API wraps this |
+| `getStorageAt` | `(logicId, storageKey, options?)` / `(logicId, storageKey, address, options?)` | `moi.LogicStorage` | raw logic-state / actor-state slot; the logic driver's `logicState`/`actorState` wrap this |
 | `getLogicManifest` | `(logicId, encoding, options?)` | `moi.LogicManifest` | `"JSON"` → decoded `Manifest` object; `"POLO"` → hex |
 | `getLogs` | `(filter: LogFilter) → Log[]` | `moi.GetLogs` | see below |
 
@@ -129,9 +148,9 @@ Height span is limited server-side (docstring warns >10 is rejected). Start
 inclusive, end exclusive per docstring. **`Log`** =
 `{ id, topics: string[], data, ix_hash, ts_hash, participants }`.
 
-## Filters (polling — works over HTTP)
+## Filters (polling, works over HTTP)
 
-Server-side filters (≈1-minute TTL, reset each poll) — an alternative to WS.
+Server-side filters (≈1-minute TTL, reset each poll), an alternative to WS.
 
 | Method | RPC |
 |---|---|
@@ -139,7 +158,7 @@ Server-side filters (≈1-minute TTL, reset each poll) — an alternative to WS.
 | `getNewTesseractsByAccountFilter(address)` | `moi.NewTesseractsByAccountFilter` |
 | `getPendingInteractionFilter()` | `moi.PendingIxnsFilter` |
 | `getLogsFilter(filter: LogFilter)` | `moi.NewLogFilter` |
-| `getFilterChanges<T>(filter)` | `moi.GetFilterChanges` — **returns `null` when no changes** (does not throw) |
+| `getFilterChanges<T>(filter)` | `moi.GetFilterChanges`; **returns `null` when no changes** (does not throw) |
 | `removeFilter(filter)` | `moi.RemoveFilter` → `{status}` |
 
 `Filter = { id: string }`.
@@ -152,7 +171,7 @@ Server-side filters (≈1-minute TTL, reset each poll) — an alternative to WS.
 
 ## Subscriptions (`WebsocketProvider`)
 
-`WebSocketEvent` enum (`websocket-events.ts`): `Close="close"`,
+`WebSocketEvent` enum (`websocket-events.ts`, unchanged): `Close="close"`,
 `Connect="connect"`, `Error="error"`, `Reconnect="reconnect"`,
 `NewTesseracts="newTesseracts"`, `NewTesseractsByAccount="newTesseractsByAccount"`,
 `NewPendingInteractions="newPendingInteractions"`, `NewLog="newLog"`.
@@ -180,14 +199,14 @@ subscription id; `WebsocketProvider` dedupes it per event.
 
 > Some nodes reject the SDK's object-form `newLogs` subscription (it sends
 > `{ address, … }` while the node wants `{ id }`). If you hit "invalid
-> identifier", send the raw frame yourself — see `patterns.md`.
+> identifier", send the raw frame yourself; see `patterns.md`.
 
 ## BrowserProvider extras (wallet dApps)
 
 In addition to all BaseProvider reads: `request(method, params)`,
 `getWalletAccounts()` (first = active), `getWalletAccount(id?)`,
 `requestPermissions`/`getPermissions`/`revokePermissions`, `getNetwork()`,
-`getWalletVersion()`, and `sendInteraction(signedRequest)` — same signed
+`getWalletVersion()`, and `sendInteraction(signedRequest)`: same signed
 `{ ix_args, signatures }` shape as the other providers, routed through
 `wallet.SendInteraction`. Wallet events: `on("accountChange", cb)`,
 `on("networkChange", cb)` (callback gets a `NetworkConfiguration`), plus
@@ -197,15 +216,17 @@ In addition to all BaseProvider reads: `request(method, params)`,
 
 - **Undecoded hex:** `AssetInfo`, `AccountState`, `InteractionReceipt.fuel_used`,
   `InteractionInfo` fields, wait-time, and tesseract fields come back as **raw
-  `0x` hex strings** — decode with `hexToBN`/`BigInt` yourself. Only balances,
+  `0x` hex strings**; decode with `hexToBN`/`BigInt` yourself. Only balances,
   counts, TDU amounts, fuel estimate, statuses are pre-decoded.
 - **`getFilterChanges` returns `null`** (not `[]`, not throw) when nothing
   changed.
 - **Errors** are thrown as `CustomError` with `.code` (`ErrorCode`), `.reason`,
   `.params`. Account-not-found style errors have `message`/`reason ===
-  "account not found"` — catch and treat as "not on chain yet" (see
+  "account not found"`; catch and treat as "not on chain yet" (see
   `patterns.md`).
-- **`JsonRpcProvider` won't subscribe** — it only POSTs. Use `WebsocketProvider`
+- **`JsonRpcProvider` won't subscribe**; it only POSTs. Use `WebsocketProvider`
   (or a raw `websocket` client) for live streams.
 - `getAccountMetaInfo(id)` throws for an account that has never appeared on
-  chain — use it to detect whether a primary needs registering.
+  chain; use it to detect whether a primary needs registering. Devnet answers
+  `"account not found"` for every account that predates the 11 September 2026
+  reset, including previously funded faucet accounts.
