@@ -1,22 +1,25 @@
 # Wallets, signers, keys (js-moi-wallet / signer / hdnode / bip39)
 
-Verified against `src.ts/` of each package (v0.7.1). Signing curve is
+Verified against `src.ts/` of each package (v0.9.0-rc2). Nothing changed in
+HDNode, bip39 or the keystore code since 0.7.1; the 0.9.0 additions are the
+fee-payer hooks on `signInteraction`/`sendInteraction`, the new
+`signRawInteractionObject`, and the exported serializers. Signing curve is
 **secp256k1**; message pre-hash is **blake2b (32-byte digest)**; default MOI
 derivation path is **`m/44'/6174'/0'/0/0`** (`MOI_DERIVATION_PATH` in
 js-moi-constants).
 
 ## Wallet (the account you sign with)
 
-`class Wallet extends Signer`. Construct it from a mnemonic (or, since 0.7.1, a
-keystore), connect a provider, sign & send. Advanced: `new Wallet(hdNode,
+`class Wallet extends Signer`. Construct it from a mnemonic (or a keystore), connect a provider, sign & send. Advanced: `new Wallet(hdNode,
 curve, options?: WalletOption)` for direct construction.
 
 ```js
+// Alternatives: pick ONE way to build `wallet` (do not paste all of these as-is).
 const wallet = await Wallet.fromMnemonic(mnemonic);        // async! default path
-const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/0'/0/3"); // custom path
-const wallet = Wallet.fromMnemonicSync(mnemonic, path?);   // sync variant
-const wallet = await Wallet.createRandom();                // 16 random bytes → mnemonic
-const wallet = Wallet.createRandomSync();
+// const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/0'/0/3"); // custom path
+// const wallet = Wallet.fromMnemonicSync(mnemonic, path?);   // sync variant (`path?` = optional)
+// const wallet = await Wallet.createRandom();                // 16 random bytes → mnemonic
+// const wallet = Wallet.createRandomSync();
 wallet.connect(provider);
 const address = String(await wallet.getIdentifier());      // 0x… 32-byte id
 ```
@@ -27,11 +30,11 @@ const address = String(await wallet.getIdentifier());      // 0x… 32-byte id
 | `fromMnemonicSync` | `(mnemonic, path?, wordlist?) → Wallet` | sync |
 | `createRandom` | `async () → Wallet` | async |
 | `createRandomSync` | `() → Wallet` | sync |
-| `fromKeystore` | `(keystore: string \| Keystore, password, options?: WalletOption) → Wallet` | sync; **new in 0.7.1** (see Keystores below) |
+| `fromKeystore` | `(keystore: string \| Keystore, password, options?: WalletOption) → Wallet` | sync (see Keystores below) |
 | `deriveKeys` | `(key: Buffer, curve?) → { privKey, pubKey }` | hex; pubKey compressed |
 | `deriveAccountKey` | `async (mnemonic, path?, wordlist?) → { privKey, pubKey }` | keypair without a Wallet |
 
-> **`Wallet.fromPrivateKey` does NOT exist** (in any 0.7.x). To load a raw key,
+> **`Wallet.fromPrivateKey` does NOT exist** (still true in 0.9.0-rc2). To load a raw key,
 > go through `HDNode.fromPrivateKey(buf)` + `new Wallet(hdNode, CURVE.SECP256K1,
 > options?)`. The `CURVE` enum (`{ SECP256K1: "secp256k1" }`) is exported.
 
@@ -41,9 +44,9 @@ NOT check initialization; `identifier` (`Promise<Identifier>`) fails with a
 `TypeError` (private-field access), not `NOT_INITIALIZED`, on an uninitialized
 wallet, while `keyId` (`Promise<number>`) never touches the vault and simply
 resolves `undefined`. (In practice the uninitialized state is unreachable via
-the public API — the constructor either fully initializes or throws.)
+the public API ; the constructor either fully initializes or throws.)
 
-## Keystores (new in 0.7.1)
+## Keystores
 
 ```js
 const keystore = wallet.generateKeystore("my-password");        // sync → Keystore
@@ -58,7 +61,7 @@ const restored = Wallet.fromKeystore(fs.readFileSync("wallet.json", "utf8"), "my
   as `keystore.id` (Web3 Secret Storage style).
 - **`Wallet.fromKeystore(keystore, password, options?)`** decrypts and, when
   `keystore.id` is present, verifies the identifier derived from the decrypted
-  key (using `options?.subAccountId ?? 0`) matches it — wrong password or
+  key (using `options?.subAccountId ?? 0`) matches it ; wrong password or
   tampering throws; keystores without an `id` (external tools) skip the check.
   **`options.subAccountId` must match the value in effect at export time** or
   verification fails.
@@ -81,8 +84,13 @@ Instance methods:
 | `getSubAccountId()` / `setSubAccountId(id)` | `→ number` / `→ void` | the identifier **variant**; changing it changes the derived address |
 | `getPublicKey()` | `→ Hex` | current key's pubkey |
 | `sign(message, keyId, sigAlgo)` | `async → string` | ECDSA sign; returns hex `Signature.serialize()` |
-| `signInteraction(ixObject, _sigAlgo)` | `async → InteractionRequest` | POLO-serializes + signs; returns `{ ix_args, signatures }`. The `_sigAlgo` param is **ignored** — always ecdsa_secp256k1. Throws if `ixObject.sender.key_id` isn't a registered key |
+| `signInteraction(ixObject, _sigAlgo, participantSignatures?)` | `async → InteractionRequest` | POLO-serializes + signs; returns `{ ix_args, signatures }`. The `_sigAlgo` param is **ignored**, always ecdsa_secp256k1. Throws if `ixObject.sender.key_id` isn't a registered key. **0.9.0:** if `ixObject.payer` is set and non-zero it must be a participant id (`INVALID_ARGUMENT` "Payer must be a participant account…"), and `participantSignatures` (the payer's) are appended after the wallet's own. Errors now read `Failed to sign interaction: <cause>` |
+| `signRawInteractionObject(ixObject, _sigAlgo)` | `async → Signature[]` | **new in 0.9.0.** Signs with every registered key and returns raw `{ id, key_id, signature }` entries without serializing; no payer check, no sender-key check. This is what a **fee payer** calls on the sender's interaction object, then hands back as `participantSignatures` (see `interactions.md`) |
 | Multisig | `addKey(keyId, publicKey, privateKey)`, `setKeyId(keyId)`, `getKeys()`, `removeKey(keyId)` | multiple keys per participant; `signInteraction` signs with every registered key |
+
+Also exported from js-moi-wallet since 0.9.0: `serializeIxObject(ixObject) →
+Uint8Array` and `serializeIxSignatures(signatures) → Uint8Array` (the POLO
+serializers `signInteraction` uses), handy for hashing exactly what was signed.
 
 **Sub-accounts:** to act as inherited sub-account *n*, `wallet.setSubAccountId(n)`
 before deriving the identifier / sending. Index 0 (or unset) = the primary.
@@ -97,13 +105,13 @@ const subId = String(await wallet.getIdentifier());  // primary[0..28) + 0x00000
 
 ## Signer (the base class)
 
-`abstract class Signer` — `Wallet` implements it. You interact with a `Signer`
+`abstract class Signer` ; `Wallet` implements it. You interact with a `Signer`
 anywhere the SDK takes one (`getLogicDriver(id, signer)`,
 `new MAS0AssetLogic(id, signer)`, builders). Constructor: `(provider?)`.
 
 Abstract (implemented by Wallet): `connect(provider)`, `getKeyId()`,
 `getIdentifier()`, `sign(message, keyId, sigAlgo)`, `isInitialized()`,
-`signInteraction(ixObject, sigAlgo)`. Also public on the base:
+`signInteraction(ixObject, sigAlgo, participantSignatures?)`. Also public on the base:
 `signer.provider` (optional field), `signer.signingAlgorithms`
 (`{ ecdsa_secp256k1 }`), and `prepareInteraction(method, ixObject)` (fills
 sender/nonce and validates before a call/send).
@@ -116,10 +124,10 @@ Concrete on the base:
 | `getNonce(options?)` | `async → number\|bigint` | no options → `getPendingInteractionCount`; with options → `getInteractionCount` |
 | `call(ixObject)` | `async → InteractionCallResponse` | read-only via provider |
 | `estimateFuel(ixObject)` | `async → number\|bigint` | |
-| `sendInteraction(ixObject)` | `async → InteractionResponse` | prepares sender/sequence, signs (ecdsa_secp256k1), broadcasts — the main "sign & send" entry |
+| `sendInteraction(ixObject, participantSignatures?)` | `async → InteractionResponse` | prepares sender/sequence, signs (ecdsa_secp256k1), broadcasts: the main "sign & send" entry. **0.9.0:** when `ixObject.payer` is non-zero it first requires a matching entry in `participantSignatures` (`checkSignature`), else throws `MISSING_ARGUMENT` "Payer signature is missing." |
 | `verify(message, signature, publicKey)` | `→ boolean` | ECDSA verify |
 
-> There is **no `getAddress()`** — use `getIdentifier()` (returns an
+> There is **no `getAddress()`**; use `getIdentifier()` (returns an
 > `Identifier`; `String(...)` for the hex).
 
 Signature scheme classes (`ECDSA_S256`, `Signature`) are internal (not
@@ -135,28 +143,31 @@ it only for custom derivation.
 const master = HDNode.fromSeed(seedBuffer);        // does NOT auto-derive a path
 const node   = master.derivePath("m/44'/6174'/0'/0/0");
 const child  = node.deriveChild(index);
-const pub  = node.publicKey();   // Buffer — METHOD, not a property
-const priv = node.privateKey();  // Buffer — throws PROPERTY_NOT_DEFINED if absent
+const pub  = node.publicKey();   // Buffer ; METHOD, not a property
+const priv = node.privateKey();  // Buffer ; throws PROPERTY_NOT_DEFINED if absent
 node.getExtendedPrivateKey(); node.getExtendedPublicKey();
 HDNode.fromExtendedKey(xprv/xpub);
-HDNode.fromPrivateKey(privKeyBuffer);  // new in 0.7.1 — raw 32-byte key, zero
-                                       // chain code: can sign, can't derive children
+HDNode.fromPrivateKey(privKeyBuffer);  // raw 32-byte key, all-zero chain code:
+                                       // can sign. deriveChild runs but derives from
+                                       // the zero chain code, so do not use it for
+                                       // account derivation
 ```
 
 > Gotcha: `publicKey()` / `privateKey()` are **method calls** returning
 > **`Buffer`**, not fields. The default path constant lives in js-moi-constants,
-> not here — `fromSeed` returns the master node.
+> not here ; `fromSeed` returns the master node.
 
 ## bip39 (js-moi-bip39)
 
 ```js
 const mnemonic = generateMnemonic();                    // strength 128 → 12 words
 // full: generateMnemonic(strength?, rng?, wordlist?)
-validateMnemonic(mnemonic, wordlist?);                  // boolean
-const seed = await mnemonicToSeed(mnemonic, password?); // 64-byte Buffer (async)
-const seed = mnemonicToSeedSync(mnemonic, password?);   // sync
-const ent  = mnemonicToEntropy(mnemonic, wordlist?);    // hex string
-const mn   = entropyToMnemonic(entropyHexOrBuffer, wordlist?);
+validateMnemonic(mnemonic /*, wordlist? */);            // boolean
+// Alternatives for the seed (`seed` is declared once; optional arguments are in comments):
+const seed = await mnemonicToSeed(mnemonic /*, password? */); // 64-byte Buffer (async)
+// const seed = mnemonicToSeedSync(mnemonic /*, password? */);   // sync
+const ent  = mnemonicToEntropy(mnemonic /*, wordlist? */);    // hex string
+const mn   = entropyToMnemonic(entropyHexOrBuffer /*, wordlist? */);
 getDefaultWordlist();                                   // "english"
 ```
 
@@ -165,6 +176,20 @@ portuguese, czech, chinese_simplified, chinese_traditional` + aliases `EN`,
 `JA`) and `_default` (english). Gotchas: `mnemonicToSeed`/`Sync` take **no**
 wordlist (only mnemonic + password); wordlist defaults to English; there is
 **no `setDefaultWordlist`**.
+
+## Sponsoring fuel for someone else (fee payer)
+
+```js
+// sender side: build the object with the payer named, so sequence is fixed
+const ctx = driver.routines.DoThing(x);
+const ixObject = await ctx.ixData({ payer: payerId, fuel_limit: 60_000 });
+// payer side: sign the very same object
+const sigs = await payerWallet.signRawInteractionObject(ixObject, payerWallet.signingAlgorithms.ecdsa_secp256k1);
+// sender side again: send with both
+const resp = await ctx.send({ payer: payerId, fuel_limit: 60_000, sequence: ixObject.sender.sequence, participantSignatures: sigs });
+```
+
+rc3 renames the option/field `payer` to `fee_payer` (`interactions.md`).
 
 ## Typical setup helper
 

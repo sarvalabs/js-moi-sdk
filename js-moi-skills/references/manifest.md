@@ -1,10 +1,11 @@
-# js-moi-manifest — calldata & manifest (de)coding
+# js-moi-manifest: calldata & manifest (de)coding
 
-Verified against `packages/js-moi-manifest/src.ts/` (v0.7.1). This package does
-the POLO encode/decode between JS values and the MOI wire format, driven by a
-logic's **manifest** (its ABI). The logic driver uses it under the hood; reach
+Verified against `packages/js-moi-manifest/src.ts/` (v0.9.0-rc2). This package
+does the POLO encode/decode between JS values and the MOI wire format, driven by
+a logic's **manifest** (its ABI). The logic driver uses it under the hood; reach
 for `ManifestCoder` directly when you build raw interactions or decode
-events/outputs yourself.
+events/outputs yourself. Nothing in `ManifestCoder` or `Schema` changed between
+0.7.1 and 0.9.0-rc2; the only change is the state-kind renaming at the bottom.
 
 Exports: `ManifestCoder`, `ManifestCoderFormat`, `ContextStateMatrix` /
 `ContextStateKind`, `ElementDescriptor`, `Schema` (+ `isPrimitiveType`,
@@ -16,8 +17,8 @@ Exports: `ManifestCoder`, `ManifestCoderFormat`, `ContextStateMatrix` /
 const coder = new ManifestCoder(manifest);   // manifest = decoded JSON Manifest object
 ```
 
-Only one constructor form in 0.7.x: it takes a decoded JSON manifest object
-(from `provider.getLogicManifest(id, "JSON")` or a `.json` file). No
+Only one constructor form: it takes a decoded JSON manifest object (from
+`provider.getLogicManifest(id, "JSON")` or a `.json` file). No
 `(elements, classDefs)` overload.
 
 ### Instance methods
@@ -50,19 +51,20 @@ YAML view).
 
 ## The manifest shape (`LogicManifest` namespace)
 
-```ts
+```text
 Manifest { syntax: number; engine: { kind, flags[], version? }; kind: "logic"|"asset"; elements: Element[] }
 Element<K> { ptr: number; kind: string; deps?: number[]; data: K }
 ```
 
-(Real manifests also carry `engine.version`, even though the TS type omits it.)
+(Real manifests also carry `engine.version`, even though the TS type omits it.
+Coco 0.9.3 at PISA target 0.8.2 still writes `engine.version: 0.8.0`.)
 
 `element.kind` selects `data`:
 
 | `kind` | `data` | Notes |
 |---|---|---|
-| `"state"` | `{ mode: "logic"\|"actor"; fields: TypeField[] }` | `logic`=persistent, `actor`=ephemeral |
-| `"literal"` | `{ type, value }` | constants — the kind string is `"literal"`, NOT `"constant"` |
+| `"state"` | `{ mode: "logic"\|"actor"; fields: TypeField[] }` | `logic` = logic state (shared), `actor` = actor state (per participant) |
+| `"literal"` | `{ type, value }` | constants; the kind string is `"literal"`, NOT `"constant"` |
 | `"typedef"` | `string` | |
 | `"class"` | `{ name; fields?: TypeField[]; methods?: MethodField[] }` | |
 | `"method"` | `{ name; class; mutable; accepts?; returns?; executes; catches? }` | |
@@ -78,8 +80,12 @@ TypeField { slot: number; label: string; type: string }   // slot = positional i
 ```
 
 - `kind` maps to `OpType` (`invoke→LOGIC_INVOKE`, `enlist→LOGIC_ENLIST`,
-  `deploy→LOGIC_DEPLOY`).
+  `deploy→LOGIC_DEPLOY`). Coco 0.9.2 and later no longer compile `enlist`
+  endpoints, so manifests from a current compiler contain only `invoke` and
+  `deploy` routines; the SDK still accepts `enlist` for older manifests.
 - `mode`: `dynamic` may mutate (`.send()`), `static` is read-only (`.call()`).
+- `LogicManifest.StateMode` (type-only enum) was renamed in 0.8.0 to
+  `LOGIC = "logic"`, `ACTOR = "actor"` (was `STATIC`/`DYNAMIC`).
 
 ## The MOI / Coco type grammar (`type` strings)
 
@@ -94,13 +100,13 @@ POLO wire mapping: `bool→bool`; `bytes`/`identifier`→`bytes`; `string→stri
 
 Composite grammar:
 
-- **Array**: `[]T` (or `[N]T`) — e.g. `[]u64`, `[]bytes`, `[][]identifier`.
-- **Map**: `map[K]V` — e.g. `map[u64]string`, `map[identifier]u256`.
-- **Class**: class types are keyed **`class.<Name>`** (e.g. `class.Token`) —
+- **Array**: `[]T` (or `[N]T`), e.g. `[]u64`, `[]bytes`, `[][]identifier`.
+- **Map**: `map[K]V`, e.g. `map[u64]string`, `map[identifier]u256`.
+- **Class**: class types are keyed **`class.<Name>`** (e.g. `class.Token`);
   `ElementDescriptor` registers class defs under that prefixed key, and
   `isClass(type, classDefs)` expects it; a bare class name won't resolve.
 
-> Note: `address` is **not** in the primitive set — addresses travel as
+> Note: `address` is **not** in the primitive set; addresses travel as
 > `identifier`/`bytes` on the wire. A raw `address` type string never resolves:
 > `Schema.parseDataType` only handles primitives, arrays, maps, and
 > `class.`-prefixed class defs, and throws `Unsupported data type` for
@@ -125,12 +131,18 @@ static `PISA_*_SCHEMA` constants for (de)serializing the manifest and results
 (e.g. `PISA_RESULT_SCHEMA = { outputs: bytes, error: bytes }`,
 `PISA_EXCEPTION_SCHEMA`). You rarely call these directly.
 
-`ContextStateMatrix` maps declared state: `ContextStateKind` `{ PersistentState=0,
-EphemeralState=1 }`; `.persistent()`, `.ephemeral()`, `.get(kind)`.
+### ContextStateMatrix (renamed in 0.8.0)
+
+`ContextStateMatrix` maps declared state. **`ContextStateKind` is now
+`{ LogicState = 0, ActorState = 1 }`** (was `PersistentState`/`EphemeralState`),
+and the probe methods are **`.logic()`** and **`.actor()`** (were
+`.persistent()`/`.ephemeral()`), plus `.get(kind)` for the element pointer
+(`context-state-matrix.ts`). The manifest wire format did not change: `mode:
+"logic"` still maps to `LogicState`, `mode: "actor"` to `ActorState`.
 
 ## When to use ManifestCoder directly
 
-- Building a **raw** interaction (no driver) — encode calldata with
+- Building a **raw** interaction (no driver): encode calldata with
   `encodeArguments`, then hand it to a LOGIC_INVOKE payload (see
   `interactions.md`).
 - Decoding a **static** endpoint's raw output, or an event log's `data`, outside

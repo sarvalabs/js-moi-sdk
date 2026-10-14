@@ -1,38 +1,44 @@
 # Account-to-account swap via lockup + release
 
 MOI Builders Webinar, Session 4. A trust-minimized two-party swap using **native
-MAS0 `lockup` / `release`** — no custom Coco contract. Each party locks their
+MAS0 `lockup` / `release`**, no custom Coco contract. APIs checked against
+js-moi-sdk v0.9.0-rc2 (the MAS0 lockup/release/transfer signatures and the asset
+driver's auto-unwrapped static routines are unchanged since 0.7.1). Each party locks their
 side as an irrevocable on-chain offer to the counterparty, then each claims the
 other's lock. Needs **two funded devnet wallets** (Alice, Bob).
 
 **What this demonstrates**
-- `MAS0AssetLogic(assetId, wallet).lockup(beneficiary, amount).send()` — lock
+- `MAS0AssetLogic(assetId, wallet).lockup(beneficiary, amount).send()`: lock
   funds *for* a beneficiary; the locker cannot reclaim, only the beneficiary can
   pull.
-- `.release(benefactor, beneficiary, amount).send()` — the beneficiary claims
-  what was locked for them (signature-gated: verified on devnet that nobody else
-  can move locked funds).
-- `.transfer(beneficiary, amount)` — direct MAS0 transfer for comparison.
-- `getAssetDriver(assetId, signer).routines.BalanceOf(address)` — asset-driver
-  read; note asset-driver routines resolve the result **directly** (`{ output,
-  error }`), no `.call()` chaining.
-- Two wallets sharing the devnet faucet path `m/44'/6174'/7020'/0/0`.
+- `.release(benefactor, beneficiary, amount).send()`: the beneficiary claims
+  what was locked for them (signature-gated: verified on devnet with 0.7.1 that
+  nobody else can move locked funds).
+- `.transfer(beneficiary, amount)`: direct MAS0 transfer for comparison.
+- `getAssetDriver(assetId, signer).routines.BalanceOf(address)`: asset-driver
+  read; asset-driver routines execute themselves and a `static` one resolves
+  **directly** to `{ output, error }`, no `.call()` chaining (`asset-driver.ts`,
+  `unwrap()`).
+- Two mnemonics (`VITE_ALICE_MNEMONIC`, `VITE_BOB_MNEMONIC`), both at index 7020
+  (`m/44'/6174'/7020'/0/0`).
 
 > **Reaching past the public API:** `getLockups` below calls
 > `provider.execute('moi.Lockups', …)` and `provider.processResponse(…)`. Those
 > members are `protected` in the SDK and `moi.Lockups` is not a documented RPC
-> method — this works at runtime on devnet but is unsupported/typed-private. Treat
-> it as a devnet convenience, not a stable API.
+> method; it worked at runtime on devnet in 0.7.1 and is unsupported/typed-
+> private. Treat it as a devnet convenience, not a stable API, and expect it to
+> need re-checking after each node upgrade.
 
-## `logic/swap.js` — the swap primitives
+## `logic/swap.js` ; the swap primitives
 
 ```js
 // Browser-safe: imported by both the CLI and the UI. Keep dotenv/process.env out.
 import { MAS0AssetLogic, getAssetDriver } from 'js-moi-sdk'
 
-async function sendIx(label, ixPromise) {
-  const ix = await ixPromise.send()
-  await ix.result()
+async function sendIx(label, ixContext) {
+  const ix = await ixContext.send({ fuel_limit: 100_000 })   // fuel_price defaults to 50
+  const receipt = await ix.wait(60)
+  if (receipt.status !== 0) throw new Error(`${label} failed, status ${receipt.status}`)
   console.log(`  ✓ ${label}  hash=${ix.hash}`)
   return ix.hash
 }
@@ -59,7 +65,7 @@ export async function claim(assetId, wallet, benefactor, selfAddress, amount) {
   await release(assetId, wallet, benefactor, selfAddress, amount)
   const after = await getAssetBalance(assetId, selfAddress, wallet)
   if (after - before < BigInt(amount)) {
-    throw new Error(`Nothing to claim — counterparty hasn't locked ${amount} for you yet.`)
+    throw new Error(`Nothing to claim ; counterparty hasn't locked ${amount} for you yet.`)
   }
   return after
 }
@@ -84,7 +90,7 @@ export async function getAssetBalance(assetId, address, signer) {
   return BigInt(output?.balance ?? 0)
 }
 
-// Devnet convenience — reaches past the public provider API (see note above).
+// Devnet convenience ; reaches past the public provider API (see note above).
 export async function getLockups(provider, accountId) {
   const response = await provider.execute('moi.Lockups', {
     id: accountId, options: { tesseract_number: -1 },
@@ -104,17 +110,17 @@ export async function hasLockedForBeneficiary(provider, benefactor, beneficiary,
 }
 ```
 
-## `logic/wallets.js` — two wallets, faucet path
+## `logic/wallets.js` ; two wallets, faucet path
 
 ```js
 import 'dotenv/config'
 import { VoyageProvider, Wallet } from 'js-moi-sdk'
 
-const DEFAULT_PATH = "m/44'/6174'/7020'/0/0"   // Voyage faucet path — both demo wallets
+const DEFAULT_PATH = "m/44'/6174'/7020'/0/0"   // Voyage faucet path ; both demo wallets
 
 export function env(name) {
   const value = process.env[name]
-  if (!value) throw new Error(`${name} is not set — copy .env.example to .env`)
+  if (!value) throw new Error(`${name} is not set ; copy .env.example to .env`)
   return value
 }
 export function optionalEnv(name, fallback = '') { return process.env[name] ?? fallback }
@@ -136,28 +142,30 @@ export async function loadBothWallets() {
 }
 ```
 
-## `logic/tokens.js` — deploy + mint helpers
+## `logic/tokens.js` ; deploy + mint helpers
 
 ```js
 import { MAS0AssetLogic } from 'js-moi-sdk'
 
 export async function deployAsset(wallet, symbol, supply, manager) {
-  const ix = await MAS0AssetLogic.create(wallet, symbol, supply, manager, true).send()
-  const [{ asset_id }] = await ix.result()
+  // (signer, symbol, max_supply, manager, enableEvents, decimals?) + bundled 10 KMOI storage fund
+  const ix = await MAS0AssetLogic.create(wallet, symbol, supply, manager, true, 0).send({ fuel_limit: 200_000 })
+  if ((await ix.wait(120)).status !== 0) throw new Error(`${symbol} create failed`)
+  const [{ asset_id }] = await ix.result()                  // op 0 = create, op 1 = funding
   console.log(`  ✓ Deployed ${symbol}  asset_id=${asset_id}  hash=${ix.hash}`)
   return asset_id
 }
 
 export async function mintAsset(assetId, wallet, beneficiary, amount) {
   const asset = new MAS0AssetLogic(assetId, wallet)
-  const ix = await asset.mint(beneficiary, amount).send()
-  await ix.result()
+  const ix = await asset.mint(beneficiary, amount).send({ fuel_limit: 100_000 })
+  if ((await ix.wait(60)).status !== 0) throw new Error('mint failed')
   console.log(`  ✓ Mint ${amount} → ${beneficiary.slice(0, 10)}…  hash=${ix.hash}`)
   return ix.hash
 }
 ```
 
-## The full swap — `extras/swap-cli.js` (core)
+## The full swap ; `extras/swap-cli.js` (core)
 
 ```js
 import { env, loadBothWallets } from '../logic/wallets.js'
@@ -188,6 +196,9 @@ runFullSwap().catch((err) => { console.error('Swap failed:', err.message ?? err)
 The full CLI also exposes individual steps (`lock-alice`, `lock-bob`,
 `claim-alice`, `claim-bob`, `balances`) plus a `setup.js` that deploys the TKA/TKB
 test assets and an `extras/mint-tkb-to-bob.js` for funding Bob after the faucet.
+Both wallets must exist on devnet and hold KMOI (each create costs fuel plus the
+10 KMOI storage fund; each lockup/release just fuel). Swapping **KMOI** itself
+works the same way through `new MASNAssetLogic(wallet).lockup(...)`.
 
 ## Swap flow, in one line
 
