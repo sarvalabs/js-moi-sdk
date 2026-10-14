@@ -35,6 +35,9 @@ so you chain `.send(option?)` / `.call(option?)` / `.estimateFuel(option?)`
 callsite, calldata }` with participants pre-filled; you can still pass extra
 participants / fuel in the `.send()` option.
 
+The signer's account must exist on chain. For an unregistered wallet, read its
+balance with `provider.getBalance` instead (`references/patterns.md` section 9).
+
 ```ts
 await new MAS0AssetLogic(assetId, wallet).transfer(to, 100n).send({ fuel_limit: 100_000 });
 await new MAS0AssetLogic(assetId, wallet).mint(to, 1_000_000n).send({ fuel_limit: 100_000 });
@@ -52,7 +55,7 @@ const resp = await ix.send({ fuel_limit: 200_000 });
 const [{ asset_id }] = await resp.result();          // op 0 = the create
 ```
 
-- Signature (`mas0-asset.ts:162`): `create(signer, symbol, supply: number |
+- Signature (`mas0-asset.ts:41`): `create(signer, symbol, supply: number |
   bigint, manager, enableEvents, decimals?: number, option?: RoutineOption)`.
   `decimals` is validated (integer, 0 to 18) and written to the payload only when
   given; the chain's default applies otherwise.
@@ -167,7 +170,7 @@ before using them.
 ## AssetFactory (logic-backed / MASX assets)
 
 `AssetFactory.create(signer, symbol, supply, manager, enableEvents, manifest,
-callsite?, ...calldata)` (`asset-factory.ts:29`) builds an `ASSET_CREATE`
+callsite?, ...calldata)` (`asset-factory.ts:18`) builds an `ASSET_CREATE`
 context with `standard: AssetStandard.MASX` and the POLO-encoded manifest in
 `logic_payload`.
 

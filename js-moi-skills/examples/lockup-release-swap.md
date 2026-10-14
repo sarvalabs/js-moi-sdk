@@ -19,7 +19,8 @@ other's lock. Needs **two funded devnet wallets** (Alice, Bob).
   read; asset-driver routines execute themselves and a `static` one resolves
   **directly** to `{ output, error }`, no `.call()` chaining (`asset-driver.ts`,
   `unwrap()`).
-- Two wallets sharing the devnet faucet path `m/44'/6174'/7020'/0/0`.
+- Two mnemonics (`VITE_ALICE_MNEMONIC`, `VITE_BOB_MNEMONIC`), both at index 7020
+  (`m/44'/6174'/7020'/0/0`).
 
 > **Reaching past the public API:** `getLockups` below calls
 > `provider.execute('moi.Lockups', …)` and `provider.processResponse(…)`. Those

@@ -87,7 +87,7 @@ Gotchas); you get raw hex strings.
 
 ### Overloads
 
-```ts
+```text
 // by account id  |  or by tesseract (via options.tesseract_hash/_number)
 getTesseract(id: string, with_interactions: boolean, with_commit_info: boolean, options?): Promise<Tesseract>
 getTesseract(with_interactions: boolean, with_commit_info: boolean, options: Options): Promise<Tesseract>
@@ -95,7 +95,7 @@ getTesseract(with_interactions: boolean, with_commit_info: boolean, options: Opt
 await provider.getTesseract(true, true, { tesseract_hash: tsHash });
 ```
 
-```ts
+```text
 getInteractionByTesseract(address: string, options?, ix_index = 1)
 getInteractionByTesseract(options: Options, ix_index = 1)
 ```

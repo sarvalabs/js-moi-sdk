@@ -81,6 +81,19 @@ need all.
 > path (`7020`) and `VoyageProvider("devnet")`. Devnet was reset on 11
 > September 2026: accounts from before then no longer exist.
 
+## Setting up a project
+
+- `npm install js-moi-sdk@0.9.0-rc2`, plus `dotenv` if you load a `.env` file
+  (it is not a js-moi-sdk dependency).
+- Set `"type": "module"` in `package.json` (the snippets use `import`).
+- Use Node 20.10 or later: the examples load manifests with import attributes
+  (`import manifest from "./x.json" with { type: "json" }`).
+- The examples import companion files that are not shipped with this skill
+  (compiled Coco manifests, a `.env.example`). Compile the Coco source to JSON
+  first.
+- Any write needs a funded devnet account: register it in MOI Wallet, then use
+  the faucet at voyage.moi.technology.
+
 ## The 60-second flow
 
 > **On Voyage devnet** (the MOI Builders default), swap steps 1 and 2 for
@@ -127,8 +140,8 @@ const [{ asset_id }] = await created.result();
 
 - **`Wallet.fromMnemonic` / `createRandom` / `mnemonicToSeed` are async.** Sync
   variants exist (`fromMnemonicSync`, …). Default derivation path is
-  `m/44'/6174'/0'/0/0` (`MOI_DERIVATION_PATH`), NOT `.../0/1`; apps that want a
-  different account must pass the path explicitly.
+  `m/44'/6174'/0'/0/0` (`MOI_DERIVATION_PATH`); apps that want a different
+  account must pass the path explicitly.
 - **Keystores:** `wallet.generateKeystore(password)` and
   `Wallet.fromKeystore(keystore, password, options?)` (plus
   `HDNode.fromPrivateKey`). `Wallet.fromPrivateKey` does NOT exist. Only the
@@ -140,8 +153,8 @@ const [{ asset_id }] = await created.result();
   Amounts are in the asset's smallest unit (`formatAmount`/`parseAmount`).
   `nowNs = BigInt(Date.now()) * 1_000_000n`.
 - **Fuel is paid in KMOI and the chain reserves `fuel_limit × fuel_price` up
-  front** (`fuel_price` defaults to **50**, limit to 100000). A price of 1 is
-  rejected as underpriced. Cap the limit; see `references/patterns.md` §1.
+  front** (`fuel_price` defaults to **50**, a default and not an SDK floor; limit to
+  100000). The node rejects lower prices as underpriced. Cap the limit; see `references/patterns.md` §1.
 - **Every deploy/create moves 10 KMOI to the new account** (`DEFAULT_STORAGE_FUND`)
   in the same interaction, so the sender needs fuel **plus** 10 KMOI, the
   receipt has two `ix_operations`, and `result()[0]` is yours. Override with a

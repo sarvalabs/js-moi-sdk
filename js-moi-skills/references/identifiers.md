@@ -34,7 +34,7 @@ Worked example, the 0.9.0 `KMOI_ASSET_ID`
 
 ## Identifier (base class)
 
-```ts
+```text
 new Identifier(value: Uint8Array | Hex | Identifier)   // must be exactly 32 bytes, else TypeError
 ```
 
@@ -125,8 +125,9 @@ In practice most code passes lowercase `0x…` strings around and only reaches f
 these types to inspect an id. Common ad-hoc helpers (from real apps):
 
 ```js
-// prefix tells you the kind without constructing an Identifier:
-const isAccount = id.startsWith("0x00000000");
+// the kind comes from the id's tag; construct an Identifier to read it:
+const isAccount = new Identifier(id).getKind() === IdentifierKind.Participant;
+// quick prefix checks for the other two kinds:
 const isAsset   = id.startsWith("0x10");
 const isLogic   = id.startsWith("0x20");
 

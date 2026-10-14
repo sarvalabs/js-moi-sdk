@@ -81,7 +81,7 @@ const { output } = await (await driver.routines.GetBalance(addr).call()).result(
 
 ### Send options: `IxOption` (snake_case)
 
-```ts
+```text
 interface IxOption {
   sender?: { id: Hex; sequence: number; key_id: number };
   sequence?: number;                 // nonce override (replace a stuck ix)

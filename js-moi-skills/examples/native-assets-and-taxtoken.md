@@ -8,12 +8,12 @@ checked against js-moi-sdk v0.9.0-rc2.
 **What this demonstrates**
 - `MAS0AssetLogic.create(signer, symbol, supply, manager, enableEvents, decimals?, option?).send()`
   → create; `.result()` yields `[{ asset_id }, fundingResult]`. Verified sig:
-  `mas0-asset.ts:162` (standard MAS0). `decimals` is new in 0.9.0 and sits
+  `mas0-asset.ts:41` (standard MAS0). `decimals` is new in 0.9.0 and sits
   **before** `option`.
 - `new MAS0AssetLogic(asset_id, wallet).mint(beneficiary, amount).send()`.
 - `AssetFactory.create(signer, symbol, supply, manager, enableEvents, manifest,
   callsite, ...calldata).send()` → **MASX** logic-backed asset, running the Coco
-  `Init` deploy routine with calldata. Verified sig: `asset-factory.ts:29`.
+  `Init` deploy routine with calldata. Verified sig: `asset-factory.ts:18`.
   Since 0.8.0 `manifest` is required and `callsite` is required because the
   manifest defines a deploy routine.
 - Both creates bundle a second operation: a **10 KMOI storage-funding transfer**

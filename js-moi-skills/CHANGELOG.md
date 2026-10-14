@@ -12,6 +12,22 @@ on 13 October 2026). Rebuilt by reading every `packages/*/src.ts` file at that
 tag; nothing was taken from the npm docs or from memory. The one-commit rc3
 hotfix (`v0.9.0-rc3`, GitHub only) is described inline wherever it differs.
 
+### Fixed (test-run corrections)
+- Source line references corrected: `mas0-asset.ts:41`, `asset-factory.ts:18`
+  (`assets.md`, `native-assets-and-taxtoken.md`).
+- `wallet-signer.md`: `HDNode.fromPrivateKey` can sign but must not be used for
+  account derivation (all-zero chain code); alternative snippets now commented
+  so they are not pasted as-is.
+- `identifiers.md`: participant check uses `getKind() === IdentifierKind.Participant`.
+- `nft-mint-transfer.md`: `cappedFuel` helper added; the `ParticipantCreate`
+  builder cannot use the Symbol workaround; verification wording tightened.
+- `patterns.md`: duplicate import removed, receipt snippet marked as a sketch.
+- `SKILL.md`: dropped the confusing derivation-path clause; fuel price wording
+  (default 50, not an SDK floor); new "Setting up a project" section.
+- `assets.md`: the signer's account must exist on chain.
+- `lockup-release-swap.md`: names the two mnemonics and index 7020.
+- Pseudo-signature blocks use the `text` fence language.
+
 ### Changed (SDK drift, 0.7.1 → 0.9.0-rc2)
 - `references/utils-constants.md`: new constant values `KMOI_ASSET_ID`
   (`0x1080fffe…`), `DEFAULT_FUEL_PRICE` 50, `DEFAULT_FUEL_LIMIT` 100000,

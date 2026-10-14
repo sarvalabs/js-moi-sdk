@@ -51,7 +51,7 @@ YAML view).
 
 ## The manifest shape (`LogicManifest` namespace)
 
-```ts
+```text
 Manifest { syntax: number; engine: { kind, flags[], version? }; kind: "logic"|"asset"; elements: Element[] }
 Element<K> { ptr: number; kind: string; deps?: number[]; data: K }
 ```

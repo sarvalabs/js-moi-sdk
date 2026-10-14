@@ -17,8 +17,6 @@ interaction. Cap the limit to what the account can actually reserve and fail
 clearly when broke:
 
 ```js
-import { KMOI_ASSET_ID } from "js-moi-sdk";
-
 import { KMOI_ASSET_ID, DEFAULT_FUEL_PRICE, DEFAULT_STORAGE_FUND } from "js-moi-sdk";
 
 export const cappedFuel = async (provider, address, wantFuel, { fuelPrice = DEFAULT_FUEL_PRICE, reserve = 0n } = {}) => {
@@ -38,9 +36,9 @@ export const cappedFuel = async (provider, address, wantFuel, { fuelPrice = DEFA
 Rough guidance: cheap ops ~20000 fuel; heavier logic calls 2 to 8×; deploy can
 need hundreds of thousands to millions. Prefer `.estimateFuel()` when unsure
 (the logic `.send()` auto-estimates if you omit `fuel_limit`), but still cap to
-KMOI. Do not lower `fuel_price` below 50 to save KMOI: current devnet rejects
-that as underpriced (`ErrorCode.INTERACTION_UNDERPRICED` / "interaction
-underpriced").
+KMOI. `DEFAULT_FUEL_PRICE` is 50 (a default, not an SDK floor); the node
+rejects lower prices as underpriced (`ErrorCode.INTERACTION_UNDERPRICED` /
+"interaction underpriced"), so do not lower `fuel_price` to save KMOI.
 
 ## 2. One send in flight per signer (nonce serialization)
 
@@ -64,7 +62,8 @@ higher `fuel_limit`) in the send option.
 ## 3. A receipt does NOT mean success: check status AND op error
 
 ```js
-const resp = await driver.routines.DoThing(...).send({ fuel_limit });
+// Sketch: `driver` is your logic driver; `DoThing` and its arguments are placeholders.
+const resp = await driver.routines.DoThing(/* your arguments */).send({ fuel_limit });
 const receipt = await resp.wait(60);          // seconds; throws on timeout
 // receipt.status: 0 = ok, non-zero = failure (e.g. out-of-fuel)
 if (receipt.status !== 0) throw new Error(`ix failed, status ${receipt.status}`);

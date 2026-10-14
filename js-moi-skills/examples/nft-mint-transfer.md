@@ -166,7 +166,20 @@ accounts from **one mnemonic at two paths** ; owner `m/44'/6174'/7020'/0/0`,
 recipient `m/44'/6174'/7020'/0/1`.
 
 ```js
-import { InteractionContext, OpType, KMOI_ASSET_ID, LockType } from "js-moi-sdk";
+import { InteractionContext, OpType, KMOI_ASSET_ID, LockType, DEFAULT_FUEL_PRICE, DEFAULT_STORAGE_FUND } from "js-moi-sdk";
+
+// Fuel-cap helper, copied from references/patterns.md section 1.
+const cappedFuel = async (provider, address, wantFuel, { fuelPrice = DEFAULT_FUEL_PRICE, reserve = 0n } = {}) => {
+  let kmoi = 0n;                                   // anu
+  try { kmoi = BigInt(String(await provider.getBalance(address, KMOI_ASSET_ID))); }
+  catch { kmoi = 0n; }
+  const spendable = kmoi - BigInt(reserve);        // reserve = storage fund on create/deploy
+  if (spendable <= 0n) throw new Error(`${address} has no KMOI to pay fuel.`);
+  const maxLimit = spendable / BigInt(fuelPrice);
+  const want = BigInt(wantFuel);
+  const fuelLimit = maxLimit < want ? Number(maxLimit) : Number(want);
+  return { fuelLimit, kmoi, capped: maxLimit < want };
+};
 
 async function accountExists(provider, address) {
   try { await provider.getAccountMetaInfo(address); return true; }
@@ -186,7 +199,7 @@ async function ensureRecipientRegistered(provider, ownerWallet, recipientWallet,
     },
     participants: [{ id: KMOI_ASSET_ID, lock_type: LockType.NO_LOCK }],   // also auto-derived; harmless
     signer: ownerWallet,
-  }).send({ fuel_limit: fuelLimit });   // the equivalent builder: new ParticipantCreate(ownerWallet).id(recipient).addKey(pub, 1000).value(KMOI_ASSET_ID, recipient, 0n).build()
+  }).send({ fuel_limit: fuelLimit });   // the ParticipantCreate builder cannot do this: its .value() always emits the "Transfer" callsite, so it has no Symbol workaround
   const receipt = await resp.wait(120);
   if (receipt.status !== 0) throw new Error(`PARTICIPANT_CREATE failed: status ${receipt.status}`);
 }
@@ -229,7 +242,7 @@ wrong path. The API in the references is right; this file records the Voyage
 choices and the five landmines so the demo is reliable the first time.
 
 **Re-verification status (13 October 2026):** every SDK call on this page was
-checked against the v0.9.0-rc2 sources and type-checked against the installed
-`js-moi-sdk@0.9.0-rc2` package; the on-chain run was last performed with 0.7.1
+checked against the v0.9.0-rc2 sources and exercised offline and syntax-checked
+against the installed `js-moi-sdk@0.9.0-rc2` package; the on-chain run was last performed with 0.7.1
 before the September devnet reset. Re-run it with a funded post-reset account
 before relying on the transfer landmines.

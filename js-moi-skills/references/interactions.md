@@ -49,7 +49,7 @@ Verified against `packages/js-moi-utils/src.ts/enums.ts`,
 `InteractionObject` (`js-moi-providers/types/interaction.d.ts`): what
 `.ixData()` builds and `signer.call/estimateFuel/sendInteraction` consume:
 
-```ts
+```text
 InteractionObject {
   sender: { id: Hex; sequence: number; key_id: number };
   payer?: Hex;                         // fee payer; ZERO_ADDRESS applied at serialization. rc3 renames this `fee_payer`

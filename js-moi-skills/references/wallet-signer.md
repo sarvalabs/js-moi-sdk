@@ -14,11 +14,12 @@ js-moi-constants).
 curve, options?: WalletOption)` for direct construction.
 
 ```js
+// Alternatives: pick ONE way to build `wallet` (do not paste all of these as-is).
 const wallet = await Wallet.fromMnemonic(mnemonic);        // async! default path
-const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/0'/0/3"); // custom path
-const wallet = Wallet.fromMnemonicSync(mnemonic, path?);   // sync variant
-const wallet = await Wallet.createRandom();                // 16 random bytes → mnemonic
-const wallet = Wallet.createRandomSync();
+// const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/0'/0/3"); // custom path
+// const wallet = Wallet.fromMnemonicSync(mnemonic, path?);   // sync variant (`path?` = optional)
+// const wallet = await Wallet.createRandom();                // 16 random bytes → mnemonic
+// const wallet = Wallet.createRandomSync();
 wallet.connect(provider);
 const address = String(await wallet.getIdentifier());      // 0x… 32-byte id
 ```
@@ -146,8 +147,10 @@ const pub  = node.publicKey();   // Buffer ; METHOD, not a property
 const priv = node.privateKey();  // Buffer ; throws PROPERTY_NOT_DEFINED if absent
 node.getExtendedPrivateKey(); node.getExtendedPublicKey();
 HDNode.fromExtendedKey(xprv/xpub);
-HDNode.fromPrivateKey(privKeyBuffer);  // raw 32-byte key, zero chain code:
-                                       // can sign, can't derive children
+HDNode.fromPrivateKey(privKeyBuffer);  // raw 32-byte key, all-zero chain code:
+                                       // can sign. deriveChild runs but derives from
+                                       // the zero chain code, so do not use it for
+                                       // account derivation
 ```
 
 > Gotcha: `publicKey()` / `privateKey()` are **method calls** returning
@@ -159,11 +162,12 @@ HDNode.fromPrivateKey(privKeyBuffer);  // raw 32-byte key, zero chain code:
 ```js
 const mnemonic = generateMnemonic();                    // strength 128 → 12 words
 // full: generateMnemonic(strength?, rng?, wordlist?)
-validateMnemonic(mnemonic, wordlist?);                  // boolean
-const seed = await mnemonicToSeed(mnemonic, password?); // 64-byte Buffer (async)
-const seed = mnemonicToSeedSync(mnemonic, password?);   // sync
-const ent  = mnemonicToEntropy(mnemonic, wordlist?);    // hex string
-const mn   = entropyToMnemonic(entropyHexOrBuffer, wordlist?);
+validateMnemonic(mnemonic /*, wordlist? */);            // boolean
+// Alternatives for the seed (`seed` is declared once; optional arguments are in comments):
+const seed = await mnemonicToSeed(mnemonic /*, password? */); // 64-byte Buffer (async)
+// const seed = mnemonicToSeedSync(mnemonic /*, password? */);   // sync
+const ent  = mnemonicToEntropy(mnemonic /*, wordlist? */);    // hex string
+const mn   = entropyToMnemonic(entropyHexOrBuffer /*, wordlist? */);
 getDefaultWordlist();                                   // "english"
 ```
 

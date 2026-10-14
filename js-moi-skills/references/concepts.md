@@ -141,11 +141,11 @@ op type (see `interactions.md`).
 ## Fuel, fee payer and nonces
 
 - **Fuel is paid in KMOI (anu).** `fuel_price` defaults to **`50`**
-  (`DEFAULT_FUEL_PRICE`, raised from 1 in 0.9.0-rc1 to match the node's floor),
+  (`DEFAULT_FUEL_PRICE`, raised from 1 in 0.9.0-rc1; a default, not an SDK floor),
   `fuel_limit` defaults to **`100000`** (`DEFAULT_FUEL_LIMIT`). The chain
   **reserves `fuel_limit × fuel_price`** anu up front and refunds the unused
   part, so that product must be ≤ the payer's KMOI balance even when the op is
-  cheap. A `fuel_price` below the node's floor is rejected as underpriced.
+  cheap. The node rejects a lower `fuel_price` as underpriced.
 - **Fee payer** (new in 0.9.0-rc1): a different account can cover the fuel. The
   sender sets `payer` (rc3: `fee_payer`), the payer signs the same interaction
   object with `signRawInteractionObject`, and both signatures are sent together
