@@ -1,3 +1,6 @@
+.. meta::
+   :description: Create, sign, and send MOI interactions with js-moi-sdk - transfers, asset creation, logic deploy and invoke, with complete API reference and examples.
+
 ============
 Interactions
 ============

@@ -1,3 +1,6 @@
+.. meta::
+   :description: A downloadable SKILL.md package that teaches AI coding agents (Claude Code, Cursor) the js-moi-sdk API surface, including Voyage devnet flows.
+
 ============
 Agent Skill
 ============
@@ -12,8 +15,8 @@ Voyage devnet flows.
 
 --------------------------------------------------------------------------------
 
-Download
---------
+How do I download the skill?
+----------------------------
 
 `js-moi-sdk-skills.zip <https://cdn.moi.technology/js-moi-sdk-skills/js-moi-sdk-skills.zip>`_
 
@@ -29,8 +32,8 @@ The archive contains:
 
 --------------------------------------------------------------------------------
 
-Using the skill
----------------
+How do I use the skill with my coding agent?
+--------------------------------------------
 
 **1. Unzip it into your agent's skills directory.**
 

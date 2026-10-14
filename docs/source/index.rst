@@ -1,3 +1,6 @@
+.. meta::
+   :description: js-moi-sdk is a feature-rich JavaScript/TypeScript library for interacting with the MOI Protocol - providers, signers, wallets, logic, and utilities in one SDK.
+
 =============
 Documentation
 =============

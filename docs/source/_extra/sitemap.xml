@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://js-moi-sdk.docs.moi.technology/</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/getting-started</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/constants</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/providers</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/signer</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/interactions</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/utilities</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/agent-skill</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/contributions</loc></url>
+  <url><loc>https://js-moi-sdk.docs.moi.technology/license-and-copyright</loc></url>
+</urlset>
